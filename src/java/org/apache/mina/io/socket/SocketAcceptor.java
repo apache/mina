@@ -61,6 +61,8 @@ public class SocketAcceptor implements IoAcceptor
     private final Queue registerQueue = new Queue();
 
     private final Queue cancelQueue = new Queue();
+    
+    private int backlog = 50;
 
     private ExceptionMonitor exceptionMonitor = new DefaultExceptionMonitor();
 
@@ -78,21 +80,14 @@ public class SocketAcceptor implements IoAcceptor
     }
 
 
-    public void bind( SocketAddress address, IoHandler handler ) throws IOException
-    {
-        this.bind( address, 50, handler );
-    }
-
-
     /**
      * Binds to the specified <code>address</code> and handles incoming
-     * connections with the specified <code>handler</code>.
+     * connections with the specified <code>handler</code>.  Backlog value
+     * is configured to the value of <code>backlog</code> property.
      *
-     * @param backlog the listen backlog length 
      * @throws IOException if failed to bind
      */
-    public void bind( SocketAddress address, int backlog, IoHandler handler )
-            throws IOException
+    public void bind( SocketAddress address, IoHandler handler ) throws IOException
     {
         if( address == null )
         {
@@ -200,6 +195,26 @@ public class SocketAcceptor implements IoAcceptor
 
             throw request.exception;
         }
+    }
+    
+    /**
+     * Returns the default backlog value which is used when user binds. 
+     */
+    public int getBacklog()
+    {
+        return backlog;
+    }
+    
+    /**
+     * Sets the default backlog value which is used when user binds. 
+     */
+    public void setBacklog( int defaultBacklog )
+    {
+        if( defaultBacklog <= 0 )
+        {
+            throw new IllegalArgumentException( "defaultBacklog: " + defaultBacklog );
+        }
+        this.backlog = defaultBacklog;
     }
 
 
