@@ -5,6 +5,7 @@ package org.apache.mina.registry;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -66,7 +67,7 @@ public class SimpleServiceRegistry implements ServiceRegistry
             throws IOException
     {
         IoAcceptor acceptor = findIoAcceptor( service.getTransportType() );
-        acceptor.bind( new InetSocketAddress( service.getPort() ), ioHandler );
+        acceptor.bind( service.getAddress(), ioHandler );
         startThreadPools();
         services.add( service );
     }
@@ -77,16 +78,7 @@ public class SimpleServiceRegistry implements ServiceRegistry
     {
         ProtocolAcceptor acceptor = findProtocolAcceptor( service
                 .getTransportType() );
-        if( acceptor instanceof VmPipeAcceptor )
-        {
-            acceptor.bind( new VmPipeAddress( service.getPort() ),
-                    protocolProvider );
-        }
-        else
-        {
-            acceptor.bind( new InetSocketAddress( service.getPort() ),
-                    protocolProvider );
-        }
+        acceptor.bind( service.getAddress(), protocolProvider );
         startThreadPools();
         services.add( service );
     }
@@ -97,7 +89,7 @@ public class SimpleServiceRegistry implements ServiceRegistry
                 .getTransportType() );
         try
         {
-            acceptor.unbind( new InetSocketAddress( service.getPort() ) );
+            acceptor.unbind( service.getAddress() );
         }
         catch( Exception e )
         {
@@ -106,7 +98,7 @@ public class SimpleServiceRegistry implements ServiceRegistry
         
         try
         {
-            acceptor.unbind( new VmPipeAddress( service.getPort() ) );
+            acceptor.unbind( service.getAddress() );
         }
         catch( Exception e )
         {
@@ -167,7 +159,23 @@ public class SimpleServiceRegistry implements ServiceRegistry
         while( it.hasNext() )
         {
             Service s = ( Service ) it.next();
-            if( s.getPort() == port )
+            SocketAddress addr = ( SocketAddress ) s.getAddress();
+            int servicePort;
+            
+            if( addr instanceof InetSocketAddress )
+            {
+                servicePort = ( ( InetSocketAddress ) addr ).getPort();
+            }
+            else if( addr instanceof VmPipeAddress )
+            {
+                servicePort = ( ( VmPipeAddress ) addr ).getPort();
+            }
+            else
+            {
+                servicePort = -1; // this cannot happen 
+            }
+            
+            if( servicePort == port )
             {
                 result.add( s );
             }

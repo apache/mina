@@ -19,8 +19,10 @@
 package org.apache.mina.registry;
 
 import java.io.Serializable;
+import java.net.SocketAddress;
 
 import org.apache.mina.common.TransportType;
+import org.apache.mina.protocol.vmpipe.VmPipeAddress;
 
 /**
  * Represents a service that is registered to {@link ServiceRegistry}.
@@ -36,24 +38,31 @@ public class Service implements Serializable, Cloneable
 
     private final TransportType transportType;
 
-    private final int port;
+    private final SocketAddress address;
 
     /**
      * Creates a new instance with the specified protocol name, transport type,
-     * and port number.
+     * and socket address to be bound.
      */
-    public Service( String name, TransportType transportType, int port )
+    public Service( String name, TransportType transportType, SocketAddress address )
     {
         if( name == null )
             throw new NullPointerException( "name" );
         if( transportType == null )
             throw new NullPointerException( "transportType" );
-        if( port < 0 || port > 65535 )
-            throw new IllegalArgumentException( "port: " + port );
+        if( address == null )
+            throw new NullPointerException( "address" );
+
+        if( transportType == TransportType.VM_PIPE &&
+            !( address instanceof VmPipeAddress ) )
+        {
+            throw new IllegalArgumentException(
+                    "VM_PIPE transport type accepts only VmPipeAddress: " + address.getClass() );
+        }
 
         this.name = name;
         this.transportType = transportType;
-        this.port = port;
+        this.address = address;
     }
 
     /**
@@ -73,17 +82,17 @@ public class Service implements Serializable, Cloneable
     }
 
     /**
-     * Returns the port number this service is bound on.
+     * Returns the socket address this service is bound on.
      */
-    public int getPort()
+    public SocketAddress getAddress()
     {
-        return port;
+        return address;
     }
 
     public int hashCode()
     {
         return ( ( name.hashCode() * 37 ) ^ transportType.hashCode() * 37 )
-                ^ port;
+                ^ address.hashCode();
     }
 
     public boolean equals( Object o )
@@ -98,7 +107,7 @@ public class Service implements Serializable, Cloneable
         Service that = ( Service ) o;
         return this.name.equals( that.name )
                 && this.transportType == that.transportType
-                && this.port == that.port;
+                && this.address.equals( that.address );
     }
 
     public Object clone()
@@ -114,6 +123,6 @@ public class Service implements Serializable, Cloneable
     }
     
     public String toString() {
-        return "(" + transportType + ", " + name + ", " + port + ')';
+        return "(" + transportType + ", " + name + ", " + address + ')';
     }
 }
