@@ -18,7 +18,6 @@
  */
 package org.apache.mina.io.socket;
 
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -37,7 +36,6 @@ import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.util.Queue;
-
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).

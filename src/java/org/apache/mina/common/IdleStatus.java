@@ -30,8 +30,8 @@ import org.apache.mina.protocol.ProtocolSession;
  *   <li>{@link #BOTH_IDLE} - Both {@link #READER_IDLE} and {@link #WRITER_IDLE}.</li>
  * </ul>
  * <p>
- * Idle time settings are all disabled by default.  You can enable them all or
- * partly using {@link SessionConfig#setIdleTime(IdleStatus,int)}.
+ * Idle time settings are all disabled by default.  You can enable them
+ * using {@link SessionConfig#setIdleTime(IdleStatus,int)}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
@@ -64,6 +64,14 @@ public class IdleStatus
         this.strValue = strValue;
     }
 
+    /**
+     * Returns the string representation of this status.
+     * <ul>
+     *   <li>{@link #READER_IDLE} - <tt>"reader idle"</tt></li>
+     *   <li>{@link #WRITER_IDLE} - <tt>"writer idle"</tt></li>
+     *   <li>{@link #BOTH_IDLE} - <tt>"both idle"</tt></li>
+     * </ul>
+     */
     public String toString()
     {
         return strValue;

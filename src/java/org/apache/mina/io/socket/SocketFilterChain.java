@@ -5,6 +5,11 @@ import org.apache.mina.io.AbstractIoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.util.Queue;
 
+/**
+ * An {@link IoHandlerFilterChain} for socket transport (TCP/IP).
+ * 
+ * @author The Apache Directory Project
+ */
 class SocketFilterChain extends AbstractIoHandlerFilterChain {
 
     SocketFilterChain()

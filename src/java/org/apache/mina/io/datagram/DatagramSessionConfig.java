@@ -26,6 +26,10 @@ import org.apache.mina.util.BasicSessionConfig;
 
 /**
  * A {@link SessionConfig} for datagram transport (UDP/IP).
+ * You can downcast {@link SessionConfig} instance returned by
+ * {@link IoSession#getConfig()} or {@link ProtocolSession#getConfig()}
+ * if you've created datagram session using {@link DatagramAcceptor} or 
+ * {@link DatagramConnector}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$,

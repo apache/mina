@@ -68,7 +68,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
     /**
      * Creates a new instance.
      * 
-     * @throws IOException
+     * @throws IOException if failed to open a selector.
      */
     public DatagramAcceptor() throws IOException
     {
@@ -182,13 +182,13 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         }
     }
 
-    public void flushSession( DatagramSession session )
+    void flushSession( DatagramSession session )
     {
         scheduleFlush( session );
         selector.wakeup();
     }
 
-    public void closeSession( DatagramSession session )
+    void closeSession( DatagramSession session )
     {
     }
 

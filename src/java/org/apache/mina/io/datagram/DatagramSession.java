@@ -31,7 +31,7 @@ import org.apache.mina.io.IoSession;
 import org.apache.mina.util.Queue;
 
 /**
- * TODO Insert type comment.
+ * An {@link IoSession} for datagram transport (UDP/IP).
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$

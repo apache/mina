@@ -5,6 +5,11 @@ import org.apache.mina.io.AbstractIoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.util.Queue;
 
+/**
+ * An {@link IoHandlerFilterChain} for datagram transport (UDP/IP).
+ * 
+ * @author The Apache Directory Project
+ */
 class DatagramFilterChain extends AbstractIoHandlerFilterChain {
 
     private final DatagramProcessor processor;

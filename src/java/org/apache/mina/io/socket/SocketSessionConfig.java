@@ -22,10 +22,16 @@ import java.net.SocketException;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionConfig;
+import org.apache.mina.io.IoSession;
+import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.util.BasicSessionConfig;
 
 /**
  * A {@link SessionConfig} for socket transport (TCP/IP).
+ * You can downcast {@link SessionConfig} instance returned by
+ * {@link IoSession#getConfig()} or {@link ProtocolSession#getConfig()}
+ * if you've created datagram session using {@link SocketAcceptor} or 
+ * {@link SocketConnector}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$,
