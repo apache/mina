@@ -338,7 +338,16 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                     writeMarkerQueue.pop();
                 }
 
-                ByteBuffer.release( buf );
+                try
+                {
+                    ByteBuffer.release( buf );
+                }
+                catch( IllegalStateException e )
+                {
+                    session.getFilterManager().fireExceptionCaught( session,
+                            e );
+                }
+
                 session.getFilterManager().fireDataWritten( session, marker );
                 continue;
             }

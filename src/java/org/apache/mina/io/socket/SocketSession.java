@@ -79,6 +79,8 @@ class SocketSession implements IoSession
     private boolean idleForRead;
 
     private boolean idleForWrite;
+    
+    private boolean disposed;
 
     /**
      * Creates a new instance.
@@ -119,6 +121,11 @@ class SocketSession implements IoSession
 
     void dispose()
     {
+        if (disposed)
+        {
+            return;
+        }
+        disposed = true;
         ByteBuffer.release( readBuf );
     }
 

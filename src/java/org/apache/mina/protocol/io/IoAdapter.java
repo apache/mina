@@ -196,7 +196,14 @@ public class IoAdapter
             }
             finally
             {
-                ByteBuffer.release( in );
+                try
+                {
+                    ByteBuffer.release( in );
+                }
+                catch( IllegalStateException e )
+                {
+                    filterManager.fireExceptionCaught( psession, e );
+                }
             }
         }
 

@@ -55,8 +55,8 @@ public class IoHandlerFilterManager
             session.getHandler().sessionIdle( session, status );
         }
 
-        public void exceptionCaught( IoHandler nextHandler, IoSession session,
-                                    Throwable cause )
+        public void exceptionCaught( IoHandler nextHandler,
+                                    IoSession session, Throwable cause )
         {
             session.getHandler().exceptionCaught( session, cause );
         }
@@ -86,7 +86,7 @@ public class IoHandlerFilterManager
     };
 
     private Entry head = new Entry( null, null, Integer.MIN_VALUE,
-                                    FINAL_FILTER );
+            FINAL_FILTER );
 
     private final Entry tail = head;
 
@@ -117,9 +117,9 @@ public class IoHandlerFilterManager
             else if( e.priority == priority )
             {
                 throw new IllegalArgumentException(
-                                                    "Other filter is registered with priority "
-                                                                                                                                                                                                                + priority
-                                                                                                                                                                                                                + " already." );
+                        "Other filter is registered with priority "
+                                                                                                + priority
+                                                                                                + " already." );
             }
             prevEntry = e;
             e = e.nextEntry;
@@ -128,11 +128,11 @@ public class IoHandlerFilterManager
 
     public synchronized void removeFilter( IoHandlerFilter filter )
     {
-    	if( filter == tail )
-    	{
-    		throw new IllegalArgumentException(
-    				"Cannot remove the internal filter.");
-    	}
+        if( filter == tail )
+        {
+            throw new IllegalArgumentException(
+                    "Cannot remove the internal filter." );
+        }
 
         Entry e = head;
         Entry prevEntry = null;
@@ -161,11 +161,12 @@ public class IoHandlerFilterManager
             e = e.nextEntry;
         }
     }
-    
-    public synchronized void removeAllFilters() {
-    	tail.prevEntry = null;
-    	tail.nextEntry = null;
-    	head = tail;
+
+    public synchronized void removeAllFilters()
+    {
+        tail.prevEntry = null;
+        tail.nextEntry = null;
+        head = tail;
     }
 
     public void fireSessionOpened( IoSession session )
@@ -256,9 +257,18 @@ public class IoHandlerFilterManager
             newBuf = e.filter.filterWrite( session, buf );
             if( buf != newBuf )
             {
-            	// Original buffer is replaced with new filtered buffer;
-            	// let's release the old one.
-            	ByteBuffer.release(buf);
+                // Original buffer is replaced with new filtered buffer;
+                // let's release the old one.
+                try
+                {
+                    ByteBuffer.release( buf );
+                }
+                catch( IllegalStateException ex )
+                {
+                    fireExceptionCaught( session, ex );
+                    // abort the write operation.
+                    return;
+                }
             }
             buf = newBuf;
             e = e.prevEntry;
@@ -324,14 +334,13 @@ public class IoHandlerFilterManager
                 {
                     try
                     {
-                        Entry.this.nextEntry.filter
-                                .sessionOpened(
-                                                Entry.this.nextEntry.nextHandler,
-                                                session );
+                        Entry.this.nextEntry.filter.sessionOpened(
+                                Entry.this.nextEntry.nextHandler, session );
                     }
                     catch( Throwable e )
                     {
-                        IoHandlerFilterManager.this.fireExceptionCaught( session, e );
+                        IoHandlerFilterManager.this.fireExceptionCaught(
+                                session, e );
                     }
                 }
 
@@ -339,14 +348,13 @@ public class IoHandlerFilterManager
                 {
                     try
                     {
-                        Entry.this.nextEntry.filter
-                                .sessionClosed(
-                                                Entry.this.nextEntry.nextHandler,
-                                                session );
+                        Entry.this.nextEntry.filter.sessionClosed(
+                                Entry.this.nextEntry.nextHandler, session );
                     }
                     catch( Throwable e )
                     {
-                        IoHandlerFilterManager.this.fireExceptionCaught( session, e );
+                        IoHandlerFilterManager.this.fireExceptionCaught(
+                                session, e );
                     }
                 }
 
@@ -354,25 +362,25 @@ public class IoHandlerFilterManager
                 {
                     try
                     {
-                        Entry.this.nextEntry.filter
-                                .sessionIdle(
-                                              Entry.this.nextEntry.nextHandler,
-                                              session, status );
+                        Entry.this.nextEntry.filter.sessionIdle(
+                                Entry.this.nextEntry.nextHandler, session,
+                                status );
                     }
                     catch( Throwable e )
                     {
-                        IoHandlerFilterManager.this.fireExceptionCaught( session, e );
+                        IoHandlerFilterManager.this.fireExceptionCaught(
+                                session, e );
                     }
                 }
 
-                public void exceptionCaught( IoSession session, Throwable cause )
+                public void exceptionCaught( IoSession session,
+                                            Throwable cause )
                 {
                     try
                     {
-                        Entry.this.nextEntry.filter
-                                .exceptionCaught(
-                                                  Entry.this.nextEntry.nextHandler,
-                                                  session, cause );
+                        Entry.this.nextEntry.filter.exceptionCaught(
+                                Entry.this.nextEntry.nextHandler, session,
+                                cause );
                     }
                     catch( Throwable e )
                     {
@@ -384,13 +392,14 @@ public class IoHandlerFilterManager
                 {
                     try
                     {
-                        Entry.this.nextEntry.filter
-                                .dataRead( Entry.this.nextEntry.nextHandler,
-                                           session, buf );
+                        Entry.this.nextEntry.filter.dataRead(
+                                Entry.this.nextEntry.nextHandler, session,
+                                buf );
                     }
                     catch( Throwable e )
                     {
-                        IoHandlerFilterManager.this.fireExceptionCaught( session, e );
+                        IoHandlerFilterManager.this.fireExceptionCaught(
+                                session, e );
                     }
                 }
 
@@ -398,14 +407,14 @@ public class IoHandlerFilterManager
                 {
                     try
                     {
-                        Entry.this.nextEntry.filter
-                                .dataWritten(
-                                              Entry.this.nextEntry.nextHandler,
-                                              session, marker );
+                        Entry.this.nextEntry.filter.dataWritten(
+                                Entry.this.nextEntry.nextHandler, session,
+                                marker );
                     }
                     catch( Throwable e )
                     {
-                        IoHandlerFilterManager.this.fireExceptionCaught( session, e );
+                        IoHandlerFilterManager.this.fireExceptionCaught(
+                                session, e );
                     }
                 }
             };

@@ -46,13 +46,13 @@ import org.apache.mina.util.Queue;
  * @version $Rev$, $Date$
  */
 public class DatagramConnector extends DatagramProcessor implements
-                                                        IoConnector
+        IoConnector
 {
     private static volatile int nextId = 0;
 
     private final IoHandlerFilterManager filterManager = new IoHandlerFilterManager();
 
-    private final int id = nextId++;
+    private final int id = nextId ++ ;
 
     private final Selector selector;
 
@@ -84,7 +84,7 @@ public class DatagramConnector extends DatagramProcessor implements
         if( handler == null )
             throw new NullPointerException( "handler" );
 
-        if( ! ( address instanceof InetSocketAddress ) )
+        if( !( address instanceof InetSocketAddress ) )
             throw new IllegalArgumentException( "Unexpected address type: "
                                                 + address.getClass() );
 
@@ -200,7 +200,7 @@ public class DatagramConnector extends DatagramProcessor implements
                 catch( IOException e )
                 {
                     exceptionMonitor.exceptionCaught( DatagramConnector.this,
-                                                      e );
+                            e );
 
                     try
                     {
@@ -319,7 +319,17 @@ public class DatagramConnector extends DatagramProcessor implements
                     writeBufferQueue.pop();
                     writeMarkerQueue.pop();
                 }
-                ByteBuffer.release( buf );
+
+                try
+                {
+                    ByteBuffer.release( buf );
+                }
+                catch( IllegalStateException e )
+                {
+                    session.getFilterManager().fireExceptionCaught( session,
+                            e );
+                }
+
                 session.getFilterManager().fireDataWritten( session, marker );
                 continue;
             }
@@ -334,9 +344,8 @@ public class DatagramConnector extends DatagramProcessor implements
             }
             else
             {
-                key
-                        .interestOps( key.interestOps()
-                                      & ( ~SelectionKey.OP_WRITE ) );
+                key.interestOps( key.interestOps()
+                                 & ( ~SelectionKey.OP_WRITE ) );
 
                 // pop and fire event
                 synchronized( writeBufferQueue )
@@ -366,13 +375,10 @@ public class DatagramConnector extends DatagramProcessor implements
                 break;
 
             DatagramSession session = new DatagramSession( this,
-                                                           filterManager,
-                                                           req.channel,
-                                                           req.handler );
+                    filterManager, req.channel, req.handler );
 
             SelectionKey key = req.channel.register( selector,
-                                                     SelectionKey.OP_READ,
-                                                     session );
+                    SelectionKey.OP_READ, session );
 
             session.setSelectionKey( key );
 
@@ -427,12 +433,12 @@ public class DatagramConnector extends DatagramProcessor implements
 
     public void removeAllFilters()
     {
-    	filterManager.removeAllFilters();
+        filterManager.removeAllFilters();
     }
 
     public List getAllFilters()
     {
-    	return filterManager.filters();
+        return filterManager.filters();
     }
 
     private static class RegistrationRequest
@@ -443,7 +449,8 @@ public class DatagramConnector extends DatagramProcessor implements
 
         private DatagramSession session;
 
-        private RegistrationRequest( DatagramChannel channel, IoHandler handler )
+        private RegistrationRequest( DatagramChannel channel,
+                                    IoHandler handler )
         {
             this.channel = channel;
             this.handler = handler;
