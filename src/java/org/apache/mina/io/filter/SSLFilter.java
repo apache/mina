@@ -157,8 +157,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
         {
             if( debug != null )
             {
-                debug.print( "Data Read: " + sslHandler + " ("
-                             + buf.getHexDump() + ')' );
+                debug.print( "Data Read: " + sslHandler + " (" + buf+ ')' );
             }
             synchronized( sslHandler )
             {
@@ -243,8 +242,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
                         if( debug != null )
                         {
-                            debug.print( "encrypted data: "
-                                    + encryptedBuffer.getHexDump() );
+                            debug.print( "encrypted buf: " + encryptedBuffer);
                         }
                         buf.release();
                         nextFilter.filterWrite( session, encryptedBuffer, marker );
