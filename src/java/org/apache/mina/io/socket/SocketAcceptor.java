@@ -134,6 +134,7 @@ public class SocketAcceptor implements IoAcceptor
         
         if( request.exception != null )
         {
+            request.exception.fillInStackTrace();
             throw request.exception;
         }
     }
@@ -163,6 +164,12 @@ public class SocketAcceptor implements IoAcceptor
                 {
                 }
             }
+        }
+        
+        if( request.exception != null )
+        {
+            request.exception.fillInStackTrace();
+            throw request.exception;
         }
     }
 
@@ -312,7 +319,15 @@ public class SocketAcceptor implements IoAcceptor
 
             ServerSocketChannel ssc = ( ServerSocketChannel ) channels.get( request.address );
             if( ssc == null )
+            {
+                synchronized( request )
+                {
+                    request.done = true;
+                    request.exception = new IllegalArgumentException(
+                            "Address not bound: " + request.address );
+                }
                 continue;
+            }
             
             SelectionKey key = ssc.keyFor( selector );
             key.cancel();
@@ -382,8 +397,8 @@ public class SocketAcceptor implements IoAcceptor
     private static class CancellationRequest
     {
         private final SocketAddress address;
-        
         private boolean done;
+        private RuntimeException exception;
         
         private CancellationRequest( SocketAddress address )
         {
