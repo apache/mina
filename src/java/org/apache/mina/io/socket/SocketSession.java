@@ -145,15 +145,16 @@ class SocketSession implements IoSession
         this.attachment = attachment;
     }
 
-    ByteBuffer getReadBuffer()
+    synchronized ByteBuffer getReadBuffer()
     {
         return readBuf;
     }
     
     synchronized void setReadBuffer( ByteBuffer readBuf )
     {
-        this.readBuf.release(); // release old buffer
+        ByteBuffer oldBuf = this.readBuf;
         this.readBuf = readBuf;
+        oldBuf.release(); // release old buffer
     }
 
     Queue getWriteBufferQueue()

@@ -20,8 +20,10 @@ package org.apache.mina.examples.echoserver;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.SessionConfig;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.io.socket.SocketSessionConfig;
 
 /**
  * {@link IoHandler} implementation for echo server. 
@@ -35,6 +37,12 @@ public class EchoProtocolHandler implements IoHandler
     {
         System.out.println( Thread.currentThread().getName() + ' '
                             + session.getRemoteAddress() + ": OPEN" );
+        
+        SessionConfig cfg = session.getConfig();
+        if( cfg instanceof SocketSessionConfig )
+        {
+            ( ( SocketSessionConfig ) cfg ).setSessionReceiveBufferSize( 2048 );
+        }
     }
 
     public void sessionClosed( IoSession session )
