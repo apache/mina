@@ -266,17 +266,15 @@ class SSLHandler
 
         outNetBuffer.flip();
 
-        switch( result.getStatus() )
+        if ( result.getStatus() == SSLEngineResult.Status.OK )
         {
-
-        case OK:
             if( result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK )
             {
                 doTasks();
             }
-            break;
-
-        default:
+        }
+        else
+        {
             throw new SSLException( "SSLEngine error during data write: "
                     + result.getStatus() );
         }
@@ -294,23 +292,25 @@ class SSLHandler
         }
         while( true )
         {
-            switch( initialHandshakeStatus )
+            if ( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED )
             {
-            case FINISHED:
                 if( parent.debug != null )
                 {
                     parent.debug.print( " initialHandshakeStatus=FINISHED" );
                 }
                 initialHandshakeComplete = true;
                 return;
-            case NEED_TASK:
+            }
+            else if ( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_TASK )
+            {
                 if( parent.debug != null )
                 {
                     parent.debug.print( " initialHandshakeStatus=NEED_TASK" );
                 }
                 initialHandshakeStatus = doTasks();
-                break;
-            case NEED_UNWRAP:
+            }
+            else if ( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP )
+            {
                 // we need more data read
                 if( parent.debug != null )
                 {
@@ -318,13 +318,14 @@ class SSLHandler
                             .print( " initialHandshakeStatus=NEED_UNWRAP" );
                 }
                 SSLEngineResult.Status status = unwrap();
-                if( status == SSLEngineResult.Status.BUFFER_UNDERFLOW )
+                if( status == SSLEngineResult.Status.BUFFER_UNDERFLOW || closed )
                 {
-                    // We need more data
+                    // We need more data or the session is closed
                     return;
                 }
-                break;
-            case NEED_WRAP:
+            }
+            else if ( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP )
+            {
                 if( parent.debug != null )
                 {
                     parent.debug.print( " initialHandshakeStatus=NEED_WRAP" );
@@ -345,9 +346,9 @@ class SSLHandler
                 initialHandshakeStatus = result.getHandshakeStatus();
                 // return to allow data on out buffer being sent
                 // TODO: We might want to send more data immidiatley?
-                break;
-            //return;
-            default: // NOT_HANDSHAKING
+            }
+            else
+            {
                 throw new IllegalStateException( "Invalid Handshaking State"
                         + initialHandshakeStatus );
             }
@@ -388,27 +389,28 @@ class SSLHandler
              * transitions to do a complete handshake, so ignore that
              * possibility.
              */
-            switch( res.getStatus() )
+            SSLEngineResult.Status status = res.getStatus();
+            if( status == SSLEngineResult.Status.BUFFER_UNDERFLOW ||
+                status == SSLEngineResult.Status.OK )
             {
-
-            case BUFFER_UNDERFLOW:
-            case OK:
                 if( res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK )
                 {
                     doTasks();
                 }
-                break;
-            case CLOSED:
+            }
+            else if( status == SSLEngineResult.Status.CLOSED )
+            {
                 if( parent.debug != null )
                 {
                     parent.debug.print( "Closed while unwrapping" );
                 }
                 break;
-            default:
+            }
+            else
+            {
                 throw new SSLException( "SSLEngine error during data read: "
                         + res.getStatus() );
             }
-
         }
         while( ( inNetBuffer.position() != 0 )
                 && res.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW );
