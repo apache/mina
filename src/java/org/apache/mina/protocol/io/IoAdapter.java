@@ -124,18 +124,12 @@ public class IoAdapter
 
     private class SessionHandlerAdapter implements IoHandler
     {
-        private final ProtocolEncoder encoder;
-
-        private final ProtocolDecoder decoder;
-
+        private final ProtocolCodecFactory codecFactory;
         private final ProtocolHandler handler;
 
         public SessionHandlerAdapter( ProtocolProvider protocolProvider )
         {
-            ProtocolCodecFactory codecFactory = protocolProvider
-                    .getCodecFactory();
-            this.encoder = codecFactory.newEncoder();
-            this.decoder = codecFactory.newDecoder();
+            codecFactory = protocolProvider.getCodecFactory();
             this.handler = protocolProvider.getHandler();
         }
 
@@ -164,6 +158,7 @@ public class IoAdapter
         public void dataRead( IoSession session, ByteBuffer in )
         {
             ProtocolSessionImpl psession = getProtocolSession( session );
+            ProtocolDecoder decoder = psession.decoder;
             try
             {
                 synchronized( decoder )
@@ -219,6 +214,7 @@ public class IoAdapter
         {
             ProtocolSessionImpl psession = ( ProtocolSessionImpl ) session
                     .getAttachment();
+            ProtocolEncoder encoder = psession.encoder;
             Queue writeQueue = psession.writeQueue;
 
             if( writeQueue.isEmpty() )
@@ -285,6 +281,10 @@ public class IoAdapter
         private final SessionHandlerAdapter adapter;
 
         private final Queue writeQueue = new Queue();
+        
+        private final ProtocolEncoder encoder;
+        
+        private final ProtocolDecoder decoder;
 
         private final ProtocolEncoderOutputImpl encOut;
 
@@ -299,6 +299,8 @@ public class IoAdapter
         {
             this.session = session;
             this.adapter = adapter;
+            this.encoder = adapter.codecFactory.newEncoder();
+            this.decoder = adapter.codecFactory.newDecoder();
             this.encOut = new ProtocolEncoderOutputImpl();
             this.decOut = new ProtocolDecoderOutputImpl();
         }
@@ -310,12 +312,12 @@ public class IoAdapter
 
         public ProtocolEncoder getEncoder()
         {
-            return adapter.encoder;
+            return encoder;
         }
 
         public ProtocolDecoder getDecoder()
         {
-            return adapter.decoder;
+            return decoder;
         }
 
         public void close()
