@@ -52,7 +52,7 @@ import org.apache.mina.util.Queue;
  */
 public class IoAdapter
 {
-    private final IoProtocolFilterChain filters = new IoProtocolFilterChain();
+    private final IoProtocolFilterChain filters = new IoProtocolFilterChain( true );
 
     IoAdapter()
     {
@@ -60,7 +60,7 @@ public class IoAdapter
     
     public ProtocolHandlerFilterChain newFilterChain()
     {
-        return new IoProtocolFilterChain();
+        return new IoProtocolFilterChain( false );
     }
     
     public ProtocolHandlerFilterChain getFilterChain()

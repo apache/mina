@@ -198,6 +198,8 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     };
 
+    private final boolean root;
+    
     private AbstractProtocolHandlerFilterChain parent;
     
     private final Map name2entry = new HashMap();
@@ -208,13 +210,18 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
 
     private final Entry tail;
 
-    protected AbstractProtocolHandlerFilterChain()
+    protected AbstractProtocolHandlerFilterChain( boolean root )
     {
+        this.root = root;
+        
         head = new Entry( null, null, "head", HEAD_FILTER );
         tail = new Entry( head, null, "tail", TAIL_FILTER );
         head.nextEntry = tail;
         
-        register( head, ProtocolHandlerFilterChain.NEXT_FILTER, NEXT_FILTER );
+        if( !root )
+        {
+            register( head, ProtocolHandlerFilterChain.NEXT_FILTER, NEXT_FILTER );
+        }
     }
     
     public ProtocolHandlerFilterChain getRoot()
@@ -327,15 +334,28 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
 
     private void register( Entry prevEntry, String name, ProtocolHandlerFilter filter )
     {
+        if ( filter instanceof AbstractProtocolHandlerFilterChain )
+        {
+            if( !this.getClass().isAssignableFrom( filter.getClass() ) )
+            {
+                throw new IllegalArgumentException( "Incompatible chain" );
+            }
+            if( ( ( AbstractProtocolHandlerFilterChain ) filter ).root )
+            {
+                throw new IllegalArgumentException( "Root chain cannot be added." );
+            }
+            if( ( ( AbstractProtocolHandlerFilterChain ) filter ).parent != null )
+            {
+                throw new IllegalArgumentException( "Already added to other parent chain." );
+            }
+
+            ( ( AbstractProtocolHandlerFilterChain ) filter ).parent = this;
+        }
         Entry newEntry = new Entry( prevEntry, prevEntry.nextEntry, name, filter );
         prevEntry.nextEntry.prevEntry = newEntry;
         prevEntry.nextEntry = newEntry;
         name2entry.put( name, newEntry );
         filter2entry.put( filter, newEntry );
-        if ( filter instanceof AbstractProtocolHandlerFilterChain )
-        {
-            ( ( AbstractProtocolHandlerFilterChain ) filter ).parent = this;
-        }
     }
 
     /**

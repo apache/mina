@@ -47,7 +47,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
-    private final DatagramFilterChain filters = new DatagramFilterChain( this );
+    private final DatagramFilterChain filters = new DatagramFilterChain( true, this );
 
     private final int id = nextId ++ ;
 
@@ -515,7 +515,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
     
     public IoHandlerFilterChain newFilterChain()
     {
-        return new DatagramFilterChain( this );
+        return new DatagramFilterChain( false, this );
     }
     
     public IoHandlerFilterChain getFilterChain()
