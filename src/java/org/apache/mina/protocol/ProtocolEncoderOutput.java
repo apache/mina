@@ -38,4 +38,12 @@ public interface ProtocolEncoderOutput
      * @param buf the buffer which contains encoded data
      */
     void write( ByteBuffer buf );
+    
+    /**
+     * Merges all buffers you wrote via {@link #write(ByteBuffer)} into
+     * one {@link ByteBuffer} and replaces the old fragmented ones with it.
+     * This method is useful when you want to control the way MINA generates
+     * network packets.
+     */
+    void mergeAll();
 }

@@ -423,6 +423,38 @@ public class IoAdapter
         {
             queue.push( buf );
         }
+        
+        public void mergeAll()
+        {
+            int sum = 0;
+            final int size = queue.size();
+            
+            // Get the size of merged BB
+            for( int i = size - 1; i >= 0; i -- )
+            {
+                sum += ( ( ByteBuffer ) queue.get( i ) ).remaining();
+            }
+            
+            // Allocate a new BB that will contain all fragments
+            ByteBuffer newBuf = ByteBuffer.allocate( sum );
+            
+            // and merge all.
+            for( ;; )
+            {
+                ByteBuffer buf = ( ByteBuffer ) queue.pop();
+                if( buf == null )
+                {
+                    break;
+                }
+
+                newBuf.put( buf );
+                ByteBuffer.release( buf );
+            }
+            
+            // Push the new buffer finally.
+            newBuf.flip();
+            queue.push(newBuf);
+        }
     }
 
     private static class ProtocolDecoderOutputImpl implements

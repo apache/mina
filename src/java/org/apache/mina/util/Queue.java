@@ -144,6 +144,11 @@ public class Queue implements Serializable
 
         return items[ ( last + items.length - 1 ) & mask ];
     }
+    
+    public Object get( int idx )
+    {
+        return items[ ( first + idx ) & mask ];
+    }
 
     /**
      * Returns <code>true</code> if the queue is empty.
