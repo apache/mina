@@ -50,6 +50,40 @@ public class TransportType implements Serializable
     public static final TransportType VM_PIPE = new TransportType( "VM_PIPE",
             false );
 
+    /**
+     * Returns the transport type of the specified name.  Here are the list
+     * of available names:
+     * <ul>
+     *   <li><code>"socket"</code> or <code>"tcp"</code> - {@link #SOCKET}</li>
+     *   <li><code>"datagram"</code> or <code>"udp"</code> - {@link #DATAGRAM}</li>
+     *   <li><code>"vm_pipe"</code> - {@link #VM_PIPE}</li>
+     * </ul>
+     * All names are case-insensitive.
+     * 
+     * @param name the name of the transport type
+     * @return the transport type
+     * @throws IllegalArgumentException if the specified name is not available.
+     */
+    public static TransportType getInstance(String name)
+    {
+        if( "socket".equalsIgnoreCase(name) || "tcp".equalsIgnoreCase(name) )
+        {
+            return SOCKET;
+        }
+
+        if( "datagram".equalsIgnoreCase(name) || "udp".equalsIgnoreCase(name) )
+        {
+            return DATAGRAM;
+        }
+        
+        if( "vm_pipe".equalsIgnoreCase(name) )
+        {
+            return VM_PIPE;
+        }
+        
+        throw new IllegalArgumentException("Unknown transport type name: " + name);
+    }
+
     private final String strVal;
 
     private final boolean stateless;
