@@ -20,20 +20,26 @@ package org.apache.mina.examples.echoserver;
 
 import java.net.InetSocketAddress;
 
+import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.datagram.DatagramAcceptor;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
+import org.apache.mina.io.filter.SSLFilter;
 import org.apache.mina.io.socket.SocketAcceptor;
 
 /**
  * (<b>Entry point</b>) Echo server
  * 
  * @author Trustin Lee (trustin@apache.org)
- * @version $Rev$, $Date$,
+ * @version $Rev$, $Date$
  */
 public class Main
 {
+    /** Choose your favorite port number. */
     private static final int PORT = 8080;
+    
+    /** Set this to true if you want to make the server SSL */
+    private static final boolean USE_SSL = false;
 
     public static void main( String[] args ) throws Exception
     {
@@ -47,6 +53,15 @@ public class Main
         // Add thread pool filter
         // MINA runs in a single thread if you don't add this filter.
         acceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
+
+        // Add SSL filter if SSL is enabled.
+        if( USE_SSL )
+        {
+            System.out.println( "SSL is enabled." );
+            SSLFilter sslFilter = new SSLFilter( BogusSSLContextFactory
+                    .getInstance( true ) );
+            acceptor.addFilter( Integer.MAX_VALUE - 1, sslFilter );
+        }
 
         // Bind
         acceptor.bind( new InetSocketAddress( PORT ),

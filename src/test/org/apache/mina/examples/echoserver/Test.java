@@ -6,15 +6,25 @@ package org.apache.mina.examples.echoserver;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
+import javax.net.ServerSocketFactory;
+import javax.net.SocketFactory;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.net.EchoTCPClient;
 import org.apache.commons.net.EchoUDPClient;
+import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
+import org.apache.mina.examples.echoserver.ssl.SSLServerSocketFactory;
+import org.apache.mina.examples.echoserver.ssl.SSLSocketFactory;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.datagram.DatagramAcceptor;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
+import org.apache.mina.io.filter.SSLFilter;
 import org.apache.mina.io.socket.SocketAcceptor;
 
 /**
@@ -27,7 +37,7 @@ public class Test extends TestCase
 {
     private int port;
 
-    private IoAcceptor acceptor;
+    protected IoAcceptor acceptor;
 
     private IoAcceptor datagramAcceptor;
 
@@ -57,7 +67,7 @@ public class Test extends TestCase
         // Find an availble test port and bind to it.
         boolean socketBound = false;
         boolean datagramBound = false;
-        
+
         // Let's start from port #1 to detect possible resource leak
         // because test will fail in port 1-1023 if user run this test
         // as a normal user.
@@ -122,6 +132,69 @@ public class Test extends TestCase
     public void testTCP() throws Exception
     {
         EchoTCPClient client = new EchoTCPClient();
+        testTCP0( client );
+    }
+
+    public void testTCPWithSSL() throws Exception
+    {
+        // Add an SSL filter
+        SSLFilter sslFilter = new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
+        sslFilter.setDebug( SSLFilter.Debug.ON );
+        acceptor.addFilter( Integer.MAX_VALUE - 1, sslFilter );
+        
+        // Create a commons-net socket factory
+        SSLSocketFactory.setSslEnabled(true);
+        SSLServerSocketFactory.setSslEnabled(true);
+        org.apache.commons.net.SocketFactory factory = new org.apache.commons.net.SocketFactory() {
+
+            private SocketFactory f = SSLSocketFactory.getSocketFactory();
+            private ServerSocketFactory ssf = SSLServerSocketFactory.getServerSocketFactory();
+
+            public Socket createSocket( String arg0, int arg1 ) throws UnknownHostException, IOException
+            {
+                return f.createSocket(arg0, arg1);
+            }
+
+            public Socket createSocket( InetAddress arg0, int arg1 ) throws IOException
+            {
+                return f.createSocket(arg0, arg1);
+            }
+
+            public Socket createSocket( String arg0, int arg1, InetAddress arg2, int arg3 ) throws UnknownHostException, IOException
+            {
+                return f.createSocket(arg0, arg1, arg2, arg3);
+            }
+
+            public Socket createSocket( InetAddress arg0, int arg1, InetAddress arg2, int arg3 ) throws IOException
+            {
+                return f.createSocket(arg0, arg1, arg2, arg3);
+            }
+
+            public ServerSocket createServerSocket( int arg0 ) throws IOException
+            {
+                return ssf.createServerSocket(arg0);
+            }
+
+            public ServerSocket createServerSocket( int arg0, int arg1 ) throws IOException
+            {
+                return ssf.createServerSocket(arg0, arg1);
+            }
+
+            public ServerSocket createServerSocket( int arg0, int arg1, InetAddress arg2 ) throws IOException
+            {
+                return ssf.createServerSocket(arg0, arg1, arg2);
+            }
+            
+        };
+        
+        // Create a echo client with SSL factory and test it.
+        EchoTCPClient client = new EchoTCPClient();
+        client.setSocketFactory( factory );
+        testTCP0( client );
+    }
+    
+    private void testTCP0( EchoTCPClient client ) throws Exception
+    {
         client.connect( InetAddress.getLocalHost(), port );
         client.setSoTimeout( 3000 );
 
