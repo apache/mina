@@ -3,6 +3,7 @@
  */
 package org.apache.mina.examples.echoserver;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import junit.framework.Assert;
@@ -56,8 +57,9 @@ public class ConnectorTest extends AbstractTest
     {
         EchoConnectorHandler handler = new EchoConnectorHandler();
         ByteBuffer readBuf = handler.readBuf;
-        IoSession session = connector.connect( new InetSocketAddress( port ),
-                                               handler );
+        IoSession session = connector.connect(
+                new InetSocketAddress( InetAddress.getLocalHost(), port ),
+                handler );
         
         for( int i = 0; i < 10; i ++ )
         {

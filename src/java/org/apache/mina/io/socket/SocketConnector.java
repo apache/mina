@@ -36,6 +36,7 @@ import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.util.IoHandlerFilterManager;
+import org.apache.mina.util.Queue;
 
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
@@ -54,6 +55,8 @@ public class SocketConnector implements IoConnector
     private final Selector selector;
 
     private ExceptionMonitor exceptionMonitor = new DefaultExceptionMonitor();
+
+    private final Queue connectQueue = new Queue();
 
     private Worker worker;
 
@@ -98,26 +101,30 @@ public class SocketConnector implements IoConnector
         }
         else
         {
-            ConnectEntry entry = new ConnectEntry( timeout, handler );
+            ConnectionRequest request = new ConnectionRequest( ch, timeout, handler );
+            synchronized( connectQueue )
+            {
+                connectQueue.push( request );
+            }
 
             synchronized( this )
             {
-                ch.register( selector, SelectionKey.OP_CONNECT, entry );
-
                 if( worker == null )
                 {
                     worker = new Worker();
                     worker.start();
                 }
             }
+            
+            selector.wakeup();
 
-            synchronized( entry )
+            synchronized( request )
             {
-                while( !entry.done )
+                while( !request.done )
                 {
                     try
                     {
-                        entry.wait();
+                        request.wait();
                     }
                     catch( InterruptedException e )
                     {
@@ -125,15 +132,51 @@ public class SocketConnector implements IoConnector
                 }
             }
 
-            if( entry.exception != null )
-                throw entry.exception;
+            if( request.exception != null )
+            {
+                request.exception.fillInStackTrace();
+                throw request.exception;
+            }
 
-            session = entry.session;
+            session = request.session;
         }
 
         return session;
     }
 
+    private void registerNew()
+    {
+        if( connectQueue.isEmpty() )
+            return;
+
+        for( ;; )
+        {
+            ConnectionRequest req;
+            synchronized( connectQueue )
+            {
+                req = ( ConnectionRequest ) connectQueue.pop();
+            }
+
+            if( req == null )
+                break;
+            
+            SocketChannel ch = req.channel;
+            try
+            {
+                ch.register( selector, SelectionKey.OP_CONNECT, req );
+            }
+            catch( IOException e )
+            {
+                req.exception = e;
+                synchronized( req )
+                {
+                    req.done = true;
+                    req.notify();
+                }
+            }
+        }
+    }
+    
     private void processSessions( Set keys )
     {
         Iterator it = keys.iterator();
@@ -146,32 +189,26 @@ public class SocketConnector implements IoConnector
                 continue;
 
             SocketChannel ch = ( SocketChannel ) key.channel();
-            ConnectEntry entry = ( ConnectEntry ) key.attachment();
+            ConnectionRequest entry = ( ConnectionRequest ) key.attachment();
 
             try
             {
                 ch.finishConnect();
                 SocketSession session = newSession( ch, entry.handler );
                 entry.session = session;
-                entry.done = true;
-
-                synchronized( entry )
-                {
-                    entry.notify();
-                }
             }
             catch( IOException e )
             {
                 entry.exception = e;
-                entry.done = true;
-
-                synchronized( entry )
-                {
-                    entry.notify();
-                }
             }
             finally
             {
+                synchronized( entry )
+                {
+                    entry.done = true;
+                    entry.notify();
+                }
+
                 key.cancel();
             }
         }
@@ -191,7 +228,7 @@ public class SocketConnector implements IoConnector
             if( !key.isValid() )
                 continue;
 
-            ConnectEntry entry = ( ConnectEntry ) key.attachment();
+            ConnectionRequest entry = ( ConnectionRequest ) key.attachment();
 
             if( currentTime >= entry.deadline )
             {
@@ -228,8 +265,10 @@ public class SocketConnector implements IoConnector
             {
                 try
                 {
-                    int nKeys = selector.select( 1000 );
+                    int nKeys = selector.select();
 
+                    registerNew();
+                    
                     if( selector.keys().isEmpty() )
                     {
                         synchronized( SocketConnector.this )
@@ -263,8 +302,10 @@ public class SocketConnector implements IoConnector
         }
     }
 
-    private static class ConnectEntry
+    private static class ConnectionRequest
     {
+        private final SocketChannel channel;
+        
         private final long deadline;
 
         private final IoHandler handler;
@@ -275,8 +316,9 @@ public class SocketConnector implements IoConnector
 
         private IOException exception;
 
-        private ConnectEntry( int timeout, IoHandler handler )
+        private ConnectionRequest( SocketChannel channel, int timeout, IoHandler handler )
         {
+            this.channel = channel;
             this.deadline = System.currentTimeMillis() + timeout * 1000L;
             this.handler = handler;
         }
