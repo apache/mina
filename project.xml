@@ -1,163 +1,163 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
 
-	<groupId>incubator-directory</groupId>
-	<id>mina</id>
-	<name>MINA</name>
-	<package>org.apache.mina</package>
-	<currentVersion>0.7-SNAPSHOT</currentVersion>
-	<inceptionYear>2004</inceptionYear>
+  <groupId>incubator-directory</groupId>
+  <id>mina</id>
+  <name>MINA</name>
+  <package>org.apache.mina</package>
+  <currentVersion>0.7-SNAPSHOT</currentVersion>
+  <inceptionYear>2004</inceptionYear>
 
-	<organization>
-		<name>The Apache Directory project</name>
-		<url>http://directory.apache.org</url>
-		<logo>/images/apache-incubator-logo.png</logo>
-	</organization>
+  <organization>
+    <name>The Apache Directory project</name>
+    <url>http://directory.apache.org</url>
+    <logo>/images/apache-incubator-logo.png</logo>
+  </organization>
 
-	<logo>/images/apache-directory-logo.png</logo>
-	<url>http://directory.apache.org/</url>
+  <logo>/images/apache-directory-logo.png</logo>
+  <url>http://directory.apache.org/</url>
 
-	<issueTrackingUrl>
-	  http://issues.apache.org/jira/
-	</issueTrackingUrl>
-	<siteAddress>minotaur.apache.org</siteAddress>
-	<siteDirectory>
-          /www/directory.apache.org/directory/subprojects/network/mina
-        </siteDirectory>
-	<distributionDirectory>
-          /www/cvs.apache.org/dist/directory
-	</distributionDirectory>
+  <issueTrackingUrl>
+    http://issues.apache.org/jira/
+  </issueTrackingUrl>
+  <siteAddress>minotaur.apache.org</siteAddress>
+  <siteDirectory>
+    /www/directory.apache.org/directory/subprojects/network/mina
+  </siteDirectory>
+  <distributionDirectory>
+    /www/cvs.apache.org/dist/directory
+  </distributionDirectory>
 
-	<repository>
-		<connection>
-			scm:svn:http://svn.apache.org/repos/asf/incubator:directory/network/mina/trunk
-		</connection>
-		<url>
-			http://svn.apache.org/viewcvs.cgi/incubator/directory/network/mina/trunk/?root=Apache-SVN
-		</url>
-		<developerConnection>
-			scm:svn:https://svn.apache.org/repos/asf/incubator:directory/network/mina/trunk
-		</developerConnection>
-	</repository>
+  <repository>
+    <connection>
+      scm:svn:http://svn.apache.org/repos/asf/incubator:directory/network/mina/trunk
+    </connection>
+    <url>
+      http://svn.apache.org/viewcvs.cgi/incubator/directory/network/mina/trunk/?root=Apache-SVN
+    </url>
+    <developerConnection>
+      scm:svn:https://svn.apache.org/repos/asf/incubator:directory/network/mina/trunk
+    </developerConnection>
+  </repository>
 
-	<gumpRepositoryId>apache-incubator-svn</gumpRepositoryId>
+  <gumpRepositoryId>apache-incubator-svn</gumpRepositoryId>
 
-	<shortDescription>
-		A Multipurpose Infrastrusture for Network Applications
-	</shortDescription>
+  <shortDescription>
+    A Multipurpose Infrastrusture for Network Applications
+  </shortDescription>
 
-	<description>
-		MINA (Multipurpose Infrastructure for Network Applications) is a
-		network application framework which helps users develop high
-		performance and high scalability network applications easily.
-	</description>
+  <description>
+    MINA (Multipurpose Infrastructure for Network Applications) is a
+    network application framework which helps users develop high
+    performance and high scalability network applications easily.
+  </description>
 
-	<mailingLists>
-		<mailingList>
-			<name>Apache Directory Developement - use [mina] prefix</name>
-			<subscribe>
-				directory-dev-subscribe@incubator.apache.org
-			</subscribe>
-			<unsubscribe>
-				directory-dev-unsubscribe@incubator.apache.org
-			</unsubscribe>
-			<archive>
-				http://nagoya.apache.org/eyebrowse/SummarizeList?listId=181
-			</archive>
-		</mailingList>
-	</mailingLists>
+  <mailingLists>
+    <mailingList>
+      <name>Apache Directory Developement - use [mina] prefix</name>
+      <subscribe>
+        directory-dev-subscribe@incubator.apache.org
+      </subscribe>
+      <unsubscribe>
+        directory-dev-unsubscribe@incubator.apache.org
+      </unsubscribe>
+      <archive>
+        http://nagoya.apache.org/eyebrowse/SummarizeList?listId=181
+      </archive>
+    </mailingList>
+  </mailingLists>
 
-	<licenses>
-		<license>
-			<name>Apache 2.0 License</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+  <licenses>
+    <license>
+      <name>Apache 2.0 License</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-	<dependencies>
+  <dependencies>
 
-		<!-- ================================================================== -->
-		<!-- Compatibility dependencies for ProtocolEncoder and ProtocolDecoder -->
-		<!-- ================================================================== -->
+    <!-- ================================================================== -->
+    <!-- Compatibility dependencies for ProtocolEncoder and ProtocolDecoder -->
+    <!-- ================================================================== -->
 
-		<dependency>
-			<groupId>incubator-directory</groupId>
-			<artifactId>asn1-codec</artifactId>
-			<version>0.2</version>
-			<url>http://incubator.apache.org/directory/subprojects/asn1/codec-stateful/</url>
-		</dependency>
+    <dependency>
+      <groupId>incubator-directory</groupId>
+      <artifactId>asn1-codec</artifactId>
+      <version>0.2</version>
+      <url>http://incubator.apache.org/directory/subprojects/asn1/codec-stateful/</url>
+    </dependency>
     
-		<dependency>
-			<groupId>tl-netty2</groupId>
-			<artifactId>tl-netty2</artifactId>
-			<version>1.8.0</version>
-			<url>http://gleamynode.net/dev/projects/netty2/</url>
-		</dependency>
+    <dependency>
+      <groupId>tl-netty2</groupId>
+      <artifactId>tl-netty2</artifactId>
+      <version>1.8.0</version>
+      <url>http://gleamynode.net/dev/projects/netty2/</url>
+    </dependency>
     
-		<!-- ========================================================= -->
-		<!-- Dependencies required for running test cases and examples -->
-		<!-- ========================================================= -->
+    <!-- ========================================================= -->
+    <!-- Dependencies required for running test cases and examples -->
+    <!-- ========================================================= -->
 
-		<dependency>
-			<groupId>commons-net</groupId>
-			<artifactId>commons-net</artifactId>
-			<version>1.3.0</version>
-			<url>http://jakarta.apache.org/commons/net/</url>
-		</dependency>
+    <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+      <version>1.3.0</version>
+      <url>http://jakarta.apache.org/commons/net/</url>
+    </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<url>http://junit.org/</url>
-		</dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <url>http://junit.org/</url>
+    </dependency>
 
-	</dependencies>
+  </dependencies>
 
 
-	<build>
-		<nagEmailAddress>directory-dev@incubator.apache.org</nagEmailAddress>
-		<sourceDirectory>${basedir}/src/java</sourceDirectory>
-		<unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
-		<integrationUnitTestSourceDirectory/>
-		<aspectSourceDirectory/>
+  <build>
+    <nagEmailAddress>directory-dev@incubator.apache.org</nagEmailAddress>
+    <sourceDirectory>${basedir}/src/java</sourceDirectory>
+    <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
+    <integrationUnitTestSourceDirectory/>
+    <aspectSourceDirectory/>
 
-		<unitTest>
-			<includes>
-				<include>**/*Test*</include>
-				<include>**/*TestCase*</include>
-			</includes>
+    <unitTest>
+      <includes>
+        <include>**/*Test*</include>
+        <include>**/*TestCase*</include>
+      </includes>
 
-			<excludes>
-				<exclude>**/Abstract*</exclude>
-			</excludes>
-		</unitTest>
+      <excludes>
+        <exclude>**/Abstract*</exclude>
+      </excludes>
+    </unitTest>
 
-		<jars/>
+    <jars/>
 
-		<resources>
-			<resource>
-				<directory>${basedir}/src/examples</directory>
-				<includes>
-					<include>**/*.cert</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/examples</directory>
+        <includes>
+          <include>**/*.cert</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 
-	<reports>
-		<report>maven-license-plugin</report>
-		<report>maven-javadoc-plugin</report>
-		<report>maven-changes-plugin</report>
-		<report>maven-jxr-plugin</report>
-		<report>maven-junit-report-plugin</report>
-		<!-- causing build failures 
-                <report>maven-jcoverage-plugin</report>
-                -->
-		<report>maven-jdepend-plugin</report>
-		<report>maven-simian-plugin</report>
-		<report>maven-tasklist-plugin</report>
-	</reports>
+  <reports>
+    <report>maven-license-plugin</report>
+    <report>maven-javadoc-plugin</report>
+    <report>maven-changes-plugin</report>
+    <report>maven-jxr-plugin</report>
+    <report>maven-junit-report-plugin</report>
+    <!-- causing build failures 
+    <report>maven-jcoverage-plugin</report>
+    -->
+    <report>maven-jdepend-plugin</report>
+    <report>maven-simian-plugin</report>
+    <report>maven-tasklist-plugin</report>
+  </reports>
 
 </project>
