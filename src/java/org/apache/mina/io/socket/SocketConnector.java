@@ -284,7 +284,7 @@ public class SocketConnector implements IoConnector
 
     public void addFilter( int priority, IoHandlerFilter filter )
     {
-        filterManager.addFilter( priority, filter );
+        filterManager.addFilter( priority, false, filter );
 
     }
 

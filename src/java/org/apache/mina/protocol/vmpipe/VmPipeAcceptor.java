@@ -26,16 +26,14 @@ public class VmPipeAcceptor implements ProtocolAcceptor
 {
     static final Map boundHandlers = new HashMap();
 
-    private final ProtocolHandlerFilterManager filterManager = new ProtocolHandlerFilterManager(
-            ProtocolHandlerFilter.MIN_PRIORITY - 1,
-            ProtocolHandlerFilter.MAX_PRIORITY );
+    private final ProtocolHandlerFilterManager filterManager = new ProtocolHandlerFilterManager();
 
     /**
      * Creates a new instance.
      */
     public VmPipeAcceptor()
     {
-        filterManager.addFilter( -1, new VmPipeFilter() );
+        filterManager.addFilter( Integer.MIN_VALUE, true, new VmPipeFilter() );
     }
 
     public void bind( SocketAddress address, ProtocolProvider protocolProvider )
@@ -74,7 +72,7 @@ public class VmPipeAcceptor implements ProtocolAcceptor
 
     public void addFilter( int priority, ProtocolHandlerFilter filter )
     {
-        filterManager.addFilter( priority, filter );
+        filterManager.addFilter( priority, false, filter );
     }
 
     public void removeFilter( ProtocolHandlerFilter filter )

@@ -6,10 +6,8 @@ package org.apache.mina.examples.sumup;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
 import org.apache.mina.io.socket.SocketConnector;
-import org.apache.mina.protocol.ProtocolHandlerFilter;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.filter.ProtocolThreadPoolFilter;
@@ -56,10 +54,8 @@ public class Client
 
         IoProtocolConnector connector = new IoProtocolConnector(
                 new SocketConnector() );
-        connector.getIoConnector().addFilter( IoHandlerFilter.MAX_PRIORITY,
-                ioThreadPoolFilter );
-        connector.addFilter( ProtocolHandlerFilter.MAX_PRIORITY,
-                protocolThreadPoolFilter );
+        connector.getIoConnector().addFilter( Integer.MAX_VALUE, ioThreadPoolFilter );
+        connector.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
 
         ProtocolProvider protocolProvider = new ClientProtocolProvider(
                 values );

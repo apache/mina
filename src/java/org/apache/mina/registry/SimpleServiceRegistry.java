@@ -55,16 +55,11 @@ public class SimpleServiceRegistry implements ServiceRegistry
 
     public SimpleServiceRegistry() throws IOException
     {
-        socketIoAcceptor.addFilter( IoHandlerFilter.MAX_PRIORITY,
-                ioThreadPoolFilter );
-        datagramIoAcceptor.addFilter( IoHandlerFilter.MAX_PRIORITY,
-                ioThreadPoolFilter );
-        socketProtocolAcceptor.addFilter( ProtocolHandlerFilter.MAX_PRIORITY,
-                protocolThreadPoolFilter );
-        datagramProtocolAcceptor.addFilter(
-                ProtocolHandlerFilter.MAX_PRIORITY, protocolThreadPoolFilter );
-        vmPipeAcceptor.addFilter( ProtocolHandlerFilter.MAX_PRIORITY,
-                protocolThreadPoolFilter );
+        socketIoAcceptor.addFilter( Integer.MAX_VALUE, ioThreadPoolFilter );
+        datagramIoAcceptor.addFilter( Integer.MAX_VALUE, ioThreadPoolFilter );
+        socketProtocolAcceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
+        datagramProtocolAcceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
+        vmPipeAcceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
     }
 
     public synchronized void bind( Service service, IoHandler ioHandler )

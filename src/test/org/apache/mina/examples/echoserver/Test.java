@@ -108,10 +108,8 @@ public class Test extends TestCase
         threadPoolFilter = new IoThreadPoolFilter();
         threadPoolFilter.start();
 
-        acceptor
-                .addFilter( IoThreadPoolFilter.MAX_PRIORITY, threadPoolFilter );
-        datagramAcceptor.addFilter( IoThreadPoolFilter.MAX_PRIORITY,
-                threadPoolFilter );
+        acceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
+        datagramAcceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
     }
 
     protected void tearDown() throws Exception

@@ -19,7 +19,6 @@
 package org.apache.mina.protocol;
 
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.io.IoHandlerFilter;
 
 /**
  * A filter which intercepts {@link ProtocolHandler} events like Servlet
@@ -46,12 +45,6 @@ import org.apache.mina.io.IoHandlerFilter;
  */
 public interface ProtocolHandlerFilter
 {
-    /** The minimum priority */
-    static int MIN_PRIORITY = IoHandlerFilter.MIN_PRIORITY;
-
-    /** The maximum priority */
-    static int MAX_PRIORITY = IoHandlerFilter.MAX_PRIORITY;
-
     /**
      * Filters {@link ProtocolHandler#sessionOpened(ProtocolSession)} event.
      */

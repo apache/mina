@@ -30,12 +30,12 @@ public class VmPipeConnector implements ProtocolConnector
      */
     public VmPipeConnector()
     {
-        filterManager.addFilter( Integer.MIN_VALUE - 1, new VmPipeFilter() );
+        filterManager.addFilter( Integer.MIN_VALUE - 1, true, new VmPipeFilter() );
     }
 
     public void addFilter( int priority, ProtocolHandlerFilter filter )
     {
-        filterManager.addFilter( priority, filter );
+        filterManager.addFilter( priority, false, filter );
     }
 
     public void removeFilter( ProtocolHandlerFilter filter )

@@ -426,7 +426,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
     public void addFilter( int priority, IoHandlerFilter filter )
     {
-        filterManager.addFilter( priority, filter );
+        filterManager.addFilter( priority, false, filter );
     }
 
     public void removeFilter( IoHandlerFilter filter )

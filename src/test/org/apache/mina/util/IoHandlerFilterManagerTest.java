@@ -26,20 +26,25 @@ public class IoHandlerFilterManagerTest extends TestCase
     private IoHandlerFilterImpl filterD;
 
     private IoHandlerFilterImpl filterE;
+    
+    private IoHandlerFilterImpl filterX;
 
     public void setUp()
     {
-        manager = new IoHandlerFilterManager(-10, 10);
+        manager = new IoHandlerFilterManager();
         filterA = new IoHandlerFilterImpl( 'A' );
         filterB = new IoHandlerFilterImpl( 'B' );
         filterC = new IoHandlerFilterImpl( 'C' );
         filterD = new IoHandlerFilterImpl( 'D' );
         filterE = new IoHandlerFilterImpl( 'E' );
-        manager.addFilter( 0, filterA );
-        manager.addFilter( -2, filterB );
-        manager.addFilter( 2, filterC );
-        manager.addFilter( -1, filterD );
-        manager.addFilter( 1, filterE );
+        filterX = new IoHandlerFilterImpl( 'X' );
+        
+        manager.addFilter( 0, false, filterA );
+        manager.addFilter( -2, false, filterB );
+        manager.addFilter( 2, false, filterC );
+        manager.addFilter( -1, false, filterD );
+        manager.addFilter( 1, false, filterE );
+        manager.addFilter( 3, true, filterX );
     }
 
     public void testAdd()
@@ -52,6 +57,14 @@ public class IoHandlerFilterManagerTest extends TestCase
         assertSame( filterA, list.get( 2 ) );
         assertSame( filterD, list.get( 3 ) );
         assertSame( filterB, list.get( 4 ) );
+
+        list = manager.getAllFiltersReversed();
+        assertEquals( 5, list.size() );
+        assertSame( filterC, list.get( 4 ) );
+        assertSame( filterE, list.get( 3 ) );
+        assertSame( filterA, list.get( 2 ) );
+        assertSame( filterD, list.get( 1 ) );
+        assertSame( filterB, list.get( 0 ) );
     }
 
     public void testRemoveFirst()
@@ -65,6 +78,13 @@ public class IoHandlerFilterManagerTest extends TestCase
         assertSame( filterA, list.get( 1 ) );
         assertSame( filterD, list.get( 2 ) );
         assertSame( filterB, list.get( 3 ) );
+
+        list = manager.getAllFiltersReversed();
+        assertEquals( 4, list.size() );
+        assertSame( filterE, list.get( 3 ) );
+        assertSame( filterA, list.get( 2 ) );
+        assertSame( filterD, list.get( 1 ) );
+        assertSame( filterB, list.get( 0 ) );
     }
 
     public void testRemoveLast()
@@ -78,6 +98,13 @@ public class IoHandlerFilterManagerTest extends TestCase
         assertSame( filterE, list.get( 1 ) );
         assertSame( filterA, list.get( 2 ) );
         assertSame( filterD, list.get( 3 ) );
+
+        list = manager.getAllFiltersReversed();
+        assertEquals( 4, list.size() );
+        assertSame( filterC, list.get( 3 ) );
+        assertSame( filterE, list.get( 2 ) );
+        assertSame( filterA, list.get( 1 ) );
+        assertSame( filterD, list.get( 0 ) );
     }
 
     public void testRemoveMiddle()
@@ -91,12 +118,19 @@ public class IoHandlerFilterManagerTest extends TestCase
         assertSame( filterE, list.get( 1 ) );
         assertSame( filterD, list.get( 2 ) );
         assertSame( filterB, list.get( 3 ) );
+
+        list = manager.getAllFiltersReversed();
+        assertEquals( 4, list.size() );
+        assertSame( filterC, list.get( 3 ) );
+        assertSame( filterE, list.get( 2 ) );
+        assertSame( filterD, list.get( 1 ) );
+        assertSame( filterB, list.get( 0 ) );
     }
     
     public void removeAll()
     {
-    	manager.removeAllFilters();
-    	assertEquals( 0, manager.getAllFilters().size() );
+        manager.removeAllFilters();
+        assertEquals( 0, manager.getAllFilters().size() );
     }
 
     public static void main( String[] args )

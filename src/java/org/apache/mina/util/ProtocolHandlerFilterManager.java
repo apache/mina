@@ -19,7 +19,6 @@
 package org.apache.mina.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.mina.common.IdleStatus;
@@ -80,89 +79,96 @@ public class ProtocolHandlerFilterManager
         }
     };
 
-    private final Entry[] entries;
+    private Entry head = new Entry( null, null, Integer.MIN_VALUE,
+                                    FINAL_FILTER, true );
 
-    private final int minPriority;
-
-    private final int maxPriority;
-
-    public ProtocolHandlerFilterManager( int minPriority, int maxPriority )
-    {
-        this.minPriority = minPriority;
-        this.maxPriority = maxPriority;
-
-        entries = new Entry[ maxPriority - minPriority + 2 ];
-        entries[ 0 ] = new Entry( minPriority - 1, FINAL_FILTER );
-    }
+    private Entry tail = head;
 
     public ProtocolHandlerFilterManager()
     {
-        this( ProtocolHandlerFilter.MIN_PRIORITY,
-                ProtocolHandlerFilter.MAX_PRIORITY );
     }
 
-    public synchronized void addFilter( int priority,
+    public synchronized void addFilter( int priority, boolean hidden,
                                        ProtocolHandlerFilter filter )
     {
-        if( priority < minPriority || priority > maxPriority )
+        Entry e = head;
+        Entry prevEntry = null;
+        for( ;; )
         {
-            throw new IllegalArgumentException( "priority: " + priority
-                    + " (should be " + minPriority + '~' + maxPriority + ')' );
+            if( e.priority < priority )
+            {
+                Entry newEntry = new Entry( prevEntry, e, priority, filter, hidden );
+                if( prevEntry == null )
+                {
+                    head = newEntry;
+                }
+                else
+                {
+                    prevEntry.nextEntry.prevEntry = newEntry;
+                    prevEntry.nextEntry = newEntry;
+                }
+                break;
+            }
+            else if( e.priority == priority )
+            {
+                throw new IllegalArgumentException(
+                                                    "Other filter is registered with priority "
+                                                                                                                                                                                                                + priority
+                                                                                                                                                                                                                + " already." );
+            }
+            prevEntry = e;
+            e = e.nextEntry;
         }
+    }
 
-        if( entries[ priority - minPriority + 1 ] == null )
-        {
-            entries[ priority - minPriority + 1 ] = new Entry( priority, filter );
-        }
-        else
+    public synchronized void removeFilter( ProtocolHandlerFilter filter )
+    {
+        if( filter == tail )
         {
             throw new IllegalArgumentException(
-                    "Other filter is registered with priority " + priority
-                            + " already." );
+                    "Cannot remove the internal filter.");
         }
-    }
 
-    public synchronized boolean removeFilter( ProtocolHandlerFilter filter )
-    {
-        for( int i = entries.length - 1; i > 0; i -- )
+        Entry e = head;
+        Entry prevEntry = null;
+        for( ;; )
         {
-            if( entries[ i ] != null && filter == entries[ i ].filter )
+            if( e.nextEntry == null )
             {
-                entries[ i ] = null;
-                return true;
+                break;
             }
+            else if( e.filter == filter )
+            {
+                if( prevEntry == null )
+                {
+                    // e is head
+                    e.nextEntry.prevEntry = null;
+                    head = e.nextEntry;
+                }
+                else
+                {
+                    e.nextEntry.prevEntry = prevEntry;
+                    prevEntry.nextEntry = e.nextEntry;
+                }
+                break;
+            }
+            prevEntry = e;
+            e = e.nextEntry;
         }
-
-        return false;
     }
 
-    public synchronized void removeAllFilters()
-    {
-        Arrays.fill( entries, 1, entries.length, null );
-    }
-
-    private Entry findNextEntry( int currentPriority )
-    {
-        currentPriority -= minPriority;
-
-        for( ; currentPriority >= 0; currentPriority -- )
-        {
-            Entry e = entries[ currentPriority ];
-            if( e != null )
-            {
-                return e;
-            }
-        }
-
-        throw new InternalError();
+    public synchronized void removeAllFilters() {
+        tail.prevEntry = null;
+        tail.nextEntry = null;
+        head = tail;
     }
 
     public void fireSessionOpened( ProtocolSession session )
     {
-        Entry entry = findNextEntry( maxPriority + 1 );
+        Entry head = this.head;
         try
         {
-            entry.filter.sessionOpened( entry.nextHandler, session );
+            head.filter.sessionOpened( head.nextHandler, session );
         }
         catch( Throwable e )
         {
@@ -172,10 +178,10 @@ public class ProtocolHandlerFilterManager
 
     public void fireSessionClosed( ProtocolSession session )
     {
-        Entry entry = findNextEntry( maxPriority + 1 );
+        Entry head = this.head;
         try
         {
-            entry.filter.sessionClosed( entry.nextHandler, session );
+            head.filter.sessionClosed( head.nextHandler, session );
         }
         catch( Throwable e )
         {
@@ -185,10 +191,10 @@ public class ProtocolHandlerFilterManager
 
     public void fireSessionIdle( ProtocolSession session, IdleStatus status )
     {
-        Entry entry = findNextEntry( maxPriority + 1 );
+        Entry head = this.head;
         try
         {
-            entry.filter.sessionIdle( entry.nextHandler, session, status );
+            head.filter.sessionIdle( head.nextHandler, session, status );
         }
         catch( Throwable e )
         {
@@ -198,10 +204,10 @@ public class ProtocolHandlerFilterManager
 
     public void fireMessageSent( ProtocolSession session, Object message )
     {
-        Entry entry = findNextEntry( maxPriority + 1 );
+        Entry head = this.head;
         try
         {
-            entry.filter.messageSent( entry.nextHandler, session, message );
+            head.filter.messageSent( head.nextHandler, session, message );
         }
         catch( Throwable e )
         {
@@ -211,11 +217,10 @@ public class ProtocolHandlerFilterManager
 
     public void fireMessageReceived( ProtocolSession session, Object message )
     {
-        Entry entry = findNextEntry( maxPriority + 1 );
+        Entry head = this.head;
         try
         {
-            entry.filter
-                    .messageReceived( entry.nextHandler, session, message );
+            head.filter.messageReceived( head.nextHandler, session, message );
         }
         catch( Throwable e )
         {
@@ -225,10 +230,10 @@ public class ProtocolHandlerFilterManager
 
     public void fireExceptionCaught( ProtocolSession session, Throwable cause )
     {
-        Entry entry = findNextEntry( maxPriority + 1 );
+        Entry head = this.head;
         try
         {
-            entry.filter.exceptionCaught( entry.nextHandler, session, cause );
+            head.filter.exceptionCaught( head.nextHandler, session, cause );
         }
         catch( Throwable e )
         {
@@ -236,116 +241,140 @@ public class ProtocolHandlerFilterManager
         }
     }
 
-    public void write( ProtocolSession session, WriteCommand cmd,
-                      Object message )
+    public void write( ProtocolSession session, WriteCommand cmd, Object message )
     {
-        for( int i = 0; i < entries.length; i ++ )
+        Entry e = tail;
+        do
         {
-            Entry e = entries[ i ];
-            if( e == null )
-            {
-                continue;
-            }
-
             message = e.filter.filterWrite( session, message );
             if( message == null )
             {
                 return;
             }
+
+            e = e.prevEntry;
         }
+        while( e != null );
 
         cmd.execute( message );
     }
 
     public List getAllFilters()
     {
-        List list = new ArrayList( maxPriority - minPriority + 1 );
-        for( int priority = maxPriority + 1;; )
+        List list = new ArrayList();
+        Entry e = head;
+        do
         {
-            Entry e = findNextEntry( priority );
-            if( e.priority < minPriority )
+            if( !e.hidden )
             {
-                break;
+                list.add( e.filter );
             }
-
-            priority = e.priority;
-            list.add( e.filter );
+            e = e.nextEntry;
         }
+        while( e != null );
+
+        return list;
+    }
+
+    public List getAllFiltersReversed()
+    {
+        List list = new ArrayList();
+        Entry e = tail;
+        do
+        {
+            if( !e.hidden )
+            {
+                list.add( e.filter );
+            }
+            e = e.prevEntry;
+        }
+        while( e != null );
 
         return list;
     }
 
     private class Entry
     {
+        private Entry prevEntry;
+
+        private Entry nextEntry;
+
         private final int priority;
+        
+        private final boolean hidden;
 
         private final ProtocolHandlerFilter filter;
 
         private final ProtocolHandler nextHandler;
 
-        private Entry( int priority, ProtocolHandlerFilter filter )
+        private Entry( Entry prevEntry, Entry nextEntry, int priority,
+                      ProtocolHandlerFilter filter, boolean hidden )
         {
             if( filter == null )
                 throw new NullPointerException( "filter" );
+            this.prevEntry = prevEntry;
+            this.nextEntry = nextEntry;
             this.priority = priority;
             this.filter = filter;
+            this.hidden = hidden;
             this.nextHandler = new ProtocolHandler()
             {
 
                 public void sessionOpened( ProtocolSession session )
                 {
-                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        nextEntry.filter.sessionOpened(
-                                nextEntry.nextHandler, session );
+                        Entry.this.nextEntry.filter
+                                .sessionOpened(
+                                                Entry.this.nextEntry.nextHandler,
+                                                session );
                     }
                     catch( Throwable e )
                     {
-                        ProtocolHandlerFilterManager.this
-                                .fireExceptionCaught( session, e );
+                        ProtocolHandlerFilterManager.this.fireExceptionCaught( session, e );
                     }
                 }
 
                 public void sessionClosed( ProtocolSession session )
                 {
-                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        nextEntry.filter.sessionClosed(
-                                nextEntry.nextHandler, session );
+                        Entry.this.nextEntry.filter
+                                .sessionClosed(
+                                                Entry.this.nextEntry.nextHandler,
+                                                session );
                     }
                     catch( Throwable e )
                     {
-                        ProtocolHandlerFilterManager.this
-                                .fireExceptionCaught( session, e );
+                        ProtocolHandlerFilterManager.this.fireExceptionCaught( session, e );
                     }
                 }
 
                 public void sessionIdle( ProtocolSession session,
                                         IdleStatus status )
                 {
-                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        nextEntry.filter.sessionIdle( nextEntry.nextHandler,
-                                session, status );
+                        Entry.this.nextEntry.filter
+                                .sessionIdle(
+                                              Entry.this.nextEntry.nextHandler,
+                                              session, status );
                     }
                     catch( Throwable e )
                     {
-                        ProtocolHandlerFilterManager.this
-                                .fireExceptionCaught( session, e );
+                        ProtocolHandlerFilterManager.this.fireExceptionCaught( session, e );
                     }
                 }
 
                 public void exceptionCaught( ProtocolSession session,
                                             Throwable cause )
                 {
-                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        nextEntry.filter.exceptionCaught(
-                                nextEntry.nextHandler, session, cause );
+                        Entry.this.nextEntry.filter
+                                .exceptionCaught(
+                                                  Entry.this.nextEntry.nextHandler,
+                                                  session, cause );
                     }
                     catch( Throwable e )
                     {
@@ -356,32 +385,32 @@ public class ProtocolHandlerFilterManager
                 public void messageReceived( ProtocolSession session,
                                             Object message )
                 {
-                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        nextEntry.filter.messageReceived(
-                                nextEntry.nextHandler, session, message );
+                        Entry.this.nextEntry.filter
+                                .messageReceived(
+                                                  Entry.this.nextEntry.nextHandler,
+                                                  session, message );
                     }
                     catch( Throwable e )
                     {
-                        ProtocolHandlerFilterManager.this
-                                .fireExceptionCaught( session, e );
+                        ProtocolHandlerFilterManager.this.fireExceptionCaught( session, e );
                     }
                 }
 
                 public void messageSent( ProtocolSession session,
                                         Object message )
                 {
-                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        nextEntry.filter.messageSent( nextEntry.nextHandler,
-                                session, message );
+                        Entry.this.nextEntry.filter
+                                .messageSent(
+                                              Entry.this.nextEntry.nextHandler,
+                                              session, message );
                     }
                     catch( Throwable e )
                     {
-                        ProtocolHandlerFilterManager.this
-                                .fireExceptionCaught( session, e );
+                        ProtocolHandlerFilterManager.this.fireExceptionCaught( session, e );
                     }
                 }
             };

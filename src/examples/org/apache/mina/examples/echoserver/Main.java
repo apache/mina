@@ -21,7 +21,6 @@ package org.apache.mina.examples.echoserver;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.io.IoAcceptor;
-import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.io.datagram.DatagramAcceptor;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
 import org.apache.mina.io.socket.SocketAcceptor;
@@ -47,7 +46,7 @@ public class Main
 
         // Add thread pool filter
         // MINA runs in a single thread if you don't add this filter.
-        acceptor.addFilter( IoHandlerFilter.MAX_PRIORITY, threadPoolFilter );
+        acceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
 
         // Bind
         acceptor.bind( new InetSocketAddress( PORT ),
@@ -57,8 +56,7 @@ public class Main
         IoAcceptor datagramAcceptor = new DatagramAcceptor();
 
         // Add thread pool filter
-        datagramAcceptor.addFilter( IoHandlerFilter.MAX_PRIORITY,
-                threadPoolFilter );
+        datagramAcceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
 
         // Bind
         datagramAcceptor.bind( new InetSocketAddress( PORT ),

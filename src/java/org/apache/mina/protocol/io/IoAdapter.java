@@ -70,7 +70,7 @@ public class IoAdapter
      */
     public void addFilter( int priority, ProtocolHandlerFilter filter )
     {
-        filterManager.addFilter( priority, filter );
+        filterManager.addFilter( priority, false, filter );
     }
 
     /**
