@@ -9,23 +9,23 @@
 	<inceptionYear>2004</inceptionYear>
 
 	<organization>
-		<name>The Apache Incubator</name>
-		<url>http://incubator.apache.org</url>
+		<name>The Apache Directory project</name>
+		<url>http://directory.apache.org</url>
 		<logo>/images/apache-incubator-logo.png</logo>
 	</organization>
 
 	<logo>/images/apache-directory-logo.png</logo>
-	<url>http://incubator.apache.org/directory</url>
+	<url>http://directory.apache.org/</url>
 
 	<issueTrackingUrl>
-	  http://nagoya.apache.org/jira/
+	  http://issues.apache.org/jira/
 	</issueTrackingUrl>
 	<siteAddress>minotaur.apache.org</siteAddress>
 	<siteDirectory>
-          /www/incubator.apache.org/directory/subprojects/network/mina
+          /www/directory.apache.org/directory/subprojects/network/mina
         </siteDirectory>
 	<distributionDirectory>
-          /www/cvs.apache.org/dist/incubator/directory
+          /www/cvs.apache.org/dist/directory
 	</distributionDirectory>
 
 	<repository>
