@@ -6,7 +6,6 @@ package org.apache.mina.protocol.io;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolConnector;
@@ -64,9 +63,9 @@ public class IoProtocolConnector implements ProtocolConnector
         return adapter.toProtocolSession( session );
     }
 
-    public ProtocolHandlerFilterChain newFilterChain( FilterChainType type )
+    public ProtocolHandlerFilterChain newFilterChain()
     {
-        return adapter.newFilterChain( type );
+        return adapter.newFilterChain();
     }
 
     public ProtocolHandlerFilterChain getFilterChain()

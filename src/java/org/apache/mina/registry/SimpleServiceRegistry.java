@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
@@ -118,16 +117,16 @@ public class SimpleServiceRegistry implements ServiceRegistry
         stopThreadPools();
     }
 
-    public IoHandlerFilterChain newIoFilterChain(TransportType transportType, FilterChainType chainType) {
-        return findIoAcceptor( transportType ).newFilterChain( chainType );
+    public IoHandlerFilterChain newIoFilterChain(TransportType transportType) {
+        return findIoAcceptor( transportType ).newFilterChain();
     }
 
     public IoHandlerFilterChain getIoFilterChain(TransportType transportType) {
         return findIoAcceptor( transportType ).getFilterChain();
     }
 
-    public ProtocolHandlerFilterChain newProtocolFilterChain(TransportType transportType, FilterChainType chainType) {
-        return findProtocolAcceptor( transportType ).newFilterChain( chainType );
+    public ProtocolHandlerFilterChain newProtocolFilterChain(TransportType transportType) {
+        return findProtocolAcceptor( transportType ).newFilterChain();
     }
 
     public ProtocolHandlerFilterChain getProtocolFilterChain(TransportType transportType) {

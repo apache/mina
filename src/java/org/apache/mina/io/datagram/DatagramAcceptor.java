@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.DefaultExceptionMonitor;
 import org.apache.mina.io.ExceptionMonitor;
 import org.apache.mina.io.IoAcceptor;
@@ -48,7 +47,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
-    private final DatagramFilterChain filters = new DatagramFilterChain( FilterChainType.PREPROCESS, this );
+    private final DatagramFilterChain filters = new DatagramFilterChain( this );
 
     private final int id = nextId ++ ;
 
@@ -514,9 +513,9 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         }
     }
     
-    public IoHandlerFilterChain newFilterChain( FilterChainType type )
+    public IoHandlerFilterChain newFilterChain()
     {
-        return new DatagramFilterChain( type, this );
+        return new DatagramFilterChain( this );
     }
     
     public IoHandlerFilterChain getFilterChain()

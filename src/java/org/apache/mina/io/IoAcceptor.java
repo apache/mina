@@ -21,8 +21,6 @@ package org.apache.mina.io;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.FilterChainType;
-
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
  * {@link IoHandler}s.
@@ -64,7 +62,7 @@ public interface IoAcceptor
      */
     void unbind( SocketAddress address );
 
-    IoHandlerFilterChain newFilterChain( FilterChainType type );
+    IoHandlerFilterChain newFilterChain();
     
     IoHandlerFilterChain getFilterChain();
     

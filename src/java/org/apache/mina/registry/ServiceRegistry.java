@@ -21,7 +21,6 @@ package org.apache.mina.registry;
 import java.io.IOException;
 import java.util.Set;
 
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
@@ -56,11 +55,11 @@ public interface ServiceRegistry
      */
     void unbind( Service service );
 
-    IoHandlerFilterChain newIoFilterChain( TransportType transportType, FilterChainType chainType );
+    IoHandlerFilterChain newIoFilterChain( TransportType transportType );
     
     IoHandlerFilterChain getIoFilterChain( TransportType transportType );
     
-    ProtocolHandlerFilterChain newProtocolFilterChain( TransportType transportType, FilterChainType chainType );
+    ProtocolHandlerFilterChain newProtocolFilterChain( TransportType transportType );
     
     ProtocolHandlerFilterChain getProtocolFilterChain( TransportType transportType );
 

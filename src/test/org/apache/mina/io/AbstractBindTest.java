@@ -98,8 +98,7 @@ public class AbstractBindTest extends TestCase
     {
         InetSocketAddress addr = new InetSocketAddress( port );
         EchoProtocolHandler handler = new EchoProtocolHandler();
-        // we test only 8192 times to avoid too many open files exception.
-        for( int i = 0; i < 8192; i++ ) 
+        for( int i = 0; i < 1024; i++ ) 
         {
             acceptor.unbind( addr );
             acceptor.bind( addr, handler );

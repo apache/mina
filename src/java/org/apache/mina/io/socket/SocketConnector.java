@@ -28,7 +28,6 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.DefaultExceptionMonitor;
 import org.apache.mina.io.ExceptionMonitor;
 import org.apache.mina.io.IoConnector;
@@ -49,7 +48,7 @@ public class SocketConnector implements IoConnector
 
     private final int id = nextId++;
 
-    private final SocketFilterChain filters = new SocketFilterChain( FilterChainType.PREPROCESS );
+    private final SocketFilterChain filters = new SocketFilterChain();
 
     private final Selector selector;
 
@@ -329,9 +328,9 @@ public class SocketConnector implements IoConnector
         }
     }
 
-    public IoHandlerFilterChain newFilterChain( FilterChainType type )
+    public IoHandlerFilterChain newFilterChain()
     {
-        return new SocketFilterChain( type );
+        return new SocketFilterChain();
     }
     
     public IoHandlerFilterChain getFilterChain()

@@ -2,13 +2,12 @@ package org.apache.mina.io;
 
 import java.util.List;
 
-import org.apache.mina.common.FilterChainType;
-
 
 public interface IoHandlerFilterChain extends IoHandlerFilter {
+    static String NEXT_FILTER = "nextFilter";
+    
     IoHandlerFilterChain getRoot();
     IoHandlerFilterChain getParent();
-    FilterChainType getType();
 
     IoHandlerFilter getChild( String name );
     List getChildren();

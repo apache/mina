@@ -21,8 +21,6 @@ package org.apache.mina.io;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.FilterChainType;
-
 /**
  * Connects to endpoint, communicates with the server, and fires events to
  * {@link IoHandler}s.
@@ -71,7 +69,7 @@ public interface IoConnector
     IoSession connect( SocketAddress address, int timeout, IoHandler handler )
             throws IOException;
 
-    IoHandlerFilterChain newFilterChain( FilterChainType type );
+    IoHandlerFilterChain newFilterChain();
     
     IoHandlerFilterChain getFilterChain();
 
