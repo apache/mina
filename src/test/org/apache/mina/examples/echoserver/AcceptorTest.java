@@ -39,7 +39,7 @@ public class AcceptorTest extends AbstractTest
         // Add an SSL filter
         SSLFilter sslFilter = new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
         sslFilter.setDebug( SSLFilter.Debug.ON );
-        acceptor.addFilter( Integer.MAX_VALUE - 1, sslFilter );
+        acceptor.getFilterChain().addLast( "SSL", sslFilter );
         
         // Create a commons-net socket factory
         SSLSocketFactory.setSslEnabled(true);

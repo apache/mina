@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.io.IoHandlerFilterAdapter;
 import org.apache.mina.io.IoSession;
@@ -61,13 +60,13 @@ public class BlacklistFilter extends IoHandlerFilterAdapter
      * Forwards event if and if only the remote address of session is not
      * blacklisted.
      */
-    public void dataRead( IoHandler nextHandler, IoSession session,
+    public void dataRead( NextFilter nextFilter, IoSession session,
                          ByteBuffer buf )
     {
         if( !isBlocked( session ) )
         {
             // forward if not blocked
-            super.dataRead( nextHandler, session, buf );
+            super.dataRead( nextFilter, session, buf );
         }
     }
 
@@ -75,7 +74,7 @@ public class BlacklistFilter extends IoHandlerFilterAdapter
      * Close connection immediately if the remote address of session is
      * blacklisted.
      */
-    public void sessionOpened( IoHandler nextHandler, IoSession session )
+    public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
         if( isBlocked( session ) )
         {
@@ -84,7 +83,7 @@ public class BlacklistFilter extends IoHandlerFilterAdapter
         }
         else
         {
-            super.sessionOpened( nextHandler, session );
+            super.sessionOpened( nextFilter, session );
         }
     }
 

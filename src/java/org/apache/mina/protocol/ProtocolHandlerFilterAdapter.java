@@ -30,44 +30,44 @@ import org.apache.mina.common.IdleStatus;
  */
 public class ProtocolHandlerFilterAdapter implements ProtocolHandlerFilter
 {
-    public void sessionOpened( ProtocolHandler nextHandler,
+    public void sessionOpened( NextFilter nextFilter,
                               ProtocolSession session )
     {
-        nextHandler.sessionOpened( session );
+        nextFilter.sessionOpened( session );
     }
 
-    public void sessionClosed( ProtocolHandler nextHandler,
+    public void sessionClosed( NextFilter nextFilter,
                               ProtocolSession session )
     {
-        nextHandler.sessionClosed( session );
+        nextFilter.sessionClosed( session );
     }
 
-    public void sessionIdle( ProtocolHandler nextHandler,
+    public void sessionIdle( NextFilter nextFilter,
                             ProtocolSession session, IdleStatus status )
     {
-        nextHandler.sessionIdle( session, status );
+        nextFilter.sessionIdle( session, status );
     }
 
-    public void exceptionCaught( ProtocolHandler nextHandler,
+    public void exceptionCaught( NextFilter nextFilter,
                                 ProtocolSession session, Throwable cause )
     {
-        nextHandler.exceptionCaught( session, cause );
+        nextFilter.exceptionCaught( session, cause );
     }
 
-    public void messageReceived( ProtocolHandler nextHandler,
+    public void messageReceived( NextFilter nextFilter,
                                 ProtocolSession session, Object message )
     {
-        nextHandler.messageReceived( session, message );
+        nextFilter.messageReceived( session, message );
     }
 
-    public void messageSent( ProtocolHandler nextHandler,
+    public void messageSent( NextFilter nextFilter,
                             ProtocolSession session, Object message )
     {
-        nextHandler.messageSent( session, message );
+        nextFilter.messageSent( session, message );
     }
 
-    public Object filterWrite( ProtocolSession session, Object message )
+    public void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message )
     {
-        return message;
+        nextFilter.filterWrite( session, message );
     }
 }

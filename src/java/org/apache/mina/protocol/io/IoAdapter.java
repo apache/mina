@@ -19,9 +19,9 @@
 package org.apache.mina.protocol.io;
 
 import java.net.SocketAddress;
-import java.util.List;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
@@ -33,13 +33,11 @@ import org.apache.mina.protocol.ProtocolDecoderOutput;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolEncoderOutput;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilter;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolViolationException;
-import org.apache.mina.util.ProtocolHandlerFilterManager;
 import org.apache.mina.util.Queue;
-import org.apache.mina.util.ProtocolHandlerFilterManager.WriteCommand;
 
 /**
  * Adapts the specified {@link ProtocolProvider} to {@link IoHandler}.
@@ -55,41 +53,20 @@ import org.apache.mina.util.ProtocolHandlerFilterManager.WriteCommand;
  */
 public class IoAdapter
 {
-    private final ProtocolHandlerFilterManager filterManager = new ProtocolHandlerFilterManager();
+    private final IoProtocolFilterChain filters = new IoProtocolFilterChain( FilterChainType.PREPROCESS );
 
     IoAdapter()
     {
     }
-
-    /**
-     * Adds the specified filter with the specified priority.  Greater priority
-     * value, higher priority, and thus evaluated more earlier.  Please note
-     * that priority value must be unique.
-     */
-    public void addFilter( int priority, ProtocolHandlerFilter filter )
+    
+    public ProtocolHandlerFilterChain newFilterChain( FilterChainType type )
     {
-        filterManager.addFilter( priority, false, filter );
+        return new IoProtocolFilterChain( type );
     }
-
-    /**
-     * Removes the specified filter from the filter list.
-     */
-    public void removeFilter( ProtocolHandlerFilter filter )
+    
+    public ProtocolHandlerFilterChain getFilterChain()
     {
-        filterManager.removeFilter( filter );
-    }
-
-    /**
-     * Removes all filters added to this adapter.
-     */
-    public void removeAllFilters()
-    {
-        filterManager.removeAllFilters();
-    }
-
-    public List getAllFilters()
-    {
-        return filterManager.getAllFilters();
+        return filters;
     }
 
     /**
@@ -120,7 +97,7 @@ public class IoAdapter
         }
     }
 
-    private class SessionHandlerAdapter implements IoHandler
+    class SessionHandlerAdapter implements IoHandler
     {
         private final ProtocolCodecFactory codecFactory;
         private final ProtocolHandler handler;
@@ -133,23 +110,23 @@ public class IoAdapter
 
         public void sessionOpened( IoSession session )
         {
-            filterManager.fireSessionOpened( getProtocolSession( session ) );
+            filters.sessionOpened( null, getProtocolSession( session ) );
         }
 
         public void sessionClosed( IoSession session )
         {
-            filterManager.fireSessionClosed( getProtocolSession( session ) );
+            filters.sessionClosed( null, getProtocolSession( session ) );
         }
 
         public void sessionIdle( IoSession session, IdleStatus status )
         {
-            filterManager.fireSessionIdle( getProtocolSession( session ),
+            filters.sessionIdle( null, getProtocolSession( session ),
                     status );
         }
 
         public void exceptionCaught( IoSession session, Throwable cause )
         {
-            filterManager.fireExceptionCaught( getProtocolSession( session ),
+            filters.exceptionCaught( null, getProtocolSession( session ),
                     cause );
         }
 
@@ -171,7 +148,7 @@ public class IoAdapter
                     {
                         do
                         {
-                            filterManager.fireMessageReceived( psession,
+                            filters.messageReceived( null, psession,
                                     queue.pop() );
                         }
                         while( !queue.isEmpty() );
@@ -181,11 +158,11 @@ public class IoAdapter
             catch( ProtocolViolationException pve )
             {
                 pve.setBuffer( in );
-                filterManager.fireExceptionCaught( psession, pve );
+                filters.exceptionCaught( null, psession, pve );
             }
             catch( Throwable t )
             {
-                filterManager.fireExceptionCaught( psession, t );
+                filters.exceptionCaught( null, psession, t );
             }
         }
 
@@ -193,11 +170,11 @@ public class IoAdapter
         {
             if( marker == null )
                 return;
-            filterManager.fireMessageSent( ( ProtocolSession ) session
+            filters.messageSent( null, ( ProtocolSession ) session
                     .getAttachment(), marker );
         }
 
-        private void write( IoSession session )
+        void doWrite( IoSession session )
         {
             ProtocolSessionImpl psession = ( ProtocolSessionImpl ) session
                     .getAttachment();
@@ -235,7 +212,7 @@ public class IoAdapter
             }
             catch( Throwable t )
             {
-                filterManager.fireExceptionCaught( psession, t );
+                filters.exceptionCaught( null, psession, t );
             }
         }
 
@@ -261,13 +238,13 @@ public class IoAdapter
         }
     }
 
-    private class ProtocolSessionImpl implements ProtocolSession
+    class ProtocolSessionImpl implements ProtocolSession
     {
-        private final IoSession session;
+        final IoSession session;
 
-        private final SessionHandlerAdapter adapter;
+        final SessionHandlerAdapter adapter;
 
-        private final Queue writeQueue = new Queue();
+        final Queue writeQueue = new Queue();
         
         private final ProtocolEncoder encoder;
         
@@ -276,8 +253,6 @@ public class IoAdapter
         private final ProtocolEncoderOutputImpl encOut;
 
         private final ProtocolDecoderOutputImpl decOut;
-
-        private final WriteCommand writeCommand = new WriteCommandImpl();
 
         private Object attachment;
 
@@ -324,7 +299,7 @@ public class IoAdapter
 
         public void write( Object message )
         {
-            filterManager.write( this, writeCommand, message );
+            filters.filterWrite( null, this, message );
         }
 
         public TransportType getTransportType()
@@ -380,19 +355,6 @@ public class IoAdapter
         public boolean isIdle( IdleStatus status )
         {
             return session.isIdle( status );
-        }
-
-        private class WriteCommandImpl implements WriteCommand
-        {
-            public void execute( Object message )
-            {
-                synchronized( writeQueue )
-                {
-                    writeQueue.push( message );
-                }
-
-                adapter.write( session );
-            }
         }
     }
 

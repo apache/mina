@@ -48,43 +48,48 @@ public interface ProtocolHandlerFilter
     /**
      * Filters {@link ProtocolHandler#sessionOpened(ProtocolSession)} event.
      */
-    void sessionOpened( ProtocolHandler nextHandler, ProtocolSession session );
+    void sessionOpened( NextFilter nextFilter, ProtocolSession session );
 
     /**
      * Filters {@link ProtocolHandler#sessionClosed(ProtocolSession)} event.
      */
-    void sessionClosed( ProtocolHandler nextHandler, ProtocolSession session );
+    void sessionClosed( NextFilter nextFilter, ProtocolSession session );
 
     /**
      * Filters {@link ProtocolHandler#sessionIdle(ProtocolSession,IdleStatus)}
      * event.
      */
-    void sessionIdle( ProtocolHandler nextHandler, ProtocolSession session,
+    void sessionIdle( NextFilter nextFilter, ProtocolSession session,
                      IdleStatus status );
 
     /**
      * Filters {@link ProtocolHandler#exceptionCaught(ProtocolSession,Throwable)}
      * event.
      */
-    void exceptionCaught( ProtocolHandler nextHandler,
+    void exceptionCaught( NextFilter nextFilter,
                          ProtocolSession session, Throwable cause );
 
     /**
      * Filters {@link ProtocolHandler#messageReceived(ProtocolSession,Object)}
      * event.
      */
-    void messageReceived( ProtocolHandler nextHandler,
+    void messageReceived( NextFilter nextFilter,
                          ProtocolSession session, Object message );
 
     /**
      * Filters {@link ProtocolHandler#messageSent(ProtocolSession,Object)}
      * event.
      */
-    void messageSent( ProtocolHandler nextHandler, ProtocolSession session,
+    void messageSent( NextFilter nextFilter, ProtocolSession session,
                      Object message );
 
     /**
      * Filters {@link ProtocolSession#write(Object)} method invocation.
      */
-    Object filterWrite( ProtocolSession session, Object message );
+    void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message );
+    
+    public interface NextFilter extends ProtocolHandler
+    {
+        void filterWrite( ProtocolSession session, Object message );
+    }
 }

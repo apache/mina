@@ -169,49 +169,49 @@ public class ProtocolThreadPoolFilter implements ProtocolHandlerFilter
         }
     }
 
-    public void sessionOpened( ProtocolHandler nextHandler,
+    public void sessionOpened( NextFilter nextFilter,
                               ProtocolSession session )
     {
-        fireEvent( nextHandler, session, EventType.OPENED, null );
+        fireEvent( nextFilter, session, EventType.OPENED, null );
     }
 
-    public void sessionClosed( ProtocolHandler nextHandler,
+    public void sessionClosed( NextFilter nextFilter,
                               ProtocolSession session )
     {
-        fireEvent( nextHandler, session, EventType.CLOSED, null );
+        fireEvent( nextFilter, session, EventType.CLOSED, null );
     }
 
-    public void sessionIdle( ProtocolHandler nextHandler,
+    public void sessionIdle( NextFilter nextFilter,
                             ProtocolSession session, IdleStatus status )
     {
-        fireEvent( nextHandler, session, EventType.IDLE, status );
+        fireEvent( nextFilter, session, EventType.IDLE, status );
     }
 
-    public void exceptionCaught( ProtocolHandler nextHandler,
+    public void exceptionCaught( NextFilter nextFilter,
                                 ProtocolSession session, Throwable cause )
     {
-        fireEvent( nextHandler, session, EventType.EXCEPTION, cause );
+        fireEvent( nextFilter, session, EventType.EXCEPTION, cause );
     }
 
-    public void messageReceived( ProtocolHandler nextHandler,
+    public void messageReceived( NextFilter nextFilter,
                                 ProtocolSession session, Object message )
     {
-        fireEvent( nextHandler, session, EventType.RECEIVED, message );
+        fireEvent( nextFilter, session, EventType.RECEIVED, message );
     }
 
-    public void messageSent( ProtocolHandler nextHandler,
+    public void messageSent( NextFilter nextFilter,
                             ProtocolSession session, Object message )
     {
-        fireEvent( nextHandler, session, EventType.SENT, message );
+        fireEvent( nextFilter, session, EventType.SENT, message );
     }
 
-    private void fireEvent( ProtocolHandler nextHandler,
+    private void fireEvent( NextFilter nextFilter,
                            ProtocolSession session, EventType type, Object data )
     {
         SessionBuffer buf = getSessionBuffer( session );
         synchronized( buf )
         {
-            buf.nextHandlers.push( nextHandler );
+            buf.nextFilters.push( nextFilter );
             buf.eventTypes.push( type );
             buf.eventDatum.push( data );
         }
@@ -257,7 +257,7 @@ public class ProtocolThreadPoolFilter implements ProtocolHandlerFilter
 
         private final ProtocolSession session;
 
-        private final Queue nextHandlers = new Queue();
+        private final Queue nextFilters = new Queue();
 
         private final Queue eventTypes = new Queue();
 
@@ -358,10 +358,10 @@ public class ProtocolThreadPoolFilter implements ProtocolHandlerFilter
                         buf = ( SessionBuffer ) it.next();
                         it.remove();
                     }
-                    while( buf != null && buf.nextHandlers.isEmpty()
+                    while( buf != null && buf.nextFilters.isEmpty()
                            && it.hasNext() );
                 }
-                while( buf != null && buf.nextHandlers.isEmpty() );
+                while( buf != null && buf.nextFilters.isEmpty() );
             }
 
             return buf;
@@ -372,49 +372,49 @@ public class ProtocolThreadPoolFilter implements ProtocolHandlerFilter
             ProtocolSession session = buf.session;
             for( ;; )
             {
-                ProtocolHandler nextHandler;
+                NextFilter nextFilter;
                 EventType type;
                 Object data;
                 synchronized( buf )
                 {
-                    nextHandler = ( ProtocolHandler ) buf.nextHandlers.pop();
-                    if( nextHandler == null )
+                    nextFilter = ( NextFilter ) buf.nextFilters.pop();
+                    if( nextFilter == null )
                         break;
 
                     type = ( EventType ) buf.eventTypes.pop();
                     data = buf.eventDatum.pop();
                 }
-                processEvent( nextHandler, session, type, data );
+                processEvent( nextFilter, session, type, data );
             }
         }
 
-        private void processEvent( ProtocolHandler nextHandler,
+        private void processEvent( NextFilter nextFilter,
                                   ProtocolSession session, EventType type,
                                   Object data )
         {
             if( type == EventType.RECEIVED )
             {
-                nextHandler.messageReceived( session, data );
+                nextFilter.messageReceived( session, data );
             }
             else if( type == EventType.SENT )
             {
-                nextHandler.messageSent( session, data );
+                nextFilter.messageSent( session, data );
             }
             else if( type == EventType.EXCEPTION )
             {
-                nextHandler.exceptionCaught( session, ( Throwable ) data );
+                nextFilter.exceptionCaught( session, ( Throwable ) data );
             }
             else if( type == EventType.IDLE )
             {
-                nextHandler.sessionIdle( session, ( IdleStatus ) data );
+                nextFilter.sessionIdle( session, ( IdleStatus ) data );
             }
             else if( type == EventType.OPENED )
             {
-                nextHandler.sessionOpened( session );
+                nextFilter.sessionOpened( session );
             }
             else if( type == EventType.CLOSED )
             {
-                nextHandler.sessionClosed( session );
+                nextFilter.sessionClosed( session );
             }
         }
 
@@ -437,7 +437,7 @@ public class ProtocolThreadPoolFilter implements ProtocolHandlerFilter
             synchronized( readySessionBuffers )
             {
                 busySessionBuffers.remove( buf );
-                if( buf.nextHandlers.isEmpty() )
+                if( buf.nextFilters.isEmpty() )
                 {
                     removeSessionBuffer( buf );
                 }
@@ -517,8 +517,8 @@ public class ProtocolThreadPoolFilter implements ProtocolHandlerFilter
         }
     }
 
-    public Object filterWrite( ProtocolSession session, Object message )
+    public void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message )
     {
-        return message;
+        nextFilter.filterWrite( session, message );
     }
 }

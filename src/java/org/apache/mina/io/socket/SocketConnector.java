@@ -26,16 +26,15 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.DefaultExceptionMonitor;
 import org.apache.mina.io.ExceptionMonitor;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilter;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
-import org.apache.mina.util.IoHandlerFilterManager;
 import org.apache.mina.util.Queue;
 
 /**
@@ -50,7 +49,7 @@ public class SocketConnector implements IoConnector
 
     private final int id = nextId++;
 
-    private final IoHandlerFilterManager filterManager = new IoHandlerFilterManager();
+    private final SocketFilterChain filters = new SocketFilterChain( FilterChainType.PREPROCESS );
 
     private final Selector selector;
 
@@ -247,7 +246,7 @@ public class SocketConnector implements IoConnector
 
     private SocketSession newSession( SocketChannel ch, IoHandler handler )
     {
-        SocketSession session = new SocketSession( filterManager, ch, handler );
+        SocketSession session = new SocketSession( filters, ch, handler );
         SocketIoProcessor.getInstance().addSession( session );
         return session;
     }
@@ -324,25 +323,14 @@ public class SocketConnector implements IoConnector
         }
     }
 
-    public void addFilter( int priority, IoHandlerFilter filter )
+    public IoHandlerFilterChain newFilterChain( FilterChainType type )
     {
-        filterManager.addFilter( priority, false, filter );
-
+        return new SocketFilterChain( type );
     }
-
-    public void removeFilter( IoHandlerFilter filter )
+    
+    public IoHandlerFilterChain getFilterChain()
     {
-        filterManager.removeFilter( filter );
-    }
-
-    public void removeAllFilters()
-    {
-    	filterManager.removeAllFilters();
-    }
-
-    public List getAllFilters()
-    {
-    	return filterManager.getAllFilters();
+        return filters;
     }
 
     public ExceptionMonitor getExceptionMonitor()

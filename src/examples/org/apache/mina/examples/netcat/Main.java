@@ -46,7 +46,8 @@ public class Main
 
         // Add I/O thread pool filter.
         // MINA runs in a single thread if you don't add this filter.
-        connector.addFilter( Integer.MAX_VALUE, new IoThreadPoolFilter() );
+        connector.getFilterChain().addFirst(
+                "threadPool", new IoThreadPoolFilter() );
 
         // Start communication.
         connector.connect( new InetSocketAddress( args[ 0 ], Integer

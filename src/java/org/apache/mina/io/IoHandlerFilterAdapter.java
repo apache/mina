@@ -35,42 +35,43 @@ import org.apache.mina.common.IdleStatus;
  */
 public class IoHandlerFilterAdapter implements IoHandlerFilter
 {
-    public void sessionOpened( IoHandler nextHandler, IoSession session )
+    public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
-        nextHandler.sessionOpened( session );
+        nextFilter.sessionOpened( session );
     }
 
-    public void sessionClosed( IoHandler nextHandler, IoSession session )
+    public void sessionClosed( NextFilter nextFilter, IoSession session )
     {
-        nextHandler.sessionClosed( session );
+        nextFilter.sessionClosed( session );
     }
 
-    public void sessionIdle( IoHandler nextHandler, IoSession session,
+    public void sessionIdle( NextFilter nextFilter, IoSession session,
                             IdleStatus status )
     {
-        nextHandler.sessionIdle( session, status );
+        nextFilter.sessionIdle( session, status );
     }
 
-    public void exceptionCaught( IoHandler nextHandler, IoSession session,
+    public void exceptionCaught( NextFilter nextFilter, IoSession session,
                                 Throwable cause )
     {
-        nextHandler.exceptionCaught( session, cause );
+        nextFilter.exceptionCaught( session, cause );
     }
 
-    public void dataRead( IoHandler nextHandler, IoSession session,
+    public void dataRead( NextFilter nextFilter, IoSession session,
                          ByteBuffer buf )
     {
-        nextHandler.dataRead( session, buf );
+        nextFilter.dataRead( session, buf );
     }
 
-    public void dataWritten( IoHandler nextHandler, IoSession session,
+    public void dataWritten( NextFilter nextFilter, IoSession session,
                             Object marker )
     {
-        nextHandler.dataWritten( session, marker );
+        nextFilter.dataWritten( session, marker );
     }
 
-    public ByteBuffer filterWrite( IoSession session, ByteBuffer buf )
+    public void filterWrite( NextFilter nextFilter, IoSession session,
+                             ByteBuffer buf, Object marker )
     {
-        return buf;
+        nextFilter.filterWrite( session, buf, marker );
     }
 }

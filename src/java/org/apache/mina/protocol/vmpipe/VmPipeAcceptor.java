@@ -6,14 +6,13 @@ package org.apache.mina.protocol.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.protocol.ProtocolAcceptor;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilter;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
-import org.apache.mina.util.ProtocolHandlerFilterManager;
 
 /**
  * Binds the specified {@link ProtocolProvider} to the specified
@@ -26,14 +25,14 @@ public class VmPipeAcceptor implements ProtocolAcceptor
 {
     static final Map boundHandlers = new HashMap();
 
-    private final ProtocolHandlerFilterManager filterManager = new ProtocolHandlerFilterManager();
+    private final VmPipeFilterChain filters = new VmPipeFilterChain( FilterChainType.PREPROCESS );
 
     /**
      * Creates a new instance.
      */
     public VmPipeAcceptor()
     {
-        filterManager.addFilter( Integer.MIN_VALUE + 1, true, new VmPipeFilter() );
+        filters.addLast( "VMPipe", new VmPipeFilter() );
     }
 
     public void bind( SocketAddress address, ProtocolProvider protocolProvider )
@@ -55,7 +54,7 @@ public class VmPipeAcceptor implements ProtocolAcceptor
             }
 
             boundHandlers.put( address, new Entry( ( VmPipeAddress ) address,
-                    filterManager, protocolProvider.getHandler() ) );
+                    filters, protocolProvider.getHandler() ) );
         }
     }
 
@@ -69,41 +68,31 @@ public class VmPipeAcceptor implements ProtocolAcceptor
             boundHandlers.remove( address );
         }
     }
-
-    public void addFilter( int priority, ProtocolHandlerFilter filter )
+    
+    public ProtocolHandlerFilterChain newFilterChain( FilterChainType type )
     {
-        filterManager.addFilter( priority, false, filter );
+        return new VmPipeFilterChain( type );
     }
-
-    public void removeFilter( ProtocolHandlerFilter filter )
+    
+    public ProtocolHandlerFilterChain getFilterChain()
     {
-        filterManager.removeFilter( filter );
-    }
-
-    public List getAllFilters()
-    {
-        return filterManager.getAllFilters();
-    }
-
-    public void removeAllFilters()
-    {
-        filterManager.removeAllFilters();
+        return filters;
     }
 
     static class Entry
     {
         final VmPipeAddress address;
 
-        final ProtocolHandlerFilterManager filterManager;
+        final ProtocolHandlerFilterChain filters;
 
         final ProtocolHandler handler;
 
         private Entry( VmPipeAddress address,
-                      ProtocolHandlerFilterManager filterManager,
+                      ProtocolHandlerFilterChain filters,
                       ProtocolHandler handler )
         {
             this.address = address;
-            this.filterManager = filterManager;
+            this.filters = filters;
             this.handler = handler;
         }
     }

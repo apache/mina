@@ -20,7 +20,8 @@ package org.apache.mina.protocol;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.List;
+
+import org.apache.mina.common.FilterChainType;
 
 /**
  * Connects to endpoint, communicates with the server, and fires events to
@@ -68,27 +69,7 @@ public interface ProtocolConnector
                             ProtocolProvider protocolProvider )
             throws IOException;
 
-    /**
-     * Adds the specified filter with the specified priority.  Greater priority
-     * value, higher priority, and thus evaluated more earlier.  Please note
-     * that priority value must be unique.
-     */
-    void addFilter( int priority, ProtocolHandlerFilter filter );
-
-    /**
-     * Removes the specified filter from the filter list.
-     */
-    void removeFilter( ProtocolHandlerFilter filter );
-
-    /**
-     * Removes all filters added to this connector.
-     */
-    void removeAllFilters();
-
-    /**
-     * Returns the list of all filters ordered by priority (higher first).
-     * The returned list is clone of internal filter chain, and thus you
-     * cannot add or remove filters using it. 
-     */
-    List getAllFilters();
+    ProtocolHandlerFilterChain newFilterChain( FilterChainType type );
+    
+    ProtocolHandlerFilterChain getFilterChain();
 }

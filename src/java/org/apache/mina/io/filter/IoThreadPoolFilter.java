@@ -197,49 +197,49 @@ public class IoThreadPoolFilter implements IoHandlerFilter
         }
     }
 
-    public void sessionOpened( IoHandler nextHandler, IoSession session )
+    public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
-        fireEvent( nextHandler, session, EventType.OPENED, null );
+        fireEvent( nextFilter, session, EventType.OPENED, null );
     }
 
-    public void sessionClosed( IoHandler nextHandler, IoSession session )
+    public void sessionClosed( NextFilter nextFilter, IoSession session )
     {
-        fireEvent( nextHandler, session, EventType.CLOSED, null );
+        fireEvent( nextFilter, session, EventType.CLOSED, null );
     }
 
-    public void sessionIdle( IoHandler nextHandler, IoSession session,
+    public void sessionIdle( NextFilter nextFilter, IoSession session,
                             IdleStatus status )
     {
-        fireEvent( nextHandler, session, EventType.IDLE, status );
+        fireEvent( nextFilter, session, EventType.IDLE, status );
     }
 
-    public void exceptionCaught( IoHandler nextHandler, IoSession session,
+    public void exceptionCaught( NextFilter nextFilter, IoSession session,
                                 Throwable cause )
     {
-        fireEvent( nextHandler, session, EventType.EXCEPTION, cause );
+        fireEvent( nextFilter, session, EventType.EXCEPTION, cause );
     }
 
-    public void dataRead( IoHandler nextHandler, IoSession session,
+    public void dataRead( NextFilter nextFilter, IoSession session,
                          ByteBuffer buf )
     {
         // MINA will release the buffer if this method returns.
         buf.acquire();
-        fireEvent( nextHandler, session, EventType.READ, buf );
+        fireEvent( nextFilter, session, EventType.READ, buf );
     }
 
-    public void dataWritten( IoHandler nextHandler, IoSession session,
+    public void dataWritten( NextFilter nextFilter, IoSession session,
                             Object marker )
     {
-        fireEvent( nextHandler, session, EventType.WRITTEN, marker );
+        fireEvent( nextFilter, session, EventType.WRITTEN, marker );
     }
 
-    private void fireEvent( IoHandler nextHandler, IoSession session,
+    private void fireEvent( NextFilter nextFilter, IoSession session,
                            EventType type, Object data )
     {
         SessionBuffer buf = getSessionBuffer( session );
         synchronized( buf )
         {
-            buf.nextHandlers.push( nextHandler );
+            buf.nextFilters.push( nextFilter );
             buf.eventTypes.push( type );
             buf.eventDatum.push( data );
         }
@@ -285,7 +285,7 @@ public class IoThreadPoolFilter implements IoHandlerFilter
 
         private final IoSession session;
 
-        private final Queue nextHandlers = new Queue();
+        private final Queue nextFilters = new Queue();
 
         private final Queue eventTypes = new Queue();
 
@@ -388,10 +388,10 @@ public class IoThreadPoolFilter implements IoHandlerFilter
                         buf = ( SessionBuffer ) it.next();
                         it.remove();
                     }
-                    while( buf != null && buf.nextHandlers.isEmpty()
+                    while( buf != null && buf.nextFilters.isEmpty()
                            && it.hasNext() );
                 }
-                while( buf != null && buf.nextHandlers.isEmpty() );
+                while( buf != null && buf.nextFilters.isEmpty() );
             }
 
             return buf;
@@ -402,50 +402,50 @@ public class IoThreadPoolFilter implements IoHandlerFilter
             IoSession session = buf.session;
             for( ;; )
             {
-                IoHandler nextHandler;
+                NextFilter nextFilter;
                 EventType type;
                 Object data;
                 synchronized( buf )
                 {
-                    nextHandler = ( IoHandler ) buf.nextHandlers.pop();
-                    if( nextHandler == null )
+                    nextFilter = ( NextFilter ) buf.nextFilters.pop();
+                    if( nextFilter == null )
                         break;
 
                     type = ( EventType ) buf.eventTypes.pop();
                     data = buf.eventDatum.pop();
                 }
-                processEvent( nextHandler, session, type, data );
+                processEvent( nextFilter, session, type, data );
             }
         }
 
-        private void processEvent( IoHandler nextHandler, IoSession session,
+        private void processEvent( NextFilter nextFilter, IoSession session,
                                   EventType type, Object data )
         {
             if( type == EventType.READ )
             {
                 ByteBuffer buf = ( ByteBuffer ) data;
-                nextHandler.dataRead( session, buf );
+                nextFilter.dataRead( session, buf );
                 buf.release();
             }
             else if( type == EventType.WRITTEN )
             {
-                nextHandler.dataWritten( session, data );
+                nextFilter.dataWritten( session, data );
             }
             else if( type == EventType.EXCEPTION )
             {
-                nextHandler.exceptionCaught( session, ( Throwable ) data );
+                nextFilter.exceptionCaught( session, ( Throwable ) data );
             }
             else if( type == EventType.IDLE )
             {
-                nextHandler.sessionIdle( session, ( IdleStatus ) data );
+                nextFilter.sessionIdle( session, ( IdleStatus ) data );
             }
             else if( type == EventType.OPENED )
             {
-                nextHandler.sessionOpened( session );
+                nextFilter.sessionOpened( session );
             }
             else if( type == EventType.CLOSED )
             {
-                nextHandler.sessionClosed( session );
+                nextFilter.sessionClosed( session );
             }
         }
 
@@ -468,7 +468,7 @@ public class IoThreadPoolFilter implements IoHandlerFilter
             synchronized( readySessionBuffers )
             {
                 busySessionBuffers.remove( buf );
-                if( buf.nextHandlers.isEmpty() )
+                if( buf.nextFilters.isEmpty() )
                 {
                     removeSessionBuffer( buf );
                 }
@@ -548,8 +548,8 @@ public class IoThreadPoolFilter implements IoHandlerFilter
         }
     }
 
-    public ByteBuffer filterWrite( IoSession session, ByteBuffer buf )
+    public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker )
     {
-        return buf;
+        nextFilter.filterWrite( session, buf, marker );
     }
 }

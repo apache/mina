@@ -24,7 +24,7 @@ class VmPipeFilter extends ProtocolHandlerFilterAdapter
         vps.lastReadTime = System.currentTimeMillis();
 
         // fire messageSent event first
-        vps.remoteFilterManager.fireMessageSent( vps.remoteSession, message );
+        vps.remoteFilters.messageSent( null, vps.remoteSession, message );
 
         // and then messageReceived
         nextHandler.messageReceived( session, message );

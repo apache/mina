@@ -35,8 +35,10 @@ public class Server
         IoProtocolAcceptor acceptor = new IoProtocolAcceptor(
                 new SocketAcceptor() );
 
-        acceptor.getIoAcceptor().addFilter( Integer.MAX_VALUE, ioThreadPoolFilter );
-        acceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
+        acceptor.getIoAcceptor().getFilterChain().addFirst(
+                "threadPool", ioThreadPoolFilter );
+        acceptor.getFilterChain().addFirst(
+                "threadPool", protocolThreadPoolFilter );
 
         acceptor.bind( new InetSocketAddress( SERVER_PORT ),
                 new ServerProtocolProvider() );

@@ -11,9 +11,8 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolSession;
-import org.apache.mina.util.ProtocolHandlerFilterManager;
-import org.apache.mina.util.ProtocolHandlerFilterManager.WriteCommand;
 
 /**
  * TODO Document me.
@@ -23,8 +22,6 @@ import org.apache.mina.util.ProtocolHandlerFilterManager.WriteCommand;
  */
 class VmPipeSession implements ProtocolSession
 {
-    private final Object lock;
-
     private final SocketAddress localAddress;
 
     private final SocketAddress remoteAddress;
@@ -33,15 +30,15 @@ class VmPipeSession implements ProtocolSession
 
     private final VmPipeSessionConfig config = new VmPipeSessionConfig();
 
-    private final WriteCommand writeCommand = new WriteCommandImpl();
+    final ProtocolHandlerFilterChain localFilters;
 
-    final ProtocolHandlerFilterManager localFilterManager;
-
-    final ProtocolHandlerFilterManager remoteFilterManager;
+    final ProtocolHandlerFilterChain remoteFilters;
 
     final VmPipeSession remoteSession;
 
     private Object attachment;
+
+    final Object lock;
 
     boolean closed;
 
@@ -60,22 +57,22 @@ class VmPipeSession implements ProtocolSession
      */
     VmPipeSession( Object lock, SocketAddress localAddress,
                   SocketAddress remoteAddress,
-                  ProtocolHandlerFilterManager localFilterManager,
+                  ProtocolHandlerFilterChain localFilters,
                   ProtocolHandler localHandler,
-                  ProtocolHandlerFilterManager remoteFilterManager,
+                  ProtocolHandlerFilterChain removeFilters,
                   ProtocolHandler remoteHandler )
     {
         this.lock = lock;
         this.localAddress = localAddress;
         this.localHandler = localHandler;
-        this.localFilterManager = localFilterManager;
+        this.localFilters = localFilters;
         this.remoteAddress = remoteAddress;
-        this.remoteFilterManager = remoteFilterManager;
+        this.remoteFilters = removeFilters;
 
         remoteSession = new VmPipeSession( this, remoteHandler );
 
-        remoteFilterManager.fireSessionOpened( remoteSession );
-        localFilterManager.fireSessionOpened( this );
+        removeFilters.sessionOpened( null, remoteSession );
+        localFilters.sessionOpened( null, this );
     }
 
     /**
@@ -86,9 +83,9 @@ class VmPipeSession implements ProtocolSession
         this.lock = remoteSession.lock;
         this.localAddress = remoteSession.remoteAddress;
         this.localHandler = localHandler;
-        this.localFilterManager = remoteSession.remoteFilterManager;
+        this.localFilters = remoteSession.remoteFilters;
         this.remoteAddress = remoteSession.localAddress;
-        this.remoteFilterManager = remoteSession.localFilterManager;
+        this.remoteFilters = remoteSession.localFilters;
 
         this.remoteSession = remoteSession;
     }
@@ -116,8 +113,8 @@ class VmPipeSession implements ProtocolSession
                 return;
 
             closed = remoteSession.closed = true;
-            localFilterManager.fireSessionClosed( this );
-            remoteFilterManager.fireSessionClosed( remoteSession );
+            localFilters.sessionClosed( null, this );
+            remoteFilters.sessionClosed( null, remoteSession );
         }
     }
 
@@ -133,7 +130,7 @@ class VmPipeSession implements ProtocolSession
 
     public void write( Object message )
     {
-        localFilterManager.write( this, writeCommand, message );
+        localFilters.filterWrite( null, this, message );
     }
 
     public TransportType getTransportType()
@@ -200,19 +197,4 @@ class VmPipeSession implements ProtocolSession
 
         throw new IllegalArgumentException( "Illegal statue: " + status );
     }
-
-    private class WriteCommandImpl implements WriteCommand
-    {
-        public void execute( Object message )
-        {
-            synchronized( lock )
-            {
-                if( closed )
-                    throw new IllegalStateException( "Session is closed." );
-                remoteFilterManager.fireMessageReceived( remoteSession,
-                                                         message );
-            }
-        }
-    }
-
 }

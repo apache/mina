@@ -31,7 +31,6 @@ import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.io.DefaultExceptionMonitor;
-import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterAdapter;
 import org.apache.mina.io.IoSession;
 
@@ -109,14 +108,14 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
     // IoHandlerFilter impl.
 
-    public void sessionOpened( IoHandler nextHandler, IoSession session )
+    public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
-        nextHandler.sessionOpened( session );
+        nextFilter.sessionOpened( session );
         // Create an SSL handler
         createSSLSessionHandler( session );
     }
 
-    public void sessionClosed( IoHandler nextHandler, IoSession session )
+    public void sessionClosed( NextFilter nextFilter, IoSession session )
     {
         SSLHandler sslHandler = getSSLSessionHandler( session );
         if( debug != null )
@@ -136,12 +135,12 @@ public class SSLFilter extends IoHandlerFilterAdapter
             }
             catch( SSLException ssle )
             {
-                nextHandler.exceptionCaught( session, ssle );
+                nextFilter.exceptionCaught( session, ssle );
             }
             finally
             {
                 // notify closed session
-                nextHandler.sessionClosed( session );
+                nextFilter.sessionClosed( session );
 
                 // release buffers
                 sslHandler.release();
@@ -150,7 +149,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
         }
     }
 
-    public void dataRead( IoHandler nextHandler, IoSession session,
+    public void dataRead( NextFilter nextFilter, IoSession session,
                          ByteBuffer buf )
     {
         SSLHandler sslHandler = getSSLSessionHandler( session );
@@ -169,7 +168,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
                     sslHandler.dataRead( buf.buf() );
 
                     // Handle data to be forwarded to application or written to net
-                    handleSSLData( nextHandler, session, sslHandler );
+                    handleSSLData( nextFilter, session, sslHandler );
 
                     if( sslHandler.isClosed() )
                     {
@@ -191,23 +190,23 @@ public class SSLFilter extends IoHandlerFilterAdapter
                         ssle = newSSLE;
                     }
 
-                    nextHandler.exceptionCaught( session, ssle );
+                    nextFilter.exceptionCaught( session, ssle );
                 }
             }
         }
         else
         {
-            nextHandler.dataRead( session, buf );
+            nextFilter.dataRead( session, buf );
         }
     }
 
-    public void dataWritten( IoHandler nextHandler, IoSession session,
+    public void dataWritten( NextFilter nextFilter, IoSession session,
                             Object marker )
     {
-        nextHandler.dataWritten( session, marker );
+        nextFilter.dataWritten( session, marker );
     }
 
-    public ByteBuffer filterWrite( IoSession session, ByteBuffer buf )
+    public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker )
     {
 
         SSLHandler sslHandler = getSSLSessionHandler( session );
@@ -226,7 +225,8 @@ public class SSLFilter extends IoHandlerFilterAdapter
                     {
                         debug.print( "  already encrypted: " + buf );
                     }
-                    return buf;
+                    nextFilter.filterWrite( session, buf, marker );
+                    return;
                 }
                 if( sslHandler.isInitialHandshakeComplete() )
                 {
@@ -246,7 +246,9 @@ public class SSLFilter extends IoHandlerFilterAdapter
                             debug.print( "encrypted data: "
                                     + encryptedBuffer.getHexDump() );
                         }
-                        return encryptedBuffer;
+                        buf.release();
+                        nextFilter.filterWrite( session, encryptedBuffer, marker );
+                        return;
                     }
                     catch( SSLException ssle )
                     {
@@ -256,21 +258,22 @@ public class SSLFilter extends IoHandlerFilterAdapter
                 }
             }
         }
-        return buf;
+        
+        nextFilter.filterWrite( session, buf, marker );
     }
 
     // Utiliities
 
-    private void handleSSLData( IoHandler nextHandler, IoSession session,
+    private void handleSSLData( NextFilter nextFilter, IoSession session,
                                SSLHandler sslHandler ) throws SSLException
     {
         // First write encrypted data to be written (if any)
         writeNetBuffer( session, sslHandler );
         // handle app. data read (if any)
-        handleAppDataRead( nextHandler, session, sslHandler );
+        handleAppDataRead( nextFilter, session, sslHandler );
     }
 
-    private void handleAppDataRead( IoHandler nextHandler, IoSession session,
+    private void handleAppDataRead( NextFilter nextFilter, IoSession session,
                                    SSLHandler sslHandler )
     {
         if( debug != null )
@@ -285,7 +288,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
             {
                 debug.print( "app data read: " + readBuffer + " (" + readBuffer.getHexDump() + ')' );
             }
-            nextHandler.dataRead( session, readBuffer );
+            nextFilter.dataRead( session, readBuffer );
         }
     }
 

@@ -54,8 +54,10 @@ public class Client
 
         IoProtocolConnector connector = new IoProtocolConnector(
                 new SocketConnector() );
-        connector.getIoConnector().addFilter( Integer.MAX_VALUE, ioThreadPoolFilter );
-        connector.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
+        connector.getIoConnector().getFilterChain().addFirst(
+                "threadPool", ioThreadPoolFilter );
+        connector.getFilterChain().addFirst(
+                "threadPool", protocolThreadPoolFilter );
 
         ProtocolProvider protocolProvider = new ClientProtocolProvider(
                 values );

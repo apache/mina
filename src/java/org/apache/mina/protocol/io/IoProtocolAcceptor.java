@@ -5,11 +5,11 @@ package org.apache.mina.protocol.io;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.List;
 
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.protocol.ProtocolAcceptor;
-import org.apache.mina.protocol.ProtocolHandlerFilter;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 
 /**
@@ -55,24 +55,14 @@ public class IoProtocolAcceptor implements ProtocolAcceptor
     {
         acceptor.unbind( address );
     }
-
-    public void addFilter( int priority, ProtocolHandlerFilter filter )
+    
+    public ProtocolHandlerFilterChain newFilterChain( FilterChainType type )
     {
-        adapter.addFilter( priority, filter );
+        return adapter.newFilterChain( type );
     }
 
-    public void removeFilter( ProtocolHandlerFilter filter )
+    public ProtocolHandlerFilterChain getFilterChain()
     {
-        adapter.removeFilter( filter );
-    }
-
-    public void removeAllFilters()
-    {
-    	adapter.removeAllFilters();
-    }
-
-    public List getAllFilters()
-    {
-    	return adapter.getAllFilters();
+        return adapter.getFilterChain();
     }
 }

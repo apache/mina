@@ -9,15 +9,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilter;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.datagram.DatagramAcceptor;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
 import org.apache.mina.io.socket.SocketAcceptor;
 import org.apache.mina.protocol.ProtocolAcceptor;
-import org.apache.mina.protocol.ProtocolHandlerFilter;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.filter.ProtocolThreadPoolFilter;
 import org.apache.mina.protocol.io.IoProtocolAcceptor;
@@ -55,11 +56,11 @@ public class SimpleServiceRegistry implements ServiceRegistry
 
     public SimpleServiceRegistry() throws IOException
     {
-        socketIoAcceptor.addFilter( Integer.MAX_VALUE, ioThreadPoolFilter );
-        datagramIoAcceptor.addFilter( Integer.MAX_VALUE, ioThreadPoolFilter );
-        socketProtocolAcceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
-        datagramProtocolAcceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
-        vmPipeAcceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
+        socketIoAcceptor.getFilterChain().addFirst( "threadPool", ioThreadPoolFilter );
+        datagramIoAcceptor.getFilterChain().addFirst( "threadPool", ioThreadPoolFilter );
+        socketProtocolAcceptor.getFilterChain().addFirst( "threadPool", protocolThreadPoolFilter );
+        datagramProtocolAcceptor.getFilterChain().addFirst( "threadPool", protocolThreadPoolFilter );
+        vmPipeAcceptor.getFilterChain().addFirst( "threadPool", protocolThreadPoolFilter );
     }
 
     public synchronized void bind( Service service, IoHandler ioHandler )
@@ -101,113 +102,20 @@ public class SimpleServiceRegistry implements ServiceRegistry
         stopThreadPools();
     }
 
-    public synchronized void addFilter( int priority, IoHandlerFilter filter )
-    {
-        boolean s = false;
-        boolean d = false;
-        try
-        {
-            socketIoAcceptor.addFilter( priority, filter );
-            s = true;
-            datagramIoAcceptor.addFilter( priority, filter );
-            d = true;
-        }
-        finally
-        {
-            if( !s || !d )
-            {
-                // rollback
-                if( s )
-                {
-                    socketIoAcceptor.removeFilter( filter );
-                }
-
-                if( d )
-                {
-                    datagramIoAcceptor.removeFilter( filter );
-                }
-            }
-        }
+    public IoHandlerFilterChain newIoFilterChain(TransportType transportType, FilterChainType chainType) {
+        return findIoAcceptor( transportType ).newFilterChain( chainType );
     }
 
-    public synchronized void addFilter( int priority,
-                                       ProtocolHandlerFilter filter )
-    {
-        boolean s = false;
-        boolean d = false;
-        boolean v = false;
-        try
-        {
-            socketProtocolAcceptor.addFilter( priority, filter );
-            s = true;
-            datagramProtocolAcceptor.addFilter( priority, filter );
-            d = true;
-            vmPipeAcceptor.addFilter( priority, filter );
-            v = true;
-        }
-        finally
-        {
-            if( !s || !d || !v )
-            {
-                // rollback
-                if( s )
-                {
-                    socketProtocolAcceptor.removeFilter( filter );
-                }
-
-                if( d )
-                {
-                    datagramProtocolAcceptor.removeFilter( filter );
-                }
-
-                if( v )
-                {
-                    vmPipeAcceptor.removeFilter( filter );
-                }
-            }
-        }
+    public IoHandlerFilterChain getIoFilterChain(TransportType transportType) {
+        return findIoAcceptor( transportType ).getFilterChain();
     }
 
-    public synchronized void addFilter( TransportType transportType,
-                                       int priority, IoHandlerFilter filter )
-    {
-        IoAcceptor acceptor = findIoAcceptor( transportType );
-        acceptor.addFilter( priority, filter );
+    public ProtocolHandlerFilterChain newProtocolFilterChain(TransportType transportType, FilterChainType chainType) {
+        return findProtocolAcceptor( transportType ).newFilterChain( chainType );
     }
 
-    public synchronized void addFilter( TransportType transportType,
-                                       int priority,
-                                       ProtocolHandlerFilter filter )
-    {
-        ProtocolAcceptor acceptor = findProtocolAcceptor( transportType );
-        acceptor.addFilter( priority, filter );
-    }
-
-    public synchronized void removeFilter( IoHandlerFilter filter )
-    {
-        socketIoAcceptor.removeFilter( filter );
-        datagramIoAcceptor.removeFilter( filter );
-    }
-
-    public synchronized void removeFilter( ProtocolHandlerFilter filter )
-    {
-        socketProtocolAcceptor.removeFilter( filter );
-        datagramProtocolAcceptor.removeFilter( filter );
-        vmPipeAcceptor.removeFilter( filter );
-    }
-
-    public synchronized void removeFilter( TransportType transportType,
-                                          IoHandlerFilter filter )
-    {
-        IoAcceptor acceptor = findIoAcceptor( transportType );
-        acceptor.removeFilter( filter );
-    }
-
-    public synchronized void removeFilter( TransportType transportType,
-                                          ProtocolHandlerFilter filter )
-    {
-        ProtocolAcceptor acceptor = findProtocolAcceptor( transportType );
-        acceptor.removeFilter( filter );
+    public ProtocolHandlerFilterChain getProtocolFilterChain(TransportType transportType) {
+        return findProtocolAcceptor( transportType ).getFilterChain();
     }
 
     public synchronized Set getAllServices()

@@ -20,7 +20,8 @@ package org.apache.mina.io;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.List;
+
+import org.apache.mina.common.FilterChainType;
 
 /**
  * Connects to endpoint, communicates with the server, and fires events to
@@ -70,29 +71,9 @@ public interface IoConnector
     IoSession connect( SocketAddress address, int timeout, IoHandler handler )
             throws IOException;
 
-    /**
-     * Adds the specified filter with the specified priority.  Greater priority
-     * value, higher priority, and thus evaluated more earlier.  Please note
-     * that priority value must be unique.
-     */
-    void addFilter( int priority, IoHandlerFilter filter );
-
-    /**
-     * Removes the specified filter from the filter list.
-     */
-    void removeFilter( IoHandlerFilter filter );
-
-    /**
-     * Removes all filters added to this connector.
-     */
-    void removeAllFilters();
+    IoHandlerFilterChain newFilterChain( FilterChainType type );
     
-    /**
-     * Returns the list of all filters ordered by priority (higher first).
-     * The returned list is clone of internal filter chain, and thus you
-     * cannot add or remove filters using it. 
-     */
-    List getAllFilters();
+    IoHandlerFilterChain getFilterChain();
 
     /**
      * Returns the current exception monitor.
