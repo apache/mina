@@ -459,7 +459,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 break;
             }
 
-            DatagramChannel ch = ( DatagramChannel ) channels.get( request.address );
+            DatagramChannel ch = ( DatagramChannel ) channels.remove( request.address );
             // close the channel
             try
             {

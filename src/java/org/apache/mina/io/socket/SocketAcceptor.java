@@ -138,9 +138,7 @@ public class SocketAcceptor implements IoAcceptor
             {
                 try
                 {
-                    request.wait( 1000 );
-
-                    System.out.println( "request.done = " + request.done );
+                    request.wait();
                 }
                 catch( InterruptedException e )
                 {
@@ -291,8 +289,6 @@ public class SocketAcceptor implements IoAcceptor
             synchronized( registerQueue )
             {
                 req = ( RegistrationRequest ) registerQueue.pop();
-
-                System.out.println( "popped request = " + req );
             }
 
             if( req == null )
@@ -364,7 +360,7 @@ public class SocketAcceptor implements IoAcceptor
                 break;
             }
 
-            ServerSocketChannel ssc = ( ServerSocketChannel ) channels.get( request.address );
+            ServerSocketChannel ssc = ( ServerSocketChannel ) channels.remove( request.address );
             
             // close the channel
             try
