@@ -5,7 +5,6 @@ package org.apache.mina.examples.echoserver;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -14,18 +13,12 @@ import java.net.UnknownHostException;
 import javax.net.ServerSocketFactory;
 import javax.net.SocketFactory;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.net.EchoTCPClient;
 import org.apache.commons.net.EchoUDPClient;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.examples.echoserver.ssl.SSLServerSocketFactory;
 import org.apache.mina.examples.echoserver.ssl.SSLSocketFactory;
-import org.apache.mina.io.IoAcceptor;
-import org.apache.mina.io.datagram.DatagramAcceptor;
-import org.apache.mina.io.filter.IoThreadPoolFilter;
 import org.apache.mina.io.filter.SSLFilter;
-import org.apache.mina.io.socket.SocketAcceptor;
 
 /**
  * Tests echo server example.
@@ -33,102 +26,8 @@ import org.apache.mina.io.socket.SocketAcceptor;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class Test extends TestCase
+public class AcceptorTest extends AbstractTest
 {
-    private int port;
-
-    protected IoAcceptor acceptor;
-
-    private IoAcceptor datagramAcceptor;
-
-    private IoThreadPoolFilter threadPoolFilter;
-
-    public static void assertEquals( byte[] expected, byte[] actual )
-    {
-        assertEquals( toString( expected ), toString( actual ) );
-    }
-
-    private static String toString( byte[] buf )
-    {
-        StringBuffer str = new StringBuffer( buf.length * 4 );
-        for( int i = 0; i < buf.length; i ++ )
-        {
-            str.append( buf[ i ] );
-            str.append( ' ' );
-        }
-        return str.toString();
-    }
-
-    protected void setUp() throws Exception
-    {
-        acceptor = new SocketAcceptor();
-        datagramAcceptor = new DatagramAcceptor();
-
-        // Find an availble test port and bind to it.
-        boolean socketBound = false;
-        boolean datagramBound = false;
-
-        // Let's start from port #1 to detect possible resource leak
-        // because test will fail in port 1-1023 if user run this test
-        // as a normal user.
-        for( port = 1; port <= 65535; port ++ )
-        {
-            socketBound = false;
-            datagramBound = false;
-            try
-            {
-                acceptor.bind( new InetSocketAddress( port ),
-                        new EchoProtocolHandler() );
-                socketBound = true;
-
-                datagramAcceptor.bind( new InetSocketAddress( port ),
-                        new EchoProtocolHandler() );
-                datagramBound = true;
-
-                break;
-            }
-            catch( IOException e )
-            {
-            }
-            finally
-            {
-                if( !socketBound || !datagramBound )
-                {
-                    if( socketBound )
-                    {
-                        acceptor.unbind( new InetSocketAddress( port ) );
-                    }
-                    if( datagramBound )
-                    {
-                        datagramAcceptor
-                                .unbind( new InetSocketAddress( port ) );
-                    }
-                }
-            }
-        }
-
-        // If there is no port available, test fails.
-        if( !socketBound || !datagramBound )
-        {
-            throw new IOException( "Cannot bind any test port." );
-        }
-
-        System.out.println( "Using port " + port + " for testing." );
-
-        threadPoolFilter = new IoThreadPoolFilter();
-        threadPoolFilter.start();
-
-        acceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
-        datagramAcceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
-    }
-
-    protected void tearDown() throws Exception
-    {
-        acceptor.unbind( new InetSocketAddress( port ) );
-        datagramAcceptor.unbind( new InetSocketAddress( port ) );
-        threadPoolFilter.stop();
-    }
-
     public void testTCP() throws Exception
     {
         EchoTCPClient client = new EchoTCPClient();
@@ -285,6 +184,6 @@ public class Test extends TestCase
 
     public static void main( String[] args )
     {
-        junit.textui.TestRunner.run( Test.class );
+        junit.textui.TestRunner.run( AcceptorTest.class );
     }
 }
