@@ -30,13 +30,13 @@
 
 	<repository>
 		<connection>
-			scm:svn:http://svn.apache.org/repos/asf/incubator:directory/network/trunk/mina
+			scm:svn:http://svn.apache.org/repos/asf/incubator:directory/network/mina/trunk
 		</connection>
 		<url>
-			http://svn.apache.org/viewcvs.cgi/incubator/directory/network/trunk/mina/?root=Apache-SVN
+			http://svn.apache.org/viewcvs.cgi/incubator/directory/network/mina/trunk/?root=Apache-SVN
 		</url>
 		<developerConnection>
-			scm:svn:https://svn.apache.org/repos/asf/incubator:directory/network/trunk/mina
+			scm:svn:https://svn.apache.org/repos/asf/incubator:directory/network/mina/trunk
 		</developerConnection>
 	</repository>
 

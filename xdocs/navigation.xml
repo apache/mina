@@ -32,7 +32,7 @@
 		<menu name="MINA References">
 			<item name="JavaDocs" href="/apidocs/index.html" target="_blank"/>
 			<item name="Source code" href="/xref/index.html" target="_blank"/>
-			<item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/incubator/directory/network/trunk/mina/?root=Apache-SVN" target="_blank"/>
+			<item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/incubator/directory/network/mina/trunk/?root=Apache-SVN" target="_blank"/>
 		</menu>
 		
 		<menu name="MINA Examples">
