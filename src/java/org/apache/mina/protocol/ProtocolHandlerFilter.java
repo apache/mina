@@ -35,8 +35,6 @@ import org.apache.mina.common.IdleStatus;
  * <strong>Please NEVER implement your filters to wrap
  * {@link ProtocolSession}s.</strong> Users can cache the reference to the
  * session, which might malfunction if any filters are added or removed later.
- * Please implement {@link #filterWrite(ProtocolSession,Object)} method to
- * override {@link ProtocolSession#write(Object)} method.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
