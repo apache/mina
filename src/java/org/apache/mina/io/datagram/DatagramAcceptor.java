@@ -118,7 +118,22 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         if( request.exception != null )
         {
             request.exception.fillInStackTrace();
-            throw request.exception;
+            if( request.exception instanceof IOException )
+            {
+                throw ( IOException ) request.exception;
+            }
+            else if( request.exception instanceof RuntimeException )
+            {
+                throw ( RuntimeException ) request.exception;
+            }
+            else if( request.exception instanceof Error )
+            {
+                throw ( Error ) request.exception;
+            }
+            else
+            {
+                throw new IllegalStateException();
+            }
         }
     }
 
@@ -422,9 +437,9 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 ch.register( selector, SelectionKey.OP_READ, req.handler );
                 channels.put( req.address, ch );
             }
-            catch( IOException e )
+            catch( Throwable t )
             {
-                req.exception = e;
+                req.exception = t;
             }
             finally
             {
@@ -440,7 +455,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                     {
                         ch.close();
                     }
-                    catch( IOException e )
+                    catch( Throwable e )
                     {
                         exceptionMonitor.exceptionCaught( this, e );
                     }
@@ -484,9 +499,9 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                     ch.close();
                 }
             }
-            catch( IOException e )
+            catch( Throwable t )
             {
-                exceptionMonitor.exceptionCaught( this, e );
+                exceptionMonitor.exceptionCaught( this, t );
             }
             finally
             {
@@ -515,7 +530,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         
         private final IoHandler handler;
         
-        private IOException exception; 
+        private Throwable exception; 
         
         private boolean done;
         
