@@ -48,7 +48,7 @@ public class DatagramConnector extends DatagramProcessor implements
 {
     private static volatile int nextId = 0;
 
-    private final DatagramFilterChain filters = new DatagramFilterChain( this );
+    private final DatagramFilterChain filters = new DatagramFilterChain( true, this );
 
     private final int id = nextId ++ ;
 
@@ -428,7 +428,7 @@ public class DatagramConnector extends DatagramProcessor implements
 
     public IoHandlerFilterChain newFilterChain()
     {
-        return new DatagramFilterChain( this );
+        return new DatagramFilterChain( false, this );
     }
     
     public IoHandlerFilterChain getFilterChain()

@@ -5,8 +5,9 @@ import org.apache.mina.protocol.ProtocolSession;
 
 class VmPipeFilterChain extends AbstractProtocolHandlerFilterChain {
 
-    VmPipeFilterChain()
+    VmPipeFilterChain( boolean root )
     {
+        super( root );
     }
 
     protected void doWrite(ProtocolSession session, Object message)

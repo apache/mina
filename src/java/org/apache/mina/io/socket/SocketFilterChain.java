@@ -7,8 +7,9 @@ import org.apache.mina.util.Queue;
 
 class SocketFilterChain extends AbstractIoHandlerFilterChain {
 
-    SocketFilterChain()
+    SocketFilterChain( boolean root )
     {
+        super( root );
     }
 
     protected void doWrite( IoSession session, ByteBuffer buf, Object marker )

@@ -7,7 +7,8 @@ import org.apache.mina.util.Queue;
 
 class IoProtocolFilterChain extends AbstractProtocolHandlerFilterChain {
 
-    IoProtocolFilterChain() {
+    IoProtocolFilterChain( boolean root ) {
+        super( root );
     }
 
     protected void doWrite(ProtocolSession session, Object message) {

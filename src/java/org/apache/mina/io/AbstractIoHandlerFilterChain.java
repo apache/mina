@@ -200,6 +200,8 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
             nextFilter.filterWrite( session, buf, marker );
         }
     };
+    
+    private final boolean root;
 
     private AbstractIoHandlerFilterChain parent;
     
@@ -211,13 +213,18 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
     
     private final Entry tail;
 
-    protected AbstractIoHandlerFilterChain()
+    protected AbstractIoHandlerFilterChain( boolean root )
     {
+        this.root = root;
+
         head = new Entry( null, null, "head", HEAD_FILTER );
         tail = new Entry( head, null, "tail", TAIL_FILTER );
         head.nextEntry = tail;
         
-        register( head, IoHandlerFilterChain.NEXT_FILTER, NEXT_FILTER );
+        if( !root )
+        {
+            register( head, IoHandlerFilterChain.NEXT_FILTER, NEXT_FILTER );
+        }
     }
     
     public IoHandlerFilterChain getRoot()
@@ -330,15 +337,29 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
 
     private void register( Entry prevEntry, String name, IoHandlerFilter filter )
     {
+        if ( filter instanceof AbstractIoHandlerFilterChain )
+        {
+            if( !this.getClass().isAssignableFrom( filter.getClass() ) )
+            {
+                throw new IllegalArgumentException( "Incompatible chain" );
+            }
+            if( ( ( AbstractIoHandlerFilterChain ) filter ).root )
+            {
+                throw new IllegalArgumentException( "Root chain cannot be added." );
+            }
+            if( ( ( AbstractIoHandlerFilterChain ) filter ).parent != null )
+            {
+                throw new IllegalArgumentException( "Already added to other parent chain." );
+            }
+
+            ( ( AbstractIoHandlerFilterChain ) filter ).parent = this;
+        }
+        
         Entry newEntry = new Entry( prevEntry, prevEntry.nextEntry, name, filter );
         prevEntry.nextEntry.prevEntry = newEntry;
         prevEntry.nextEntry = newEntry;
         name2entry.put( name, newEntry );
         filter2entry.put( filter, newEntry );
-        if ( filter instanceof AbstractIoHandlerFilterChain )
-        {
-            ( ( AbstractIoHandlerFilterChain ) filter ).parent = this;
-        }
     }
 
     /**
