@@ -82,8 +82,7 @@ class VmPipeIdleStatusChecker
                                                    && ( currentTime - session.lastReadTime ) > idleTime;
                                 if( session.bothIdle )
                                     session.localFilters
-                                            .sessionIdle( null,
-                                                          session,
+                                            .sessionIdle( session,
                                                           IdleStatus.BOTH_IDLE );
                             }
 
@@ -95,8 +94,7 @@ class VmPipeIdleStatusChecker
                                                      && ( currentTime - session.lastReadTime ) > idleTime;
                                 if( session.readerIdle )
                                     session.localFilters
-                                            .sessionIdle( null,
-                                                          session,
+                                            .sessionIdle( session,
                                                           IdleStatus.READER_IDLE );
                             }
 
@@ -108,8 +106,7 @@ class VmPipeIdleStatusChecker
                                                      && ( currentTime - session.lastReadTime ) > idleTime;
                                 if( session.writerIdle )
                                     session.localFilters
-                                            .sessionIdle( null,
-                                                          session,
+                                            .sessionIdle( session,
                                                           IdleStatus.WRITER_IDLE );
                             }
                         }

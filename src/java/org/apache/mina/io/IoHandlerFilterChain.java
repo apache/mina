@@ -3,12 +3,7 @@ package org.apache.mina.io;
 import java.util.List;
 
 
-public interface IoHandlerFilterChain extends IoHandlerFilter {
-    static String NEXT_FILTER = "nextFilter";
-    
-    IoHandlerFilterChain getRoot();
-    IoHandlerFilterChain getParent();
-
+public interface IoHandlerFilterChain {
     IoHandlerFilter getChild( String name );
     List getChildren();
     List getChildrenReversed();

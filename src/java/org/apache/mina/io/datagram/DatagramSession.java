@@ -139,7 +139,7 @@ class DatagramSession implements IoSession
 
     public void write( ByteBuffer buf, Object marker )
     {
-        filters.filterWrite( null, this, buf, marker );
+        filters.filterWrite( this, buf, marker );
     }
 
     public TransportType getTransportType()

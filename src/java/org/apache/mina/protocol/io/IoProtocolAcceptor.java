@@ -55,11 +55,6 @@ public class IoProtocolAcceptor implements ProtocolAcceptor
         acceptor.unbind( address );
     }
     
-    public ProtocolHandlerFilterChain newFilterChain()
-    {
-        return adapter.newFilterChain();
-    }
-
     public ProtocolHandlerFilterChain getFilterChain()
     {
         return adapter.getFilterChain();

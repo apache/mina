@@ -52,15 +52,10 @@ import org.apache.mina.util.Queue;
  */
 public class IoAdapter
 {
-    private final IoProtocolFilterChain filters = new IoProtocolFilterChain( true );
+    private final IoProtocolFilterChain filters = new IoProtocolFilterChain();
 
     IoAdapter()
     {
-    }
-    
-    public ProtocolHandlerFilterChain newFilterChain()
-    {
-        return new IoProtocolFilterChain( false );
     }
     
     public ProtocolHandlerFilterChain getFilterChain()
@@ -109,24 +104,22 @@ public class IoAdapter
 
         public void sessionOpened( IoSession session )
         {
-            filters.sessionOpened( null, getProtocolSession( session ) );
+            filters.sessionOpened( getProtocolSession( session ) );
         }
 
         public void sessionClosed( IoSession session )
         {
-            filters.sessionClosed( null, getProtocolSession( session ) );
+            filters.sessionClosed( getProtocolSession( session ) );
         }
 
         public void sessionIdle( IoSession session, IdleStatus status )
         {
-            filters.sessionIdle( null, getProtocolSession( session ),
-                    status );
+            filters.sessionIdle( getProtocolSession( session ), status );
         }
 
         public void exceptionCaught( IoSession session, Throwable cause )
         {
-            filters.exceptionCaught( null, getProtocolSession( session ),
-                    cause );
+            filters.exceptionCaught( getProtocolSession( session ), cause );
         }
 
         public void dataRead( IoSession session, ByteBuffer in )
@@ -147,8 +140,7 @@ public class IoAdapter
                     {
                         do
                         {
-                            filters.messageReceived( null, psession,
-                                    queue.pop() );
+                            filters.messageReceived( psession, queue.pop() );
                         }
                         while( !queue.isEmpty() );
                     }
@@ -157,11 +149,11 @@ public class IoAdapter
             catch( ProtocolViolationException pve )
             {
                 pve.setBuffer( in );
-                filters.exceptionCaught( null, psession, pve );
+                filters.exceptionCaught( psession, pve );
             }
             catch( Throwable t )
             {
-                filters.exceptionCaught( null, psession, t );
+                filters.exceptionCaught( psession, t );
             }
         }
 
@@ -169,8 +161,8 @@ public class IoAdapter
         {
             if( marker == null )
                 return;
-            filters.messageSent( null, ( ProtocolSession ) session
-                    .getAttachment(), marker );
+            filters.messageSent( 
+                    ( ProtocolSession ) session.getAttachment(), marker );
         }
 
         void doWrite( IoSession session )
@@ -211,7 +203,7 @@ public class IoAdapter
             }
             catch( Throwable t )
             {
-                filters.exceptionCaught( null, psession, t );
+                filters.exceptionCaught( psession, t );
             }
         }
 
@@ -298,7 +290,7 @@ public class IoAdapter
 
         public void write( Object message )
         {
-            filters.filterWrite( null, this, message );
+            filters.filterWrite( this, message );
         }
 
         public TransportType getTransportType()

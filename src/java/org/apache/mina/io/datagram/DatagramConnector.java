@@ -48,7 +48,7 @@ public class DatagramConnector extends DatagramProcessor implements
 {
     private static volatile int nextId = 0;
 
-    private final DatagramFilterChain filters = new DatagramFilterChain( true, this );
+    private final DatagramFilterChain filters = new DatagramFilterChain( this );
 
     private final int id = nextId ++ ;
 
@@ -255,12 +255,12 @@ public class DatagramConnector extends DatagramProcessor implements
                 newBuf.put( readBuf );
                 newBuf.flip();
 
-                filters.dataRead( null, session, newBuf );
+                filters.dataRead( session, newBuf );
             }
         }
         catch( IOException e )
         {
-            filters.exceptionCaught( null, session, e );
+            filters.exceptionCaught( session, e );
         }
         finally
         {
@@ -291,7 +291,7 @@ public class DatagramConnector extends DatagramProcessor implements
             }
             catch( IOException e )
             {
-                session.getFilters().exceptionCaught( null, session, e );
+                session.getFilters().exceptionCaught( session, e );
             }
         }
     }
@@ -331,11 +331,10 @@ public class DatagramConnector extends DatagramProcessor implements
                 }
                 catch( IllegalStateException e )
                 {
-                    session.getFilters().exceptionCaught( null, session,
-                            e );
+                    session.getFilters().exceptionCaught( session, e );
                 }
 
-                session.getFilters().dataWritten( null, session, marker );
+                session.getFilters().dataWritten( session, marker );
                 continue;
             }
 
@@ -358,7 +357,7 @@ public class DatagramConnector extends DatagramProcessor implements
                     writeBufferQueue.pop();
                     writeMarkerQueue.pop();
                 }
-                session.getFilters().dataWritten( null, session, marker );
+                session.getFilters().dataWritten( session, marker );
             }
         }
     }
@@ -426,11 +425,6 @@ public class DatagramConnector extends DatagramProcessor implements
         }
     }
 
-    public IoHandlerFilterChain newFilterChain()
-    {
-        return new DatagramFilterChain( false, this );
-    }
-    
     public IoHandlerFilterChain getFilterChain()
     {
         return filters;

@@ -47,7 +47,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
-    private final DatagramFilterChain filters = new DatagramFilterChain( true, this );
+    private final DatagramFilterChain filters = new DatagramFilterChain( this );
 
     private final int id = nextId ++ ;
 
@@ -300,12 +300,12 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 newBuf.flip();
 
                 session.increaseReadBytes( newBuf.remaining() );
-                filters.dataRead( null, session, newBuf );
+                filters.dataRead( session, newBuf );
             }
         }
         catch( IOException e )
         {
-            filters.exceptionCaught( null, session, e );
+            filters.exceptionCaught( session, e );
         }
         finally
         {
@@ -336,7 +336,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             }
             catch( IOException e )
             {
-                session.getFilters().exceptionCaught( null, session, e );
+                session.getFilters().exceptionCaught( session, e );
             }
         }
     }
@@ -376,11 +376,10 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 }
                 catch( IllegalStateException e )
                 {
-                    session.getFilters().exceptionCaught( null, session,
-                            e );
+                    session.getFilters().exceptionCaught( session, e );
                 }
 
-                session.getFilters().dataWritten( null, session, marker );
+                session.getFilters().dataWritten( session, marker );
                 continue;
             }
 
@@ -406,7 +405,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
-                session.getFilters().dataWritten( null, session, marker );
+                session.getFilters().dataWritten( session, marker );
             }
         }
     }
@@ -511,11 +510,6 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 }
             }
         }
-    }
-    
-    public IoHandlerFilterChain newFilterChain()
-    {
-        return new DatagramFilterChain( false, this );
     }
     
     public IoHandlerFilterChain getFilterChain()

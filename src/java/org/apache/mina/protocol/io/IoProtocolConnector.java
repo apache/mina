@@ -63,11 +63,6 @@ public class IoProtocolConnector implements ProtocolConnector
         return adapter.toProtocolSession( session );
     }
 
-    public ProtocolHandlerFilterChain newFilterChain()
-    {
-        return adapter.newFilterChain();
-    }
-
     public ProtocolHandlerFilterChain getFilterChain()
     {
         return adapter.getFilterChain();

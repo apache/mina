@@ -5,9 +5,8 @@ import org.apache.mina.protocol.ProtocolSession;
 
 class VmPipeFilterChain extends AbstractProtocolHandlerFilterChain {
 
-    VmPipeFilterChain( boolean root )
+    VmPipeFilterChain()
     {
-        super( root );
     }
 
     protected void doWrite(ProtocolSession session, Object message)
@@ -18,8 +17,7 @@ class VmPipeFilterChain extends AbstractProtocolHandlerFilterChain {
         {
             if( s.closed )
                 throw new IllegalStateException( "Session is closed." );
-            s.remoteFilters.messageReceived( null,
-                                             s.remoteSession, message );
+            s.remoteFilters.messageReceived( s.remoteSession, message );
         }
     }
 }

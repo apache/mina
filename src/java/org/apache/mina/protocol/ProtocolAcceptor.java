@@ -59,7 +59,5 @@ public interface ProtocolAcceptor
      */
     void unbind( SocketAddress address );
 
-    ProtocolHandlerFilterChain newFilterChain();
-    
     ProtocolHandlerFilterChain getFilterChain();
 }

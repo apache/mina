@@ -11,13 +11,13 @@ import org.apache.mina.common.TransportType;
 
 public class ProtocolHandlerFilterChainTest extends TestCase
 {
-    private ProtocolHandlerFilterChain chain;
+    private ProtocolHandlerFilterChainImpl chain;
     private ProtocolSession session;
     private String result;
 
     public void setUp()
     {
-        chain = new ProtocolHandlerFilterChainImpl( true );
+        chain = new ProtocolHandlerFilterChainImpl();
         session = new TestSession();
         result = "";
     }
@@ -31,7 +31,7 @@ public class ProtocolHandlerFilterChainTest extends TestCase
         run( "HSO HMR HMS HSI HEC HSC" );
     }
     
-    public void testSimpleChain()
+    public void testChained()
     {
         chain.addLast( "A", new TestFilter( 'A' ) );
         chain.addLast( "B", new TestFilter( 'B' ) );
@@ -43,32 +43,14 @@ public class ProtocolHandlerFilterChainTest extends TestCase
              "ASC BSC HSC" );
     }
     
-    public void testNestedChain()
-    {
-        ProtocolHandlerFilterChainImpl childChain = new ProtocolHandlerFilterChainImpl( false );
-
-        chain.addLast( "A", new TestFilter( 'A' ) );
-        chain.addLast( "child", childChain );
-        chain.addLast( "B", new TestFilter( 'B' ) );
-        childChain.addFirst( "C", new TestFilter( 'C' ) );
-        childChain.addLast( "D", new TestFilter( 'D' ) );
-        
-        run( "ASO CSO BSO HSO DSO" +
-             "AMR CMR BMR HMR DMR" +
-             "BFW DFW AFW AMS CMS BMS HMS DMS CFW" +
-             "ASI CSI BSI HSI DSI" +
-             "AEC CEC BEC HEC DEC" +
-             "ASC CSC BSC HSC DSC" );
-    }
-    
     private void run( String expectedResult )
     {
-        chain.sessionOpened( null, session );
-        chain.messageReceived( null, session, new Object() );
-        chain.filterWrite( null, session, new Object() );
-        chain.sessionIdle( null, session, IdleStatus.READER_IDLE );
-        chain.exceptionCaught( null, session, new Exception() );
-        chain.sessionClosed( null, session );
+        chain.sessionOpened( session );
+        chain.messageReceived( session, new Object() );
+        chain.filterWrite( session, new Object() );
+        chain.sessionIdle( session, IdleStatus.READER_IDLE );
+        chain.exceptionCaught( session, new Exception() );
+        chain.sessionClosed( session );
         
         result = formatResult( result );
         expectedResult = formatResult( expectedResult );
@@ -244,14 +226,13 @@ public class ProtocolHandlerFilterChainTest extends TestCase
 
     private static class ProtocolHandlerFilterChainImpl extends AbstractProtocolHandlerFilterChain
     {
-        protected ProtocolHandlerFilterChainImpl( boolean root )
+        protected ProtocolHandlerFilterChainImpl()
         {
-            super( root );
         }
 
         protected void doWrite( ProtocolSession session, Object message )
         {
-            getRoot().messageSent( null, session, message );
+            messageSent( session, message );
         }
     }
     

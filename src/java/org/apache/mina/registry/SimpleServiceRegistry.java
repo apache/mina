@@ -117,16 +117,8 @@ public class SimpleServiceRegistry implements ServiceRegistry
         stopThreadPools();
     }
 
-    public IoHandlerFilterChain newIoFilterChain(TransportType transportType) {
-        return findIoAcceptor( transportType ).newFilterChain();
-    }
-
     public IoHandlerFilterChain getIoFilterChain(TransportType transportType) {
         return findIoAcceptor( transportType ).getFilterChain();
-    }
-
-    public ProtocolHandlerFilterChain newProtocolFilterChain(TransportType transportType) {
-        return findProtocolAcceptor( transportType ).newFilterChain();
     }
 
     public ProtocolHandlerFilterChain getProtocolFilterChain(TransportType transportType) {
