@@ -25,7 +25,7 @@ import org.apache.mina.io.socket.SocketSessionConfig;
 import org.apache.mina.protocol.ProtocolSession;
 
 /**
- * Provides general or transport-specific configuration.
+ * Provides general or {@link TransportType}-specific configuration.
  * <p>
  * <ul>
  *   <li><code>idleTime</code> (secs) - <code>sessionIdle</code> event is
@@ -36,10 +36,17 @@ import org.apache.mina.protocol.ProtocolSession;
  * </ul>
  * <p>
  * Please refer to {@link SocketSessionConfig} and {@link DatagramSessionConfig}
- * for transport-specific configurations.
+ * for {@link TransportType}-specific configurations.
  * <p>
  * {@link SessionConfig} can be obtained by {@link IoSession#getConfig()} and
- * by {@link ProtocolSession#getConfig()}.
+ * by {@link ProtocolSession#getConfig()}.  To adjust
+ * {@link TransportType}-specific settings, please downcast it:
+ * <pre>
+ * public void sessionOpened( IoSession s )
+ * {
+ *     ( ( SocketSessionConfig ) s.getConfig() ).setReuseAddress( true );
+ * }
+ * </pre>
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$

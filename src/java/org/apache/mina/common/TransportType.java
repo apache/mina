@@ -23,7 +23,13 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 /**
- * Represents network transport types.
+ * Represents network transport types.  MINA provides three transport types:
+ * <ul>
+ *   <li>{@link #SOCKET} - TCP/IP</li>
+ *   <li>{@link #DATAGRAM} - UDP/IP</li>
+ *   <li>{@link #VM_PIPE} - in-VM pipe support (only available in protocol
+ *       layer</li>
+ * </ul> 
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
@@ -45,7 +51,10 @@ public class TransportType implements Serializable
             "DATAGRAM", true );
 
     /**
-     * Transport type: VM pipe (direct message exchange)
+     * Transport type: VM pipe (direct message exchange).
+     * Please refer to
+     * <a href="../protocol/vmpipe/package-summary.htm"><tt>org.apache.mina.protocol.vmpipe</tt></a>
+     * package.
      */
     public static final TransportType VM_PIPE = new TransportType( "VM_PIPE",
             false );
@@ -54,9 +63,9 @@ public class TransportType implements Serializable
      * Returns the transport type of the specified name.  Here are the list
      * of available names:
      * <ul>
-     *   <li><code>"socket"</code> or <code>"tcp"</code> - {@link #SOCKET}</li>
-     *   <li><code>"datagram"</code> or <code>"udp"</code> - {@link #DATAGRAM}</li>
-     *   <li><code>"vm_pipe"</code> - {@link #VM_PIPE}</li>
+     *   <li><code>"socket"</code> or <code>"tcp"</code> returns {@link #SOCKET}</li>
+     *   <li><code>"datagram"</code> or <code>"udp"</code> returns {@link #DATAGRAM}</li>
+     *   <li><code>"vm_pipe"</code> returns {@link #VM_PIPE}</li>
      * </ul>
      * All names are case-insensitive.
      * 

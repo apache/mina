@@ -48,42 +48,22 @@ import org.apache.mina.util.Stack;
  */
 public final class ByteBuffer
 {
-    private static final Stack[] bufferStacks = new Stack[] { new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(),
-                                                             new Stack(), };
+    private static final Stack[] bufferStacks = new Stack[] {
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), };
 
     /**
      * Returns the buffer which is capable of the specified size.
      */
-    public static ByteBuffer allocate( int size )
+    public static ByteBuffer allocate( int capacity )
     {
-        int idx = getBufferStackIndex( size );
+        int idx = getBufferStackIndex( capacity );
         Stack stack = bufferStacks[ idx ];
 
         ByteBuffer buf;

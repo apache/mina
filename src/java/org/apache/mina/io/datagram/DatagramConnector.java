@@ -67,7 +67,7 @@ public class DatagramConnector extends DatagramProcessor implements
     /**
      * Creates a new instance.
      * 
-     * @throws IOException
+     * @throws IOException if failed to open a selector
      */
     public DatagramConnector() throws IOException
     {
@@ -134,7 +134,7 @@ public class DatagramConnector extends DatagramProcessor implements
         return connect( address, handler );
     }
 
-    public void closeSession( DatagramSession session )
+    void closeSession( DatagramSession session )
     {
         synchronized( this )
         {
@@ -149,7 +149,7 @@ public class DatagramConnector extends DatagramProcessor implements
         selector.wakeup();
     }
 
-    public void flushSession( DatagramSession session )
+    void flushSession( DatagramSession session )
     {
         scheduleFlush( session );
         selector.wakeup();

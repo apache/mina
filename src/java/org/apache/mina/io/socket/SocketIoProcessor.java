@@ -32,8 +32,8 @@ import org.apache.mina.io.WriteTimeoutException;
 import org.apache.mina.util.Queue;
 
 /**
- * Performs core I/O operations for sockets.  This class is used by MINA
- * internally.
+ * Performs all I/O operations for sockets which is connected or bound.
+ * This class is used by MINA internally.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$,

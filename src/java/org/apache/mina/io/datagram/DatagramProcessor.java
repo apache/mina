@@ -29,11 +29,13 @@ package org.apache.mina.io.datagram;
 abstract class DatagramProcessor
 {
     /**
-     * This method is invoked by MINA internally.
+     * Requests this processor to flush the write buffer of the specified
+     * session.  This method is invoked by MINA internally.
      */
     abstract void flushSession( DatagramSession session );
 
     /**
+     * Requests this processor to close the specified session.
      * This method is invoked by MINA internally.
      */
     abstract void closeSession( DatagramSession session );

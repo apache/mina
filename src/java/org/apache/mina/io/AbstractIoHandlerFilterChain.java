@@ -11,6 +11,25 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.io.IoHandlerFilter.NextFilter;
 
+/**
+ * An abstract implementation of {@link IoHandlerFilterChain} that provides
+ * common operations for developers to support specific transport types.
+ * <p>
+ * All methods has been implemented.  The list of filters is maintained
+ * as a doublely linked list.  You can fire any MINA events which is filtered
+ * by this chain using these public methods:
+ * <ul>
+ *   <li></li>
+ * </ul>
+ * 
+ * The only method a developer should implement is {@link #doWrite(IoSession, ByteBuffer, Object)}.
+ * This method is invoked when filter chain is evaluated for
+ * {@link IoHandlerFilter#filterWrite(NextFilter, IoSession, ByteBuffer, Object)} and 
+ * finally to be written to the underlying transport layer (e.g. socket)
+ * 
+ * @author The Apache Directory Project
+ * @version $Rev$, $Date$,
+ */
 public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterChain
 {
     private final IoHandlerFilter HEAD_FILTER = new IoHandlerFilter()
