@@ -266,7 +266,7 @@ public class SocketConnector implements IoConnector
             {
                 try
                 {
-                    int nKeys = selector.select();
+                    int nKeys = selector.select( 1000 );
 
                     registerNew();
                     
