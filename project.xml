@@ -21,7 +21,7 @@
   </issueTrackingUrl>
   <siteAddress>minotaur.apache.org</siteAddress>
   <siteDirectory>
-    /www/directory.apache.org/directory/subprojects/network/mina
+    /www/directory.apache.org/subprojects/network
   </siteDirectory>
   <distributionDirectory>
     /www/cvs.apache.org/dist/directory
@@ -29,13 +29,13 @@
 
   <repository>
     <connection>
-      scm:svn:http://svn.apache.org/repos/asf:directory/network/mina/trunk
+      scm:svn:http://svn.apache.org/repos/asf:directory/network/trunk
     </connection>
     <url>
-      http://svn.apache.org/viewcvs.cgi/directory/network/mina/trunk/?root=Apache-SVN
+      http://svn.apache.org/viewcvs.cgi/directory/network/trunk/?root=Apache-SVN
     </url>
     <developerConnection>
-      scm:svn:https://svn.apache.org/repos/asf:directory/network/mina/trunk
+      scm:svn:https://svn.apache.org/repos/asf:directory/network/trunk
     </developerConnection>
   </repository>
 
@@ -55,13 +55,13 @@
     <mailingList>
       <name>Apache Directory Developement - use [mina] prefix</name>
       <subscribe>
-        directory-dev-subscribe@incubator.apache.org
+        dev-subscribe@directory.apache.org
       </subscribe>
       <unsubscribe>
-        directory-dev-unsubscribe@incubator.apache.org
+        dev-unsubscribe@directory.apache.org
       </unsubscribe>
       <archive>
-        http://nagoya.apache.org/eyebrowse/SummarizeList?listId=181
+        http://issues.apache.org/eyebrowse/SummarizeList?listId=181
       </archive>
     </mailingList>
   </mailingLists>
@@ -80,13 +80,17 @@
     <!-- Compatibility dependencies for ProtocolEncoder and ProtocolDecoder -->
     <!-- ================================================================== -->
 
+    <!-- this dep should just go away - fork what you need if you have to -->
+
     <dependency>
-      <groupId>incubator-directory</groupId>
+      <groupId>directory-asn1</groupId>
       <artifactId>asn1-codec</artifactId>
-      <version>0.2</version>
-      <url>http://incubator.apache.org/directory/subprojects/asn1/codec-stateful/</url>
+      <version>0.3-SNAPSHOT</version>
+      <url>http://directory.apache.org/subprojects/asn1/codec-stateful/</url>
     </dependency>
     
+    <!-- this dep should just go away too - fork what you need if you have to -->
+
     <dependency>
       <groupId>tl-netty2</groupId>
       <artifactId>tl-netty2</artifactId>
@@ -116,7 +120,7 @@
 
 
   <build>
-    <nagEmailAddress>directory-dev@incubator.apache.org</nagEmailAddress>
+    <nagEmailAddress>dev@directory.apache.org</nagEmailAddress>
     <sourceDirectory>${basedir}/src/java</sourceDirectory>
     <sourceModifications>
       <sourceModification>
