@@ -93,7 +93,6 @@ class SocketIoProcessor
             {
                 newSessions.push( session );
             }
-
             startupWorker();
         }
 
@@ -499,7 +498,8 @@ class SocketIoProcessor
                     {
                         synchronized( SocketIoProcessor.this )
                         {
-                            if( selector.keys().isEmpty() )
+                            if( selector.keys().isEmpty() &&
+                                newSessions.isEmpty() )
                             {
                                 worker = null;
                                 break;

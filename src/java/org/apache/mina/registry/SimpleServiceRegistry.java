@@ -96,8 +96,24 @@ public class SimpleServiceRegistry implements ServiceRegistry
     {
         ProtocolAcceptor acceptor = findProtocolAcceptor( service
                 .getTransportType() );
-        acceptor.unbind( new InetSocketAddress( service.getPort() ) );
-        acceptor.unbind( new VmPipeAddress( service.getPort() ) );
+        try
+        {
+            acceptor.unbind( new InetSocketAddress( service.getPort() ) );
+        }
+        catch( Exception e )
+        {
+            // ignore
+        }
+        
+        try
+        {
+            acceptor.unbind( new VmPipeAddress( service.getPort() ) );
+        }
+        catch( Exception e )
+        {
+            // ignore
+        }
+
         services.remove( service );
         stopThreadPools();
     }
