@@ -75,8 +75,8 @@ class SSLByteBufferPool
 
             // application buffer size has been doubled because SSLEngine
             // returns BUFFER_OVERFLOW even if there is enough room for the buffer.
-            // So I doubled the size as a workaround.
-            appBufferSize = sslEngine.getSession().getApplicationBufferSize() * 2;
+            // So for now we use a size double the packet size as a workaround.
+            appBufferSize = packetBufferSize * 2;
             initiateBufferStacks();
             initiated = true;
         }
