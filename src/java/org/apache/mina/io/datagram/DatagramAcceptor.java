@@ -21,7 +21,6 @@ package org.apache.mina.io.datagram;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -32,9 +31,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.DefaultExceptionMonitor;
 import org.apache.mina.io.ExceptionMonitor;
+import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.util.IoHandlerFilterManager;
@@ -92,30 +91,14 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         if( ( ( InetSocketAddress ) address ).getPort() == 0 )
             throw new IllegalArgumentException( "Unsupported port number: 0" );
 
-        DatagramChannel ch = DatagramChannel.open();
-        boolean bound = false;
-        try
+        RegistrationRequest request = new RegistrationRequest( address, handler );
+        synchronized( registerQueue )
         {
-            ch.configureBlocking( false );
-            ch.socket().bind( address );
-            bound = true;
-        }
-        finally
-        {
-            if( !bound )
-            {
-                ch.close();
-            }
+            registerQueue.push( request );
         }
 
         synchronized( this )
         {
-            synchronized( registerQueue )
-            {
-                registerQueue.push( new RegistrationRequest( ch, handler ) );
-            }
-            channels.put( address, ch );
-
             if( worker == null )
             {
                 worker = new Worker();
@@ -124,6 +107,25 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         }
 
         selector.wakeup();
+        
+        synchronized( request )
+        {
+            while( !request.done )
+            {
+                try
+                {
+                    request.wait();
+                }
+                catch( InterruptedException e )
+                {
+                }
+            }
+        }
+        
+        if( request.exception != null )
+        {
+            throw request.exception;
+        }
     }
 
     public void unbind( SocketAddress address )
@@ -131,25 +133,27 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         if( address == null )
             throw new NullPointerException( "address" );
 
-        DatagramChannel ch;
-
-        synchronized( this )
+        CancellationRequest request = new CancellationRequest( address );
+        synchronized( cancelQueue )
         {
-            ch = ( DatagramChannel ) channels.get( address );
-
-            if( ch == null )
-                return;
-
-            SelectionKey key = ch.keyFor( selector );
-            channels.remove( address );
-            synchronized( cancelQueue )
-            {
-                cancelQueue.push( key );
-            }
+            cancelQueue.push( request );
         }
 
         selector.wakeup();
-        ch.socket().close();
+        
+        synchronized( request )
+        {
+            while( !request.done )
+            {
+                try
+                {
+                    request.wait();
+                }
+                catch( InterruptedException e )
+                {
+                }
+            }
+        }
     }
 
     public void flushSession( DatagramSession session )
@@ -380,7 +384,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         }
     }
 
-    private void registerNew() throws ClosedChannelException
+    private void registerNew()
     {
         if( registerQueue.isEmpty() )
             return;
@@ -396,8 +400,39 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             if( req == null )
                 break;
 
-            req.channel
-                    .register( selector, SelectionKey.OP_READ, req.handler );
+            DatagramChannel ch = null;
+            try
+            {
+                ch = DatagramChannel.open();
+                ch.configureBlocking( false );
+                ch.socket().bind( req.address );
+                ch.register( selector, SelectionKey.OP_READ, req.handler );
+                channels.put( req.address, ch );
+            }
+            catch( IOException e )
+            {
+                req.exception = e;
+            }
+            finally
+            {
+                synchronized( req )
+                {
+                    req.done = true;
+                    req.notify();
+                }
+
+                if( ch != null && req.exception != null )
+                {
+                    try
+                    {
+                        ch.close();
+                    }
+                    catch( IOException e )
+                    {
+                        exceptionMonitor.exceptionCaught( this, e );
+                    }
+                }
+            }
         }
     }
 
@@ -408,18 +443,41 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
         for( ;; )
         {
-            SelectionKey key;
+            CancellationRequest request;
             synchronized( cancelQueue )
             {
-                key = ( SelectionKey ) cancelQueue.pop();
+                request = ( CancellationRequest ) cancelQueue.pop();
+            }
+            
+            if( request == null )
+            {
+                break;
             }
 
-            if( key == null )
-                break;
-            else
+            DatagramChannel ch = ( DatagramChannel ) channels.get( request.address );
+            if( ch == null )
+                continue;
+            
+            SelectionKey key = ch.keyFor( selector );
+            key.cancel();
+            selector.wakeup(); // wake up again to trigger thread death
+            
+            // close the channel
+            try
             {
-                key.cancel();
-                selector.wakeup(); // wake up again to trigger thread death
+                ch.close();
+            }
+            catch( IOException e )
+            {
+                exceptionMonitor.exceptionCaught( this, e );
+            }
+            finally
+            {
+                synchronized( request )
+                {
+                    request.done = true;
+                    request.notify();
+                }
             }
         }
     }
@@ -446,15 +504,30 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
     private static class RegistrationRequest
     {
-        private final DatagramChannel channel;
-
+        private final SocketAddress address;
+        
         private final IoHandler handler;
-
-        private RegistrationRequest( DatagramChannel channel,
-                                    IoHandler handler )
+        
+        private IOException exception; 
+        
+        private boolean done;
+        
+        private RegistrationRequest( SocketAddress address, IoHandler handler )
         {
-            this.channel = channel;
+            this.address = address;
             this.handler = handler;
+        }
+    }
+
+    private static class CancellationRequest
+    {
+        private final SocketAddress address;
+        
+        private boolean done;
+        
+        private CancellationRequest( SocketAddress address )
+        {
+            this.address = address;
         }
     }
 

@@ -156,6 +156,11 @@ public class SSLFilter extends IoHandlerFilterAdapter
         SSLHandler sslHandler = getSSLSessionHandler( session );
         if( sslHandler != null )
         {
+            if( debug != null )
+            {
+                debug.print( "Data Read: " + sslHandler + " ("
+                             + buf.getHexDump() + ')' );
+            }
             synchronized( sslHandler )
             {
                 try
@@ -165,6 +170,16 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
                     // Handle data to be forwarded to application or written to net
                     handleSSLData( nextHandler, session, sslHandler );
+
+                    if( sslHandler.isClosed() )
+                    {
+                        if( debug != null )
+                        {
+                            debug
+                                    .print( "SSL Session closed. Closing connection.." );
+                        }
+                        session.close();
+                    }
                 }
                 catch( SSLException ssle )
                 {
@@ -196,6 +211,10 @@ public class SSLFilter extends IoHandlerFilterAdapter
     {
 
         SSLHandler sslHandler = getSSLSessionHandler( session );
+        if( debug != null )
+        {
+            debug.print( "Filtered Write: " + sslHandler );
+        }
         if( sslHandler != null )
         {
             synchronized( sslHandler )
@@ -221,7 +240,12 @@ public class SSLFilter extends IoHandlerFilterAdapter
                         sslHandler.encrypt( buf.buf() );
                         ByteBuffer encryptedBuffer = copy( sslHandler
                                 .getOutNetBuffer() );
-                        //debug("encrypted data: {0}", encryptedBuffer.getHexDump());
+
+                        if( debug != null )
+                        {
+                            debug.print( "encrypted data: "
+                                    + encryptedBuffer.getHexDump() );
+                        }
                         return encryptedBuffer;
                     }
                     catch( SSLException ssle )
@@ -236,6 +260,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
     }
 
     // Utiliities
+
     private void handleSSLData( IoHandler nextHandler, IoSession session,
                                SSLHandler sslHandler ) throws SSLException
     {
@@ -258,9 +283,8 @@ public class SSLFilter extends IoHandlerFilterAdapter
             ByteBuffer readBuffer = copy( sslHandler.getAppBuffer() );
             if( debug != null )
             {
-                debug.print( "app data read: " + readBuffer );
+                debug.print( "app data read: " + readBuffer + " (" + readBuffer.getHexDump() + ')' );
             }
-            //debug("app data: {0}", readBuffer.getHexDump());
             nextHandler.dataRead( session, readBuffer );
         }
     }
@@ -387,7 +411,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
          * This will print out the messages to Commons-Logging or stdout.
          */
         static final Debug ON = new DebugOn();
-        
+
         /**
          * This will suppress debug messages.
          */

@@ -58,7 +58,7 @@ class SSLByteBufferPool
      *
      * @param sslEngine SSLEngine
      */
-    static void initiate( SSLEngine sslEngine )
+    static synchronized void initiate( SSLEngine sslEngine )
     {
         if( !initiated )
         {
@@ -71,7 +71,11 @@ class SSLByteBufferPool
             }
             // init buffer sizes from SSLEngine
             packetBufferSize = sslEngine.getSession().getPacketBufferSize();
-            appBufferSize = sslEngine.getSession().getApplicationBufferSize();
+            
+            // application buffer size has been doubled because SSLEngine
+            // returns BUFFER_OVERFLOW even if there is enough room for the buffer.
+            // So I doubled the size as a workaround.
+            appBufferSize = sslEngine.getSession().getApplicationBufferSize() * 2;
             initiateBufferStacks();
             initiated = true;
         }

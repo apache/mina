@@ -21,7 +21,6 @@ package org.apache.mina.io.socket;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -31,9 +30,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.DefaultExceptionMonitor;
 import org.apache.mina.io.ExceptionMonitor;
+import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.util.IoHandlerFilterManager;
@@ -102,30 +101,14 @@ public class SocketAcceptor implements IoAcceptor
         if( ( ( InetSocketAddress ) address ).getPort() == 0 )
             throw new IllegalArgumentException( "Unsupported port number: 0" );
 
-        ServerSocketChannel ssc = ServerSocketChannel.open();
-        boolean bound = false;
-        try
+        RegistrationRequest request = new RegistrationRequest( address, backlog, handler );
+        synchronized( registerQueue )
         {
-            ssc.configureBlocking( false );
-            ssc.socket().bind( address, backlog );
-            bound = true;
-        }
-        finally
-        {
-            if( !bound )
-            {
-                ssc.close();
-            }
+            registerQueue.push( request );
         }
 
         synchronized( this )
         {
-            synchronized( registerQueue )
-            {
-                registerQueue.push( new RegistrationRequest( ssc, handler ) );
-            }
-            channels.put( address, ssc );
-
             if( worker == null )
             {
                 worker = new Worker();
@@ -134,39 +117,52 @@ public class SocketAcceptor implements IoAcceptor
         }
 
         selector.wakeup();
+        
+        synchronized( request )
+        {
+            while( !request.done )
+            {
+                try
+                {
+                    request.wait();
+                }
+                catch( InterruptedException e )
+                {
+                }
+            }
+        }
+        
+        if( request.exception != null )
+        {
+            throw request.exception;
+        }
     }
 
     public void unbind( SocketAddress address )
     {
         if( address == null )
             throw new NullPointerException( "address" );
-
-        ServerSocketChannel ssc;
-
-        synchronized( this )
+        
+        CancellationRequest request = new CancellationRequest( address );
+        synchronized( cancelQueue )
         {
-            ssc = ( ServerSocketChannel ) channels.get( address );
-
-            if( ssc == null )
-                return;
-
-            SelectionKey key = ssc.keyFor( selector );
-            channels.remove( address );
-            synchronized( cancelQueue )
-            {
-                cancelQueue.push( key );
-            }
+            cancelQueue.push( request );
         }
 
         selector.wakeup();
 
-        try
+        synchronized( request )
         {
-            ssc.close();
-        }
-        catch( IOException e )
-        {
-            exceptionMonitor.exceptionCaught( this, e );
+            while( !request.done )
+            {
+                try
+                {
+                    request.wait();
+                }
+                catch( InterruptedException e )
+                {
+                }
+            }
         }
     }
 
@@ -243,7 +239,7 @@ public class SocketAcceptor implements IoAcceptor
         }
     }
 
-    private void registerNew() throws ClosedChannelException
+    private void registerNew()
     {
         if( registerQueue.isEmpty() )
             return;
@@ -259,8 +255,40 @@ public class SocketAcceptor implements IoAcceptor
             if( req == null )
                 break;
 
-            req.channel.register( selector, SelectionKey.OP_ACCEPT,
-                    req.handler );
+            ServerSocketChannel ssc = null;
+            try
+            {
+                ssc = ServerSocketChannel.open();
+                ssc.configureBlocking( false );
+                ssc.socket().bind( req.address, req.backlog );
+                ssc.register( selector, SelectionKey.OP_ACCEPT,
+                              req.handler );
+                channels.put( req.address, ssc );
+            }
+            catch( IOException e )
+            {
+                req.exception = e;
+            }
+            finally
+            {
+                synchronized( req )
+                {
+                    req.done = true;
+                    req.notify();
+                }
+
+                if( ssc != null && req.exception != null )
+                {
+                    try
+                    {
+                        ssc.close();
+                    }
+                    catch( IOException e )
+                    {
+                        exceptionMonitor.exceptionCaught( this, e );
+                    }
+                }
+            }
         }
     }
 
@@ -271,18 +299,41 @@ public class SocketAcceptor implements IoAcceptor
 
         for( ;; )
         {
-            SelectionKey key;
+            CancellationRequest request;
             synchronized( cancelQueue )
             {
-                key = ( SelectionKey ) cancelQueue.pop();
+                request = ( CancellationRequest ) cancelQueue.pop();
+            }
+            
+            if( request == null )
+            {
+                break;
             }
 
-            if( key == null )
-                break;
-            else
+            ServerSocketChannel ssc = ( ServerSocketChannel ) channels.get( request.address );
+            if( ssc == null )
+                continue;
+            
+            SelectionKey key = ssc.keyFor( selector );
+            key.cancel();
+            selector.wakeup(); // wake up again to trigger thread death
+            
+            // close the channel
+            try
             {
-                key.cancel();
-                selector.wakeup(); // wake up again to trigger thread death
+                ssc.close();
+            }
+            catch( IOException e )
+            {
+                exceptionMonitor.exceptionCaught( this, e );
+            }
+            finally
+            {
+                synchronized( request )
+                {
+                    request.done = true;
+                    request.notify();
+                }
             }
         }
     }
@@ -309,15 +360,34 @@ public class SocketAcceptor implements IoAcceptor
 
     private static class RegistrationRequest
     {
-        private final ServerSocketChannel channel;
+        private final SocketAddress address;
+        
+        private final int backlog;
 
         private final IoHandler handler;
-
-        private RegistrationRequest( ServerSocketChannel channel,
-                                    IoHandler handler )
+        
+        private IOException exception; 
+        
+        private boolean done;
+        
+        private RegistrationRequest( SocketAddress address, int backlog,
+                                     IoHandler handler )
         {
-            this.channel = channel;
+            this.address = address;
+            this.backlog = backlog;
             this.handler = handler;
+        }
+    }
+
+    private static class CancellationRequest
+    {
+        private final SocketAddress address;
+        
+        private boolean done;
+        
+        private CancellationRequest( SocketAddress address )
+        {
+            this.address = address;
         }
     }
 
