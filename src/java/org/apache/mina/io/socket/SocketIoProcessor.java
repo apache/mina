@@ -235,6 +235,9 @@ class SocketIoProcessor
         ByteBuffer buf = session.getReadBuffer();
         SocketChannel ch = session.getChannel();
 
+        // Acquire buffer to prevent buffer is released by
+        // SocketSession.setReadBuffer()
+        buf.acquire(); 
         try
         {
             int readBytes = 0;
@@ -277,6 +280,10 @@ class SocketIoProcessor
             if( e instanceof IOException )
                 scheduleRemove( session );
             session.getFilters().exceptionCaught( null, session, e );
+        }
+        finally
+        {
+            buf.release();
         }
     }
 

@@ -19,8 +19,8 @@
 package org.apache.mina.io.socket;
 
 import java.net.SocketException;
-import java.nio.channels.SocketChannel;
 
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.util.BasicSessionConfig;
 
@@ -32,90 +32,100 @@ import org.apache.mina.util.BasicSessionConfig;
  */
 public class SocketSessionConfig extends BasicSessionConfig
 {
-    private final SocketChannel ch;
+    private final SocketSession session;
 
-    SocketSessionConfig( SocketChannel ch )
+    SocketSessionConfig( SocketSession session )
     {
-        this.ch = ch;
+        this.session = session;
     }
 
     public boolean getKeepAlive() throws SocketException
     {
-        return ch.socket().getKeepAlive();
+        return session.getChannel().socket().getKeepAlive();
     }
 
     public void setKeepAlive( boolean on ) throws SocketException
     {
-        ch.socket().setKeepAlive( on );
+        session.getChannel().socket().setKeepAlive( on );
     }
 
     public boolean getOOBInline() throws SocketException
     {
-        return ch.socket().getOOBInline();
+        return session.getChannel().socket().getOOBInline();
     }
 
     public void setOOBInline( boolean on ) throws SocketException
     {
-        ch.socket().setOOBInline( on );
+        session.getChannel().socket().setOOBInline( on );
     }
 
     public boolean getReuseAddress() throws SocketException
     {
-        return ch.socket().getReuseAddress();
+        return session.getChannel().socket().getReuseAddress();
     }
 
     public void setReuseAddress( boolean on ) throws SocketException
     {
-        ch.socket().setReuseAddress( on );
+        session.getChannel().socket().setReuseAddress( on );
     }
 
     public int getSoLinger() throws SocketException
     {
-        return ch.socket().getSoLinger();
+        return session.getChannel().socket().getSoLinger();
     }
 
     public void setSoLinger( boolean on, int linger ) throws SocketException
     {
-        ch.socket().setSoLinger( on, linger );
+        session.getChannel().socket().setSoLinger( on, linger );
     }
 
     public boolean getTcpNoDelay() throws SocketException
     {
-        return ch.socket().getTcpNoDelay();
+        return session.getChannel().socket().getTcpNoDelay();
     }
 
     public void setTcpNoDelay( boolean on ) throws SocketException
     {
-        ch.socket().setTcpNoDelay( on );
+        session.getChannel().socket().setTcpNoDelay( on );
     }
 
     public int getTrafficClass() throws SocketException
     {
-        return ch.socket().getTrafficClass();
+        return session.getChannel().socket().getTrafficClass();
     }
 
     public void setTrafficClass( int tc ) throws SocketException
     {
-        ch.socket().setTrafficClass( tc );
+        session.getChannel().socket().setTrafficClass( tc );
     }
 
     public int getSendBufferSize() throws SocketException
     {
-        return ch.socket().getSendBufferSize();
+        return session.getChannel().socket().getSendBufferSize();
     }
 
     public void setSendBufferSize( int size ) throws SocketException
     {
-        ch.socket().setSendBufferSize( size );
+        session.getChannel().socket().setSendBufferSize( size );
     }
 
     public int getReceiveBufferSize() throws SocketException
     {
-        return ch.socket().getReceiveBufferSize();
+        return session.getChannel().socket().getReceiveBufferSize();
     }
 
     public void setReceiveBufferSize( int size ) throws SocketException
     {
-        ch.socket().setReceiveBufferSize( size );
+        session.getChannel().socket().setReceiveBufferSize( size );
+    }
+    
+    public void getSessionReceiveBufferSize()
+    {
+        session.getReadBuffer().capacity();
+    }
+    
+    public void setSessionReceiveBufferSize( int size )
+    {
+        session.setReadBuffer( ByteBuffer.allocate( size ).limit( 0 ) );
     }
 }
