@@ -20,6 +20,7 @@ package org.apache.mina.examples.netcat;
 
 import java.net.InetSocketAddress;
 
+import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
 import org.apache.mina.io.socket.SocketConnector;
 
@@ -46,7 +47,8 @@ public class Main
 
         // Add I/O thread pool filter.
         // MINA runs in a single thread if you don't add this filter.
-        connector.addFilter( Integer.MAX_VALUE, new IoThreadPoolFilter() );
+        connector.addFilter( IoHandlerFilter.MAX_PRIORITY,
+                new IoThreadPoolFilter() );
 
         // Start communication.
         connector.connect( new InetSocketAddress( args[ 0 ], Integer

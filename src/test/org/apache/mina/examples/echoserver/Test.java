@@ -98,14 +98,16 @@ public class Test extends TestCase
         {
             throw new IOException( "Cannot bind any test port." );
         }
-        
-        System.out.println("Using port " + port + " for testing.");
+
+        System.out.println( "Using port " + port + " for testing." );
 
         threadPoolFilter = new IoThreadPoolFilter();
         threadPoolFilter.start();
 
-        acceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
-        datagramAcceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
+        acceptor
+                .addFilter( IoThreadPoolFilter.MAX_PRIORITY, threadPoolFilter );
+        datagramAcceptor.addFilter( IoThreadPoolFilter.MAX_PRIORITY,
+                threadPoolFilter );
     }
 
     protected void tearDown() throws Exception

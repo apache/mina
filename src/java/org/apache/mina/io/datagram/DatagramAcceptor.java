@@ -440,7 +440,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
     public List getAllFilters()
     {
-        return filterManager.filters();
+        return filterManager.getAllFilters();
     }
 
     private static class RegistrationRequest

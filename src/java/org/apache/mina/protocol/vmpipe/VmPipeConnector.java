@@ -50,7 +50,7 @@ public class VmPipeConnector implements ProtocolConnector
 
     public List getAllFilters()
     {
-    	return filterManager.filters();
+    	return filterManager.getAllFilters();
     }
 
     public ProtocolSession connect( SocketAddress address,

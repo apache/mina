@@ -91,7 +91,7 @@ public class IoAdapter
 
     public List getAllFilters()
     {
-        return filterManager.filters();
+        return filterManager.getAllFilters();
     }
 
     /**

@@ -303,7 +303,7 @@ public class SocketAcceptor implements IoAcceptor
 
     public List getAllFilters()
     {
-        return filterManager.filters();
+        return filterManager.getAllFilters();
     }
 
     private static class RegistrationRequest

@@ -300,7 +300,7 @@ public class SocketConnector implements IoConnector
 
     public List getAllFilters()
     {
-    	return filterManager.filters();
+    	return filterManager.getAllFilters();
     }
 
     public ExceptionMonitor getExceptionMonitor()

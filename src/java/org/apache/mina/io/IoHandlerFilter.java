@@ -48,6 +48,12 @@ import org.apache.mina.common.IdleStatus;
  */
 public interface IoHandlerFilter
 {
+    /** The minimum priority */
+    static int MIN_PRIORITY = 0;
+
+    /** The maximum priority */
+    static int MAX_PRIORITY = 99;
+
     /**
      * Filters {@link IoHandler#sessionOpened(IoSession)} event.
      */

@@ -19,6 +19,7 @@
 package org.apache.mina.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.mina.common.ByteBuffer;
@@ -85,96 +86,88 @@ public class IoHandlerFilterManager
         }
     };
 
-    private Entry head = new Entry( null, null, Integer.MIN_VALUE,
-            FINAL_FILTER );
+    private final Entry[] entries;
 
-    private final Entry tail = head;
+    private final int minPriority;
+
+    private final int maxPriority;
+
+    public IoHandlerFilterManager( int minPriority, int maxPriority )
+    {
+        this.minPriority = minPriority;
+        this.maxPriority = maxPriority;
+
+        entries = new Entry[ maxPriority - minPriority + 2 ];
+        entries[ 0 ] = new Entry( minPriority - 1, FINAL_FILTER );
+    }
 
     public IoHandlerFilterManager()
     {
+        this( IoHandlerFilter.MIN_PRIORITY, IoHandlerFilter.MAX_PRIORITY );
     }
 
     public synchronized void addFilter( int priority, IoHandlerFilter filter )
     {
-        Entry e = head;
-        Entry prevEntry = null;
-        for( ;; )
+        if( priority < minPriority || priority > maxPriority )
         {
-            if( e.priority < priority )
-            {
-                Entry newEntry = new Entry( prevEntry, e, priority, filter );
-                if( prevEntry == null )
-                {
-                    head = newEntry;
-                }
-                else
-                {
-                    prevEntry.nextEntry.prevEntry = newEntry;
-                    prevEntry.nextEntry = newEntry;
-                }
-                break;
-            }
-            else if( e.priority == priority )
-            {
-                throw new IllegalArgumentException(
-                        "Other filter is registered with priority "
-                                                                                                + priority
-                                                                                                + " already." );
-            }
-            prevEntry = e;
-            e = e.nextEntry;
+            throw new IllegalArgumentException( "priority: " + priority
+                    + " (should be " + minPriority + '~' + maxPriority + ')' );
+        }
+
+        if( entries[ priority - minPriority + 1 ] == null )
+        {
+            entries[ priority - minPriority + 1 ] = new Entry( priority,
+                    filter );
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                    "Other filter is registered with priority " + priority
+                            + " already." );
         }
     }
 
-    public synchronized void removeFilter( IoHandlerFilter filter )
+    public synchronized boolean removeFilter( IoHandlerFilter filter )
     {
-        if( filter == tail )
+        for( int i = entries.length - 1; i > 0; i -- )
         {
-            throw new IllegalArgumentException(
-                    "Cannot remove the internal filter." );
+            if( entries[ i ] != null && filter == entries[ i ].filter )
+            {
+                entries[ i ] = null;
+                return true;
+            }
         }
 
-        Entry e = head;
-        Entry prevEntry = null;
-        for( ;; )
-        {
-            if( e.nextEntry == null )
-            {
-                break;
-            }
-            else if( e.filter == filter )
-            {
-                if( prevEntry == null )
-                {
-                    // e is head
-                    e.nextEntry.prevEntry = null;
-                    head = e.nextEntry;
-                }
-                else
-                {
-                    e.nextEntry.prevEntry = prevEntry;
-                    prevEntry.nextEntry = e.nextEntry;
-                }
-                break;
-            }
-            prevEntry = e;
-            e = e.nextEntry;
-        }
+        return false;
     }
 
     public synchronized void removeAllFilters()
     {
-        tail.prevEntry = null;
-        tail.nextEntry = null;
-        head = tail;
+        Arrays.fill( entries, 1, entries.length, null );
+    }
+
+    private Entry findNextEntry( int currentPriority )
+    {
+        currentPriority -= minPriority;
+
+        for( ; currentPriority >= 0; currentPriority -- )
+        {
+            Entry e = entries[ currentPriority ];
+            if( e != null )
+            {
+                return e;
+            }
+        }
+
+        throw new InternalError();
     }
 
     public void fireSessionOpened( IoSession session )
     {
-        Entry head = this.head;
+        Entry entry = findNextEntry( maxPriority + 1 );
         try
         {
-            head.filter.sessionOpened( head.nextHandler, session );
+            entry.filter.sessionOpened( entry.nextHandler, session );
         }
         catch( Throwable e )
         {
@@ -184,10 +177,10 @@ public class IoHandlerFilterManager
 
     public void fireSessionClosed( IoSession session )
     {
-        Entry head = this.head;
+        Entry entry = findNextEntry( maxPriority + 1 );
         try
         {
-            head.filter.sessionClosed( head.nextHandler, session );
+            entry.filter.sessionClosed( entry.nextHandler, session );
         }
         catch( Throwable e )
         {
@@ -197,10 +190,10 @@ public class IoHandlerFilterManager
 
     public void fireSessionIdle( IoSession session, IdleStatus status )
     {
-        Entry head = this.head;
+        Entry entry = findNextEntry( maxPriority + 1 );
         try
         {
-            head.filter.sessionIdle( head.nextHandler, session, status );
+            entry.filter.sessionIdle( entry.nextHandler, session, status );
         }
         catch( Throwable e )
         {
@@ -210,10 +203,10 @@ public class IoHandlerFilterManager
 
     public void fireDataRead( IoSession session, ByteBuffer buf )
     {
-        Entry head = this.head;
+        Entry entry = findNextEntry( maxPriority + 1 );
         try
         {
-            head.filter.dataRead( head.nextHandler, session, buf );
+            entry.filter.dataRead( entry.nextHandler, session, buf );
         }
         catch( Throwable e )
         {
@@ -223,10 +216,10 @@ public class IoHandlerFilterManager
 
     public void fireDataWritten( IoSession session, Object marker )
     {
-        Entry head = this.head;
+        Entry entry = findNextEntry( maxPriority + 1 );
         try
         {
-            head.filter.dataWritten( head.nextHandler, session, marker );
+            entry.filter.dataWritten( entry.nextHandler, session, marker );
         }
         catch( Throwable e )
         {
@@ -236,10 +229,10 @@ public class IoHandlerFilterManager
 
     public void fireExceptionCaught( IoSession session, Throwable cause )
     {
-        Entry head = this.head;
+        Entry entry = findNextEntry( maxPriority + 1 );
         try
         {
-            head.filter.exceptionCaught( head.nextHandler, session, cause );
+            entry.filter.exceptionCaught( entry.nextHandler, session, cause );
         }
         catch( Throwable e )
         {
@@ -250,81 +243,62 @@ public class IoHandlerFilterManager
     public void write( IoSession session, WriteCommand cmd, ByteBuffer buf,
                       Object marker )
     {
-        Entry e = tail;
         ByteBuffer newBuf;
-        do
+        for( int i = 0; i < entries.length; i ++ )
         {
+            Entry e = entries[ i ];
+            if( e == null )
+            {
+                continue;
+            }
+
             newBuf = e.filter.filterWrite( session, buf );
             if( buf != newBuf )
             {
                 // Original buffer is replaced with new filtered buffer;
                 // let's release the old one.
-                try
-                {
-                    ByteBuffer.release( buf );
-                }
-                catch( IllegalStateException ex )
-                {
-                    fireExceptionCaught( session, ex );
-                    // abort the write operation.
-                    return;
-                }
+                ByteBuffer.release( buf );
+            }
+            else if( newBuf == null )
+            {
+                return;
             }
             buf = newBuf;
-            e = e.prevEntry;
         }
-        while( e != null );
 
         cmd.execute( buf, marker );
     }
 
-    public List filters()
+    public List getAllFilters()
     {
-        List list = new ArrayList();
-        Entry e = head;
-        do
+        List list = new ArrayList( maxPriority - minPriority + 1 );
+        for( int priority = maxPriority + 1;; )
         {
-            list.add( e.filter );
-            e = e.nextEntry;
-        }
-        while( e != null );
+            Entry e = findNextEntry( priority );
+            if( e.priority < minPriority )
+            {
+                break;
+            }
 
-        return list;
-    }
-
-    public List filtersReversed()
-    {
-        List list = new ArrayList();
-        Entry e = tail;
-        do
-        {
+            priority = e.priority;
             list.add( e.filter );
-            e = e.prevEntry;
         }
-        while( e != null );
 
         return list;
     }
 
     private class Entry
     {
-        private Entry prevEntry;
-
-        private Entry nextEntry;
-
         private final int priority;
 
         private final IoHandlerFilter filter;
 
         private final IoHandler nextHandler;
 
-        private Entry( Entry prevEntry, Entry nextEntry, int priority,
-                      IoHandlerFilter filter )
+        private Entry( int priority, IoHandlerFilter filter )
         {
             if( filter == null )
                 throw new NullPointerException( "filter" );
-            this.prevEntry = prevEntry;
-            this.nextEntry = nextEntry;
             this.priority = priority;
             this.filter = filter;
             this.nextHandler = new IoHandler()
@@ -332,10 +306,11 @@ public class IoHandlerFilterManager
 
                 public void sessionOpened( IoSession session )
                 {
+                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        Entry.this.nextEntry.filter.sessionOpened(
-                                Entry.this.nextEntry.nextHandler, session );
+                        nextEntry.filter.sessionOpened(
+                                nextEntry.nextHandler, session );
                     }
                     catch( Throwable e )
                     {
@@ -346,10 +321,11 @@ public class IoHandlerFilterManager
 
                 public void sessionClosed( IoSession session )
                 {
+                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        Entry.this.nextEntry.filter.sessionClosed(
-                                Entry.this.nextEntry.nextHandler, session );
+                        nextEntry.filter.sessionClosed(
+                                nextEntry.nextHandler, session );
                     }
                     catch( Throwable e )
                     {
@@ -360,11 +336,11 @@ public class IoHandlerFilterManager
 
                 public void sessionIdle( IoSession session, IdleStatus status )
                 {
+                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        Entry.this.nextEntry.filter.sessionIdle(
-                                Entry.this.nextEntry.nextHandler, session,
-                                status );
+                        nextEntry.filter.sessionIdle( nextEntry.nextHandler,
+                                session, status );
                     }
                     catch( Throwable e )
                     {
@@ -376,11 +352,11 @@ public class IoHandlerFilterManager
                 public void exceptionCaught( IoSession session,
                                             Throwable cause )
                 {
+                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        Entry.this.nextEntry.filter.exceptionCaught(
-                                Entry.this.nextEntry.nextHandler, session,
-                                cause );
+                        nextEntry.filter.exceptionCaught(
+                                nextEntry.nextHandler, session, cause );
                     }
                     catch( Throwable e )
                     {
@@ -390,11 +366,11 @@ public class IoHandlerFilterManager
 
                 public void dataRead( IoSession session, ByteBuffer buf )
                 {
+                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        Entry.this.nextEntry.filter.dataRead(
-                                Entry.this.nextEntry.nextHandler, session,
-                                buf );
+                        nextEntry.filter.dataRead( nextEntry.nextHandler,
+                                session, buf );
                     }
                     catch( Throwable e )
                     {
@@ -405,11 +381,11 @@ public class IoHandlerFilterManager
 
                 public void dataWritten( IoSession session, Object marker )
                 {
+                    Entry nextEntry = findNextEntry( Entry.this.priority );
                     try
                     {
-                        Entry.this.nextEntry.filter.dataWritten(
-                                Entry.this.nextEntry.nextHandler, session,
-                                marker );
+                        nextEntry.filter.dataWritten( nextEntry.nextHandler,
+                                session, marker );
                     }
                     catch( Throwable e )
                     {

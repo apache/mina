@@ -26,14 +26,16 @@ public class VmPipeAcceptor implements ProtocolAcceptor
 {
     static final Map boundHandlers = new HashMap();
 
-    private final ProtocolHandlerFilterManager filterManager = new ProtocolHandlerFilterManager();
+    private final ProtocolHandlerFilterManager filterManager = new ProtocolHandlerFilterManager(
+            ProtocolHandlerFilter.MIN_PRIORITY - 1,
+            ProtocolHandlerFilter.MAX_PRIORITY );
 
     /**
      * Creates a new instance.
      */
     public VmPipeAcceptor()
     {
-        filterManager.addFilter( Integer.MIN_VALUE - 1, new VmPipeFilter() );
+        filterManager.addFilter( -1, new VmPipeFilter() );
     }
 
     public void bind( SocketAddress address, ProtocolProvider protocolProvider )
@@ -43,9 +45,9 @@ public class VmPipeAcceptor implements ProtocolAcceptor
             throw new NullPointerException( "address" );
         if( protocolProvider == null )
             throw new NullPointerException( "protocolProvider" );
-        if( ! ( address instanceof VmPipeAddress ) )
+        if( !( address instanceof VmPipeAddress ) )
             throw new IllegalArgumentException(
-                                                "address must be VmPipeAddress." );
+                    "address must be VmPipeAddress." );
 
         synchronized( boundHandlers )
         {
@@ -55,9 +57,7 @@ public class VmPipeAcceptor implements ProtocolAcceptor
             }
 
             boundHandlers.put( address, new Entry( ( VmPipeAddress ) address,
-                                                   filterManager,
-                                                   protocolProvider
-                                                           .getHandler() ) );
+                    filterManager, protocolProvider.getHandler() ) );
         }
     }
 
@@ -81,15 +81,15 @@ public class VmPipeAcceptor implements ProtocolAcceptor
     {
         filterManager.removeFilter( filter );
     }
-    
+
     public List getAllFilters()
     {
-    	return filterManager.filters();
+        return filterManager.getAllFilters();
     }
 
     public void removeAllFilters()
     {
-    	filterManager.removeAllFilters();
+        filterManager.removeAllFilters();
     }
 
     static class Entry

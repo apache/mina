@@ -5,8 +5,10 @@ package org.apache.mina.examples.sumup;
 
 import java.net.InetSocketAddress;
 
+import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
 import org.apache.mina.io.socket.SocketAcceptor;
+import org.apache.mina.protocol.ProtocolHandlerFilter;
 import org.apache.mina.protocol.filter.ProtocolThreadPoolFilter;
 import org.apache.mina.protocol.io.IoProtocolAcceptor;
 
@@ -33,14 +35,15 @@ public class Server
         protocolThreadPoolFilter.start();
 
         IoProtocolAcceptor acceptor = new IoProtocolAcceptor(
-                                                              new SocketAcceptor() );
+                new SocketAcceptor() );
 
-        acceptor.getIoAcceptor().addFilter( Integer.MAX_VALUE,
-                                            ioThreadPoolFilter );
-        acceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
+        acceptor.getIoAcceptor().addFilter( IoHandlerFilter.MAX_PRIORITY,
+                ioThreadPoolFilter );
+        acceptor.addFilter( ProtocolHandlerFilter.MAX_PRIORITY,
+                protocolThreadPoolFilter );
 
         acceptor.bind( new InetSocketAddress( SERVER_PORT ),
-                       new ServerProtocolProvider() );
+                new ServerProtocolProvider() );
         System.out.println( "Listening on port " + SERVER_PORT );
     }
 }

@@ -438,7 +438,7 @@ public class DatagramConnector extends DatagramProcessor implements
 
     public List getAllFilters()
     {
-        return filterManager.filters();
+        return filterManager.getAllFilters();
     }
 
     private static class RegistrationRequest

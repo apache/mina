@@ -6,8 +6,10 @@ package org.apache.mina.examples.sumup;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
+import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
 import org.apache.mina.io.socket.SocketConnector;
+import org.apache.mina.protocol.ProtocolHandlerFilter;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.filter.ProtocolThreadPoolFilter;
@@ -37,7 +39,7 @@ public class Client
 
         // prepare values to sum up
         int[] values = new int[ args.length ];
-        for( int i = 0; i < args.length; i++ )
+        for( int i = 0; i < args.length; i ++ )
         {
             values[ i ] = Integer.parseInt( args[ i ] );
         }
@@ -53,20 +55,21 @@ public class Client
         protocolThreadPoolFilter.start();
 
         IoProtocolConnector connector = new IoProtocolConnector(
-                                                                 new SocketConnector() );
-        connector.getIoConnector().addFilter( Integer.MAX_VALUE,
-                                              ioThreadPoolFilter );
-        connector.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
+                new SocketConnector() );
+        connector.getIoConnector().addFilter( IoHandlerFilter.MAX_PRIORITY,
+                ioThreadPoolFilter );
+        connector.addFilter( ProtocolHandlerFilter.MAX_PRIORITY,
+                protocolThreadPoolFilter );
 
-        ProtocolProvider protocolProvider = new ClientProtocolProvider( values );
+        ProtocolProvider protocolProvider = new ClientProtocolProvider(
+                values );
         ProtocolSession session;
         for( ;; )
         {
             try
             {
-                session = connector
-                        .connect( new InetSocketAddress( HOSTNAME, PORT ),
-                                  CONNECT_TIMEOUT, protocolProvider );
+                session = connector.connect( new InetSocketAddress( HOSTNAME,
+                        PORT ), CONNECT_TIMEOUT, protocolProvider );
                 break;
             }
             catch( IOException e )
