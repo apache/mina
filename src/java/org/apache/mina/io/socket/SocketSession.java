@@ -39,7 +39,7 @@ import org.apache.mina.util.Queue;
  */
 class SocketSession implements IoSession
 {
-    private static final int READ_BUFFER_SIZE = 8192;
+    private static final int DEFAULT_READ_BUFFER_SIZE = 1024;
 
     private final IoHandlerFilterChain filters;
 
@@ -47,7 +47,7 @@ class SocketSession implements IoSession
 
     private final SocketSessionConfig config;
 
-    private final ByteBuffer readBuf;
+    private ByteBuffer readBuf;
 
     private final Queue writeBufferQueue;
 
@@ -83,12 +83,12 @@ class SocketSession implements IoSession
      * Creates a new instance.
      */
     SocketSession( IoHandlerFilterChain filters, SocketChannel ch,
-                  IoHandler defaultHandler )
+                   IoHandler defaultHandler )
     {
         this.filters = filters;
         this.ch = ch;
-        this.config = new SocketSessionConfig( ch );
-        this.readBuf = ByteBuffer.allocate( READ_BUFFER_SIZE ).limit( 0 );
+        this.config = new SocketSessionConfig( this );
+        this.readBuf = ByteBuffer.allocate( DEFAULT_READ_BUFFER_SIZE ).limit( 0 );
         this.writeBufferQueue = new Queue();
         this.writeMarkerQueue = new Queue();
         this.handler = defaultHandler;
@@ -149,6 +149,12 @@ class SocketSession implements IoSession
     ByteBuffer getReadBuffer()
     {
         return readBuf;
+    }
+    
+    synchronized void setReadBuffer( ByteBuffer readBuf )
+    {
+        this.readBuf.release(); // release old buffer
+        this.readBuf = readBuf;
     }
 
     Queue getWriteBufferQueue()
