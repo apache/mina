@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<document>
+    <properties>
+        <author email="trustin@apache.org">Trustin Lee</author>
+        <title>Overview</title>
+    </properties>
+
+    <body>
+        <section name="Introduction">
+            <p>
+                MINA (Multipurpose Infrastructure for Network Applications) is a
+                network application framework which helps users develop high
+                performance and high scalability network applications easily.
+            </p>
+            <p>
+                MINA will be a simple yet full-featured network application
+                which provides:
+                <ul>
+                    <li>Support for TCP and UDP transport types,</li>
+                    <li>Support for both server (inetd-like) and client side,</li>
+                    <li>Unit testability,</li>
+                    <li>JMX managability,</li>
+                    <li>Traffic throttling,</li>
+                    <li>Overload shielding,</li>
+                    <li>Integration with well known containers such as Spring
+                    	and OSGi,</li>
+                </ul>
+            </p>
+        </section>
+		
+        <section name="Getting Started">
+            <p>
+                Tutorial is under construction.  Please start from
+                <a target="_blank" href="xref-examples/index.html">examples</a>
+                referring to
+                <a target="_blank" href="apidocs/index.html">JavaDocs</a>.
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Feature it demonstrates</th>
+                        <th>Side</th>
+                    </tr>
+                    <tr>
+                        <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/reverser/package-summary.html">Reverser</a></td>
+                        <td>High-level protocol layer</td>
+                        <td>Server</td>
+                    </tr>
+                    <tr>
+                        <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/echoserver/package-summary.html">Echo server</a></td>
+                        <td>Low-level I/O layer</td>
+                        <td>Server</td>
+                    </tr>
+                    <tr>
+                        <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/netcat/package-summary.html">NetCat</a></td>
+                        <td>Low-level I/O layer</td>
+                        <td>Client</td>
+                    </tr>
+                    <tr>
+                        <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/tennis/package-summary.html">Tennis</a></td>
+                        <td>In-VM pipe support in protocol layer.</td>
+                        <td>Both</td>
+                    </tr>
+                    <tr>
+                        <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/sumup/package-summary.html">SumUp</a></td>
+                        <td>Migration from <a target="_blank" href="http://gleamynode.net/dev/projects/netty2-example-sumup/">Netty SumUp example</a>.</td>
+                        <td>Both</td>
+                    </tr>
+                </table>
+            </p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+	<properties>
+		<author email="trustin@apache.org">Trustin Lee</author>
+		<title>Roadmap</title>
+	</properties>
+  
+	<body>
+
+		<section name="Roadmap">
+			
+			<subsection name="0.7 (January 2005)">
+				<p>
+					<ul>
+						<li>Stable core API implementation</li>
+						<li><a href="http://gleamynode.net/dev/projects/netty2/">Netty2</a>
+							and <a href="http://incubator.apache.org/directory/subprojects/snickers/codec-stateful/">Snickers
+							stateful codec</a> wrapper.</li>
+						<li>Frontend API for usability</li>
+						<li>Support for TCP and UDP transport</li>
+					</ul>
+				</p>
+			</subsection>
+
+			<subsection name="0.8 (no date set)">
+				<p>
+					<ul>
+						<li>Add various IoHandlerFilters and ProtocolHandlerFilters
+							<ul>
+								<li>Performance tracing</li>
+								<li>Event logging</li>
+								<li>Traffic throttling</li>
+								<li>Overload prevention</li>
+							</ul></li>
+					</ul>
+				</p>
+			</subsection>
+
+			<subsection name="0.9 (no date set)">
+				<p>
+					<ul>
+						<li>Integration with containers: Spring and OSGi</li>
+					</ul>
+				</p>
+			</subsection>
+
+			<subsection name="1.0 (no date set)">
+				<p>
+					<ul>
+						<li>JMX compliance</li>
+					</ul>
+				</p>
+			</subsection>
+
+			<subsection name="1.1 (no date set)">
+				<p>
+					<ul>
+						<li>Add advanced IoHandlerFilters and ProtocolHandlerFilters:
+							<ul>
+								<li>Integration with
+									<a href="http://incubator.apache.org/directory/subprojects/janus/">Janus</a></li>
+							</ul></li>
+					</ul>
+				</p>
+			</subsection>
+		</section>
+	</body>
+</document>
