@@ -101,12 +101,14 @@ public class SocketConnector implements IoConnector
         else
         {
             ConnectionRequest request = new ConnectionRequest( ch, timeout, handler );
-            synchronized( connectQueue )
+            synchronized( this )
             {
-                connectQueue.push( request );
+                synchronized( connectQueue )
+                {
+                    connectQueue.push( request );
+                }
+                startupWorker();
             }
-
-            startupWorker();
             selector.wakeup();
 
             synchronized( request )
@@ -280,7 +282,8 @@ public class SocketConnector implements IoConnector
                     {
                         synchronized( SocketConnector.this )
                         {
-                            if( selector.keys().isEmpty() )
+                            if( selector.keys().isEmpty() &&
+                                connectQueue.isEmpty() )
                             {
                                 worker = null;
                                 break;

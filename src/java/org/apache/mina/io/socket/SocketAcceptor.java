@@ -116,12 +116,15 @@ public class SocketAcceptor implements IoAcceptor
 
         RegistrationRequest request = new RegistrationRequest( address, backlog, handler );
 
-        synchronized( registerQueue )
+        synchronized( this )
         {
-            registerQueue.push( request );
+            synchronized( registerQueue )
+            {
+                registerQueue.push( request );
+            }
+            startupWorker();
         }
-
-        startupWorker();
+        
         selector.wakeup();
         
         synchronized( request )
@@ -166,13 +169,15 @@ public class SocketAcceptor implements IoAcceptor
         }
 
         CancellationRequest request = new CancellationRequest( address );
-
-        synchronized( cancelQueue )
+        synchronized( this )
         {
-            cancelQueue.push( request );
+            synchronized( cancelQueue )
+            {
+                cancelQueue.push( request );
+            }
+            startupWorker();
         }
-
-        startupWorker();
+        
         selector.wakeup();
 
         synchronized( request )
@@ -225,7 +230,9 @@ public class SocketAcceptor implements IoAcceptor
                     {
                         synchronized( SocketAcceptor.this )
                         {
-                            if( selector.keys().isEmpty() )
+                            if( selector.keys().isEmpty() &&
+                                registerQueue.isEmpty() &&
+                                cancelQueue.isEmpty() )
                             {
                                 worker = null;
 

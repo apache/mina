@@ -91,12 +91,14 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             throw new IllegalArgumentException( "Unsupported port number: 0" );
 
         RegistrationRequest request = new RegistrationRequest( address, handler );
-        synchronized( registerQueue )
+        synchronized( this )
         {
-            registerQueue.push( request );
+            synchronized( registerQueue )
+            {
+                registerQueue.push( request );
+            }
+            startupWorker();
         }
-
-        startupWorker();
         selector.wakeup();
         
         synchronized( request )
@@ -126,12 +128,14 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             throw new NullPointerException( "address" );
 
         CancellationRequest request = new CancellationRequest( address );
-        synchronized( cancelQueue )
+        synchronized( this )
         {
-            cancelQueue.push( request );
+            synchronized( cancelQueue )
+            {
+                cancelQueue.push( request );
+            }
+            startupWorker();
         }
-
-        startupWorker();
         selector.wakeup();
         
         synchronized( request )
@@ -211,7 +215,9 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                     {
                         synchronized( DatagramAcceptor.this )
                         {
-                            if( selector.keys().isEmpty() )
+                            if( selector.keys().isEmpty() &&
+                                registerQueue.isEmpty() &&
+                                cancelQueue.isEmpty() )
                             {
                                 worker = null;
                                 break;

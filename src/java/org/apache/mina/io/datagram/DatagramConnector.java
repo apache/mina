@@ -98,7 +98,6 @@ public class DatagramConnector extends DatagramProcessor implements
             {
                 registerQueue.push( request );
             }
-
             startupWorker();
         }
 
@@ -145,6 +144,7 @@ public class DatagramConnector extends DatagramProcessor implements
             {
                 cancelQueue.push( key );
             }
+            startupWorker();
         }
 
         selector.wakeup();
@@ -193,7 +193,9 @@ public class DatagramConnector extends DatagramProcessor implements
                     {
                         synchronized( DatagramConnector.this )
                         {
-                            if( selector.keys().isEmpty() )
+                            if( selector.keys().isEmpty() &&
+                                registerQueue.isEmpty() &&
+                                cancelQueue.isEmpty() )
                             {
                                 worker = null;
                                 break;
