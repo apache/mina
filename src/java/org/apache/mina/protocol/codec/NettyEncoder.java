@@ -56,7 +56,7 @@ public class NettyEncoder implements ProtocolEncoder
                 }
                 else
                 {
-                    ByteBuffer.release( buf );
+                    buf.release();
                 }
             }
         }

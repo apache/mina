@@ -98,41 +98,12 @@ public final class ByteBuffer
         }
 
         buf.clear();
-        // Check leaked or dangling ByteBuffer.
-        if( buf.inUse )
+        synchronized( buf )
         {
-            throw new IllegalStateException(
-                    "Already allocated buffer. Did you release the buffer more than once?" );
-        }
-        else
-        {
-            buf.inUse = true;
+            buf.refCount = 1;
         }
 
         return buf;
-    }
-
-    /**
-     * Returns the specified buffer to buffer pool.
-     */
-    public static void release( ByteBuffer buf )
-    {
-        Stack stack = bufferStacks[ getBufferStackIndex( buf.capacity() ) ];
-        synchronized( stack )
-        {
-            // Check leaked or dangling ByteBuffer.
-            if( !buf.inUse )
-            {
-                throw new IllegalStateException(
-                        "Already released buffer.  Did you release the buffer more than once?" );
-            }
-            else
-            {
-                buf.inUse = false; // clear the flag
-            }
-
-            stack.push( buf );
-        }
     }
 
     private static int getBufferStackIndex( int size )
@@ -155,11 +126,58 @@ public final class ByteBuffer
 
     private final java.nio.ByteBuffer buf;
 
-    private boolean inUse;
+    private int refCount = 1;
 
     private ByteBuffer( java.nio.ByteBuffer buf )
     {
         this.buf = buf;
+    }
+    
+    /**
+     * Increases the internal reference count of this buffer to defer
+     * automatic release.  You have to invoke {@link #release()} as many
+     * as you invoked this method to release this buffer.
+     * 
+     * @throws IllegalStateException if you attempt to acquire already
+     *                               released buffer.
+     */
+    public synchronized void acquire()
+    {
+        if( refCount <= 0 )
+        {
+            throw new IllegalStateException( "Already released buffer." );
+        }
+
+        refCount ++;
+    }
+
+    /**
+     * Releases the specified buffer to buffer pool.
+     * 
+     * @throws IllegalStateException if you attempt to release already
+     *                               released buffer.
+     */
+    public synchronized void release()
+    {
+        if( refCount <= 0 )
+        {
+            refCount = 0;
+            throw new IllegalStateException(
+                    "Already released buffer.  You released the buffer too many times." );
+        }
+
+        refCount --;
+        if( refCount > 0)
+        {
+            return;
+        }
+
+        Stack stack = bufferStacks[ getBufferStackIndex( buf.capacity() ) ];
+        synchronized( stack )
+        {
+            // push back
+            stack.push( this );
+        }
     }
 
     /**

@@ -222,6 +222,8 @@ public class IoThreadPoolFilter implements IoHandlerFilter
     public void dataRead( IoHandler nextHandler, IoSession session,
                          ByteBuffer buf )
     {
+        // MINA will release the buffer if this method returns.
+        buf.acquire();
         fireEvent( nextHandler, session, EventType.READ, buf );
     }
 
@@ -421,7 +423,9 @@ public class IoThreadPoolFilter implements IoHandlerFilter
         {
             if( type == EventType.READ )
             {
-                nextHandler.dataRead( session, ( ByteBuffer ) data );
+                ByteBuffer buf = ( ByteBuffer ) data;
+                nextHandler.dataRead( session, buf );
+                buf.release();
             }
             else if( type == EventType.WRITTEN )
             {

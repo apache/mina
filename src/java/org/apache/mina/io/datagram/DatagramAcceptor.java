@@ -282,7 +282,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         }
         finally
         {
-            ByteBuffer.release( readBuf );
+            readBuf.release();
         }
     }
 
@@ -345,7 +345,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
                 try
                 {
-                    ByteBuffer.release( buf );
+                    buf.release();
                 }
                 catch( IllegalStateException e )
                 {

@@ -55,8 +55,6 @@ import org.apache.mina.util.ProtocolHandlerFilterManager.WriteCommand;
  */
 public class IoAdapter
 {
-    public static final Class IO_HANDLER_TYPE = SessionHandlerAdapter.class;
-
     private final ProtocolHandlerFilterManager filterManager = new ProtocolHandlerFilterManager();
 
     IoAdapter()
@@ -193,7 +191,7 @@ public class IoAdapter
             {
                 try
                 {
-                    ByteBuffer.release( in );
+                    in.release();
                 }
                 catch( IllegalStateException e )
                 {
@@ -454,7 +452,7 @@ public class IoAdapter
                 }
 
                 newBuf.put( buf );
-                ByteBuffer.release( buf );
+                buf.release();
             }
             
             // Push the new buffer finally.

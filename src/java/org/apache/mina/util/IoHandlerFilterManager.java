@@ -26,7 +26,6 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilter;
 import org.apache.mina.io.IoSession;
-import org.apache.mina.protocol.io.IoAdapter;
 
 /**
  * Manages the list of {@link IoHandlerFilter}s.
@@ -66,11 +65,7 @@ public class IoHandlerFilterManager
         {
             IoHandler handler = session.getHandler();
             handler.dataRead( session, buf );
-            if( !IoAdapter.IO_HANDLER_TYPE.isAssignableFrom( handler
-                    .getClass() ) )
-            {
-                ByteBuffer.release( buf );
-            }
+            buf.release();
         }
 
         public void dataWritten( IoHandler nextHandler, IoSession session,
@@ -259,7 +254,7 @@ public class IoHandlerFilterManager
             {
                 // Original buffer is replaced with new filtered buffer;
                 // let's release the old one.
-                ByteBuffer.release( buf );
+                buf.release();
             }
             else if( newBuf == null )
             {

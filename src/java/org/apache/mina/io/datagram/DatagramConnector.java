@@ -259,7 +259,7 @@ public class DatagramConnector extends DatagramProcessor implements
         }
         finally
         {
-            ByteBuffer.release( readBuf );
+            readBuf.release();
         }
     }
 
@@ -322,7 +322,7 @@ public class DatagramConnector extends DatagramProcessor implements
 
                 try
                 {
-                    ByteBuffer.release( buf );
+                    buf.release();
                 }
                 catch( IllegalStateException e )
                 {

@@ -420,7 +420,7 @@ class SocketIoProcessor
                 }
                 try
                 {
-                    ByteBuffer.release( buf );
+                    buf.release();
                 }
                 catch( IllegalStateException e )
                 {

@@ -126,7 +126,7 @@ class SocketSession implements IoSession
             return;
         }
         disposed = true;
-        ByteBuffer.release( readBuf );
+        readBuf.release();
     }
 
     public IoHandler getHandler()

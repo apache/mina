@@ -49,22 +49,42 @@ public class ByteBufferTest extends TestCase
             Assert.assertEquals( buf.capacity(), buf.remaining() );
             Assert.assertTrue( buf.capacity() >= i );
             Assert.assertTrue( buf.capacity() < i * 2 );
-            ByteBuffer.release( buf );
+            buf.release();
         }
     }
 
     public void testLeakageDetection() throws Exception
     {
         ByteBuffer buf = ByteBuffer.allocate( 1024 );
-        ByteBuffer.release( buf );
+        buf.release();
         try
         {
-            ByteBuffer.release( buf );
+            buf.release();
             Assert.fail( "Releasing a buffer twice should fail." );
         }
         catch( IllegalStateException e )
         {
 
+        }
+    }
+    
+    public void testAcquireRelease() throws Exception
+    {
+        ByteBuffer buf = ByteBuffer.allocate( 1024 );
+        buf.acquire();
+        buf.release();
+        buf.acquire();
+        buf.acquire();
+        buf.release();
+        buf.release();
+        buf.release();
+        try
+        {
+            buf.release();
+            Assert.fail( "Releasing a buffer twice should fail." );
+        }
+        catch( IllegalStateException e )
+        {
         }
     }
 }
