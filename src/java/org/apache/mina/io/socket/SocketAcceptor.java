@@ -155,8 +155,10 @@ public class SocketAcceptor implements IoAcceptor
     public void unbind( SocketAddress address )
     {
         if( address == null )
+        {
             throw new NullPointerException( "address" );
-        
+        }
+
         CancellationRequest request = new CancellationRequest( address );
 
         synchronized( cancelQueue )
