@@ -187,17 +187,6 @@ public class IoAdapter
             {
                 filterManager.fireExceptionCaught( psession, t );
             }
-            finally
-            {
-                try
-                {
-                    in.release();
-                }
-                catch( IllegalStateException e )
-                {
-                    filterManager.fireExceptionCaught( psession, e );
-                }
-            }
         }
 
         public void dataWritten( IoSession session, Object marker )
