@@ -107,9 +107,8 @@ public class Asn1CodecEncoder implements ProtocolEncoder
             else
             {
                 throw new IllegalArgumentException(
-                        "Encoded result is not a ByteBuffer: "
-                                                                                                + encoded
-                                                                                                        .getClass() );
+                        "Encoded result is not a ByteBuffer: " +
+                        encoded.getClass() );
             }
         }
     }
