@@ -245,8 +245,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             DatagramChannel ch = ( DatagramChannel ) key.channel();
 
             DatagramSession session = new DatagramSession(
-                    DatagramAcceptor.this, filters, ch,
-                    ( IoHandler ) key.attachment() );
+                    filters, ch, ( IoHandler ) key.attachment() );
             session.setSelectionKey( key );
 
             if( key.isReadable() )

@@ -38,8 +38,6 @@ import org.apache.mina.common.IdleStatus;
  * <strong>Please NEVER implement your filters to wrap
  * {@link IoSession}s.</strong> Users can cache the reference to the session,
  * which might malfunction if any filters are added or removed later.
- * Please implement {@link #filterWrite(IoSession,ByteBuffer)} method to
- * override {@link IoSession#write(ByteBuffer, Object)} method.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$

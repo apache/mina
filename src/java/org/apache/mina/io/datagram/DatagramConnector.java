@@ -373,7 +373,7 @@ public class DatagramConnector extends DatagramProcessor implements
             if( req == null )
                 break;
 
-            DatagramSession session = new DatagramSession( this,
+            DatagramSession session = new DatagramSession(
                     filters, req.channel, req.handler );
 
             SelectionKey key = req.channel.register( selector,

@@ -38,8 +38,6 @@ import org.apache.mina.util.Queue;
  */
 class DatagramSession implements IoSession
 {
-    private final DatagramProcessor parent;
-
     private final DatagramFilterChain filters;
 
     private final DatagramChannel ch;
@@ -77,11 +75,9 @@ class DatagramSession implements IoSession
     /**
      * Creates a new instance.
      */
-    DatagramSession( DatagramProcessor parent,
-                    DatagramFilterChain filters, DatagramChannel ch,
-                    IoHandler defaultHandler )
+    DatagramSession( DatagramFilterChain filters, DatagramChannel ch,
+                     IoHandler defaultHandler )
     {
-        this.parent = parent;
         this.filters = filters;
         this.ch = ch;
         this.config = new DatagramSessionConfig( ch );
