@@ -124,6 +124,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         
         if( request.exception != null )
         {
+            request.exception.fillInStackTrace();
             throw request.exception;
         }
     }
@@ -153,6 +154,12 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 {
                 }
             }
+        }
+        
+        if( request.exception == null )
+        {
+            request.exception.fillInStackTrace();
+            throw request.exception;
         }
     }
 
@@ -456,7 +463,15 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
             DatagramChannel ch = ( DatagramChannel ) channels.get( request.address );
             if( ch == null )
+            {
+                synchronized( request )
+                {
+                    request.done = true;
+                    request.exception = new IllegalArgumentException(
+                            "Address not bound: " + request.address );
+                }
                 continue;
+            }
             
             SelectionKey key = ch.keyFor( selector );
             key.cancel();
@@ -522,8 +537,8 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
     private static class CancellationRequest
     {
         private final SocketAddress address;
-        
         private boolean done;
+        private RuntimeException exception;
         
         private CancellationRequest( SocketAddress address )
         {
