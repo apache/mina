@@ -274,7 +274,7 @@ class SSLHandler
         
         return status;
     }
-
+    
     private void doEncrypt( ByteBuffer src ) throws SSLException
     {
         if( !initialHandshakeComplete )
@@ -282,27 +282,34 @@ class SSLHandler
             throw new IllegalStateException();
         }
 
-        // The data buffer is (must be) empty, we can reuse the entire buffer.
+        // The data buffer is (must be) empty, we can reuse the entire
+        // buffer.
         outNetBuffer.clear();
 
-        SSLEngineResult result = sslEngine.wrap( src, outNetBuffer );
+        SSLEngineResult result;
+
+        // Loop until there is no more data in src
+        while(src.hasRemaining())
+        {
+               result = sslEngine.wrap( src, outNetBuffer );
+
+               if( result.getStatus() == SSLEngineResult.Status.OK )
+               {
+                   if( result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK )
+                   {
+                       doTasks();
+                   }
+               }
+               else
+               {
+                   throw new SSLException( "SSLEngine error during encrypt: "
+                           + result.getStatus() );
+               }
+        }
 
         outNetBuffer.flip();
-
-        if( result.getStatus() == SSLEngineResult.Status.OK )
-        {
-            if( result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK )
-            {
-                doTasks();
-            }
-        }
-        else
-        {
-            throw new SSLException( "SSLEngine error during encrypt: "
-                    + result.getStatus() );
-        }
     }
-
+    
     /**
      * Perform any handshaking processing.
      */
