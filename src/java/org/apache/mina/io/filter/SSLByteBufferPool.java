@@ -71,12 +71,8 @@ class SSLByteBufferPool
             }
             
             // init buffer sizes from SSLEngine
-            // Janne: The problem we found is in SSLHandler.doEncrypt() or
-            // more correctly how we use sslEngine.wrap(). If the passed src
-            // ByteBuffer is larger than 16 kbytes only 16 kbytes will be
-            // encrypted!
-            packetBufferSize = sslEngine.getSession().getPacketBufferSize() * 2;
-            
+            packetBufferSize = sslEngine.getSession().getPacketBufferSize();
+
             // application buffer size has been doubled because SSLEngine
             // returns BUFFER_OVERFLOW even if there is enough room for the buffer.
             // So I doubled the size as a workaround.
@@ -96,7 +92,7 @@ class SSLByteBufferPool
         {
             throw new IllegalStateException( "Not initialized" );
         }
-        return get( PACKET_BUFFER_INDEX );
+        return allocate( PACKET_BUFFER_INDEX );
     }
 
     /**
@@ -109,13 +105,13 @@ class SSLByteBufferPool
         {
             throw new IllegalStateException( "Not initialized" );
         }
-        return get( APPLICATION_BUFFER_INDEX );
+        return allocate( APPLICATION_BUFFER_INDEX );
     }
 
     /**
-     * Get the buffer which is capable of the specified size.
+     * Allocate or get the buffer which is capable of the specified size.
      */
-    private static ByteBuffer get( int idx )
+    private static ByteBuffer allocate( int idx )
     {
         Stack stack = bufferStacks[ idx ];
 
@@ -134,15 +130,31 @@ class SSLByteBufferPool
     }
 
     /**
-     * Returns the specified buffer to buffer pool.
+     * Releases the specified buffer to buffer pool.
      */
-    public static void put( ByteBuffer buf )
+    public static void release( ByteBuffer buf )
     {
-        Stack stack = bufferStacks[ getBufferStackIndex( buf.capacity() ) ];
-        synchronized( stack )
-        {
-            stack.push( buf );
+        int stackIndex =getBufferStackIndex( buf.capacity() );
+        if ( stackIndex >= PACKET_BUFFER_INDEX ) {
+            Stack stack = bufferStacks[getBufferStackIndex( buf.capacity() )];
+            synchronized ( stack ) {
+                stack.push( buf );
+            }
         }
+    }
+
+    /**
+     * Expand size of provided buffer
+     * @param buf buffer to be expande
+     * @param newCapacity new capacity
+     */
+    public static ByteBuffer expandBuffer( ByteBuffer buf, int newCapacity )
+    {
+        ByteBuffer newBuf = createBuffer( newCapacity );
+        buf.flip();
+        newBuf.put( buf );
+        release(buf);
+        return newBuf;
     }
 
     private static void initiateBufferStacks()
@@ -158,7 +170,7 @@ class SSLByteBufferPool
             return PACKET_BUFFER_INDEX;
         if( size == appBufferSize )
             return APPLICATION_BUFFER_INDEX;
-        throw new IllegalArgumentException( "Unknown buffer size: " + size );
+        return -1;  // not reused
     }
 
     private static ByteBuffer createBuffer( int capacity )

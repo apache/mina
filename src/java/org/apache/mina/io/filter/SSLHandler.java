@@ -156,6 +156,16 @@ class SSLHandler
      */
     public void dataRead( ByteBuffer buf ) throws SSLException
     {
+        if ( buf.limit() > inNetBuffer.remaining() ) {
+            // We have to expand inNetBuffer
+            inNetBuffer = SSLByteBufferPool.expandBuffer( inNetBuffer,
+                    2 * (inNetBuffer.position() + buf.limit()) );
+            if( parent.debug != null )
+            {
+                parent.debug.print("expanded inNetBuffer:" + inNetBuffer);
+            }
+        }
+
         // append buf to inNetBuffer
         inNetBuffer.put( buf );
         if( !initialHandshakeComplete )
@@ -231,9 +241,9 @@ class SSLHandler
      */
     public void release()
     {
-        SSLByteBufferPool.put( appBuffer );
-        SSLByteBufferPool.put( inNetBuffer );
-        SSLByteBufferPool.put( outNetBuffer );
+        SSLByteBufferPool.release( appBuffer );
+        SSLByteBufferPool.release( inNetBuffer );
+        SSLByteBufferPool.release( outNetBuffer );
     }
 
     /**
@@ -289,22 +299,31 @@ class SSLHandler
         SSLEngineResult result;
 
         // Loop until there is no more data in src
-        while(src.hasRemaining())
-        {
-               result = sslEngine.wrap( src, outNetBuffer );
+        while ( src.hasRemaining() ) {
 
-               if( result.getStatus() == SSLEngineResult.Status.OK )
-               {
-                   if( result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK )
-                   {
-                       doTasks();
-                   }
-               }
-               else
-               {
-                   throw new SSLException( "SSLEngine error during encrypt: "
-                           + result.getStatus() );
-               }
+            if ( src.limit() > ( outNetBuffer.remaining() / 2 ) ) {
+                // We have to expand outNetBuffer
+                // Note: there is no way to know the exact size required, but enrypted data
+                // shouln't need to be larger than twice the source data size?
+                outNetBuffer = SSLByteBufferPool.expandBuffer( outNetBuffer, src.limit() * 2 );
+                if ( parent.debug != null ) {
+                    parent.debug.print( "expanded outNetBuffer:" + outNetBuffer );
+                }
+            }
+
+            result = sslEngine.wrap( src, outNetBuffer );
+            if ( parent.debug != null ) {
+                parent.debug.print( "Wrap res:" + result );
+            }
+
+            if ( result.getStatus() == SSLEngineResult.Status.OK ) {
+                if ( result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK ) {
+                    doTasks();
+                }
+            } else {
+                throw new SSLException( "SSLEngine error during encrypt: "
+                        + result.getStatus() );
+            }
         }
 
         outNetBuffer.flip();
