@@ -57,7 +57,11 @@ public class Test extends TestCase
         // Find an availble test port and bind to it.
         boolean socketBound = false;
         boolean datagramBound = false;
-        for( port = 1024; port <= 65535; port ++ )
+        
+        // Let's start from port #1 to detect possible resource leak
+        // because test will fail in port 1-1023 if user run this test
+        // as a normal user.
+        for( port = 1; port <= 65535; port ++ )
         {
             socketBound = false;
             datagramBound = false;

@@ -99,6 +99,8 @@ public class SocketAcceptor implements IoAcceptor
         if( !( address instanceof InetSocketAddress ) )
             throw new IllegalArgumentException( "Unexpected address type: "
                                                 + address.getClass() );
+        if( ( ( InetSocketAddress ) address ).getPort() == 0 )
+            throw new IllegalArgumentException( "Unsupported port number: 0" );
 
         ServerSocketChannel ssc = ServerSocketChannel.open();
         boolean bound = false;
