@@ -119,6 +119,16 @@
   <build>
     <nagEmailAddress>directory-dev@incubator.apache.org</nagEmailAddress>
     <sourceDirectory>${basedir}/src/java</sourceDirectory>
+    <sourceModifications>
+      <sourceModification>
+        <className>javax.net.ssl.SSLEngine</className>
+        <excludes>
+          <exclude>**/SSLFilter.java</exclude>
+          <exclude>**/SSLHandler.java</exclude>
+          <exclude>**/SSLByteBufferPool.java</exclude>
+        </excludes>
+      </sourceModification>
+    </sourceModifications>
     <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
     <integrationUnitTestSourceDirectory/>
     <aspectSourceDirectory/>
