@@ -53,6 +53,14 @@ public class Queue implements Serializable
         items = new Object[ DEFAULT_CAPACITY ];
         mask = DEFAULT_MASK;
     }
+    
+    /**
+     * Returns the capacity of this queue.
+     */
+    public int capacity()
+    {
+        return items.length;
+    }
 
     /**
      * Clears this queue.
