@@ -18,32 +18,37 @@
  */
 package org.apache.mina.common;
 
+import java.io.InvalidObjectException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+
 /**
  * Represents network transport types.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class TransportType
+public class TransportType implements Serializable
 {
+    private static final long serialVersionUID = 3258132470497883447L;
+
     /**
      * Transport type: TCP/IP (<code>SocketChannel</code>)
      */
     public static final TransportType SOCKET = new TransportType( "SOCKET",
-                                                                  false );
+            false );
 
     /**
      * Transport type: UDP/IP (<code>DatagramChannel</code>)
      */
     public static final TransportType DATAGRAM = new TransportType(
-                                                                    "DATAGRAM",
-                                                                    true );
+            "DATAGRAM", true );
 
     /**
      * Transport type: VM pipe (direct message exchange)
      */
     public static final TransportType VM_PIPE = new TransportType( "VM_PIPE",
-                                                                   false );
+            false );
 
     private final String strVal;
 
@@ -70,5 +75,18 @@ public class TransportType
     public String toString()
     {
         return strVal;
+    }
+    
+    private Object readResolve() throws ObjectStreamException
+    {
+        if( strVal.equals( SOCKET.toString() ) )
+            return SOCKET;
+        if( strVal.equals( DATAGRAM.toString() ) )
+            return DATAGRAM;
+        if( strVal.equals( VM_PIPE.toString() ) )
+            return VM_PIPE;
+        else
+            throw new InvalidObjectException( "Unknown transport type: "
+                    + this );
     }
 }

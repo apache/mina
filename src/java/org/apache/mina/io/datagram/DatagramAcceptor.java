@@ -136,8 +136,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             ch = ( DatagramChannel ) channels.get( address );
 
             if( ch == null )
-                throw new IllegalArgumentException( "Unknown address: "
-                                                    + address );
+                return;
 
             SelectionKey key = ch.keyFor( selector );
             channels.remove( address );

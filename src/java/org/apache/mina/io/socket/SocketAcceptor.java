@@ -146,8 +146,7 @@ public class SocketAcceptor implements IoAcceptor
             ssc = ( ServerSocketChannel ) channels.get( address );
 
             if( ssc == null )
-                throw new IllegalArgumentException( "Unknown address: "
-                                                    + address );
+                return;
 
             SelectionKey key = ssc.keyFor( selector );
             channels.remove( address );

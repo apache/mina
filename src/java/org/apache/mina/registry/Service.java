@@ -18,6 +18,8 @@
  */
 package org.apache.mina.registry;
 
+import java.io.Serializable;
+
 import org.apache.mina.common.TransportType;
 
 /**
@@ -26,11 +28,92 @@ import org.apache.mina.common.TransportType;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public interface Service
+public class Service implements Serializable, Cloneable
 {
-    String getName();
+    private static final long serialVersionUID = 3258407344110383155L;
 
-    TransportType getTransportType();
+    private final String name;
 
-    int getPort();
+    private final TransportType transportType;
+
+    private final int port;
+
+    /**
+     * Creates a new instance with the specified protocol name, transport type,
+     * and port number.
+     */
+    public Service( String name, TransportType transportType, int port )
+    {
+        if( name == null )
+            throw new NullPointerException( "name" );
+        if( transportType == null )
+            throw new NullPointerException( "transportType" );
+        if( port < 0 || port > 65535 )
+            throw new IllegalArgumentException( "port: " + port );
+
+        this.name = name;
+        this.transportType = transportType;
+        this.port = port;
+    }
+
+    /**
+     * Returns the name of this service (protocol).
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Returns the transport type this service uses.
+     */
+    public TransportType getTransportType()
+    {
+        return transportType;
+    }
+
+    /**
+     * Returns the port number this service is bound on.
+     */
+    public int getPort()
+    {
+        return port;
+    }
+
+    public int hashCode()
+    {
+        return ( ( name.hashCode() * 37 ) ^ transportType.hashCode() * 37 )
+                ^ port;
+    }
+
+    public boolean equals( Object o )
+    {
+        if( o == null )
+            return false;
+        if( this == o )
+            return true;
+        if( !( o instanceof Service ) )
+            return false;
+
+        Service that = ( Service ) o;
+        return this.name.equals( that.name )
+                && this.transportType == that.transportType
+                && this.port == that.port;
+    }
+
+    public Object clone()
+    {
+        try
+        {
+            return super.clone();
+        }
+        catch( CloneNotSupportedException e )
+        {
+            throw new InternalError();
+        }
+    }
+    
+    public String toString() {
+        return "(" + transportType + ", " + name + ", " + port + ')';
+    }
 }

@@ -19,13 +19,13 @@
 package org.apache.mina.registry;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilter;
-import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolHandlerFilter;
+import org.apache.mina.protocol.ProtocolProvider;
 
 /**
  * Interface for the internet service registry. The registry is used by MINA
@@ -37,51 +37,94 @@ import org.apache.mina.protocol.ProtocolHandlerFilter;
  */
 public interface ServiceRegistry
 {
-    void bind( Service service, IoHandler sessionHandler ) throws IOException;
+    /**
+     * Binds the specified I/O handler to the specified service.
+     */
+    void bind( Service service, IoHandler ioHandler ) throws IOException;
 
-    void bind( Service service, ProtocolHandler sessionHandler )
+    /**
+     * Binds the specified protocol provider to the specified service.
+     */
+    void bind( Service service, ProtocolProvider protocolProvider )
             throws IOException;
 
+    /**
+     * Unbinds the specified service (and its aggregated I/O handler or
+     * protocol provider). 
+     */
     void unbind( Service service );
 
+    /**
+     * Adds the specified filter to the acceptors of all transport types
+     * in this registry.
+     */
     void addFilter( int priority, IoHandlerFilter filter );
-
+    
+    /**
+     * Adds the specified filter to the acceptors of all transport types
+     * in this registry.
+     */
     void addFilter( int priority, ProtocolHandlerFilter filter );
+    
+    /**
+     * Adds the specified filter to the acceptor of the specified transport
+     * type with the specified priority.
+     */
+    void addFilter( TransportType transportType, int priority,
+                   IoHandlerFilter filter );
 
-    void addFilter( Service service, int priority, IoHandlerFilter filter );
+    /**
+     * Adds the specified filter to the acceptor of the specified transport
+     * type with the specified priority.
+     */
+    void addFilter( TransportType transportType, int priority,
+                   ProtocolHandlerFilter filter );
 
-    void addFilter( Service service, int priority, ProtocolHandlerFilter filter );
-
+    /**
+     * Removes the specified filter from the acceptors of all transport types
+     * in this registry.
+     */
     void removeFilter( IoHandlerFilter filter );
 
+    /**
+     * Removes the specified filter from the acceptors of all transport types
+     * in this registry.
+     */
     void removeFilter( ProtocolHandlerFilter filter );
 
-    Service getByName( String name, TransportType transportType );
-
-    Service getByPort( int port, TransportType transportType );
-
-    Iterator getAll();
-
-    Iterator getByTransportType( TransportType transportType );
+    /**
+     * Removes the specified filter from the acceptor of the specified
+     * transport type.
+     */
+    void removeFilter( TransportType transportType, IoHandlerFilter filter );
 
     /**
-     * Gets an iteration over all the entries for a service by the name of the
-     * service.
-     * 
-     * @param name
-     *            the authoritative name of the service
-     * @return an Iterator over InetServiceEntry objects
+     * Removes the specified filter from the acceptor of the specified
+     * transport type.
      */
-    Iterator getByName( String name );
+    void removeFilter( TransportType transportType,
+                      ProtocolHandlerFilter filter );
 
     /**
-     * Gets an iteration over all the entries for a service by port number.
-     * This method returns an Iterator over the set of InetServiceEntry objects
-     * since more than one transport protocol can be used on the same port.
-     * 
-     * @param port
-     *            the port one which the service resides
-     * @return an Iterator over InetServiceEntry objects
+     * Returns {@link Set} of all services bound in this registry.
      */
-    Iterator getByPort( int port );
+    Set getAllServices();
+    
+    /**
+     * Returns {@link Set} of services bound in this registry with the
+     * specified service(or protocol) name.
+     */
+    Set getServices(String name);
+
+    /**
+     * Returns {@link Set} of services bound in this registry with the
+     * specified transport type.
+     */
+    Set getServices(TransportType transportType);
+    
+    /**
+     * Returns {@link Set} of services bound in this registry with the
+     * specified port number.
+     */
+    Set getServices(int port);
 }
