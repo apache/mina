@@ -552,10 +552,7 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
             list.add( e.filter );
             e = e.prevEntry;
         }
-        while( e != null );
-
         return list;
-
     }
     
     private void fireExceptionCaught( IoSession session, Throwable cause )

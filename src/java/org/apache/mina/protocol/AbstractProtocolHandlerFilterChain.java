@@ -550,10 +550,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
             list.add( e.filter );
             e = e.prevEntry;
         }
-        while( e != null );
-
         return list;
-
     }
     
     private void fireExceptionCaught( ProtocolSession session, Throwable cause )
