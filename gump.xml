@@ -1,42 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-  - This descriptor was automatically generated using Maven.
-  - To regenerate, run: "maven gump:gump"
-  -
-  - If you have a requirement that leads to hand editing, please consider filing
-  - a feature request at http://jira.codehaus.org/browse/MPGUMP
--->
 <module name="mina">
-  <description>
-		A Multipurpose Infrastrusture for Network Applications
-	</description>
-  <url href="http://incubator.apache.org/directory"/>
-
-  <nag from="mina development &lt;directory-dev@incubator.apache.org&gt;" to="directory-dev@incubator.apache.org"/>
-
-  <svn repository="apache-incubator-svn" dir="directory/network/mina/trunk" />
-    
+  <description>A Multipurpose Infrastrusture for Network Applications</description>
+  <url href="http://directory.apache.org/">
+  </url>
+  <cvs repository="directory">
+  </cvs>
   <project name="mina">
-    <maven goal="jar" basedir=".">
-      <property name="maven.final.name" value="mina-@@DATE@@"/>
-      
+    <maven goal="jar">
+      <property name="final.name" value="mina-@@DATE@@">
+      </property>
     </maven>
-
-    <depend project="asn1-codec" />
-    <depend project="commons-net" />
-    <depend project="junit" />
-    <depend project="tl-netty2" />
-    
-    <home nested="." />
-
-    <jar name="target/mina-@@DATE@@.jar" />
-      
-    <javadoc nested="target/docs/apidocs" />
-
-    <junitreport nested="./target/test-reports" />
-  
-    <nag from="mina development &lt;directory-dev@incubator.apache.org&gt;"
-         to="directory-dev@incubator.apache.org"/>
+    <package>org.apache.mina</package>
+    <depend project="commons-net">
+    </depend>
+    <depend project="directory-asn1">
+    </depend>
+    <depend project="jakarta-ant">
+    </depend>
+    <depend project="junit">
+    </depend>
+    <depend project="tl-netty2">
+    </depend>
+    <depend project="xml-xerces">
+    </depend>
+    <work nested="target/classes">
+    </work>
+    <home nested="target">
+    </home>
+    <jar name="mina-@@DATE@@.jar">
+    </jar>
+    <javadoc nested="target/docs/apidocs">
+    </javadoc>
+    <nag to="dev@directory.apache.org" from="mina development &lt;dev@directory.apache.org&gt;">
+    </nag>
   </project>
 </module>
