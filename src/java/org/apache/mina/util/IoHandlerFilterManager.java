@@ -245,6 +245,11 @@ public class IoHandlerFilterManager
     public void write( IoSession session, WriteCommand cmd, ByteBuffer buf,
                       Object marker )
     {
+        if( buf == null )
+        {
+            return;
+        }
+
         Entry e = tail;
         ByteBuffer newBuf;
         do
