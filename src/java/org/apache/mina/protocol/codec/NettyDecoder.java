@@ -104,6 +104,7 @@ public class NettyDecoder implements ProtocolDecoder
                         else
                         {
                             readBuf.clear();
+			    break;
                         }
                     }
                 }
