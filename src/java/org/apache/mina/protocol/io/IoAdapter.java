@@ -21,7 +21,6 @@ package org.apache.mina.protocol.io;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
@@ -53,15 +52,15 @@ import org.apache.mina.util.Queue;
  */
 public class IoAdapter
 {
-    private final IoProtocolFilterChain filters = new IoProtocolFilterChain( FilterChainType.PREPROCESS );
+    private final IoProtocolFilterChain filters = new IoProtocolFilterChain();
 
     IoAdapter()
     {
     }
     
-    public ProtocolHandlerFilterChain newFilterChain( FilterChainType type )
+    public ProtocolHandlerFilterChain newFilterChain()
     {
-        return new IoProtocolFilterChain( type );
+        return new IoProtocolFilterChain();
     }
     
     public ProtocolHandlerFilterChain getFilterChain()

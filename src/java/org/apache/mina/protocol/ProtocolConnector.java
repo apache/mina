@@ -21,8 +21,6 @@ package org.apache.mina.protocol;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.FilterChainType;
-
 /**
  * Connects to endpoint, communicates with the server, and fires events to
  * {@link ProtocolProvider}s.
@@ -69,7 +67,7 @@ public interface ProtocolConnector
                             ProtocolProvider protocolProvider )
             throws IOException;
 
-    ProtocolHandlerFilterChain newFilterChain( FilterChainType type );
+    ProtocolHandlerFilterChain newFilterChain();
     
     ProtocolHandlerFilterChain getFilterChain();
 }

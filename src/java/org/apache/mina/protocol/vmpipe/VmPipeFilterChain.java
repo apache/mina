@@ -1,14 +1,12 @@
 package org.apache.mina.protocol.vmpipe;
 
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.protocol.AbstractProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolSession;
 
 class VmPipeFilterChain extends AbstractProtocolHandlerFilterChain {
 
-    VmPipeFilterChain( FilterChainType type )
+    VmPipeFilterChain()
     {
-        super(type);
     }
 
     protected void doWrite(ProtocolSession session, Object message)

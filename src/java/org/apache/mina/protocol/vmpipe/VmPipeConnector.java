@@ -6,7 +6,6 @@ package org.apache.mina.protocol.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.protocol.ProtocolConnector;
 import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
@@ -22,7 +21,7 @@ import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
  */
 public class VmPipeConnector implements ProtocolConnector
 {
-    private final VmPipeFilterChain filters = new VmPipeFilterChain( FilterChainType.PREPROCESS );
+    private final VmPipeFilterChain filters = new VmPipeFilterChain();
 
     /**
      * Creates a new instance.
@@ -32,9 +31,9 @@ public class VmPipeConnector implements ProtocolConnector
         filters.addLast( "VMPipe", new VmPipeFilter() );
     }
     
-    public ProtocolHandlerFilterChain newFilterChain( FilterChainType type )
+    public ProtocolHandlerFilterChain newFilterChain()
     {
-        return new VmPipeFilterChain( type );
+        return new VmPipeFilterChain();
     }
     
     public ProtocolHandlerFilterChain getFilterChain()

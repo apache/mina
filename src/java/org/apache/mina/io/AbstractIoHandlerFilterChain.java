@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.common.IdleStatus;
 
 public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterChain
@@ -52,7 +51,7 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
         public void filterWrite( NextFilter nextFilter, IoSession session,
                                  ByteBuffer buf, Object marker )
         {
-            if( AbstractIoHandlerFilterChain.this.parent == null )
+            if( parent == null )
             {
                 // write only when root filter chain traversal is finished.
                 doWrite( session, buf, marker );
@@ -60,42 +59,139 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
         }
     };
     
-    private static final IoHandlerFilter TAIL_FILTER = new IoHandlerFilter()
+    private final IoHandlerFilter NEXT_FILTER = new IoHandlerFilter()
     {
         public void sessionOpened( NextFilter nextFilter, IoSession session )
         {
-            session.getHandler().sessionOpened( session );
+            if( parent != null )
+            {
+                Entry e = ( Entry ) parent.filter2entry.get( AbstractIoHandlerFilterChain.this );
+                e.nextFilter.sessionOpened( session );
+            }
+            nextFilter.sessionOpened( session );
         }
 
         public void sessionClosed( NextFilter nextFilter, IoSession session )
         {
-            session.getHandler().sessionClosed( session );
+            if( parent != null )
+            {
+                Entry e = ( Entry ) parent.filter2entry.get( AbstractIoHandlerFilterChain.this );
+                e.nextFilter.sessionClosed( session );
+            }
+            nextFilter.sessionClosed( session );
         }
 
         public void sessionIdle( NextFilter nextFilter, IoSession session,
                                 IdleStatus status )
         {
-            session.getHandler().sessionIdle( session, status );
+            if( parent != null )
+            {
+                Entry e = ( Entry ) parent.filter2entry.get( AbstractIoHandlerFilterChain.this );
+                
+                e.nextFilter.sessionIdle( session, status );
+            }
+            nextFilter.sessionIdle( session, status );
         }
 
         public void exceptionCaught( NextFilter nextFilter,
                                     IoSession session, Throwable cause )
         {
-            session.getHandler().exceptionCaught( session, cause );
+            if( parent != null )
+            {
+                Entry e = ( Entry ) parent.filter2entry.get( AbstractIoHandlerFilterChain.this );
+                e.nextFilter.exceptionCaught( session, cause );
+            }
+            nextFilter.exceptionCaught( session, cause );
         }
 
         public void dataRead( NextFilter nextFilter, IoSession session,
                              ByteBuffer buf )
         {
-            IoHandler handler = session.getHandler();
-            handler.dataRead( session, buf );
-            buf.release();
+            if( parent != null )
+            {
+                Entry e = ( Entry ) parent.filter2entry.get( AbstractIoHandlerFilterChain.this );
+                e.nextFilter.dataRead( session, buf );
+            }
+            nextFilter.dataRead( session, buf );
         }
 
         public void dataWritten( NextFilter nextFilter, IoSession session,
                                 Object marker )
         {
-            session.getHandler().dataWritten( session, marker );
+            if( parent != null )
+            {
+                Entry e = ( Entry ) parent.filter2entry.get( AbstractIoHandlerFilterChain.this );
+                e.nextFilter.dataWritten( session, marker );
+            }
+            nextFilter.dataWritten( session, marker );
+        }
+        
+        public void filterWrite( NextFilter nextFilter, IoSession session,
+                                 ByteBuffer buf, Object marker )
+        {
+            if( parent != null )
+            {
+                Entry e = ( Entry ) parent.filter2entry.get( AbstractIoHandlerFilterChain.this );
+                e.prevFilter.filterWrite( session, buf, marker );
+            }
+            nextFilter.filterWrite( session, buf, marker );
+        }
+    };
+    
+    private final IoHandlerFilter TAIL_FILTER = new IoHandlerFilter()
+    {
+        public void sessionOpened( NextFilter nextFilter, IoSession session )
+        {
+            if( parent == null )
+            {
+                session.getHandler().sessionOpened( session );
+            }
+        }
+
+        public void sessionClosed( NextFilter nextFilter, IoSession session )
+        {
+            if( parent == null )
+            {
+                session.getHandler().sessionClosed( session );
+            }
+        }
+
+        public void sessionIdle( NextFilter nextFilter, IoSession session,
+                                IdleStatus status )
+        {
+            if( parent == null )
+            {
+                session.getHandler().sessionIdle( session, status );
+            }
+        }
+
+        public void exceptionCaught( NextFilter nextFilter,
+                                    IoSession session, Throwable cause )
+        {
+            if( parent == null )
+            {
+                session.getHandler().exceptionCaught( session, cause );
+            }
+        }
+
+        public void dataRead( NextFilter nextFilter, IoSession session,
+                             ByteBuffer buf )
+        {
+            if( parent == null )
+            {
+                IoHandler handler = session.getHandler();
+                handler.dataRead( session, buf );
+                buf.release();
+            }
+        }
+
+        public void dataWritten( NextFilter nextFilter, IoSession session,
+                                Object marker )
+        {
+            if( parent == null )
+            {
+                session.getHandler().dataWritten( session, marker );
+            }
         }
 
         public void filterWrite( NextFilter nextFilter,
@@ -107,28 +203,21 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
 
     private AbstractIoHandlerFilterChain parent;
     
-    private final FilterChainType type; 
-    
     private final Map name2entry = new HashMap();
 
     private final Map filter2entry = new IdentityHashMap();
 
     private final Entry head;
-
+    
     private final Entry tail;
 
-    protected AbstractIoHandlerFilterChain( FilterChainType type )
+    protected AbstractIoHandlerFilterChain()
     {
-        if( type == null )
-        {
-            throw new NullPointerException( "type" );
-        }
-        
-        this.type = type;
-        
         head = new Entry( null, null, "head", HEAD_FILTER );
         tail = new Entry( head, null, "tail", TAIL_FILTER );
         head.nextEntry = tail;
+        
+        register( head, IoHandlerFilterChain.NEXT_FILTER, NEXT_FILTER );
     }
     
     public IoHandlerFilterChain getRoot()
@@ -144,11 +233,6 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
     public IoHandlerFilterChain getParent()
     {
         return parent;
-    }
-    
-    public FilterChainType getType()
-    {
-        return type;
     }
     
     public IoHandlerFilter getChild( String name )
@@ -296,29 +380,15 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
     public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
         Entry head = this.head;
-        callNextSessionOpened(head, nextFilter, session);
+        callNextSessionOpened(head, session);
     }
 
     private void callNextSessionOpened( Entry entry,
-                                        NextFilter nextFilter, IoSession session)
+                                        IoSession session)
     {
         try
         {
-            if( nextFilter == null )
-            {
-                entry.filter.sessionOpened( entry.nextFilter, session );
-            }
-            else if ( type == FilterChainType.PREPROCESS )
-            {
-                entry.filter.sessionOpened( entry.nextFilter, session );
-                nextFilter.sessionOpened( session );
-            }
-            else // POSTPROCESS
-            {
-                nextFilter.sessionOpened( session );
-                entry.filter.sessionOpened( entry.nextFilter, session );
-            }
-                
+            entry.filter.sessionOpened( entry.nextFilter, session );
         }
         catch( Throwable e )
         {
@@ -329,29 +399,15 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
     public void sessionClosed( NextFilter nextFilter, IoSession session )
     {
         Entry head = this.head;
-        callNextSessionClosed(head, nextFilter, session);
+        callNextSessionClosed(head, session);
     }
 
     private void callNextSessionClosed( Entry entry,
-                                        NextFilter nextFilter, IoSession session )
+                                        IoSession session )
     {
         try
         {
-            if( nextFilter == null )
-            {
-                entry.filter.sessionClosed( entry.nextFilter, session );
-            }
-            else if( type == FilterChainType.PREPROCESS )
-            {
-                entry.filter.sessionClosed( entry.nextFilter, session );
-                nextFilter.sessionClosed( session );
-            }
-            else // POSTPROCESS
-            {
-                nextFilter.sessionClosed( session );
-                entry.filter.sessionClosed( entry.nextFilter, session );
-            }
-                
+            entry.filter.sessionClosed( entry.nextFilter, session );
         }
         catch( Throwable e )
         {
@@ -362,29 +418,16 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
     public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status )
     {
         Entry head = this.head;
-        callNextSessionIdle(head, nextFilter, session, status);
+        callNextSessionIdle(head, session, status);
     }
 
     private void callNextSessionIdle( Entry entry,
-                                      NextFilter nextFilter, IoSession session,
+                                      IoSession session,
                                       IdleStatus status )
     {
         try
         {
-            if( nextFilter == null )
-            {
-                entry.filter.sessionIdle( entry.nextFilter, session, status );
-            }
-            else if( type == FilterChainType.PREPROCESS )
-            {
-                entry.filter.sessionIdle( entry.nextFilter, session, status );
-                nextFilter.sessionIdle( session, status );
-            }
-            else // POSTPROCESS
-            {
-                nextFilter.sessionIdle( session, status );
-                entry.filter.sessionIdle( entry.nextFilter, session, status );
-            }
+            entry.filter.sessionIdle( entry.nextFilter, session, status );
         }
         catch( Throwable e )
         {
@@ -395,29 +438,16 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
     public void dataRead( NextFilter nextFilter, IoSession session, ByteBuffer buf )
     {
         Entry head = this.head;
-        callNextDataRead(head, nextFilter, session, buf);
+        callNextDataRead(head, session, buf);
     }
 
     private void callNextDataRead( Entry entry,
-                                   NextFilter nextFilter, IoSession session,
+                                   IoSession session,
                                    ByteBuffer buf )
     {
         try
         {
-            if( nextFilter == null )
-            {
-                entry.filter.dataRead( entry.nextFilter, session, buf );
-            }
-            else if( type == FilterChainType.PREPROCESS )
-            {
-                entry.filter.dataRead( entry.nextFilter, session, buf );
-                nextFilter.dataRead( session, buf );
-            }
-            else // POSTPROCESS
-            {
-                nextFilter.dataRead( session, buf );
-                entry.filter.dataRead( entry.nextFilter, session, buf );
-            }
+            entry.filter.dataRead( entry.nextFilter, session, buf );
         }
         catch( Throwable e )
         {
@@ -428,29 +458,16 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
     public void dataWritten( NextFilter nextFilter, IoSession session, Object marker )
     {
         Entry head = this.head;
-        callNextDataWritten(head, nextFilter, session, marker);
+        callNextDataWritten(head, session, marker);
     }
 
     private void callNextDataWritten( Entry entry,
-                                      NextFilter nextFilter, IoSession session,
+                                      IoSession session,
                                       Object marker ) 
     {
         try
         {
-            if( nextFilter == null )
-            {
-                entry.filter.dataWritten( entry.nextFilter, session, marker );
-            }
-            else if( type == FilterChainType.PREPROCESS )
-            {
-                entry.filter.dataWritten( entry.nextFilter, session, marker );
-                nextFilter.dataWritten( session, marker );
-            }
-            else // POSTPROCESS
-            {
-                nextFilter.dataWritten( session, marker );
-                entry.filter.dataWritten( entry.nextFilter, session, marker );
-            }
+            entry.filter.dataWritten( entry.nextFilter, session, marker );
         }
         catch( Throwable e )
         {
@@ -461,29 +478,16 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
     public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause )
     {
         Entry head = this.head;
-        callNextExceptionCaught(head, nextFilter, session, cause);
+        callNextExceptionCaught(head, session, cause);
     }
 
     private void callNextExceptionCaught( Entry entry,
-                                          NextFilter nextFilter, IoSession session,
+                                          IoSession session,
                                           Throwable cause )
     {
         try
         {
-            if( nextFilter == null )
-            {
-                entry.filter.exceptionCaught( entry.nextFilter, session, cause );
-            }
-            else if( type == FilterChainType.PREPROCESS )
-            {
-                entry.filter.exceptionCaught( entry.nextFilter, session, cause );
-                nextFilter.exceptionCaught( session, cause );
-            }
-            else // POSTPROCESS
-            {
-                entry.filter.exceptionCaught( entry.nextFilter, session, cause );
-                nextFilter.exceptionCaught( session, cause );
-            }
+            entry.filter.exceptionCaught( entry.nextFilter, session, cause );
         }
         catch( Throwable e )
         {
@@ -495,11 +499,11 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
                              IoSession session, ByteBuffer buf, Object marker )
     {
         Entry tail = this.tail;
-        callPreviousFilterWrite( tail, nextFilter, session, buf, marker );
+        callPreviousFilterWrite( tail, session, buf, marker );
     }
 
     private void callPreviousFilterWrite( Entry entry,
-                                          NextFilter prevFilter, IoSession session,
+                                          IoSession session,
                                           ByteBuffer buf, Object marker )
     {
         if( buf == null )
@@ -509,20 +513,7 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
         
         try
         {
-            if( prevFilter == null )
-            {
-                entry.filter.filterWrite( entry.prevFilter, session, buf, marker );
-            }
-            else if( type == FilterChainType.PREPROCESS )
-            {
-                entry.filter.filterWrite( entry.prevFilter, session, buf, marker );
-                prevFilter.filterWrite( session, buf, marker );
-            }
-            else // POSTPROCESS
-            {
-                entry.filter.filterWrite( entry.prevFilter, session, buf, marker );
-                prevFilter.filterWrite( session, buf, marker );
-            }
+            entry.filter.filterWrite( entry.prevFilter, session, buf, marker );
         }
         catch( Throwable e )
         {
@@ -605,38 +596,38 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
                 public void sessionOpened( IoSession session )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
-                    callNextSessionOpened( nextEntry, null, session );
+                    callNextSessionOpened( nextEntry, session );
                 }
 
                 public void sessionClosed( IoSession session )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
-                    callNextSessionClosed( nextEntry, null, session );
+                    callNextSessionClosed( nextEntry, session );
                 }
 
                 public void sessionIdle( IoSession session, IdleStatus status )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
-                    callNextSessionIdle( nextEntry, null, session, status );
+                    callNextSessionIdle( nextEntry, session, status );
                 }
 
                 public void exceptionCaught( IoSession session,
                                             Throwable cause )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
-                    callNextExceptionCaught( nextEntry, null, session, cause );
+                    callNextExceptionCaught( nextEntry, session, cause );
                 }
 
                 public void dataRead( IoSession session, ByteBuffer buf )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
-                    callNextDataRead( nextEntry, null, session, buf );
+                    callNextDataRead( nextEntry, session, buf );
                 }
 
                 public void dataWritten( IoSession session, Object marker )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
-                    callNextDataWritten( nextEntry, null, session, marker );
+                    callNextDataWritten( nextEntry, session, marker );
                 }
                 
                 public void filterWrite( IoSession session, ByteBuffer buf, Object marker )
@@ -682,7 +673,7 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
                 public void filterWrite( IoSession session, ByteBuffer buf, Object marker )
                 {
                     Entry nextEntry = Entry.this.prevEntry;
-                    callPreviousFilterWrite( nextEntry, null, session, buf, marker );
+                    callPreviousFilterWrite( nextEntry, session, buf, marker );
                 }
             };
         }

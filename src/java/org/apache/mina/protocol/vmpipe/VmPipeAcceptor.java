@@ -8,7 +8,6 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.protocol.ProtocolAcceptor;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolHandlerFilterChain;
@@ -25,7 +24,7 @@ public class VmPipeAcceptor implements ProtocolAcceptor
 {
     static final Map boundHandlers = new HashMap();
 
-    private final VmPipeFilterChain filters = new VmPipeFilterChain( FilterChainType.PREPROCESS );
+    private final VmPipeFilterChain filters = new VmPipeFilterChain();
 
     /**
      * Creates a new instance.
@@ -69,9 +68,9 @@ public class VmPipeAcceptor implements ProtocolAcceptor
         }
     }
     
-    public ProtocolHandlerFilterChain newFilterChain( FilterChainType type )
+    public ProtocolHandlerFilterChain newFilterChain()
     {
-        return new VmPipeFilterChain( type );
+        return new VmPipeFilterChain();
     }
     
     public ProtocolHandlerFilterChain getFilterChain()

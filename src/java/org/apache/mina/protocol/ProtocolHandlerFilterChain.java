@@ -2,13 +2,12 @@ package org.apache.mina.protocol;
 
 import java.util.List;
 
-import org.apache.mina.common.FilterChainType;
-
 
 public interface ProtocolHandlerFilterChain extends ProtocolHandlerFilter {
+    static String NEXT_FILTER = "nextFilter";
+    
     ProtocolHandlerFilterChain getRoot();
     ProtocolHandlerFilterChain getParent();
-    FilterChainType getType();
 
     ProtocolHandlerFilter getChild( String name );
     List getChildren();

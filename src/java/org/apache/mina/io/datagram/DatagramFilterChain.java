@@ -1,7 +1,6 @@
 package org.apache.mina.io.datagram;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.AbstractIoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.util.Queue;
@@ -10,10 +9,8 @@ class DatagramFilterChain extends AbstractIoHandlerFilterChain {
 
     private final DatagramProcessor processor;
 
-    DatagramFilterChain( FilterChainType type, DatagramProcessor processor )
+    DatagramFilterChain( DatagramProcessor processor )
     {
-        super( type );
-        
         this.processor = processor;
     }
 
