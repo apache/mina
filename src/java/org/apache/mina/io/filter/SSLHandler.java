@@ -160,9 +160,14 @@ class SSLHandler
             // We have to expand inNetBuffer
             inNetBuffer = SSLByteBufferPool.expandBuffer( inNetBuffer,
                     2 * (inNetBuffer.position() + buf.limit()) );
+            // We also expand app. buffer (twice the size of in net. buffer)
+            appBuffer = SSLByteBufferPool.expandBuffer( appBuffer, inNetBuffer.capacity() * 2);
+            appBuffer.position( 0 );
+            appBuffer.limit( 0 );
             if( parent.debug != null )
             {
                 parent.debug.print("expanded inNetBuffer:" + inNetBuffer);
+                parent.debug.print("expanded appBuffer:" + appBuffer);
             }
         }
 
@@ -261,6 +266,9 @@ class SSLHandler
 
         if( appBuffer.hasRemaining() )
         {
+             if ( parent.debug != null ) {
+                 parent.debug.print( "Error: appBuffer not empty!" );
+             }
             //still app data in buffer!?
             throw new IllegalStateException();
         }
@@ -279,7 +287,8 @@ class SSLHandler
             status != SSLEngineResult.Status.BUFFER_UNDERFLOW )
         {
             throw new SSLException( "SSLEngine error during decrypt: " +
-                                    status );
+                                    status +
+                                    " inNetBuffer: " + inNetBuffer + "appBuffer: " + appBuffer);
         }
         
         return status;
@@ -301,11 +310,11 @@ class SSLHandler
         // Loop until there is no more data in src
         while ( src.hasRemaining() ) {
 
-            if ( src.limit() > ( outNetBuffer.remaining() / 2 ) ) {
+            if ( src.remaining() > ( ( outNetBuffer.capacity() - outNetBuffer.position() ) / 2 ) ) {
                 // We have to expand outNetBuffer
                 // Note: there is no way to know the exact size required, but enrypted data
                 // shouln't need to be larger than twice the source data size?
-                outNetBuffer = SSLByteBufferPool.expandBuffer( outNetBuffer, src.limit() * 2 );
+                outNetBuffer = SSLByteBufferPool.expandBuffer( outNetBuffer, src.capacity() * 2 );
                 if ( parent.debug != null ) {
                     parent.debug.print( "expanded outNetBuffer:" + outNetBuffer );
                 }
@@ -322,13 +331,14 @@ class SSLHandler
                 }
             } else {
                 throw new SSLException( "SSLEngine error during encrypt: "
-                        + result.getStatus() );
+                        + result.getStatus() +
+                        " src: " + src + "outNetBuffer: " + outNetBuffer);
             }
         }
 
         outNetBuffer.flip();
     }
-    
+
     /**
      * Perform any handshaking processing.
      */
