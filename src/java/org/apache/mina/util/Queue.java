@@ -173,4 +173,9 @@ public class Queue implements Serializable
     {
         return size;
     }
+    
+    public String toString()
+    {
+        return "first=" + first + ", last=" + last + ", size=" + size + ", mask = " + mask;
+    }
 }

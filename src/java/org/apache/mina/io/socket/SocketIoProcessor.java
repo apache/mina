@@ -94,11 +94,7 @@ class SocketIoProcessor
                 newSessions.push( session );
             }
 
-            if( worker == null )
-            {
-                worker = new Worker();
-                worker.start();
-            }
+            startupWorker();
         }
 
         selector.wakeup();
@@ -107,7 +103,17 @@ class SocketIoProcessor
     void removeSession( SocketSession session )
     {
         scheduleRemove( session );
+        startupWorker();
         selector.wakeup();
+    }
+
+    private synchronized void startupWorker()
+    {
+        if( worker == null )
+        {
+            worker = new Worker();
+            worker.start();
+        }
     }
 
     void flushSession( SocketSession session )
@@ -480,6 +486,15 @@ class SocketIoProcessor
                     int nKeys = selector.select( 1000 );
                     addSessions();
 
+                    if( nKeys > 0 )
+                    {
+                        processSessions( selector.selectedKeys() );
+                    }
+
+                    flushSessions();
+                    removeSessions();
+                    notifyIdleSessions();
+
                     if( selector.keys().isEmpty() )
                     {
                         synchronized( SocketIoProcessor.this )
@@ -491,15 +506,6 @@ class SocketIoProcessor
                             }
                         }
                     }
-
-                    if( nKeys > 0 )
-                    {
-                        processSessions( selector.selectedKeys() );
-                    }
-
-                    flushSessions();
-                    removeSessions();
-                    notifyIdleSessions();
                 }
                 catch( IOException e )
                 {

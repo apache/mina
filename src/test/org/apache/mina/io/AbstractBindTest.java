@@ -5,6 +5,7 @@ package org.apache.mina.io;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Date;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -50,7 +51,7 @@ public class AbstractBindTest extends TestCase
             throw new IOException( "Cannot bind any test port." );
         }
 
-        System.out.println( "Using port " + port + " for testing." );
+        //System.out.println( "Using port " + port + " for testing." );
     }
     
     public void tearDown()
@@ -97,11 +98,31 @@ public class AbstractBindTest extends TestCase
     {
         InetSocketAddress addr = new InetSocketAddress( port );
         EchoProtocolHandler handler = new EchoProtocolHandler();
-        for( int i = 0; i < 8192; i++ )
+        // we test only 512 times to avoid too many open files exception.
+        for( int i = 0; i < 512; i++ ) 
         {
             acceptor.unbind( addr );
             acceptor.bind( addr, handler );
         }
+    }
+    
+    public void _testRegressively() throws IOException
+    {
+        tearDown();
+
+        InetSocketAddress addr = new InetSocketAddress( port );
+        EchoProtocolHandler handler = new EchoProtocolHandler();
+        for( int i = 0; i < 1048576; i++ )
+        {
+            acceptor.bind( addr, handler );
+            testDuplicateBind();
+            testDuplicateUnbind();
+            if( i % 100 == 0 )
+            {
+                System.out.println( i + " (" + new Date() + ")" );
+            }
+        }
+        setUp();
     }
 
 }
