@@ -21,10 +21,11 @@ package org.apache.mina.registry;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilter;
-import org.apache.mina.protocol.ProtocolHandlerFilter;
+import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 
 /**
@@ -48,62 +49,20 @@ public interface ServiceRegistry
     void bind( Service service, ProtocolProvider protocolProvider )
             throws IOException;
 
+    
     /**
      * Unbinds the specified service (and its aggregated I/O handler or
      * protocol provider). 
      */
     void unbind( Service service );
 
-    /**
-     * Adds the specified filter to the acceptors of all transport types
-     * in this registry.
-     */
-    void addFilter( int priority, IoHandlerFilter filter );
+    IoHandlerFilterChain newIoFilterChain( TransportType transportType, FilterChainType chainType );
     
-    /**
-     * Adds the specified filter to the acceptors of all transport types
-     * in this registry.
-     */
-    void addFilter( int priority, ProtocolHandlerFilter filter );
+    IoHandlerFilterChain getIoFilterChain( TransportType transportType );
     
-    /**
-     * Adds the specified filter to the acceptor of the specified transport
-     * type with the specified priority.
-     */
-    void addFilter( TransportType transportType, int priority,
-                   IoHandlerFilter filter );
-
-    /**
-     * Adds the specified filter to the acceptor of the specified transport
-     * type with the specified priority.
-     */
-    void addFilter( TransportType transportType, int priority,
-                   ProtocolHandlerFilter filter );
-
-    /**
-     * Removes the specified filter from the acceptors of all transport types
-     * in this registry.
-     */
-    void removeFilter( IoHandlerFilter filter );
-
-    /**
-     * Removes the specified filter from the acceptors of all transport types
-     * in this registry.
-     */
-    void removeFilter( ProtocolHandlerFilter filter );
-
-    /**
-     * Removes the specified filter from the acceptor of the specified
-     * transport type.
-     */
-    void removeFilter( TransportType transportType, IoHandlerFilter filter );
-
-    /**
-     * Removes the specified filter from the acceptor of the specified
-     * transport type.
-     */
-    void removeFilter( TransportType transportType,
-                      ProtocolHandlerFilter filter );
+    ProtocolHandlerFilterChain newProtocolFilterChain( TransportType transportType, FilterChainType chainType );
+    
+    ProtocolHandlerFilterChain getProtocolFilterChain( TransportType transportType );
 
     /**
      * Returns {@link Set} of all services bound in this registry.

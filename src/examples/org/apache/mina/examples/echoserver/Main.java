@@ -52,7 +52,7 @@ public class Main
 
         // Add thread pool filter
         // MINA runs in a single thread if you don't add this filter.
-        acceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
+        acceptor.getFilterChain().addFirst( "threadPool", threadPoolFilter );
 
         // Add SSL filter if SSL is enabled.
         if( USE_SSL )
@@ -60,7 +60,7 @@ public class Main
             System.out.println( "SSL is enabled." );
             SSLFilter sslFilter = new SSLFilter( BogusSSLContextFactory
                     .getInstance( true ) );
-            acceptor.addFilter( Integer.MAX_VALUE - 1, sslFilter );
+            acceptor.getFilterChain().addLast( "sslFilter", sslFilter );
         }
 
         // Bind
@@ -71,7 +71,7 @@ public class Main
         IoAcceptor datagramAcceptor = new DatagramAcceptor();
 
         // Add thread pool filter
-        datagramAcceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
+        datagramAcceptor.getFilterChain().addFirst( "threadPool", threadPoolFilter );
 
         // Bind
         datagramAcceptor.bind( new InetSocketAddress( PORT ),

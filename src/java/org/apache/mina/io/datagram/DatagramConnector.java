@@ -26,17 +26,16 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.DefaultExceptionMonitor;
 import org.apache.mina.io.ExceptionMonitor;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilter;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
-import org.apache.mina.util.IoHandlerFilterManager;
 import org.apache.mina.util.Queue;
 
 /**
@@ -50,7 +49,7 @@ public class DatagramConnector extends DatagramProcessor implements
 {
     private static volatile int nextId = 0;
 
-    private final IoHandlerFilterManager filterManager = new IoHandlerFilterManager();
+    private final DatagramFilterChain filters = new DatagramFilterChain( FilterChainType.PREPROCESS, this );
 
     private final int id = nextId ++ ;
 
@@ -250,12 +249,12 @@ public class DatagramConnector extends DatagramProcessor implements
                 newBuf.put( readBuf );
                 newBuf.flip();
 
-                filterManager.fireDataRead( session, newBuf );
+                filters.dataRead( null, session, newBuf );
             }
         }
         catch( IOException e )
         {
-            filterManager.fireExceptionCaught( session, e );
+            filters.exceptionCaught( null, session, e );
         }
         finally
         {
@@ -286,7 +285,7 @@ public class DatagramConnector extends DatagramProcessor implements
             }
             catch( IOException e )
             {
-                session.getFilterManager().fireExceptionCaught( session, e );
+                session.getFilters().exceptionCaught( null, session, e );
             }
         }
     }
@@ -326,11 +325,11 @@ public class DatagramConnector extends DatagramProcessor implements
                 }
                 catch( IllegalStateException e )
                 {
-                    session.getFilterManager().fireExceptionCaught( session,
+                    session.getFilters().exceptionCaught( null, session,
                             e );
                 }
 
-                session.getFilterManager().fireDataWritten( session, marker );
+                session.getFilters().dataWritten( null, session, marker );
                 continue;
             }
 
@@ -353,7 +352,7 @@ public class DatagramConnector extends DatagramProcessor implements
                     writeBufferQueue.pop();
                     writeMarkerQueue.pop();
                 }
-                session.getFilterManager().fireDataWritten( session, marker );
+                session.getFilters().dataWritten( null, session, marker );
             }
         }
     }
@@ -375,7 +374,7 @@ public class DatagramConnector extends DatagramProcessor implements
                 break;
 
             DatagramSession session = new DatagramSession( this,
-                    filterManager, req.channel, req.handler );
+                    filters, req.channel, req.handler );
 
             SelectionKey key = req.channel.register( selector,
                     SelectionKey.OP_READ, session );
@@ -421,24 +420,14 @@ public class DatagramConnector extends DatagramProcessor implements
         }
     }
 
-    public void addFilter( int priority, IoHandlerFilter filter )
+    public IoHandlerFilterChain newFilterChain( FilterChainType type )
     {
-        filterManager.addFilter( priority, false, filter );
+        return new DatagramFilterChain( type, this );
     }
-
-    public void removeFilter( IoHandlerFilter filter )
+    
+    public IoHandlerFilterChain getFilterChain()
     {
-        filterManager.removeFilter( filter );
-    }
-
-    public void removeAllFilters()
-    {
-        filterManager.removeAllFilters();
-    }
-
-    public List getAllFilters()
-    {
-        return filterManager.getAllFilters();
+        return filters;
     }
 
     private static class RegistrationRequest

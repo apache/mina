@@ -81,10 +81,10 @@ class VmPipeIdleStatusChecker
                                 session.bothIdle = idleTime > 0L
                                                    && ( currentTime - session.lastReadTime ) > idleTime;
                                 if( session.bothIdle )
-                                    session.localFilterManager
-                                            .fireSessionIdle(
-                                                              session,
-                                                              IdleStatus.BOTH_IDLE );
+                                    session.localFilters
+                                            .sessionIdle( null,
+                                                          session,
+                                                          IdleStatus.BOTH_IDLE );
                             }
 
                             if( !session.readerIdle )
@@ -94,10 +94,10 @@ class VmPipeIdleStatusChecker
                                 session.readerIdle = idleTime > 0L
                                                      && ( currentTime - session.lastReadTime ) > idleTime;
                                 if( session.readerIdle )
-                                    session.localFilterManager
-                                            .fireSessionIdle(
-                                                              session,
-                                                              IdleStatus.READER_IDLE );
+                                    session.localFilters
+                                            .sessionIdle( null,
+                                                          session,
+                                                          IdleStatus.READER_IDLE );
                             }
 
                             if( !session.writerIdle )
@@ -107,10 +107,10 @@ class VmPipeIdleStatusChecker
                                 session.writerIdle = idleTime > 0L
                                                      && ( currentTime - session.lastReadTime ) > idleTime;
                                 if( session.writerIdle )
-                                    session.localFilterManager
-                                            .fireSessionIdle(
-                                                              session,
-                                                              IdleStatus.WRITER_IDLE );
+                                    session.localFilters
+                                            .sessionIdle( null,
+                                                          session,
+                                                          IdleStatus.WRITER_IDLE );
                             }
                         }
                     }

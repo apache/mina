@@ -27,15 +27,14 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.DefaultExceptionMonitor;
 import org.apache.mina.io.ExceptionMonitor;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilter;
-import org.apache.mina.util.IoHandlerFilterManager;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
@@ -48,7 +47,7 @@ public class SocketAcceptor implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
-    private final IoHandlerFilterManager filterManager = new IoHandlerFilterManager();
+    private final SocketFilterChain filters = new SocketFilterChain( FilterChainType.PREPROCESS );
 
     private final int id = nextId ++ ;
 
@@ -225,7 +224,7 @@ public class SocketAcceptor implements IoAcceptor
                             continue;
 
                         SocketSession session = new SocketSession(
-                                filterManager, ch, ( IoHandler ) key
+                                filters, ch, ( IoHandler ) key
                                         .attachment() );
                         SocketIoProcessor.getInstance().addSession( session );
                     }
@@ -352,27 +351,17 @@ public class SocketAcceptor implements IoAcceptor
             }
         }
     }
-
-    public void addFilter( int priority, IoHandlerFilter filter )
+    
+    public IoHandlerFilterChain newFilterChain( FilterChainType type )
     {
-        filterManager.addFilter( priority, false, filter );
+        return new SocketFilterChain( type );
     }
-
-    public void removeFilter( IoHandlerFilter filter )
+    
+    public IoHandlerFilterChain getFilterChain()
     {
-        filterManager.removeFilter( filter );
+        return filters;
     }
-
-    public void removeAllFilters()
-    {
-        filterManager.removeAllFilters();
-    }
-
-    public List getAllFilters()
-    {
-        return filterManager.getAllFilters();
-    }
-
+    
     private static class RegistrationRequest
     {
         private final SocketAddress address;

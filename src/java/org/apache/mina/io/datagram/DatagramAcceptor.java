@@ -26,17 +26,16 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.DefaultExceptionMonitor;
 import org.apache.mina.io.ExceptionMonitor;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilter;
-import org.apache.mina.util.IoHandlerFilterManager;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
@@ -49,7 +48,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
-    private final IoHandlerFilterManager filterManager = new IoHandlerFilterManager();
+    private final DatagramFilterChain filters = new DatagramFilterChain( FilterChainType.PREPROCESS, this );
 
     private final int id = nextId ++ ;
 
@@ -246,7 +245,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             DatagramChannel ch = ( DatagramChannel ) key.channel();
 
             DatagramSession session = new DatagramSession(
-                    DatagramAcceptor.this, filterManager, ch,
+                    DatagramAcceptor.this, filters, ch,
                     ( IoHandler ) key.attachment() );
             session.setSelectionKey( key );
 
@@ -280,12 +279,12 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 newBuf.flip();
 
                 session.increaseReadBytes( newBuf.remaining() );
-                filterManager.fireDataRead( session, newBuf );
+                filters.dataRead( null, session, newBuf );
             }
         }
         catch( IOException e )
         {
-            filterManager.fireExceptionCaught( session, e );
+            filters.exceptionCaught( null, session, e );
         }
         finally
         {
@@ -316,7 +315,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             }
             catch( IOException e )
             {
-                session.getFilterManager().fireExceptionCaught( session, e );
+                session.getFilters().exceptionCaught( null, session, e );
             }
         }
     }
@@ -356,11 +355,11 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 }
                 catch( IllegalStateException e )
                 {
-                    session.getFilterManager().fireExceptionCaught( session,
+                    session.getFilters().exceptionCaught( null, session,
                             e );
                 }
 
-                session.getFilterManager().fireDataWritten( session, marker );
+                session.getFilters().dataWritten( null, session, marker );
                 continue;
             }
 
@@ -386,7 +385,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
-                session.getFilterManager().fireDataWritten( session, marker );
+                session.getFilters().dataWritten( null, session, marker );
             }
         }
     }
@@ -496,25 +495,15 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             }
         }
     }
-
-    public void addFilter( int priority, IoHandlerFilter filter )
+    
+    public IoHandlerFilterChain newFilterChain( FilterChainType type )
     {
-        filterManager.addFilter( priority, false, filter );
+        return new DatagramFilterChain( type, this );
     }
-
-    public void removeFilter( IoHandlerFilter filter )
+    
+    public IoHandlerFilterChain getFilterChain()
     {
-        filterManager.removeFilter( filter );
-    }
-
-    public void removeAllFilters()
-    {
-        filterManager.removeAllFilters();
-    }
-
-    public List getAllFilters()
-    {
-        return filterManager.getAllFilters();
+        return filters;
     }
 
     private static class RegistrationRequest

@@ -28,9 +28,7 @@ import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
-import org.apache.mina.util.IoHandlerFilterManager;
 import org.apache.mina.util.Queue;
-import org.apache.mina.util.IoHandlerFilterManager.WriteCommand;
 
 /**
  * TODO Insert type comment.
@@ -42,7 +40,7 @@ class DatagramSession implements IoSession
 {
     private final DatagramProcessor parent;
 
-    private final IoHandlerFilterManager filterManager;
+    private final DatagramFilterChain filters;
 
     private final DatagramChannel ch;
 
@@ -55,8 +53,6 @@ class DatagramSession implements IoSession
     private final IoHandler handler;
 
     private final SocketAddress localAddress;
-
-    private final WriteCommand writeCommand = new WriteCommandImpl();
 
     private SocketAddress remoteAddress;
 
@@ -82,11 +78,11 @@ class DatagramSession implements IoSession
      * Creates a new instance.
      */
     DatagramSession( DatagramProcessor parent,
-                    IoHandlerFilterManager filterManager, DatagramChannel ch,
+                    DatagramFilterChain filters, DatagramChannel ch,
                     IoHandler defaultHandler )
     {
         this.parent = parent;
-        this.filterManager = filterManager;
+        this.filters = filters;
         this.ch = ch;
         this.config = new DatagramSessionConfig( ch );
         this.writeBufferQueue = new Queue();
@@ -96,9 +92,9 @@ class DatagramSession implements IoSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
 
-    IoHandlerFilterManager getFilterManager()
+    DatagramFilterChain getFilters()
     {
-        return filterManager;
+        return filters;
     }
 
     DatagramChannel getChannel()
@@ -147,7 +143,7 @@ class DatagramSession implements IoSession
 
     public void write( ByteBuffer buf, Object marker )
     {
-        filterManager.write( this, writeCommand, buf, marker );
+        filters.filterWrite( null, this, buf, marker );
     }
 
     public TransportType getTransportType()
@@ -242,19 +238,5 @@ class DatagramSession implements IoSession
         else
             throw new IllegalArgumentException( "Unknown idle status: "
                                                 + status );
-    }
-
-    private class WriteCommandImpl implements WriteCommand
-    {
-        public void execute( ByteBuffer buf, Object marker )
-        {
-            synchronized( writeBufferQueue )
-            {
-                writeBufferQueue.push( buf );
-                writeMarkerQueue.push( marker );
-            }
-
-            parent.flushSession( DatagramSession.this );
-        }
     }
 }

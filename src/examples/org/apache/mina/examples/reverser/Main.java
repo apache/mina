@@ -53,8 +53,10 @@ public class Main
                 new SocketAcceptor() );
 
         // Add both thread pool filters.
-        acceptor.getIoAcceptor().addFilter( Integer.MAX_VALUE, ioThreadPoolFilter );
-        acceptor.addFilter( Integer.MAX_VALUE, protocolThreadPoolFilter );
+        acceptor.getIoAcceptor().getFilterChain().addFirst(
+                "threadPool", ioThreadPoolFilter );
+        acceptor.getFilterChain().addFirst(
+                "threadPool", protocolThreadPoolFilter );
 
         // Bind
         acceptor.bind( new InetSocketAddress( PORT ),

@@ -37,10 +37,11 @@ public class Main
         // Set up server
         VmPipeAcceptor acceptor = new VmPipeAcceptor();
         acceptor.bind( address, new TennisPlayer() );
-        acceptor.addFilter( 0, threadPool );
+        acceptor.getFilterChain().addFirst( "threadPool", threadPool );
 
         // Connect to the server.
         VmPipeConnector connector = new VmPipeConnector();
+        connector.getFilterChain().addFirst( "threadPool", threadPool );
         ProtocolSession session = connector.connect( address,
                                                      new TennisPlayer() );
 

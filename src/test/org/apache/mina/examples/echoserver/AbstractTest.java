@@ -115,8 +115,8 @@ public class AbstractTest extends TestCase
         threadPoolFilter = new IoThreadPoolFilter();
         threadPoolFilter.start();
 
-        acceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
-        datagramAcceptor.addFilter( Integer.MAX_VALUE, threadPoolFilter );
+        acceptor.getFilterChain().addFirst( "threadPool", threadPoolFilter );
+        datagramAcceptor.getFilterChain().addFirst( "threadPool", threadPoolFilter );
     }
 
     protected void tearDown() throws Exception

@@ -5,14 +5,13 @@ package org.apache.mina.protocol.vmpipe;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.List;
 
+import org.apache.mina.common.FilterChainType;
 import org.apache.mina.protocol.ProtocolConnector;
-import org.apache.mina.protocol.ProtocolHandlerFilter;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
-import org.apache.mina.util.ProtocolHandlerFilterManager;
 
 /**
  * Connects to {@link ProtocolProvider}s which is bound on the specified
@@ -23,34 +22,24 @@ import org.apache.mina.util.ProtocolHandlerFilterManager;
  */
 public class VmPipeConnector implements ProtocolConnector
 {
-    private final ProtocolHandlerFilterManager filterManager = new ProtocolHandlerFilterManager();
+    private final VmPipeFilterChain filters = new VmPipeFilterChain( FilterChainType.PREPROCESS );
 
     /**
      * Creates a new instance.
      */
     public VmPipeConnector()
     {
-        filterManager.addFilter( Integer.MIN_VALUE - 1, true, new VmPipeFilter() );
+        filters.addLast( "VMPipe", new VmPipeFilter() );
     }
-
-    public void addFilter( int priority, ProtocolHandlerFilter filter )
+    
+    public ProtocolHandlerFilterChain newFilterChain( FilterChainType type )
     {
-        filterManager.addFilter( priority, false, filter );
+        return new VmPipeFilterChain( type );
     }
-
-    public void removeFilter( ProtocolHandlerFilter filter )
+    
+    public ProtocolHandlerFilterChain getFilterChain()
     {
-        filterManager.removeFilter( filter );
-    }
-
-    public void removeAllFilters()
-    {
-    	filterManager.removeAllFilters();
-    }
-
-    public List getAllFilters()
-    {
-    	return filterManager.getAllFilters();
+        return filters;
     }
 
     public ProtocolSession connect( SocketAddress address,
@@ -73,10 +62,10 @@ public class VmPipeConnector implements ProtocolConnector
                                                    new Object(), // lock
                                                    AnonymousVmPipeAddress.INSTANCE,
                                                    entry.address,
-                                                   filterManager,
+                                                   filters,
                                                    protocolProvider
                                                            .getHandler(),
-                                                   entry.filterManager,
+                                                   entry.filters,
                                                    entry.handler );
         VmPipeIdleStatusChecker.INSTANCE.addSession( session );
         return session;

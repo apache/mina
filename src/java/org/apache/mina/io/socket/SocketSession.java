@@ -27,10 +27,9 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
-import org.apache.mina.util.IoHandlerFilterManager;
 import org.apache.mina.util.Queue;
-import org.apache.mina.util.IoHandlerFilterManager.WriteCommand;
 
 /**
  * TODO Insert type comment.
@@ -42,7 +41,7 @@ class SocketSession implements IoSession
 {
     private static final int READ_BUFFER_SIZE = 8192;
 
-    private final IoHandlerFilterManager filterManager;
+    private final IoHandlerFilterChain filters;
 
     private final SocketChannel ch;
 
@@ -59,8 +58,6 @@ class SocketSession implements IoSession
     private final SocketAddress remoteAddress;
 
     private final SocketAddress localAddress;
-
-    private final WriteCommand writeCommand = new WriteCommandImpl();
 
     private SelectionKey key;
 
@@ -85,10 +82,10 @@ class SocketSession implements IoSession
     /**
      * Creates a new instance.
      */
-    SocketSession( IoHandlerFilterManager filterManager, SocketChannel ch,
+    SocketSession( IoHandlerFilterChain filters, SocketChannel ch,
                   IoHandler defaultHandler )
     {
-        this.filterManager = filterManager;
+        this.filters = filters;
         this.ch = ch;
         this.config = new SocketSessionConfig( ch );
         this.readBuf = ByteBuffer.allocate( READ_BUFFER_SIZE ).limit( 0 );
@@ -99,9 +96,9 @@ class SocketSession implements IoSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
 
-    IoHandlerFilterManager getFilterManager()
+    IoHandlerFilterChain getFilters()
     {
-        return filterManager;
+        return filters;
     }
 
     SocketChannel getChannel()
@@ -166,7 +163,7 @@ class SocketSession implements IoSession
 
     public void write( ByteBuffer buf, Object marker )
     {
-        filterManager.write( this, writeCommand, buf, marker );
+        filters.filterWrite( null, this, buf, marker );
     }
 
     public TransportType getTransportType()
@@ -256,19 +253,5 @@ class SocketSession implements IoSession
         else
             throw new IllegalArgumentException( "Unknown idle status: "
                                                 + status );
-    }
-
-    private class WriteCommandImpl implements WriteCommand
-    {
-        public void execute( ByteBuffer buf, Object marker )
-        {
-            synchronized( writeBufferQueue )
-            {
-                writeBufferQueue.push( buf );
-                writeMarkerQueue.push( marker );
-            }
-
-            SocketIoProcessor.getInstance().flushSession( SocketSession.this );
-        }
     }
 }

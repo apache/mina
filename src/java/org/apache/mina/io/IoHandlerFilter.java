@@ -51,37 +51,42 @@ public interface IoHandlerFilter
     /**
      * Filters {@link IoHandler#sessionOpened(IoSession)} event.
      */
-    void sessionOpened( IoHandler nextHandler, IoSession session );
+    void sessionOpened( NextFilter nextFilter, IoSession session );
 
     /**
      * Filters {@link IoHandler#sessionClosed(IoSession)} event.
      */
-    void sessionClosed( IoHandler nextHandler, IoSession session );
+    void sessionClosed( NextFilter nextFilter, IoSession session );
 
     /**
      * Filters {@link IoHandler#sessionIdle(IoSession, IdleStatus)} event.
      */
-    void sessionIdle( IoHandler nextHandler, IoSession session,
-                     IdleStatus status );
+    void sessionIdle( NextFilter nextFilter, IoSession session,
+                      IdleStatus status );
 
     /**
      * Filters {@link IoHandler#exceptionCaught(IoSession, Throwable)} event.
      */
-    void exceptionCaught( IoHandler nextHandler, IoSession session,
-                         Throwable cause );
+    void exceptionCaught( NextFilter nextFilter, IoSession session,
+                          Throwable cause );
 
     /**
      * Filters {@link IoHandler#dataRead(IoSession, ByteBuffer)} event.
      */
-    void dataRead( IoHandler nextHandler, IoSession session, ByteBuffer buf );
+    void dataRead( NextFilter nextFilter, IoSession session, ByteBuffer buf );
 
     /**
      * Filters {@link IoHandler#dataWritten(IoSession, Object)} event.
      */
-    void dataWritten( IoHandler nextHandler, IoSession session, Object marker );
+    void dataWritten( NextFilter nextFilter, IoSession session, Object marker );
 
     /**
      * Filters {@link IoSession#write(ByteBuffer, Object)} method invocation.
      */
-    ByteBuffer filterWrite( IoSession session, ByteBuffer buf );
+    void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker );
+    
+    public interface NextFilter extends IoHandler
+    {
+        void filterWrite( IoSession session, ByteBuffer buf, Object marker );
+    }
 }

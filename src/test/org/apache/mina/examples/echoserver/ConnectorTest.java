@@ -28,7 +28,7 @@ public class ConnectorTest extends AbstractTest
     public void testTCP() throws Exception
     {
         IoConnector connector = new SocketConnector();
-        connector.addFilter( Integer.MAX_VALUE, super.threadPoolFilter );
+        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
         testTCP0( connector );
     }
 
@@ -39,16 +39,16 @@ public class ConnectorTest extends AbstractTest
     {
         // Add an SSL filter to acceptor
         SSLFilter acceptorSSLFilter = new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
-        acceptor.addFilter( Integer.MAX_VALUE - 1, acceptorSSLFilter );
+        acceptor.getFilterChain().addLast( "SSL", acceptorSSLFilter );
 
         // Create a connector
         IoConnector connector = new SocketConnector();
-        connector.addFilter( Integer.MAX_VALUE, super.threadPoolFilter );
+        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
         
         // Add an SSL filter to connector
         SSLFilter connectorSSLFilter = new SSLFilter( BogusSSLContextFactory.getInstance( false ) );
         connectorSSLFilter.setDebug( SSLFilter.Debug.ON );
-        connector.addFilter( Integer.MAX_VALUE - 1, connectorSSLFilter );
+        connector.getFilterChain().addLast( "SSL", connectorSSLFilter );
 
         testTCP0( connector );
     }
@@ -109,7 +109,7 @@ public class ConnectorTest extends AbstractTest
     public void testUDP() throws Exception
     {
         IoConnector connector = new DatagramConnector();
-        connector.addFilter( Integer.MAX_VALUE, super.threadPoolFilter );
+        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
         testTCP0( connector );
     }
     
