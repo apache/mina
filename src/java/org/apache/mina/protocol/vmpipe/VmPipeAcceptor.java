@@ -33,7 +33,7 @@ public class VmPipeAcceptor implements ProtocolAcceptor
      */
     public VmPipeAcceptor()
     {
-        filterManager.addFilter( Integer.MIN_VALUE, true, new VmPipeFilter() );
+        filterManager.addFilter( Integer.MIN_VALUE + 1, true, new VmPipeFilter() );
     }
 
     public void bind( SocketAddress address, ProtocolProvider protocolProvider )
