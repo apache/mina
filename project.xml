@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
 
-  <groupId>incubator-directory</groupId>
+  <groupId>directory</groupId>
   <id>mina</id>
   <name>MINA</name>
   <package>org.apache.mina</package>
@@ -9,9 +9,8 @@
   <inceptionYear>2004</inceptionYear>
 
   <organization>
-    <name>The Apache Directory project</name>
-    <url>http://directory.apache.org</url>
-    <logo>/images/apache-incubator-logo.png</logo>
+    <name>The Apache Software Foundation</name>
+    <url>http://www.apache.org</url>
   </organization>
 
   <logo>/images/apache-directory-logo.png</logo>
@@ -30,17 +29,17 @@
 
   <repository>
     <connection>
-      scm:svn:http://svn.apache.org/repos/asf/incubator:directory/network/mina/trunk
+      scm:svn:http://svn.apache.org/repos/asf:directory/network/mina/trunk
     </connection>
     <url>
-      http://svn.apache.org/viewcvs.cgi/incubator/directory/network/mina/trunk/?root=Apache-SVN
+      http://svn.apache.org/viewcvs.cgi/directory/network/mina/trunk/?root=Apache-SVN
     </url>
     <developerConnection>
-      scm:svn:https://svn.apache.org/repos/asf/incubator:directory/network/mina/trunk
+      scm:svn:https://svn.apache.org/repos/asf:directory/network/mina/trunk
     </developerConnection>
   </repository>
 
-  <gumpRepositoryId>apache-incubator-svn</gumpRepositoryId>
+  <gumpRepositoryId>apache-directory-svn</gumpRepositoryId>
 
   <shortDescription>
     A Multipurpose Infrastrusture for Network Applications
