@@ -18,6 +18,7 @@
  */
 package org.apache.mina.io.socket;
 
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -37,10 +38,11 @@ import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.util.Queue;
 
+
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
 public class SocketAcceptor implements IoAcceptor
@@ -63,6 +65,7 @@ public class SocketAcceptor implements IoAcceptor
 
     private Worker worker;
 
+
     /**
      * Creates a new instance.
      * 
@@ -73,11 +76,12 @@ public class SocketAcceptor implements IoAcceptor
         selector = Selector.open();
     }
 
-    public void bind( SocketAddress address, IoHandler handler )
-            throws IOException
+
+    public void bind( SocketAddress address, IoHandler handler ) throws IOException
     {
         this.bind( address, 50, handler );
     }
+
 
     /**
      * Binds to the specified <code>address</code> and handles incoming
@@ -152,6 +156,7 @@ public class SocketAcceptor implements IoAcceptor
         }
     }
 
+
     public void unbind( SocketAddress address )
     {
         if( address == null )
@@ -189,6 +194,7 @@ public class SocketAcceptor implements IoAcceptor
             throw request.exception;
         }
     }
+
 
     private class Worker extends Thread
     {
@@ -269,6 +275,7 @@ public class SocketAcceptor implements IoAcceptor
             }
         }
     }
+
 
     private void registerNew()
     {
@@ -443,6 +450,7 @@ public class SocketAcceptor implements IoAcceptor
         }
     }
 
+    
     public ExceptionMonitor getExceptionMonitor()
     {
         return exceptionMonitor;
