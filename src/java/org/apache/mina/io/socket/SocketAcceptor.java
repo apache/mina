@@ -29,6 +29,7 @@ import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.mina.common.FilterChainType;
 import org.apache.mina.io.DefaultExceptionMonitor;
@@ -120,16 +121,7 @@ public class SocketAcceptor implements IoAcceptor
             registerQueue.push( request );
         }
 
-        synchronized( this )
-        {
-            if( worker == null )
-            {
-                worker = new Worker();
-
-                worker.start();
-            }
-        }
-
+        startupWorker();
         selector.wakeup();
         
         synchronized( request )
@@ -155,6 +147,17 @@ public class SocketAcceptor implements IoAcceptor
     }
 
 
+    private synchronized void startupWorker()
+    {
+        if( worker == null )
+        {
+            worker = new Worker();
+
+            worker.start();
+        }
+    }
+
+
     public void unbind( SocketAddress address )
     {
         if( address == null )
@@ -169,6 +172,7 @@ public class SocketAcceptor implements IoAcceptor
             cancelQueue.push( request );
         }
 
+        startupWorker();
         selector.wakeup();
 
         synchronized( request )
@@ -210,6 +214,12 @@ public class SocketAcceptor implements IoAcceptor
                     int nKeys = selector.select();
 
                     registerNew();
+                    cancelKeys();
+
+                    if( nKeys > 0 )
+                    {
+                        processSessions( selector.selectedKeys() );
+                    }
 
                     if( selector.keys().isEmpty() )
                     {
@@ -222,40 +232,6 @@ public class SocketAcceptor implements IoAcceptor
                                 break;
                             }
                         }
-                    }
-
-                    cancelKeys();
-
-                    if( nKeys == 0 )
-                    {
-                        continue;
-                    }
-
-                    Iterator it = selector.selectedKeys().iterator();
-
-                    while( it.hasNext() )
-                    {
-                        SelectionKey key = ( SelectionKey ) it.next();
-
-                        it.remove();
-
-                        if( !key.isAcceptable() )
-                        {
-                            continue;
-                        }
-
-                        ServerSocketChannel ssc = ( ServerSocketChannel ) key.channel();
-
-                        SocketChannel ch = ssc.accept();
-
-                        if( ch == null )
-                        {
-                            continue;
-                        }
-
-                        SocketSession session = new SocketSession( filters, ch, ( IoHandler ) key.attachment() );
-
-                        SocketIoProcessor.getInstance().addSession( session );
                     }
                 }
                 catch( IOException e )
@@ -270,6 +246,35 @@ public class SocketAcceptor implements IoAcceptor
                     {
                     }
                 }
+            }
+        }
+
+        private void processSessions( Set keys ) throws IOException
+        {
+            Iterator it = keys.iterator();
+            while( it.hasNext() )
+            {
+                SelectionKey key = ( SelectionKey ) it.next();
+   
+                it.remove();
+   
+                if( !key.isAcceptable() )
+                {
+                    continue;
+                }
+   
+                ServerSocketChannel ssc = ( ServerSocketChannel ) key.channel();
+   
+                SocketChannel ch = ssc.accept();
+   
+                if( ch == null )
+                {
+                    continue;
+                }
+   
+                SocketSession session = new SocketSession( filters, ch, ( IoHandler ) key.attachment() );
+   
+                SocketIoProcessor.getInstance().addSession( session );
             }
         }
     }
@@ -354,7 +359,7 @@ public class SocketAcceptor implements IoAcceptor
             {
                 request = ( CancellationRequest ) cancelQueue.pop();
             }
-            
+
             if( request == null )
             {
                 break;

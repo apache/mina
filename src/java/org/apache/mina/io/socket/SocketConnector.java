@@ -76,7 +76,7 @@ public class SocketConnector implements IoConnector
     }
 
     public IoSession connect( SocketAddress address, int timeout,
-                             IoHandler handler ) throws IOException
+                              IoHandler handler ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -106,15 +106,7 @@ public class SocketConnector implements IoConnector
                 connectQueue.push( request );
             }
 
-            synchronized( this )
-            {
-                if( worker == null )
-                {
-                    worker = new Worker();
-                    worker.start();
-                }
-            }
-            
+            startupWorker();
             selector.wakeup();
 
             synchronized( request )
@@ -141,6 +133,15 @@ public class SocketConnector implements IoConnector
         }
 
         return session;
+    }
+    
+    private synchronized void startupWorker()
+    {
+        if( worker == null )
+        {
+            worker = new Worker();
+            worker.start();
+        }
     }
 
     private void registerNew()
@@ -268,6 +269,13 @@ public class SocketConnector implements IoConnector
 
                     registerNew();
                     
+                    if( nKeys > 0 )
+                    {
+                        processSessions( selector.selectedKeys() );
+                    }
+
+                    processTimedOutSessions( selector.keys() );
+
                     if( selector.keys().isEmpty() )
                     {
                         synchronized( SocketConnector.this )
@@ -279,11 +287,6 @@ public class SocketConnector implements IoConnector
                             }
                         }
                     }
-
-                    if( nKeys > 0 )
-                        processSessions( selector.selectedKeys() );
-
-                    processTimedOutSessions( selector.keys() );
                 }
                 catch( IOException e )
                 {

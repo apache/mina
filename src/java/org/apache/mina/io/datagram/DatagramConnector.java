@@ -99,11 +99,7 @@ public class DatagramConnector extends DatagramProcessor implements
                 registerQueue.push( request );
             }
 
-            if( worker == null )
-            {
-                worker = new Worker();
-                worker.start();
-            }
+            startupWorker();
         }
 
         selector.wakeup();
@@ -123,6 +119,15 @@ public class DatagramConnector extends DatagramProcessor implements
         }
 
         return request.session;
+    }
+    
+    private synchronized void startupWorker()
+    {
+        if( worker == null )
+        {
+            worker = new Worker();
+            worker.start();
+        }
     }
 
     public IoSession connect( SocketAddress address, int timeout,
@@ -176,6 +181,14 @@ public class DatagramConnector extends DatagramProcessor implements
 
                     registerNew();
 
+                    if( nKeys > 0 )
+                    {
+                        processReadySessions( selector.selectedKeys() );
+                    }
+
+                    flushSessions();
+                    cancelKeys();
+
                     if( selector.keys().isEmpty() )
                     {
                         synchronized( DatagramConnector.this )
@@ -187,14 +200,6 @@ public class DatagramConnector extends DatagramProcessor implements
                             }
                         }
                     }
-
-                    if( nKeys > 0 )
-                    {
-                        processReadySessions( selector.selectedKeys() );
-                    }
-
-                    flushSessions();
-                    cancelKeys();
                 }
                 catch( IOException e )
                 {

@@ -96,15 +96,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             registerQueue.push( request );
         }
 
-        synchronized( this )
-        {
-            if( worker == null )
-            {
-                worker = new Worker();
-                worker.start();
-            }
-        }
-
+        startupWorker();
         selector.wakeup();
         
         synchronized( request )
@@ -139,6 +131,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             cancelQueue.push( request );
         }
 
+        startupWorker();
         selector.wakeup();
         
         synchronized( request )
@@ -159,6 +152,15 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         {
             request.exception.fillInStackTrace();
             throw request.exception;
+        }
+    }
+    
+    private synchronized void startupWorker()
+    {
+        if( worker == null )
+        {
+            worker = new Worker();
+            worker.start();
         }
     }
 
@@ -197,6 +199,14 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
                     registerNew();
 
+                    if( nKeys > 0 )
+                    {
+                        processReadySessions( selector.selectedKeys() );
+                    }
+
+                    flushSessions();
+                    cancelKeys();
+
                     if( selector.keys().isEmpty() )
                     {
                         synchronized( DatagramAcceptor.this )
@@ -208,14 +218,6 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                             }
                         }
                     }
-
-                    if( nKeys > 0 )
-                    {
-                        processReadySessions( selector.selectedKeys() );
-                    }
-
-                    flushSessions();
-                    cancelKeys();
                 }
                 catch( IOException e )
                 {
