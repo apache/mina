@@ -135,6 +135,15 @@
 		</unitTest>
 
 		<jars/>
+
+		<resources>
+			<resource>
+				<directory>${basedir}/src/examples</directory>
+				<includes>
+					<include>**/*.cert</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
 	<reports>
