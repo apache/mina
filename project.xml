@@ -29,17 +29,17 @@
 
   <repository>
     <connection>
-      scm:svn:http://svn.apache.org/repos/asf:directory/network/trunk
+      scm:svn:http://svn.apache.org/repos/asf/directory:network/trunk
     </connection>
     <url>
       http://svn.apache.org/viewcvs.cgi/directory/network/trunk/?root=Apache-SVN
     </url>
     <developerConnection>
-      scm:svn:https://svn.apache.org/repos/asf:directory/network/trunk
+      scm:svn:https://svn.apache.org/repos/asf/directory:network/trunk
     </developerConnection>
   </repository>
 
-  <gumpRepositoryId>apache-directory-svn</gumpRepositoryId>
+  <gumpRepositoryId>directory</gumpRepositoryId>
 
   <shortDescription>
     A Multipurpose Infrastrusture for Network Applications
