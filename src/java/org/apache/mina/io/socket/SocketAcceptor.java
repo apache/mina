@@ -90,17 +90,27 @@ public class SocketAcceptor implements IoAcceptor
             throws IOException
     {
         if( address == null )
+        {
             throw new NullPointerException( "address" );
+        }
+
         if( handler == null )
+        {
             throw new NullPointerException( "handler" );
+        }
 
         if( !( address instanceof InetSocketAddress ) )
-            throw new IllegalArgumentException( "Unexpected address type: "
-                                                + address.getClass() );
+        {
+            throw new IllegalArgumentException( "Unexpected address type: " + address.getClass() );
+        }
+
         if( ( ( InetSocketAddress ) address ).getPort() == 0 )
+        {
             throw new IllegalArgumentException( "Unsupported port number: 0" );
+        }
 
         RegistrationRequest request = new RegistrationRequest( address, backlog, handler );
+
         synchronized( registerQueue )
         {
             registerQueue.push( request );
@@ -111,6 +121,7 @@ public class SocketAcceptor implements IoAcceptor
             if( worker == null )
             {
                 worker = new Worker();
+
                 worker.start();
             }
         }
@@ -123,7 +134,9 @@ public class SocketAcceptor implements IoAcceptor
             {
                 try
                 {
-                    request.wait();
+                    request.wait( 1000 );
+
+                    System.out.println( "request.done = " + request.done );
                 }
                 catch( InterruptedException e )
                 {
@@ -134,6 +147,7 @@ public class SocketAcceptor implements IoAcceptor
         if( request.exception != null )
         {
             request.exception.fillInStackTrace();
+
             throw request.exception;
         }
     }
@@ -144,6 +158,7 @@ public class SocketAcceptor implements IoAcceptor
             throw new NullPointerException( "address" );
         
         CancellationRequest request = new CancellationRequest( address );
+
         synchronized( cancelQueue )
         {
             cancelQueue.push( request );
@@ -168,6 +183,7 @@ public class SocketAcceptor implements IoAcceptor
         if( request.exception != null )
         {
             request.exception.fillInStackTrace();
+
             throw request.exception;
         }
     }
@@ -196,6 +212,7 @@ public class SocketAcceptor implements IoAcceptor
                             if( selector.keys().isEmpty() )
                             {
                                 worker = null;
+
                                 break;
                             }
                         }
@@ -204,28 +221,34 @@ public class SocketAcceptor implements IoAcceptor
                     cancelKeys();
 
                     if( nKeys == 0 )
+                    {
                         continue;
+                    }
 
                     Iterator it = selector.selectedKeys().iterator();
 
                     while( it.hasNext() )
                     {
                         SelectionKey key = ( SelectionKey ) it.next();
+
                         it.remove();
 
                         if( !key.isAcceptable() )
+                        {
                             continue;
+                        }
 
-                        ServerSocketChannel ssc = ( ServerSocketChannel ) key
-                                .channel();
+                        ServerSocketChannel ssc = ( ServerSocketChannel ) key.channel();
+
                         SocketChannel ch = ssc.accept();
 
                         if( ch == null )
+                        {
                             continue;
+                        }
 
-                        SocketSession session = new SocketSession(
-                                filters, ch, ( IoHandler ) key
-                                        .attachment() );
+                        SocketSession session = new SocketSession( filters, ch, ( IoHandler ) key.attachment() );
+
                         SocketIoProcessor.getInstance().addSession( session );
                     }
                 }
@@ -248,27 +271,38 @@ public class SocketAcceptor implements IoAcceptor
     private void registerNew()
     {
         if( registerQueue.isEmpty() )
+        {
             return;
+        }
 
         for( ;; )
         {
             RegistrationRequest req;
+
             synchronized( registerQueue )
             {
                 req = ( RegistrationRequest ) registerQueue.pop();
+
+                System.out.println( "popped request = " + req );
             }
 
             if( req == null )
+            {
                 break;
+            }
 
             ServerSocketChannel ssc = null;
+
             try
             {
                 ssc = ServerSocketChannel.open();
+
                 ssc.configureBlocking( false );
+
                 ssc.socket().bind( req.address, req.backlog );
-                ssc.register( selector, SelectionKey.OP_ACCEPT,
-                              req.handler );
+
+                ssc.register( selector, SelectionKey.OP_ACCEPT, req.handler );
+
                 channels.put( req.address, ssc );
             }
             catch( IOException e )
@@ -280,6 +314,7 @@ public class SocketAcceptor implements IoAcceptor
                 synchronized( req )
                 {
                     req.done = true;
+
                     req.notify();
                 }
 
@@ -298,14 +333,18 @@ public class SocketAcceptor implements IoAcceptor
         }
     }
 
+
     private void cancelKeys()
     {
         if( cancelQueue.isEmpty() )
+        {
             return;
+        }
 
         for( ;; )
         {
             CancellationRequest request;
+
             synchronized( cancelQueue )
             {
                 request = ( CancellationRequest ) cancelQueue.pop();
@@ -323,14 +362,16 @@ public class SocketAcceptor implements IoAcceptor
             {
                 if( ssc == null )
                 {
-                    request.exception = new IllegalArgumentException(
-                            "Address not bound: " + request.address );
+                    request.exception = new IllegalArgumentException( "Address not bound: " + request.address );
                 }
                 else
                 {
                     SelectionKey key = ssc.keyFor( selector );
+
                     key.cancel();
+
                     selector.wakeup(); // wake up again to trigger thread death
+
                     ssc.close();
                 }
             }
@@ -343,22 +384,26 @@ public class SocketAcceptor implements IoAcceptor
                 synchronized( request )
                 {
                     request.done = true;
+
                     request.notify();
                 }
             }
         }
     }
-    
+
+
     public IoHandlerFilterChain newFilterChain( FilterChainType type )
     {
         return new SocketFilterChain( type );
     }
-    
+
+
     public IoHandlerFilterChain getFilterChain()
     {
         return filters;
     }
-    
+
+
     private static class RegistrationRequest
     {
         private final SocketAddress address;
@@ -371,19 +416,23 @@ public class SocketAcceptor implements IoAcceptor
         
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, int backlog,
-                                     IoHandler handler )
+        private RegistrationRequest( SocketAddress address, int backlog, IoHandler handler )
         {
             this.address = address;
+
             this.backlog = backlog;
+
             this.handler = handler;
         }
     }
 
+
     private static class CancellationRequest
     {
         private final SocketAddress address;
+
         private boolean done;
+
         private RuntimeException exception;
         
         private CancellationRequest( SocketAddress address )
@@ -396,6 +445,7 @@ public class SocketAcceptor implements IoAcceptor
     {
         return exceptionMonitor;
     }
+
 
     public void setExceptionMonitor( ExceptionMonitor monitor )
     {
