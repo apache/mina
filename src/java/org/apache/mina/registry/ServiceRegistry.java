@@ -55,11 +55,7 @@ public interface ServiceRegistry
      */
     void unbind( Service service );
 
-    IoHandlerFilterChain newIoFilterChain( TransportType transportType );
-    
     IoHandlerFilterChain getIoFilterChain( TransportType transportType );
-    
-    ProtocolHandlerFilterChain newProtocolFilterChain( TransportType transportType );
     
     ProtocolHandlerFilterChain getProtocolFilterChain( TransportType transportType );
 

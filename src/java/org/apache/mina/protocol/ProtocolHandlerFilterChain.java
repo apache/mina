@@ -3,12 +3,7 @@ package org.apache.mina.protocol;
 import java.util.List;
 
 
-public interface ProtocolHandlerFilterChain extends ProtocolHandlerFilter {
-    static String NEXT_FILTER = "nextFilter";
-    
-    ProtocolHandlerFilterChain getRoot();
-    ProtocolHandlerFilterChain getParent();
-
+public interface ProtocolHandlerFilterChain {
     ProtocolHandlerFilter getChild( String name );
     List getChildren();
     List getChildrenReversed();

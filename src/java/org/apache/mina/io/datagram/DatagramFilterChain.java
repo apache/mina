@@ -9,9 +9,8 @@ class DatagramFilterChain extends AbstractIoHandlerFilterChain {
 
     private final DatagramProcessor processor;
 
-    DatagramFilterChain( boolean root, DatagramProcessor processor )
+    DatagramFilterChain( DatagramProcessor processor )
     {
-        super( root );
         this.processor = processor;
     }
 

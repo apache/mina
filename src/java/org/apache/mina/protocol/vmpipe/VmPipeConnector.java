@@ -21,7 +21,7 @@ import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
  */
 public class VmPipeConnector implements ProtocolConnector
 {
-    private final VmPipeFilterChain filters = new VmPipeFilterChain( true );
+    private final VmPipeFilterChain filters = new VmPipeFilterChain();
 
     /**
      * Creates a new instance.
@@ -29,11 +29,6 @@ public class VmPipeConnector implements ProtocolConnector
     public VmPipeConnector()
     {
         filters.addLast( "VMPipe", new VmPipeFilter() );
-    }
-    
-    public ProtocolHandlerFilterChain newFilterChain()
-    {
-        return new VmPipeFilterChain( false );
     }
     
     public ProtocolHandlerFilterChain getFilterChain()

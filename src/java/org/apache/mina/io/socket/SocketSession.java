@@ -27,7 +27,6 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.util.Queue;
 
@@ -41,7 +40,7 @@ class SocketSession implements IoSession
 {
     private static final int DEFAULT_READ_BUFFER_SIZE = 1024;
 
-    private final IoHandlerFilterChain filters;
+    private final SocketFilterChain filters;
 
     private final SocketChannel ch;
 
@@ -82,7 +81,7 @@ class SocketSession implements IoSession
     /**
      * Creates a new instance.
      */
-    SocketSession( IoHandlerFilterChain filters, SocketChannel ch,
+    SocketSession( SocketFilterChain filters, SocketChannel ch,
                    IoHandler defaultHandler )
     {
         this.filters = filters;
@@ -96,7 +95,7 @@ class SocketSession implements IoSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
 
-    IoHandlerFilterChain getFilters()
+    SocketFilterChain getFilters()
     {
         return filters;
     }
@@ -169,7 +168,7 @@ class SocketSession implements IoSession
 
     public void write( ByteBuffer buf, Object marker )
     {
-        filters.filterWrite( null, this, buf, marker );
+        filters.filterWrite( this, buf, marker );
     }
 
     public TransportType getTransportType()

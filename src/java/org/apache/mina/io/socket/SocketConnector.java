@@ -48,7 +48,7 @@ public class SocketConnector implements IoConnector
 
     private final int id = nextId++;
 
-    private final SocketFilterChain filters = new SocketFilterChain( true );
+    private final SocketFilterChain filters = new SocketFilterChain();
 
     private final Selector selector;
 
@@ -328,11 +328,6 @@ public class SocketConnector implements IoConnector
         }
     }
 
-    public IoHandlerFilterChain newFilterChain()
-    {
-        return new SocketFilterChain( false );
-    }
-    
     public IoHandlerFilterChain getFilterChain()
     {
         return filters;

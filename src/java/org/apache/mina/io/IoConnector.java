@@ -69,8 +69,6 @@ public interface IoConnector
     IoSession connect( SocketAddress address, int timeout, IoHandler handler )
             throws IOException;
 
-    IoHandlerFilterChain newFilterChain();
-    
     IoHandlerFilterChain getFilterChain();
 
     /**

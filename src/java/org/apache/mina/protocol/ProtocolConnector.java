@@ -67,7 +67,5 @@ public interface ProtocolConnector
                             ProtocolProvider protocolProvider )
             throws IOException;
 
-    ProtocolHandlerFilterChain newFilterChain();
-    
     ProtocolHandlerFilterChain getFilterChain();
 }

@@ -62,8 +62,6 @@ public interface IoAcceptor
      */
     void unbind( SocketAddress address );
 
-    IoHandlerFilterChain newFilterChain();
-    
     IoHandlerFilterChain getFilterChain();
     
     /**

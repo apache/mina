@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.protocol.ProtocolHandlerFilter.NextFilter;
 
 public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHandlerFilterChain
 {
@@ -50,89 +51,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         public void filterWrite( NextFilter nextFilter, ProtocolSession session,
                                  Object message )
         {
-            if( parent == null )
-            {
-                // write only when root filter chain traversal is finished.
-                doWrite( session, message );
-            }
-        }
-    };
-    
-    private final ProtocolHandlerFilter NEXT_FILTER = new ProtocolHandlerFilter()
-    {
-        public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
-        {
-            if( parent != null )
-            {
-                Entry e = ( Entry ) parent.filter2entry.get( AbstractProtocolHandlerFilterChain.this );
-                e.nextFilter.sessionOpened( session );
-            }
-            nextFilter.sessionOpened( session );
-        }
-
-        public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
-        {
-            if( parent != null )
-            {
-                Entry e = ( Entry ) parent.filter2entry.get( AbstractProtocolHandlerFilterChain.this );
-                e.nextFilter.sessionClosed( session );
-            }
-            nextFilter.sessionClosed( session );
-        }
-
-        public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
-                                IdleStatus status )
-        {
-            if( parent != null )
-            {
-                Entry e = ( Entry ) parent.filter2entry.get( AbstractProtocolHandlerFilterChain.this );
-                e.nextFilter.sessionIdle( session, status );
-            }
-            nextFilter.sessionIdle( session, status );
-        }
-
-        public void exceptionCaught( NextFilter nextFilter,
-                                    ProtocolSession session, Throwable cause )
-        {
-            if( parent != null )
-            {
-                Entry e = ( Entry ) parent.filter2entry.get( AbstractProtocolHandlerFilterChain.this );
-                e.nextFilter.exceptionCaught( session, cause );
-            }
-            nextFilter.exceptionCaught( session, cause );
-        }
-
-        public void messageReceived( NextFilter nextFilter, ProtocolSession session,
-                                     Object message )
-        {
-            if( parent != null )
-            {
-                Entry e = ( Entry ) parent.filter2entry.get( AbstractProtocolHandlerFilterChain.this );
-                e.nextFilter.messageReceived( session, message );
-            }
-            nextFilter.messageReceived( session, message );
-        }
-
-        public void messageSent( NextFilter nextFilter, ProtocolSession session,
-                                 Object message )
-        {
-            if( parent != null )
-            {
-                Entry e = ( Entry ) parent.filter2entry.get( AbstractProtocolHandlerFilterChain.this );
-                e.nextFilter.messageSent( session, message );
-            }
-            nextFilter.messageSent( session, message );
-        }
-        
-        public void filterWrite( NextFilter nextFilter, ProtocolSession session,
-                                 Object message )
-        {
-            if( parent != null )
-            {
-                Entry e = ( Entry ) parent.filter2entry.get( AbstractProtocolHandlerFilterChain.this );
-                e.prevFilter.filterWrite( session, message );
-            }
-            nextFilter.filterWrite( session, message );
+            doWrite( session, message );
         }
     };
     
@@ -140,55 +59,37 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
     {
         public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
         {
-            if( parent == null )
-            {
-                session.getHandler().sessionOpened( session );
-            }
+            session.getHandler().sessionOpened( session );
         }
 
         public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
         {
-            if( parent == null )
-            {
-                session.getHandler().sessionClosed( session );
-            }
+            session.getHandler().sessionClosed( session );
         }
 
         public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
                                 IdleStatus status )
         {
-            if( parent == null )
-            {
-                session.getHandler().sessionIdle( session, status );
-            }
+            session.getHandler().sessionIdle( session, status );
         }
 
         public void exceptionCaught( NextFilter nextFilter,
                                     ProtocolSession session, Throwable cause )
         {
-            if( parent == null )
-            {
-                session.getHandler().exceptionCaught( session, cause );
-            }
+            session.getHandler().exceptionCaught( session, cause );
         }
 
         public void messageReceived( NextFilter nextFilter, ProtocolSession session,
                                      Object message )
         {
-            if( parent == null )
-            {
-                ProtocolHandler handler = session.getHandler();
-                handler.messageReceived( session, message );
-            }
+            ProtocolHandler handler = session.getHandler();
+            handler.messageReceived( session, message );
         }
 
         public void messageSent( NextFilter nextFilter, ProtocolSession session,
                                  Object message )
         {
-            if( parent == null )
-            {
-                session.getHandler().messageSent( session, message );
-            }
+            session.getHandler().messageSent( session, message );
         }
 
         public void filterWrite( NextFilter nextFilter,
@@ -198,10 +99,6 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     };
 
-    private final boolean root;
-    
-    private AbstractProtocolHandlerFilterChain parent;
-    
     private final Map name2entry = new HashMap();
 
     private final Map filter2entry = new IdentityHashMap();
@@ -210,33 +107,11 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
 
     private final Entry tail;
 
-    protected AbstractProtocolHandlerFilterChain( boolean root )
+    protected AbstractProtocolHandlerFilterChain()
     {
-        this.root = root;
-        
         head = new Entry( null, null, "head", HEAD_FILTER );
         tail = new Entry( head, null, "tail", TAIL_FILTER );
         head.nextEntry = tail;
-        
-        if( !root )
-        {
-            register( head, ProtocolHandlerFilterChain.NEXT_FILTER, NEXT_FILTER );
-        }
-    }
-    
-    public ProtocolHandlerFilterChain getRoot()
-    {
-        AbstractProtocolHandlerFilterChain current = this;
-        while( current.parent != null )
-        {
-            current = current.parent;
-        }
-        return current;
-    }
-    
-    public ProtocolHandlerFilterChain getParent()
-    {
-        return parent;
     }
     
     public ProtocolHandlerFilter getChild( String name )
@@ -255,7 +130,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
     public synchronized void addFirst( String name,
                                        ProtocolHandlerFilter filter )
     {
-        checkAddable( name, filter );
+        checkAddable( name );
         register( head, name, filter );
     }
 
@@ -266,7 +141,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
     public synchronized void addLast( String name,
                                       ProtocolHandlerFilter filter )
     {
-        checkAddable( name, filter );
+        checkAddable( name );
         register( tail.prevEntry, name, filter );
     }
 
@@ -280,7 +155,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
                                         ProtocolHandlerFilter filter )
     {
         Entry baseEntry = checkOldName( baseName );
-        checkAddable( name, filter );
+        checkAddable( name );
         register( baseEntry, name, filter );
     }
 
@@ -294,7 +169,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
                                        ProtocolHandlerFilter filter )
     {
         Entry baseEntry = checkOldName( baseName );
-        checkAddable( name, filter );
+        checkAddable( name );
         register( baseEntry.prevEntry, name, filter );
     }
 
@@ -313,10 +188,6 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         name2entry.remove( name );
         ProtocolHandlerFilter filter = entry.filter;
         filter2entry.remove( filter );
-        if ( filter instanceof AbstractProtocolHandlerFilterChain )
-        {
-            ( ( AbstractProtocolHandlerFilterChain ) filter ).parent = null;
-        }
     }
 
 
@@ -334,23 +205,6 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
 
     private void register( Entry prevEntry, String name, ProtocolHandlerFilter filter )
     {
-        if ( filter instanceof AbstractProtocolHandlerFilterChain )
-        {
-            if( !this.getClass().isAssignableFrom( filter.getClass() ) )
-            {
-                throw new IllegalArgumentException( "Incompatible chain" );
-            }
-            if( ( ( AbstractProtocolHandlerFilterChain ) filter ).root )
-            {
-                throw new IllegalArgumentException( "Root chain cannot be added." );
-            }
-            if( ( ( AbstractProtocolHandlerFilterChain ) filter ).parent != null )
-            {
-                throw new IllegalArgumentException( "Already added to other parent chain." );
-            }
-
-            ( ( AbstractProtocolHandlerFilterChain ) filter ).parent = this;
-        }
         Entry newEntry = new Entry( prevEntry, prevEntry.nextEntry, name, filter );
         prevEntry.nextEntry.prevEntry = newEntry;
         prevEntry.nextEntry = newEntry;
@@ -378,23 +232,15 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
     /**
      * Checks the specified interceptor name is already taken and throws an exception if already taken.
      */
-    private void checkAddable( String name, ProtocolHandlerFilter filter )
+    private void checkAddable( String name )
     {
         if ( name2entry.containsKey( name ) )
         {
             throw new IllegalArgumentException( "Other interceptor is using name '" + name + "'" );
         }
-
-        if ( filter instanceof AbstractProtocolHandlerFilterChain )
-        {
-            if ( ( ( AbstractProtocolHandlerFilterChain ) filter ).parent != null )
-            {
-                throw new IllegalArgumentException( "This interceptor chain has its parent already." );
-            }
-        }
     }
 
-    public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
+    public void sessionOpened( ProtocolSession session )
     {
         Entry head = this.head;
         callNextSessionOpened(head, session);
@@ -409,11 +255,11 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
         catch( Throwable e )
         {
-            fireExceptionCaught( session, e );
+            exceptionCaught( session, e );
         }
     }
 
-    public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
+    public void sessionClosed( ProtocolSession session )
     {
         Entry head = this.head;
         callNextSessionClosed(head, session);
@@ -429,11 +275,11 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
         catch( Throwable e )
         {
-            fireExceptionCaught( session, e );
+            exceptionCaught( session, e );
         }
     }
 
-    public void sessionIdle( NextFilter nextFilter, ProtocolSession session, IdleStatus status )
+    public void sessionIdle( ProtocolSession session, IdleStatus status )
     {
         Entry head = this.head;
         callNextSessionIdle(head, session, status);
@@ -449,11 +295,11 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
         catch( Throwable e )
         {
-            fireExceptionCaught( session, e );
+            exceptionCaught( session, e );
         }
     }
 
-    public void messageReceived( NextFilter nextFilter, ProtocolSession session, Object message )
+    public void messageReceived( ProtocolSession session, Object message )
     {
         Entry head = this.head;
         callNextMessageReceived(head, session, message );
@@ -469,11 +315,11 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
         catch( Throwable e )
         {
-            fireExceptionCaught( session, e );
+            exceptionCaught( session, e );
         }
     }
 
-    public void messageSent( NextFilter nextFilter, ProtocolSession session, Object message )
+    public void messageSent( ProtocolSession session, Object message )
     {
         Entry head = this.head;
         callNextMessageSent(head, session, message);
@@ -489,11 +335,11 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
         catch( Throwable e )
         {
-            fireExceptionCaught( session, e );
+            exceptionCaught( session, e );
         }
     }
 
-    public void exceptionCaught( NextFilter nextFilter, ProtocolSession session, Throwable cause )
+    public void exceptionCaught( ProtocolSession session, Throwable cause )
     {
         Entry head = this.head;
         callNextExceptionCaught(head, session, cause);
@@ -513,8 +359,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
     
-    public void filterWrite( NextFilter nextFilter,
-                             ProtocolSession session, Object message )
+    public void filterWrite( ProtocolSession session, Object message )
     {
         Entry tail = this.tail;
         callPreviousFilterWrite( tail, session, message );
@@ -535,7 +380,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
         catch( Throwable e )
         {
-            fireExceptionCaught( session, e );
+            exceptionCaught( session, e );
         }
     }
 
@@ -562,18 +407,6 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
             e = e.prevEntry;
         }
         return list;
-    }
-    
-    private void fireExceptionCaught( ProtocolSession session, Throwable cause )
-    {
-        try
-        {
-            getRoot().exceptionCaught( null, session, cause );
-        }
-        catch( Throwable t )
-        {
-            t.printStackTrace();
-        }
     }
     
     protected abstract void doWrite( ProtocolSession session, Object message );

@@ -12,13 +12,13 @@ import org.apache.mina.common.TransportType;
 
 public class IoHandlerFilterChainTest extends TestCase
 {
-    private IoHandlerFilterChain chain;
+    private IoHandlerFilterChainImpl chain;
     private IoSession session;
     private String result;
 
     public void setUp()
     {
-        chain = new IoHandlerFilterChainImpl( true );
+        chain = new IoHandlerFilterChainImpl();
         session = new TestSession();
         result = "";
     }
@@ -32,7 +32,7 @@ public class IoHandlerFilterChainTest extends TestCase
         run( "HSO HDR HDW HSI HEC HSC" );
     }
     
-    public void testSimpleChain()
+    public void testChained()
     {
         chain.addLast( "A", new TestFilter( 'A' ) );
         chain.addLast( "B", new TestFilter( 'B' ) );
@@ -44,32 +44,14 @@ public class IoHandlerFilterChainTest extends TestCase
              "ASC BSC HSC" );
     }
     
-    public void testNestedChain()
-    {
-        IoHandlerFilterChainImpl childChain = new IoHandlerFilterChainImpl( false );
-
-        chain.addLast( "A", new TestFilter( 'A' ) );
-        chain.addLast( "child", childChain );
-        chain.addLast( "B", new TestFilter( 'B' ) );
-        childChain.addFirst( "C", new TestFilter( 'C' ) );
-        childChain.addLast( "D", new TestFilter( 'D' ) );
-        
-        run( "ASO CSO BSO HSO DSO" +
-             "ADR CDR BDR HDR DDR" +
-             "BFW DFW AFW ADW CDW BDW HDW DDW CFW" +
-             "ASI CSI BSI HSI DSI" +
-             "AEC CEC BEC HEC DEC" +
-             "ASC CSC BSC HSC DSC" );
-    }
-    
     private void run( String expectedResult )
     {
-        chain.sessionOpened( null, session );
-        chain.dataRead( null, session, ByteBuffer.allocate( 16 ) );
-        chain.filterWrite( null, session, ByteBuffer.allocate( 16 ), null );
-        chain.sessionIdle( null, session, IdleStatus.READER_IDLE );
-        chain.exceptionCaught( null, session, new Exception() );
-        chain.sessionClosed( null, session );
+        chain.sessionOpened( session );
+        chain.dataRead( session, ByteBuffer.allocate( 16 ) );
+        chain.filterWrite( session, ByteBuffer.allocate( 16 ), null );
+        chain.sessionIdle( session, IdleStatus.READER_IDLE );
+        chain.exceptionCaught( session, new Exception() );
+        chain.sessionClosed( session );
         
         result = formatResult( result );
         expectedResult = formatResult( expectedResult );
@@ -253,13 +235,13 @@ public class IoHandlerFilterChainTest extends TestCase
 
     private static class IoHandlerFilterChainImpl extends AbstractIoHandlerFilterChain
     {
-        protected IoHandlerFilterChainImpl(boolean root) {
-            super( root );
+        protected IoHandlerFilterChainImpl()
+        {
         }
 
         protected void doWrite(IoSession session, ByteBuffer buffer, Object marker)
         {
-            getRoot().dataWritten( null, session, marker );
+            dataWritten( session, marker );
         }
     }
     

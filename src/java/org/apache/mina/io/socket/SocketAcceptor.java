@@ -49,7 +49,7 @@ public class SocketAcceptor implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
-    private final SocketFilterChain filters = new SocketFilterChain( true );
+    private final SocketFilterChain filters = new SocketFilterChain();
 
     private final int id = nextId ++ ;
 
@@ -422,18 +422,10 @@ public class SocketAcceptor implements IoAcceptor
         }
     }
 
-
-    public IoHandlerFilterChain newFilterChain()
-    {
-        return new SocketFilterChain( false );
-    }
-
-
     public IoHandlerFilterChain getFilterChain()
     {
         return filters;
     }
-
 
     private static class RegistrationRequest
     {

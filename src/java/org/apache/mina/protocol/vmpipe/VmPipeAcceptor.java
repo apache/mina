@@ -24,7 +24,7 @@ public class VmPipeAcceptor implements ProtocolAcceptor
 {
     static final Map boundHandlers = new HashMap();
 
-    private final VmPipeFilterChain filters = new VmPipeFilterChain( true );
+    private final VmPipeFilterChain filters = new VmPipeFilterChain();
 
     /**
      * Creates a new instance.
@@ -68,11 +68,6 @@ public class VmPipeAcceptor implements ProtocolAcceptor
         }
     }
     
-    public ProtocolHandlerFilterChain newFilterChain()
-    {
-        return new VmPipeFilterChain( false );
-    }
-    
     public ProtocolHandlerFilterChain getFilterChain()
     {
         return filters;
@@ -82,13 +77,13 @@ public class VmPipeAcceptor implements ProtocolAcceptor
     {
         final VmPipeAddress address;
 
-        final ProtocolHandlerFilterChain filters;
+        final VmPipeFilterChain filters;
 
         final ProtocolHandler handler;
 
         private Entry( VmPipeAddress address,
-                      ProtocolHandlerFilterChain filters,
-                      ProtocolHandler handler )
+                       VmPipeFilterChain filters,
+                       ProtocolHandler handler )
         {
             this.address = address;
             this.filters = filters;

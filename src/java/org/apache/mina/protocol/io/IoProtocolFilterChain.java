@@ -7,11 +7,12 @@ import org.apache.mina.util.Queue;
 
 class IoProtocolFilterChain extends AbstractProtocolHandlerFilterChain {
 
-    IoProtocolFilterChain( boolean root ) {
-        super( root );
+    IoProtocolFilterChain()
+    {
     }
 
-    protected void doWrite(ProtocolSession session, Object message) {
+    protected void doWrite( ProtocolSession session, Object message )
+    {
         ProtocolSessionImpl s = ( ProtocolSessionImpl ) session;
         Queue writeQueue = s.writeQueue;
         synchronized( writeQueue )

@@ -11,7 +11,6 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolSession;
 
 /**
@@ -30,9 +29,9 @@ class VmPipeSession implements ProtocolSession
 
     private final VmPipeSessionConfig config = new VmPipeSessionConfig();
 
-    final ProtocolHandlerFilterChain localFilters;
+    final VmPipeFilterChain localFilters;
 
-    final ProtocolHandlerFilterChain remoteFilters;
+    final VmPipeFilterChain remoteFilters;
 
     final VmPipeSession remoteSession;
 
@@ -57,9 +56,9 @@ class VmPipeSession implements ProtocolSession
      */
     VmPipeSession( Object lock, SocketAddress localAddress,
                   SocketAddress remoteAddress,
-                  ProtocolHandlerFilterChain localFilters,
+                  VmPipeFilterChain localFilters,
                   ProtocolHandler localHandler,
-                  ProtocolHandlerFilterChain removeFilters,
+                  VmPipeFilterChain removeFilters,
                   ProtocolHandler remoteHandler )
     {
         this.lock = lock;
@@ -71,8 +70,8 @@ class VmPipeSession implements ProtocolSession
 
         remoteSession = new VmPipeSession( this, remoteHandler );
 
-        removeFilters.sessionOpened( null, remoteSession );
-        localFilters.sessionOpened( null, this );
+        removeFilters.sessionOpened( remoteSession );
+        localFilters.sessionOpened( this );
     }
 
     /**
@@ -113,8 +112,8 @@ class VmPipeSession implements ProtocolSession
                 return;
 
             closed = remoteSession.closed = true;
-            localFilters.sessionClosed( null, this );
-            remoteFilters.sessionClosed( null, remoteSession );
+            localFilters.sessionClosed( this );
+            remoteFilters.sessionClosed( remoteSession );
         }
     }
 
@@ -130,7 +129,7 @@ class VmPipeSession implements ProtocolSession
 
     public void write( Object message )
     {
-        localFilters.filterWrite( null, this, message );
+        localFilters.filterWrite( this, message );
     }
 
     public TransportType getTransportType()
