@@ -121,11 +121,11 @@
     <sourceDirectory>${basedir}/src/java</sourceDirectory>
     <sourceModifications>
       <sourceModification>
-        <className>javax.net.ssl.SSLEngine</className>
+        <className>javax.swing.SwingGraphics</className>
         <excludes>
-          <exclude>**/SSLFilter.java</exclude>
-          <exclude>**/SSLHandler.java</exclude>
-          <exclude>**/SSLByteBufferPool.java</exclude>
+          <exclude>org/apache/mina/io/filter/SSLFilter.java</exclude>
+          <exclude>org/apache/mina/io/filter/SSLHandler.java</exclude>
+          <exclude>org/apache/mina/io/filter/SSLByteBufferPool.java</exclude>
         </excludes>
       </sourceModification>
     </sourceModifications>
