@@ -429,6 +429,12 @@ public class IoAdapter
             int sum = 0;
             final int size = queue.size();
             
+            if( size < 2 )
+            {
+                // no need to merge!
+                return;
+            }
+            
             // Get the size of merged BB
             for( int i = size - 1; i >= 0; i -- )
             {

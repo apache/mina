@@ -71,6 +71,8 @@ public class Asn1CodecEncoder implements ProtocolEncoder
                 {
                     this.encodeOccurred( codec, bufArray[ i ] );
                 }
+
+                encOut.mergeAll();
             }
             else if( encoded instanceof Iterator )
             {
@@ -79,6 +81,8 @@ public class Asn1CodecEncoder implements ProtocolEncoder
                 {
                     this.encodeOccurred( codec, it.next() );
                 }
+                
+                encOut.mergeAll();
             }
             else if( encoded instanceof Collection )
             {
@@ -87,6 +91,8 @@ public class Asn1CodecEncoder implements ProtocolEncoder
                 {
                     this.encodeOccurred( codec, it.next() );
                 }
+                
+                encOut.mergeAll();
             }
             else if( encoded instanceof Enumeration )
             {
@@ -95,6 +101,8 @@ public class Asn1CodecEncoder implements ProtocolEncoder
                 {
                     this.encodeOccurred( codec, e.nextElement() );
                 }
+                
+                encOut.mergeAll();
             }
             else
             {
