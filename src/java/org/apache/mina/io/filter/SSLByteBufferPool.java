@@ -69,8 +69,13 @@ class SSLByteBufferPool
                 useDirectAllocatedBuffers = Boolean
                         .getBoolean( DIRECT_MEMORY_PROP );
             }
+            
             // init buffer sizes from SSLEngine
-            packetBufferSize = sslEngine.getSession().getPacketBufferSize();
+            // Janne: The problem we found is in SSLHandler.doEncrypt() or
+            // more correctly how we use sslEngine.wrap(). If the passed src
+            // ByteBuffer is larger than 16 kbytes only 16 kbytes will be
+            // encrypted!
+            packetBufferSize = sslEngine.getSession().getPacketBufferSize() * 2;
             
             // application buffer size has been doubled because SSLEngine
             // returns BUFFER_OVERFLOW even if there is enough room for the buffer.
