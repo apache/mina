@@ -439,6 +439,13 @@ class SocketIoProcessor
             }
             finally
             {
+                if( writtenBytes > 0 )
+                {
+                    session.increaseWrittenBytes( writtenBytes );
+                    session.setIdle( IdleStatus.BOTH_IDLE, false );
+                    session.setIdle( IdleStatus.WRITER_IDLE, false );
+                }
+
                 SelectionKey key = session.getSelectionKey();
                 if( buf.hasRemaining() )
                 {
@@ -446,18 +453,12 @@ class SocketIoProcessor
                     key
                             .interestOps( key.interestOps()
                                           | SelectionKey.OP_WRITE );
+                    break;
                 }
                 else
                 {
                     key.interestOps( key.interestOps()
                                      & ( ~SelectionKey.OP_WRITE ) );
-                }
-
-                if( writtenBytes > 0 )
-                {
-                    session.increaseWrittenBytes( writtenBytes );
-                    session.setIdle( IdleStatus.BOTH_IDLE, false );
-                    session.setIdle( IdleStatus.WRITER_IDLE, false );
                 }
             }
         }
