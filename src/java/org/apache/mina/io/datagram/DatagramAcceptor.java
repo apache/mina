@@ -460,25 +460,21 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             }
 
             DatagramChannel ch = ( DatagramChannel ) channels.get( request.address );
-            if( ch == null )
-            {
-                synchronized( request )
-                {
-                    request.done = true;
-                    request.exception = new IllegalArgumentException(
-                            "Address not bound: " + request.address );
-                }
-                continue;
-            }
-            
-            SelectionKey key = ch.keyFor( selector );
-            key.cancel();
-            selector.wakeup(); // wake up again to trigger thread death
-            
             // close the channel
             try
             {
-                ch.close();
+                if( ch == null )
+                {
+                    request.exception = new IllegalArgumentException(
+                            "Address not bound: " + request.address );
+                }
+                else
+                {
+                    SelectionKey key = ch.keyFor( selector );
+                    key.cancel();
+                    selector.wakeup(); // wake up again to trigger thread death
+                    ch.close();
+                }
             }
             catch( IOException e )
             {

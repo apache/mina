@@ -317,25 +317,22 @@ public class SocketAcceptor implements IoAcceptor
             }
 
             ServerSocketChannel ssc = ( ServerSocketChannel ) channels.get( request.address );
-            if( ssc == null )
-            {
-                synchronized( request )
-                {
-                    request.done = true;
-                    request.exception = new IllegalArgumentException(
-                            "Address not bound: " + request.address );
-                }
-                continue;
-            }
-            
-            SelectionKey key = ssc.keyFor( selector );
-            key.cancel();
-            selector.wakeup(); // wake up again to trigger thread death
             
             // close the channel
             try
             {
-                ssc.close();
+                if( ssc == null )
+                {
+                    request.exception = new IllegalArgumentException(
+                            "Address not bound: " + request.address );
+                }
+                else
+                {
+                    SelectionKey key = ssc.keyFor( selector );
+                    key.cancel();
+                    selector.wakeup(); // wake up again to trigger thread death
+                    ssc.close();
+                }
             }
             catch( IOException e )
             {
