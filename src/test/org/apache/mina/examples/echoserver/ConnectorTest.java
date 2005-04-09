@@ -17,6 +17,7 @@ import org.apache.mina.io.IoSession;
 import org.apache.mina.io.datagram.DatagramConnector;
 import org.apache.mina.io.filter.SSLFilter;
 import org.apache.mina.io.socket.SocketConnector;
+import org.apache.mina.util.AvailablePortFinder;
 
 /**
  * Tests echo server example.
@@ -26,6 +27,14 @@ import org.apache.mina.io.socket.SocketConnector;
  */
 public class ConnectorTest extends AbstractTest
 {
+    private int clientPort;
+    
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        clientPort = AvailablePortFinder.getNextAvailable( port + 1 );
+    }
+    
     public void testTCP() throws Exception
     {
         IoConnector connector = new SocketConnector();
@@ -37,7 +46,7 @@ public class ConnectorTest extends AbstractTest
     {
         IoConnector connector = new SocketConnector();
         connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
-        testTCP0( connector, new InetSocketAddress( port + 1 ) );
+        testTCP0( connector, new InetSocketAddress( clientPort ) );
     }
 
     /**
@@ -126,7 +135,7 @@ public class ConnectorTest extends AbstractTest
     {
         IoConnector connector = new DatagramConnector();
         connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
-        testTCP0( connector, new InetSocketAddress( port + 1 ) );
+        testTCP0( connector, new InetSocketAddress( clientPort ) );
     }
     
     private void fillWriteBuffer( ByteBuffer writeBuf, int i )
