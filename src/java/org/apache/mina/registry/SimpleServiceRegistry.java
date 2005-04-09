@@ -159,7 +159,7 @@ public class SimpleServiceRegistry implements ServiceRegistry
         while( it.hasNext() )
         {
             Service s = ( Service ) it.next();
-            SocketAddress addr = ( SocketAddress ) s.getAddress();
+            SocketAddress addr = s.getAddress();
             int servicePort;
             
             if( addr instanceof InetSocketAddress )
