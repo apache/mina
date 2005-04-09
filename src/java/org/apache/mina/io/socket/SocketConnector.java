@@ -71,11 +71,23 @@ public class SocketConnector implements IoConnector
     public IoSession connect( SocketAddress address, IoHandler handler )
             throws IOException
     {
-        return connect( address, Integer.MAX_VALUE, handler );
+        return connect( address, null, handler );
+    }
+
+    public IoSession connect( SocketAddress address, SocketAddress localAddress,
+                              IoHandler handler ) throws IOException
+    {
+        return connect( address, localAddress, Integer.MAX_VALUE, handler );
     }
 
     public IoSession connect( SocketAddress address, int timeout,
                               IoHandler handler ) throws IOException
+    {
+        return connect( address, null, timeout, handler );
+    }
+
+    public IoSession connect( SocketAddress address, SocketAddress localAddress,
+                              int timeout, IoHandler handler ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -89,51 +101,68 @@ public class SocketConnector implements IoConnector
             throw new IllegalArgumentException( "Unexpected address type: "
                                                 + address.getClass() );
 
+        if( localAddress != null && !( localAddress instanceof InetSocketAddress ) )
+            throw new IllegalArgumentException( "Unexpected local address type: "
+                                                + localAddress.getClass() );
+
         SocketChannel ch = SocketChannel.open();
-        ch.configureBlocking( false );
-
-        IoSession session;
-        if( ch.connect( address ) )
+        boolean initialized = false;
+        try
         {
-            session = newSession( ch, handler );
+            if( localAddress != null )
+            {
+                ch.socket().bind( localAddress );
+            }
+            ch.configureBlocking( false );
+    
+            boolean connected = ch.connect( address );
+            initialized = true;
+
+            if( connected )
+            {
+                return newSession( ch, handler );
+            }
         }
-        else
+        finally
         {
-            ConnectionRequest request = new ConnectionRequest( ch, timeout, handler );
-            synchronized( this )
+            if( !initialized )
             {
-                synchronized( connectQueue )
-                {
-                    connectQueue.push( request );
-                }
-                startupWorker();
+                ch.close();
             }
-            selector.wakeup();
-
-            synchronized( request )
-            {
-                while( !request.done )
-                {
-                    try
-                    {
-                        request.wait();
-                    }
-                    catch( InterruptedException e )
-                    {
-                    }
-                }
-            }
-
-            if( request.exception != null )
-            {
-                request.exception.fillInStackTrace();
-                throw request.exception;
-            }
-
-            session = request.session;
         }
 
-        return session;
+        ConnectionRequest request = new ConnectionRequest( ch, timeout, handler );
+        synchronized( this )
+        {
+            synchronized( connectQueue )
+            {
+                connectQueue.push( request );
+            }
+            startupWorker();
+        }
+        selector.wakeup();
+
+        synchronized( request )
+        {
+            while( !request.done )
+            {
+                try
+                {
+                    request.wait();
+                }
+                catch( InterruptedException e )
+                {
+                }
+            }
+        }
+
+        if( request.exception != null )
+        {
+            request.exception.fillInStackTrace();
+            throw request.exception;
+        }
+
+        return request.session;
     }
     
     private synchronized void startupWorker()

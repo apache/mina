@@ -53,8 +53,18 @@ public interface ProtocolConnector
      * @throws IOException if failed to connect
      */
     ProtocolSession connect( SocketAddress address,
-                            ProtocolProvider protocolProvider )
-            throws IOException;
+                             ProtocolProvider protocolProvider ) throws IOException;
+
+    /**
+     * Connects to the specified <code>address</code>.  If communication starts
+     * successfully, events are fired to the specified
+     * <code>protocolProvider</code>.  This method blocks.
+     * 
+     * @param localAddress the local address the channel is bound to
+     * @throws IOException if failed to connect
+     */
+    ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
+                             ProtocolProvider protocolProvider ) throws IOException;
 
     /**
      * Connects to the specified <code>address</code> with timeout.  If
@@ -64,8 +74,18 @@ public interface ProtocolConnector
      * @throws IOException if failed to connect
      */
     ProtocolSession connect( SocketAddress address, int timeout,
-                            ProtocolProvider protocolProvider )
-            throws IOException;
+                             ProtocolProvider protocolProvider ) throws IOException;
+
+    /**
+     * Connects to the specified <code>address</code> with timeout.  If
+     * communication starts successfully, events are fired to the specified
+     * <code>protocolProvider</code>.  This method blocks.
+     * 
+     * @param localAddress the local address the channel is bound to
+     * @throws IOException if failed to connect
+     */
+    ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
+                             int timeout, ProtocolProvider protocolProvider ) throws IOException;
 
     ProtocolHandlerFilterChain getFilterChain();
 }

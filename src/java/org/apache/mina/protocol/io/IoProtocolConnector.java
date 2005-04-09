@@ -46,20 +46,34 @@ public class IoProtocolConnector implements ProtocolConnector
     }
 
     public ProtocolSession connect( SocketAddress address,
-                                   ProtocolProvider provider )
-            throws IOException
+                                    ProtocolProvider provider ) throws IOException
     {
-        IoSession session = connector.connect( address, adapter
-                .adapt( provider ) );
+        IoSession session = connector.connect(
+                address, adapter.adapt( provider ) );
+        return adapter.toProtocolSession( session );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
+                                    ProtocolProvider provider ) throws IOException
+    {
+        IoSession session = connector.connect(
+                address, localAddress, adapter.adapt( provider ) );
         return adapter.toProtocolSession( session );
     }
 
     public ProtocolSession connect( SocketAddress address, int timeout,
-                                   ProtocolProvider provider )
-            throws IOException
+                                    ProtocolProvider provider ) throws IOException
     {
-        IoSession session = connector.connect( address, timeout, adapter
-                .adapt( provider ) );
+        IoSession session = connector.connect(
+                address, timeout, adapter.adapt( provider ) );
+        return adapter.toProtocolSession( session );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
+                                    int timeout, ProtocolProvider provider ) throws IOException
+    {
+        IoSession session = connector.connect(
+                address, localAddress, timeout, adapter.adapt( provider ) );
         return adapter.toProtocolSession( session );
     }
 

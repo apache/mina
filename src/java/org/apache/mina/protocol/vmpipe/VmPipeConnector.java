@@ -36,9 +36,14 @@ public class VmPipeConnector implements ProtocolConnector
         return filters;
     }
 
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
+                                    ProtocolProvider protocolProvider ) throws IOException
+    {
+        return connect( address, protocolProvider );
+    }
+
     public ProtocolSession connect( SocketAddress address,
-                                   ProtocolProvider protocolProvider )
-            throws IOException
+                                    ProtocolProvider protocolProvider ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -66,8 +71,13 @@ public class VmPipeConnector implements ProtocolConnector
     }
 
     public ProtocolSession connect( SocketAddress address, int timeout,
-                                   ProtocolProvider protocolProvider )
-            throws IOException
+                                    ProtocolProvider protocolProvider ) throws IOException
+    {
+        return connect( address, protocolProvider );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
+                                    int timeout, ProtocolProvider protocolProvider ) throws IOException
     {
         return connect( address, protocolProvider );
     }
