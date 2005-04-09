@@ -77,6 +77,12 @@ public class DatagramConnector extends DatagramProcessor implements
     public IoSession connect( SocketAddress address, IoHandler handler )
             throws IOException
     {
+        return connect( address, null, handler );
+    }
+    
+    public IoSession connect( SocketAddress address, SocketAddress localAddress,
+                              IoHandler handler ) throws IOException
+    {
         if( address == null )
             throw new NullPointerException( "address" );
         if( handler == null )
@@ -85,10 +91,32 @@ public class DatagramConnector extends DatagramProcessor implements
         if( !( address instanceof InetSocketAddress ) )
             throw new IllegalArgumentException( "Unexpected address type: "
                                                 + address.getClass() );
+        
+        if( localAddress != null && !( localAddress instanceof InetSocketAddress ) )
+        {
+            throw new IllegalArgumentException( "Unexpected local address type: "
+                                                + localAddress.getClass() );
+        }
 
         DatagramChannel ch = DatagramChannel.open();
-        ch.connect( address );
-        ch.configureBlocking( false );
+        boolean initialized = false;
+        try
+        {
+            if( localAddress != null )
+            {
+                ch.socket().bind( localAddress );
+            }
+            ch.connect( address );
+            ch.configureBlocking( false );
+            initialized = true;
+        }
+        finally
+        {
+            if( !initialized )
+            {
+                ch.close();
+            }
+        }
 
         RegistrationRequest request = new RegistrationRequest( ch, handler );
         synchronized( this )
@@ -128,10 +156,16 @@ public class DatagramConnector extends DatagramProcessor implements
         }
     }
 
-    public IoSession connect( SocketAddress address, int timeout,
-                             IoHandler handler ) throws IOException
+    public IoSession connect( SocketAddress address,
+                              int timeout, IoHandler handler ) throws IOException
     {
-        return connect( address, handler );
+        return connect( address, null, timeout, handler );
+    }
+
+    public IoSession connect( SocketAddress address, SocketAddress localAddress,
+                              int timeout, IoHandler handler ) throws IOException
+    {
+        return connect( address, localAddress, handler );
     }
 
     void closeSession( DatagramSession session )

@@ -60,6 +60,17 @@ public interface IoConnector
             throws IOException;
 
     /**
+     * Connects to the specified <code>address</code>.  If communication starts
+     * successfully, events are fired to the specified
+     * <code>handler</code>.  This method blocks.
+     * 
+     * @param localAddress the local address the channel is bound to
+     * @throws IOException if failed to connect
+     */
+    IoSession connect( SocketAddress address, SocketAddress loadlAddress,
+                       IoHandler handler ) throws IOException;
+
+    /**
      * Connects to the specified <code>address</code> with timeout.  If
      * communication starts successfully, events are fired to the specified
      * <code>handler</code>.  This method blocks.
@@ -68,6 +79,17 @@ public interface IoConnector
      */
     IoSession connect( SocketAddress address, int timeout, IoHandler handler )
             throws IOException;
+    
+    /**
+     * Connects to the specified <code>address</code> with timeout.  If
+     * communication starts successfully, events are fired to the specified
+     * <code>handler</code>.  This method blocks.
+     * 
+     * @param localAddress the local address the channel is bound to
+     * @throws IOException if failed to connect
+     */
+    IoSession connect( SocketAddress address, SocketAddress localAddress,
+                       int timeout, IoHandler handler ) throws IOException;
 
     IoHandlerFilterChain getFilterChain();
 

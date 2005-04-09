@@ -5,6 +5,7 @@ package org.apache.mina.examples.echoserver;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 import junit.framework.Assert;
 
@@ -29,7 +30,14 @@ public class ConnectorTest extends AbstractTest
     {
         IoConnector connector = new SocketConnector();
         connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
-        testTCP0( connector );
+        testTCP0( connector, null );
+    }
+    
+    public void testTCPWithLocalAddress() throws Exception
+    {
+        IoConnector connector = new SocketConnector();
+        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
+        testTCP0( connector, new InetSocketAddress( port + 1 ) );
     }
 
     /**
@@ -50,15 +58,16 @@ public class ConnectorTest extends AbstractTest
         connectorSSLFilter.setDebug( SSLFilter.Debug.ON );
         connector.getFilterChain().addLast( "SSL", connectorSSLFilter );
 
-        testTCP0( connector );
+        testTCP0( connector, null );
     }
     
-    private void testTCP0( IoConnector connector ) throws Exception
+    private void testTCP0( IoConnector connector, SocketAddress localAddress ) throws Exception
     {
         EchoConnectorHandler handler = new EchoConnectorHandler();
         ByteBuffer readBuf = handler.readBuf;
         IoSession session = connector.connect(
                 new InetSocketAddress( InetAddress.getLocalHost(), port ),
+                localAddress,
                 handler );
         
         for( int i = 0; i < 10; i ++ )
@@ -110,7 +119,14 @@ public class ConnectorTest extends AbstractTest
     {
         IoConnector connector = new DatagramConnector();
         connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
-        testTCP0( connector );
+        testTCP0( connector, null );
+    }
+    
+    public void testUDPWithLocalAddress() throws Exception
+    {
+        IoConnector connector = new DatagramConnector();
+        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
+        testTCP0( connector, new InetSocketAddress( port + 1 ) );
     }
     
     private void fillWriteBuffer( ByteBuffer writeBuf, int i )
