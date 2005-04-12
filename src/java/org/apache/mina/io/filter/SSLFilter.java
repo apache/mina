@@ -124,31 +124,34 @@ public class SSLFilter extends IoHandlerFilterAdapter
         }
         if( sslHandler != null )
         {
-            // Start SSL shutdown process
-            try
+            synchronized( sslHandler )
             {
-                // shut down
-                sslHandler.shutdown();
-
-                // there might be data to write out here?
-                writeNetBuffer( session, sslHandler );
-            }
-            catch( SSLException ssle )
-            {
-                nextFilter.exceptionCaught( session, ssle );
-            }
-            finally
-            {
-                // notify closed session
-                nextFilter.sessionClosed( session );
-
-                // release buffers
-                sslHandler.release();
-                removeSSLSessionHandler( session );
+               // Start SSL shutdown process
+               try
+               {
+                  // shut down
+                  sslHandler.shutdown();
+                  
+                  // there might be data to write out here?
+                  writeNetBuffer( session, sslHandler );
+               }
+               catch( SSLException ssle )
+               {
+                  nextFilter.exceptionCaught( session, ssle );
+               }
+               finally
+               {
+                  // notify closed session
+                  nextFilter.sessionClosed( session );
+                  
+                  // release buffers
+                  sslHandler.release();
+                  removeSSLSessionHandler( session );
+               }
             }
         }
     }
-
+   
     public void dataRead( NextFilter nextFilter, IoSession session,
                          ByteBuffer buf )
     {
