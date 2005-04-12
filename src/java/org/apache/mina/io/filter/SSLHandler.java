@@ -159,7 +159,7 @@ class SSLHandler
         if ( buf.limit() > inNetBuffer.remaining() ) {
             // We have to expand inNetBuffer
             inNetBuffer = SSLByteBufferPool.expandBuffer( inNetBuffer,
-                    2 * (inNetBuffer.position() + buf.limit()) );
+                inNetBuffer.capacity() + ( buf.limit() * 2 ) );
             // We also expand app. buffer (twice the size of in net. buffer)
             appBuffer = SSLByteBufferPool.expandBuffer( appBuffer, inNetBuffer.capacity() * 2);
             appBuffer.position( 0 );
