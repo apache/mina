@@ -240,8 +240,8 @@ public class SSLFilter extends IoHandlerFilterAdapter
                             debug.print( "encrypt: " + buf );
                         }
                         sslHandler.encrypt( buf.buf() );
-                        ByteBuffer encryptedBuffer = copy( sslHandler
-                                .getOutNetBuffer() );
+                        ByteBuffer encryptedBuffer =
+                            ByteBuffer.wrap( sslHandler.getOutNetBuffer() );
 
                         if( debug != null )
                         {
@@ -284,7 +284,8 @@ public class SSLFilter extends IoHandlerFilterAdapter
         if( sslHandler.getAppBuffer().hasRemaining() )
         {
             // forward read app data
-            ByteBuffer readBuffer = copy( sslHandler.getAppBuffer() );
+            ByteBuffer readBuffer =
+                ByteBuffer.wrap( sslHandler.getAppBuffer() );
             if( debug != null )
             {
                 debug.print( "app data read: " + readBuffer + " (" + readBuffer.getHexDump() + ')' );
@@ -319,7 +320,8 @@ public class SSLFilter extends IoHandlerFilterAdapter
                 debug.print( "write outNetBuffer: "
                         + sslHandler.getOutNetBuffer() );
             }
-            ByteBuffer writeBuffer = copy( sslHandler.getOutNetBuffer() );
+            ByteBuffer writeBuffer =
+                ByteBuffer.wrap( sslHandler.getOutNetBuffer() );
             if( debug != null )
             {
                 debug.print( "session write: " + writeBuffer );
@@ -348,8 +350,8 @@ public class SSLFilter extends IoHandlerFilterAdapter
                         debug.print( "write outNetBuffer2: "
                                 + sslHandler.getOutNetBuffer() );
                     }
-                    ByteBuffer writeBuffer2 = copy( sslHandler
-                            .getOutNetBuffer() );
+                    ByteBuffer writeBuffer2 =
+                        ByteBuffer.wrap ( sslHandler.getOutNetBuffer() );
                     session.write( writeBuffer2, null );
                 }
             }
@@ -361,21 +363,6 @@ public class SSLFilter extends IoHandlerFilterAdapter
                 sslHandler.setWritingEncryptedData( false );
             }
         }
-    }
-
-    /**
-     * Creates a new Mina byte buffer that is a deep copy of the remaining bytes
-     * in the given buffer (between index buf.position() and buf.limit())
-     *
-     * @param src the buffer to copy
-     * @return the new buffer, ready to read from
-     */
-    private ByteBuffer copy( java.nio.ByteBuffer src )
-    {
-        ByteBuffer copy = ByteBuffer.allocate( src.remaining() );
-        copy.put( src );
-        copy.flip();
-        return copy;
     }
 
     // Utilities to mainpulate SSLHandler based on IoSession
