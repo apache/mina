@@ -2,6 +2,7 @@ package org.apache.mina.io.socket;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.io.AbstractIoHandlerFilterChain;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.util.Queue;
 

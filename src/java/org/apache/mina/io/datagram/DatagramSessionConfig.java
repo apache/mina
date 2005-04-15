@@ -22,6 +22,8 @@ import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 
 import org.apache.mina.common.SessionConfig;
+import org.apache.mina.io.IoSession;
+import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.util.BasicSessionConfig;
 
 /**
