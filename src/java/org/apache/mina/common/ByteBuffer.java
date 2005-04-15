@@ -52,6 +52,8 @@ import org.apache.mina.util.Stack;
  */
 public final class ByteBuffer
 {
+    private static final int MINIMUM_CAPACITY = 1;
+
     private static final Stack[] heapBufferStacks = new Stack[] {
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
@@ -60,8 +62,8 @@ public final class ByteBuffer
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), };
-
+            new Stack(), new Stack(), new Stack(), new Stack(), };
+    
     private static final Stack[] directBufferStacks = new Stack[] {
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
@@ -70,7 +72,7 @@ public final class ByteBuffer
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), };
+            new Stack(), new Stack(), new Stack(), new Stack(), };
     
     /**
      * Returns the direct buffer which is capable of the specified size.
@@ -101,7 +103,7 @@ public final class ByteBuffer
             buf = ( ByteBuffer ) stack.pop();
             if( buf == null )
             {
-                buf = new ByteBuffer( 16 << idx, direct );
+                buf = new ByteBuffer( MINIMUM_CAPACITY << idx, direct );
             }
         }
 
@@ -124,7 +126,7 @@ public final class ByteBuffer
     
     private static int getBufferStackIndex( Stack[] bufferStacks, int size )
     {
-        int targetSize = 16;
+        int targetSize = MINIMUM_CAPACITY;
         int stackIdx = 0;
         while( size > targetSize )
         {
