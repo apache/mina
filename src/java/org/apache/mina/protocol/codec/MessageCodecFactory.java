@@ -32,7 +32,6 @@ import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolEncoderOutput;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolViolationException;
-import org.apache.mina.protocol.codec.MessageDecoder.DecodeResult;
 
 /**
  * A composite {@link ProtocolCodecFactory} that consists of multiple
@@ -169,7 +168,7 @@ public class MessageCodecFactory implements ProtocolCodecFactory {
                     MessageDecoder decoder = decoders[i];
                     int limit = in.limit();
                     in.position( 0 );
-                    DecodeResult result = decoder.decodable( session, in );
+                    MessageDecoderResult result = decoder.decodable( session, in );
                     in.position( 0 );
                     in.limit( limit );
                     
@@ -203,7 +202,7 @@ public class MessageCodecFactory implements ProtocolCodecFactory {
                 }
             }
             
-            DecodeResult result = currentDecoder.decode( session, in, out );
+            MessageDecoderResult result = currentDecoder.decode( session, in, out );
             if( result == MessageDecoder.OK )
             {
                 currentDecoder = null;

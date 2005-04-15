@@ -28,6 +28,8 @@ import org.apache.mina.protocol.ProtocolEncoder;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @see MessageCodecFactory
  */
 public interface MessageEncoder extends ProtocolEncoder
 {  
