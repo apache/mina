@@ -75,13 +75,25 @@ public final class ByteBuffer
             new Stack(), new Stack(), new Stack(), new Stack(), };
     
     /**
-     * Returns the direct buffer which is capable of the specified size.
+     * Returns the direct or heap buffer which is capable of the specified
+     * size.  This method tries to allocate direct buffer first, and then
+     * tries heap buffer if direct buffer memory is exhausted.  Please use
+     * {@link #allocate(int, boolean)} to allocate buffers of specific type.
      * 
      * @param capacity the capacity of the buffer
      */
     public static ByteBuffer allocate( int capacity )
     {
-        return allocate( capacity, true );
+        try
+        {
+            // first try to allocate direct buffer
+            return allocate( capacity, true );
+        }
+        catch( OutOfMemoryError e )
+        {
+            // if failed, try heap
+            return allocate( capacity, false );
+        }
     }
     
     /**
@@ -227,7 +239,7 @@ public final class ByteBuffer
     {
         return buf.capacity();
     }
-
+    
     public int position()
     {
         return buf.position();
@@ -914,6 +926,38 @@ public final class ByteBuffer
         }
 
         return this;
+    }
+    
+    /**
+     * Allocates and returns a new {@link ByteBuffer} whose content, position,
+     * limit, and capacity is identical.  
+     */
+    public ByteBuffer fork()
+    {
+        return fork( this.capacity() );
+    }
+    
+    /**
+     * Allocates and returns a new {@link ByteBuffer} whose content, position,
+     * and limit except capacity is identical.  New capacity can be both greater
+     * and less than original capacity.  If limit or position is less than
+     * new capacity, they will become same with new capacity.
+     */
+    public ByteBuffer fork( int newCapacity )
+    {
+        ByteBuffer buf = allocate( newCapacity );
+        int pos = this.position();
+        int limit = this.limit();
+        this.position( 0 );
+        this.limit( newCapacity < this.capacity()? newCapacity : this.capacity() );
+        buf.put( this );
+        buf.position( pos < newCapacity? pos : newCapacity );
+        buf.limit( limit < newCapacity? limit : newCapacity );
+        this.limit( this.capacity() );
+        this.position( pos );
+        this.limit( limit );
+        
+        return buf;
     }
 
     private static void checkFieldSize( int fieldSize )

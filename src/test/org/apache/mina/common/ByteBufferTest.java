@@ -102,4 +102,87 @@ public class ByteBufferTest extends TestCase
         {
         }
     }
+    
+    public void testFork() throws Exception
+    {
+        ByteBuffer buf = ByteBuffer.allocate( 16 );
+        ByteBuffer newBuf;
+        
+        // initialize buf
+        for( int i = 0; i < 16; i ++ )
+        {
+            buf.put( i, (byte) i );
+        }
+
+        // without capacity
+        buf.position( 4 );
+        buf.limit( 8 );
+        newBuf = buf.fork();
+        Assert.assertEquals( 4, buf.position() );
+        Assert.assertEquals( 8, buf.limit() );
+        Assert.assertEquals( buf.position(), newBuf.position() );
+        Assert.assertEquals( buf.limit(), newBuf.limit() );
+        buf.limit( buf.capacity() );
+        newBuf.limit( newBuf.capacity() );
+        
+        // with larger capacity
+        buf.position( 4 );
+        buf.limit( 8 );
+        newBuf = buf.fork( 18 );
+        Assert.assertEquals( 4, buf.position() );
+        Assert.assertEquals( 8, buf.limit() );
+        Assert.assertEquals( buf.position(), newBuf.position() );
+        Assert.assertEquals( buf.limit(), newBuf.limit() );
+        buf.limit( buf.capacity() );
+        newBuf.limit( newBuf.capacity() );
+        for( int i = 0; i < 16; i ++ )
+        {
+            Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
+        }
+        
+        // with smaller capacity
+        buf.position( 4 );
+        buf.limit( 8 );
+        newBuf = buf.fork( 12 );
+        Assert.assertEquals( 4, buf.position() );
+        Assert.assertEquals( 8, buf.limit() );
+        Assert.assertEquals( buf.position(), newBuf.position() );
+        Assert.assertEquals( buf.limit(), newBuf.limit() );
+        buf.limit( buf.capacity() );
+        newBuf.limit( newBuf.capacity() );
+        for( int i = 0; i < 12; i ++ )
+        {
+            Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
+        }
+        
+        // with more smaller capacity
+        buf.position( 4 );
+        buf.limit( 8 );
+        newBuf = buf.fork( 6 );
+        Assert.assertEquals( 4, buf.position() );
+        Assert.assertEquals( 8, buf.limit() );
+        Assert.assertEquals( buf.position(), newBuf.position() );
+        Assert.assertEquals( 6, newBuf.limit() );
+        buf.limit( buf.capacity() );
+        newBuf.limit( newBuf.capacity() );
+        for( int i = 0; i < 6; i ++ )
+        {
+            Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
+        }
+        
+        // with smallest capacity
+        buf.position( 4 );
+        buf.limit( 8 );
+        newBuf = buf.fork( 2 );
+        Assert.assertEquals( 4, buf.position() );
+        Assert.assertEquals( 8, buf.limit() );
+        Assert.assertEquals( 2, newBuf.position() );
+        Assert.assertEquals( 2, newBuf.limit() );
+        buf.limit( buf.capacity() );
+        newBuf.limit( newBuf.capacity() );
+        for( int i = 0; i < 2; i ++ )
+        {
+            Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
+        }
+    }
 }
