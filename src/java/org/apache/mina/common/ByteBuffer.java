@@ -114,6 +114,14 @@ public final class ByteBuffer
         return buf;
     }
     
+    /**
+     * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
+     */
+    public static ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
+    {
+        return new ByteBuffer( nioBuffer );
+    }
+    
     private static int getBufferStackIndex( Stack[] bufferStacks, int size )
     {
         int targetSize = 16;
@@ -135,6 +143,15 @@ public final class ByteBuffer
     private final java.nio.ByteBuffer buf;
 
     private int refCount = 1;
+    
+    private ByteBuffer( java.nio.ByteBuffer buf )
+    {
+        if( buf == null )
+        {
+            throw new NullPointerException( "buf" );
+        }
+        this.buf = buf;
+    }
 
     private ByteBuffer( int capacity, boolean direct )
     {
