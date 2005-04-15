@@ -90,22 +90,27 @@ public abstract class CumulativeProtocolDecoder implements ProtocolDecoder {
         ByteBuffer buf = this.buf;
         buf.flip();
 
-        for( ;; )
+        try
         {
-            int oldPos = buf.position();
-            if( !doDecode( session, buf, out ) )
+            for( ;; )
             {
-                break;
-            }
-            
-            if( buf.position() == oldPos )
-            {
-                throw new IllegalStateException(
-                        "doDecode() can't return true when buffer is not consumed." );
+                int oldPos = buf.position();
+                if( !doDecode( session, buf, out ) )
+                {
+                    break;
+                }
+                
+                if( buf.position() == oldPos )
+                {
+                    throw new IllegalStateException(
+                            "doDecode() can't return true when buffer is not consumed." );
+                }
             }
         }
-
-        buf.compact();
+        finally
+        {
+            buf.compact();
+        }
     }
     
     /**
@@ -115,6 +120,8 @@ public abstract class CumulativeProtocolDecoder implements ProtocolDecoder {
      * @param in the cumulative buffer
      * @return <tt>true</tt> if and only if there's more to decode in the buffer
      *         and you want to have <tt>doDecode</tt> method invoked again.
+     *         Return <tt>false</tt> if remaining data is not enough to decode,
+     *         then this method will be invoked again when more data is cumulated.
      * @throws ProtocolViolationException if cannot decode <tt>in</tt>.
      */
     protected abstract boolean doDecode( ProtocolSession session, ByteBuffer in,

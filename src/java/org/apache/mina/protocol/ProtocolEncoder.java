@@ -49,5 +49,5 @@ public interface ProtocolEncoder
      *                                    specification
      */
     void encode( ProtocolSession session, Object message,
-                ProtocolEncoderOutput out ) throws ProtocolViolationException;
+                 ProtocolEncoderOutput out ) throws ProtocolViolationException;
 }
