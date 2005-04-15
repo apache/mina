@@ -29,6 +29,8 @@ import org.apache.mina.protocol.ProtocolViolationException;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @see MessageCodecFactory
  */
 public interface MessageDecoder {
     /**
@@ -36,21 +38,21 @@ public interface MessageDecoder {
      * {@link #decode(ProtocolSession, ByteBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
-    static DecodeResult OK = new DecodeResult( "OK" );
+    static MessageDecoderResult OK = MessageDecoderResult.OK;
 
     /**
      * Represents a result from {@link #decodable(ProtocolSession, ByteBuffer)} and
      * {@link #decode(ProtocolSession, ByteBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
-    static DecodeResult NEED_DATA = new DecodeResult( "NEED_DATA" );
+    static MessageDecoderResult NEED_DATA = MessageDecoderResult.NEED_DATA;
 
     /**
      * Represents a result from {@link #decodable(ProtocolSession, ByteBuffer)} and
      * {@link #decode(ProtocolSession, ByteBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
-    static DecodeResult NOT_OK = new DecodeResult( "NOT_OK" );
+    static MessageDecoderResult NOT_OK = MessageDecoderResult.NOT_OK;
     
     /**
      * Checks the specified buffer is decodable by this decoder.
@@ -61,7 +63,7 @@ public interface MessageDecoder {
      *         specified buffer is decodable ({@link #OK}) or not decodable
      *         {@link #NOT_OK}.
      */
-    DecodeResult decodable( ProtocolSession session, ByteBuffer in );
+    MessageDecoderResult decodable( ProtocolSession session, ByteBuffer in );
     
     /**
      * Decodes binary or protocol-specific content into higher-level message objects.
@@ -76,24 +78,6 @@ public interface MessageDecoder {
      * @throws ProtocolViolationException if the read data violated protocol
      *                                    specification 
      */
-    DecodeResult decode( ProtocolSession session, ByteBuffer in,
+    MessageDecoderResult decode( ProtocolSession session, ByteBuffer in,
                          ProtocolDecoderOutput out ) throws ProtocolViolationException;
-    
-    /**
-     * Enumeration type  for decoding results.
-     */
-    public class DecodeResult
-    {
-        private final String name;
-
-        private DecodeResult( String name )
-        {
-            this.name = name;
-        }
-        
-        public String toString()
-        {
-            return name;
-        }
-    }
 }
