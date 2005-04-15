@@ -60,7 +60,7 @@ public abstract class DemuxingProtocolHandler implements ProtocolHandler
      */
     public void messageReceived( ProtocolSession session, Object message )
     {
-        MessageHandler handler = getHandler( message.getClass() );
+        MessageHandler handler = findHandler( message.getClass() );
         if( handler != null )
         {
             handler.messageReceived( session, message );
@@ -72,37 +72,36 @@ public abstract class DemuxingProtocolHandler implements ProtocolHandler
         }
     }
 
-    private MessageHandler getHandler( Class type )
+    private MessageHandler findHandler( Class type )
     {
         MessageHandler handler = ( MessageHandler ) type2handler.get( type );
         if( handler == null )
         {
-            handler = getHandler( type, new HashSet() );
+            handler = findHandler( type, new HashSet() );
         }
 
         return handler;
     }
 
-    private MessageHandler getHandler( Class type, Set triedClassNames )
+    private MessageHandler findHandler( Class type, Set triedClasses )
     {
         MessageHandler handler;
 
-        String typeName = type.getName();
-        if( triedClassNames.contains( typeName ) )
+        if( triedClasses.contains( type ) )
             return null;
-        triedClassNames.add( typeName );
+        triedClasses.add( type );
 
-        handler = ( MessageHandler ) type2handler.get( typeName );
+        handler = ( MessageHandler ) type2handler.get( type );
         if( handler == null )
         {
-            handler = getHandler( type, triedClassNames );
+            handler = findHandler( type, triedClasses );
             if( handler != null )
                 return handler;
 
             Class[] interfaces = type.getInterfaces();
             for( int i = 0; i < interfaces.length; i ++ )
             {
-                handler = getHandler( interfaces[ i ], triedClassNames );
+                handler = findHandler( interfaces[ i ], triedClasses );
                 if( handler != null )
                     return handler;
             }

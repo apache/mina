@@ -85,6 +85,12 @@ public abstract class CumulativeProtocolDecoder implements ProtocolDecoder {
     public void decode( ProtocolSession session, ByteBuffer in,
                         ProtocolDecoderOutput out ) throws ProtocolViolationException
     {
+        if( session.getTransportType().isStateless() )
+        {
+            throw new IllegalStateException(
+                    "This decoder doesn't work for stateless transport types." );
+        }
+
         put( in );
         
         ByteBuffer buf = this.buf;
