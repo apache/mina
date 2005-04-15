@@ -190,7 +190,6 @@ class SocketIoProcessor
 
             SocketChannel ch = session.getChannel();
             session.getSelectionKey().cancel();
-            session.dispose();
 
             try
             {
@@ -232,12 +231,10 @@ class SocketIoProcessor
 
     private void read( SocketSession session )
     {
-        ByteBuffer buf = session.getReadBuffer();
+        ByteBuffer buf = ByteBuffer.allocate(
+                (( SocketSessionConfig ) session.getConfig()).getSessionReceiveBufferSize() ); 
         SocketChannel ch = session.getChannel();
 
-        // Acquire buffer to prevent buffer is released by
-        // SocketSession.setReadBuffer()
-        buf.acquire(); 
         try
         {
             int readBytes = 0;

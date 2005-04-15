@@ -20,7 +20,6 @@ package org.apache.mina.io.socket;
 
 import java.net.SocketException;
 
-import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolSession;
@@ -38,7 +37,11 @@ import org.apache.mina.util.BasicSessionConfig;
  */
 public class SocketSessionConfig extends BasicSessionConfig
 {
+    private static final int DEFAULT_READ_BUFFER_SIZE = 1024;
+
     private final SocketSession session;
+    
+    private int readBufferSize = DEFAULT_READ_BUFFER_SIZE;
 
     SocketSessionConfig( SocketSession session )
     {
@@ -125,13 +128,18 @@ public class SocketSessionConfig extends BasicSessionConfig
         session.getChannel().socket().setReceiveBufferSize( size );
     }
     
-    public void getSessionReceiveBufferSize()
+    public int getSessionReceiveBufferSize()
     {
-        session.getReadBuffer().capacity();
+        return readBufferSize;
     }
     
     public void setSessionReceiveBufferSize( int size )
     {
-        session.setReadBuffer( ByteBuffer.allocate( size ).limit( 0 ) );
+        if( size <= 0 )
+        {
+            throw new IllegalArgumentException( "Invalid session receive buffer size: " + size );
+        }
+        
+        this.readBufferSize = size;
     }
 }
