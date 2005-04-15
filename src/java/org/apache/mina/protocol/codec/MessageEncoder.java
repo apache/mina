@@ -29,7 +29,7 @@ import org.apache.mina.protocol.ProtocolEncoder;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
- * @see MessageCodecFactory
+ * @see DemuxingProtocolCodecFactory
  */
 public interface MessageEncoder extends ProtocolEncoder
 {  

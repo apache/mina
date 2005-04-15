@@ -67,7 +67,7 @@ public interface IoConnector
      * @param localAddress the local address the channel is bound to
      * @throws IOException if failed to connect
      */
-    IoSession connect( SocketAddress address, SocketAddress loadlAddress,
+    IoSession connect( SocketAddress address, SocketAddress localAddress,
                        IoHandler handler ) throws IOException;
 
     /**

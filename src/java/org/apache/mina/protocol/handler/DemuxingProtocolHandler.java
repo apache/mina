@@ -1,12 +1,15 @@
 /*
  * @(#) $Id$
  */
-package org.apache.mina.protocol;
+package org.apache.mina.protocol.handler;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.mina.protocol.ProtocolHandler;
+import org.apache.mina.protocol.ProtocolSession;
 
 /**
  * A {@link ProtocolHandler} that demuxes <code>messageReceived</code> events
@@ -110,68 +113,5 @@ public abstract class DemuxingProtocolHandler implements ProtocolHandler
         }
         else
             return handler;
-    }
-
-    /**
-     * A handler interface that {@link DemuxingProtocolHandler} forwards
-     * <code>messageReceived</code> events to.  You have to register your
-     * handler with the type of message you want to get notified using
-     * {@link DemuxingProtocolHandler#registerMessageType(Class, MessageHandler)}.
-     * 
-     * @author The Apache Directory Project
-     * @version $Rev$, $Date$
-     */
-    public interface MessageHandler
-    {
-        /**
-         * A {@link MessageHandler} that does nothing.  This is usefule when
-         * you want to ignore messages of the specific type silently.
-         */
-        static MessageHandler NOOP = new MessageHandler()
-        {
-            public void messageReceived( ProtocolSession session, Object message )
-            {
-            }
-        };
-        
-        /**
-         * Invoked when the specific type of message is received from the
-         * specified <code>session</code>.
-         */
-        void messageReceived( ProtocolSession session, Object message );
-    }
-
-    /**
-     * An exception that is thrown when {@link DemuxingProtocolHandler}
-     * cannot find any {@link MessageHandler}s associated with the specific
-     * message type.  You have to use
-     * {@link DemuxingProtocolHandler#registerMessageType(Class, MessageHandler)}
-     * to associate a message type and a message handler. 
-     * 
-     * @author The Apache Directory Project
-     * @version $Rev$, $Date$
-     */
-    public class UnknownMessageTypeException extends RuntimeException
-    {
-        private static final long serialVersionUID = 3257290227428047158L;
-
-        public UnknownMessageTypeException()
-        {
-        }
-
-        public UnknownMessageTypeException( String message, Throwable cause )
-        {
-            super( message, cause );
-        }
-
-        public UnknownMessageTypeException( String message )
-        {
-            super( message );
-        }
-
-        public UnknownMessageTypeException( Throwable cause )
-        {
-            super( cause );
-        }
     }
 }

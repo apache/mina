@@ -30,7 +30,7 @@ import org.apache.mina.protocol.ProtocolViolationException;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
- * @see MessageCodecFactory
+ * @see DemuxingProtocolCodecFactory
  */
 public interface MessageDecoder {
     /**

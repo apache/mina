@@ -47,7 +47,7 @@ import org.apache.mina.protocol.ProtocolViolationException;
  * @see MessageEncoder
  * @see MessageDecoder
  */
-public class MessageCodecFactory implements ProtocolCodecFactory {
+public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
 
     private MessageDecoder[] decoders = new MessageDecoder[0];
     private final Map encoders = new HashMap();
@@ -56,7 +56,7 @@ public class MessageCodecFactory implements ProtocolCodecFactory {
 
     private final ProtocolDecoder protocolDecoder = new ProtocolDecoderImpl();
     
-    public MessageCodecFactory()
+    public DemuxingProtocolCodecFactory()
     {
     }
     
@@ -161,7 +161,7 @@ public class MessageCodecFactory implements ProtocolCodecFactory {
         {
             if( currentDecoder == null )
             {
-                MessageDecoder[] decoders = MessageCodecFactory.this.decoders;
+                MessageDecoder[] decoders = DemuxingProtocolCodecFactory.this.decoders;
                 int undecodables = 0;
                 for( int i = decoders.length - 1; i >= 0; i -- ) 
                 {
