@@ -37,7 +37,7 @@ import org.apache.mina.common.ByteBuffer;
 public interface ProtocolDecoder
 {
     /**
-     * Decodes binary or protocol-specific into higher-level message objects.
+     * Decodes binary or protocol-specific content into higher-level message objects.
      * MINA invokes {@link #decode(ProtocolSession, ByteBuffer, ProtocolDecoderOutput)}
      * method with read data, and then the decoder implementation puts decoded
      * messages into {@link ProtocolDecoderOutput}.
@@ -46,5 +46,5 @@ public interface ProtocolDecoder
      *                                    specification 
      */
     void decode( ProtocolSession session, ByteBuffer in,
-                ProtocolDecoderOutput out ) throws ProtocolViolationException;
+                 ProtocolDecoderOutput out ) throws ProtocolViolationException;
 }
