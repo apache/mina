@@ -17,7 +17,7 @@ import java.nio.charset.CharsetEncoder;
 import org.apache.mina.util.Stack;
 
 /**
- * A pooled direct byte buffer used by MINA applications.
+ * A pooled byte buffer used by MINA applications.
  * <p>
  * This is a replacement for {@link java.nio.ByteBuffer}. Please refer to
  * {@link java.nio.ByteBuffer} and {@link java.nio.Buffer} documentation for
@@ -31,14 +31,18 @@ import org.apache.mina.util.Stack;
  *       pool or not.  MINA have to return used buffers back to pool.</li>
  * </ul>
  * <p>
- * You can get (or allocate) a new buffer from buffer pool:
+ * You can get a heap buffer from buffer pool:
  * <pre>
  * ByteBuffer buf = ByteBuffer.allocate(1024);
  * </pre>
+ * or you can get a direct buffer from buffer pool:
+ * <pre>
+ * ByteBuffer buf = ByteBuffer.allocate(1024, false);
+ * </pre>
  * <p>
  * <b>Please note that you never need to release the allocated buffer because
- * MINA will release it automatically.</b>  But, if you didn't pass it to MINA,
- * you will have to release it manually:
+ * MINA will release it automatically.</b>  But, if you didn't pass it to MINA
+ * or called {@link #acquire()} by yourself, you will have to release it manually:
  * <pre>
  * ByteBuffer.release(buf);
  * </pre>
@@ -48,7 +52,7 @@ import org.apache.mina.util.Stack;
  */
 public final class ByteBuffer
 {
-    private static final Stack[] bufferStacks = new Stack[] {
+    private static final Stack[] heapBufferStacks = new Stack[] {
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
@@ -58,12 +62,37 @@ public final class ByteBuffer
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), };
 
+    private static final Stack[] directBufferStacks = new Stack[] {
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), new Stack(), new Stack(), new Stack(),
+            new Stack(), };
+    
     /**
-     * Returns the buffer which is capable of the specified size.
+     * Returns the direct buffer which is capable of the specified size.
+     * 
+     * @param capacity the capacity of the buffer
      */
     public static ByteBuffer allocate( int capacity )
     {
-        int idx = getBufferStackIndex( capacity );
+        return allocate( capacity, true );
+    }
+    
+    /**
+     * Returns the buffer which is capable of the specified size.
+     * 
+     * @param capacity the capacity of the buffer
+     * @param direct <tt>true</tt> to get a direct buffer,
+     *               <tt>false</tt> to get a heap buffer.
+     */
+    public static ByteBuffer allocate( int capacity, boolean direct )
+    {
+        Stack[] bufferStacks = direct? directBufferStacks : heapBufferStacks;
+        int idx = getBufferStackIndex( bufferStacks, capacity );
         Stack stack = bufferStacks[ idx ];
 
         ByteBuffer buf;
@@ -72,8 +101,7 @@ public final class ByteBuffer
             buf = ( ByteBuffer ) stack.pop();
             if( buf == null )
             {
-                buf = new ByteBuffer( java.nio.ByteBuffer
-                        .allocateDirect( 16 << idx ) );
+                buf = new ByteBuffer( 16 << idx, direct );
             }
         }
 
@@ -85,8 +113,8 @@ public final class ByteBuffer
 
         return buf;
     }
-
-    private static int getBufferStackIndex( int size )
+    
+    private static int getBufferStackIndex( Stack[] bufferStacks, int size )
     {
         int targetSize = 16;
         int stackIdx = 0;
@@ -108,9 +136,16 @@ public final class ByteBuffer
 
     private int refCount = 1;
 
-    private ByteBuffer( java.nio.ByteBuffer buf )
+    private ByteBuffer( int capacity, boolean direct )
     {
-        this.buf = buf;
+        if( direct )
+        {
+            buf = java.nio.ByteBuffer.allocateDirect( capacity );
+        }
+        else
+        {
+            buf = java.nio.ByteBuffer.allocate( capacity );
+        }
     }
     
     /**
@@ -152,7 +187,8 @@ public final class ByteBuffer
             return;
         }
 
-        Stack stack = bufferStacks[ getBufferStackIndex( buf.capacity() ) ];
+        Stack[] bufferStacks = buf.isDirect()? directBufferStacks : heapBufferStacks;
+        Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, buf.capacity() ) ];
         synchronized( stack )
         {
             // push back
