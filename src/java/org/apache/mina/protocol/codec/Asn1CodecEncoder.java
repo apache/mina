@@ -59,10 +59,7 @@ public class Asn1CodecEncoder implements ProtocolEncoder
             if( encoded instanceof java.nio.ByteBuffer )
             {
                 java.nio.ByteBuffer buf = ( java.nio.ByteBuffer ) encoded;
-                ByteBuffer outBuf = ByteBuffer.allocate( buf.remaining() );
-                outBuf.put( buf );
-                outBuf.flip();
-                encOut.write( outBuf );
+                encOut.write( ByteBuffer.wrap( buf ) );
             }
             else if( encoded instanceof Object[] )
             {
