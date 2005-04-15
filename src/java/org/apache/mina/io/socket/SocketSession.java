@@ -38,15 +38,11 @@ import org.apache.mina.util.Queue;
  */
 class SocketSession implements IoSession
 {
-    private static final int DEFAULT_READ_BUFFER_SIZE = 1024;
-
     private final SocketFilterChain filters;
 
     private final SocketChannel ch;
 
     private final SocketSessionConfig config;
-
-    private ByteBuffer readBuf;
 
     private final Queue writeBufferQueue;
 
@@ -75,8 +71,6 @@ class SocketSession implements IoSession
     private boolean idleForRead;
 
     private boolean idleForWrite;
-    
-    private boolean disposed;
 
     /**
      * Creates a new instance.
@@ -87,7 +81,6 @@ class SocketSession implements IoSession
         this.filters = filters;
         this.ch = ch;
         this.config = new SocketSessionConfig( this );
-        this.readBuf = ByteBuffer.allocate( DEFAULT_READ_BUFFER_SIZE ).limit( 0 );
         this.writeBufferQueue = new Queue();
         this.writeMarkerQueue = new Queue();
         this.handler = defaultHandler;
@@ -115,16 +108,6 @@ class SocketSession implements IoSession
         this.key = key;
     }
 
-    void dispose()
-    {
-        if (disposed)
-        {
-            return;
-        }
-        disposed = true;
-        readBuf.release();
-    }
-
     public IoHandler getHandler()
     {
         return handler;
@@ -143,18 +126,6 @@ class SocketSession implements IoSession
     public void setAttachment( Object attachment )
     {
         this.attachment = attachment;
-    }
-
-    synchronized ByteBuffer getReadBuffer()
-    {
-        return readBuf;
-    }
-    
-    synchronized void setReadBuffer( ByteBuffer readBuf )
-    {
-        ByteBuffer oldBuf = this.readBuf;
-        this.readBuf = readBuf;
-        oldBuf.release(); // release old buffer
     }
 
     Queue getWriteBufferQueue()
