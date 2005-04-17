@@ -14,7 +14,7 @@ import org.apache.mina.protocol.ProtocolViolationException;
 
 /**
  * A wrapper for {@link StatefulDecoder} from 
- * <a href="http://incubator.apache.org/directory/subprojects/asn1/codec-stateful/">Apache ASN.1 Codec</a>.
+ * <a href="http://directory.apache.org/subprojects/asn1/codec-stateful/">Apache ASN.1 Codec</a>.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$, 
