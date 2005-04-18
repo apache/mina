@@ -32,6 +32,16 @@
 		
         <section name="Getting Started">
             <p>
+                First, check out the source code from SVN repository:
+<source>
+$ svn co https://svn.apache.org/repos/asf/directory/network/trunk mina
+$ cd mina
+$ maven jar     # Build JAR
+$ maven site    # Generate documentation
+$ maven eclipse # Generate Eclipse project file if you want
+</source>
+            </p>
+            <p>
                 Tutorial is under construction.  Please start from
                 <a target="_blank" href="xref-examples/index.html">examples</a>
                 referring to
