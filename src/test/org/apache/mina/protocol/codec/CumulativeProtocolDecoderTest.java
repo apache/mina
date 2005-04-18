@@ -18,6 +18,7 @@
  */
 package org.apache.mina.protocol.codec;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,13 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.SessionConfig;
+import org.apache.mina.common.TransportType;
+import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolDecoderOutput;
+import org.apache.mina.protocol.ProtocolEncoder;
+import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolViolationException;
 
@@ -37,6 +44,7 @@ import org.apache.mina.protocol.ProtocolViolationException;
  */
 public class CumulativeProtocolDecoderTest extends TestCase
 {
+    private final ProtocolSession session = new ProtocolSessionImpl();
     private ByteBuffer buf;
     private IntegerDecoder decoder;
     private IntegerDecoderOutput output;
@@ -62,7 +70,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
         buf.put( (byte) 0 );
         buf.flip();
         
-        decoder.decode( null, buf, output );
+        decoder.decode( session, buf, output );
         Assert.assertEquals( 0, output.getValues().size() );
         Assert.assertEquals( buf.limit(), buf.position() );
         
@@ -72,7 +80,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
         buf.put( (byte) 1 );
         buf.flip();
 
-        decoder.decode( null, buf, output );
+        decoder.decode( session, buf, output );
         Assert.assertEquals( 1, output.getValues().size() );
         Assert.assertEquals( new Integer( 1 ), output.getValues().get( 0 ) );
         Assert.assertEquals( buf.limit(), buf.position() );
@@ -86,7 +94,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
         }
         buf.flip();
         
-        decoder.decode( null, buf, output );
+        decoder.decode( session, buf, output );
         Assert.assertEquals( 4, output.getValues().size() );
         Assert.assertEquals( buf.limit(), buf.position() );
         
@@ -102,7 +110,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
     public void testWrongImplementationDetection() throws Exception {
         try
         {
-            new WrongDecoder().decode( null, buf, output );
+            new WrongDecoder().decode( session, buf, output );
             Assert.fail();
         }
         catch( IllegalStateException e )
@@ -161,5 +169,79 @@ public class CumulativeProtocolDecoderTest extends TestCase
                                     ProtocolDecoderOutput out ) throws ProtocolViolationException {
             return true;
         }
+    }
+    
+    private static class ProtocolSessionImpl implements ProtocolSession
+    {
+
+        public ProtocolHandler getHandler() {
+            return null;
+        }
+
+        public ProtocolEncoder getEncoder() {
+            return null;
+        }
+
+        public ProtocolDecoder getDecoder() {
+            return null;
+        }
+
+        public void close() {
+        }
+
+        public Object getAttachment() {
+            return null;
+        }
+
+        public void setAttachment(Object attachment) {
+        }
+
+        public void write(Object message) {
+        }
+
+        public TransportType getTransportType() {
+            return TransportType.SOCKET;
+        }
+
+        public boolean isConnected() {
+            return false;
+        }
+
+        public SessionConfig getConfig() {
+            return null;
+        }
+
+        public SocketAddress getRemoteAddress() {
+            return null;
+        }
+
+        public SocketAddress getLocalAddress() {
+            return null;
+        }
+
+        public long getReadBytes() {
+            return 0;
+        }
+
+        public long getWrittenBytes() {
+            return 0;
+        }
+
+        public long getLastIoTime() {
+            return 0;
+        }
+
+        public long getLastReadTime() {
+            return 0;
+        }
+
+        public long getLastWriteTime() {
+            return 0;
+        }
+
+        public boolean isIdle(IdleStatus status) {
+            return false;
+        }
+        
     }
 }
