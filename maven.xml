@@ -32,12 +32,17 @@
 	</postGoal>
 
 	<postGoal name="maven-javadoc-plugin:report">
+		<ant:copy todir="${basedir}/target/javadoc/src">
+			<ant:fileset dir="${basedir}/src/examples">
+				<ant:include name="**/*.java" />
+				<ant:include name="**/doc-files/**/*" />
+			</ant:fileset>
+		</ant:copy>
 		<ant:javadoc
 			packagenames="org.apache.mina.examples.*"
 			sourcepath="${basedir}/src/examples"
 			destdir="${maven.docs.dest}/apidocs-examples" />
 	</postGoal>
-
 	<postGoal name="maven-jxr-plugin:register">
 		<doc:registerReport 
 			name="Examples Xref" 
