@@ -76,21 +76,6 @@
 
   <dependencies>
 
-    <!-- ================================================================== -->
-    <!-- Compatibility dependencies for ProtocolEncoder and ProtocolDecoder -->
-    <!-- ================================================================== -->
-
-    <!-- this dep should just go away - fork what you need if you have to -->
-
-    <dependency>
-      <groupId>directory-asn1</groupId>
-      <artifactId>asn1-codec</artifactId>
-      <version>0.3-SNAPSHOT</version>
-      <url>http://directory.apache.org/subprojects/asn1/codec-stateful/</url>
-    </dependency>
-    
-    <!-- this dep should just go away too - fork what you need if you have to -->
-
     <!-- ========================================================= -->
     <!-- Dependencies required for running test cases and examples -->
     <!-- ========================================================= -->
