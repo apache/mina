@@ -91,13 +91,6 @@
     
     <!-- this dep should just go away too - fork what you need if you have to -->
 
-    <dependency>
-      <groupId>tl-netty2</groupId>
-      <artifactId>tl-netty2</artifactId>
-      <version>1.8.0</version>
-      <url>http://gleamynode.net/dev/projects/netty2/</url>
-    </dependency>
-    
     <!-- ========================================================= -->
     <!-- Dependencies required for running test cases and examples -->
     <!-- ========================================================= -->

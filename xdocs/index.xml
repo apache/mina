@@ -65,11 +65,6 @@
                         <td>A frontend package that makes setting up MINA easier.</td>
                         <td>Server (registry)</td>
                     </tr>
-                    <tr>
-                        <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/sumup/package-summary.html">SumUp</a></td>
-                        <td>Migration from <a target="_blank" href="http://gleamynode.net/dev/projects/netty2-example-sumup/">Netty SumUp example</a>.</td>
-                        <td>Both</td>
-                    </tr>
                 </table>
             </p>
         </section>
