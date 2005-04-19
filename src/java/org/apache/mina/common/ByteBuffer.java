@@ -137,7 +137,7 @@ public abstract class ByteBuffer
         }
 
         buf.clear();
-        buf.resetRefCount();
+        buf.init();
 
         return buf;
     }
@@ -197,9 +197,11 @@ public abstract class ByteBuffer
     
     public abstract boolean isDirect();
     
-    public abstract boolean isReadOnly();
-    
     public abstract int capacity();
+    
+    public abstract boolean isAutoExpand();
+    
+    public abstract ByteBuffer setAutoExpand( boolean autoExpand );
     
     public abstract int position();
 
@@ -222,12 +224,6 @@ public abstract class ByteBuffer
     public abstract int remaining();
 
     public abstract boolean hasRemaining();
-
-    public abstract ByteBuffer slice();
-
-    public abstract ByteBuffer duplicate();
-
-    public abstract ByteBuffer asReadOnlyBuffer();
 
     public abstract byte get();
 
@@ -419,25 +415,13 @@ public abstract class ByteBuffer
      */
     public abstract ByteBuffer fillAndReset( int size );
     
-    /**
-     * Allocates and returns a new {@link ByteBuffer} whose content, position,
-     * limit, and capacity is identical.  
-     */
-    public abstract ByteBuffer fork();
-    
-    /**
-     * Allocates and returns a new {@link ByteBuffer} whose content, position,
-     * and limit except capacity is identical.  New capacity can be both greater
-     * and less than original capacity.  If limit or position is less than
-     * new capacity, they will become same with new capacity.
-     */
-    public abstract ByteBuffer fork( int newCapacity );
-    
-    private static abstract class BaseByteBuffer extends ByteBuffer
+    private static class DefaultByteBuffer extends ByteBuffer
     {
-        private final java.nio.ByteBuffer buf;
+        private java.nio.ByteBuffer buf;
+        private int refCount = 1;
+        private boolean autoExpand;
 
-        protected BaseByteBuffer( java.nio.ByteBuffer buf )
+        protected DefaultByteBuffer( java.nio.ByteBuffer buf )
         {
             if( buf == null )
             {
@@ -446,6 +430,52 @@ public abstract class ByteBuffer
             this.buf = buf;
         }
 
+        protected DefaultByteBuffer( int capacity, boolean direct )
+        {
+            this( direct? java.nio.ByteBuffer.allocateDirect( capacity ) :
+                          java.nio.ByteBuffer.allocate( capacity ) );
+        }
+
+        private synchronized void init()
+        {
+            autoExpand = false;
+            refCount = 1;
+        }
+        
+        public synchronized void acquire()
+        {
+            if( refCount <= 0 )
+            {
+                throw new IllegalStateException( "Already released buffer." );
+            }
+
+            refCount ++;
+        }
+
+        public synchronized void release()
+        {
+            if( refCount <= 0 )
+            {
+                refCount = 0;
+                throw new IllegalStateException(
+                        "Already released buffer.  You released the buffer too many times." );
+            }
+
+            refCount --;
+            if( refCount > 0)
+            {
+                return;
+            }
+
+            Stack[] bufferStacks = isDirect()? directBufferStacks : heapBufferStacks;
+            Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, capacity() ) ];
+            synchronized( stack )
+            {
+                // push back
+                stack.push( this );
+            }
+        }
+        
         public java.nio.ByteBuffer buf()
         {
             return buf;
@@ -460,6 +490,17 @@ public abstract class ByteBuffer
         {
             return buf.isReadOnly();
         }
+        
+        public boolean isAutoExpand()
+        {
+            return autoExpand;
+        }
+        
+        public ByteBuffer setAutoExpand( boolean autoExpand )
+        {
+            this.autoExpand = autoExpand;
+            return this;
+        }
 
         public int capacity()
         {
@@ -473,6 +514,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer position( int newPosition )
         {
+            autoExpand( newPosition, 0 );
             buf.position( newPosition );
             return this;
         }
@@ -484,6 +526,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer limit( int newLimit )
         {
+            autoExpand( newLimit, 0 );
             buf.limit( newLimit );
             return this;
         }
@@ -528,21 +571,6 @@ public abstract class ByteBuffer
             return buf.hasRemaining();
         }
 
-        public ByteBuffer slice()
-        {
-            return new DuplicateByteBuffer( this, buf.slice());
-        }
-
-        public ByteBuffer duplicate()
-        {
-            return new DuplicateByteBuffer( this, buf.duplicate() );
-        }
-
-        public ByteBuffer asReadOnlyBuffer()
-        {
-            return new DuplicateByteBuffer( this, buf.asReadOnlyBuffer() );
-        }
-
         public byte get()
         {
             return buf.get();
@@ -555,6 +583,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer put( byte b )
         {
+            autoExpand( 1 );
             buf.put( b );
             return this;
         }
@@ -571,6 +600,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer put( int index, byte b )
         {
+            autoExpand( index, 1 );
             buf.put( index, b );
             return this;
         }
@@ -589,24 +619,28 @@ public abstract class ByteBuffer
 
         public ByteBuffer put( java.nio.ByteBuffer src )
         {
+            autoExpand( src.remaining() );
             buf.put( src );
             return this;
         }
 
         public ByteBuffer put( ByteBuffer src )
         {
+            autoExpand( src.remaining() );
             buf.put( src.buf() );
             return this;
         }
 
         public ByteBuffer put( byte[] src, int offset, int length )
         {
+            autoExpand( length );
             buf.put( src, offset, length );
             return this;
         }
 
         public ByteBuffer put( byte[] src )
         {
+            autoExpand( src.length );
             buf.put( src );
             return this;
         }
@@ -659,6 +693,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putChar( char value )
         {
+            autoExpand( 2 );
             buf.putChar( value );
             return this;
         }
@@ -670,6 +705,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putChar( int index, char value )
         {
+            autoExpand( index, 2 );
             buf.putChar( index, value );
             return this;
         }
@@ -691,6 +727,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putShort( short value )
         {
+            autoExpand( 2 );
             buf.putShort( value );
             return this;
         }
@@ -707,6 +744,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putShort( int index, short value )
         {
+            autoExpand( index, 2 );
             buf.putShort( index, value );
             return this;
         }
@@ -728,6 +766,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putInt( int value )
         {
+            autoExpand( 4 );
             buf.putInt( value );
             return this;
         }
@@ -744,6 +783,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putInt( int index, int value )
         {
+            autoExpand( index, 4 );
             buf.putInt( index, value );
             return this;
         }
@@ -760,6 +800,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putLong( long value )
         {
+            autoExpand( 8 );
             buf.putLong( value );
             return this;
         }
@@ -771,6 +812,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putLong( int index, long value )
         {
+            autoExpand( index, 8 );
             buf.putLong( index, value );
             return this;
         }
@@ -787,6 +829,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putFloat( float value )
         {
+            autoExpand( 4 );
             buf.putFloat( value );
             return this;
         }
@@ -798,6 +841,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putFloat( int index, float value )
         {
+            autoExpand( index, 4 );
             buf.putFloat( index, value );
             return this;
         }
@@ -814,6 +858,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putDouble( double value )
         {
+            autoExpand( 8 );
             buf.putDouble( value );
             return this;
         }
@@ -825,6 +870,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer putDouble( int index, double value )
         {
+            autoExpand( index, 8 );
             buf.putDouble( index, value );
             return this;
         }
@@ -1043,8 +1089,10 @@ public abstract class ByteBuffer
             if( fieldSize == 0 )
                 return this;
             
+            autoExpand( fieldSize );
+            
             CharBuffer in = CharBuffer.wrap( val ); 
-
+            int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar());
             boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
 
             if( utf16 && ( ( fieldSize & 1 ) != 0 ) )
@@ -1104,7 +1152,7 @@ public abstract class ByteBuffer
                 CharSequence val, CharsetEncoder encoder ) throws CharacterCodingException
         {
             CharBuffer in = CharBuffer.wrap( val ); 
-
+            int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar());
             boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
 
             encoder.reset();
@@ -1124,6 +1172,11 @@ public abstract class ByteBuffer
                 {
                     break;
                 }
+                if( cr.isOverflow() && autoExpand )
+                {
+                    autoExpand( expectedLength );
+                    continue;
+                }
                 cr.throwException();
             }
             return this;
@@ -1131,11 +1184,13 @@ public abstract class ByteBuffer
         
         public ByteBuffer skip( int size )
         {
+            autoExpand( size );
             return position( position() + size );
         }
 
         public ByteBuffer fill( byte value, int size )
         {
+            autoExpand( size );
             int q = size >>> 3;
             int r = size & 7;
 
@@ -1182,6 +1237,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer fillAndReset( byte value, int size )
         {
+            autoExpand( size );
             int pos = buf.position();
             try
             {
@@ -1196,6 +1252,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer fill( int size )
         {
+            autoExpand( size );
             int q = size >>> 3;
             int r = size & 7;
 
@@ -1230,6 +1287,7 @@ public abstract class ByteBuffer
 
         public ByteBuffer fillAndReset( int size )
         {
+            autoExpand( size );
             int pos = buf.position();
             try
             {
@@ -1242,29 +1300,62 @@ public abstract class ByteBuffer
 
             return this;
         }
-        
-        public ByteBuffer fork()
-        {
-            return fork( this.capacity() );
-        }
-        
-        public ByteBuffer fork( int newCapacity )
-        {
-            ByteBuffer buf = allocate( newCapacity, isDirect() );
-            int pos = this.position();
-            int limit = this.limit();
-            this.position( 0 );
-            this.limit( newCapacity < this.capacity()? newCapacity : this.capacity() );
-            buf.put( this );
-            buf.position( pos < newCapacity? pos : newCapacity );
-            buf.limit( limit < newCapacity? limit : newCapacity );
-            this.limit( this.capacity() );
-            this.position( pos );
-            this.limit( limit );
-            
-            return buf;
-        }
 
+        private void autoExpand( int delta )
+        {
+            if( autoExpand )
+            {
+                int pos = buf.position();
+                int limit = buf.limit();
+                int end = pos + delta;
+                if( end > limit ) {
+                    ensureCapacity( end );
+                    buf.limit( end );
+                }
+            }
+        }
+        
+        private void autoExpand( int pos, int delta )
+        {
+            if( autoExpand )
+            {
+                int limit = buf.limit();
+                int end = pos + delta;
+                if( end > limit ) {
+                    ensureCapacity( end ); // expand by 50%
+                    buf.limit( end );
+                }
+            }
+        }
+        
+        private void ensureCapacity( int requestedCapacity )
+        {
+            if( requestedCapacity <= buf.capacity() )
+            {
+                return;
+            }
+            
+            int newCapacity = MINIMUM_CAPACITY;
+            while( newCapacity < requestedCapacity )
+            {
+                newCapacity <<= 1;
+            }
+            
+            java.nio.ByteBuffer oldBuf = this.buf;
+            java.nio.ByteBuffer newBuf = isDirect() ? java.nio.ByteBuffer.allocateDirect( newCapacity ) :
+                                                      java.nio.ByteBuffer.allocate( newCapacity );
+            
+            int pos = oldBuf.position();
+            int limit = oldBuf.limit();
+            oldBuf.clear();
+            newBuf.put( oldBuf );
+            newBuf.position( 0 );
+            newBuf.limit( limit );
+            newBuf.position( pos );
+            this.buf = newBuf;
+            new DefaultByteBuffer( oldBuf ).release();
+        }
+        
         private static void checkFieldSize( int fieldSize )
         {
             if( fieldSize < 0 )
@@ -1273,79 +1364,6 @@ public abstract class ByteBuffer
                         "fieldSize cannot be negative: " + fieldSize );
             }
         }
-    }
-
-    private static class DefaultByteBuffer extends BaseByteBuffer
-    {
-        private int refCount = 1;
         
-        protected DefaultByteBuffer( java.nio.ByteBuffer buf )
-        {
-            super( buf );
-        }
-
-        protected DefaultByteBuffer( int capacity, boolean direct )
-        {
-            super( direct? java.nio.ByteBuffer.allocateDirect( capacity ) :
-                           java.nio.ByteBuffer.allocate( capacity ) );
-        }
-        
-        private synchronized void resetRefCount()
-        {
-            refCount = 1;
-        }
-        
-        public synchronized void acquire()
-        {
-            if( refCount <= 0 )
-            {
-                throw new IllegalStateException( "Already released buffer." );
-            }
-
-            refCount ++;
-        }
-
-        public synchronized void release()
-        {
-            if( refCount <= 0 )
-            {
-                refCount = 0;
-                throw new IllegalStateException(
-                        "Already released buffer.  You released the buffer too many times." );
-            }
-
-            refCount --;
-            if( refCount > 0)
-            {
-                return;
-            }
-
-            Stack[] bufferStacks = isDirect()? directBufferStacks : heapBufferStacks;
-            Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, capacity() ) ];
-            synchronized( stack )
-            {
-                // push back
-                stack.push( this );
-            }
-        }
-    }
-    
-    private static class DuplicateByteBuffer extends BaseByteBuffer
-    {
-        private ByteBuffer buf;
-
-        private DuplicateByteBuffer( ByteBuffer buf, java.nio.ByteBuffer duplicateBuf )
-        {
-            super( duplicateBuf );
-            this.buf = buf;
-        }
-
-        public void acquire() {
-            buf.acquire();
-        }
-
-        public void release() {
-            buf.release();
-        }
     }
 }

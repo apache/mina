@@ -35,17 +35,11 @@ import java.nio.charset.CharsetEncoder;
  * You can think this class like a {@link FilterOutputStream}.  All operations
  * are proxied by default so that you can extend this class and override existing
  * operations selectively.  You can introduce new operations, too.
- * <p>
- * Please note that you have to implement {@link ByteBuffer#duplicate()},
- * {@link ByteBuffer#slice()}, {@link ByteBuffer#asReadOnlyBuffer()},
- * {@link ByteBuffer#fork()}, and {@link ByteBuffer#fork(int)}.
- * It is because <tt>ByteBufferProxy</tt> itself cannot instantiate
- * the class you extended.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class ByteBufferProxy extends ByteBuffer {
+public class ByteBufferProxy extends ByteBuffer {
 
     /**
      * The buffer proxied by this proxy.
@@ -78,11 +72,6 @@ public abstract class ByteBufferProxy extends ByteBuffer {
         return buf.isDirect();
     }
     
-    public boolean isReadOnly()
-    {
-        return buf.isReadOnly();
-    }
-
     public java.nio.ByteBuffer buf() {
         return buf.buf();
     }
@@ -424,6 +413,15 @@ public abstract class ByteBufferProxy extends ByteBuffer {
 
     public ByteBuffer fillAndReset(int size) {
         buf.fillAndReset( size );
+        return this;
+    }
+
+    public boolean isAutoExpand() {
+        return buf.isAutoExpand();
+    }
+
+    public ByteBuffer setAutoExpand(boolean autoExpand) {
+        buf.setAutoExpand( autoExpand );
         return this;
     }
 }

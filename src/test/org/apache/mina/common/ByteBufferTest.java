@@ -18,6 +18,8 @@
  */
 package org.apache.mina.common;
 
+import java.nio.BufferOverflowException;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -103,98 +105,42 @@ public class ByteBufferTest extends TestCase
         }
     }
     
-    public void testFork() throws Exception
+    public void testAutoExpand() throws Exception
     {
-        ByteBuffer buf = ByteBuffer.allocate( 16 );
-        ByteBuffer newBuf;
+        ByteBuffer buf = ByteBuffer.allocate( 1 );
         
-        // initialize buf
-        for( int i = 0; i < 16; i ++ )
+        buf.put( (byte) 0 );
+        try
         {
-            buf.put( i, (byte) i );
+            buf.put( (byte) 0 );
+            Assert.fail();
         }
-
-        // without capacity
-        buf.position( 4 );
-        buf.limit( 8 );
-        newBuf = buf.fork();
-        Assert.assertEquals( 4, buf.position() );
-        Assert.assertEquals( 8, buf.limit() );
-        Assert.assertEquals( buf.position(), newBuf.position() );
-        Assert.assertEquals( buf.limit(), newBuf.limit() );
-        buf.limit( buf.capacity() );
-        newBuf.limit( newBuf.capacity() );
-        
-        // with larger capacity
-        buf.position( 4 );
-        buf.limit( 8 );
-        newBuf = buf.fork( 18 );
-        Assert.assertEquals( 4, buf.position() );
-        Assert.assertEquals( 8, buf.limit() );
-        Assert.assertEquals( buf.position(), newBuf.position() );
-        Assert.assertEquals( buf.limit(), newBuf.limit() );
-        buf.limit( buf.capacity() );
-        newBuf.limit( newBuf.capacity() );
-        for( int i = 0; i < 16; i ++ )
+        catch( BufferOverflowException e )
         {
-            Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
+            // ignore
         }
         
-        // with smaller capacity
-        buf.position( 4 );
-        buf.limit( 8 );
-        newBuf = buf.fork( 12 );
-        Assert.assertEquals( 4, buf.position() );
-        Assert.assertEquals( 8, buf.limit() );
-        Assert.assertEquals( buf.position(), newBuf.position() );
-        Assert.assertEquals( buf.limit(), newBuf.limit() );
-        buf.limit( buf.capacity() );
-        newBuf.limit( newBuf.capacity() );
-        for( int i = 0; i < 12; i ++ )
+        buf.setAutoExpand( true );
+        buf.put( (byte) 0 );
+        Assert.assertEquals( 2, buf.position() );
+        Assert.assertEquals( 2, buf.limit() );
+        Assert.assertEquals( 2, buf.capacity() );
+        
+        buf.setAutoExpand( false );
+        try
         {
-            Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
+            buf.put( 3, (byte) 0 );
+            Assert.fail();
+        }
+        catch( IndexOutOfBoundsException e )
+        {
+            // ignore
         }
         
-        // with more smaller capacity
-        buf.position( 4 );
-        buf.limit( 8 );
-        newBuf = buf.fork( 6 );
-        Assert.assertEquals( 4, buf.position() );
-        Assert.assertEquals( 8, buf.limit() );
-        Assert.assertEquals( buf.position(), newBuf.position() );
-        Assert.assertEquals( 6, newBuf.limit() );
-        buf.limit( buf.capacity() );
-        newBuf.limit( newBuf.capacity() );
-        for( int i = 0; i < 6; i ++ )
-        {
-            Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
-        }
-        
-        // with smallest capacity
-        buf.position( 4 );
-        buf.limit( 8 );
-        newBuf = buf.fork( 2 );
-        Assert.assertEquals( 4, buf.position() );
-        Assert.assertEquals( 8, buf.limit() );
-        Assert.assertEquals( 2, newBuf.position() );
-        Assert.assertEquals( 2, newBuf.limit() );
-        buf.limit( buf.capacity() );
-        newBuf.limit( newBuf.capacity() );
-        for( int i = 0; i < 2; i ++ )
-        {
-            Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
-        }
-    }
-    
-    public void testDuplication()
-    {
-        ByteBuffer buf = ByteBuffer.allocate( 16 );
-        buf.fillAndReset( buf.remaining() );
-
-        ByteBuffer buf2 = buf.duplicate();
-        buf.putInt( 1234 );
-        Assert.assertEquals( 4, buf.position() );
-        Assert.assertEquals( 0, buf2.position() );
-        Assert.assertEquals( 1234, buf2.getInt() );
+        buf.setAutoExpand( true );
+        buf.put( 3, (byte) 0 );
+        Assert.assertEquals( 2, buf.position() );
+        Assert.assertEquals( 4, buf.limit() );
+        Assert.assertEquals( 4, buf.capacity() );
     }
 }
