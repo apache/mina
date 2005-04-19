@@ -26,8 +26,10 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
 
 import org.apache.mina.util.Stack;
 
@@ -343,13 +345,11 @@ public abstract class ByteBuffer
     ////////////////////////////////
 
     /**
-     * Reads a <code>NUL</code>-terminated string from this buffer and puts it
-     * into <code>out</code> using the specified <code>decoder</code>.
-     * 
-     * @param fieldSize the maximum number of bytes to read
+     * Reads a <code>NUL</code>-terminated string from this buffer using the
+     * specified <code>decoder</code> and returns it.  This method reads
+     * until the limit of this buffer if no <tt>NUL</tt> is found.
      */
-    public abstract ByteBuffer getString( CharBuffer out, int fieldSize,
-                                CharsetDecoder decoder );
+    public abstract String getString( CharsetDecoder decoder ) throws CharacterCodingException;
 
     /**
      * Reads a <code>NUL</code>-terminated string from this buffer using the
@@ -357,7 +357,16 @@ public abstract class ByteBuffer
      * 
      * @param fieldSize the maximum number of bytes to read
      */
-    public abstract String getString( int fieldSize, CharsetDecoder decoder );
+    public abstract String getString( int fieldSize, CharsetDecoder decoder ) throws CharacterCodingException;
+    
+    /**
+     * Writes the content of <code>in</code> into this buffer using the
+     * specified <code>encoder</code>.  This method doesn't terminate
+     * string with <tt>NUL</tt>.  You have to do it by yourself.
+     * 
+     * @throws BufferOverflowException if the specified string doesn't fit
+     */
+    public abstract ByteBuffer putString( CharSequence in, CharsetEncoder encoder ) throws CharacterCodingException;
 
     /**
      * Writes the content of <code>in</code> into this buffer as a 
@@ -369,29 +378,12 @@ public abstract class ByteBuffer
      * <code>NUL</code>s as a terminator.
      * <p>
      * Please note that this method doesn't terminate with <code>NUL</code>
-     * if the input string is too long.
+     * if the input string is longer than <tt>fieldSize</tt>.
      * 
      * @param fieldSize the maximum number of bytes to write
      */
-    public abstract ByteBuffer putString( CharBuffer in, int fieldSize,
-                                CharsetEncoder encoder );
-
-    /**
-     * Writes the content of <code>in</code> into this buffer as a 
-     * <code>NUL</code>-terminated string using the specified
-     * <code>encoder</code>.
-     * <p>
-     * If the charset name of the encoder is UTF-16, you cannot specify
-     * odd <code>fieldSize</code>, and this method will append two
-     * <code>NUL</code>s as a terminator.
-     * <p>
-     * Please note that this method doesn't terminate with <code>NUL</code>
-     * if the input string is too long.
-     * 
-     * @param fieldSize the maximum number of bytes to write
-     */
-    public abstract ByteBuffer putString( CharSequence in, int fieldSize,
-                                CharsetEncoder encoder );
+    public abstract ByteBuffer putString(
+            CharSequence in, int fieldSize, CharsetEncoder encoder ) throws CharacterCodingException;
 
     //////////////////////////
     // Skip or fill methods //
@@ -847,13 +839,104 @@ public abstract class ByteBuffer
             return ByteBufferHexDumper.getHexdump( this );
         }
 
-        public ByteBuffer getString( CharBuffer out, int fieldSize,
-                                    CharsetDecoder decoder )
+        public String getString( CharsetDecoder decoder ) throws CharacterCodingException
+        {
+            boolean utf16 = decoder.charset().name().startsWith( "UTF-16" );
+
+            int oldPos = buf.position();
+            int oldLimit = buf.limit();
+            int end;
+
+            buf.mark();
+
+            if( !utf16 )
+            {
+                while( buf.hasRemaining() )
+                {
+                    if( buf.get() == 0 )
+                    {
+                        break;
+                    }
+                }
+
+                end = buf.position();
+                if( end == oldLimit )
+                {
+                    buf.limit( end );
+                }
+                else
+                {
+                    buf.limit( end - 1 );
+                }
+            }
+            else
+            {
+                while( buf.remaining() >= 2 )
+                {
+                    if( ( buf.get() == 0 ) && ( buf.get() == 0 ) )
+                    {
+                        break;
+                    }
+                }
+
+                end = buf.position();
+                if( end == oldLimit || end == oldLimit - 1 )
+                {
+                    buf.limit( end );
+                }
+                else
+                {
+                    buf.limit( end - 2 );
+                }
+            }
+
+            buf.reset();
+            decoder.reset();
+
+            int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() );
+            CharBuffer out = CharBuffer.allocate( expectedLength );
+            for( ;; )
+            {
+                CoderResult cr;
+                if ( buf.hasRemaining() )
+                {
+                    cr = decoder.decode( buf, out, true );
+                }
+                else
+                {
+                    cr = decoder.flush( out );
+                }
+                
+                if ( cr.isUnderflow() )
+                {
+                    break;
+                }
+                
+                if ( cr.isOverflow() )
+                {
+                    CharBuffer o = CharBuffer.allocate( out.capacity() + expectedLength );
+                    out.flip();
+                    o.put(out);
+                    out = o;
+                    continue;
+                }
+
+                cr.throwException();
+            }
+            
+            buf.limit( oldLimit );
+            buf.position( oldLimit );
+            return out.toString();
+        }
+        
+        public String getString( int fieldSize, CharsetDecoder decoder ) throws CharacterCodingException
         {
             checkFieldSize( fieldSize );
 
             if( fieldSize == 0 )
-                return this;
+            {
+                return "";
+            }
 
             boolean utf16 = decoder.charset().name().startsWith( "UTF-16" );
 
@@ -863,10 +946,11 @@ public abstract class ByteBuffer
             }
 
             int i;
+            int oldPos = buf.position();
             int oldLimit = buf.limit();
-            int limit = buf.position() + fieldSize;
+            int end = buf.position() + fieldSize;
 
-            if( oldLimit < limit )
+            if( oldLimit < end )
             {
                 throw new BufferOverflowException();
             }
@@ -885,7 +969,7 @@ public abstract class ByteBuffer
 
                 if( i == fieldSize )
                 {
-                    buf.limit( limit );
+                    buf.limit( end );
                 }
                 else
                 {
@@ -904,7 +988,7 @@ public abstract class ByteBuffer
 
                 if( i == fieldSize )
                 {
-                    buf.limit( limit );
+                    buf.limit( end );
                 }
                 else
                 {
@@ -913,27 +997,53 @@ public abstract class ByteBuffer
             }
 
             buf.reset();
-            decoder.decode( buf, out, true );
+            decoder.reset();
+
+            int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() );
+            CharBuffer out = CharBuffer.allocate( expectedLength );
+            for( ;; )
+            {
+                CoderResult cr;
+                if ( buf.hasRemaining() )
+                {
+                    cr = decoder.decode( buf, out, true );
+                }
+                else
+                {
+                    cr = decoder.flush( out );
+                }
+                
+                if ( cr.isUnderflow() )
+                {
+                    break;
+                }
+                
+                if ( cr.isOverflow() )
+                {
+                    CharBuffer o = CharBuffer.allocate( out.capacity() + expectedLength );
+                    out.flip();
+                    o.put(out);
+                    out = o;
+                    continue;
+                }
+
+                cr.throwException();
+            }
+            
             buf.limit( oldLimit );
-            buf.position( limit );
-            return this;
+            buf.position( end );
+            return out.toString();
         }
 
-        public String getString( int fieldSize, CharsetDecoder decoder )
-        {
-            CharBuffer out = CharBuffer.allocate( ( int ) ( decoder
-                    .maxCharsPerByte() * fieldSize ) + 1 );
-            getString( out, fieldSize, decoder );
-            return out.flip().toString();
-        }
-
-        public ByteBuffer putString( CharBuffer in, int fieldSize,
-                                    CharsetEncoder encoder )
+        public ByteBuffer putString(
+                CharSequence val, int fieldSize, CharsetEncoder encoder ) throws CharacterCodingException
         {
             checkFieldSize( fieldSize );
 
             if( fieldSize == 0 )
                 return this;
+            
+            CharBuffer in = CharBuffer.wrap( val ); 
 
             boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
 
@@ -943,18 +1053,37 @@ public abstract class ByteBuffer
             }
 
             int oldLimit = buf.limit();
-            int limit = buf.position() + fieldSize;
+            int end = buf.position() + fieldSize;
 
-            if( oldLimit < limit )
+            if( oldLimit < end )
             {
                 throw new BufferOverflowException();
             }
 
-            buf.limit( limit );
-            encoder.encode( in, buf, true );
+            buf.limit( end );
+            encoder.reset();
+
+            for (;;) {
+                CoderResult cr;
+                if( in.hasRemaining() )
+                {
+                    cr = encoder.encode( in, buf(), true );
+                }
+                else
+                {
+                    cr = encoder.flush( buf() );
+                }
+                
+                if( cr.isUnderflow() || cr.isOverflow() )
+                {
+                    break;
+                }
+                cr.throwException();
+            }
+
             buf.limit( oldLimit );
 
-            if( limit > buf.position() )
+            if( buf.position() < end )
             {
                 if( !utf16 )
                 {
@@ -967,16 +1096,39 @@ public abstract class ByteBuffer
                 }
             }
 
-            buf.position( limit );
+            buf.position( end );
             return this;
         }
 
-        public ByteBuffer putString( CharSequence in, int fieldSize,
-                                    CharsetEncoder encoder )
+        public ByteBuffer putString(
+                CharSequence val, CharsetEncoder encoder ) throws CharacterCodingException
         {
-            return putString( CharBuffer.wrap( in ), fieldSize, encoder );
-        }
+            CharBuffer in = CharBuffer.wrap( val ); 
 
+            boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
+
+            encoder.reset();
+
+            for (;;) {
+                CoderResult cr;
+                if( in.hasRemaining() )
+                {
+                    cr = encoder.encode( in, buf(), true );
+                }
+                else
+                {
+                    cr = encoder.flush( buf() );
+                }
+                
+                if( cr.isUnderflow() )
+                {
+                    break;
+                }
+                cr.throwException();
+            }
+            return this;
+        }
+        
         public ByteBuffer skip( int size )
         {
             return position( position() + size );
@@ -1098,7 +1250,7 @@ public abstract class ByteBuffer
         
         public ByteBuffer fork( int newCapacity )
         {
-            ByteBuffer buf = allocate( newCapacity );
+            ByteBuffer buf = allocate( newCapacity, isDirect() );
             int pos = this.position();
             int limit = this.limit();
             this.position( 0 );
