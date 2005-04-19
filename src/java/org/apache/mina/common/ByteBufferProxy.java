@@ -25,6 +25,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
@@ -36,7 +37,8 @@ import java.nio.charset.CharsetEncoder;
  * operations selectively.  You can introduce new operations, too.
  * <p>
  * Please note that you have to implement {@link ByteBuffer#duplicate()},
- * {@link ByteBuffer#slice()}, and {@link ByteBuffer#asReadOnlyBuffer()}.
+ * {@link ByteBuffer#slice()}, {@link ByteBuffer#asReadOnlyBuffer()},
+ * {@link ByteBuffer#fork()}, and {@link ByteBuffer#fork(int)}.
  * It is because <tt>ByteBufferProxy</tt> itself cannot instantiate
  * the class you extended.
  * 
@@ -48,7 +50,7 @@ public abstract class ByteBufferProxy extends ByteBuffer {
     /**
      * The buffer proxied by this proxy.
      */
-    protected final ByteBuffer buf;
+    protected ByteBuffer buf;
     
     /**
      * Create a new instance.
@@ -380,25 +382,23 @@ public abstract class ByteBufferProxy extends ByteBuffer {
         return buf.getHexDump();
     }
 
-    public ByteBuffer getString(CharBuffer out,
-            int fieldSize, CharsetDecoder decoder) {
-        buf.getString( out, fieldSize, decoder );
-        return this;
-    }
-
-    public String getString(int fieldSize, CharsetDecoder decoder) {
+    public String getString(int fieldSize, CharsetDecoder decoder) throws CharacterCodingException {
         return buf.getString( fieldSize, decoder );
     }
 
-    public ByteBuffer putString(CharBuffer in,
-            int fieldSize, CharsetEncoder encoder) {
+    public String getString(CharsetDecoder decoder) throws CharacterCodingException {
+        return buf.getString( decoder );
+    }
+
+    public ByteBuffer putString(
+            CharSequence in, int fieldSize, CharsetEncoder encoder) throws CharacterCodingException {
         buf.putString( in, fieldSize, encoder );
         return this;
     }
 
-    public ByteBuffer putString(CharSequence in,
-            int fieldSize, CharsetEncoder encoder) {
-        buf.putString( in, fieldSize, encoder );
+    public ByteBuffer putString(
+            CharSequence in, CharsetEncoder encoder) throws CharacterCodingException {
+        buf.putString( in, encoder );
         return this;
     }
 
@@ -424,16 +424,6 @@ public abstract class ByteBufferProxy extends ByteBuffer {
 
     public ByteBuffer fillAndReset(int size) {
         buf.fillAndReset( size );
-        return this;
-    }
-
-    public ByteBuffer fork() {
-        buf.fork();
-        return this;
-    }
-
-    public ByteBuffer fork(int newCapacity) {
-        buf.fork( newCapacity );
         return this;
     }
 }
