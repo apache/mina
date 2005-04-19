@@ -177,7 +177,11 @@ public abstract class ByteBuffer
      * Returns the underlying NIO buffer instance.
      */
     public abstract java.nio.ByteBuffer buf();
-
+    
+    public abstract boolean isDirect();
+    
+    public abstract boolean isReadOnly();
+    
     public abstract int capacity();
     
     public abstract int position();
@@ -202,11 +206,11 @@ public abstract class ByteBuffer
 
     public abstract boolean hasRemaining();
 
-    public abstract java.nio.ByteBuffer slice();
+    public abstract ByteBuffer slice();
 
-    public abstract java.nio.ByteBuffer duplicate();
+    public abstract ByteBuffer duplicate();
 
-    public abstract java.nio.ByteBuffer asReadOnlyBuffer();
+    public abstract ByteBuffer asReadOnlyBuffer();
 
     public abstract byte get();
 
@@ -422,13 +426,11 @@ public abstract class ByteBuffer
      */
     public abstract ByteBuffer fork( int newCapacity );
     
-    private static class DefaultByteBuffer extends ByteBuffer
+    private static abstract class BaseByteBuffer extends ByteBuffer
     {
         private final java.nio.ByteBuffer buf;
 
-        private int refCount = 1;
-        
-        private DefaultByteBuffer( java.nio.ByteBuffer buf )
+        protected BaseByteBuffer( java.nio.ByteBuffer buf )
         {
             if( buf == null )
             {
@@ -437,60 +439,19 @@ public abstract class ByteBuffer
             this.buf = buf;
         }
 
-        private DefaultByteBuffer( int capacity, boolean direct )
-        {
-            if( direct )
-            {
-                buf = java.nio.ByteBuffer.allocateDirect( capacity );
-            }
-            else
-            {
-                buf = java.nio.ByteBuffer.allocate( capacity );
-            }
-        }
-        
-        private synchronized void resetRefCount()
-        {
-            refCount = 1;
-        }
-        
-        public synchronized void acquire()
-        {
-            if( refCount <= 0 )
-            {
-                throw new IllegalStateException( "Already released buffer." );
-            }
-
-            refCount ++;
-        }
-
-        public synchronized void release()
-        {
-            if( refCount <= 0 )
-            {
-                refCount = 0;
-                throw new IllegalStateException(
-                        "Already released buffer.  You released the buffer too many times." );
-            }
-
-            refCount --;
-            if( refCount > 0)
-            {
-                return;
-            }
-
-            Stack[] bufferStacks = buf.isDirect()? directBufferStacks : heapBufferStacks;
-            Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, buf.capacity() ) ];
-            synchronized( stack )
-            {
-                // push back
-                stack.push( this );
-            }
-        }
-
         public java.nio.ByteBuffer buf()
         {
             return buf;
+        }
+        
+        public boolean isDirect()
+        {
+            return buf.isDirect();
+        }
+        
+        public boolean isReadOnly()
+        {
+            return buf.isReadOnly();
         }
 
         public int capacity()
@@ -560,19 +521,19 @@ public abstract class ByteBuffer
             return buf.hasRemaining();
         }
 
-        public java.nio.ByteBuffer slice()
+        public ByteBuffer slice()
         {
-            return buf.slice();
+            return new DuplicateByteBuffer( this, buf.slice());
         }
 
-        public java.nio.ByteBuffer duplicate()
+        public ByteBuffer duplicate()
         {
-            return buf.duplicate();
+            return new DuplicateByteBuffer( this, buf.duplicate() );
         }
 
-        public java.nio.ByteBuffer asReadOnlyBuffer()
+        public ByteBuffer asReadOnlyBuffer()
         {
-            return buf.asReadOnlyBuffer();
+            return new DuplicateByteBuffer( this, buf.asReadOnlyBuffer() );
         }
 
         public byte get()
@@ -1144,6 +1105,80 @@ public abstract class ByteBuffer
                 throw new IllegalArgumentException(
                         "fieldSize cannot be negative: " + fieldSize );
             }
+        }
+    }
+
+    private static class DefaultByteBuffer extends BaseByteBuffer
+    {
+        private int refCount = 1;
+        
+        protected DefaultByteBuffer( java.nio.ByteBuffer buf )
+        {
+            super( buf );
+        }
+
+        protected DefaultByteBuffer( int capacity, boolean direct )
+        {
+            super( direct? java.nio.ByteBuffer.allocateDirect( capacity ) :
+                           java.nio.ByteBuffer.allocate( capacity ) );
+        }
+        
+        private synchronized void resetRefCount()
+        {
+            refCount = 1;
+        }
+        
+        public synchronized void acquire()
+        {
+            if( refCount <= 0 )
+            {
+                throw new IllegalStateException( "Already released buffer." );
+            }
+
+            refCount ++;
+        }
+
+        public synchronized void release()
+        {
+            if( refCount <= 0 )
+            {
+                refCount = 0;
+                throw new IllegalStateException(
+                        "Already released buffer.  You released the buffer too many times." );
+            }
+
+            refCount --;
+            if( refCount > 0)
+            {
+                return;
+            }
+
+            Stack[] bufferStacks = isDirect()? directBufferStacks : heapBufferStacks;
+            Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, capacity() ) ];
+            synchronized( stack )
+            {
+                // push back
+                stack.push( this );
+            }
+        }
+    }
+    
+    private static class DuplicateByteBuffer extends BaseByteBuffer
+    {
+        private ByteBuffer buf;
+
+        private DuplicateByteBuffer( ByteBuffer buf, java.nio.ByteBuffer duplicateBuf )
+        {
+            super( duplicateBuf );
+            this.buf = buf;
+        }
+
+        public void acquire() {
+            buf.acquire();
+        }
+
+        public void release() {
+            buf.release();
         }
     }
 }

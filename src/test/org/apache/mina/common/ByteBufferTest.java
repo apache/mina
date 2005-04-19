@@ -185,4 +185,16 @@ public class ByteBufferTest extends TestCase
             Assert.assertEquals( buf.get( i ), newBuf.get( i ) );
         }
     }
+    
+    public void testDuplication()
+    {
+        ByteBuffer buf = ByteBuffer.allocate( 16 );
+        buf.fillAndReset( buf.remaining() );
+
+        ByteBuffer buf2 = buf.duplicate();
+        buf.putInt( 1234 );
+        Assert.assertEquals( 4, buf.position() );
+        Assert.assertEquals( 0, buf2.position() );
+        Assert.assertEquals( 1234, buf2.getInt() );
+    }
 }
