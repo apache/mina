@@ -71,6 +71,8 @@ public abstract class ByteBuffer
 {
     private static final int MINIMUM_CAPACITY = 1;
 
+    private static final Stack containerStack = new Stack();
+
     private static final Stack[] heapBufferStacks = new Stack[] {
             new Stack(), new Stack(), new Stack(), new Stack(),
             new Stack(), new Stack(), new Stack(), new Stack(),
@@ -122,24 +124,54 @@ public abstract class ByteBuffer
      */
     public static ByteBuffer allocate( int capacity, boolean direct )
     {
+        java.nio.ByteBuffer nioBuffer = allocate0( capacity, direct );
+        DefaultByteBuffer buf;
+        
+        synchronized( containerStack )
+        {
+            buf = ( DefaultByteBuffer ) containerStack.pop();
+        }
+        
+        if( buf == null )
+        {
+            buf = new DefaultByteBuffer();
+        }
+
+        buf.init( nioBuffer );
+        return buf;
+    }
+    
+    private static java.nio.ByteBuffer allocate0( int capacity, boolean direct )
+    {
         Stack[] bufferStacks = direct? directBufferStacks : heapBufferStacks;
         int idx = getBufferStackIndex( bufferStacks, capacity );
         Stack stack = bufferStacks[ idx ];
 
-        DefaultByteBuffer buf;
+        java.nio.ByteBuffer buf;
         synchronized( stack )
         {
-            buf = ( DefaultByteBuffer ) stack.pop();
-            if( buf == null )
-            {
-                buf = new DefaultByteBuffer( MINIMUM_CAPACITY << idx, direct );
-            }
+            buf = ( java.nio.ByteBuffer ) stack.pop();
         }
 
+        if( buf == null )
+        {
+            buf = direct ? java.nio.ByteBuffer.allocateDirect( MINIMUM_CAPACITY << idx ) :
+                           java.nio.ByteBuffer.allocate( MINIMUM_CAPACITY << idx );
+        }
+        
         buf.clear();
-        buf.init();
-
         return buf;
+    }
+    
+    private static void release0( java.nio.ByteBuffer buf )
+    {
+        Stack[] bufferStacks = buf.isDirect()? directBufferStacks : heapBufferStacks;
+        Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, buf.capacity() ) ];
+        synchronized( stack )
+        {
+            // push back
+            stack.push( buf );
+        }
     }
     
     /**
@@ -147,7 +179,9 @@ public abstract class ByteBuffer
      */
     public static ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
-        return new DefaultByteBuffer( nioBuffer );
+        DefaultByteBuffer buf = new DefaultByteBuffer();
+        buf.init( nioBuffer );
+        return buf;
     }
     
     private static int getBufferStackIndex( Stack[] bufferStacks, int size )
@@ -421,23 +455,13 @@ public abstract class ByteBuffer
         private int refCount = 1;
         private boolean autoExpand;
 
-        protected DefaultByteBuffer( java.nio.ByteBuffer buf )
+        protected DefaultByteBuffer()
         {
-            if( buf == null )
-            {
-                throw new NullPointerException( "buf" );
-            }
+        }
+
+        private synchronized void init( java.nio.ByteBuffer buf )
+        {
             this.buf = buf;
-        }
-
-        protected DefaultByteBuffer( int capacity, boolean direct )
-        {
-            this( direct? java.nio.ByteBuffer.allocateDirect( capacity ) :
-                          java.nio.ByteBuffer.allocate( capacity ) );
-        }
-
-        private synchronized void init()
-        {
             autoExpand = false;
             refCount = 1;
         }
@@ -452,30 +476,31 @@ public abstract class ByteBuffer
             refCount ++;
         }
 
-        public synchronized void release()
+        public void release()
         {
-            if( refCount <= 0 )
+            synchronized( this )
             {
-                refCount = 0;
-                throw new IllegalStateException(
-                        "Already released buffer.  You released the buffer too many times." );
+                if( refCount <= 0 )
+                {
+                    refCount = 0;
+                    throw new IllegalStateException(
+                            "Already released buffer.  You released the buffer too many times." );
+                }
+
+                refCount --;
+                if( refCount > 0)
+                {
+                    return;
+                }
             }
 
-            refCount --;
-            if( refCount > 0)
+            release0( buf );
+            synchronized( containerStack )
             {
-                return;
-            }
-
-            Stack[] bufferStacks = isDirect()? directBufferStacks : heapBufferStacks;
-            Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, capacity() ) ];
-            synchronized( stack )
-            {
-                // push back
-                stack.push( this );
+                containerStack.push( this );
             }
         }
-        
+
         public java.nio.ByteBuffer buf()
         {
             return buf;
@@ -1349,7 +1374,7 @@ public abstract class ByteBuffer
             newBuf.limit( limit );
             newBuf.position( pos );
             this.buf = newBuf;
-            new DefaultByteBuffer( oldBuf ).release();
+            release0( oldBuf );
         }
         
         private static void checkFieldSize( int fieldSize )
