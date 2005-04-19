@@ -19,6 +19,7 @@
 package org.apache.mina.common;
 
 import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
@@ -914,10 +915,9 @@ public abstract class ByteBuffer
         {
             boolean utf16 = decoder.charset().name().startsWith( "UTF-16" );
 
+            int oldPos = buf.position();
             int oldLimit = buf.limit();
             int end;
-
-            buf.mark();
 
             if( !utf16 )
             {
@@ -960,7 +960,7 @@ public abstract class ByteBuffer
                 }
             }
 
-            buf.reset();
+            buf.position( oldPos );
             decoder.reset();
 
             int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() );
@@ -1016,15 +1016,14 @@ public abstract class ByteBuffer
             }
 
             int i;
+            int oldPos = buf.position();
             int oldLimit = buf.limit();
             int end = buf.position() + fieldSize;
 
             if( oldLimit < end )
             {
-                throw new BufferOverflowException();
+                throw new BufferUnderflowException();
             }
-
-            buf.mark();
 
             if( !utf16 )
             {
@@ -1065,7 +1064,7 @@ public abstract class ByteBuffer
                 }
             }
 
-            buf.reset();
+            buf.position( oldPos );
             decoder.reset();
 
             int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() );
