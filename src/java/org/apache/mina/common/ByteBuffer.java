@@ -889,7 +889,6 @@ public abstract class ByteBuffer
         {
             boolean utf16 = decoder.charset().name().startsWith( "UTF-16" );
 
-            int oldPos = buf.position();
             int oldLimit = buf.limit();
             int end;
 
@@ -992,7 +991,6 @@ public abstract class ByteBuffer
             }
 
             int i;
-            int oldPos = buf.position();
             int oldLimit = buf.limit();
             int end = buf.position() + fieldSize;
 
@@ -1092,7 +1090,6 @@ public abstract class ByteBuffer
             autoExpand( fieldSize );
             
             CharBuffer in = CharBuffer.wrap( val ); 
-            int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar());
             boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
 
             if( utf16 && ( ( fieldSize & 1 ) != 0 ) )
@@ -1153,7 +1150,6 @@ public abstract class ByteBuffer
         {
             CharBuffer in = CharBuffer.wrap( val ); 
             int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar());
-            boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
 
             encoder.reset();
 
