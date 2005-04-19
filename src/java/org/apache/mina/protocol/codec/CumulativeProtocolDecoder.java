@@ -71,6 +71,7 @@ public abstract class CumulativeProtocolDecoder implements ProtocolDecoder {
     protected CumulativeProtocolDecoder( int defaultCapacity )
     {
         buf = ByteBuffer.allocate( defaultCapacity );
+        buf.setAutoExpand( true );
     }
     
     /**
@@ -91,9 +92,8 @@ public abstract class CumulativeProtocolDecoder implements ProtocolDecoder {
                     "This decoder doesn't work for stateless transport types." );
         }
 
-        put( in );
-        
         ByteBuffer buf = this.buf;
+        buf.put( in );
         buf.flip();
 
         try
@@ -132,24 +132,4 @@ public abstract class CumulativeProtocolDecoder implements ProtocolDecoder {
      */
     protected abstract boolean doDecode( ProtocolSession session, ByteBuffer in,
                                          ProtocolDecoderOutput out ) throws ProtocolViolationException;
-
-
-    private void put( ByteBuffer in )
-    {
-        ByteBuffer buf = this.buf;
-        
-        // Check capacity
-        if( in.remaining() > buf.remaining() ) {
-            int newCapacity = buf.position() + in.remaining();
-            ByteBuffer newBuf = ByteBuffer.allocate( newCapacity );
-            buf.flip();
-            newBuf.put( buf );
-            buf.release(); // Release old buffer
-            buf = newBuf;
-        }
-        
-        // Copy to cumulative buffer
-        buf.put( in.buf() );
-        this.buf = buf;
-    }
 }

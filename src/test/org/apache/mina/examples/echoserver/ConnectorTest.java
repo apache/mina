@@ -59,6 +59,7 @@ public class ConnectorTest extends AbstractTest
     
     public void testTCPWithLocalAddress() throws Exception
     {
+        System.out.println( "Using client port " + clientPort + " for testing." );
         IoConnector connector = new SocketConnector();
         connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
         testTCP0( connector, new InetSocketAddress( clientPort ) );
@@ -148,6 +149,7 @@ public class ConnectorTest extends AbstractTest
     
     public void testUDPWithLocalAddress() throws Exception
     {
+        System.out.println( "Using client port " + clientPort + " for testing." );
         IoConnector connector = new DatagramConnector();
         connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
         testTCP0( connector, new InetSocketAddress( clientPort ) );
