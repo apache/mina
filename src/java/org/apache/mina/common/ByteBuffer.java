@@ -47,16 +47,26 @@ import org.apache.mina.util.Stack;
  *       <code>get/putAsciiInt()</code> enough.</li>
  *   <li>It is hard to distinguish if the buffer is created from MINA buffer
  *       pool or not.  MINA have to return used buffers back to pool.</li>
+ *   <li>It is difficult to write variable-length data due to its fixed
+ *       capacity</li>
  * </ul>
+ * 
+ * <h2>Allocation</h2>
  * <p>
  * You can get a heap buffer from buffer pool:
  * <pre>
- * ByteBuffer buf = ByteBuffer.allocate(1024);
- * </pre>
- * or you can get a direct buffer from buffer pool:
- * <pre>
  * ByteBuffer buf = ByteBuffer.allocate(1024, false);
  * </pre>
+ * you can also get a direct buffer from buffer pool:
+ * <pre>
+ * ByteBuffer buf = ByteBuffer.allocate(1024, true);
+ * </pre>
+ * or you can let MINA choose:
+ * <pre>
+ * ByteBuffer buf = ByteBuffer.allocate(1024);
+ * </pre>
+ * 
+ * <h2>Acquire/Release</h2>
  * <p>
  * <b>Please note that you never need to release the allocated buffer because
  * MINA will release it automatically.</b>  But, if you didn't pass it to MINA
@@ -64,6 +74,26 @@ import org.apache.mina.util.Stack;
  * <pre>
  * ByteBuffer.release(buf);
  * </pre>
+ * 
+ * <h2>AutoExpand</h2>
+ * <p>
+ * Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
+ * easy, and it is because its size is fixed.  MINA <tt>ByteBuffer</tt>
+ * introduces <tt>autoExpand</tt> property.  If <tt>autoExpand</tt> property
+ * is true, you never get {@link BufferOverflowException} or
+ * {@link IndexOutOfBoundsException} (except when index is negative).
+ * It automatically expands its capacity and limit value.  For example:
+ * <pre>
+ * String greeting = messageBundle.getMessage( "hello" );
+ * ByteBuffer buf = ByteBuffer.allocate( 16 );
+ * // Turn on autoExpand (it is off by default)
+ * buf.setAutoExpand( true );
+ * buf.putString( greeting, utf8encoder );
+ * </pre>
+ * NIO <tt>ByteBuffer</tt> is reallocated by MINA <tt>ByteBuffer</tt> behind
+ * the scene if the encoded data is larger than 16 bytes.  Its capacity will
+ * increase by two times, and its limit will increase to the last position
+ * the string is written.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
@@ -234,8 +264,14 @@ public abstract class ByteBuffer
     
     public abstract int capacity();
     
+    /**
+     * Returns <tt>true</tt> if and only if <tt>autoExpand</tt> is turned on.
+     */
     public abstract boolean isAutoExpand();
     
+    /**
+     * Turns on or off <tt>autoExpand</tt>.
+     */
     public abstract ByteBuffer setAutoExpand( boolean autoExpand );
     
     public abstract int position();
