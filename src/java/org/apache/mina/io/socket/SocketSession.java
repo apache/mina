@@ -71,7 +71,7 @@ class SocketSession extends BaseSession implements IoSession
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
-
+    
     SocketFilterChain getFilters()
     {
         return filters;

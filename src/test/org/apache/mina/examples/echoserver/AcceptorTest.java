@@ -43,6 +43,11 @@ import org.apache.mina.io.filter.SSLFilter;
  */
 public class AcceptorTest extends AbstractTest
 {
+    public AcceptorTest()
+    {
+        super( true );
+    }
+
     public void testTCP() throws Exception
     {
         EchoTCPClient client = new EchoTCPClient();

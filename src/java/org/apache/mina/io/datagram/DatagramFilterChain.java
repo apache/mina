@@ -13,7 +13,7 @@ import org.apache.mina.util.Queue;
  */
 class DatagramFilterChain extends AbstractIoHandlerFilterChain {
 
-    private final DatagramProcessor processor;
+    final DatagramProcessor processor;
 
     DatagramFilterChain( DatagramProcessor processor )
     {

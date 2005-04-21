@@ -99,6 +99,10 @@ class DatagramSession extends BaseSession implements IoSession
 
     public void close()
     {
+        if( filters.processor instanceof DatagramConnector )
+        {
+            filters.processor.closeSession( this );
+        }
     }
 
     Queue getWriteBufferQueue()

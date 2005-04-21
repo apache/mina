@@ -193,6 +193,7 @@ class SocketIoProcessor
 
             try
             {
+                ch.socket().close();
                 ch.close();
             }
             catch( IOException e )

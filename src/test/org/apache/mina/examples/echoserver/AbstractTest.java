@@ -21,9 +21,12 @@ package org.apache.mina.examples.echoserver;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.Session;
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.datagram.DatagramAcceptor;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
@@ -37,6 +40,10 @@ import org.apache.mina.io.socket.SocketAcceptor;
  */
 public class AbstractTest extends TestCase
 {
+    private final boolean testInitializer;
+    
+    private MarkingInitializer initializer;
+
     protected int port;
 
     protected IoAcceptor acceptor;
@@ -44,6 +51,11 @@ public class AbstractTest extends TestCase
     protected IoAcceptor datagramAcceptor;
 
     protected IoThreadPoolFilter threadPoolFilter;
+    
+    protected AbstractTest( boolean testInitializer )
+    {
+        this.testInitializer = testInitializer;
+    }
 
     protected static void assertEquals( byte[] expected, byte[] actual )
     {
@@ -75,6 +87,11 @@ public class AbstractTest extends TestCase
     {
         acceptor = new SocketAcceptor();
         datagramAcceptor = new DatagramAcceptor();
+        
+        if( testInitializer )
+        {
+            initializer = new MarkingInitializer();
+        }
 
         // Find an availble test port and bind to it.
         boolean socketBound = false;
@@ -90,11 +107,12 @@ public class AbstractTest extends TestCase
             try
             {
                 acceptor.bind( new InetSocketAddress( port ),
-                        new EchoProtocolHandler() );
+                               new EchoProtocolHandler(), initializer );
                 socketBound = true;
 
                 datagramAcceptor.bind( new InetSocketAddress( port ),
-                        new EchoProtocolHandler() );
+                                       new EchoProtocolHandler(),
+                                       initializer );
                 datagramBound = true;
 
                 break;
@@ -139,5 +157,20 @@ public class AbstractTest extends TestCase
         acceptor.unbind( new InetSocketAddress( port ) );
         datagramAcceptor.unbind( new InetSocketAddress( port ) );
         threadPoolFilter.stop();
+        
+        if( initializer != null  )
+        {
+            Assert.assertTrue( initializer.executed );
+        }
+    }
+
+    private static class MarkingInitializer implements SessionInitializer
+    {
+        private boolean executed;
+
+        public void initializeSession(Session session) throws IOException
+        {
+            executed = true;
+        }
     }
 }
