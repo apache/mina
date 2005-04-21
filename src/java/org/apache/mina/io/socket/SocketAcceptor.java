@@ -30,11 +30,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.io.DefaultExceptionMonitor;
-import org.apache.mina.io.ExceptionMonitor;
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.util.BaseSessionManager;
 import org.apache.mina.util.Queue;
 
 /**
@@ -43,7 +43,7 @@ import org.apache.mina.util.Queue;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor implements IoAcceptor
+public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
@@ -61,8 +61,6 @@ public class SocketAcceptor implements IoAcceptor
     
     private int backlog = 50;
 
-    private ExceptionMonitor exceptionMonitor = new DefaultExceptionMonitor();
-
     private Worker worker;
 
 
@@ -76,7 +74,6 @@ public class SocketAcceptor implements IoAcceptor
         selector = Selector.open();
     }
 
-
     /**
      * Binds to the specified <code>address</code> and handles incoming
      * connections with the specified <code>handler</code>.  Backlog value
@@ -85,6 +82,19 @@ public class SocketAcceptor implements IoAcceptor
      * @throws IOException if failed to bind
      */
     public void bind( SocketAddress address, IoHandler handler ) throws IOException
+    {
+        bind( address, handler, null );
+    }
+
+    /**
+     * Binds to the specified <code>address</code> and handles incoming
+     * connections with the specified <code>handler</code>.  Backlog value
+     * is configured to the value of <code>backlog</code> property.
+     *
+     * @throws IOException if failed to bind
+     */
+    public void bind( SocketAddress address, IoHandler handler,
+                      SessionInitializer initializer ) throws IOException
     {
         if( address == null )
         {
@@ -106,7 +116,7 @@ public class SocketAcceptor implements IoAcceptor
             throw new IllegalArgumentException( "Unsupported port number: 0" );
         }
 
-        RegistrationRequest request = new RegistrationRequest( address, backlog, handler );
+        RegistrationRequest request = new RegistrationRequest( address, backlog, handler, initializer );
 
         synchronized( this )
         {
@@ -136,7 +146,6 @@ public class SocketAcceptor implements IoAcceptor
         if( request.exception != null )
         {
             request.exception.fillInStackTrace();
-
             throw request.exception;
         }
     }
@@ -291,9 +300,31 @@ public class SocketAcceptor implements IoAcceptor
                     continue;
                 }
    
-                SocketSession session = new SocketSession( filters, ch, ( IoHandler ) key.attachment() );
-   
-                SocketIoProcessor.getInstance().addSession( session );
+                boolean success = false;
+                try
+                {
+                    RegistrationRequest req = ( RegistrationRequest ) key.attachment();
+                    SocketSession session = new SocketSession( filters, ch, req.handler );
+                    
+                    if( req.initializer != null )
+                    {
+                        req.initializer.initializeSession( session );
+                    }
+                    
+                    SocketIoProcessor.getInstance().addSession( session );
+                    success = true;
+                }
+                catch( Throwable t )
+                {
+                    exceptionMonitor.exceptionCaught( SocketAcceptor.this, t );
+                }
+                finally
+                {
+                    if( !success )
+                    {
+                        ch.close();
+                    }
+                }
             }
         }
     }
@@ -330,7 +361,7 @@ public class SocketAcceptor implements IoAcceptor
 
                 ssc.socket().bind( req.address, req.backlog );
 
-                ssc.register( selector, SelectionKey.OP_ACCEPT, req.handler );
+                ssc.register( selector, SelectionKey.OP_ACCEPT, req );
 
                 channels.put( req.address, ssc );
             }
@@ -433,17 +464,19 @@ public class SocketAcceptor implements IoAcceptor
 
         private final IoHandler handler;
         
+        private final SessionInitializer initializer;
+        
         private IOException exception; 
         
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, int backlog, IoHandler handler )
+        private RegistrationRequest( SocketAddress address, int backlog, IoHandler handler,
+                                     SessionInitializer initializer )
         {
             this.address = address;
-
             this.backlog = backlog;
-
             this.handler = handler;
+            this.initializer = initializer;
         }
     }
 
@@ -460,22 +493,5 @@ public class SocketAcceptor implements IoAcceptor
         {
             this.address = address;
         }
-    }
-
-    
-    public ExceptionMonitor getExceptionMonitor()
-    {
-        return exceptionMonitor;
-    }
-
-
-    public void setExceptionMonitor( ExceptionMonitor monitor )
-    {
-        if( monitor == null )
-        {
-            monitor = new DefaultExceptionMonitor();
-        }
-
-        this.exceptionMonitor = monitor;
     }
 }

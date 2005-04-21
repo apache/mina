@@ -21,6 +21,9 @@ package org.apache.mina.io;
 import java.io.IOException;
 import java.net.SocketAddress;
 
+import org.apache.mina.common.SessionInitializer;
+import org.apache.mina.common.SessionManager;
+
 /**
  * Connects to endpoint, communicates with the server, and fires events to
  * {@link IoHandler}s.
@@ -39,15 +42,13 @@ import java.net.SocketAddress;
  * <p>
  * {@link IoHandlerFilter}s can be added and removed at any time to filter
  * events just like Servlet filters and they are effective immediately.
- * <p>
- * You can monitor any uncaught exceptions by setting {@link ExceptionMonitor}
- * by calling {@link #setExceptionMonitor(ExceptionMonitor)}.  The default
- * monitor is {@link DefaultExceptionMonitor}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @see SessionInitializer
  */
-public interface IoConnector
+public interface IoConnector extends SessionManager
 {
     /**
      * Connects to the specified <code>address</code>.  If communication starts
@@ -91,16 +92,48 @@ public interface IoConnector
     IoSession connect( SocketAddress address, SocketAddress localAddress,
                        int timeout, IoHandler handler ) throws IOException;
 
+    /**
+     * Connects to the specified <code>address</code>.  If communication starts
+     * successfully, events are fired to the specified
+     * <code>handler</code>.  This method blocks.
+     * 
+     * @throws IOException if failed to connect
+     */
+    IoSession connect( SocketAddress address, IoHandler handler,
+                       SessionInitializer initializer ) throws IOException;
+
+    /**
+     * Connects to the specified <code>address</code>.  If communication starts
+     * successfully, events are fired to the specified
+     * <code>handler</code>.  This method blocks.
+     * 
+     * @param localAddress the local address the channel is bound to
+     * @throws IOException if failed to connect
+     */
+    IoSession connect( SocketAddress address, SocketAddress localAddress,
+                       IoHandler handler, SessionInitializer initializer ) throws IOException;
+
+    /**
+     * Connects to the specified <code>address</code> with timeout.  If
+     * communication starts successfully, events are fired to the specified
+     * <code>handler</code>.  This method blocks.
+     * 
+     * @throws IOException if failed to connect
+     */
+    IoSession connect( SocketAddress address, int timeout, IoHandler handler,
+                       SessionInitializer initializer ) throws IOException;
+    
+    /**
+     * Connects to the specified <code>address</code> with timeout.  If
+     * communication starts successfully, events are fired to the specified
+     * <code>handler</code>.  This method blocks.
+     * 
+     * @param localAddress the local address the channel is bound to
+     * @throws IOException if failed to connect
+     */
+    IoSession connect( SocketAddress address, SocketAddress localAddress,
+                       int timeout, IoHandler handler,
+                       SessionInitializer initializer ) throws IOException;
+
     IoHandlerFilterChain getFilterChain();
-
-    /**
-     * Returns the current exception monitor.
-     */
-    ExceptionMonitor getExceptionMonitor();
-
-    /**
-     * Sets the uncaught exception monitor.  If <code>null</code> is specified,
-     * a new instance of {@link DefaultExceptionMonitor} will be set.
-     */
-    void setExceptionMonitor( ExceptionMonitor monitor );
 }

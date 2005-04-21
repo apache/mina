@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.DefaultExceptionMonitor;
-import org.apache.mina.io.ExceptionMonitor;
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
 /**
@@ -61,8 +61,6 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
     private final Queue flushingSessions = new Queue();
 
-    private ExceptionMonitor exceptionMonitor = new DefaultExceptionMonitor();
-
     private Worker worker;
 
     /**
@@ -78,6 +76,12 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
     public void bind( SocketAddress address, IoHandler handler )
             throws IOException
     {
+        bind( address, handler, null );
+    }
+
+    public void bind( SocketAddress address, IoHandler handler, SessionInitializer initializer )
+            throws IOException
+    {
         if( address == null )
             throw new NullPointerException( "address" );
         if( handler == null )
@@ -89,7 +93,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         if( ( ( InetSocketAddress ) address ).getPort() == 0 )
             throw new IllegalArgumentException( "Unsupported port number: 0" );
 
-        RegistrationRequest request = new RegistrationRequest( address, handler );
+        RegistrationRequest request = new RegistrationRequest( address, handler, initializer );
         synchronized( this )
         {
             synchronized( registerQueue )
@@ -117,22 +121,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         if( request.exception != null )
         {
             request.exception.fillInStackTrace();
-            if( request.exception instanceof IOException )
-            {
-                throw ( IOException ) request.exception;
-            }
-            else if( request.exception instanceof RuntimeException )
-            {
-                throw ( RuntimeException ) request.exception;
-            }
-            else if( request.exception instanceof Error )
-            {
-                throw ( Error ) request.exception;
-            }
-            else
-            {
-                throw new IllegalStateException();
-            }
+            ExceptionUtil.throwException( request.exception );
         }
     }
 
@@ -266,18 +255,31 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
 
             DatagramChannel ch = ( DatagramChannel ) key.channel();
 
+            RegistrationRequest req = ( RegistrationRequest ) key.attachment();
             DatagramSession session = new DatagramSession(
-                    filters, ch, ( IoHandler ) key.attachment() );
+                    filters, ch, req.handler );
             session.setSelectionKey( key );
-
-            if( key.isReadable() )
+            
+            try
             {
-                readSession( session );
+                if( req.initializer != null )
+                {
+                    req.initializer.initializeSession( session );
+                }
+
+                if( key.isReadable() )
+                {
+                    readSession( session );
+                }
+
+                if( key.isWritable() )
+                {
+                    scheduleFlush( session );
+                }
             }
-
-            if( key.isWritable() )
+            catch( Throwable t )
             {
-                scheduleFlush( session );
+                exceptionMonitor.exceptionCaught( this, t );
             }
         }
     }
@@ -432,7 +434,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 ch = DatagramChannel.open();
                 ch.configureBlocking( false );
                 ch.socket().bind( req.address );
-                ch.register( selector, SelectionKey.OP_READ, req.handler );
+                ch.register( selector, SelectionKey.OP_READ, req );
                 channels.put( req.address, ch );
             }
             catch( Throwable t )
@@ -523,14 +525,18 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         
         private final IoHandler handler;
         
+        private final SessionInitializer initializer;
+        
         private Throwable exception; 
         
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, IoHandler handler )
+        private RegistrationRequest( SocketAddress address, IoHandler handler,
+                                     SessionInitializer initializer )
         {
             this.address = address;
             this.handler = handler;
+            this.initializer = initializer;
         }
     }
 
@@ -544,20 +550,5 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         {
             this.address = address;
         }
-    }
-
-    public ExceptionMonitor getExceptionMonitor()
-    {
-        return exceptionMonitor;
-    }
-
-    public void setExceptionMonitor( ExceptionMonitor monitor )
-    {
-        if( monitor == null )
-        {
-            monitor = new DefaultExceptionMonitor();
-        }
-
-        this.exceptionMonitor = monitor;
     }
 }

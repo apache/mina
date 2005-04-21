@@ -30,7 +30,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.DefaultExceptionMonitor;
+import org.apache.mina.common.DefaultExceptionMonitor;
 import org.apache.mina.io.IoHandlerFilterAdapter;
 import org.apache.mina.io.IoSession;
 

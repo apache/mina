@@ -21,7 +21,6 @@ package org.apache.mina.io.datagram;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -29,12 +28,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.DefaultExceptionMonitor;
-import org.apache.mina.io.ExceptionMonitor;
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
 /**
@@ -43,8 +42,7 @@ import org.apache.mina.util.Queue;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends DatagramProcessor implements
-        IoConnector
+public class DatagramConnector extends DatagramProcessor implements IoConnector
 {
     private static volatile int nextId = 0;
 
@@ -60,8 +58,6 @@ public class DatagramConnector extends DatagramProcessor implements
 
     private final Queue flushingSessions = new Queue();
 
-    private ExceptionMonitor exceptionMonitor = new DefaultExceptionMonitor();
-
     private Worker worker;
 
     /**
@@ -74,14 +70,43 @@ public class DatagramConnector extends DatagramProcessor implements
         selector = Selector.open();
     }
 
-    public IoSession connect( SocketAddress address, IoHandler handler )
-            throws IOException
+    public IoSession connect( SocketAddress address, IoHandler handler ) throws IOException
     {
-        return connect( address, null, handler );
+        return connect( address, null, handler, null );
     }
-    
+
+    public IoSession connect( SocketAddress address, SocketAddress localAddress, IoHandler handler ) throws IOException
+    {
+        return connect( address, localAddress, handler, null );
+    }
+
+    public IoSession connect( SocketAddress address, int timeout, IoHandler handler ) throws IOException
+    {
+        return connect( address, null, handler, null );
+    }
+
+    public IoSession connect( SocketAddress address, SocketAddress localAddress, int timeout, IoHandler handler ) throws IOException
+    {
+        return connect( address, localAddress, handler, null );
+    }
+
+    public IoSession connect( SocketAddress address, IoHandler handler, SessionInitializer initializer ) throws IOException
+    {
+        return connect( address, null, handler, initializer );
+    }
+
+    public IoSession connect( SocketAddress address, int timeout, IoHandler handler, SessionInitializer initializer ) throws IOException
+    {
+        return connect( address, null, handler, initializer );
+    }
+
+    public IoSession connect( SocketAddress address, SocketAddress localAddress, int timeout, IoHandler handler, SessionInitializer initializer ) throws IOException
+    {
+        return connect( address, localAddress, handler, initializer );
+    }
+
     public IoSession connect( SocketAddress address, SocketAddress localAddress,
-                              IoHandler handler ) throws IOException
+                              IoHandler handler, SessionInitializer initializer ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -118,7 +143,7 @@ public class DatagramConnector extends DatagramProcessor implements
             }
         }
 
-        RegistrationRequest request = new RegistrationRequest( ch, handler );
+        RegistrationRequest request = new RegistrationRequest( ch, handler, initializer );
         synchronized( this )
         {
             synchronized( registerQueue )
@@ -132,7 +157,7 @@ public class DatagramConnector extends DatagramProcessor implements
 
         synchronized( request )
         {
-            while( request.session == null )
+            while( !request.done )
             {
                 try
                 {
@@ -142,6 +167,12 @@ public class DatagramConnector extends DatagramProcessor implements
                 {
                 }
             }
+        }
+        
+        if( request.exception != null )
+        {
+            request.exception.fillInStackTrace();
+            ExceptionUtil.throwException( request.exception );
         }
 
         return request.session;
@@ -154,18 +185,6 @@ public class DatagramConnector extends DatagramProcessor implements
             worker = new Worker();
             worker.start();
         }
-    }
-
-    public IoSession connect( SocketAddress address,
-                              int timeout, IoHandler handler ) throws IOException
-    {
-        return connect( address, null, timeout, handler );
-    }
-
-    public IoSession connect( SocketAddress address, SocketAddress localAddress,
-                              int timeout, IoHandler handler ) throws IOException
-    {
-        return connect( address, localAddress, handler );
     }
 
     void closeSession( DatagramSession session )
@@ -396,7 +415,7 @@ public class DatagramConnector extends DatagramProcessor implements
         }
     }
 
-    private void registerNew() throws ClosedChannelException
+    private void registerNew()
     {
         if( registerQueue.isEmpty() )
             return;
@@ -415,15 +434,43 @@ public class DatagramConnector extends DatagramProcessor implements
             DatagramSession session = new DatagramSession(
                     filters, req.channel, req.handler );
 
-            SelectionKey key = req.channel.register( selector,
-                    SelectionKey.OP_READ, session );
-
-            session.setSelectionKey( key );
-
-            synchronized( req )
+            try
             {
-                req.session = session;
-                req.notify();
+                SelectionKey key = req.channel.register( selector,
+                        SelectionKey.OP_READ, session );
+    
+                session.setSelectionKey( key );
+
+                if( req.initializer != null )
+                {
+                    req.initializer.initializeSession( session );
+                }
+
+            }
+            catch( Throwable t )
+            {
+                req.exception = t;
+            }
+            finally 
+            {
+                synchronized( req )
+                {
+                    req.done = true;
+                    req.session = session;
+                    req.notify();
+                }
+                
+                if( req.exception != null )
+                {
+                    try
+                    {
+                        req.channel.close();
+                    }
+                    catch (IOException e)
+                    {
+                        exceptionMonitor.exceptionCaught( this, e );
+                    }
+                }
             }
         }
     }
@@ -469,29 +516,21 @@ public class DatagramConnector extends DatagramProcessor implements
         private final DatagramChannel channel;
 
         private final IoHandler handler;
+        
+        private final SessionInitializer initializer;
 
+        private boolean done;
+        
         private DatagramSession session;
+        
+        private Throwable exception;
 
         private RegistrationRequest( DatagramChannel channel,
-                                    IoHandler handler )
+                                     IoHandler handler, SessionInitializer initializer )
         {
             this.channel = channel;
             this.handler = handler;
+            this.initializer = initializer;
         }
-    }
-
-    public ExceptionMonitor getExceptionMonitor()
-    {
-        return exceptionMonitor;
-    }
-
-    public void setExceptionMonitor( ExceptionMonitor monitor )
-    {
-        if( monitor == null )
-        {
-            monitor = new DefaultExceptionMonitor();
-        }
-
-        this.exceptionMonitor = monitor;
     }
 }

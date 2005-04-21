@@ -8,10 +8,12 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.protocol.ProtocolAcceptor;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
+import org.apache.mina.util.BaseSessionManager;
 
 /**
  * Binds the specified {@link ProtocolProvider} to the specified
@@ -20,7 +22,7 @@ import org.apache.mina.protocol.ProtocolProvider;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAcceptor implements ProtocolAcceptor
+public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAcceptor
 {
     static final Map boundHandlers = new HashMap();
 
@@ -33,9 +35,14 @@ public class VmPipeAcceptor implements ProtocolAcceptor
     {
         filters.addLast( "VMPipe", new VmPipeFilter() );
     }
+    
+    public void bind( SocketAddress address, ProtocolProvider protocolProvider ) throws IOException
+    {
+        bind( address, protocolProvider, null );
+    }
 
-    public void bind( SocketAddress address, ProtocolProvider protocolProvider )
-            throws IOException
+    public void bind( SocketAddress address, ProtocolProvider protocolProvider,
+                      SessionInitializer initializer ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -52,8 +59,12 @@ public class VmPipeAcceptor implements ProtocolAcceptor
                 throw new IOException( "Address already bound: " + address );
             }
 
-            boundHandlers.put( address, new Entry( ( VmPipeAddress ) address,
-                    filters, protocolProvider.getHandler() ) );
+            boundHandlers.put( address, 
+                               new Entry( this,
+                                          ( VmPipeAddress ) address,
+                                          filters,
+                                          protocolProvider.getHandler(),
+                                          initializer ) );
         }
     }
 
@@ -75,19 +86,27 @@ public class VmPipeAcceptor implements ProtocolAcceptor
 
     static class Entry
     {
+        final VmPipeAcceptor acceptor;
+        
         final VmPipeAddress address;
 
         final VmPipeFilterChain filters;
 
         final ProtocolHandler handler;
+        
+        final SessionInitializer initializer;
 
-        private Entry( VmPipeAddress address,
+        private Entry( VmPipeAcceptor acceptor,
+                       VmPipeAddress address,
                        VmPipeFilterChain filters,
-                       ProtocolHandler handler )
+                       ProtocolHandler handler,
+                       SessionInitializer initializer )
         {
+            this.acceptor = acceptor;
             this.address = address;
             this.filters = filters;
             this.handler = handler;
+            this.initializer = initializer;
         }
     }
 }

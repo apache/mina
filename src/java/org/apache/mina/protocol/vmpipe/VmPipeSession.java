@@ -3,14 +3,17 @@
  */
 package org.apache.mina.protocol.vmpipe;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.SessionConfig;
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolSession;
+import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
 import org.apache.mina.util.BaseSession;
 
 /**
@@ -26,7 +29,7 @@ class VmPipeSession extends BaseSession implements ProtocolSession
     private final SocketAddress remoteAddress;
 
     private final ProtocolHandler localHandler;
-
+    
     private final VmPipeSessionConfig config = new VmPipeSessionConfig();
 
     final VmPipeFilterChain localFilters;
@@ -43,22 +46,37 @@ class VmPipeSession extends BaseSession implements ProtocolSession
      * Constructor for client-side session.
      */
     VmPipeSession( Object lock, SocketAddress localAddress,
-                  SocketAddress remoteAddress,
-                  VmPipeFilterChain localFilters,
-                  ProtocolHandler localHandler,
-                  VmPipeFilterChain removeFilters,
-                  ProtocolHandler remoteHandler )
+                   VmPipeFilterChain localFilters,
+                   ProtocolHandler localHandler,
+                   SessionInitializer initializer,
+                   Entry remoteEntry ) throws IOException
     {
         this.lock = lock;
         this.localAddress = localAddress;
         this.localHandler = localHandler;
         this.localFilters = localFilters;
-        this.remoteAddress = remoteAddress;
-        this.remoteFilters = removeFilters;
+        this.remoteAddress = remoteEntry.address;
+        this.remoteFilters = remoteEntry.filters;
 
-        remoteSession = new VmPipeSession( this, remoteHandler );
+        remoteSession = new VmPipeSession( this, remoteEntry.handler );
+        if( remoteEntry.initializer != null )
+        {
+            boolean success = false;
+            try
+            {
+                remoteEntry.initializer.initializeSession( remoteSession );
+                success = true;
+            }
+            catch( Throwable t )
+            {
+                remoteEntry.acceptor.getExceptionMonitor().exceptionCaught( remoteEntry.acceptor, t );
+                IOException e = new IOException( "Failed to initialize remote session." );
+                e.initCause( t );
+                throw e;
+            }
+        }
 
-        removeFilters.sessionOpened( remoteSession );
+        remoteEntry.filters.sessionOpened( remoteSession );
         localFilters.sessionOpened( this );
     }
 

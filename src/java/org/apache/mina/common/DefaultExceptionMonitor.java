@@ -16,7 +16,7 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.io;
+package org.apache.mina.common;
 
 import java.lang.reflect.Method;
 import java.text.DateFormat;
