@@ -69,11 +69,20 @@ import org.apache.mina.util.Stack;
  * <h2>Acquire/Release</h2>
  * <p>
  * <b>Please note that you never need to release the allocated buffer because
- * MINA will release it automatically.</b>  But, if you didn't pass it to MINA
- * or called {@link #acquire()} by yourself, you will have to release it manually:
- * <pre>
- * ByteBuffer.release(buf);
- * </pre>
+ * MINA will release it automatically when:
+ * <ul>
+ *   <li>You pass the buffer by calling {@link IoSession#write(ByteBuffer, Object)}.</li>
+ *   <li>You pass the buffer by calling {@link ProtocolEncoderOutput#write(ByteBuffer)}.</li>
+ * </ul>
+ * And, you don't need to release any {@link ByteBuffer} which is passed as a parameter
+ * of <li>{@link IoHandler#dataRead(IoSession, ByteBuffer)} method.  They are released
+ * automatically when the method returns.
+ * <p>
+ * You have to release buffers manually by calling {@link #release()} when:
+ * <ul>
+ *   <li>You allocated a buffer, but didn't pass the buffer to any of two methods above.</li>
+ *   <li>You called {@link #acquire()} to prevent the buffer from being released.</li>
+ * </ul>
  * 
  * <h2>AutoExpand</h2>
  * <p>
