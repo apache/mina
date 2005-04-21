@@ -72,6 +72,13 @@ public interface Session {
     Object setAttribute( String key, Object value );
     
     /**
+     * Removes a user-defined attribute with the specified key.
+     * 
+     * @return The old value of the attribute.  <tt>null</tt> if not found.
+     */
+    Object removeAttribute( String key );
+    
+    /**
      * Returns the set of keys of all user-defined attributes.
      */
     Set getAttributeKeys();

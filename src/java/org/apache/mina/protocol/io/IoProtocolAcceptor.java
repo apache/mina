@@ -9,9 +9,11 @@ import java.net.SocketAddress;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
+import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolAcceptor;
 import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
+import org.apache.mina.protocol.ProtocolSession;
 
 /**
  * A {@link ProtocolAcceptor} which wraps {@link IoAcceptor} to provide

@@ -79,6 +79,14 @@ public abstract class BaseSession implements Session
             return attributes.put( key, value );
         }
     }
+    
+    public Object removeAttribute( String key )
+    {
+        synchronized( attributes )
+        {
+            return attributes.remove( key );
+        }
+    }
 
     public Set getAttributeKeys() {
         synchronized( attributes )
@@ -86,7 +94,7 @@ public abstract class BaseSession implements Session
             return attributes.keySet();
         }
     }
-
+    
     public long getReadBytes()
     {
         return readBytes;
