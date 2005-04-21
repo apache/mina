@@ -27,6 +27,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
+import org.apache.mina.util.BaseSession;
 
 /**
  * Tests {@link AbstractIoHandlerFilterChain}.
@@ -101,7 +102,7 @@ public class IoHandlerFilterChainTest extends TestCase
         return buf.toString();
     }
 
-    private class TestSession implements IoSession
+    private class TestSession extends BaseSession implements IoSession
     {
         private IoHandler handler = new IoHandler()
         {
@@ -147,15 +148,6 @@ public class IoHandlerFilterChainTest extends TestCase
         {
         }
 
-        public Object getAttachment()
-        {
-            return null;
-        }
-
-        public void setAttachment(Object attachment)
-        {
-        }
-
         public TransportType getTransportType()
         {
             return null;
@@ -179,36 +171,6 @@ public class IoHandlerFilterChainTest extends TestCase
         public SocketAddress getLocalAddress()
         {
             return null;
-        }
-
-        public long getReadBytes()
-        {
-            return 0;
-        }
-
-        public long getWrittenBytes()
-        {
-            return 0;
-        }
-
-        public long getLastIoTime()
-        {
-            return 0;
-        }
-
-        public long getLastReadTime()
-        {
-            return 0;
-        }
-
-        public long getLastWriteTime()
-        {
-            return 0;
-        }
-
-        public boolean isIdle(IdleStatus status)
-        {
-            return false;
         }
     }
 

@@ -23,7 +23,7 @@ import java.net.SocketException;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolSession;
-import org.apache.mina.util.BasicSessionConfig;
+import org.apache.mina.util.BaseSessionConfig;
 
 /**
  * A {@link SessionConfig} for socket transport (TCP/IP).
@@ -35,7 +35,7 @@ import org.apache.mina.util.BasicSessionConfig;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$,
  */
-public class SocketSessionConfig extends BasicSessionConfig
+public class SocketSessionConfig extends BaseSessionConfig
 {
     private static final int DEFAULT_READ_BUFFER_SIZE = 1024;
 

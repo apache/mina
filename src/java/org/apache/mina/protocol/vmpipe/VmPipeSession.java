@@ -5,13 +5,13 @@ package org.apache.mina.protocol.vmpipe;
 
 import java.net.SocketAddress;
 
-import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolSession;
+import org.apache.mina.util.BaseSession;
 
 /**
  * TODO Document me.
@@ -19,7 +19,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-class VmPipeSession implements ProtocolSession
+class VmPipeSession extends BaseSession implements ProtocolSession
 {
     private final SocketAddress localAddress;
 
@@ -35,21 +35,9 @@ class VmPipeSession implements ProtocolSession
 
     final VmPipeSession remoteSession;
 
-    private Object attachment;
-
     final Object lock;
 
     boolean closed;
-
-    long lastReadTime;
-
-    long lastWriteTime;
-
-    boolean bothIdle;
-
-    boolean readerIdle;
-
-    boolean writerIdle;
 
     /**
      * Constructor for client-side session.
@@ -117,16 +105,6 @@ class VmPipeSession implements ProtocolSession
         }
     }
 
-    public Object getAttachment()
-    {
-        return attachment;
-    }
-
-    public void setAttachment( Object attachment )
-    {
-        this.attachment = attachment;
-    }
-
     public void write( Object message )
     {
         localFilters.filterWrite( this, message );
@@ -155,45 +133,5 @@ class VmPipeSession implements ProtocolSession
     public SocketAddress getLocalAddress()
     {
         return localAddress;
-    }
-
-    public long getReadBytes()
-    {
-        return 0;
-    }
-
-    public long getWrittenBytes()
-    {
-        return 0;
-    }
-
-    public long getLastIoTime()
-    {
-        return Math.max( lastReadTime, lastWriteTime );
-    }
-
-    public long getLastReadTime()
-    {
-        return lastReadTime;
-    }
-
-    public long getLastWriteTime()
-    {
-        return lastWriteTime;
-    }
-
-    public boolean isIdle( IdleStatus status )
-    {
-        if( status == null )
-            throw new NullPointerException( "status" );
-
-        if( status == IdleStatus.BOTH_IDLE )
-            return bothIdle;
-        if( status == IdleStatus.READER_IDLE )
-            return readerIdle;
-        if( status == IdleStatus.WRITER_IDLE )
-            return writerIdle;
-
-        throw new IllegalArgumentException( "Illegal statue: " + status );
     }
 }

@@ -23,11 +23,11 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.util.BaseSession;
 import org.apache.mina.util.Queue;
 
 /**
@@ -36,7 +36,7 @@ import org.apache.mina.util.Queue;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-class SocketSession implements IoSession
+class SocketSession extends BaseSession implements IoSession
 {
     private final SocketFilterChain filters;
 
@@ -55,22 +55,6 @@ class SocketSession implements IoSession
     private final SocketAddress localAddress;
 
     private SelectionKey key;
-
-    private Object attachment;
-
-    private long readBytes;
-
-    private long writtenBytes;
-
-    private long lastReadTime;
-
-    private long lastWriteTime;
-
-    private boolean idleForBoth;
-
-    private boolean idleForRead;
-
-    private boolean idleForWrite;
 
     /**
      * Creates a new instance.
@@ -118,16 +102,6 @@ class SocketSession implements IoSession
         SocketIoProcessor.getInstance().removeSession( this );
     }
 
-    public Object getAttachment()
-    {
-        return attachment;
-    }
-
-    public void setAttachment( Object attachment )
-    {
-        this.attachment = attachment;
-    }
-
     Queue getWriteBufferQueue()
     {
         return writeBufferQueue;
@@ -166,69 +140,5 @@ class SocketSession implements IoSession
     public SocketAddress getLocalAddress()
     {
         return localAddress;
-    }
-
-    public long getReadBytes()
-    {
-        return readBytes;
-    }
-
-    public long getWrittenBytes()
-    {
-        return writtenBytes;
-    }
-
-    void increaseReadBytes( int increment )
-    {
-        readBytes += increment;
-        lastReadTime = System.currentTimeMillis();
-    }
-
-    void increaseWrittenBytes( int increment )
-    {
-        writtenBytes += increment;
-        lastWriteTime = System.currentTimeMillis();
-    }
-
-    public long getLastIoTime()
-    {
-        return Math.max( lastReadTime, lastWriteTime );
-    }
-
-    public long getLastReadTime()
-    {
-        return lastReadTime;
-    }
-
-    public long getLastWriteTime()
-    {
-        return lastWriteTime;
-    }
-
-    public boolean isIdle( IdleStatus status )
-    {
-        if( status == IdleStatus.BOTH_IDLE )
-            return idleForBoth;
-
-        if( status == IdleStatus.READER_IDLE )
-            return idleForRead;
-
-        if( status == IdleStatus.WRITER_IDLE )
-            return idleForWrite;
-
-        throw new IllegalArgumentException( "Unknown idle status: " + status );
-    }
-
-    void setIdle( IdleStatus status, boolean value )
-    {
-        if( status == IdleStatus.BOTH_IDLE )
-            idleForBoth = value;
-        else if( status == IdleStatus.READER_IDLE )
-            idleForRead = value;
-        else if( status == IdleStatus.WRITER_IDLE )
-            idleForWrite = value;
-        else
-            throw new IllegalArgumentException( "Unknown idle status: "
-                                                + status );
     }
 }

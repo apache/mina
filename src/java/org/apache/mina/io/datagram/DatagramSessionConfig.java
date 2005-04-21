@@ -24,7 +24,7 @@ import java.nio.channels.DatagramChannel;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolSession;
-import org.apache.mina.util.BasicSessionConfig;
+import org.apache.mina.util.BaseSessionConfig;
 
 /**
  * A {@link SessionConfig} for datagram transport (UDP/IP).
@@ -36,7 +36,7 @@ import org.apache.mina.util.BasicSessionConfig;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$,
  */
-public class DatagramSessionConfig extends BasicSessionConfig
+public class DatagramSessionConfig extends BaseSessionConfig
 {
     private final DatagramChannel ch;
 
