@@ -1031,8 +1031,8 @@ public abstract class ByteBuffer
             }
             
             buf.limit( oldLimit );
-            buf.position( oldLimit );
-            return out.toString();
+            buf.position( end );
+            return out.flip().toString();
         }
         
         public String getString( int fieldSize, CharsetDecoder decoder ) throws CharacterCodingException
@@ -1136,7 +1136,7 @@ public abstract class ByteBuffer
             
             buf.limit( oldLimit );
             buf.position( end );
-            return out.toString();
+            return out.flip().toString();
         }
 
         public ByteBuffer putString(
