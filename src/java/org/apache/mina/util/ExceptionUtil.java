@@ -16,21 +16,39 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.io;
+package org.apache.mina.util;
+
+import java.io.IOException;
 
 /**
- * Monitors uncaught exceptions.  {@link #exceptionCaught(Object, Throwable)} is
- * invoked when there are any uncaught exceptions.
+ * Exception utility.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
- * 
- * @see DefaultExceptionMonitor
  */
-public interface ExceptionMonitor
-{
-    /**
-     * Invoked when there are any uncaught exceptions.
-     */
-    void exceptionCaught( Object source, Throwable cause );
+public class ExceptionUtil {
+
+    public static void throwException( Throwable t ) throws IOException
+    {
+        if( t instanceof IOException )
+        {
+            throw ( IOException ) t;
+        }
+        else if( t instanceof RuntimeException )
+        {
+            throw ( RuntimeException ) t;
+        }
+        else if( t instanceof Error )
+        {
+            throw ( Error ) t;
+        }
+        else
+        {
+            throw new RuntimeException( t );
+        }
+    }
+    
+    private ExceptionUtil()
+    {
+    }
 }

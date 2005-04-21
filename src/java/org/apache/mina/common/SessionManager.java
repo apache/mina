@@ -16,29 +16,29 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.io.datagram;
-
-import org.apache.mina.util.BaseSessionManager;
+package org.apache.mina.common;
 
 /**
- * A base class for {@link DatagramAcceptor} and {@link DatagramConnector}.
- * Session interacts with this abstract class instead of those two concrete
- * classes.
+ * Base interface for all acceptors and connectors that manage
+ * sessions.
+ * <p>
+ * You can monitor any uncaught exceptions by setting {@link ExceptionMonitor}
+ * by calling {@link #setExceptionMonitor(ExceptionMonitor)}.  The default
+ * monitor is {@link DefaultExceptionMonitor}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-abstract class DatagramProcessor extends BaseSessionManager
-{
+public interface SessionManager {
+    
     /**
-     * Requests this processor to flush the write buffer of the specified
-     * session.  This method is invoked by MINA internally.
+     * Returns the current exception monitor.
      */
-    abstract void flushSession( DatagramSession session );
+    ExceptionMonitor getExceptionMonitor();
 
     /**
-     * Requests this processor to close the specified session.
-     * This method is invoked by MINA internally.
+     * Sets the uncaught exception monitor.  If <code>null</code> is specified,
+     * a new instance of {@link DefaultExceptionMonitor} will be set.
      */
-    abstract void closeSession( DatagramSession session );
+    void setExceptionMonitor( ExceptionMonitor monitor );
 }

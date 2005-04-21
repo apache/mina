@@ -6,6 +6,8 @@ package org.apache.mina.protocol.io;
 import java.io.IOException;
 import java.net.SocketAddress;
 
+import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolConnector;
@@ -77,8 +79,51 @@ public class IoProtocolConnector implements ProtocolConnector
         return adapter.toProtocolSession( session );
     }
 
+    public ProtocolSession connect( SocketAddress address,
+                                    ProtocolProvider provider,
+                                    SessionInitializer initializer ) throws IOException
+    {
+        IoSession session = connector.connect(
+                address, adapter.adapt( provider ), initializer );
+        return adapter.toProtocolSession( session );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
+                                    ProtocolProvider provider, SessionInitializer initializer ) throws IOException
+    {
+        IoSession session = connector.connect(
+                address, localAddress, adapter.adapt( provider ), initializer );
+        return adapter.toProtocolSession( session );
+    }
+
+    public ProtocolSession connect( SocketAddress address, int timeout,
+                                    ProtocolProvider provider, SessionInitializer initializer ) throws IOException
+    {
+        IoSession session = connector.connect(
+                address, timeout, adapter.adapt( provider ), initializer );
+        return adapter.toProtocolSession( session );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
+                                    int timeout, ProtocolProvider provider, SessionInitializer initializer ) throws IOException
+    {
+        IoSession session = connector.connect(
+                address, localAddress, timeout, adapter.adapt( provider ), initializer );
+        return adapter.toProtocolSession( session );
+    }
+
     public ProtocolHandlerFilterChain getFilterChain()
     {
         return adapter.getFilterChain();
+    }
+
+    public ExceptionMonitor getExceptionMonitor()
+    {
+        return connector.getExceptionMonitor();
+    }
+
+    public void setExceptionMonitor( ExceptionMonitor monitor )
+    {
+        connector.setExceptionMonitor( monitor );
     }
 }

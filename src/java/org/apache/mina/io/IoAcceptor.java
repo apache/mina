@@ -21,6 +21,9 @@ package org.apache.mina.io;
 import java.io.IOException;
 import java.net.SocketAddress;
 
+import org.apache.mina.common.SessionInitializer;
+import org.apache.mina.common.SessionManager;
+
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
  * {@link IoHandler}s.
@@ -39,15 +42,13 @@ import java.net.SocketAddress;
  * <p>
  * {@link IoHandlerFilter}s can be added and removed at any time to filter
  * events just like Servlet filters and they are effective immediately.
- * <p>
- * You can monitor any uncaught exceptions by setting {@link ExceptionMonitor}
- * by calling {@link #setExceptionMonitor(ExceptionMonitor)}.  The default
- * monitor is {@link DefaultExceptionMonitor}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @see SessionInitializer
  */
-public interface IoAcceptor
+public interface IoAcceptor extends SessionManager
 {
     /**
      * Binds to the specified <code>address</code> and handles incoming
@@ -58,20 +59,17 @@ public interface IoAcceptor
     void bind( SocketAddress address, IoHandler handler ) throws IOException;
 
     /**
+     * Binds to the specified <code>address</code> and handles incoming
+     * connections with the specified <code>handler</code>.
+     * 
+     * @throws IOException if failed to bind
+     */
+    void bind( SocketAddress address, IoHandler handler, SessionInitializer initializer ) throws IOException;
+
+    /**
      * Unbinds from the specified <code>address</code>.
      */
     void unbind( SocketAddress address );
 
     IoHandlerFilterChain getFilterChain();
-    
-    /**
-     * Returns the current exception monitor.
-     */
-    ExceptionMonitor getExceptionMonitor();
-
-    /**
-     * Sets the uncaught exception monitor.  If <code>null</code> is specified,
-     * a new instance of {@link DefaultExceptionMonitor} will be set.
-     */
-    void setExceptionMonitor( ExceptionMonitor monitor );
 }

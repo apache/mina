@@ -6,11 +6,13 @@ package org.apache.mina.protocol.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.protocol.ProtocolConnector;
 import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
+import org.apache.mina.util.BaseSessionManager;
 
 /**
  * Connects to {@link ProtocolProvider}s which is bound on the specified
@@ -19,7 +21,7 @@ import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeConnector implements ProtocolConnector
+public class VmPipeConnector extends BaseSessionManager implements ProtocolConnector
 {
     private final VmPipeFilterChain filters = new VmPipeFilterChain();
 
@@ -36,14 +38,44 @@ public class VmPipeConnector implements ProtocolConnector
         return filters;
     }
 
-    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
-                                    ProtocolProvider protocolProvider ) throws IOException
+    public ProtocolSession connect( SocketAddress address, ProtocolProvider protocolProvider ) throws IOException 
     {
-        return connect( address, protocolProvider );
+        return connect( address, null, Integer.MAX_VALUE, protocolProvider, null );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress, ProtocolProvider protocolProvider ) throws IOException
+    {
+        return connect( address, localAddress, Integer.MAX_VALUE, protocolProvider, null );
+    }
+
+    public ProtocolSession connect( SocketAddress address, int timeout, ProtocolProvider protocolProvider ) throws IOException
+    {
+        return connect( address, null, timeout, protocolProvider, null );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress, int timeout, ProtocolProvider protocolProvider ) throws IOException
+    {
+        return connect( address, localAddress, timeout, protocolProvider, null );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress, ProtocolProvider protocolProvider, SessionInitializer initializer ) throws IOException
+    {
+        return connect( address, localAddress, Integer.MAX_VALUE, protocolProvider, initializer );
+    }
+
+    public ProtocolSession connect( SocketAddress address, int timeout, ProtocolProvider protocolProvider, SessionInitializer initializer ) throws IOException
+    {
+        return connect( address, null, timeout, protocolProvider, initializer );
+    }
+
+    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress, int timeout, ProtocolProvider protocolProvider, SessionInitializer initializer ) throws IOException
+    {
+        return connect( address, localAddress, timeout, protocolProvider, initializer );
     }
 
     public ProtocolSession connect( SocketAddress address,
-                                    ProtocolProvider protocolProvider ) throws IOException
+                                    ProtocolProvider protocolProvider,
+                                    SessionInitializer initializer ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -57,28 +89,14 @@ public class VmPipeConnector implements ProtocolConnector
         if( entry == null )
             throw new IOException( "Endpoint unavailable: " + address );
 
-        VmPipeSession session = new VmPipeSession(
-                                                   new Object(), // lock
+        VmPipeSession session = new VmPipeSession( new Object(), // lock
                                                    AnonymousVmPipeAddress.INSTANCE,
-                                                   entry.address,
                                                    filters,
-                                                   protocolProvider
-                                                           .getHandler(),
-                                                   entry.filters,
-                                                   entry.handler );
+                                                   protocolProvider.getHandler(),
+                                                   initializer,
+                                                   entry );
+
         VmPipeIdleStatusChecker.INSTANCE.addSession( session );
         return session;
-    }
-
-    public ProtocolSession connect( SocketAddress address, int timeout,
-                                    ProtocolProvider protocolProvider ) throws IOException
-    {
-        return connect( address, protocolProvider );
-    }
-
-    public ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
-                                    int timeout, ProtocolProvider protocolProvider ) throws IOException
-    {
-        return connect( address, protocolProvider );
     }
 }

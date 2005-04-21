@@ -16,29 +16,21 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.io.datagram;
-
-import org.apache.mina.util.BaseSessionManager;
+package org.apache.mina.common;
 
 /**
- * A base class for {@link DatagramAcceptor} and {@link DatagramConnector}.
- * Session interacts with this abstract class instead of those two concrete
- * classes.
+ * Monitors uncaught exceptions.  {@link #exceptionCaught(Object, Throwable)} is
+ * invoked when there are any uncaught exceptions.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @see DefaultExceptionMonitor
  */
-abstract class DatagramProcessor extends BaseSessionManager
+public interface ExceptionMonitor
 {
     /**
-     * Requests this processor to flush the write buffer of the specified
-     * session.  This method is invoked by MINA internally.
+     * Invoked when there are any uncaught exceptions.
      */
-    abstract void flushSession( DatagramSession session );
-
-    /**
-     * Requests this processor to close the specified session.
-     * This method is invoked by MINA internally.
-     */
-    abstract void closeSession( DatagramSession session );
+    void exceptionCaught( Object source, Throwable cause );
 }
