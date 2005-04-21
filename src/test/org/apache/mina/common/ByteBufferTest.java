@@ -19,6 +19,9 @@
 package org.apache.mina.common;
 
 import java.nio.BufferOverflowException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -142,5 +145,139 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 2, buf.position() );
         Assert.assertEquals( 4, buf.limit() );
         Assert.assertEquals( 4, buf.capacity() );
+    }
+    
+    public void testGetString() throws Exception
+    {
+        ByteBuffer buf = ByteBuffer.allocate( 16 );
+        CharsetDecoder decoder;
+
+        decoder = Charset.forName( "ISO-8859-1" ).newDecoder();
+        buf.put( (byte) 'A' );
+        buf.put( (byte) 'B' );
+        buf.put( (byte) 'C' );
+        buf.put( (byte) 0 );
+        
+        buf.position( 0 );
+        Assert.assertEquals( "ABC", buf.getString( decoder ) );
+        Assert.assertEquals( 4, buf.position() );
+        
+        buf.position( 0 );
+        buf.limit( 1 );
+        Assert.assertEquals( "A", buf.getString( decoder ) );
+        Assert.assertEquals( 1, buf.position() );
+        
+        buf.clear();
+        Assert.assertEquals( "ABC", buf.getString( 10, decoder ) );
+        Assert.assertEquals( 10, buf.position() );
+        
+        buf.clear();
+        Assert.assertEquals( "A", buf.getString( 1, decoder ) );
+        Assert.assertEquals( 1, buf.position() );
+        
+        buf.clear();
+        buf.fillAndReset( buf.limit() );
+        decoder = Charset.forName( "UTF-16" ).newDecoder();
+        buf.put( (byte) 0 );
+        buf.put( (byte) 'A' );
+        buf.put( (byte) 0 );
+        buf.put( (byte) 'B' );
+        buf.put( (byte) 0 );
+        buf.put( (byte) 'C' );
+        buf.put( (byte) 0 );
+        buf.put( (byte) 0 );
+        
+        buf.position( 0 );
+        Assert.assertEquals( "ABC", buf.getString( decoder ) );
+        Assert.assertEquals( 8, buf.position() );
+
+        buf.position( 0 );
+        buf.limit( 2 );
+        Assert.assertEquals( "A", buf.getString( decoder ) );
+        Assert.assertEquals( 2, buf.position() );
+        
+        buf.position( 0 );
+        buf.limit( 3 );
+        Assert.assertEquals( "A", buf.getString( decoder ) );
+        Assert.assertEquals( 2, buf.position() );
+        
+        buf.clear();
+        Assert.assertEquals( "ABC", buf.getString( 10, decoder ) );
+        Assert.assertEquals( 10, buf.position() );
+        
+        buf.clear();
+        Assert.assertEquals( "A", buf.getString( 2, decoder ) );
+        Assert.assertEquals( 2, buf.position() );
+        
+        buf.clear();
+        try
+        {
+            buf.getString( 1, decoder );
+            Assert.fail();
+        }
+        catch( IllegalArgumentException e )
+        {
+            // ignore
+        }
+    }
+    
+    public void testPutString() throws Exception
+    {
+        CharsetEncoder encoder;
+        ByteBuffer buf = ByteBuffer.allocate( 16 );
+        encoder = Charset.forName( "ISO-8859-1" ).newEncoder();
+        
+        buf.putString( "ABC", encoder );
+        Assert.assertEquals( 3, buf.position() );
+        buf.clear();
+        Assert.assertEquals( 'A', buf.get( 0 ) );
+        Assert.assertEquals( 'B', buf.get( 1 ) );
+        Assert.assertEquals( 'C', buf.get( 2 ) );
+        
+        buf.putString( "D", 5, encoder );
+        Assert.assertEquals( 5, buf.position() );
+        buf.clear();
+        Assert.assertEquals( 'D', buf.get( 0 ) );
+        Assert.assertEquals( 0, buf.get( 1 ) );
+        
+        buf.putString( "EFG", 2, encoder );
+        Assert.assertEquals( 2, buf.position() );
+        buf.clear();
+        Assert.assertEquals( 'E', buf.get( 0 ) );
+        Assert.assertEquals( 'F', buf.get( 1 ) );
+        Assert.assertEquals( 'C', buf.get( 2 ) ); // C may not be overwritten
+
+        // UTF-16: We specify byte order to omit BOM.
+        encoder = Charset.forName( "UTF-16BE" ).newEncoder();
+        buf.clear();
+        
+        buf.putString( "ABC", encoder );
+        Assert.assertEquals( 6, buf.position() );
+        buf.clear();
+        
+        Assert.assertEquals( 0, buf.get( 0 ) );
+        Assert.assertEquals( 'A', buf.get( 1 ) );
+        Assert.assertEquals( 0, buf.get( 2 ) );
+        Assert.assertEquals( 'B', buf.get( 3 ) );
+        Assert.assertEquals( 0, buf.get( 4 ) );
+        Assert.assertEquals( 'C', buf.get( 5 ) );
+        
+        buf.putString( "D", 10, encoder );
+        Assert.assertEquals( 10, buf.position() );
+        buf.clear();
+        Assert.assertEquals( 0, buf.get( 0 ) );
+        Assert.assertEquals( 'D', buf.get( 1 ) );
+        Assert.assertEquals( 0, buf.get( 2 ) );
+        Assert.assertEquals( 0, buf.get( 3 ) );
+        
+        buf.putString( "EFG", 4, encoder );
+        Assert.assertEquals( 4, buf.position() );
+        buf.clear();
+        Assert.assertEquals( 0, buf.get( 0 ) );
+        Assert.assertEquals( 'E', buf.get( 1 ) );
+        Assert.assertEquals( 0, buf.get( 2 ) );
+        Assert.assertEquals( 'F', buf.get( 3 ) );
+        Assert.assertEquals( 0, buf.get( 4 ) );   // C may not be overwritten
+        Assert.assertEquals( 'C', buf.get( 5 ) ); // C may not be overwritten
     }
 }
