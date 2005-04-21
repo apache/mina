@@ -75,7 +75,7 @@ import org.apache.mina.util.Stack;
  *   <li>You pass the buffer by calling {@link ProtocolEncoderOutput#write(ByteBuffer)}.</li>
  * </ul>
  * And, you don't need to release any {@link ByteBuffer} which is passed as a parameter
- * of <li>{@link IoHandler#dataRead(IoSession, ByteBuffer)} method.  They are released
+ * of {@link IoHandler#dataRead(IoSession, ByteBuffer)} method.  They are released
  * automatically when the method returns.
  * <p>
  * You have to release buffers manually by calling {@link #release()} when:
