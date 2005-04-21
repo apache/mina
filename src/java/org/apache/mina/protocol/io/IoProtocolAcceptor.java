@@ -16,6 +16,9 @@ import org.apache.mina.protocol.ProtocolProvider;
 /**
  * A {@link ProtocolAcceptor} which wraps {@link IoAcceptor} to provide
  * low-level I/O.
+ * <p>
+ * Please note that the user-defined attributes of {@link ProtocolSession}
+ * and its wrapping {@link IoSession} are shared.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$

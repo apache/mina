@@ -18,7 +18,10 @@ import org.apache.mina.protocol.ProtocolSession;
 /**
  * A {@link ProtocolConnector} which wraps {@link IoConnector} to provide
  * low-level I/O.
- * 
+ * <p>
+ * Please note that the user-defined attributes of {@link ProtocolSession}
+ * and its wrapping {@link IoSession} are shared.
+ *
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
