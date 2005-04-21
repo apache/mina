@@ -19,6 +19,7 @@
 package org.apache.mina.protocol.io;
 
 import java.net.SocketAddress;
+import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
@@ -245,8 +246,6 @@ public class IoAdapter
 
         private final ProtocolDecoderOutputImpl decOut;
 
-        private Object attachment;
-
         private ProtocolSessionImpl( IoSession session,
                                     SessionHandlerAdapter adapter )
         {
@@ -280,12 +279,27 @@ public class IoAdapter
 
         public Object getAttachment()
         {
-            return attachment;
+            return session.getAttachment();
         }
 
-        public void setAttachment( Object attachment )
+        public Object setAttachment( Object attachment )
         {
-            this.attachment = attachment;
+            return session.setAttachment( attachment );
+        }
+
+        public Object getAttribute( String key )
+        {
+            return session.getAttribute( key );
+        }
+
+        public Object setAttribute( String key, Object value )
+        {
+            return session.setAttribute( key, value );
+        }
+
+        public Set getAttributeKeys()
+        {
+            return session.getAttributeKeys();
         }
 
         public void write( Object message )

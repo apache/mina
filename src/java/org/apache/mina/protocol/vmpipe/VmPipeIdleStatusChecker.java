@@ -74,37 +74,40 @@ class VmPipeIdleStatusChecker
                             long idleTime;
                             SessionConfig config = session.getConfig();
 
-                            if( !session.bothIdle )
+                            if( !session.isIdle( IdleStatus.BOTH_IDLE ) )
                             {
                                 idleTime = config
                                         .getIdleTimeInMillis( IdleStatus.BOTH_IDLE );
-                                session.bothIdle = idleTime > 0L
-                                                   && ( currentTime - session.lastReadTime ) > idleTime;
-                                if( session.bothIdle )
+                                session.setIdle( IdleStatus.BOTH_IDLE,
+                                                 idleTime > 0L
+                                                 && ( currentTime - session.getLastIoTime() ) > idleTime );
+                                if( session.isIdle( IdleStatus.BOTH_IDLE ) )
                                     session.localFilters
                                             .sessionIdle( session,
                                                           IdleStatus.BOTH_IDLE );
                             }
 
-                            if( !session.readerIdle )
+                            if( !session.isIdle( IdleStatus.READER_IDLE ) )
                             {
                                 idleTime = config
                                         .getIdleTimeInMillis( IdleStatus.READER_IDLE );
-                                session.readerIdle = idleTime > 0L
-                                                     && ( currentTime - session.lastReadTime ) > idleTime;
-                                if( session.readerIdle )
+                                session.setIdle( IdleStatus.READER_IDLE,
+                                                 idleTime > 0L
+                                                 && ( currentTime - session.getLastReadTime() ) > idleTime );
+                                if( session.isIdle( IdleStatus.READER_IDLE ) )
                                     session.localFilters
                                             .sessionIdle( session,
                                                           IdleStatus.READER_IDLE );
                             }
 
-                            if( !session.writerIdle )
+                            if( !session.isIdle( IdleStatus.WRITER_IDLE ) )
                             {
                                 idleTime = config
                                         .getIdleTimeInMillis( IdleStatus.WRITER_IDLE );
-                                session.writerIdle = idleTime > 0L
-                                                     && ( currentTime - session.lastReadTime ) > idleTime;
-                                if( session.writerIdle )
+                                session.setIdle( IdleStatus.WRITER_IDLE,
+                                                 idleTime > 0L
+                                                 && ( currentTime - session.getLastWriteTime() ) > idleTime );
+                                if( session.isIdle( IdleStatus.WRITER_IDLE ) )
                                     session.localFilters
                                             .sessionIdle( session,
                                                           IdleStatus.WRITER_IDLE );

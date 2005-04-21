@@ -3,6 +3,7 @@
  */
 package org.apache.mina.protocol.vmpipe;
 
+import org.apache.mina.common.IdleStatus;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolHandlerFilterAdapter;
 import org.apache.mina.protocol.ProtocolSession;
@@ -20,8 +21,9 @@ class VmPipeFilter extends ProtocolHandlerFilterAdapter
     {
         VmPipeSession vps = ( VmPipeSession ) session;
 
-        vps.bothIdle = vps.readerIdle = false;
-        vps.lastReadTime = System.currentTimeMillis();
+        vps.setIdle( IdleStatus.BOTH_IDLE, false );
+        vps.setIdle( IdleStatus.READER_IDLE, false );
+        vps.increaseReadBytes( 0 );
 
         // fire messageSent event first
         vps.remoteFilters.messageSent( vps.remoteSession, message );
@@ -34,8 +36,9 @@ class VmPipeFilter extends ProtocolHandlerFilterAdapter
                             ProtocolSession session, Object message )
     {
         VmPipeSession vps = ( VmPipeSession ) session;
-        vps.bothIdle = vps.writerIdle = false;
-        vps.lastWriteTime = System.currentTimeMillis();
+        vps.setIdle( IdleStatus.BOTH_IDLE, false );
+        vps.setIdle( IdleStatus.WRITER_IDLE, false );
+        vps.increaseWrittenBytes( 0 );
 
         nextHandler.messageSent( session, message );
     }

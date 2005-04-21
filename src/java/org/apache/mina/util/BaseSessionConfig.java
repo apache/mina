@@ -22,12 +22,12 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 
 /**
- * Base class of all {@link SessionConfig}s.
+ * Base implementation of {@link SessionConfig}s.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BasicSessionConfig implements SessionConfig
+public abstract class BaseSessionConfig implements SessionConfig
 {
     private int idleTimeForRead;
 
@@ -37,7 +37,7 @@ public abstract class BasicSessionConfig implements SessionConfig
 
     private int writeTimeout;
 
-    protected BasicSessionConfig()
+    protected BaseSessionConfig()
     {
     }
 

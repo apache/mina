@@ -26,7 +26,6 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolDecoder;
@@ -35,6 +34,7 @@ import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolViolationException;
+import org.apache.mina.util.BaseSession;
 
 /**
  * Tests {@link CumulativeProtocolDecoder}.
@@ -171,7 +171,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
         }
     }
     
-    private static class ProtocolSessionImpl implements ProtocolSession
+    private static class ProtocolSessionImpl extends BaseSession implements ProtocolSession
     {
 
         public ProtocolHandler getHandler() {
@@ -187,13 +187,6 @@ public class CumulativeProtocolDecoderTest extends TestCase
         }
 
         public void close() {
-        }
-
-        public Object getAttachment() {
-            return null;
-        }
-
-        public void setAttachment(Object attachment) {
         }
 
         public void write(Object message) {
@@ -218,30 +211,5 @@ public class CumulativeProtocolDecoderTest extends TestCase
         public SocketAddress getLocalAddress() {
             return null;
         }
-
-        public long getReadBytes() {
-            return 0;
-        }
-
-        public long getWrittenBytes() {
-            return 0;
-        }
-
-        public long getLastIoTime() {
-            return 0;
-        }
-
-        public long getLastReadTime() {
-            return 0;
-        }
-
-        public long getLastWriteTime() {
-            return 0;
-        }
-
-        public boolean isIdle(IdleStatus status) {
-            return false;
-        }
-        
     }
 }
