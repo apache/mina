@@ -53,6 +53,8 @@ import org.apache.mina.util.Queue;
  */
 public class IoAdapter
 {
+    private static final String KEY = "IoAdapter.ProtocolSession";
+
     private final IoProtocolFilterChain filters = new IoProtocolFilterChain();
 
     IoAdapter()
@@ -162,14 +164,13 @@ public class IoAdapter
         {
             if( marker == null )
                 return;
-            filters.messageSent( 
-                    ( ProtocolSession ) session.getAttachment(), marker );
+            filters.messageSent( getProtocolSession( session ),
+                                 marker );
         }
 
         void doWrite( IoSession session )
         {
-            ProtocolSessionImpl psession = ( ProtocolSessionImpl ) session
-                    .getAttachment();
+            ProtocolSessionImpl psession = getProtocolSession( session );
             ProtocolEncoder encoder = psession.encoder;
             Queue writeQueue = psession.writeQueue;
 
@@ -210,18 +211,18 @@ public class IoAdapter
 
         private ProtocolSessionImpl getProtocolSession( IoSession session )
         {
-            ProtocolSessionImpl psession = ( ProtocolSessionImpl ) session
-                    .getAttachment();
+            ProtocolSessionImpl psession =
+                ( ProtocolSessionImpl ) session.getAttribute( KEY );
             if( psession == null )
             {
                 synchronized( session )
                 {
-                    psession = ( ProtocolSessionImpl ) session
-                            .getAttachment();
+                    psession =
+                        ( ProtocolSessionImpl ) session.getAttribute( KEY );
                     if( psession == null )
                     {
                         psession = new ProtocolSessionImpl( session, this );
-                        session.setAttachment( psession );
+                        session.setAttribute( KEY, psession );
                     }
                 }
             }
@@ -295,6 +296,11 @@ public class IoAdapter
         public Object setAttribute( String key, Object value )
         {
             return session.setAttribute( key, value );
+        }
+        
+        public Object removeAttribute( String key )
+        {
+            return session.removeAttribute( key );
         }
 
         public Set getAttributeKeys()

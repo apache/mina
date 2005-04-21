@@ -61,11 +61,9 @@ class VmPipeSession extends BaseSession implements ProtocolSession
         remoteSession = new VmPipeSession( this, remoteEntry.handler );
         if( remoteEntry.initializer != null )
         {
-            boolean success = false;
             try
             {
                 remoteEntry.initializer.initializeSession( remoteSession );
-                success = true;
             }
             catch( Throwable t )
             {
@@ -74,6 +72,8 @@ class VmPipeSession extends BaseSession implements ProtocolSession
                 e.initCause( t );
                 throw e;
             }
+            
+            initializer.initializeSession( this );
         }
 
         remoteEntry.filters.sessionOpened( remoteSession );

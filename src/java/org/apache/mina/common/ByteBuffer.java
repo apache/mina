@@ -32,6 +32,9 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
+import org.apache.mina.io.IoHandler;
+import org.apache.mina.io.IoSession;
+import org.apache.mina.protocol.ProtocolEncoderOutput;
 import org.apache.mina.util.Stack;
 
 /**
