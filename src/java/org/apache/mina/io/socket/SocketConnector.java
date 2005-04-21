@@ -145,7 +145,6 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
         {
             if( !success )
             {
-                ch.socket().close();
                 ch.close();
             }
         }
@@ -257,7 +256,6 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
                 {
                     try
                     {
-                        ch.socket().close();
                         ch.close();
                     }
                     catch( IOException e )

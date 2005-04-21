@@ -139,7 +139,6 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
         {
             if( !initialized )
             {
-                ch.socket().close();
                 ch.close();
             }
         }
@@ -465,7 +464,6 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
                 {
                     try
                     {
-                        req.channel.socket().close();
                         req.channel.close();
                     }
                     catch (IOException e)
@@ -497,7 +495,6 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
                 DatagramChannel ch = ( DatagramChannel ) key.channel();
                 try
                 {
-                    ch.socket().close();
                     ch.close();
                 }
                 catch( IOException e )
