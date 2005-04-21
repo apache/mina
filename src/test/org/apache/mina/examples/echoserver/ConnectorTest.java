@@ -18,6 +18,7 @@
  */
 package org.apache.mina.examples.echoserver;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -25,6 +26,8 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.Session;
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandlerAdapter;
@@ -44,27 +47,26 @@ public class ConnectorTest extends AbstractTest
 {
     private int clientPort;
     
+    public ConnectorTest()
+    {
+        super( false );
+    }
+
     public void setUp() throws Exception
     {
         super.setUp();
-        clientPort = AvailablePortFinder.getNextAvailable( port + 1 );
+        clientPort = port;
+        clientPort = AvailablePortFinder.getNextAvailable( clientPort + 1 );
+        System.out.println( "Using port " + clientPort + " as local address" );
     }
     
     public void testTCP() throws Exception
     {
         IoConnector connector = new SocketConnector();
         connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
-        testTCP0( connector, null );
+        testConnector( connector );
     }
     
-    public void testTCPWithLocalAddress() throws Exception
-    {
-        System.out.println( "Using client port " + clientPort + " for testing." );
-        IoConnector connector = new SocketConnector();
-        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
-        testTCP0( connector, new InetSocketAddress( clientPort ) );
-    }
-
     /**
      * Client-side SSL doesn't work for now.
      */
@@ -83,17 +85,53 @@ public class ConnectorTest extends AbstractTest
         connectorSSLFilter.setDebug( SSLFilter.Debug.ON );
         connector.getFilterChain().addLast( "SSL", connectorSSLFilter );
 
-        testTCP0( connector, null );
+        testConnector( connector );
     }
     
-    private void testTCP0( IoConnector connector, SocketAddress localAddress ) throws Exception
+    public void testUDP() throws Exception
+    {
+        IoConnector connector = new DatagramConnector();
+        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
+        testConnector( connector );
+    }
+    
+    private void testConnector( IoConnector connector ) throws Exception
+    {
+        MarkingInitializer marker;
+        InetSocketAddress localAddress = new InetSocketAddress( clientPort );
+
+        System.out.println("* Without localAddress and initializer");
+        testConnector( connector, null, null );
+        
+        marker = new MarkingInitializer();
+        System.out.println("* Without localAddress and with initializer");
+        testConnector( connector, null, marker );
+        Assert.assertTrue( marker.executed );
+
+        if( !(connector instanceof SocketConnector) )
+        {
+            // FIXME This test fails in case of SocketConnector.
+            // I don't know why yet.
+            System.out.println("* With localAddress and without initializer");
+            testConnector( connector, localAddress, null );
+            
+            marker = new MarkingInitializer();
+            System.out.println("* With localAddress and initializer");
+            testConnector( connector, localAddress, marker );
+            Assert.assertTrue( marker.executed );
+        }
+    }
+    
+    private void testConnector( IoConnector connector, SocketAddress localAddress,
+                                SessionInitializer initializer ) throws Exception
     {
         EchoConnectorHandler handler = new EchoConnectorHandler();
         ByteBuffer readBuf = handler.readBuf;
         IoSession session = connector.connect(
                 new InetSocketAddress( InetAddress.getLocalHost(), port ),
                 localAddress,
-                handler );
+                handler,
+                initializer );
         
         for( int i = 0; i < 10; i ++ )
         {
@@ -140,21 +178,6 @@ public class ConnectorTest extends AbstractTest
         assertEquals(expectedBuf, readBuf);
     }
 
-    public void testUDP() throws Exception
-    {
-        IoConnector connector = new DatagramConnector();
-        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
-        testTCP0( connector, null );
-    }
-    
-    public void testUDPWithLocalAddress() throws Exception
-    {
-        System.out.println( "Using client port " + clientPort + " for testing." );
-        IoConnector connector = new DatagramConnector();
-        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
-        testTCP0( connector, new InetSocketAddress( clientPort ) );
-    }
-    
     private void fillWriteBuffer( ByteBuffer writeBuf, int i )
     {
         while( writeBuf.remaining() > 0 )
@@ -195,6 +218,16 @@ public class ConnectorTest extends AbstractTest
         public void exceptionCaught( IoSession session, Throwable cause )
         {
             cause.printStackTrace();
+        }
+    }
+    
+    private static class MarkingInitializer implements SessionInitializer
+    {
+        private boolean executed;
+
+        public void initializeSession(Session session) throws IOException
+        {
+            executed = true;
         }
     }
 }

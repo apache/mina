@@ -129,11 +129,14 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
             {
                 ch.socket().bind( localAddress );
             }
-            ch.configureBlocking( false );
     
+            ch.configureBlocking( false );
+
             if( ch.connect( address ) )
             {
-                return newSession( ch, handler, initializer );
+                SocketSession session = newSession( ch, handler, initializer );
+                success = true;
+                return session;
             }
             
             success = true;
@@ -142,10 +145,11 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
         {
             if( !success )
             {
+                ch.socket().close();
                 ch.close();
             }
         }
-
+        
         ConnectionRequest request = new ConnectionRequest( ch, timeout, handler, initializer );
         synchronized( this )
         {
@@ -173,7 +177,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
         if( request.exception != null )
         {
-            request.exception.fillInStackTrace();
+            //request.exception.fillInStackTrace();
             throw request.exception;
         }
 
@@ -248,13 +252,25 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
             }
             finally
             {
+                key.cancel();
+                if( entry.session == null )
+                {
+                    try
+                    {
+                        ch.socket().close();
+                        ch.close();
+                    }
+                    catch( IOException e )
+                    {
+                        exceptionMonitor.exceptionCaught( this, e );
+                    }
+                }
+
                 synchronized( entry )
                 {
                     entry.done = true;
                     entry.notify();
                 }
-
-                key.cancel();
             }
         }
 
