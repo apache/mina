@@ -23,10 +23,13 @@ import java.text.DateFormat;
 import java.util.Date;
 
 /**
- * A default {@link ExceptionMonitor} implementation.  It logs uncaught
+ * A default {@link ExceptionMonitor} implementation that logs uncaught
  * exceptions using <a href="http://jakarta.apache.org/commons/logging/">Apache
  * Jakarta Commons Logging</a> if available.  If not available, it prints it
  * out to {@link System#err}.
+ * <p>
+ * All {@link SessionManager}s have this implementation as a default exception
+ * monitor.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$

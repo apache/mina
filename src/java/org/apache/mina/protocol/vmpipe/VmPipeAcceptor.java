@@ -51,6 +51,10 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
         if( !( address instanceof VmPipeAddress ) )
             throw new IllegalArgumentException(
                     "address must be VmPipeAddress." );
+        if( initializer == null )
+        {
+            initializer = defaultInitializer;
+        }
 
         synchronized( boundHandlers )
         {

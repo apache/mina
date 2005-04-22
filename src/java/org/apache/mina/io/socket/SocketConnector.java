@@ -121,6 +121,11 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
             throw new IllegalArgumentException( "Unexpected local address type: "
                                                 + localAddress.getClass() );
 
+        if( initializer == null )
+        {
+            initializer = defaultInitializer;
+        }
+
         SocketChannel ch = SocketChannel.open();
         boolean success = false;
         try
@@ -307,10 +312,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
     private SocketSession newSession( SocketChannel ch, IoHandler handler, SessionInitializer initializer ) throws IOException
     {
         SocketSession session = new SocketSession( filters, ch, handler );
-        if( initializer != null )
-        {
-            initializer.initializeSession( session );
-        }
+        initializer.initializeSession( session );
         SocketIoProcessor.getInstance().addSession( session );
         return session;
     }

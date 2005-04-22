@@ -59,22 +59,22 @@ class VmPipeSession extends BaseSession implements ProtocolSession
         this.remoteFilters = remoteEntry.filters;
 
         remoteSession = new VmPipeSession( this, remoteEntry.handler );
-        if( remoteEntry.initializer != null )
+        
+        // initialize remote session
+        try
         {
-            try
-            {
-                remoteEntry.initializer.initializeSession( remoteSession );
-            }
-            catch( Throwable t )
-            {
-                remoteEntry.acceptor.getExceptionMonitor().exceptionCaught( remoteEntry.acceptor, t );
-                IOException e = new IOException( "Failed to initialize remote session." );
-                e.initCause( t );
-                throw e;
-            }
-            
-            initializer.initializeSession( this );
+            remoteEntry.initializer.initializeSession( remoteSession );
         }
+        catch( Throwable t )
+        {
+            remoteEntry.acceptor.getExceptionMonitor().exceptionCaught( remoteEntry.acceptor, t );
+            IOException e = new IOException( "Failed to initialize remote session." );
+            e.initCause( t );
+            throw e;
+        }
+        
+        // initialize client session
+        initializer.initializeSession( this );
 
         remoteEntry.filters.sessionOpened( remoteSession );
         localFilters.sessionOpened( this );
