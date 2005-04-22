@@ -115,6 +115,11 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
         {
             throw new IllegalArgumentException( "Unsupported port number: 0" );
         }
+        
+        if( initializer == null )
+        {
+            initializer = defaultInitializer;
+        }
 
         RegistrationRequest request = new RegistrationRequest( address, backlog, handler, initializer );
 
@@ -305,12 +310,7 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
                 {
                     RegistrationRequest req = ( RegistrationRequest ) key.attachment();
                     SocketSession session = new SocketSession( filters, ch, req.handler );
-                    
-                    if( req.initializer != null )
-                    {
-                        req.initializer.initializeSession( session );
-                    }
-                    
+                    req.initializer.initializeSession( session );
                     SocketIoProcessor.getInstance().addSession( session );
                     success = true;
                 }

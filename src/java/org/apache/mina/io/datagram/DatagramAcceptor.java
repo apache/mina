@@ -92,6 +92,11 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                                                 + address.getClass() );
         if( ( ( InetSocketAddress ) address ).getPort() == 0 )
             throw new IllegalArgumentException( "Unsupported port number: 0" );
+        
+        if( initializer == null )
+        {
+            initializer = defaultInitializer;
+        }
 
         RegistrationRequest request = new RegistrationRequest( address, handler, initializer );
         synchronized( this )
@@ -262,10 +267,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             
             try
             {
-                if( req.initializer != null )
-                {
-                    req.initializer.initializeSession( session );
-                }
+                req.initializer.initializeSession( session );
 
                 if( key.isReadable() )
                 {

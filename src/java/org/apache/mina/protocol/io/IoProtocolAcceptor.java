@@ -72,6 +72,16 @@ public class IoProtocolAcceptor implements ProtocolAcceptor
     {
         return adapter.getFilterChain();
     }
+    
+    public SessionInitializer getDefaultSessionInitializer()
+    {
+        return acceptor.getDefaultSessionInitializer();
+    }
+    
+    public void setDefaultSessionInitializer( SessionInitializer defaultInitializer )
+    {
+        acceptor.setDefaultSessionInitializer( defaultInitializer );
+    }
 
     public ExceptionMonitor getExceptionMonitor()
     {

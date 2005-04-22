@@ -122,6 +122,11 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
             throw new IllegalArgumentException( "Unexpected local address type: "
                                                 + localAddress.getClass() );
         }
+        
+        if( initializer == null )
+        {
+            initializer = defaultInitializer;
+        }
 
         DatagramChannel ch = DatagramChannel.open();
         boolean initialized = false;
@@ -436,16 +441,12 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
 
             try
             {
+                req.initializer.initializeSession( session );
+
                 SelectionKey key = req.channel.register( selector,
                         SelectionKey.OP_READ, session );
     
                 session.setSelectionKey( key );
-
-                if( req.initializer != null )
-                {
-                    req.initializer.initializeSession( session );
-                }
-
             }
             catch( Throwable t )
             {

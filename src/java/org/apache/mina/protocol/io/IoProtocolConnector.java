@@ -120,6 +120,16 @@ public class IoProtocolConnector implements ProtocolConnector
         return adapter.getFilterChain();
     }
 
+    public SessionInitializer getDefaultSessionInitializer()
+    {
+        return connector.getDefaultSessionInitializer();
+    }
+    
+    public void setDefaultSessionInitializer( SessionInitializer defaultInitializer )
+    {
+        connector.setDefaultSessionInitializer( defaultInitializer );
+    }
+
     public ExceptionMonitor getExceptionMonitor()
     {
         return connector.getExceptionMonitor();

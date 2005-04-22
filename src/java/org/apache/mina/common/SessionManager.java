@@ -22,6 +22,8 @@ package org.apache.mina.common;
  * Base interface for all acceptors and connectors that manage
  * sessions.
  * <p>
+ * The default {@link SessionInitializer} is {@link DefaultSessionInitializer}.
+ * <p>
  * You can monitor any uncaught exceptions by setting {@link ExceptionMonitor}
  * by calling {@link #setExceptionMonitor(ExceptionMonitor)}.  The default
  * monitor is {@link DefaultExceptionMonitor}.
@@ -32,6 +34,23 @@ package org.apache.mina.common;
 public interface SessionManager {
     
     /**
+     * Returns default {@link SessionInitializer} when no initializer
+     * is specified as a parameter when user call <tt>bind(...)</tt>
+     * and <tt>connect(...)</tt> methods.
+     */
+    SessionInitializer getDefaultSessionInitializer();
+    
+    /**
+     * Sets default {@link SessionInitializer} when no initializer
+     * is specified as a parameter when user call <tt>bind(...)</tt>
+     * and <tt>connect(...)</tt> methods.
+     * 
+     * @param initializer A new instance of {@link DefaultSessionInitializer}
+     *                    is set if <tt>null</tt> is specified.
+     */
+    void setDefaultSessionInitializer( SessionInitializer initializer );
+    
+    /**
      * Returns the current exception monitor.
      */
     ExceptionMonitor getExceptionMonitor();
@@ -39,6 +58,9 @@ public interface SessionManager {
     /**
      * Sets the uncaught exception monitor.  If <code>null</code> is specified,
      * a new instance of {@link DefaultExceptionMonitor} will be set.
+     * 
+     * @param monitor A new instance of {@link DefaultExceptionMonitor} is set
+     *                if <tt>null</tt> is specified.
      */
     void setExceptionMonitor( ExceptionMonitor monitor );
 }

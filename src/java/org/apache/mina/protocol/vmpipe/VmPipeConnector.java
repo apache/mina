@@ -85,6 +85,11 @@ public class VmPipeConnector extends BaseSessionManager implements ProtocolConne
             throw new IllegalArgumentException(
                                                 "address must be VmPipeAddress." );
 
+        if( initializer == null )
+        {
+            initializer = defaultInitializer;
+        }
+
         Entry entry = ( Entry ) VmPipeAcceptor.boundHandlers.get( address );
         if( entry == null )
             throw new IOException( "Endpoint unavailable: " + address );
