@@ -89,9 +89,12 @@ public class IoThreadPoolFilter implements IoHandlerFilter
     /**
      * Returns the number of threads in the thread pool.
      */
-    public synchronized int getPoolSize()
+    public int getPoolSize()
     {
-        return poolSize;
+        synchronized( poolSizeLock )
+        {
+            return poolSize;
+        }
     }
 
     /**
