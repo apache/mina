@@ -176,7 +176,6 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
         
         if( request.exception != null )
         {
-            request.exception.fillInStackTrace();
             ExceptionUtil.throwException( request.exception );
         }
 
