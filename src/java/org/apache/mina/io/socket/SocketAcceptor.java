@@ -150,7 +150,6 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
         
         if( request.exception != null )
         {
-            request.exception.fillInStackTrace();
             throw request.exception;
         }
     }

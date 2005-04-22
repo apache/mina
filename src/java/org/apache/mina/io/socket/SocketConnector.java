@@ -181,7 +181,6 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
         if( request.exception != null )
         {
-            //request.exception.fillInStackTrace();
             throw request.exception;
         }
 

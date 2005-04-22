@@ -125,7 +125,6 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
         
         if( request.exception != null )
         {
-            request.exception.fillInStackTrace();
             ExceptionUtil.throwException( request.exception );
         }
     }
