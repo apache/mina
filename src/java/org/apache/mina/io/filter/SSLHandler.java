@@ -25,7 +25,10 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
+
 import org.apache.mina.io.IoSession;
+import org.apache.mina.io.IoHandlerFilter.NextFilter;
+import org.apache.mina.util.Queue;
 
 /**
  * A helper class using the SSLEngine API to decrypt/encrypt data.
@@ -41,6 +44,14 @@ import org.apache.mina.io.IoSession;
 class SSLHandler
 {
     private final SSLFilter parent;
+
+    private final IoSession session;
+    
+    private final Queue nextFilterQueue = new Queue();
+    
+    private final Queue writeBufferQueue = new Queue();
+    
+    private final Queue writeMarkerQueue = new Queue();
 
     private SSLEngine sslEngine;
 
@@ -83,8 +94,7 @@ class SSLHandler
     private boolean closed = false;
 
     private boolean isWritingEncryptedData = false;
-    private IoSession session = null;
-
+    
     /**
      * Constuctor.
      *
@@ -164,6 +174,31 @@ class SSLHandler
     public boolean needToCompleteInitialHandshake()
     {
         return ( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !closed );
+    }
+    
+    public synchronized void scheduleWrite( NextFilter nextFilter, org.apache.mina.common.ByteBuffer buf, Object marker )
+    {
+        nextFilterQueue.push( nextFilter );
+        writeBufferQueue.push( buf );
+        writeMarkerQueue.push( marker );
+    }
+    
+    public synchronized void flushScheduledWrites()
+    {
+        NextFilter nextFilter;
+        org.apache.mina.common.ByteBuffer scheduledBuf;
+        Object scheduledMarker;
+        
+        while( ( scheduledBuf = ( org.apache.mina.common.ByteBuffer ) writeBufferQueue.pop() ) != null )
+        {
+            if( parent.debug != null )
+            {
+                parent.debug.print( parent, "Flushing buffered write request: " + scheduledBuf );
+            }
+            nextFilter = ( NextFilter ) nextFilterQueue.pop();
+            scheduledMarker = writeMarkerQueue.pop();
+            parent.filterWrite( nextFilter, session, scheduledBuf, scheduledMarker );
+        }
     }
 
     /**
