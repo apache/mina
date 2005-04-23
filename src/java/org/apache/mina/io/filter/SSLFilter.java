@@ -41,8 +41,13 @@ import org.apache.mina.io.IoSession;
  * Java version 5 or above is mandatory to use this filter. And please note that
  * this filter only works for TCP/IP connections.
  * <p>
- * Jan Andersson kindly contributed this filter for the Apache Directory team.
- * We thank him a lot for his significant contribution.
+ * 
+ * <h3>Contribution</h3>
+ * <ul>
+ *   <li>This filter is written and contributed by Jan Andersson at first.</li>
+ *   <li>Vinod Panicker made this filter also work in client-side.<li>
+ * </ul>
+ * Thanks to all contributers!
  * 
  * @author Jan Andersson (janne@minq.se)
  * @author Trustin Lee (trustin@apache.org)
