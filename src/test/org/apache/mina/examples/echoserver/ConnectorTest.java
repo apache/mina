@@ -107,23 +107,31 @@ public class ConnectorTest extends AbstractTest
         System.out.println("* Without localAddress and initializer");
         testConnector( connector, null, null );
         
-//        marker = new MarkingInitializer();
-//        System.out.println("* Without localAddress and with initializer");
-//        testConnector( connector, null, marker );
-//        Assert.assertTrue( marker.executed );
+        System.out.println("* Without localAddress and with initializer");
+        marker = new MarkingInitializer();
+        testConnector( connector, null, marker );
+        Assert.assertTrue( marker.executed );
 
-        if( !(connector instanceof SocketConnector) )
+        // Tests below fail in Windows platform.
+        if( System.getProperty("os.name").toLowerCase().indexOf( "windows" ) >= 0 )
         {
-            // FIXME This test fails in case of SocketConnector.
-            // I don't know why yet.
-            System.out.println("* With localAddress and without initializer");
-            testConnector( connector, localAddress, null );
-            
-            marker = new MarkingInitializer();
-            System.out.println("* With localAddress and initializer");
-            testConnector( connector, localAddress, marker );
-            Assert.assertTrue( marker.executed );
+            // skip further tests
+            System.out.println( "** Skipping some tests that fails in Windows platform." );
+            return;
         }
+        
+        System.out.println("* With localAddress and without initializer");
+        testConnector( connector, localAddress, null );
+        
+        // It takes some time for local address to be cleared by OS,
+        // so let's just get a new one rather than waiting for it.
+        clientPort = AvailablePortFinder.getNextAvailable( clientPort + 1 );
+        localAddress = new InetSocketAddress( clientPort );
+
+        System.out.println("* With localAddress and initializer");
+        marker = new MarkingInitializer();
+        testConnector( connector, localAddress, marker );
+        Assert.assertTrue( marker.executed );
     }
     
     private void testConnector( IoConnector connector, SocketAddress localAddress,
@@ -168,7 +176,7 @@ public class ConnectorTest extends AbstractTest
         }
         
         Thread.sleep( 300 );
-        session.close();
+        session.close( true );
         
         Assert.assertEquals( 160, readBuf.position() );
         readBuf.flip();
