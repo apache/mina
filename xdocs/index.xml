@@ -68,6 +68,11 @@ $ maven eclipse # Generate Eclipse project file if you want
                         <td>Client</td>
                     </tr>
                     <tr>
+                        <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/httpserver/package-summary.html">HTTP server</a></td>
+                        <td>Stream-based I/O support.</td>
+                        <td>Server</td>
+                    </tr>
+                    <tr>
                         <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/tennis/package-summary.html">Tennis</a></td>
                         <td>In-VM pipe support in protocol layer.</td>
                         <td>Both</td>
