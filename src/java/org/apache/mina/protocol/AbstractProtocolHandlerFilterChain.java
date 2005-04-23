@@ -1,3 +1,21 @@
+/*
+ *   @(#) $Id$
+ *
+ *   Copyright 2004 The Apache Software Foundation
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
 package org.apache.mina.protocol;
 
 import java.util.ArrayList;
@@ -10,6 +28,25 @@ import java.util.Map;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.protocol.ProtocolHandlerFilter.NextFilter;
 
+/**
+ * An abstract implementation of {@link ProtocolHandlerFilterChain} that provides
+ * common operations for developers to extend protocol layer.
+ * <p>
+ * All methods has been implemented.  The list of filters is maintained
+ * as a doublely linked list.  You can fire any MINA events which is filtered
+ * by this chain using these public methods:
+ * <ul>
+ *   <li></li>
+ * </ul>
+ * 
+ * The only method a developer should implement is {@link #doWrite(ProtocolSession, Object)}.
+ * This method is invoked when filter chain is evaluated for
+ * {@link ProtocolHandlerFilter#filterWrite(NextFilter, ProtocolSession, Object)} and 
+ * finally to be written out.
+ * 
+ * @author The Apache Directory Project
+ * @version $Rev$, $Date$
+ */
 public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHandlerFilterChain
 {
     private final ProtocolHandlerFilter HEAD_FILTER = new ProtocolHandlerFilter()
