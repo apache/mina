@@ -44,7 +44,7 @@ public interface Session {
     /**
      * Closes this session immediately.
      * 
-     * @param wait <tt>true</tt> if you want to wait for closing process is
+     * @param wait <tt>true</tt> if you want to wait until closing process is
      *             complete.
      */
     void close( boolean wait );
