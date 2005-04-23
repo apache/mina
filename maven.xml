@@ -33,8 +33,9 @@
 
 	<postGoal name="maven-javadoc-plugin:report">
 		<ant:copy todir="${basedir}/target/javadoc/src">
-			<ant:fileset dir="${basedir}/src/examples">
+			<ant:fileset dir="${basedir}/src/java">
 				<ant:include name="**/*.java" />
+				<ant:include name="**/*.html" />
 				<ant:include name="**/doc-files/**/*" />
 			</ant:fileset>
 		</ant:copy>
