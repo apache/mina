@@ -219,12 +219,34 @@ public abstract class ByteBuffer
     
     /**
      * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
+     * Please note that MINA buffers are going to be pooled, and
+     * therefore there can be waste of memory if you specified
+     * a sliced buffer.
      */
     public static ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
         DefaultByteBuffer buf = new DefaultByteBuffer();
         buf.init( nioBuffer );
         return buf;
+    }
+    
+    /**
+     * Wraps the specified byte array into MINA heap buffer.
+     */
+    public static ByteBuffer wrap( byte[] byteArray )
+    {
+        return wrap( java.nio.ByteBuffer.wrap( byteArray ) );
+    }
+    
+    /**
+     * Wraps the specified byte array into MINA heap buffer.
+     * Please note that MINA buffers are going to be pooled, and
+     * therefore there can be waste of memory if you wrap
+     * your byte array specifying <tt>offset</tt> and <tt>length</tt>.
+     */
+    public static ByteBuffer wrap( byte[] byteArray, int offset, int length )
+    {
+        return wrap( java.nio.ByteBuffer.wrap( byteArray, offset, length ) );
     }
     
     private static int getBufferStackIndex( Stack[] bufferStacks, int size )
