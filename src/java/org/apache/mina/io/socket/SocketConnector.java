@@ -130,6 +130,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
         boolean success = false;
         try
         {
+            ch.socket().setReuseAddress( true );
             if( localAddress != null )
             {
                 ch.socket().bind( localAddress );

@@ -132,6 +132,7 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
         boolean initialized = false;
         try
         {
+            ch.socket().setReuseAddress( true );
             if( localAddress != null )
             {
                 ch.socket().bind( localAddress );
