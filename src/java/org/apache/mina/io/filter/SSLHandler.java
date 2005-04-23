@@ -24,6 +24,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import org.apache.mina.io.IoSession;
 
 /**
  * A helper class using the SSLEngine API to decrypt/encrypt data.
@@ -60,7 +62,7 @@ class SSLHandler
     /**
      * Empty buffer used during initial handshake and close operations
      */
-    private static ByteBuffer hsBB = ByteBuffer.allocate( 0 );
+    private ByteBuffer hsBB = ByteBuffer.allocate( 0 );
 
     /**
      * Handshake status
@@ -81,20 +83,38 @@ class SSLHandler
     private boolean closed = false;
 
     private boolean isWritingEncryptedData = false;
+    private IoSession session = null;
 
     /**
      * Constuctor.
      *
      * @param sslc
+     * @throws SSLException 
      */
-    protected SSLHandler( SSLFilter parent, SSLContext sslc )
+    SSLHandler( SSLFilter parent, SSLContext sslc, IoSession session ) throws SSLException
     {
         this.parent = parent;
+        this.session = session;
         sslEngine = sslc.createSSLEngine();
-        sslEngine.setUseClientMode( false );
-        initialHandshakeStatus = SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
-        initialHandshakeComplete = false;
+        sslEngine.setUseClientMode( parent.isUseClientMode() );
+        sslEngine.setNeedClientAuth( parent.isNeedClientAuth() );
+        sslEngine.setWantClientAuth( parent.isWantClientAuth() );
+  
+        if( parent.getEnabledCipherSuites() != null )
+        {
+            sslEngine.setEnabledCipherSuites( parent.getEnabledCipherSuites() );
+        }
+        
+        if( parent.getEnabledProtocols() != null )
+        {
+            sslEngine.setEnabledProtocols( parent.getEnabledProtocols() );
+        }
 
+        sslEngine.beginHandshake();   
+        initialHandshakeStatus = sslEngine.getHandshakeStatus();//SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+        initialHandshakeComplete = false;
+        //SSLSession sslSession = sslEngine.getSession
+        
         SSLByteBufferPool.initiate( sslEngine );
 
         appBuffer = SSLByteBufferPool.getApplicationBuffer();
@@ -166,8 +186,10 @@ class SSLHandler
             appBuffer.limit( 0 );
             if( parent.debug != null )
             {
-                parent.debug.print("expanded inNetBuffer:" + inNetBuffer);
-                parent.debug.print("expanded appBuffer:" + appBuffer);
+                parent.debug.print( parent,
+                                    "expanded inNetBuffer:" + inNetBuffer );
+                parent.debug.print( parent, 
+                                    "expanded appBuffer:" + appBuffer );
             }
         }
 
@@ -192,7 +214,7 @@ class SSLHandler
     {
         if( parent.debug != null )
         {
-            parent.debug.print( "continueHandshake()" );
+            parent.debug.print( parent, "continueHandshake()" );
         }
         doHandshake();
     }
@@ -267,7 +289,7 @@ class SSLHandler
         if( appBuffer.hasRemaining() )
         {
              if ( parent.debug != null ) {
-                 parent.debug.print( "Error: appBuffer not empty!" );
+                 parent.debug.print( parent, "Error: appBuffer not empty!" );
              }
             //still app data in buffer!?
             throw new IllegalStateException();
@@ -316,13 +338,13 @@ class SSLHandler
                 // shouln't need to be larger than twice the source data size?
                 outNetBuffer = SSLByteBufferPool.expandBuffer( outNetBuffer, src.capacity() * 2 );
                 if ( parent.debug != null ) {
-                    parent.debug.print( "expanded outNetBuffer:" + outNetBuffer );
+                    parent.debug.print( parent, "expanded outNetBuffer:" + outNetBuffer );
                 }
             }
 
             result = sslEngine.wrap( src, outNetBuffer );
             if ( parent.debug != null ) {
-                parent.debug.print( "Wrap res:" + result );
+                parent.debug.print( parent, "Wrap res:" + result );
             }
 
             if ( result.getStatus() == SSLEngineResult.Status.OK ) {
@@ -347,15 +369,18 @@ class SSLHandler
 
         if( parent.debug != null )
         {
-            parent.debug.print( "doHandshake()" );
+            parent.debug.print( parent, "doHandshake()" );
         }
+
         while( true )
         {
             if( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED )
             {
                 if( parent.debug != null )
                 {
-                    parent.debug.print( " initialHandshakeStatus=FINISHED" );
+                    SSLSession sslSession = sslEngine.getSession();
+                    parent.debug.print( parent, " initialHandshakeStatus=FINISHED" );
+                    parent.debug.print( parent, " sslSession CipherSuite used " + sslSession.getCipherSuite());
                 }
                 initialHandshakeComplete = true;
                 return;
@@ -364,7 +389,7 @@ class SSLHandler
             {
                 if( parent.debug != null )
                 {
-                    parent.debug.print( " initialHandshakeStatus=NEED_TASK" );
+                    parent.debug.print( parent, " initialHandshakeStatus=NEED_TASK" );
                 }
                 initialHandshakeStatus = doTasks();
             }
@@ -373,8 +398,9 @@ class SSLHandler
                 // we need more data read
                 if( parent.debug != null )
                 {
-                    parent.debug
-                            .print( " initialHandshakeStatus=NEED_UNWRAP" );
+                    parent.debug.print(
+                            parent,
+                            " initialHandshakeStatus=NEED_UNWRAP" );
                 }
                 SSLEngineResult.Status status = unwrapHandshake();
                 if( status == SSLEngineResult.Status.BUFFER_UNDERFLOW
@@ -388,7 +414,7 @@ class SSLHandler
             {
                 if( parent.debug != null )
                 {
-                    parent.debug.print( " initialHandshakeStatus=NEED_WRAP" );
+                    parent.debug.print( parent, " initialHandshakeStatus=NEED_WRAP" );
                 }
                 // First make sure that the out buffer is completely empty. Since we
                 // cannot call wrap with data left on the buffer
@@ -396,7 +422,7 @@ class SSLHandler
                 {
                     if( parent.debug != null )
                     {
-                        parent.debug.print( " Still data in out buffer!" );
+                        parent.debug.print( parent, " Still data in out buffer!" );
                     }
                     return;
                 }
@@ -404,11 +430,12 @@ class SSLHandler
                 SSLEngineResult result = sslEngine.wrap( hsBB, outNetBuffer );
                 if( parent.debug != null )
                 {
-                    parent.debug.print( "Wrap res:" + result );
+                    parent.debug.print( parent, "Wrap res:" + result );
                 }
 
                 outNetBuffer.flip();
                 initialHandshakeStatus = result.getHandshakeStatus();
+                parent.writeNetBuffer( session, this );
                 // return to allow data on out buffer being sent
                 // TODO: We might want to send more data immidiatley?
             }
@@ -424,7 +451,7 @@ class SSLHandler
     {
         if( parent.debug != null )
         {
-            parent.debug.print( "unwrap()" );
+            parent.debug.print( parent, "unwrap()" );
         }
         // Prepare the application buffer to receive decrypted data
         appBuffer.clear();
@@ -437,13 +464,13 @@ class SSLHandler
         {
             if( parent.debug != null )
             {
-                parent.debug.print( "  inNetBuffer: " + inNetBuffer );
-                parent.debug.print( "  appBuffer: " + appBuffer );
+                parent.debug.print( parent, "  inNetBuffer: " + inNetBuffer );
+                parent.debug.print( parent, "  appBuffer: " + appBuffer );
             }
             res = sslEngine.unwrap( inNetBuffer, appBuffer );
             if( parent.debug != null )
             {
-                parent.debug.print( "Unwrap res:" + res );
+                parent.debug.print( parent, "Unwrap res:" + res );
             }
         }
         while( res.getStatus() == SSLEngineResult.Status.OK );
@@ -470,11 +497,11 @@ class SSLHandler
         return checkStatus( res.getStatus() );
     }
 
-    SSLEngineResult.Status unwrapHandshake() throws SSLException
+    private SSLEngineResult.Status unwrapHandshake() throws SSLException
     {
         if( parent.debug != null )
         {
-            parent.debug.print( "unwrapHandshake()" );
+            parent.debug.print( parent, "unwrapHandshake()" );
         }
         // Prepare the application buffer to receive decrypted data
         appBuffer.clear();
@@ -487,13 +514,13 @@ class SSLHandler
         {
             if( parent.debug != null )
             {
-                parent.debug.print( "  inNetBuffer: " + inNetBuffer );
-                parent.debug.print( "  appBuffer: " + appBuffer );
+                parent.debug.print( parent, "  inNetBuffer: " + inNetBuffer );
+                parent.debug.print( parent, "  appBuffer: " + appBuffer );
             }
             res = sslEngine.unwrap( inNetBuffer, appBuffer );
             if( parent.debug != null )
             {
-                parent.debug.print( "Unwrap res:" + res );
+                parent.debug.print( parent, "Unwrap res:" + res );
             }
 
         }
@@ -531,7 +558,7 @@ class SSLHandler
     {
         if( parent.debug != null )
         {
-            parent.debug.print( "  doTasks()" );
+            parent.debug.print( parent, "  doTasks()" );
         }
 
         /*
@@ -543,13 +570,13 @@ class SSLHandler
         {
             if( parent.debug != null )
             {
-                parent.debug.print( "   doTask: " + runnable );
+                parent.debug.print( parent, "   doTask: " + runnable );
             }
             runnable.run();
         }
         if( parent.debug != null )
         {
-            parent.debug.print( "  doTasks(): "
+            parent.debug.print( parent, "  doTasks(): "
                     + sslEngine.getHandshakeStatus() );
         }
         return sslEngine.getHandshakeStatus();

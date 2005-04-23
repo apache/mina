@@ -36,9 +36,18 @@ import java.util.Set;
 public interface Session {
 
     /**
-     * Closes this session immediately.
+     * Closes this session immediately.  Calling method is identical with
+     * calling <tt>close( false )</tt>.
      */
     void close();
+
+    /**
+     * Closes this session immediately.
+     * 
+     * @param wait <tt>true</tt> if you want to wait for closing process is
+     *             complete.
+     */
+    void close( boolean wait );
     
     /**
      * Returns an attachment of this session.

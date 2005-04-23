@@ -277,6 +277,11 @@ public class IoAdapter
         {
             session.close();
         }
+        
+        public void close( boolean wait )
+        {
+            session.close( wait );
+        }
 
         public Object getAttachment()
         {

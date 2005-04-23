@@ -202,6 +202,7 @@ class SocketIoProcessor
             finally
             {
                 session.getFilters().sessionClosed( session );
+                session.notifyClose();
             }
         }
     }

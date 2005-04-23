@@ -140,7 +140,7 @@ public class IoHandlerFilterChainTest extends TestCase
             return handler;
         }
 
-        public void close()
+        public void close( boolean wait )
         {
         }
 
