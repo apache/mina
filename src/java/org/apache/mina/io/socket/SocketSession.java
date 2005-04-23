@@ -55,6 +55,8 @@ class SocketSession extends BaseSession implements IoSession
     private final SocketAddress localAddress;
 
     private SelectionKey key;
+    
+    private boolean disposed;
 
     /**
      * Creates a new instance.
@@ -96,10 +98,38 @@ class SocketSession extends BaseSession implements IoSession
     {
         return handler;
     }
-
-    public void close()
+    
+    synchronized void notifyClose()
     {
+        if( !disposed )
+        {
+            disposed = true;
+            notify();
+        }
+    }
+    
+
+    public synchronized void close( boolean wait )
+    {
+        if( disposed )
+        {
+            return;
+        }
+
         SocketIoProcessor.getInstance().removeSession( this );
+        if( wait )
+        {
+            while( disposed )
+            {
+                try
+                {
+                    wait();
+                }
+                catch( InterruptedException e )
+                {
+                }
+            }
+        }
     }
 
     Queue getWriteBufferQueue()

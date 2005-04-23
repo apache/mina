@@ -57,7 +57,8 @@ public class AcceptorTest extends AbstractTest
     public void testTCPWithSSL() throws Exception
     {
         // Add an SSL filter
-        SSLFilter sslFilter = new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
+        SSLFilter sslFilter =
+            new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
         sslFilter.setDebug( SSLFilter.Debug.ON );
         acceptor.getFilterChain().addLast( "SSL", sslFilter );
         

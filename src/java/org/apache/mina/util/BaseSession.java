@@ -53,6 +53,11 @@ public abstract class BaseSession implements Session
     protected BaseSession()
     {
     }
+    
+    public void close()
+    {
+        this.close( false );
+    }
 
     public Object getAttachment()
     {

@@ -55,6 +55,8 @@ class DatagramSession extends BaseSession implements IoSession
     private SocketAddress remoteAddress;
 
     private SelectionKey key;
+    
+    private boolean disposed;
 
     /**
      * Creates a new instance.
@@ -96,12 +98,39 @@ class DatagramSession extends BaseSession implements IoSession
     {
         return handler;
     }
-
-    public void close()
+    
+    synchronized void notifyClose()
     {
+        if( !disposed )
+        {
+            disposed = true;
+            notify();
+        }
+    }
+
+    public synchronized void close( boolean wait )
+    {
+        if( disposed )
+        {
+            return;
+        }
+
         if( filters.processor instanceof DatagramConnector )
         {
             filters.processor.closeSession( this );
+            if( wait )
+            {
+                while( disposed )
+                {
+                    try
+                    {
+                        wait();
+                    }
+                    catch( InterruptedException e )
+                    {
+                    }
+                }
+            }
         }
     }
 

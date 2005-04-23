@@ -31,6 +31,7 @@ import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultExceptionMonitor;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterAdapter;
 import org.apache.mina.io.IoSession;
 
@@ -49,6 +50,18 @@ import org.apache.mina.io.IoSession;
  */
 public class SSLFilter extends IoHandlerFilterAdapter
 {
+    /**
+     * A marker which is passed with {@link IoHandler#dataWritten(IoSession, Object)}
+     * when <tt>SSLFilter</tt> writes data other then user actually requested.
+     */
+    public static final Object SSL_MARKER = new Object()
+    {
+        public String toString()
+        {
+            return "SSL_MARKER";
+        }
+    };
+    
     // SSL Context
     private SSLContext sslContext;
 
@@ -57,6 +70,12 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
     /** debug interface */
     Debug debug = null;
+
+    private boolean client;
+    private boolean needClientAuth;
+    private boolean wantClientAuth;
+    private String[] enabledCipherSuites;
+    private String[] enabledProtocols;
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
@@ -69,6 +88,104 @@ public class SSLFilter extends IoHandlerFilterAdapter
         }
 
         this.sslContext = sslContext;
+    }
+
+    /**
+     * Returns <tt>true</tt> if the engine is set to use client mode
+     * when handshaking.
+     */
+    public boolean isUseClientMode()
+    {
+        return client;
+    }
+    
+    /**
+     * Configures the engine to use client (or server) mode when handshaking.
+     */
+    public void setUseClientMode( boolean clientMode )
+    {
+        this.client = clientMode;
+    }
+    
+    /**
+     * Returns <tt>true</tt> if the engine will <em>require</em> client authentication.
+     * This option is only useful to engines in the server mode.
+     */
+    public boolean isNeedClientAuth()
+    {
+        return needClientAuth;
+    }
+
+    /**
+     * Configures the engine to <em>require</em> client authentication.
+     * This option is only useful for engines in the server mode.
+     */
+    public void setNeedClientAuth( boolean needClientAuth )
+    {
+        this.needClientAuth = needClientAuth;
+    }
+    
+    
+    /**
+     * Returns <tt>true</tt> if the engine will <em>request</em> client authentication.
+     * This option is only useful to engines in the server mode.
+     */
+    public boolean isWantClientAuth()
+    {
+        return wantClientAuth;
+    }
+    
+    /**
+     * Configures the engine to <em>request</em> client authentication.
+     * This option is only useful for engines in the server mode.
+     */
+    public void setWantClientAuth( boolean wantClientAuth )
+    {
+        this.wantClientAuth = wantClientAuth;
+    }
+    
+    /**
+     * Returns the list of cipher suites to be enabled when {@link SSLEngine}
+     * is initialized.
+     * 
+     * @return <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public String[] getEnabledCipherSuites()
+    {
+        return enabledCipherSuites;
+    }
+    
+    /**
+     * Sets the list of cipher suites to be enabled when {@link SSLEngine}
+     * is initialized.
+     * 
+     * @param cipherSuites <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public void setEnabledCipherSuites( String[] cipherSuites )
+    {
+        this.enabledCipherSuites = cipherSuites;
+    }
+
+    /**
+     * Returns the list of protocols to be enabled when {@link SSLEngine}
+     * is initialized.
+     * 
+     * @return <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public String[] getEnabledProtocols()
+    {
+        return enabledProtocols;
+    }
+    
+    /**
+     * Sets the list of protocols to be enabled when {@link SSLEngine}
+     * is initialized.
+     * 
+     * @param protocols <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public void setEnabledProtocols( String[] protocols )
+    {
+        this.enabledProtocols = protocols;
     }
 
     /**
@@ -110,9 +227,12 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
     public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
-        nextFilter.sessionOpened( session );
         // Create an SSL handler
-        createSSLSessionHandler( session );
+        if( createSSLSessionHandler( session ) == null )
+        {
+            throw new InternalError();
+        }
+        nextFilter.sessionOpened( session );
     }
 
     public void sessionClosed( NextFilter nextFilter, IoSession session )
@@ -120,7 +240,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
         SSLHandler sslHandler = getSSLSessionHandler( session );
         if( debug != null )
         {
-            debug.print( "Closed: " + sslHandler );
+            debug.print( this, "Closed: " + sslHandler );
         }
         if( sslHandler != null )
         {
@@ -160,7 +280,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
         {
             if( debug != null )
             {
-                debug.print( "Data Read: " + sslHandler + " (" + buf+ ')' );
+                debug.print( this, "Data Read: " + sslHandler + " (" + buf+ ')' );
             }
             synchronized( sslHandler )
             {
@@ -176,8 +296,9 @@ public class SSLFilter extends IoHandlerFilterAdapter
                     {
                         if( debug != null )
                         {
-                            debug
-                                    .print( "SSL Session closed. Closing connection.." );
+                            debug.print(
+                                    this,
+                                    "SSL Session closed. Closing connection.." );
                         }
                         session.close();
                     }
@@ -214,8 +335,9 @@ public class SSLFilter extends IoHandlerFilterAdapter
         SSLHandler sslHandler = getSSLSessionHandler( session );
         if( debug != null )
         {
-            debug.print( "Filtered Write: " + sslHandler );
+            debug.print( this, "Filtered Write: " + sslHandler );
         }
+
         if( sslHandler != null )
         {
             synchronized( sslHandler )
@@ -225,7 +347,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
                     // data already encrypted; simply return buffer
                     if( debug != null )
                     {
-                        debug.print( "  already encrypted: " + buf );
+                        debug.print( this, "  already encrypted: " + buf );
                     }
                     nextFilter.filterWrite( session, buf, marker );
                     return;
@@ -237,7 +359,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
                     {
                         if( debug != null )
                         {
-                            debug.print( "encrypt: " + buf );
+                            debug.print( this, "encrypt: " + buf );
                         }
                         sslHandler.encrypt( buf.buf() );
                         ByteBuffer encryptedBuffer = copy( sslHandler
@@ -245,7 +367,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
                         if( debug != null )
                         {
-                            debug.print( "encrypted buf: " + encryptedBuffer);
+                            debug.print( this, "encrypted buf: " + encryptedBuffer);
                         }
                         buf.release();
                         nextFilter.filterWrite( session, encryptedBuffer, marker );
@@ -279,7 +401,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
     {
         if( debug != null )
         {
-            debug.print( "appBuffer: " + sslHandler.getAppBuffer() );
+            debug.print( this, "appBuffer: " + sslHandler.getAppBuffer() );
         }
         if( sslHandler.getAppBuffer().hasRemaining() )
         {
@@ -287,19 +409,23 @@ public class SSLFilter extends IoHandlerFilterAdapter
             ByteBuffer readBuffer = copy( sslHandler.getAppBuffer() );
             if( debug != null )
             {
-                debug.print( "app data read: " + readBuffer + " (" + readBuffer.getHexDump() + ')' );
+                debug.print( this, "app data read: " + readBuffer + " (" + readBuffer.getHexDump() + ')' );
             }
             nextFilter.dataRead( session, readBuffer );
         }
     }
 
-    private void writeNetBuffer( IoSession session, SSLHandler sslHandler )
+    void writeNetBuffer( IoSession session, SSLHandler sslHandler )
             throws SSLException
     {
         // first check if any net data needed to be writen
         if( !sslHandler.getOutNetBuffer().hasRemaining() )
         {
             // no; bail out
+            if( debug != null )
+            {
+                debug.print( this, "net data is empty" );
+            }
             return;
         }
 
@@ -316,16 +442,16 @@ public class SSLFilter extends IoHandlerFilterAdapter
         {
             if( debug != null )
             {
-                debug.print( "write outNetBuffer: "
-                        + sslHandler.getOutNetBuffer() );
+                debug.print( this, "write outNetBuffer: " +
+                                   sslHandler.getOutNetBuffer() );
             }
             ByteBuffer writeBuffer = copy( sslHandler.getOutNetBuffer() );
             if( debug != null )
             {
-                debug.print( "session write: " + writeBuffer );
+                debug.print( this, "session write: " + writeBuffer );
             }
             //debug("outNetBuffer (after copy): {0}", sslHandler.getOutNetBuffer());
-            session.write( writeBuffer, null );
+            session.write( writeBuffer, SSL_MARKER );
 
             // loop while more writes required to complete handshake
             while( sslHandler.needToCompleteInitialHandshake() )
@@ -345,12 +471,12 @@ public class SSLFilter extends IoHandlerFilterAdapter
                 {
                     if( debug != null )
                     {
-                        debug.print( "write outNetBuffer2: "
-                                + sslHandler.getOutNetBuffer() );
+                        debug.print( this, "write outNetBuffer2: " +
+                                           sslHandler.getOutNetBuffer() );
                     }
                     ByteBuffer writeBuffer2 = copy( sslHandler
                             .getOutNetBuffer() );
-                    session.write( writeBuffer2, null );
+                    session.write( writeBuffer2, SSL_MARKER );
                 }
             }
         }
@@ -382,12 +508,35 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
     private SSLHandler createSSLSessionHandler( IoSession session )
     {
-        SSLHandler sslHandler = new SSLHandler( this, sslContext );
-        synchronized( sslSessionHandlerMap )
+        SSLHandler handler = ( SSLHandler ) sslSessionHandlerMap.get( session );
+        if( handler == null )
         {
-            sslSessionHandlerMap.put( session, sslHandler );
+            synchronized( sslSessionHandlerMap )
+            {
+                handler = ( SSLHandler ) sslSessionHandlerMap.get( session );
+                if( handler == null )
+                {
+                    try
+                    {
+                        handler =
+                            new SSLHandler( this, sslContext, session );
+                        sslSessionHandlerMap.put( session, handler );
+                        if( isUseClientMode() )
+                        {
+                            handler.doHandshake();
+                        }
+                    }
+                    catch( SSLException e )
+                    {
+                        sslSessionHandlerMap.remove( session );
+                        throw new RuntimeException(
+                                "Failed to initialize SSLEngine.", e );
+                    }
+                }
+            }
         }
-        return sslHandler;
+        
+        return handler;
     }
 
     private SSLHandler getSSLSessionHandler( IoSession session )
@@ -424,7 +573,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
         /**
          * Prints out the specified debug messages.
          */
-        void print( String message );
+        void print( SSLFilter filter, String message );
     }
 
     private static class DebugOn implements Debug
@@ -467,8 +616,17 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
         private final Date date = new Date();
 
-        public void print( String message )
+        public void print( SSLFilter filter, String message )
         {
+            if( filter.isUseClientMode() )
+            {
+                message = "[CLIENT] " + message;
+            }
+            else
+            {
+                message = "[SERVER] " + message;
+            }
+
             if( log == null )
             {
                 logToStdOut( message );
@@ -509,7 +667,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
 
     private static class DebugOff implements Debug
     {
-        public void print( String message )
+        public void print( SSLFilter filter, String message )
         {
             // do nothing
         }

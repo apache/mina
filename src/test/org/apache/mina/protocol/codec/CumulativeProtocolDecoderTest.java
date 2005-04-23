@@ -186,7 +186,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
             return null;
         }
 
-        public void close() {
+        public void close( boolean wait ) {
         }
 
         public void write(Object message) {

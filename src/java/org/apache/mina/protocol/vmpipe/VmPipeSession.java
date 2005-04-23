@@ -110,7 +110,7 @@ class VmPipeSession extends BaseSession implements ProtocolSession
         return null;
     }
 
-    public void close()
+    public void close( boolean wait )
     {
         synchronized( lock )
         {
