@@ -13,17 +13,31 @@
                 performance and high scalability network applications easily.
             </p>
             <p>
-                MINA will be a simple yet full-featured network application
+                MINA is a simple yet full-featured network application framework
                 which provides:
                 <ul>
-                    <li>Support for TCP and UDP transport types,</li>
-                    <li>Support for both server (inetd-like) and client side,</li>
-                    <li>Unit testability,</li>
-                    <li>JMX managability,</li>
-                    <li>Traffic throttling,</li>
-                    <li>Overload shielding,</li>
+                    <li>Unified API for various transport types:
+		        <ul>
+			    <li>TCP/IP</li>
+			    <li>UDP/IP</li>
+			    <li>In-VM pipe communication</li>
+			    <li>You can implement your own!</li>
+			</ul>
+                    </li>
+		    <li>Low-level and high-level API:
+		        <ul>
+			    <li>Low-level: uses ByteBuffers</li>
+			    <li>High-level: uses user-defined message objects and codecs</li>
+			</ul>
+		    </li>
+		    <li>Support for stream-based I/O model via <code>StreamIoHandler</code></li>
+		    <li>Filter interface as an extension point; similar to <a href="http://java.sun.com/products/servlet/Filters.html">Servlet filters</a></li>
+                    <li>Unit testability using <a href="http://www.mockobjects.com/">mock objects</a>,</li>
+                    <li>JMX managability, (coming soon)</li>
+                    <li>Traffic throttling, (coming soon)</li>
+                    <li>Overload shielding, (coming soon)</li>
                     <li>Integration with well known containers such as Spring
-                    	and OSGi,</li>
+                    	and OSGi, (coming soon)</li>
                     <li>Smooth migration from Netty, a popular NIO framework.
                     	(See <a href="http://gleamynode.net/dev/tl-netty2-example-sumup/docs/">Netty Tutorial</a>)</li>
                 </ul>
@@ -69,18 +83,18 @@ $ maven eclipse # Generate Eclipse project file if you want
                     </tr>
                     <tr>
                         <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/httpserver/package-summary.html">HTTP server</a></td>
-                        <td>Stream-based I/O support.</td>
+                        <td>Stream-based synchronous I/O support.</td>
                         <td>Server</td>
                     </tr>
                     <tr>
                         <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/tennis/package-summary.html">Tennis</a></td>
-                        <td>In-VM pipe support in protocol layer.</td>
+                        <td>In-VM pipe communication support in protocol layer.</td>
                         <td>Both</td>
                     </tr>
                     <tr>
                         <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/registry/package-summary.html">Registry</a></td>
                         <td>A frontend package that makes setting up MINA easier.</td>
-                        <td>Server (registry)</td>
+                        <td>Server</td>
                     </tr>
                 </table>
             </p>
