@@ -258,17 +258,15 @@ class SocketIoProcessor
             session.increaseReadBytes( readBytes );
             session.setIdle( IdleStatus.BOTH_IDLE, false );
             session.setIdle( IdleStatus.READER_IDLE, false );
-            if( ret >= 0 )
+
+            if( readBytes > 0 )
             {
-                if( readBytes > 0 )
-                {
-                    ByteBuffer newBuf = ByteBuffer.allocate( readBytes );
-                    newBuf.put( buf );
-                    newBuf.flip();
-                    session.getFilters().dataRead( session, newBuf );
-                }
+                ByteBuffer newBuf = ByteBuffer.allocate( readBytes );
+                newBuf.put( buf );
+                newBuf.flip();
+                session.getFilters().dataRead( session, newBuf );
             }
-            else
+            if( ret < 0 )
             {
                 scheduleRemove( session );
             }
