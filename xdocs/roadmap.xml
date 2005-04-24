@@ -9,15 +9,20 @@
 
 		<section name="Roadmap">
 			
-			<subsection name="0.7 (January 2005)">
+			<subsection name="0.7 (May 2005)">
 				<p>
 					<ul>
-						<li>Stable core API implementation</li>
-						<li><a href="http://gleamynode.net/dev/projects/netty2/">Netty2</a>
-							and <a href="http://incubator.apache.org/directory/subprojects/snickers/codec-stateful/">Snickers
-							stateful codec</a> wrapper.</li>
-						<li>Frontend API for usability</li>
-						<li>Support for TCP and UDP transport</li>
+						<li>Stable core API and its implementation</li>
+						<li>Frontend API</li>
+						<li>Support for various transport types:
+							<ul>
+								<li>TCP/IP</li>
+								<li>UDP/IP</li>
+								<li>In-VM pipe communication</li>
+							</ul>
+						</li>
+						<li>Stream-based I/O</li>
+						<li>SSL Filter based on Java 5 SSLEngine</li>
 					</ul>
 				</p>
 			</subsection>
@@ -25,7 +30,7 @@
 			<subsection name="0.8 (no date set)">
 				<p>
 					<ul>
-						<li>Add various IoHandlerFilters and ProtocolHandlerFilters
+						<li>Useful IoHandlerFilters and ProtocolHandlerFilters
 							<ul>
 								<li>Performance tracing</li>
 								<li>Event logging</li>
@@ -55,11 +60,7 @@
 			<subsection name="1.1 (no date set)">
 				<p>
 					<ul>
-						<li>Add advanced IoHandlerFilters and ProtocolHandlerFilters:
-							<ul>
-								<li>Integration with
-									<a href="http://incubator.apache.org/directory/subprojects/janus/">Janus</a></li>
-							</ul></li>
+						<li>More useful IoHandlerFilters and ProtocolHandlerFilters</li>
 					</ul>
 				</p>
 			</subsection>
