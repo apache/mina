@@ -8,11 +8,12 @@ import java.net.SocketTimeoutException;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerAdapter;
 import org.apache.mina.io.IoSession;
 
 /**
- * A {@lin IoHandler} that adapts asynchronous MINA events to stream I/O.
+ * A {@link IoHandler} that adapts asynchronous MINA events to stream I/O.
  * <p>
  * Please extend this class and implement
  * {@link #processStreamIo(IoSession, InputStream, OutputStream)} to
