@@ -30,8 +30,13 @@
 			    <li>High-level: uses user-defined message objects and codecs</li>
 			</ul>
 		    </li>
-		    <li>Support for stream-based I/O model via <code>StreamIoHandler</code></li>
-		    <li>Filter interface as an extension point; similar to <a href="http://java.sun.com/products/servlet/Filters.html">Servlet filters</a></li>
+		    <li>Stream-based I/O support via <code>StreamIoHandler</code></li>
+		    <li>Filter interface as an extension point; similar to <a href="http://java.sun.com/products/servlet/Filters.html">Servlet filters</a>
+		        <ul>
+			    <li>SSL support via <code>SSLFilter</code> (requires Java 5 <code>SSLEngine</code></li>
+			    <li>Thread pools are implemented as filters so that users can choose their favorite thread model.</li>
+			</ul>
+		    </li>
                     <li>Unit testability using <a href="http://www.mockobjects.com/">mock objects</a>,</li>
                     <li>JMX managability, (coming soon)</li>
                     <li>Traffic throttling, (coming soon)</li>
