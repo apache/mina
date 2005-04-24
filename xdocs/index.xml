@@ -33,8 +33,8 @@
 		    <li>Stream-based I/O support via <code>StreamIoHandler</code></li>
 		    <li>Filter interface as an extension point; similar to <a href="http://java.sun.com/products/servlet/Filters.html">Servlet filters</a>
 		        <ul>
-			    <li>SSL support via <code>SSLFilter</code> (requires Java 5 <code>SSLEngine</code></li>
-			    <li>Thread pools are implemented as filters so that users can choose their favorite thread model.</li>
+			    <li>SSL support via <code>SSLFilter</code> thanks to Java 5 <code>SSLEngine</code></li>
+			    <li>Thread pools are implemented as filters so that users can customize thread model.</li>
 			</ul>
 		    </li>
                     <li>Unit testability using <a href="http://www.mockobjects.com/">mock objects</a>,</li>
