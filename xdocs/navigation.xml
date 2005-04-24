@@ -5,22 +5,14 @@
 
 	<body>
 		<links>
-			<!--
-			<item name="Apache" href="http://apache.org/"/>
-			-->
-			<item name="Directory" href="../../index.html"/>
-			<item name="Eve" href="../eve/index.html"/>
-			<item name="LDAP" href="../directory-ldap/index.html"/>
-			<item name="Naming" href="../directory-naming/index.html"/>
-			<item name="Snickers" href="../snickers/index.html"/>
-			<item name="Janus" href="../janus/index.html"/>
+			<item name="Directory" href="../../index.html" />
+			<item name="ApacheDS" href="../apacheds/index.html"/>
+			<item name="LDAP" href="../ldap/index.html"/>
+			<item name="Naming" href="../naming/index.html"/>
+			<item name="ASN.1" href="../asn1/index.html"/>
 			<item name="Kerberos" href="../kerberos/index.html"/>
-			<!--
-			<item name="SEDA" href="../seda/index.html"/>
-			-->
-			<!--
-			<item name="Sitedocs" href="../sitedocs/index.html"/>
-			-->
+			<item name="AuthX" href="../authx/index.html"/>
+			<item name="Network Layer (MINA)" href="../network/index.html"/>
 		</links>
 
 		<menu name="MINA">
