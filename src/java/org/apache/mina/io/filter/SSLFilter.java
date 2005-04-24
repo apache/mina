@@ -445,10 +445,6 @@ public class SSLFilter extends IoHandlerFilterAdapter
         if( !sslHandler.getOutNetBuffer().hasRemaining() )
         {
             // no; bail out
-            if( debug != null )
-            {
-                debug.print( this, "net data is empty" );
-            }
             return;
         }
 

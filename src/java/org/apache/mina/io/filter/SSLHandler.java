@@ -399,7 +399,7 @@ class SSLHandler
     /**
      * Perform any handshaking processing.
      */
-    void doHandshake() throws SSLException
+    synchronized void doHandshake() throws SSLException
     {
 
         if( parent.debug != null )
@@ -407,7 +407,7 @@ class SSLHandler
             parent.debug.print( parent, "doHandshake()" );
         }
 
-        while( true )
+        while( !initialHandshakeComplete )
         {
             if( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED )
             {
