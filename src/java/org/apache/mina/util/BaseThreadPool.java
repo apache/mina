@@ -49,15 +49,15 @@ public abstract class BaseThreadPool implements ThreadPool
 
     private static volatile int threadId = 0;
 
-    private Map buffers = new IdentityHashMap();
+    private final Map buffers = new IdentityHashMap();
 
-    private Stack followers = new Stack();
+    private final Stack followers = new Stack();
+
+    private final BlockingSet readySessionBuffers = new BlockingSet();
+
+    private final Set busySessionBuffers = new HashSet();
 
     private Worker leader;
-
-    private BlockingSet readySessionBuffers = new BlockingSet();
-
-    private Set busySessionBuffers = new HashSet();
 
     private int maximumPoolSize = DEFAULT_MAXIMUM_POOL_SIZE;
 
@@ -173,12 +173,15 @@ public abstract class BaseThreadPool implements ThreadPool
     protected void fireEvent( Object nextFilter, Session session,
                               EventType type, Object data )
     {
-        SessionBuffer buf = getSessionBuffer( session );
+        final BlockingSet readySessionBuffers = this.readySessionBuffers;
+        final Set busySessionBuffers = this.busySessionBuffers;
+        final SessionBuffer buf = getSessionBuffer( session );
+        final Queue eventQueue = buf.eventQueue;
+        final Event event = new Event( type, nextFilter, data );
+
         synchronized( buf )
         {
-            buf.nextFilters.push( nextFilter );
-            buf.eventTypes.push( type );
-            buf.eventDatum.push( data );
+            eventQueue.push( event );
         }
 
         synchronized( readySessionBuffers )
@@ -199,6 +202,7 @@ public abstract class BaseThreadPool implements ThreadPool
 
     private SessionBuffer getSessionBuffer( Session session )
     {
+        final Map buffers = this.buffers;
         SessionBuffer buf = ( SessionBuffer ) buffers.get( session );
         if( buf == null )
         {
@@ -217,9 +221,11 @@ public abstract class BaseThreadPool implements ThreadPool
 
     private void removeSessionBuffer( SessionBuffer buf )
     {
+        final Map buffers = this.buffers;
+        final Session session = buf.session;
         synchronized( buffers )
         {
-            buffers.remove( buf.session );
+            buffers.remove( session );
         }
     }
 
@@ -227,11 +233,7 @@ public abstract class BaseThreadPool implements ThreadPool
     {
         private final Session session;
 
-        private final Queue nextFilters = new Queue();
-
-        private final Queue eventTypes = new Queue();
-
-        private final Queue eventDatum = new Queue();
+        private final Queue eventQueue = new Queue();
 
         private SessionBuffer( Session session )
         {
@@ -251,6 +253,7 @@ public abstract class BaseThreadPool implements ThreadPool
 
         public void lead()
         {
+            final Object promotionLock = this.promotionLock;
             synchronized( promotionLock )
             {
                 leader = this;
@@ -284,6 +287,7 @@ public abstract class BaseThreadPool implements ThreadPool
         private SessionBuffer fetchBuffer()
         {
             SessionBuffer buf = null;
+            BlockingSet readySessionBuffers = BaseThreadPool.this.readySessionBuffers;
             synchronized( readySessionBuffers )
             {
                 do
@@ -311,10 +315,10 @@ public abstract class BaseThreadPool implements ThreadPool
                         buf = ( SessionBuffer ) it.next();
                         it.remove();
                     }
-                    while( buf != null && buf.nextFilters.isEmpty()
+                    while( buf != null && buf.eventQueue.isEmpty()
                            && it.hasNext() );
                 }
-                while( buf != null && buf.nextFilters.isEmpty() );
+                while( buf != null && buf.eventQueue.isEmpty() );
             }
 
             return buf;
@@ -322,27 +326,26 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private void processEvents( SessionBuffer buf )
         {
-            Session session = buf.session;
+            final Session session = buf.session;
+            final Queue eventQueue = buf.eventQueue;
             for( ;; )
             {
-                Object nextFilter;
-                EventType type;
-                Object data;
+                Event event;
                 synchronized( buf )
                 {
-                    nextFilter = buf.nextFilters.pop();
-                    if( nextFilter == null )
+                    event = ( Event ) eventQueue.pop();
+                    if( event == null )
                         break;
-
-                    type = ( EventType ) buf.eventTypes.pop();
-                    data = buf.eventDatum.pop();
                 }
-                processEvent( nextFilter, session, type, data );
+                processEvent( event.getNextFilter(), session,
+                              event.getType(), event.getData() );
             }
         }
 
         private void follow()
         {
+            final Object promotionLock = this.promotionLock;
+            final Stack followers = BaseThreadPool.this.followers;
             synchronized( promotionLock )
             {
                 if( this != leader )
@@ -357,10 +360,14 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private void releaseBuffer( SessionBuffer buf )
         {
+            final BlockingSet readySessionBuffers = BaseThreadPool.this.readySessionBuffers;
+            final Set busySessionBuffers = BaseThreadPool.this.busySessionBuffers;
+            final Queue eventQueue = buf.eventQueue;
+
             synchronized( readySessionBuffers )
             {
                 busySessionBuffers.remove( buf );
-                if( buf.nextFilters.isEmpty() )
+                if( eventQueue.isEmpty() )
                 {
                     removeSessionBuffer( buf );
                 }
@@ -373,6 +380,8 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private boolean waitForPromotion()
         {
+            final Object promotionLock = this.promotionLock;
+
             synchronized( promotionLock )
             {
                 if( this != leader )
@@ -411,6 +420,7 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private void giveUpLead()
         {
+            final Stack followers = BaseThreadPool.this.followers;
             Worker worker;
             synchronized( followers )
             {
