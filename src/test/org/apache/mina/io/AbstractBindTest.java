@@ -92,6 +92,7 @@ public class AbstractBindTest extends TestCase
         try
         {
             acceptor.bind( new InetSocketAddress( port ), new EchoProtocolHandler() );
+            acceptor.bind( new InetSocketAddress( port ), new EchoProtocolHandler() );
             Assert.fail( "IOException is not thrown" );
         }
         catch( IOException e )
