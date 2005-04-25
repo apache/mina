@@ -355,7 +355,6 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
             try
             {
                 ssc = ServerSocketChannel.open();
-                ssc.socket().setReuseAddress( true );
                 ssc.configureBlocking( false );
                 ssc.socket().bind( req.address, req.backlog );
                 ssc.register( selector, SelectionKey.OP_ACCEPT, req );
