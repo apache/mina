@@ -122,7 +122,6 @@
 
       <excludes>
         <exclude>**/Abstract*</exclude>
-	<exclude>**/datagram/BindTest*</exclude>
       </excludes>
     </unitTest>
 
