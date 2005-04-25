@@ -40,17 +40,8 @@ import org.apache.mina.io.IoSession;
  * This filter uses an {@link SSLEngine} which was introduced in Java 5, so 
  * Java version 5 or above is mandatory to use this filter. And please note that
  * this filter only works for TCP/IP connections.
- * <p>
  * 
- * <h3>Contribution</h3>
- * <ul>
- *   <li>This filter is written and contributed by Jan Andersson at first.</li>
- *   <li>Vinod Panicker made this filter also work in client-side.<li>
- * </ul>
- * Thanks to all contributers!
- * 
- * @author Jan Andersson (janne@minq.se)
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SSLFilter extends IoHandlerFilterAdapter

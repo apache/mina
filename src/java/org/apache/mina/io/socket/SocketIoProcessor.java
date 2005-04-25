@@ -201,6 +201,8 @@ class SocketIoProcessor
             }
             finally
             {
+                releaseWriteBuffers( session );
+
                 session.getFilters().sessionClosed( session );
                 session.notifyClose();
             }
@@ -385,7 +387,10 @@ class SocketIoProcessor
                 break;
 
             if( !session.isConnected() )
+            {
+                releaseWriteBuffers( session );
                 continue;
+            }
 
             try
             {
@@ -394,6 +399,25 @@ class SocketIoProcessor
             catch( IOException e )
             {
                 scheduleRemove( session );
+                session.getFilters().exceptionCaught( session, e );
+            }
+        }
+    }
+    
+    private void releaseWriteBuffers( SocketSession session )
+    {
+        Queue writeBufferQueue = session.getWriteBufferQueue();
+        session.getWriteMarkerQueue().clear();
+        ByteBuffer buf;
+        
+        while( ( buf = (ByteBuffer) writeBufferQueue.pop() ) != null )
+        {
+            try
+            {
+                buf.release();
+            }
+            catch( IllegalStateException e )
+            {
                 session.getFilters().exceptionCaught( session, e );
             }
         }
