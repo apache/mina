@@ -17,7 +17,6 @@
 
 		<menu name="MINA">
 			<item name="Overview" href="/index.html"/>
-			<item name="News and Status" href="/news.html"/>
 			<item name="Roadmap" href="/roadmap.html"/>
 		</menu>
 		
