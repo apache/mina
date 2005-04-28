@@ -189,10 +189,15 @@ class SocketIoProcessor
                 break;
 
             SocketChannel ch = session.getChannel();
-            session.getSelectionKey().cancel();
+            SelectionKey key = session.getSelectionKey();
+            if( !key.isValid() ) // skip if channel is already closed
+            {
+                continue;
+            }
 
             try
             {
+                key.cancel();
                 ch.close();
             }
             catch( IOException e )
