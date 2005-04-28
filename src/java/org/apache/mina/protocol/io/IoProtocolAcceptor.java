@@ -29,7 +29,7 @@ public class IoProtocolAcceptor implements ProtocolAcceptor
 {
     private final IoAcceptor acceptor;
 
-    private final IoAdapter adapter = new IoAdapter();
+    private final IoAdapter adapter = new IoAdapter( new IoProtocolSessionManagerFilterChain( this ) );
 
     /**
      * Creates a new instance with the specified {@link IoAcceptor}.

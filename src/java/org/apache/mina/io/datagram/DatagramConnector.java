@@ -33,6 +33,7 @@ import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
@@ -42,11 +43,12 @@ import org.apache.mina.util.Queue;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends DatagramProcessor implements IoConnector
+public class DatagramConnector extends DatagramSessionManager implements IoConnector
 {
     private static volatile int nextId = 0;
 
-    private final DatagramFilterChain filters = new DatagramFilterChain( this );
+    private final IoSessionManagerFilterChain filters =
+        new DatagramSessionManagerFilterChain( this );
 
     private final int id = nextId ++ ;
 
@@ -349,7 +351,7 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
             }
             catch( IOException e )
             {
-                session.getFilters().exceptionCaught( session, e );
+                session.getManagerFilterChain().exceptionCaught( session, e );
             }
         }
     }
@@ -389,10 +391,10 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
                 }
                 catch( IllegalStateException e )
                 {
-                    session.getFilters().exceptionCaught( session, e );
+                    session.getManagerFilterChain().exceptionCaught( session, e );
                 }
 
-                session.getFilters().dataWritten( session, marker );
+                session.getManagerFilterChain().dataWritten( session, marker );
                 continue;
             }
 
@@ -415,7 +417,7 @@ public class DatagramConnector extends DatagramProcessor implements IoConnector
                     writeBufferQueue.pop();
                     writeMarkerQueue.pop();
                 }
-                session.getFilters().dataWritten( session, marker );
+                session.getManagerFilterChain().dataWritten( session, marker );
             }
         }
     }

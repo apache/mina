@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.SessionInitializer;
-import org.apache.mina.common.SessionManager;
 
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
@@ -39,16 +38,13 @@ import org.apache.mina.common.SessionManager;
  * Threads accept incoming connections start automatically when
  * {@link #bind(SocketAddress, IoHandler)} is invoked, and stop when all
  * addresses are unbound.
- * <p>
- * {@link IoHandlerFilter}s can be added and removed at any time to filter
- * events just like Servlet filters and they are effective immediately.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see SessionInitializer
  */
-public interface IoAcceptor extends SessionManager
+public interface IoAcceptor extends IoSessionManager
 {
     /**
      * Binds to the specified <code>address</code> and handles incoming
@@ -70,6 +66,4 @@ public interface IoAcceptor extends SessionManager
      * Unbinds from the specified <code>address</code>.
      */
     void unbind( SocketAddress address );
-
-    IoHandlerFilterChain getFilterChain();
 }

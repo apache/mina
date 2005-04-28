@@ -19,6 +19,7 @@
 package org.apache.mina.io.datagram;
 
 import org.apache.mina.common.BaseSessionManager;
+import org.apache.mina.io.IoSessionManager;
 
 /**
  * A base class for {@link DatagramAcceptor} and {@link DatagramConnector}.
@@ -28,7 +29,7 @@ import org.apache.mina.common.BaseSessionManager;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-abstract class DatagramProcessor extends BaseSessionManager
+abstract class DatagramSessionManager extends BaseSessionManager implements IoSessionManager
 {
     /**
      * Requests this processor to flush the write buffer of the specified

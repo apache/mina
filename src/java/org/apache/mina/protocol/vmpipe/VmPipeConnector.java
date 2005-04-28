@@ -23,19 +23,20 @@ import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
  */
 public class VmPipeConnector extends BaseSessionManager implements ProtocolConnector
 {
-    private final VmPipeFilterChain filters = new VmPipeFilterChain();
+    private final VmPipeSessionManagerFilterChain filterChain =
+        new VmPipeSessionManagerFilterChain( this );
 
     /**
      * Creates a new instance.
      */
     public VmPipeConnector()
     {
-        filters.addLast( "VMPipe", new VmPipeFilter() );
+        filterChain.addFirst( "VMPipe", new VmPipeFilter() );
     }
     
     public ProtocolHandlerFilterChain getFilterChain()
     {
-        return filters;
+        return filterChain;
     }
 
     public ProtocolSession connect( SocketAddress address, ProtocolProvider protocolProvider ) throws IOException 
@@ -70,13 +71,6 @@ public class VmPipeConnector extends BaseSessionManager implements ProtocolConne
 
     public ProtocolSession connect( SocketAddress address, SocketAddress localAddress, int timeout, ProtocolProvider protocolProvider, SessionInitializer initializer ) throws IOException
     {
-        return connect( address, localAddress, timeout, protocolProvider, initializer );
-    }
-
-    public ProtocolSession connect( SocketAddress address,
-                                    ProtocolProvider protocolProvider,
-                                    SessionInitializer initializer ) throws IOException
-    {
         if( address == null )
             throw new NullPointerException( "address" );
         if( protocolProvider == null )
@@ -96,12 +90,19 @@ public class VmPipeConnector extends BaseSessionManager implements ProtocolConne
 
         VmPipeSession session = new VmPipeSession( new Object(), // lock
                                                    AnonymousVmPipeAddress.INSTANCE,
-                                                   filters,
+                                                   filterChain,
                                                    protocolProvider.getHandler(),
                                                    initializer,
                                                    entry );
 
         VmPipeIdleStatusChecker.INSTANCE.addSession( session );
         return session;
+    }
+
+    public ProtocolSession connect( SocketAddress address,
+                                    ProtocolProvider protocolProvider,
+                                    SessionInitializer initializer ) throws IOException
+    {
+        return connect( address, null, Integer.MAX_VALUE, protocolProvider, initializer);
     }
 }

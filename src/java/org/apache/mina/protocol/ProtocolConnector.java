@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.SessionInitializer;
-import org.apache.mina.common.SessionManager;
 
 /**
  * Connects to endpoint, communicates with the server, and fires events to
@@ -39,16 +38,13 @@ import org.apache.mina.common.SessionManager;
  * Threads connect to endpoint start automatically when
  * {@link #connect(SocketAddress, ProtocolProvider)} is invoked, and stop when
  * all connection attempts are finished.
- * <p>
- * {@link ProtocolHandlerFilter}s can be added and removed at any time to filter
- * events just like Servlet filters and they are effective immediately.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see SessionInitializer
  */
-public interface ProtocolConnector extends SessionManager
+public interface ProtocolConnector extends ProtocolSessionManager
 {
     /**
      * Connects to the specified <code>address</code>.  If communication starts
@@ -137,6 +133,4 @@ public interface ProtocolConnector extends SessionManager
     ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
                              int timeout, ProtocolProvider protocolProvider,
                              SessionInitializer initializer ) throws IOException;
-
-    ProtocolHandlerFilterChain getFilterChain();
 }

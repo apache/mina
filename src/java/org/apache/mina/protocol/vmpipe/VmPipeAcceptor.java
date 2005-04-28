@@ -26,14 +26,15 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
 {
     static final Map boundHandlers = new HashMap();
 
-    private final VmPipeFilterChain filters = new VmPipeFilterChain();
+    private final VmPipeSessionManagerFilterChain filterChain =
+        new VmPipeSessionManagerFilterChain( this );
 
     /**
      * Creates a new instance.
      */
     public VmPipeAcceptor()
     {
-        filters.addLast( "VMPipe", new VmPipeFilter() );
+        filterChain.addFirst( "VMPipe", new VmPipeFilter() );
     }
     
     public void bind( SocketAddress address, ProtocolProvider protocolProvider ) throws IOException
@@ -66,7 +67,7 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
             boundHandlers.put( address, 
                                new Entry( this,
                                           ( VmPipeAddress ) address,
-                                          filters,
+                                          filterChain,
                                           protocolProvider.getHandler(),
                                           initializer ) );
         }
@@ -85,7 +86,7 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
     
     public ProtocolHandlerFilterChain getFilterChain()
     {
-        return filters;
+        return filterChain;
     }
 
     static class Entry
@@ -94,7 +95,7 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
         
         final VmPipeAddress address;
 
-        final VmPipeFilterChain filters;
+        final VmPipeSessionManagerFilterChain managerFilterChain;
 
         final ProtocolHandler handler;
         
@@ -102,13 +103,13 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
 
         private Entry( VmPipeAcceptor acceptor,
                        VmPipeAddress address,
-                       VmPipeFilterChain filters,
+                       VmPipeSessionManagerFilterChain managerFilterChain,
                        ProtocolHandler handler,
                        SessionInitializer initializer )
         {
             this.acceptor = acceptor;
             this.address = address;
-            this.filters = filters;
+            this.managerFilterChain = managerFilterChain;
             this.handler = handler;
             this.initializer = initializer;
         }

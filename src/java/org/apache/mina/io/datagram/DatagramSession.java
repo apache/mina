@@ -27,7 +27,11 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.io.IoSessionFilterChain;
+import org.apache.mina.io.IoSessionManager;
+import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
@@ -38,7 +42,9 @@ import org.apache.mina.util.Queue;
  */
 class DatagramSession extends BaseSession implements IoSession
 {
-    private final DatagramFilterChain filters;
+    private final IoSessionManagerFilterChain managerFilterChain;
+    
+    private final IoSessionFilterChain filterChain;
 
     private final DatagramChannel ch;
 
@@ -61,10 +67,11 @@ class DatagramSession extends BaseSession implements IoSession
     /**
      * Creates a new instance.
      */
-    DatagramSession( DatagramFilterChain filters, DatagramChannel ch,
-                     IoHandler defaultHandler )
+    DatagramSession( IoSessionManagerFilterChain managerFilterChain,
+                     DatagramChannel ch, IoHandler defaultHandler )
     {
-        this.filters = filters;
+        this.managerFilterChain = managerFilterChain;
+        this.filterChain = new IoSessionFilterChain( managerFilterChain );
         this.ch = ch;
         this.config = new DatagramSessionConfig( ch );
         this.writeBufferQueue = new Queue();
@@ -74,9 +81,14 @@ class DatagramSession extends BaseSession implements IoSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
 
-    DatagramFilterChain getFilters()
+    IoSessionManagerFilterChain getManagerFilterChain()
     {
-        return filters;
+        return managerFilterChain;
+    }
+    
+    public IoHandlerFilterChain getFilterChain()
+    {
+        return filterChain;
     }
 
     DatagramChannel getChannel()
@@ -115,9 +127,10 @@ class DatagramSession extends BaseSession implements IoSession
             return;
         }
 
-        if( filters.processor instanceof DatagramConnector )
+        IoSessionManager manager = managerFilterChain.getManager();
+        if( manager instanceof DatagramConnector )
         {
-            filters.processor.closeSession( this );
+            ( ( DatagramConnector ) manager ).closeSession( this );
             if( wait )
             {
                 while( disposed )
@@ -146,7 +159,7 @@ class DatagramSession extends BaseSession implements IoSession
 
     public void write( ByteBuffer buf, Object marker )
     {
-        filters.filterWrite( this, buf, marker );
+        filterChain.filterWrite( this, buf, marker );
     }
 
     public TransportType getTransportType()

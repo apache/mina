@@ -172,6 +172,11 @@ public class IoHandlerFilterChainTest extends TestCase
         {
             return null;
         }
+
+        public IoHandlerFilterChain getFilterChain()
+        {
+            return null;
+        }
     }
 
     private class TestFilter implements IoHandlerFilter

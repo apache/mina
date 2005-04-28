@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.SessionInitializer;
-import org.apache.mina.common.SessionManager;
 
 /**
  * Connects to endpoint, communicates with the server, and fires events to
@@ -39,16 +38,13 @@ import org.apache.mina.common.SessionManager;
  * Threads connect to endpoint start automatically when
  * {@link #connect(SocketAddress, IoHandler)} is invoked, and stop when all
  * connection attempts are finished.
- * <p>
- * {@link IoHandlerFilter}s can be added and removed at any time to filter
- * events just like Servlet filters and they are effective immediately.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see SessionInitializer
  */
-public interface IoConnector extends SessionManager
+public interface IoConnector extends IoSessionManager
 {
     /**
      * Connects to the specified <code>address</code>.  If communication starts
@@ -134,6 +130,4 @@ public interface IoConnector extends SessionManager
     IoSession connect( SocketAddress address, SocketAddress localAddress,
                        int timeout, IoHandler handler,
                        SessionInitializer initializer ) throws IOException;
-
-    IoHandlerFilterChain getFilterChain();
 }

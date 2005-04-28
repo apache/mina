@@ -34,6 +34,7 @@ import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
@@ -48,7 +49,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
     private final int id = nextId++;
 
-    private final SocketFilterChain filters = new SocketFilterChain();
+    private final IoSessionManagerFilterChain filters = new SocketSessionManagerFilterChain( this );
 
     private final Selector selector;
 

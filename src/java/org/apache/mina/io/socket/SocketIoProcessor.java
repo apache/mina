@@ -161,12 +161,12 @@ class SocketIoProcessor
             catch( IOException e )
             {
                 registered = false;
-                session.getFilters().exceptionCaught( session, e );
+                session.getManagerFilterChain().exceptionCaught( session, e );
             }
 
             if( registered )
             {
-                session.getFilters().sessionOpened( session );
+                session.getManagerFilterChain().sessionOpened( session );
             }
         }
     }
@@ -202,13 +202,13 @@ class SocketIoProcessor
             }
             catch( IOException e )
             {
-                session.getFilters().exceptionCaught( session, e );
+                session.getManagerFilterChain().exceptionCaught( session, e );
             }
             finally
             {
                 releaseWriteBuffers( session );
 
-                session.getFilters().sessionClosed( session );
+                session.getManagerFilterChain().sessionClosed( session );
                 session.notifyClose();
             }
         }
@@ -271,7 +271,7 @@ class SocketIoProcessor
                 ByteBuffer newBuf = ByteBuffer.allocate( readBytes );
                 newBuf.put( buf );
                 newBuf.flip();
-                session.getFilters().dataRead( session, newBuf );
+                session.getManagerFilterChain().dataRead( session, newBuf );
             }
             if( ret < 0 )
             {
@@ -282,7 +282,7 @@ class SocketIoProcessor
         {
             if( e instanceof IOException )
                 scheduleRemove( session );
-            session.getFilters().exceptionCaught( session, e );
+            session.getManagerFilterChain().exceptionCaught( session, e );
         }
         finally
         {
@@ -356,7 +356,7 @@ class SocketIoProcessor
             && ( currentTime - lastIoTime ) >= idleTime )
         {
             session.setIdle( status, true );
-            session.getFilters().sessionIdle( session, status );
+            session.getManagerFilterChain().sessionIdle( session, status );
         }
     }
 
@@ -369,7 +369,7 @@ class SocketIoProcessor
             && ( session.getSelectionKey().interestOps() & SelectionKey.OP_WRITE ) != 0 )
         {
             session
-                    .getFilters()
+                    .getManagerFilterChain()
                     .exceptionCaught( session, new WriteTimeoutException() );
         }
     }
@@ -404,7 +404,7 @@ class SocketIoProcessor
             catch( IOException e )
             {
                 scheduleRemove( session );
-                session.getFilters().exceptionCaught( session, e );
+                session.getManagerFilterChain().exceptionCaught( session, e );
             }
         }
     }
@@ -423,7 +423,7 @@ class SocketIoProcessor
             }
             catch( IllegalStateException e )
             {
-                session.getFilters().exceptionCaught( session, e );
+                session.getManagerFilterChain().exceptionCaught( session, e );
             }
         }
     }
@@ -461,10 +461,10 @@ class SocketIoProcessor
                 }
                 catch( IllegalStateException e )
                 {
-                    session.getFilters().exceptionCaught( session, e );
+                    session.getManagerFilterChain().exceptionCaught( session, e );
                 }
 
-                session.getFilters().dataWritten( session, marker );
+                session.getManagerFilterChain().dataWritten( session, marker );
                 continue;
             }
 

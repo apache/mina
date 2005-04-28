@@ -27,7 +27,10 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
+import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.io.IoSessionFilterChain;
+import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
@@ -38,7 +41,9 @@ import org.apache.mina.util.Queue;
  */
 class SocketSession extends BaseSession implements IoSession
 {
-    private final SocketFilterChain filters;
+    private final IoSessionManagerFilterChain managerFilterChain;
+    
+    private final IoSessionFilterChain filterChain;
 
     private final SocketChannel ch;
 
@@ -61,10 +66,11 @@ class SocketSession extends BaseSession implements IoSession
     /**
      * Creates a new instance.
      */
-    SocketSession( SocketFilterChain filters, SocketChannel ch,
-                   IoHandler defaultHandler )
+    SocketSession( IoSessionManagerFilterChain managerFilterChain,
+                   SocketChannel ch, IoHandler defaultHandler )
     {
-        this.filters = filters;
+        this.managerFilterChain = managerFilterChain;
+        this.filterChain = new IoSessionFilterChain( managerFilterChain );
         this.ch = ch;
         this.config = new SocketSessionConfig( this );
         this.writeBufferQueue = new Queue();
@@ -74,9 +80,14 @@ class SocketSession extends BaseSession implements IoSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
     
-    SocketFilterChain getFilters()
+    IoSessionManagerFilterChain getManagerFilterChain()
     {
-        return filters;
+        return managerFilterChain;
+    }
+    
+    public IoHandlerFilterChain getFilterChain()
+    {
+        return filterChain;
     }
 
     SocketChannel getChannel()
@@ -144,7 +155,7 @@ class SocketSession extends BaseSession implements IoSession
 
     public void write( ByteBuffer buf, Object marker )
     {
-        filters.filterWrite( this, buf, marker );
+        filterChain.filterWrite( this, buf, marker );
     }
 
     public TransportType getTransportType()

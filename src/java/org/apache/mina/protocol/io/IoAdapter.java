@@ -49,15 +49,16 @@ class IoAdapter
 {
     private static final String KEY = "IoAdapter.ProtocolSession";
 
-    final IoProtocolFilterChain filters = new IoProtocolFilterChain();
+    private final IoProtocolSessionManagerFilterChain managerFilterChain;
 
-    IoAdapter()
+    IoAdapter( IoProtocolSessionManagerFilterChain filters )
     {
+        this.managerFilterChain = filters;
     }
     
     public ProtocolHandlerFilterChain getFilterChain()
     {
-        return filters;
+        return managerFilterChain;
     }
 
     /**
@@ -101,22 +102,22 @@ class IoAdapter
 
         public void sessionOpened( IoSession session )
         {
-            filters.sessionOpened( getProtocolSession( session ) );
+            managerFilterChain.sessionOpened( getProtocolSession( session ) );
         }
 
         public void sessionClosed( IoSession session )
         {
-            filters.sessionClosed( getProtocolSession( session ) );
+            managerFilterChain.sessionClosed( getProtocolSession( session ) );
         }
 
         public void sessionIdle( IoSession session, IdleStatus status )
         {
-            filters.sessionIdle( getProtocolSession( session ), status );
+            managerFilterChain.sessionIdle( getProtocolSession( session ), status );
         }
 
         public void exceptionCaught( IoSession session, Throwable cause )
         {
-            filters.exceptionCaught( getProtocolSession( session ), cause );
+            managerFilterChain.exceptionCaught( getProtocolSession( session ), cause );
         }
 
         public void dataRead( IoSession session, ByteBuffer in )
@@ -137,7 +138,7 @@ class IoAdapter
                     {
                         do
                         {
-                            filters.messageReceived( psession, queue.pop() );
+                            managerFilterChain.messageReceived( psession, queue.pop() );
                         }
                         while( !queue.isEmpty() );
                     }
@@ -146,11 +147,11 @@ class IoAdapter
             catch( ProtocolViolationException pve )
             {
                 pve.setBuffer( in );
-                filters.exceptionCaught( psession, pve );
+                managerFilterChain.exceptionCaught( psession, pve );
             }
             catch( Throwable t )
             {
-                filters.exceptionCaught( psession, t );
+                managerFilterChain.exceptionCaught( psession, t );
             }
         }
 
@@ -158,7 +159,7 @@ class IoAdapter
         {
             if( marker == null )
                 return;
-            filters.messageSent( getProtocolSession( session ),
+            managerFilterChain.messageSent( getProtocolSession( session ),
                                  marker );
         }
 
@@ -199,7 +200,7 @@ class IoAdapter
             }
             catch( Throwable t )
             {
-                filters.exceptionCaught( psession, t );
+                managerFilterChain.exceptionCaught( psession, t );
             }
         }
 
@@ -215,7 +216,8 @@ class IoAdapter
                         ( IoProtocolSession ) session.getAttribute( KEY );
                     if( psession == null )
                     {
-                        psession = new IoProtocolSession( IoAdapter.this, session, this );
+                        psession = new IoProtocolSession(
+                                IoAdapter.this.managerFilterChain, session, this );
                         session.setAttribute( KEY, psession );
                     }
                 }

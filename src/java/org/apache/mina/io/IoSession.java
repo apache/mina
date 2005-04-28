@@ -36,6 +36,11 @@ public interface IoSession extends Session
      * Returns the event handler for this session.
      */
     IoHandler getHandler();
+    
+    /**
+     * Returns the filter chain that only affects this session.
+     */
+    IoHandlerFilterChain getFilterChain();
 
     /**
      * Writes the content of the specified <code>buf</code>.
