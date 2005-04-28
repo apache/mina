@@ -49,93 +49,6 @@ import org.apache.mina.protocol.ProtocolHandlerFilter.NextFilter;
  */
 public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHandlerFilterChain
 {
-    private final ProtocolHandlerFilter HEAD_FILTER = new ProtocolHandlerFilter()
-    {
-        public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
-        {
-            nextFilter.sessionOpened( session );
-        }
-
-        public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
-        {
-            nextFilter.sessionClosed( session );
-        }
-
-        public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
-                                IdleStatus status )
-        {
-            nextFilter.sessionIdle( session, status );
-        }
-
-        public void exceptionCaught( NextFilter nextFilter,
-                                    ProtocolSession session, Throwable cause )
-        {
-            nextFilter.exceptionCaught( session, cause );
-        }
-
-        public void messageReceived( NextFilter nextFilter, ProtocolSession session,
-                                     Object message )
-        {
-            nextFilter.messageReceived( session, message );
-        }
-
-        public void messageSent( NextFilter nextFilter, ProtocolSession session,
-                                 Object message )
-        {
-            nextFilter.messageSent( session, message );
-        }
-        
-        public void filterWrite( NextFilter nextFilter, ProtocolSession session,
-                                 Object message )
-        {
-            doWrite( session, message );
-        }
-    };
-    
-    private final ProtocolHandlerFilter TAIL_FILTER = new ProtocolHandlerFilter()
-    {
-        public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
-        {
-            session.getHandler().sessionOpened( session );
-        }
-
-        public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
-        {
-            session.getHandler().sessionClosed( session );
-        }
-
-        public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
-                                IdleStatus status )
-        {
-            session.getHandler().sessionIdle( session, status );
-        }
-
-        public void exceptionCaught( NextFilter nextFilter,
-                                    ProtocolSession session, Throwable cause )
-        {
-            session.getHandler().exceptionCaught( session, cause );
-        }
-
-        public void messageReceived( NextFilter nextFilter, ProtocolSession session,
-                                     Object message )
-        {
-            ProtocolHandler handler = session.getHandler();
-            handler.messageReceived( session, message );
-        }
-
-        public void messageSent( NextFilter nextFilter, ProtocolSession session,
-                                 Object message )
-        {
-            session.getHandler().messageSent( session, message );
-        }
-
-        public void filterWrite( NextFilter nextFilter,
-                                 ProtocolSession session, Object message )
-        {
-            nextFilter.filterWrite( session, message );
-        }
-    };
-
     private final Map name2entry = new HashMap();
 
     private final Map filter2entry = new IdentityHashMap();
@@ -146,9 +59,108 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
 
     protected AbstractProtocolHandlerFilterChain()
     {
-        head = new Entry( null, null, "head", HEAD_FILTER );
-        tail = new Entry( head, null, "tail", TAIL_FILTER );
+        head = new Entry( null, null, "head", createHeadFilter() );
+        tail = new Entry( head, null, "tail", createTailFilter() );
         head.nextEntry = tail;
+    }
+    
+    /**
+     * Override this method to create custom head of this filter chain.
+     */
+    protected ProtocolHandlerFilter createHeadFilter()
+    {
+        return new ProtocolHandlerFilter()
+        {
+            public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
+            {
+                nextFilter.sessionOpened( session );
+            }
+
+            public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
+            {
+                nextFilter.sessionClosed( session );
+            }
+
+            public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
+                                    IdleStatus status )
+            {
+                nextFilter.sessionIdle( session, status );
+            }
+
+            public void exceptionCaught( NextFilter nextFilter,
+                                        ProtocolSession session, Throwable cause )
+            {
+                nextFilter.exceptionCaught( session, cause );
+            }
+
+            public void messageReceived( NextFilter nextFilter, ProtocolSession session,
+                                         Object message )
+            {
+                nextFilter.messageReceived( session, message );
+            }
+
+            public void messageSent( NextFilter nextFilter, ProtocolSession session,
+                                     Object message )
+            {
+                nextFilter.messageSent( session, message );
+            }
+            
+            public void filterWrite( NextFilter nextFilter, ProtocolSession session,
+                                     Object message )
+            {
+                doWrite( session, message );
+            }
+        };
+    }
+    
+    /**
+     * Override this method to create custom head of this filter chain.
+     */
+    protected ProtocolHandlerFilter createTailFilter()
+    {
+        return new ProtocolHandlerFilter()
+        {
+            public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
+            {
+                session.getHandler().sessionOpened( session );
+            }
+
+            public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
+            {
+                session.getHandler().sessionClosed( session );
+            }
+
+            public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
+                                    IdleStatus status )
+            {
+                session.getHandler().sessionIdle( session, status );
+            }
+
+            public void exceptionCaught( NextFilter nextFilter,
+                                        ProtocolSession session, Throwable cause )
+            {
+                session.getHandler().exceptionCaught( session, cause );
+            }
+
+            public void messageReceived( NextFilter nextFilter, ProtocolSession session,
+                                         Object message )
+            {
+                ProtocolHandler handler = session.getHandler();
+                handler.messageReceived( session, message );
+            }
+
+            public void messageSent( NextFilter nextFilter, ProtocolSession session,
+                                     Object message )
+            {
+                session.getHandler().messageSent( session, message );
+            }
+
+            public void filterWrite( NextFilter nextFilter,
+                                     ProtocolSession session, Object message )
+            {
+                nextFilter.filterWrite( session, message );
+            }
+        };
     }
     
     public ProtocolHandlerFilter getChild( String name )

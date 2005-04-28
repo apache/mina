@@ -50,94 +50,6 @@ import org.apache.mina.io.IoHandlerFilter.NextFilter;
  */
 public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterChain
 {
-    private final IoHandlerFilter HEAD_FILTER = new IoHandlerFilter()
-    {
-        public void sessionOpened( NextFilter nextFilter, IoSession session )
-        {
-            nextFilter.sessionOpened( session );
-        }
-
-        public void sessionClosed( NextFilter nextFilter, IoSession session )
-        {
-            nextFilter.sessionClosed( session );
-        }
-
-        public void sessionIdle( NextFilter nextFilter, IoSession session,
-                                IdleStatus status )
-        {
-            nextFilter.sessionIdle( session, status );
-        }
-
-        public void exceptionCaught( NextFilter nextFilter,
-                                    IoSession session, Throwable cause )
-        {
-            nextFilter.exceptionCaught( session, cause );
-        }
-
-        public void dataRead( NextFilter nextFilter, IoSession session,
-                             ByteBuffer buf )
-        {
-            nextFilter.dataRead( session, buf );
-        }
-
-        public void dataWritten( NextFilter nextFilter, IoSession session,
-                                Object marker )
-        {
-            nextFilter.dataWritten( session, marker );
-        }
-        
-        public void filterWrite( NextFilter nextFilter, IoSession session,
-                                 ByteBuffer buf, Object marker )
-        {
-            doWrite( session, buf, marker );
-        }
-    };
-    
-    private final IoHandlerFilter TAIL_FILTER = new IoHandlerFilter()
-    {
-        public void sessionOpened( NextFilter nextFilter, IoSession session )
-        {
-            session.getHandler().sessionOpened( session );
-        }
-
-        public void sessionClosed( NextFilter nextFilter, IoSession session )
-        {
-            session.getHandler().sessionClosed( session );
-        }
-
-        public void sessionIdle( NextFilter nextFilter, IoSession session,
-                                IdleStatus status )
-        {
-            session.getHandler().sessionIdle( session, status );
-        }
-
-        public void exceptionCaught( NextFilter nextFilter,
-                                    IoSession session, Throwable cause )
-        {
-            session.getHandler().exceptionCaught( session, cause );
-        }
-
-        public void dataRead( NextFilter nextFilter, IoSession session,
-                             ByteBuffer buf )
-        {
-            IoHandler handler = session.getHandler();
-            handler.dataRead( session, buf );
-            buf.release();
-        }
-
-        public void dataWritten( NextFilter nextFilter, IoSession session,
-                                Object marker )
-        {
-            session.getHandler().dataWritten( session, marker );
-        }
-
-        public void filterWrite( NextFilter nextFilter,
-                                 IoSession session, ByteBuffer buf, Object marker )
-        {
-            nextFilter.filterWrite( session, buf, marker );
-        }
-    };
-    
     private final Map name2entry = new HashMap();
 
     private final Map filter2entry = new IdentityHashMap();
@@ -148,9 +60,109 @@ public abstract class AbstractIoHandlerFilterChain implements IoHandlerFilterCha
 
     protected AbstractIoHandlerFilterChain()
     {
-        head = new Entry( null, null, "head", HEAD_FILTER );
-        tail = new Entry( head, null, "tail", TAIL_FILTER );
+        head = new Entry( null, null, "head", createHeadFilter() );
+        tail = new Entry( head, null, "tail", createTailFilter() );
         head.nextEntry = tail;
+    }
+    
+    /**
+     * Override this method to create custom head of this filter chain.
+     */
+    protected IoHandlerFilter createHeadFilter()
+    {
+        return new IoHandlerFilter()
+        {
+            public void sessionOpened( NextFilter nextFilter, IoSession session )
+            {
+                nextFilter.sessionOpened( session );
+            }
+
+            public void sessionClosed( NextFilter nextFilter, IoSession session )
+            {
+                nextFilter.sessionClosed( session );
+            }
+
+            public void sessionIdle( NextFilter nextFilter, IoSession session,
+                                    IdleStatus status )
+            {
+                nextFilter.sessionIdle( session, status );
+            }
+
+            public void exceptionCaught( NextFilter nextFilter,
+                                        IoSession session, Throwable cause )
+            {
+                nextFilter.exceptionCaught( session, cause );
+            }
+
+            public void dataRead( NextFilter nextFilter, IoSession session,
+                                 ByteBuffer buf )
+            {
+                nextFilter.dataRead( session, buf );
+            }
+
+            public void dataWritten( NextFilter nextFilter, IoSession session,
+                                    Object marker )
+            {
+                nextFilter.dataWritten( session, marker );
+            }
+            
+            public void filterWrite( NextFilter nextFilter, IoSession session,
+                                     ByteBuffer buf, Object marker )
+            {
+                doWrite( session, buf, marker );
+            }
+        };
+    }
+    
+    /**
+     * Override this method to create custom tail of this filter chain.
+     */
+    protected IoHandlerFilter createTailFilter()
+    {
+        return new IoHandlerFilter()
+        {
+            public void sessionOpened( NextFilter nextFilter, IoSession session )
+            {
+                session.getHandler().sessionOpened( session );
+            }
+
+            public void sessionClosed( NextFilter nextFilter, IoSession session )
+            {
+                session.getHandler().sessionClosed( session );
+            }
+
+            public void sessionIdle( NextFilter nextFilter, IoSession session,
+                                    IdleStatus status )
+            {
+                session.getHandler().sessionIdle( session, status );
+            }
+
+            public void exceptionCaught( NextFilter nextFilter,
+                                        IoSession session, Throwable cause )
+            {
+                session.getHandler().exceptionCaught( session, cause );
+            }
+
+            public void dataRead( NextFilter nextFilter, IoSession session,
+                                 ByteBuffer buf )
+            {
+                IoHandler handler = session.getHandler();
+                handler.dataRead( session, buf );
+                buf.release();
+            }
+
+            public void dataWritten( NextFilter nextFilter, IoSession session,
+                                    Object marker )
+            {
+                session.getHandler().dataWritten( session, marker );
+            }
+
+            public void filterWrite( NextFilter nextFilter,
+                                     IoSession session, ByteBuffer buf, Object marker )
+            {
+                nextFilter.filterWrite( session, buf, marker );
+            }
+        };
     }
     
     public IoHandlerFilter getChild( String name )
