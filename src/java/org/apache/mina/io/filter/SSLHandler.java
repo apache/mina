@@ -382,11 +382,18 @@ class SSLHandler
                 parent.debug.print( parent, "Wrap res:" + result );
             }
 
-            if ( result.getStatus() == SSLEngineResult.Status.OK ) {
+            if ( result.getStatus() == SSLEngineResult.Status.OK )
+            {
                 if ( result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK ) {
                     doTasks();
                 }
-            } else {
+            }
+            else if( result.getStatus() == SSLEngineResult.Status.CLOSED )
+            {
+                closed = true;
+            }
+            else
+            {
                 throw new SSLException( "SSLEngine error during encrypt: "
                         + result.getStatus() +
                         " src: " + src + "outNetBuffer: " + outNetBuffer);
