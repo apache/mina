@@ -11,7 +11,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 
 /**
- * TODO Document me.
+ * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them. 
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
