@@ -116,22 +116,26 @@
   </goal>
 
   <preGoal name="emma:replace-product-classes">
+    <j:set var="maven.emma.inreport" value="${context.getVariable('maven.emma.inreport')}"/>
     <j:if test="${context.getVariable('maven.emma.inreport') != 'true'}">
       <attainGoal name="emma:backup-main"/>
     </j:if>
   </preGoal>
   <postGoal name="emma:replace-product-classes">
+    <j:set var="maven.emma.inreport" value="${context.getVariable('maven.emma.inreport')}"/>
     <j:if test="${context.getVariable('maven.emma.inreport') != 'true'}">
       <attainGoal name="emma:restore-main"/>
     </j:if>
   </postGoal>
 
   <preGoal name="emma:replace-testing-classes">
+    <j:set var="maven.emma.inreport" value="${context.getVariable('maven.emma.inreport')}"/>
     <j:if test="${context.getVariable('maven.emma.inreport') != 'true'}">
       <attainGoal name="emma:backup-test"/>
     </j:if>
   </preGoal>
   <postGoal name="emma:replace-testing-classes">
+    <j:set var="maven.emma.inreport" value="${context.getVariable('maven.emma.inreport')}"/>
     <j:if test="${context.getVariable('maven.emma.inreport') != 'true'}">
       <attainGoal name="emma:restore-test"/>
     </j:if>
@@ -142,11 +146,11 @@
     <attainGoal name="emma:backup-main"/>
     <attainGoal name="emma:backup-test"/>
     <echo>Turning on EMMA for report generation.</echo>
-    <ant:property name="maven.emma.inreport" value="true"/>
+    <j:set var="maven.emma.inreport" value="true"/>
     <attainGoal name="emma:test-with-forced-fork"/>
   </preGoal>
   <postGoal name="emma:realreport">
-    <ant:property name="maven.emma.inreport" value="false"/>
+    <j:set var="maven.emma.inreport" value="false"/>
     <echo>Turning off EMMA.</echo>
     <attainGoal name="emma:restore-main"/>
     <attainGoal name="emma:restore-test"/>
