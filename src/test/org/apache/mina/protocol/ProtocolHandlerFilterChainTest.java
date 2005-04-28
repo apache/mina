@@ -23,10 +23,10 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.mina.common.BaseSession;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.util.BaseSession;
 
 /**
  * Tests {@link AbstractProtocolHandlerFilterChain}.

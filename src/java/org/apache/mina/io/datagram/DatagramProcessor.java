@@ -18,7 +18,7 @@
  */
 package org.apache.mina.io.datagram;
 
-import org.apache.mina.util.BaseSessionManager;
+import org.apache.mina.common.BaseSessionManager;
 
 /**
  * A base class for {@link DatagramAcceptor} and {@link DatagramConnector}.

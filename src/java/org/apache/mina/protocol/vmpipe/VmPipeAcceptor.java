@@ -8,12 +8,12 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.mina.common.BaseSessionManager;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.protocol.ProtocolAcceptor;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
-import org.apache.mina.util.BaseSessionManager;
 
 /**
  * Binds the specified {@link ProtocolProvider} to the specified

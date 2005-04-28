@@ -6,13 +6,13 @@ package org.apache.mina.protocol.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 
+import org.apache.mina.common.BaseSessionManager;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.protocol.ProtocolConnector;
 import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
-import org.apache.mina.util.BaseSessionManager;
 
 /**
  * Connects to {@link ProtocolProvider}s which is bound on the specified

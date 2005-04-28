@@ -6,6 +6,7 @@ package org.apache.mina.protocol.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 
+import org.apache.mina.common.BaseSession;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
@@ -14,7 +15,6 @@ import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
-import org.apache.mina.util.BaseSession;
 
 /**
  * A {@link ProtocolSession} for in-VM transport (VM_PIPE).

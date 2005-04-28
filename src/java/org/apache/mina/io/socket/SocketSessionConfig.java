@@ -20,10 +20,10 @@ package org.apache.mina.io.socket;
 
 import java.net.SocketException;
 
+import org.apache.mina.common.BaseSessionConfig;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolSession;
-import org.apache.mina.util.BaseSessionConfig;
 
 /**
  * A {@link SessionConfig} for socket transport (TCP/IP).

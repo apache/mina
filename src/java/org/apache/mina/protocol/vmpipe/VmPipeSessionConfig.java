@@ -3,8 +3,8 @@
  */
 package org.apache.mina.protocol.vmpipe;
 
+import org.apache.mina.common.BaseSessionConfig;
 import org.apache.mina.common.SessionConfig;
-import org.apache.mina.util.BaseSessionConfig;
 
 /**
  * A {@link SessionConfig} for in-VM pipe transport.
