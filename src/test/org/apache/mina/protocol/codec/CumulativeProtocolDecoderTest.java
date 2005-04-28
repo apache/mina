@@ -25,6 +25,7 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.mina.common.BaseSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
@@ -34,7 +35,6 @@ import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolViolationException;
-import org.apache.mina.util.BaseSession;
 
 /**
  * Tests {@link CumulativeProtocolDecoder}.

@@ -130,7 +130,7 @@ class IoAdapter
                     decoder.decode( psession, in, psession.decOut );
                 }
 
-                Queue queue = psession.decOut.messageQueue;
+                Queue queue = psession.decOut.getMessageQueue();
                 synchronized( queue )
                 {
                     if( !queue.isEmpty() )
@@ -183,7 +183,7 @@ class IoAdapter
                         if( message == null )
                             break;
 
-                        Queue queue = psession.encOut.queue;
+                        Queue queue = psession.encOut.getBufferQueue();
                         encoder.encode( psession, message, psession.encOut );
                         for( ;; )
                         {

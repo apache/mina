@@ -16,7 +16,7 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.util;
+package org.apache.mina.common;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;

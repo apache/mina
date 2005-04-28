@@ -16,7 +16,7 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.util;
+package org.apache.mina.common;
 
 import java.util.HashMap;
 import java.util.Map;

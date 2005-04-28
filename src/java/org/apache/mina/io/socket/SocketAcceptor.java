@@ -30,11 +30,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.mina.common.BaseSessionManager;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
-import org.apache.mina.util.BaseSessionManager;
 import org.apache.mina.util.Queue;
 
 /**

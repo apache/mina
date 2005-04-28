@@ -28,12 +28,12 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.mina.common.BaseSessionManager;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
-import org.apache.mina.util.BaseSessionManager;
 import org.apache.mina.util.Queue;
 
 /**

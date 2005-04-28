@@ -22,12 +22,12 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
+import org.apache.mina.common.BaseSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
-import org.apache.mina.util.BaseSession;
 import org.apache.mina.util.Queue;
 
 /**
