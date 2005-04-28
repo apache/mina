@@ -17,7 +17,7 @@ import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
 import org.apache.mina.util.BaseSession;
 
 /**
- * TODO Document me.
+ * A {@link ProtocolSession} for in-VM transport (VM_PIPE).
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$

@@ -18,20 +18,14 @@
  */
 package org.apache.mina.protocol.io;
 
-import java.net.SocketAddress;
-import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.SessionConfig;
-import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolCodecFactory;
 import org.apache.mina.protocol.ProtocolDecoder;
-import org.apache.mina.protocol.ProtocolDecoderOutput;
 import org.apache.mina.protocol.ProtocolEncoder;
-import org.apache.mina.protocol.ProtocolEncoderOutput;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
@@ -51,11 +45,11 @@ import org.apache.mina.util.Queue;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class IoAdapter
+class IoAdapter
 {
     private static final String KEY = "IoAdapter.ProtocolSession";
 
-    private final IoProtocolFilterChain filters = new IoProtocolFilterChain();
+    final IoProtocolFilterChain filters = new IoProtocolFilterChain();
 
     IoAdapter()
     {
@@ -96,8 +90,8 @@ public class IoAdapter
 
     class SessionHandlerAdapter implements IoHandler
     {
-        private final ProtocolCodecFactory codecFactory;
-        private final ProtocolHandler handler;
+        final ProtocolCodecFactory codecFactory;
+        final ProtocolHandler handler;
 
         public SessionHandlerAdapter( ProtocolProvider protocolProvider )
         {
@@ -127,7 +121,7 @@ public class IoAdapter
 
         public void dataRead( IoSession session, ByteBuffer in )
         {
-            ProtocolSessionImpl psession = getProtocolSession( session );
+            IoProtocolSession psession = getProtocolSession( session );
             ProtocolDecoder decoder = psession.decoder;
             try
             {
@@ -170,7 +164,7 @@ public class IoAdapter
 
         void doWrite( IoSession session )
         {
-            ProtocolSessionImpl psession = getProtocolSession( session );
+            IoProtocolSession psession = getProtocolSession( session );
             ProtocolEncoder encoder = psession.encoder;
             Queue writeQueue = psession.writeQueue;
 
@@ -209,238 +203,25 @@ public class IoAdapter
             }
         }
 
-        private ProtocolSessionImpl getProtocolSession( IoSession session )
+        private IoProtocolSession getProtocolSession( IoSession session )
         {
-            ProtocolSessionImpl psession =
-                ( ProtocolSessionImpl ) session.getAttribute( KEY );
+            IoProtocolSession psession =
+                ( IoProtocolSession ) session.getAttribute( KEY );
             if( psession == null )
             {
                 synchronized( session )
                 {
                     psession =
-                        ( ProtocolSessionImpl ) session.getAttribute( KEY );
+                        ( IoProtocolSession ) session.getAttribute( KEY );
                     if( psession == null )
                     {
-                        psession = new ProtocolSessionImpl( session, this );
+                        psession = new IoProtocolSession( IoAdapter.this, session, this );
                         session.setAttribute( KEY, psession );
                     }
                 }
             }
 
             return psession;
-        }
-    }
-
-    class ProtocolSessionImpl implements ProtocolSession
-    {
-        final IoSession session;
-
-        final SessionHandlerAdapter adapter;
-
-        final Queue writeQueue = new Queue();
-        
-        private final ProtocolEncoder encoder;
-        
-        private final ProtocolDecoder decoder;
-
-        private final ProtocolEncoderOutputImpl encOut;
-
-        private final ProtocolDecoderOutputImpl decOut;
-
-        private ProtocolSessionImpl( IoSession session,
-                                    SessionHandlerAdapter adapter )
-        {
-            this.session = session;
-            this.adapter = adapter;
-            this.encoder = adapter.codecFactory.newEncoder();
-            this.decoder = adapter.codecFactory.newDecoder();
-            this.encOut = new ProtocolEncoderOutputImpl();
-            this.decOut = new ProtocolDecoderOutputImpl();
-        }
-
-        public ProtocolHandler getHandler()
-        {
-            return adapter.handler;
-        }
-
-        public ProtocolEncoder getEncoder()
-        {
-            return encoder;
-        }
-
-        public ProtocolDecoder getDecoder()
-        {
-            return decoder;
-        }
-
-        public void close()
-        {
-            session.close();
-        }
-        
-        public void close( boolean wait )
-        {
-            session.close( wait );
-        }
-
-        public Object getAttachment()
-        {
-            return session.getAttachment();
-        }
-
-        public Object setAttachment( Object attachment )
-        {
-            return session.setAttachment( attachment );
-        }
-
-        public Object getAttribute( String key )
-        {
-            return session.getAttribute( key );
-        }
-
-        public Object setAttribute( String key, Object value )
-        {
-            return session.setAttribute( key, value );
-        }
-        
-        public Object removeAttribute( String key )
-        {
-            return session.removeAttribute( key );
-        }
-
-        public Set getAttributeKeys()
-        {
-            return session.getAttributeKeys();
-        }
-
-        public void write( Object message )
-        {
-            filters.filterWrite( this, message );
-        }
-
-        public TransportType getTransportType()
-        {
-            return session.getTransportType();
-        }
-
-        public boolean isConnected()
-        {
-            return session.isConnected();
-        }
-
-        public SessionConfig getConfig()
-        {
-            return session.getConfig();
-        }
-
-        public SocketAddress getRemoteAddress()
-        {
-            return session.getRemoteAddress();
-        }
-
-        public SocketAddress getLocalAddress()
-        {
-            return session.getLocalAddress();
-        }
-
-        public long getReadBytes()
-        {
-            return session.getReadBytes();
-        }
-
-        public long getWrittenBytes()
-        {
-            return session.getWrittenBytes();
-        }
-
-        public long getLastIoTime()
-        {
-            return session.getLastIoTime();
-        }
-
-        public long getLastReadTime()
-        {
-            return session.getLastReadTime();
-        }
-
-        public long getLastWriteTime()
-        {
-            return session.getLastWriteTime();
-        }
-
-        public boolean isIdle( IdleStatus status )
-        {
-            return session.isIdle( status );
-        }
-    }
-
-    private static class ProtocolEncoderOutputImpl implements
-            ProtocolEncoderOutput
-    {
-
-        private final Queue queue = new Queue();
-
-        private ProtocolEncoderOutputImpl()
-        {
-        }
-
-        public void write( ByteBuffer buf )
-        {
-            queue.push( buf );
-        }
-        
-        public void mergeAll()
-        {
-            int sum = 0;
-            final int size = queue.size();
-            
-            if( size < 2 )
-            {
-                // no need to merge!
-                return;
-            }
-            
-            // Get the size of merged BB
-            for( int i = size - 1; i >= 0; i -- )
-            {
-                sum += ( ( ByteBuffer ) queue.get( i ) ).remaining();
-            }
-            
-            // Allocate a new BB that will contain all fragments
-            ByteBuffer newBuf = ByteBuffer.allocate( sum );
-            
-            // and merge all.
-            for( ;; )
-            {
-                ByteBuffer buf = ( ByteBuffer ) queue.pop();
-                if( buf == null )
-                {
-                    break;
-                }
-
-                newBuf.put( buf );
-                buf.release();
-            }
-            
-            // Push the new buffer finally.
-            newBuf.flip();
-            queue.push(newBuf);
-        }
-    }
-
-    private static class ProtocolDecoderOutputImpl implements
-            ProtocolDecoderOutput
-    {
-
-        private final Queue messageQueue = new Queue();
-
-        private ProtocolDecoderOutputImpl()
-        {
-        }
-
-        public void write( Object message )
-        {
-            messageQueue.push( message );
         }
     }
 }
