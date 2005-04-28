@@ -382,18 +382,11 @@ class SSLHandler
                 parent.debug.print( parent, "Wrap res:" + result );
             }
 
-            if ( result.getStatus() == SSLEngineResult.Status.OK )
-            {
+            if ( result.getStatus() == SSLEngineResult.Status.OK ) {
                 if ( result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK ) {
                     doTasks();
                 }
-            }
-            else if( result.getStatus() == SSLEngineResult.Status.CLOSED )
-            {
-                closed = true;
-            }
-            else
-            {
+            } else {
                 throw new SSLException( "SSLEngine error during encrypt: "
                         + result.getStatus() +
                         " src: " + src + "outNetBuffer: " + outNetBuffer);
@@ -445,7 +438,8 @@ class SSLHandler
                             " initialHandshakeStatus=NEED_UNWRAP" );
                 }
                 SSLEngineResult.Status status = unwrapHandshake();
-                if( status == SSLEngineResult.Status.BUFFER_UNDERFLOW
+                if( ( initialHandshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED 
+                		&&  status == SSLEngineResult.Status.BUFFER_UNDERFLOW )
                         || closed )
                 {
                     // We need more data or the session is closed
@@ -569,6 +563,27 @@ class SSLHandler
         while( res.getStatus() == SSLEngineResult.Status.OK &&
                res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP );
 
+        initialHandshakeStatus = res.getHandshakeStatus();
+	
+	// If handshake finished, no data was produced, and the status is still ok,
+		// try to unwrap more
+		if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED
+				&& appBuffer.position() == 0
+				&& res.getStatus() == SSLEngineResult.Status.OK
+				&& inNetBuffer.hasRemaining()) {
+			do {
+				if (parent.debug != null) {
+					parent.debug.print(parent, " extra handshake unwrap");
+					parent.debug.print(parent, "  inNetBuffer: " + inNetBuffer);
+					parent.debug.print(parent, "  appBuffer: " + appBuffer);
+				}
+				res = sslEngine.unwrap(inNetBuffer, appBuffer);
+				if (parent.debug != null) {
+					parent.debug.print(parent, "Unwrap res:" + res);
+				}
+			} while (res.getStatus() == SSLEngineResult.Status.OK);
+		}
+
         // If we are CLOSED, set flag
         if( res.getStatus() == SSLEngineResult.Status.CLOSED )
         {
@@ -589,7 +604,7 @@ class SSLHandler
          * UNDERFLOW - Need to read more data from the socket. It's normal.
          * CLOSED - The other peer closed the socket. Also normal.
          */
-        initialHandshakeStatus = res.getHandshakeStatus();
+        //initialHandshakeStatus = res.getHandshakeStatus();
         return checkStatus( res.getStatus() );
     }
 
