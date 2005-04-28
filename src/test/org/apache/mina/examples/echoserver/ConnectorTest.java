@@ -175,7 +175,17 @@ public class ConnectorTest extends AbstractTest
             }
         }
         
-        Thread.sleep( 300 );
+        for( int i = 0; i < 30; i++ ) {
+            if( readBuf.position() == 160 )
+            {
+                break;
+            }
+            else
+            {
+                Thread.sleep( 100 );
+            }
+        }
+
         session.close( true );
         
         Assert.assertEquals( 160, readBuf.position() );
