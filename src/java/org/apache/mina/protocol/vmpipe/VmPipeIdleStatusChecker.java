@@ -82,7 +82,7 @@ class VmPipeIdleStatusChecker
                                                  idleTime > 0L
                                                  && ( currentTime - session.getLastIoTime() ) > idleTime );
                                 if( session.isIdle( IdleStatus.BOTH_IDLE ) )
-                                    session.localFilters
+                                    session.getManagerFilterChain()
                                             .sessionIdle( session,
                                                           IdleStatus.BOTH_IDLE );
                             }
@@ -95,7 +95,7 @@ class VmPipeIdleStatusChecker
                                                  idleTime > 0L
                                                  && ( currentTime - session.getLastReadTime() ) > idleTime );
                                 if( session.isIdle( IdleStatus.READER_IDLE ) )
-                                    session.localFilters
+                                    session.getManagerFilterChain()
                                             .sessionIdle( session,
                                                           IdleStatus.READER_IDLE );
                             }
@@ -108,7 +108,7 @@ class VmPipeIdleStatusChecker
                                                  idleTime > 0L
                                                  && ( currentTime - session.getLastWriteTime() ) > idleTime );
                                 if( session.isIdle( IdleStatus.WRITER_IDLE ) )
-                                    session.localFilters
+                                    session.getManagerFilterChain()
                                             .sessionIdle( session,
                                                           IdleStatus.WRITER_IDLE );
                             }

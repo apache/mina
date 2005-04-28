@@ -171,6 +171,11 @@ public class ProtocolHandlerFilterChainTest extends TestCase
         public SocketAddress getLocalAddress() {
             return null;
         }
+
+        public ProtocolHandlerFilterChain getFilterChain()
+        {
+            return null;
+        }
     }
 
     private class TestFilter implements ProtocolHandlerFilter

@@ -13,7 +13,9 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolSession;
+import org.apache.mina.protocol.ProtocolSessionFilterChain;
 import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
 
 /**
@@ -28,13 +30,13 @@ class VmPipeSession extends BaseSession implements ProtocolSession
 
     private final SocketAddress remoteAddress;
 
-    private final ProtocolHandler localHandler;
+    private final ProtocolHandler handler;
     
     private final VmPipeSessionConfig config = new VmPipeSessionConfig();
 
-    final VmPipeFilterChain localFilters;
-
-    final VmPipeFilterChain remoteFilters;
+    private final ProtocolSessionFilterChain filterChain;
+    
+    private final VmPipeSessionManagerFilterChain managerFilterChain;
 
     final VmPipeSession remoteSession;
 
@@ -46,19 +48,19 @@ class VmPipeSession extends BaseSession implements ProtocolSession
      * Constructor for client-side session.
      */
     VmPipeSession( Object lock, SocketAddress localAddress,
-                   VmPipeFilterChain localFilters,
-                   ProtocolHandler localHandler,
+                   VmPipeSessionManagerFilterChain managerFilterChain,
+                   ProtocolHandler handler,
                    SessionInitializer initializer,
                    Entry remoteEntry ) throws IOException
     {
         this.lock = lock;
         this.localAddress = localAddress;
-        this.localHandler = localHandler;
-        this.localFilters = localFilters;
         this.remoteAddress = remoteEntry.address;
-        this.remoteFilters = remoteEntry.filters;
+        this.handler = handler;
+        this.filterChain = new ProtocolSessionFilterChain( managerFilterChain );
+        this.managerFilterChain = managerFilterChain;
 
-        remoteSession = new VmPipeSession( this, remoteEntry.handler );
+        remoteSession = new VmPipeSession( this, remoteEntry );
         
         // initialize remote session
         try
@@ -76,28 +78,37 @@ class VmPipeSession extends BaseSession implements ProtocolSession
         // initialize client session
         initializer.initializeSession( this );
 
-        remoteEntry.filters.sessionOpened( remoteSession );
-        localFilters.sessionOpened( this );
+        remoteEntry.managerFilterChain.sessionOpened( remoteSession );
+        managerFilterChain.sessionOpened( this );
     }
 
     /**
      * Constructor for server-side session.
      */
-    VmPipeSession( VmPipeSession remoteSession, ProtocolHandler localHandler )
+    VmPipeSession( VmPipeSession remoteSession, Entry entry )
     {
         this.lock = remoteSession.lock;
         this.localAddress = remoteSession.remoteAddress;
-        this.localHandler = localHandler;
-        this.localFilters = remoteSession.remoteFilters;
         this.remoteAddress = remoteSession.localAddress;
-        this.remoteFilters = remoteSession.localFilters;
-
+        this.handler = entry.handler;
+        this.managerFilterChain = entry.managerFilterChain;
+        this.filterChain = new ProtocolSessionFilterChain( entry.managerFilterChain );
         this.remoteSession = remoteSession;
+    }
+    
+    VmPipeSessionManagerFilterChain getManagerFilterChain()
+    {
+        return managerFilterChain;
+    }
+    
+    public ProtocolHandlerFilterChain getFilterChain()
+    {
+        return filterChain;
     }
 
     public ProtocolHandler getHandler()
     {
-        return localHandler;
+        return handler;
     }
 
     public ProtocolEncoder getEncoder()
@@ -118,14 +129,14 @@ class VmPipeSession extends BaseSession implements ProtocolSession
                 return;
 
             closed = remoteSession.closed = true;
-            localFilters.sessionClosed( this );
-            remoteFilters.sessionClosed( remoteSession );
+            managerFilterChain.sessionClosed( this );
+            remoteSession.getManagerFilterChain().sessionClosed( remoteSession );
         }
     }
 
     public void write( Object message )
     {
-        localFilters.filterWrite( this, message );
+        this.filterChain.filterWrite( this, message );
     }
 
     public TransportType getTransportType()

@@ -16,20 +16,20 @@ import org.apache.mina.protocol.ProtocolSession;
  */
 class VmPipeFilter extends ProtocolHandlerFilterAdapter
 {
-    public void messageReceived( ProtocolHandler nextHandler,
+    public void messageReceived( NextFilter nextFilter,
                                  ProtocolSession session, Object message )
     {
         VmPipeSession vps = ( VmPipeSession ) session;
 
         vps.setIdle( IdleStatus.BOTH_IDLE, false );
         vps.setIdle( IdleStatus.READER_IDLE, false );
-        vps.increaseReadBytes( 0 );
+        vps.increaseReadBytes( 1 );
 
         // fire messageSent event first
-        vps.remoteFilters.messageSent( vps.remoteSession, message );
+        vps.remoteSession.getManagerFilterChain().messageSent( vps.remoteSession, message );
 
         // and then messageReceived
-        nextHandler.messageReceived( session, message );
+        nextFilter.messageReceived( session, message );
     }
 
     public void messageSent( ProtocolHandler nextHandler,
@@ -38,7 +38,7 @@ class VmPipeFilter extends ProtocolHandlerFilterAdapter
         VmPipeSession vps = ( VmPipeSession ) session;
         vps.setIdle( IdleStatus.BOTH_IDLE, false );
         vps.setIdle( IdleStatus.WRITER_IDLE, false );
-        vps.increaseWrittenBytes( 0 );
+        vps.increaseWrittenBytes( 1 );
 
         nextHandler.messageSent( session, message );
     }

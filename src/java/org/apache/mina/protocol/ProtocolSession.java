@@ -37,6 +37,12 @@ public interface ProtocolSession extends Session
     ProtocolHandler getHandler();
 
     /**
+     * Returns the filter chain that only affects this session.
+     */
+    ProtocolHandlerFilterChain getFilterChain();
+
+
+    /**
      * Returns the {@link ProtocolEncoder} for this session.
      */
     ProtocolEncoder getEncoder();

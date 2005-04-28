@@ -13,7 +13,10 @@ import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
+import org.apache.mina.protocol.ProtocolHandlerFilterChain;
 import org.apache.mina.protocol.ProtocolSession;
+import org.apache.mina.protocol.ProtocolSessionFilterChain;
+import org.apache.mina.protocol.ProtocolSessionManagerFilterChain;
 import org.apache.mina.protocol.SimpleProtocolDecoderOutput;
 import org.apache.mina.protocol.SimpleProtocolEncoderOutput;
 import org.apache.mina.protocol.io.IoAdapter.SessionHandlerAdapter;
@@ -27,7 +30,7 @@ import org.apache.mina.util.Queue;
  */
 public class IoProtocolSession implements ProtocolSession
 {
-    private final IoAdapter ioAdapter;
+    private final ProtocolSessionFilterChain filterChain;
 
     final IoSession session;
 
@@ -43,10 +46,10 @@ public class IoProtocolSession implements ProtocolSession
 
     final SimpleProtocolDecoderOutput decOut;
 
-    IoProtocolSession( IoAdapter ioAdapter, IoSession session,
-                       SessionHandlerAdapter shAdapter )
+    IoProtocolSession( ProtocolSessionManagerFilterChain managerFilterChain,
+                       IoSession session, SessionHandlerAdapter shAdapter )
     {
-        this.ioAdapter = ioAdapter;
+        this.filterChain = new ProtocolSessionFilterChain( managerFilterChain );
         this.session = session;
         this.shAdapter = shAdapter;
         this.encoder = shAdapter.codecFactory.newEncoder();
@@ -61,6 +64,11 @@ public class IoProtocolSession implements ProtocolSession
     public IoSession getIoSession()
     {
         return session;   
+    }
+    
+    public ProtocolHandlerFilterChain getFilterChain()
+    {
+        return filterChain;
     }
 
     public ProtocolHandler getHandler()
@@ -120,7 +128,7 @@ public class IoProtocolSession implements ProtocolSession
 
     public void write( Object message )
     {
-        this.ioAdapter.filters.filterWrite( this, message );
+        filterChain.filterWrite( this, message );
     }
 
     public TransportType getTransportType()

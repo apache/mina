@@ -35,6 +35,7 @@ import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
@@ -47,7 +48,7 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
-    private final SocketFilterChain filters = new SocketFilterChain();
+    private final IoSessionManagerFilterChain filters = new SocketSessionManagerFilterChain( this );
 
     private final int id = nextId ++ ;
 

@@ -1,25 +1,26 @@
-package org.apache.mina.io.socket;
+package org.apache.mina.io.datagram;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.AbstractIoHandlerFilterChain;
 import org.apache.mina.io.IoHandlerFilterChain;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
- * An {@link IoHandlerFilterChain} for socket transport (TCP/IP).
+ * An {@link IoHandlerFilterChain} for datagram transport (UDP/IP).
  * 
  * @author The Apache Directory Project
  */
-class SocketFilterChain extends AbstractIoHandlerFilterChain {
+class DatagramSessionManagerFilterChain extends IoSessionManagerFilterChain {
 
-    SocketFilterChain()
+    DatagramSessionManagerFilterChain( DatagramSessionManager processor )
     {
+        super( processor );
     }
-
+    
     protected void doWrite( IoSession session, ByteBuffer buf, Object marker )
     {
-        SocketSession s = ( SocketSession ) session;
+        DatagramSession s = ( DatagramSession ) session;
         Queue writeBufferQueue = s.getWriteBufferQueue();
         Queue writeMarkerQueue = s.getWriteMarkerQueue();
         
@@ -29,6 +30,6 @@ class SocketFilterChain extends AbstractIoHandlerFilterChain {
             writeMarkerQueue.push( marker );
         }
 
-        SocketIoProcessor.getInstance().flushSession( s );
+        ( ( DatagramSessionManager ) getManager() ).flushSession( s );
     }
 }

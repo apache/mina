@@ -34,6 +34,7 @@ import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
@@ -43,11 +44,12 @@ import org.apache.mina.util.Queue;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
+public class DatagramAcceptor extends DatagramSessionManager implements IoAcceptor
 {
     private static volatile int nextId = 0;
 
-    private final DatagramFilterChain filters = new DatagramFilterChain( this );
+    private final IoSessionManagerFilterChain filters =
+        new DatagramSessionManagerFilterChain( this );
 
     private final int id = nextId ++ ;
 
@@ -339,7 +341,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
             }
             catch( IOException e )
             {
-                session.getFilters().exceptionCaught( session, e );
+                session.getManagerFilterChain().exceptionCaught( session, e );
             }
         }
     }
@@ -379,10 +381,10 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 }
                 catch( IllegalStateException e )
                 {
-                    session.getFilters().exceptionCaught( session, e );
+                    session.getManagerFilterChain().exceptionCaught( session, e );
                 }
 
-                session.getFilters().dataWritten( session, marker );
+                session.getManagerFilterChain().dataWritten( session, marker );
                 continue;
             }
 
@@ -408,7 +410,7 @@ public class DatagramAcceptor extends DatagramProcessor implements IoAcceptor
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
-                session.getFilters().dataWritten( session, marker );
+                session.getManagerFilterChain().dataWritten( session, marker );
             }
         }
     }

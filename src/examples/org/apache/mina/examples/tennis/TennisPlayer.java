@@ -17,7 +17,7 @@ import org.apache.mina.protocol.ProtocolSession;
  */
 public class TennisPlayer implements ProtocolProvider
 {
-    private static final ProtocolHandler HANDLER = new TennisPlayerHandler();
+    private final ProtocolHandler HANDLER = new TennisPlayerHandler();
     
     public ProtocolCodecFactory getCodecFactory()
     {
