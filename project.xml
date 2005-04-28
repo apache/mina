@@ -94,6 +94,21 @@
       <url>http://junit.org/</url>
     </dependency>
 
+    <dependency>
+      <groupId>emma</groupId>
+      <artifactId>emma</artifactId>
+      <version>2.0.latest</version>
+      <url>http://emma.sourceforge.net/</url>
+    </dependency>
+
+    <dependency>
+      <groupId>emma</groupId>
+      <artifactId>maven-emma-plugin</artifactId>
+      <version>0.4</version>
+      <url>http://emma.sourceforge.net/</url>
+      <type>plugin</type>
+    </dependency>
+
   </dependencies>
 
 
@@ -122,6 +137,7 @@
 
       <excludes>
         <exclude>**/Abstract*</exclude>
+	<exclude>**/datagram/BindTest*</exclude>
       </excludes>
     </unitTest>
 
@@ -143,9 +159,7 @@
     <report>maven-changes-plugin</report>
     <report>maven-jxr-plugin</report>
     <report>maven-junit-report-plugin</report>
-    <!-- causing build failures 
-    <report>maven-jcoverage-plugin</report>
-    -->
+    <report>maven-emma-plugin</report>
     <report>maven-jdepend-plugin</report>
     <report>maven-simian-plugin</report>
     <report>maven-tasklist-plugin</report>
