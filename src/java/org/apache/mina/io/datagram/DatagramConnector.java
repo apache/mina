@@ -315,6 +315,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 newBuf.put( readBuf );
                 newBuf.flip();
 
+		session.increseReadBytes( readBytes );
                 filters.dataRead( session, newBuf );
             }
         }
@@ -406,7 +407,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 // Kernel buffer is full
                 key.interestOps( key.interestOps() | SelectionKey.OP_WRITE );
             }
-            else
+            else if( writtenBytes > 0 )
             {
                 key.interestOps( key.interestOps()
                                  & ( ~SelectionKey.OP_WRITE ) );
@@ -417,6 +418,8 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                     writeBufferQueue.pop();
                     writeMarkerQueue.pop();
                 }
+
+                session.increaseWrittenBytes( writtenBytes );
                 session.getManagerFilterChain().dataWritten( session, marker );
             }
         }
