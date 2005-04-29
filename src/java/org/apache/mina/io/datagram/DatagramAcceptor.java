@@ -397,7 +397,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
                 // Kernel buffer is full
                 key.interestOps( key.interestOps() | SelectionKey.OP_WRITE );
             }
-            else
+            else if( writtenBytes > 0 )
             {
                 key.interestOps( key.interestOps()
                                  & ( ~SelectionKey.OP_WRITE ) );
