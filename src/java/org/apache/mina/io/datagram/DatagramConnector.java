@@ -315,7 +315,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 newBuf.put( readBuf );
                 newBuf.flip();
 
-		session.increseReadBytes( readBytes );
+                session.increaseReadBytes( readBytes );
                 filters.dataRead( session, newBuf );
             }
         }
