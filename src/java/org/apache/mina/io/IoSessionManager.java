@@ -23,7 +23,7 @@ import org.apache.mina.common.SessionManager;
 /**
  * A {@link SessionManager} for I/O layer.
  * <p>
- * {@link IoHandlerFilter}s can be added and removed at any time to filter
+ * {@link IoFilter}s can be added and removed at any time to filter
  * events just like Servlet filters and they are effective immediately.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
@@ -35,5 +35,5 @@ public interface IoSessionManager extends SessionManager {
      * Returns the filter chain that filters all events which is related
      * with sessions this manager manages.
      */
-    IoHandlerFilterChain getFilterChain();
+    IoFilterChain getFilterChain();
 }

@@ -9,7 +9,7 @@ import java.net.SocketAddress;
 import org.apache.mina.common.BaseSessionManager;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.protocol.ProtocolConnector;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
@@ -34,7 +34,7 @@ public class VmPipeConnector extends BaseSessionManager implements ProtocolConne
         filterChain.addFirst( "VMPipe", new VmPipeFilter() );
     }
     
-    public ProtocolHandlerFilterChain getFilterChain()
+    public ProtocolFilterChain getFilterChain()
     {
         return filterChain;
     }

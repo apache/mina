@@ -27,7 +27,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionFilterChain;
 import org.apache.mina.io.IoSessionManager;
@@ -86,7 +86,7 @@ class DatagramSession extends BaseSession implements IoSession
         return managerFilterChain;
     }
     
-    public IoHandlerFilterChain getFilterChain()
+    public IoFilterChain getFilterChain()
     {
         return filterChain;
     }

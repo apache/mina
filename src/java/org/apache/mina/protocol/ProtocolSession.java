@@ -39,7 +39,7 @@ public interface ProtocolSession extends Session
     /**
      * Returns the filter chain that only affects this session.
      */
-    ProtocolHandlerFilterChain getFilterChain();
+    ProtocolFilterChain getFilterChain();
 
 
     /**

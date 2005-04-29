@@ -18,22 +18,22 @@
  */
 package org.apache.mina.util;
 
-import org.apache.mina.io.IoHandlerFilter;
-import org.apache.mina.io.IoHandlerFilterAdapter;
-import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilter;
+import org.apache.mina.protocol.ProtocolFilterAdapter;
+import org.apache.mina.protocol.ProtocolFilterChain;
 
 /**
- * Bogus implementation of {@link IoHandlerFilter} to test
- * {@link IoHandlerFilterChain}.
+ * Bogus implementation of {@link ProtocolFilter} to test
+ * {@link ProtocolFilterChain}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class IoHandlerFilterImpl extends IoHandlerFilterAdapter
+public class ProtocolFilterImpl extends ProtocolFilterAdapter
 {
     private final char c;
 
-    public IoHandlerFilterImpl( char c )
+    public ProtocolFilterImpl( char c )
     {
         this.c = c;
     }
@@ -47,9 +47,9 @@ public class IoHandlerFilterImpl extends IoHandlerFilterAdapter
     {
         if( o == null )
             return false;
-        if( ! ( o instanceof IoHandlerFilterImpl ) )
+        if( ! ( o instanceof ProtocolFilterImpl ) )
             return false;
-        return this.c == ( ( IoHandlerFilterImpl ) o ).c;
+        return this.c == ( ( ProtocolFilterImpl ) o ).c;
     }
 
     public String toString()

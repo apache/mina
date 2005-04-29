@@ -21,7 +21,7 @@ package org.apache.mina.protocol.filter;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.Session;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilter;
+import org.apache.mina.protocol.ProtocolFilter;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.util.BaseThreadPool;
 import org.apache.mina.util.EventType;
@@ -37,7 +37,7 @@ import org.apache.mina.util.ThreadPool;
  * @see ThreadPool
  * @see BaseThreadPool
  */
-public class ProtocolThreadPoolFilter extends BaseThreadPool implements ThreadPool, ProtocolHandlerFilter
+public class ProtocolThreadPoolFilter extends BaseThreadPool implements ThreadPool, ProtocolFilter
 {
 
     /**

@@ -13,12 +13,12 @@ import java.util.Set;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.datagram.DatagramAcceptor;
 import org.apache.mina.io.filter.IoThreadPoolFilter;
 import org.apache.mina.io.socket.SocketAcceptor;
 import org.apache.mina.protocol.ProtocolAcceptor;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.filter.ProtocolThreadPoolFilter;
 import org.apache.mina.protocol.io.IoProtocolAcceptor;
@@ -109,11 +109,11 @@ public class SimpleServiceRegistry implements ServiceRegistry
         stopThreadPools();
     }
 
-    public IoHandlerFilterChain getIoFilterChain(TransportType transportType) {
+    public IoFilterChain getIoFilterChain(TransportType transportType) {
         return findIoAcceptor( transportType ).getFilterChain();
     }
 
-    public ProtocolHandlerFilterChain getProtocolFilterChain(TransportType transportType) {
+    public ProtocolFilterChain getProtocolFilterChain(TransportType transportType) {
         return findProtocolAcceptor( transportType ).getFilterChain();
     }
 

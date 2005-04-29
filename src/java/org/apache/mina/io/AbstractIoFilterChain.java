@@ -16,7 +16,7 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.protocol;
+package org.apache.mina.io;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,12 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.protocol.ProtocolHandlerFilter.NextFilter;
+import org.apache.mina.io.IoFilter.NextFilter;
 
 /**
- * An abstract implementation of {@link ProtocolHandlerFilterChain} that provides
- * common operations for developers to extend protocol layer.
+ * An abstract implementation of {@link IoFilterChain} that provides
+ * common operations for developers to support specific transport types.
  * <p>
  * All methods has been implemented.  The list of filters is maintained
  * as a doublely linked list.  You can fire any MINA events which is filtered
@@ -39,25 +40,25 @@ import org.apache.mina.protocol.ProtocolHandlerFilter.NextFilter;
  *   <li></li>
  * </ul>
  * 
- * The only method a developer should implement is {@link #doWrite(ProtocolSession, Object)}.
+ * The only method a developer should implement is {@link #doWrite(IoSession, ByteBuffer, Object)}.
  * This method is invoked when filter chain is evaluated for
- * {@link ProtocolHandlerFilter#filterWrite(NextFilter, ProtocolSession, Object)} and 
- * finally to be written out.
+ * {@link IoFilter#filterWrite(NextFilter, IoSession, ByteBuffer, Object)} and 
+ * finally to be written to the underlying transport layer (e.g. socket)
  * 
  * @author The Apache Directory Project
  * @version $Rev$, $Date$
  */
-public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHandlerFilterChain
+public abstract class AbstractIoFilterChain implements IoFilterChain
 {
     private final Map name2entry = new HashMap();
 
     private final Map filter2entry = new IdentityHashMap();
 
     private final Entry head;
-
+    
     private final Entry tail;
 
-    protected AbstractProtocolHandlerFilterChain()
+    protected AbstractIoFilterChain()
     {
         head = new Entry( null, null, "head", createHeadFilter() );
         tail = new Entry( head, null, "tail", createTailFilter() );
@@ -67,103 +68,104 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
     /**
      * Override this method to create custom head of this filter chain.
      */
-    protected ProtocolHandlerFilter createHeadFilter()
+    protected IoFilter createHeadFilter()
     {
-        return new ProtocolHandlerFilter()
+        return new IoFilter()
         {
-            public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
+            public void sessionOpened( NextFilter nextFilter, IoSession session )
             {
                 nextFilter.sessionOpened( session );
             }
 
-            public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
+            public void sessionClosed( NextFilter nextFilter, IoSession session )
             {
                 nextFilter.sessionClosed( session );
             }
 
-            public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
+            public void sessionIdle( NextFilter nextFilter, IoSession session,
                                     IdleStatus status )
             {
                 nextFilter.sessionIdle( session, status );
             }
 
             public void exceptionCaught( NextFilter nextFilter,
-                                        ProtocolSession session, Throwable cause )
+                                        IoSession session, Throwable cause )
             {
                 nextFilter.exceptionCaught( session, cause );
             }
 
-            public void messageReceived( NextFilter nextFilter, ProtocolSession session,
-                                         Object message )
+            public void dataRead( NextFilter nextFilter, IoSession session,
+                                 ByteBuffer buf )
             {
-                nextFilter.messageReceived( session, message );
+                nextFilter.dataRead( session, buf );
             }
 
-            public void messageSent( NextFilter nextFilter, ProtocolSession session,
-                                     Object message )
+            public void dataWritten( NextFilter nextFilter, IoSession session,
+                                    Object marker )
             {
-                nextFilter.messageSent( session, message );
+                nextFilter.dataWritten( session, marker );
             }
             
-            public void filterWrite( NextFilter nextFilter, ProtocolSession session,
-                                     Object message )
+            public void filterWrite( NextFilter nextFilter, IoSession session,
+                                     ByteBuffer buf, Object marker )
             {
-                doWrite( session, message );
+                doWrite( session, buf, marker );
             }
         };
     }
     
     /**
-     * Override this method to create custom head of this filter chain.
+     * Override this method to create custom tail of this filter chain.
      */
-    protected ProtocolHandlerFilter createTailFilter()
+    protected IoFilter createTailFilter()
     {
-        return new ProtocolHandlerFilter()
+        return new IoFilter()
         {
-            public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
+            public void sessionOpened( NextFilter nextFilter, IoSession session )
             {
                 session.getHandler().sessionOpened( session );
             }
 
-            public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
+            public void sessionClosed( NextFilter nextFilter, IoSession session )
             {
                 session.getHandler().sessionClosed( session );
             }
 
-            public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
+            public void sessionIdle( NextFilter nextFilter, IoSession session,
                                     IdleStatus status )
             {
                 session.getHandler().sessionIdle( session, status );
             }
 
             public void exceptionCaught( NextFilter nextFilter,
-                                        ProtocolSession session, Throwable cause )
+                                        IoSession session, Throwable cause )
             {
                 session.getHandler().exceptionCaught( session, cause );
             }
 
-            public void messageReceived( NextFilter nextFilter, ProtocolSession session,
-                                         Object message )
+            public void dataRead( NextFilter nextFilter, IoSession session,
+                                 ByteBuffer buf )
             {
-                ProtocolHandler handler = session.getHandler();
-                handler.messageReceived( session, message );
+                IoHandler handler = session.getHandler();
+                handler.dataRead( session, buf );
+                buf.release();
             }
 
-            public void messageSent( NextFilter nextFilter, ProtocolSession session,
-                                     Object message )
+            public void dataWritten( NextFilter nextFilter, IoSession session,
+                                    Object marker )
             {
-                session.getHandler().messageSent( session, message );
+                session.getHandler().dataWritten( session, marker );
             }
 
             public void filterWrite( NextFilter nextFilter,
-                                     ProtocolSession session, Object message )
+                                     IoSession session, ByteBuffer buf, Object marker )
             {
-                nextFilter.filterWrite( session, message );
+                nextFilter.filterWrite( session, buf, marker );
             }
         };
     }
     
-    public ProtocolHandlerFilter getChild( String name )
+    public IoFilter getChild( String name )
     {
         Entry e = ( Entry ) name2entry.get( name );
         if ( e == null )
@@ -177,7 +179,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
      * Adds the specified interceptor with the specified name at the beginning of this chain.
      */
     public synchronized void addFirst( String name,
-                                       ProtocolHandlerFilter filter )
+                                       IoFilter filter )
     {
         checkAddable( name );
         register( head, name, filter );
@@ -188,7 +190,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
      * Adds the specified interceptor with the specified name at the end of this chain.
      */
     public synchronized void addLast( String name,
-                                      ProtocolHandlerFilter filter )
+                                      IoFilter filter )
     {
         checkAddable( name );
         register( tail.prevEntry, name, filter );
@@ -201,7 +203,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
      */
     public synchronized void addBefore( String baseName,
                                         String name,
-                                        ProtocolHandlerFilter filter )
+                                        IoFilter filter )
     {
         Entry baseEntry = checkOldName( baseName );
         checkAddable( name );
@@ -215,7 +217,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
      */
     public synchronized void addAfter( String baseName,
                                        String name,
-                                       ProtocolHandlerFilter filter )
+                                       IoFilter filter )
     {
         Entry baseEntry = checkOldName( baseName );
         checkAddable( name );
@@ -235,7 +237,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         nextEntry.prevEntry = prevEntry;
 
         name2entry.remove( name );
-        ProtocolHandlerFilter filter = entry.filter;
+        IoFilter filter = entry.filter;
         filter2entry.remove( filter );
     }
 
@@ -252,7 +254,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
 
-    private void register( Entry prevEntry, String name, ProtocolHandlerFilter filter )
+    private void register( Entry prevEntry, String name, IoFilter filter )
     {
         Entry newEntry = new Entry( prevEntry, prevEntry.nextEntry, name, filter );
         prevEntry.nextEntry.prevEntry = newEntry;
@@ -289,14 +291,14 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
 
-    public void sessionOpened( ProtocolSession session )
+    public void sessionOpened( IoSession session )
     {
         Entry head = this.head;
         callNextSessionOpened(head, session);
     }
 
     private void callNextSessionOpened( Entry entry,
-                                        ProtocolSession session)
+                                        IoSession session)
     {
         try
         {
@@ -308,19 +310,18 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
 
-    public void sessionClosed( ProtocolSession session )
+    public void sessionClosed( IoSession session )
     {
         Entry head = this.head;
         callNextSessionClosed(head, session);
     }
 
     private void callNextSessionClosed( Entry entry,
-                                        ProtocolSession session )
+                                        IoSession session )
     {
         try
         {
             entry.filter.sessionClosed( entry.nextFilter, session );
-                
         }
         catch( Throwable e )
         {
@@ -328,14 +329,14 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
 
-    public void sessionIdle( ProtocolSession session, IdleStatus status )
+    public void sessionIdle( IoSession session, IdleStatus status )
     {
         Entry head = this.head;
         callNextSessionIdle(head, session, status);
     }
 
     private void callNextSessionIdle( Entry entry,
-                                      ProtocolSession session,
+                                      IoSession session,
                                       IdleStatus status )
     {
         try
@@ -348,19 +349,19 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
 
-    public void messageReceived( ProtocolSession session, Object message )
+    public void dataRead( IoSession session, ByteBuffer buf )
     {
         Entry head = this.head;
-        callNextMessageReceived(head, session, message );
+        callNextDataRead(head, session, buf);
     }
 
-    private void callNextMessageReceived( Entry entry,
-                                          ProtocolSession session,
-                                          Object message )
+    private void callNextDataRead( Entry entry,
+                                   IoSession session,
+                                   ByteBuffer buf )
     {
         try
         {
-            entry.filter.messageReceived( entry.nextFilter, session, message );
+            entry.filter.dataRead( entry.nextFilter, session, buf );
         }
         catch( Throwable e )
         {
@@ -368,19 +369,19 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
 
-    public void messageSent( ProtocolSession session, Object message )
+    public void dataWritten( IoSession session, Object marker )
     {
         Entry head = this.head;
-        callNextMessageSent(head, session, message);
+        callNextDataWritten(head, session, marker);
     }
 
-    private void callNextMessageSent( Entry entry,
-                                      ProtocolSession session,
-                                      Object message ) 
+    private void callNextDataWritten( Entry entry,
+                                      IoSession session,
+                                      Object marker ) 
     {
         try
         {
-            entry.filter.messageSent( entry.nextFilter, session, message );
+            entry.filter.dataWritten( entry.nextFilter, session, marker );
         }
         catch( Throwable e )
         {
@@ -388,14 +389,14 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
 
-    public void exceptionCaught( ProtocolSession session, Throwable cause )
+    public void exceptionCaught( IoSession session, Throwable cause )
     {
         Entry head = this.head;
         callNextExceptionCaught(head, session, cause);
     }
 
     private void callNextExceptionCaught( Entry entry,
-                                          ProtocolSession session,
+                                          IoSession session,
                                           Throwable cause )
     {
         try
@@ -408,24 +409,24 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         }
     }
     
-    public void filterWrite( ProtocolSession session, Object message )
+    public void filterWrite( IoSession session, ByteBuffer buf, Object marker )
     {
         Entry tail = this.tail;
-        callPreviousFilterWrite( tail, session, message );
+        callPreviousFilterWrite( tail, session, buf, marker );
     }
 
     private void callPreviousFilterWrite( Entry entry,
-                                          ProtocolSession session,
-                                          Object message )
+                                          IoSession session,
+                                          ByteBuffer buf, Object marker )
     {
-        if( message == null )
+        if( buf == null )
         {
             return;
         }
         
         try
         {
-            entry.filter.filterWrite( entry.prevFilter, session, message );
+            entry.filter.filterWrite( entry.prevFilter, session, buf, marker );
         }
         catch( Throwable e )
         {
@@ -458,7 +459,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
         return list;
     }
     
-    protected abstract void doWrite( ProtocolSession session, Object message );
+    protected abstract void doWrite( IoSession session, ByteBuffer buffer, Object marker );
 
     private class Entry
     {
@@ -468,14 +469,14 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
 
         private final String name;
         
-        private final ProtocolHandlerFilter filter;
+        private final IoFilter filter;
 
         private final NextFilter nextFilter;
         
         private final NextFilter prevFilter;
 
         private Entry( Entry prevEntry, Entry nextEntry,
-                       String name, ProtocolHandlerFilter filter )
+                       String name, IoFilter filter )
         {
             if( filter == null )
             {
@@ -493,44 +494,44 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
             this.nextFilter = new NextFilter()
             {
 
-                public void sessionOpened( ProtocolSession session )
+                public void sessionOpened( IoSession session )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
                     callNextSessionOpened( nextEntry, session );
                 }
 
-                public void sessionClosed( ProtocolSession session )
+                public void sessionClosed( IoSession session )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
                     callNextSessionClosed( nextEntry, session );
                 }
 
-                public void sessionIdle( ProtocolSession session, IdleStatus status )
+                public void sessionIdle( IoSession session, IdleStatus status )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
                     callNextSessionIdle( nextEntry, session, status );
                 }
 
-                public void exceptionCaught( ProtocolSession session,
+                public void exceptionCaught( IoSession session,
                                             Throwable cause )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
                     callNextExceptionCaught( nextEntry, session, cause );
                 }
 
-                public void messageReceived( ProtocolSession session, Object message )
+                public void dataRead( IoSession session, ByteBuffer buf )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
-                    callNextMessageReceived( nextEntry, session, message );
+                    callNextDataRead( nextEntry, session, buf );
                 }
 
-                public void messageSent( ProtocolSession session, Object message )
+                public void dataWritten( IoSession session, Object marker )
                 {
                     Entry nextEntry = Entry.this.nextEntry;
-                    callNextMessageSent( nextEntry, session, message );
+                    callNextDataWritten( nextEntry, session, marker );
                 }
                 
-                public void filterWrite( ProtocolSession session, Object message )
+                public void filterWrite( IoSession session, ByteBuffer buf, Object marker )
                 {
                     throw new IllegalStateException();
                 }
@@ -539,41 +540,41 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
             this.prevFilter = new NextFilter()
             {
 
-                public void sessionOpened( ProtocolSession session )
+                public void sessionOpened( IoSession session )
                 {
                     throw new IllegalStateException();
                 }
 
-                public void sessionClosed( ProtocolSession session )
+                public void sessionClosed( IoSession session )
                 {
                     throw new IllegalStateException();
                 }
 
-                public void sessionIdle( ProtocolSession session, IdleStatus status )
+                public void sessionIdle( IoSession session, IdleStatus status )
                 {
                     throw new IllegalStateException();
                 }
 
-                public void exceptionCaught( ProtocolSession session,
+                public void exceptionCaught( IoSession session,
                                             Throwable cause )
                 {
                     throw new IllegalStateException();
                 }
 
-                public void messageReceived( ProtocolSession session, Object message )
+                public void dataRead( IoSession session, ByteBuffer buf )
                 {
                     throw new IllegalStateException();
                 }
 
-                public void messageSent( ProtocolSession session, Object message )
+                public void dataWritten( IoSession session, Object marker )
                 {
                     throw new IllegalStateException();
                 }
                 
-                public void filterWrite( ProtocolSession session, Object message )
+                public void filterWrite( IoSession session, ByteBuffer buf, Object marker )
                 {
                     Entry nextEntry = Entry.this.prevEntry;
-                    callPreviousFilterWrite( nextEntry, session, message );
+                    callPreviousFilterWrite( nextEntry, session, buf, marker );
                 }
             };
         }
@@ -583,7 +584,7 @@ public abstract class AbstractProtocolHandlerFilterChain implements ProtocolHand
             return name;
         }
         
-        public ProtocolHandlerFilter getFilter()
+        public IoFilter getFilter()
         {
             return filter;
         }

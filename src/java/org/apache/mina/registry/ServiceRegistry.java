@@ -23,8 +23,8 @@ import java.util.Set;
 
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilterChain;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.io.IoFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 
 /**
@@ -55,9 +55,9 @@ public interface ServiceRegistry
      */
     void unbind( Service service );
 
-    IoHandlerFilterChain getIoFilterChain( TransportType transportType );
+    IoFilterChain getIoFilterChain( TransportType transportType );
     
-    ProtocolHandlerFilterChain getProtocolFilterChain( TransportType transportType );
+    ProtocolFilterChain getProtocolFilterChain( TransportType transportType );
 
     /**
      * Returns {@link Set} of all services bound in this registry.

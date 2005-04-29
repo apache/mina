@@ -1,13 +1,13 @@
 package org.apache.mina.io.datagram;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
- * An {@link IoHandlerFilterChain} for datagram transport (UDP/IP).
+ * An {@link IoFilterChain} for datagram transport (UDP/IP).
  * 
  * @author The Apache Directory Project
  */

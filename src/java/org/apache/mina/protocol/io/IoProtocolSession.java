@@ -13,7 +13,7 @@ import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolSessionFilterChain;
 import org.apache.mina.protocol.ProtocolSessionManagerFilterChain;
@@ -66,7 +66,7 @@ public class IoProtocolSession implements ProtocolSession
         return session;   
     }
     
-    public ProtocolHandlerFilterChain getFilterChain()
+    public ProtocolFilterChain getFilterChain()
     {
         return filterChain;
     }

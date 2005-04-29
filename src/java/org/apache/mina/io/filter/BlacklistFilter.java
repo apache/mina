@@ -25,18 +25,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.IoHandlerFilter;
-import org.apache.mina.io.IoHandlerFilterAdapter;
+import org.apache.mina.io.IoFilter;
+import org.apache.mina.io.IoFilterAdapter;
 import org.apache.mina.io.IoSession;
 
 /**
- * A {@link IoHandlerFilter} which blocks connections from blacklisted remote
+ * A {@link IoFilter} which blocks connections from blacklisted remote
  * address.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class BlacklistFilter extends IoHandlerFilterAdapter
+public class BlacklistFilter extends IoFilterAdapter
 {
     private final Set blacklist = new HashSet();
 
