@@ -29,20 +29,20 @@ import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 
 /**
- * Tests {@link AbstractProtocolHandlerFilterChain}.
+ * Tests {@link AbstractProtocolFilterChain}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$ 
  */
-public class ProtocolHandlerFilterChainTest extends TestCase
+public class ProtocolFilterChainTest extends TestCase
 {
-    private ProtocolHandlerFilterChainImpl chain;
+    private ProtocolFilterChainImpl chain;
     private ProtocolSession session;
     private String result;
 
     public void setUp()
     {
-        chain = new ProtocolHandlerFilterChainImpl();
+        chain = new ProtocolFilterChainImpl();
         session = new TestSession();
         result = "";
     }
@@ -172,13 +172,13 @@ public class ProtocolHandlerFilterChainTest extends TestCase
             return null;
         }
 
-        public ProtocolHandlerFilterChain getFilterChain()
+        public ProtocolFilterChain getFilterChain()
         {
             return null;
         }
     }
 
-    private class TestFilter implements ProtocolHandlerFilter
+    private class TestFilter implements ProtocolFilter
     {
         private final char id;
 
@@ -223,9 +223,9 @@ public class ProtocolHandlerFilterChainTest extends TestCase
         }
     }
 
-    private static class ProtocolHandlerFilterChainImpl extends AbstractProtocolHandlerFilterChain
+    private static class ProtocolFilterChainImpl extends AbstractProtocolFilterChain
     {
-        protected ProtocolHandlerFilterChainImpl()
+        protected ProtocolFilterChainImpl()
         {
         }
 

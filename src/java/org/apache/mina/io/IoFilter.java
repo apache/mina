@@ -42,9 +42,9 @@ import org.apache.mina.common.IdleStatus;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
- * @see IoHandlerFilterAdapter
+ * @see IoFilterAdapter
  */
-public interface IoHandlerFilter
+public interface IoFilter
 {
     /**
      * Filters {@link IoHandler#sessionOpened(IoSession)} event.

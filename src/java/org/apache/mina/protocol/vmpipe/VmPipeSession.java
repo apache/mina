@@ -13,7 +13,7 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolSessionFilterChain;
 import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
@@ -101,7 +101,7 @@ class VmPipeSession extends BaseSession implements ProtocolSession
         return managerFilterChain;
     }
     
-    public ProtocolHandlerFilterChain getFilterChain()
+    public ProtocolFilterChain getFilterChain()
     {
         return filterChain;
     }

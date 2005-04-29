@@ -32,7 +32,7 @@ import org.apache.mina.common.BaseSessionManager;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
@@ -396,7 +396,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
         }
     }
 
-    public IoHandlerFilterChain getFilterChain()
+    public IoFilterChain getFilterChain()
     {
         return filters;
     }

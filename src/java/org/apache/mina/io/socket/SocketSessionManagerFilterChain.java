@@ -1,14 +1,14 @@
 package org.apache.mina.io.socket;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionManager;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
 /**
- * An {@link IoHandlerFilterChain} for socket transport (TCP/IP).
+ * An {@link IoFilterChain} for socket transport (TCP/IP).
  * 
  * @author The Apache Directory Project
  */

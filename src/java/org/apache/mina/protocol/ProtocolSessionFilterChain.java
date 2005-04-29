@@ -18,12 +18,12 @@
  */
 package org.apache.mina.protocol;
 
-import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 
 /**
- * An {@link IoHandlerFilterChain} that forwards <tt>filterWrite</tt>
+ * An {@link IoFilterChain} that forwards <tt>filterWrite</tt>
  * requests to the specified {@link IoSessionManagerFilterChain}.
  * <p>
  * This filter chain is used by implementations of {@link IoSession}s.
@@ -32,7 +32,7 @@ import org.apache.mina.io.IoSessionManagerFilterChain;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class ProtocolSessionFilterChain extends AbstractProtocolHandlerFilterChain {
+public class ProtocolSessionFilterChain extends AbstractProtocolFilterChain {
 
     private final ProtocolSessionManagerFilterChain managerChain;
 

@@ -22,7 +22,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.Session;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilter;
+import org.apache.mina.io.IoFilter;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.util.BaseThreadPool;
 import org.apache.mina.util.EventType;
@@ -38,7 +38,7 @@ import org.apache.mina.util.ThreadPool;
  * @see ThreadPool
  * @see BaseThreadPool
  */
-public class IoThreadPoolFilter extends BaseThreadPool implements ThreadPool, IoHandlerFilter
+public class IoThreadPoolFilter extends BaseThreadPool implements ThreadPool, IoFilter
 {
     /**
      * Creates a new instanceof this filter with default thread pool settings.

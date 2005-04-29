@@ -22,7 +22,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 
 /**
- * An {@link IoHandlerFilterChain} that forwards all events
+ * An {@link IoFilterChain} that forwards all events
  * except <tt>filterWrite</tt> to the {@link IoSessionFilterChain}
  * of the recipient session.
  * <p>
@@ -32,7 +32,7 @@ import org.apache.mina.common.IdleStatus;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class IoSessionManagerFilterChain extends AbstractIoHandlerFilterChain {
+public abstract class IoSessionManagerFilterChain extends AbstractIoFilterChain {
 
     private final IoSessionManager manager;
 
@@ -46,9 +46,9 @@ public abstract class IoSessionManagerFilterChain extends AbstractIoHandlerFilte
         return manager;
     }
     
-    protected IoHandlerFilter createTailFilter()
+    protected IoFilter createTailFilter()
     {
-        return new IoHandlerFilter()
+        return new IoFilter()
         {
             public void sessionOpened( NextFilter nextFilter, IoSession session )
             {

@@ -39,9 +39,9 @@ import org.apache.mina.common.IdleStatus;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
- * @see ProtocolHandlerFilterAdapter
+ * @see ProtocolFilterAdapter
  */
-public interface ProtocolHandlerFilter
+public interface ProtocolFilter
 {
     /**
      * Filters {@link ProtocolHandler#sessionOpened(ProtocolSession)} event.

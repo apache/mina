@@ -12,7 +12,7 @@ import org.apache.mina.common.BaseSessionManager;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.protocol.ProtocolAcceptor;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 
 /**
@@ -84,7 +84,7 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
         }
     }
     
-    public ProtocolHandlerFilterChain getFilterChain()
+    public ProtocolFilterChain getFilterChain()
     {
         return filterChain;
     }

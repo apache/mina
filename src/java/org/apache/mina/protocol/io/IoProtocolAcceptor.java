@@ -11,7 +11,7 @@ import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolAcceptor;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 
@@ -68,7 +68,7 @@ public class IoProtocolAcceptor implements ProtocolAcceptor
         acceptor.unbind( address );
     }
     
-    public ProtocolHandlerFilterChain getFilterChain()
+    public ProtocolFilterChain getFilterChain()
     {
         return adapter.getFilterChain();
     }

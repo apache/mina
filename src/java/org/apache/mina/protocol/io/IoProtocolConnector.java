@@ -11,7 +11,7 @@ import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolConnector;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 import org.apache.mina.protocol.ProtocolSession;
 
@@ -115,7 +115,7 @@ public class IoProtocolConnector implements ProtocolConnector
         return adapter.toProtocolSession( session );
     }
 
-    public ProtocolHandlerFilterChain getFilterChain()
+    public ProtocolFilterChain getFilterChain()
     {
         return adapter.getFilterChain();
     }

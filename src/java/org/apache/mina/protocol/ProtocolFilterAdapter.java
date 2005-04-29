@@ -21,14 +21,14 @@ package org.apache.mina.protocol;
 import org.apache.mina.common.IdleStatus;
 
 /**
- * An abstract adapter class for {@link ProtocolHandlerFilter}.  You can extend
+ * An abstract adapter class for {@link ProtocolFilter}.  You can extend
  * this class and selectively override required event filter methods only.  All
  * methods forwards events to the next filter by default.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class ProtocolHandlerFilterAdapter implements ProtocolHandlerFilter
+public class ProtocolFilterAdapter implements ProtocolFilter
 {
     public void sessionOpened( NextFilter nextFilter,
                               ProtocolSession session )

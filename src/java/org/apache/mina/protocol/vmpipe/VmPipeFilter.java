@@ -5,7 +5,7 @@ package org.apache.mina.protocol.vmpipe;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilterAdapter;
+import org.apache.mina.protocol.ProtocolFilterAdapter;
 import org.apache.mina.protocol.ProtocolSession;
 
 /**
@@ -14,7 +14,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-class VmPipeFilter extends ProtocolHandlerFilterAdapter
+class VmPipeFilter extends ProtocolFilterAdapter
 {
     public void messageReceived( NextFilter nextFilter,
                                  ProtocolSession session, Object message )

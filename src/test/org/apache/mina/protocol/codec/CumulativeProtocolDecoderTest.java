@@ -33,7 +33,7 @@ import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolDecoderOutput;
 import org.apache.mina.protocol.ProtocolEncoder;
 import org.apache.mina.protocol.ProtocolHandler;
-import org.apache.mina.protocol.ProtocolHandlerFilterChain;
+import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolViolationException;
 
@@ -213,7 +213,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
             return null;
         }
 
-        public ProtocolHandlerFilterChain getFilterChain()
+        public ProtocolFilterChain getFilterChain()
         {
             return null;
         }

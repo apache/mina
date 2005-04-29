@@ -21,7 +21,7 @@ package org.apache.mina.protocol;
 import org.apache.mina.common.IdleStatus;
 
 /**
- * An {@link ProtocolHandlerFilterChain} that forwards all events
+ * An {@link ProtocolFilterChain} that forwards all events
  * except <tt>filterWrite</tt> to the {@link ProtocolSessionFilterChain}
  * of the recipient session.
  * <p>
@@ -31,7 +31,7 @@ import org.apache.mina.common.IdleStatus;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class ProtocolSessionManagerFilterChain extends AbstractProtocolHandlerFilterChain {
+public abstract class ProtocolSessionManagerFilterChain extends AbstractProtocolFilterChain {
 
     private final ProtocolSessionManager manager;
 
@@ -45,9 +45,9 @@ public abstract class ProtocolSessionManagerFilterChain extends AbstractProtocol
         return manager;
     }
     
-    protected ProtocolHandlerFilter createTailFilter()
+    protected ProtocolFilter createTailFilter()
     {
-        return new ProtocolHandlerFilter()
+        return new ProtocolFilter()
         {
             public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
             {

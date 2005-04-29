@@ -22,7 +22,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 
 /**
- * An abstract adapter class for {@link IoHandlerFilter}.  You can extend this
+ * An abstract adapter class for {@link IoFilter}.  You can extend this
  * class and selectively override required event filter methods only.  All
  * methods forwards events to the next filter by default.
  * <p>
@@ -33,7 +33,7 @@ import org.apache.mina.common.IdleStatus;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class IoHandlerFilterAdapter implements IoHandlerFilter
+public class IoFilterAdapter implements IoFilter
 {
     public void sessionOpened( NextFilter nextFilter, IoSession session )
     {

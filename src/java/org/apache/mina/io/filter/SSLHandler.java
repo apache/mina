@@ -27,7 +27,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.mina.io.IoSession;
-import org.apache.mina.io.IoHandlerFilter.NextFilter;
+import org.apache.mina.io.IoFilter.NextFilter;
 import org.apache.mina.util.Queue;
 
 /**

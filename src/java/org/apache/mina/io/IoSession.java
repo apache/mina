@@ -40,7 +40,7 @@ public interface IoSession extends Session
     /**
      * Returns the filter chain that only affects this session.
      */
-    IoHandlerFilterChain getFilterChain();
+    IoFilterChain getFilterChain();
 
     /**
      * Writes the content of the specified <code>buf</code>.

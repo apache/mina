@@ -21,7 +21,7 @@ package org.apache.mina.io;
 import org.apache.mina.common.ByteBuffer;
 
 /**
- * An {@link IoHandlerFilterChain} that forwards <tt>filterWrite</tt>
+ * An {@link IoFilterChain} that forwards <tt>filterWrite</tt>
  * requests to the specified {@link IoSessionManagerFilterChain}.
  * <p>
  * This filter chain is used by implementations of {@link IoSession}s.
@@ -30,7 +30,7 @@ import org.apache.mina.common.ByteBuffer;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class IoSessionFilterChain extends AbstractIoHandlerFilterChain {
+public class IoSessionFilterChain extends AbstractIoFilterChain {
 
     private final IoSessionManagerFilterChain managerChain;
 

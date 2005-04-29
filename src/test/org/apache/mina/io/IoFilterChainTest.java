@@ -30,20 +30,20 @@ import org.apache.mina.common.SessionConfig;
 import org.apache.mina.common.TransportType;
 
 /**
- * Tests {@link AbstractIoHandlerFilterChain}.
+ * Tests {@link AbstractIoFilterChain}.
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$ 
  */
-public class IoHandlerFilterChainTest extends TestCase
+public class IoFilterChainTest extends TestCase
 {
-    private IoHandlerFilterChainImpl chain;
+    private IoFilterChainImpl chain;
     private IoSession session;
     private String result;
 
     public void setUp()
     {
-        chain = new IoHandlerFilterChainImpl();
+        chain = new IoFilterChainImpl();
         session = new TestSession();
         result = "";
     }
@@ -173,13 +173,13 @@ public class IoHandlerFilterChainTest extends TestCase
             return null;
         }
 
-        public IoHandlerFilterChain getFilterChain()
+        public IoFilterChain getFilterChain()
         {
             return null;
         }
     }
 
-    private class TestFilter implements IoHandlerFilter
+    private class TestFilter implements IoFilter
     {
         private final char id;
 
@@ -224,9 +224,9 @@ public class IoHandlerFilterChainTest extends TestCase
         }
     }
 
-    private static class IoHandlerFilterChainImpl extends AbstractIoHandlerFilterChain
+    private static class IoFilterChainImpl extends AbstractIoFilterChain
     {
-        protected IoHandlerFilterChainImpl()
+        protected IoFilterChainImpl()
         {
         }
 

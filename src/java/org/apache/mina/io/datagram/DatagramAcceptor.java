@@ -33,7 +33,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilterChain;
+import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
@@ -517,7 +517,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
         }
     }
     
-    public IoHandlerFilterChain getFilterChain()
+    public IoFilterChain getFilterChain()
     {
         return filters;
     }

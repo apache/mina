@@ -32,7 +32,7 @@ import javax.net.ssl.SSLHandshakeException;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultExceptionMonitor;
 import org.apache.mina.io.IoHandler;
-import org.apache.mina.io.IoHandlerFilterAdapter;
+import org.apache.mina.io.IoFilterAdapter;
 import org.apache.mina.io.IoSession;
 
 /**
@@ -44,7 +44,7 @@ import org.apache.mina.io.IoSession;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SSLFilter extends IoHandlerFilterAdapter
+public class SSLFilter extends IoFilterAdapter
 {
     /**
      * A marker which is passed with {@link IoHandler#dataWritten(IoSession, Object)}
@@ -219,7 +219,7 @@ public class SSLFilter extends IoHandlerFilterAdapter
         }
     }
 
-    // IoHandlerFilter impl.
+    // IoFilter impl.
 
     public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
