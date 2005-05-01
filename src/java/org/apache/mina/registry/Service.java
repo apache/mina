@@ -19,6 +19,7 @@
 package org.apache.mina.registry;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.TransportType;
@@ -39,6 +40,15 @@ public class Service implements Serializable, Cloneable
     private final TransportType transportType;
 
     private final SocketAddress address;
+
+    /**
+     * Creates a new instance with the specified protocol name, transport type,
+     * and port number to be bound.
+     */
+    public Service( String name, TransportType transportType, int port )
+    {
+        this( name, transportType, new InetSocketAddress( port ) );
+    }
 
     /**
      * Creates a new instance with the specified protocol name, transport type,
