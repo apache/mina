@@ -60,10 +60,6 @@ public interface ServiceRegistry
      */
     void unbindAll();
 
-    IoAcceptor getIoAcceptor( TransportType transportType );
-    
-    ProtocolAcceptor getProtocolAcceptor( TransportType transportType );
-
     /**
      * Returns {@link Set} of all services bound in this registry.
      */
@@ -86,4 +82,8 @@ public interface ServiceRegistry
      * specified port number.
      */
     Set getServices(int port);
+
+    IoAcceptor getIoAcceptor( TransportType transportType );
+    
+    ProtocolAcceptor getProtocolAcceptor( TransportType transportType );
 }

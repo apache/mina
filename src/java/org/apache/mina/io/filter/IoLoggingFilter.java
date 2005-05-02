@@ -53,6 +53,23 @@ public class IoLoggingFilter implements IoFilter
      */
     public static final String LEVEL = SessionLog.LEVEL;
     
+    private static final IoLoggingFilter INSTANCE = new IoLoggingFilter();
+
+    /**
+     * Returns a logging filter.
+     */
+    public static IoLoggingFilter getInstance()
+    {
+        return INSTANCE;
+    }
+    
+    /**
+     * Creates a new instance.
+     */
+    protected IoLoggingFilter()
+    {
+    }
+    
     public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
         SessionLog.log( session, "OPENED" );

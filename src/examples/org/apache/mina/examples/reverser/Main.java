@@ -51,7 +51,7 @@ public class Main
     private static void addLogger( ServiceRegistry registry )
     {
         ProtocolAcceptor acceptor = registry.getProtocolAcceptor( TransportType.SOCKET );
-        acceptor.getFilterChain().addLast( "logger", new ProtocolLoggingFilter() );
+        acceptor.getFilterChain().addLast( "logger", ProtocolLoggingFilter.getInstance() );
         System.out.println( "Logging ON" );
     }
 }

@@ -73,7 +73,7 @@ public class Main
     private static void addLogger( ServiceRegistry registry )
     {
         IoAcceptor acceptor = registry.getIoAcceptor( TransportType.SOCKET );
-        acceptor.getFilterChain().addLast( "logger", new IoLoggingFilter() );
+        acceptor.getFilterChain().addLast( "logger", IoLoggingFilter.getInstance() );
         System.out.println( "Logging ON" );
     }
 }
