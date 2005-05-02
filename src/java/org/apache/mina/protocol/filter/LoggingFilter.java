@@ -16,22 +16,21 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.io.filter;
+package org.apache.mina.protocol.filter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionInitializer;
-import org.apache.mina.io.IoFilter;
-import org.apache.mina.io.IoSession;
+import org.apache.mina.protocol.ProtocolFilter;
+import org.apache.mina.protocol.ProtocolSession;
 
 /**
- * Logs all MINA I/O events to {@link Logger}.
+ * Logs all MINA protocol events to {@link Logger}.
  * <p>
- * Call {@link #getLogger(IoSession)}, {@link #log(IoSession, String)}, and
- * {@link #log(IoSession, String, Throwable)} to log protocol-specific messages.
+ * Call {@link #getLogger(ProtocolSession)}, {@link #log(ProtocolSession, String)}, and
+ * {@link #log(ProtocolSession, String, Throwable)} to log protocol-specific messages.
  * <p>
  * Set {@link #PREFIX}, {@link #LOGGER}, {@link #LEVEL} session attributes
  * to override prefix string, logger, and log level. (See {@link SessionInitializer})
@@ -40,7 +39,7 @@ import org.apache.mina.io.IoSession;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class LoggingFilter implements IoFilter
+public class LoggingFilter implements ProtocolFilter
 {
     /**
      * Session attribute key: prefix string
@@ -57,7 +56,7 @@ public class LoggingFilter implements IoFilter
      */
     public static final String LEVEL = LoggingFilter.class.getName() + ".level";
     
-    public static Logger getLogger( IoSession session )
+    public static Logger getLogger( ProtocolSession session )
     {
         
         Logger log = (Logger) session.getAttribute( LOGGER );
@@ -84,7 +83,7 @@ public class LoggingFilter implements IoFilter
         return log;
     }
 
-    public static void log( IoSession session, String message )
+    public static void log( ProtocolSession session, String message )
     {
         Logger log = getLogger( session );
         Level level = ( Level ) session.getAttribute( LEVEL );
@@ -94,7 +93,7 @@ public class LoggingFilter implements IoFilter
         }
     }
 
-    public static void log( IoSession session, String message, Throwable cause )
+    public static void log( ProtocolSession session, String message, Throwable cause )
     {
         Logger log = getLogger( session );
         Level level = ( Level ) session.getAttribute( LEVEL );
@@ -104,45 +103,45 @@ public class LoggingFilter implements IoFilter
         }
     }
 
-    public void sessionOpened( NextFilter nextFilter, IoSession session )
+    public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
     {
         log( session, "OPENED" );
         nextFilter.sessionOpened( session );
     }
 
-    public void sessionClosed( NextFilter nextFilter, IoSession session )
+    public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
     {
         log( session, "CLOSED" );
         nextFilter.sessionClosed( session );
     }
 
-    public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status )
+    public void sessionIdle( NextFilter nextFilter, ProtocolSession session, IdleStatus status )
     {
         log( session, "IDLE: " + status );
         nextFilter.sessionIdle( session, status );
     }
 
-    public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause )
+    public void exceptionCaught( NextFilter nextFilter, ProtocolSession session, Throwable cause )
     {
         log( session, "EXCEPTION:", cause );
         nextFilter.exceptionCaught( session, cause );
     }
 
-    public void dataRead( NextFilter nextFilter, IoSession session, ByteBuffer buf)
+    public void messageReceived( NextFilter nextFilter, ProtocolSession session, Object message )
     {
-        log( session, "READ: " + buf.getHexDump() );
-        nextFilter.dataRead( session, buf );
+        log( session, "RECEIVED: " + message );
+        nextFilter.messageReceived( session, message );
     }
 
-    public void dataWritten( NextFilter nextFilter, IoSession session, Object marker)
+    public void messageSent( NextFilter nextFilter, ProtocolSession session, Object message )
     {
-        log( session, "WRITTEN: " + marker );
-        nextFilter.dataWritten( session, marker );
+        log( session, "SENT: " + message );
+        nextFilter.messageSent( session, message );
     }
 
-    public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker)
+    public void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message)
     {
-        log( session, "WRITE:" + marker + ", " + buf.getHexDump() );
-        nextFilter.filterWrite( session, buf, marker );
+        log( session, "WRITE: " + message );
+        nextFilter.filterWrite( session, message );
     }
 }
