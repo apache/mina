@@ -18,12 +18,10 @@
  */
 package org.apache.mina.examples.reverser;
 
-import java.net.InetSocketAddress;
-
-import org.apache.mina.io.filter.IoThreadPoolFilter;
-import org.apache.mina.io.socket.SocketAcceptor;
-import org.apache.mina.protocol.filter.ProtocolThreadPoolFilter;
-import org.apache.mina.protocol.io.IoProtocolAcceptor;
+import org.apache.mina.common.TransportType;
+import org.apache.mina.registry.Service;
+import org.apache.mina.registry.ServiceRegistry;
+import org.apache.mina.registry.SimpleServiceRegistry;
 
 /**
  * (<b>Entry point</b>) Reverser server which reverses all text lines from
@@ -38,29 +36,11 @@ public class Main
 
     public static void main( String[] args ) throws Exception
     {
-        // Create I/O and Protocol thread pool filter.
-        // I/O thread pool performs encoding and decoding of messages.
-        // Protocol thread pool performs actual protocol flow.
-        IoThreadPoolFilter ioThreadPoolFilter = new IoThreadPoolFilter();
-        ProtocolThreadPoolFilter protocolThreadPoolFilter = new ProtocolThreadPoolFilter();
-
-        // and start both.
-        ioThreadPoolFilter.start();
-        protocolThreadPoolFilter.start();
-
-        // Create a TCP/IP acceptor.
-        IoProtocolAcceptor acceptor = new IoProtocolAcceptor(
-                new SocketAcceptor() );
-
-        // Add both thread pool filters.
-        acceptor.getIoAcceptor().getFilterChain().addFirst(
-                "threadPool", ioThreadPoolFilter );
-        acceptor.getFilterChain().addFirst(
-                "threadPool", protocolThreadPoolFilter );
+        ServiceRegistry registry = new SimpleServiceRegistry();
 
         // Bind
-        acceptor.bind( new InetSocketAddress( PORT ),
-                new ReverseProtocolProvider() );
+        Service service = new Service( "reverse", TransportType.SOCKET, PORT );
+        registry.bind( service, new ReverseProtocolProvider() );
 
         System.out.println( "Listening on port " + PORT );
     }

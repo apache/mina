@@ -3,11 +3,13 @@
  */
 package org.apache.mina.examples.tennis;
 
+import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolSession;
-import org.apache.mina.protocol.filter.ProtocolThreadPoolFilter;
-import org.apache.mina.protocol.vmpipe.VmPipeAcceptor;
 import org.apache.mina.protocol.vmpipe.VmPipeAddress;
 import org.apache.mina.protocol.vmpipe.VmPipeConnector;
+import org.apache.mina.registry.Service;
+import org.apache.mina.registry.ServiceRegistry;
+import org.apache.mina.registry.SimpleServiceRegistry;
 
 /**
  * (<b>Entry point</b>) An 'in-VM pipe' example which simulates a tennis game
@@ -28,20 +30,16 @@ public class Main
 
     public static void main( String[] args ) throws Exception
     {
+        ServiceRegistry registry = new SimpleServiceRegistry();
+
         VmPipeAddress address = new VmPipeAddress( 8080 );
 
-        // Prepare thread pool
-        ProtocolThreadPoolFilter threadPool = new ProtocolThreadPoolFilter();
-        threadPool.start();
-
         // Set up server
-        VmPipeAcceptor acceptor = new VmPipeAcceptor();
-        acceptor.bind( address, new TennisPlayer() );
-        acceptor.getFilterChain().addFirst( "threadPool", threadPool );
+        Service service = new Service( "tennis", TransportType.VM_PIPE, address );
+        registry.bind( service, new TennisPlayer() );
 
         // Connect to the server.
         VmPipeConnector connector = new VmPipeConnector();
-        connector.getFilterChain().addFirst( "threadPool", threadPool );
         ProtocolSession session = connector.connect( address,
                                                      new TennisPlayer() );
 
@@ -53,8 +51,7 @@ public class Main
         {
             Thread.sleep( 100 );
         }
-
-        // Stop the thread pool
-        threadPool.stop();
+        
+        registry.unbind( service );
     }
 }
