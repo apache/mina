@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import org.apache.mina.common.Session;
 import org.apache.mina.io.IoSession;
-import org.apache.mina.io.filter.LoggingFilter;
 import org.apache.mina.protocol.ProtocolSession;
 
 /**
@@ -24,17 +23,17 @@ public class SessionLog {
     /**
      * Session attribute key: prefix string
      */
-    public static final String PREFIX = LoggingFilter.class.getName() + ".prefix";
+    public static final String PREFIX = SessionLog.class.getName() + ".prefix";
 
     /**
      * Session attribute key: {@link Logger}
      */
-    public static final String LOGGER = LoggingFilter.class.getName() + ".logger";
+    public static final String LOGGER = SessionLog.class.getName() + ".logger";
     
     /**
      * Session attribute key: {@link Level}
      */
-    public static final String LEVEL = LoggingFilter.class.getName() + ".level";
+    public static final String LEVEL = SessionLog.class.getName() + ".level";
 
     public static Logger getLogger( Session session )
     {

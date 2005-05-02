@@ -21,7 +21,7 @@ package org.apache.mina.examples.echoserver;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.io.IoAcceptor;
-import org.apache.mina.io.filter.LoggingFilter;
+import org.apache.mina.io.filter.IoLoggingFilter;
 import org.apache.mina.io.filter.SSLFilter;
 import org.apache.mina.registry.Service;
 import org.apache.mina.registry.ServiceRegistry;
@@ -73,7 +73,7 @@ public class Main
     private static void addLogger( ServiceRegistry registry )
     {
         IoAcceptor acceptor = registry.getIoAcceptor( TransportType.SOCKET );
-        acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+        acceptor.getFilterChain().addLast( "logger", new IoLoggingFilter() );
         System.out.println( "Logging ON" );
     }
 }
