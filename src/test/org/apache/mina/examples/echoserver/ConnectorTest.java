@@ -30,6 +30,7 @@ import org.apache.mina.common.Session;
 import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
+import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandlerAdapter;
 import org.apache.mina.io.IoSession;
@@ -76,7 +77,8 @@ public class ConnectorTest extends AbstractTest
         SSLFilter acceptorSSLFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
         //acceptorSSLFilter.setDebug( SSLFilter.Debug.ON );
-        registry.getIoFilterChain( TransportType.SOCKET ).addLast( "SSL", acceptorSSLFilter );
+        IoAcceptor acceptor = registry.getIoAcceptor( TransportType.SOCKET );
+        acceptor.getFilterChain().addLast( "SSL", acceptorSSLFilter );
 
         // Create a connector
         IoConnector connector = new SocketConnector();
