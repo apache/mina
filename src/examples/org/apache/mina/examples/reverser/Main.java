@@ -20,7 +20,7 @@ package org.apache.mina.examples.reverser;
 
 import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolAcceptor;
-import org.apache.mina.protocol.filter.LoggingFilter;
+import org.apache.mina.protocol.filter.ProtocolLoggingFilter;
 import org.apache.mina.registry.Service;
 import org.apache.mina.registry.ServiceRegistry;
 import org.apache.mina.registry.SimpleServiceRegistry;
@@ -51,7 +51,7 @@ public class Main
     private static void addLogger( ServiceRegistry registry )
     {
         ProtocolAcceptor acceptor = registry.getProtocolAcceptor( TransportType.SOCKET );
-        acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+        acceptor.getFilterChain().addLast( "logger", new ProtocolLoggingFilter() );
         System.out.println( "Logging ON" );
     }
 }

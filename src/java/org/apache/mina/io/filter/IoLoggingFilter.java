@@ -16,18 +16,19 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.protocol.filter;
+package org.apache.mina.io.filter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.protocol.ProtocolFilter;
-import org.apache.mina.protocol.ProtocolSession;
+import org.apache.mina.io.IoFilter;
+import org.apache.mina.io.IoSession;
 import org.apache.mina.util.SessionLog;
 
 /**
- * Logs all MINA protocol events to {@link Logger}.
+ * Logs all MINA I/O events to {@link Logger}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @author Trustin Lee (trustin@apache.org)
@@ -35,7 +36,7 @@ import org.apache.mina.util.SessionLog;
  * 
  * @see SessionLog
  */
-public class LoggingFilter implements ProtocolFilter
+public class IoLoggingFilter implements IoFilter
 {
     /**
      * Session attribute key: prefix string
@@ -52,45 +53,45 @@ public class LoggingFilter implements ProtocolFilter
      */
     public static final String LEVEL = SessionLog.LEVEL;
     
-    public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
+    public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
         SessionLog.log( session, "OPENED" );
         nextFilter.sessionOpened( session );
     }
 
-    public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
+    public void sessionClosed( NextFilter nextFilter, IoSession session )
     {
         SessionLog.log( session, "CLOSED" );
         nextFilter.sessionClosed( session );
     }
 
-    public void sessionIdle( NextFilter nextFilter, ProtocolSession session, IdleStatus status )
+    public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status )
     {
         SessionLog.log( session, "IDLE: " + status );
         nextFilter.sessionIdle( session, status );
     }
 
-    public void exceptionCaught( NextFilter nextFilter, ProtocolSession session, Throwable cause )
+    public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause )
     {
         SessionLog.log( session, "EXCEPTION:", cause );
         nextFilter.exceptionCaught( session, cause );
     }
 
-    public void messageReceived( NextFilter nextFilter, ProtocolSession session, Object message )
+    public void dataRead( NextFilter nextFilter, IoSession session, ByteBuffer buf)
     {
-        SessionLog.log( session, "RECEIVED: " + message );
-        nextFilter.messageReceived( session, message );
+        SessionLog.log( session, "READ: " + buf.getHexDump() );
+        nextFilter.dataRead( session, buf );
     }
 
-    public void messageSent( NextFilter nextFilter, ProtocolSession session, Object message )
+    public void dataWritten( NextFilter nextFilter, IoSession session, Object marker)
     {
-        SessionLog.log( session, "SENT: " + message );
-        nextFilter.messageSent( session, message );
+        SessionLog.log( session, "WRITTEN: " + marker );
+        nextFilter.dataWritten( session, marker );
     }
 
-    public void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message)
+    public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker)
     {
-        SessionLog.log( session, "WRITE: " + message );
-        nextFilter.filterWrite( session, message );
+        SessionLog.log( session, "WRITE:" + marker + ", " + buf.getHexDump() );
+        nextFilter.filterWrite( session, buf, marker );
     }
 }
