@@ -48,67 +48,72 @@ public class IoLoggingFilter implements IoFilter
      */
     public static final String LOGGER = SessionLog.LOGGER;
     
-    /**
-     * Session attribute key: {@link Level}
-     */
-    public static final String LEVEL = SessionLog.LEVEL;
-    
-    private static final IoLoggingFilter INSTANCE = new IoLoggingFilter();
-
-    /**
-     * Returns a logging filter.
-     */
-    public static IoLoggingFilter getInstance()
-    {
-        return INSTANCE;
-    }
+    private Level defaultLevel = Level.INFO;
     
     /**
      * Creates a new instance.
      */
-    protected IoLoggingFilter()
+    public IoLoggingFilter()
     {
+    }
+    
+    /**
+     * Returns the default level of log entry this filter logs. 
+     */
+    public Level getDefaultLevel() {
+        return defaultLevel;
+    }
+    
+    /**
+     * Sets the default level of log entry this filter logs. 
+     */
+    public void setDefaultLevel(Level defaultLevel) {
+        if( defaultLevel == null )
+        {
+            defaultLevel = Level.INFO;
+        }
+        this.defaultLevel = defaultLevel;
     }
     
     public void sessionOpened( NextFilter nextFilter, IoSession session )
     {
-        SessionLog.log( session, "OPENED" );
+        SessionLog.log( defaultLevel, session, "OPENED" );
         nextFilter.sessionOpened( session );
     }
 
     public void sessionClosed( NextFilter nextFilter, IoSession session )
     {
-        SessionLog.log( session, "CLOSED" );
+        SessionLog.log( defaultLevel, session, "CLOSED" );
         nextFilter.sessionClosed( session );
     }
 
     public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status )
     {
-        SessionLog.log( session, "IDLE: " + status );
+        SessionLog.log( defaultLevel, session, "IDLE: " + status );
         nextFilter.sessionIdle( session, status );
     }
 
     public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause )
     {
-        SessionLog.log( session, "EXCEPTION:", cause );
+        SessionLog.log( defaultLevel, session, "EXCEPTION:", cause );
         nextFilter.exceptionCaught( session, cause );
     }
 
     public void dataRead( NextFilter nextFilter, IoSession session, ByteBuffer buf)
     {
-        SessionLog.log( session, "READ: " + buf.getHexDump() );
+        SessionLog.log( defaultLevel, session, "READ: " + buf.getHexDump() );
         nextFilter.dataRead( session, buf );
     }
 
     public void dataWritten( NextFilter nextFilter, IoSession session, Object marker)
     {
-        SessionLog.log( session, "WRITTEN: " + marker );
+        SessionLog.log( defaultLevel, session, "WRITTEN: " + marker );
         nextFilter.dataWritten( session, marker );
     }
 
     public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker)
     {
-        SessionLog.log( session, "WRITE:" + marker + ", " + buf.getHexDump() );
+        SessionLog.log( defaultLevel, session, "WRITE:" + marker + ", " + buf.getHexDump() );
         nextFilter.filterWrite( session, buf, marker );
     }
 }

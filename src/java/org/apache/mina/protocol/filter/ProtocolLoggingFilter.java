@@ -47,67 +47,73 @@ public class ProtocolLoggingFilter implements ProtocolFilter
      */
     public static final String LOGGER = SessionLog.LOGGER;
     
-    /**
-     * Session attribute key: {@link Level}
-     */
-    public static final String LEVEL = SessionLog.LEVEL;
-    
-    private static final ProtocolLoggingFilter INSTANCE = new ProtocolLoggingFilter();
-
-    /**
-     * Returns a logging filter.
-     */
-    public static ProtocolLoggingFilter getInstance()
-    {
-        return INSTANCE;
-    }
+    private Level defaultLevel = Level.INFO;
     
     /**
      * Creates a new instance.
      */
-    protected ProtocolLoggingFilter()
+    public ProtocolLoggingFilter()
     {
+    }
+    
+    
+    /**
+     * Returns the default level of log entry this filter logs. 
+     */
+    public Level getDefaultLevel() {
+        return defaultLevel;
+    }
+    
+    /**
+     * Sets the default level of log entry this filter logs. 
+     */
+    public void setDefaultLevel(Level defaultLevel) {
+        if( defaultLevel == null )
+        {
+            defaultLevel = Level.INFO;
+        }
+        this.defaultLevel = defaultLevel;
     }
     
     public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
     {
-        SessionLog.log( session, "OPENED" );
+        SessionLog.log( defaultLevel, session, "OPENED" );
         nextFilter.sessionOpened( session );
     }
 
     public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
     {
-        SessionLog.log( session, "CLOSED" );
+        SessionLog.log( defaultLevel, session, "CLOSED" );
         nextFilter.sessionClosed( session );
     }
 
     public void sessionIdle( NextFilter nextFilter, ProtocolSession session, IdleStatus status )
     {
-        SessionLog.log( session, "IDLE: " + status );
+        SessionLog.log( defaultLevel, session, "IDLE: " + status );
         nextFilter.sessionIdle( session, status );
     }
 
     public void exceptionCaught( NextFilter nextFilter, ProtocolSession session, Throwable cause )
     {
-        SessionLog.log( session, "EXCEPTION:", cause );
+        SessionLog.log( defaultLevel, session, "EXCEPTION:", cause );
         nextFilter.exceptionCaught( session, cause );
     }
 
     public void messageReceived( NextFilter nextFilter, ProtocolSession session, Object message )
     {
-        SessionLog.log( session, "RECEIVED: " + message );
+        SessionLog.log( defaultLevel, session, "RECEIVED: " + message );
         nextFilter.messageReceived( session, message );
     }
 
     public void messageSent( NextFilter nextFilter, ProtocolSession session, Object message )
     {
-        SessionLog.log( session, "SENT: " + message );
+        SessionLog.log( defaultLevel, session, "SENT: " + message );
         nextFilter.messageSent( session, message );
     }
 
     public void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message)
     {
-        SessionLog.log( session, "WRITE: " + message );
+        SessionLog.log( defaultLevel, session, "WRITE: " + message );
         nextFilter.filterWrite( session, message );
     }
 }
