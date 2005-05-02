@@ -76,7 +76,6 @@ public class ConnectorTest extends AbstractTest
         // Add an SSL filter to acceptor
         SSLFilter acceptorSSLFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
-        //acceptorSSLFilter.setDebug( SSLFilter.Debug.ON );
         IoAcceptor acceptor = registry.getIoAcceptor( TransportType.SOCKET );
         acceptor.getFilterChain().addLast( "SSL", acceptorSSLFilter );
 
@@ -87,7 +86,6 @@ public class ConnectorTest extends AbstractTest
         SSLFilter connectorSSLFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( false ) );
         connectorSSLFilter.setUseClientMode( true ); // set client mode
-        //connectorSSLFilter.setDebug( SSLFilter.Debug.ON );
         connector.getFilterChain().addLast( "SSL", connectorSSLFilter );
 
         testConnector( connector );
