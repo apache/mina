@@ -113,7 +113,7 @@ public class IoLoggingFilter implements IoFilter
 
     public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker)
     {
-        SessionLog.log( defaultLevel, session, "WRITE:" + marker + ", " + buf.getHexDump() );
+        SessionLog.log( defaultLevel, session, "WRITE: " + marker + ", " + buf.getHexDump() );
         nextFilter.filterWrite( session, buf, marker );
     }
 }
