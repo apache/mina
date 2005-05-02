@@ -187,7 +187,7 @@ class SSLHandler
         writeMarkerQueue.push( marker );
     }
     
-    public synchronized void flushScheduledWrites()
+    public synchronized void flushScheduledWrites() throws SSLException
     {
         NextFilter nextFilter;
         org.apache.mina.common.ByteBuffer scheduledBuf;

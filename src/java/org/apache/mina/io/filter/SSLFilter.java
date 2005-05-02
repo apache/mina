@@ -184,7 +184,7 @@ public class SSLFilter extends IoFilterAdapter
 
     // IoFilter impl.
 
-    public void sessionOpened( NextFilter nextFilter, IoSession session )
+    public void sessionOpened( NextFilter nextFilter, IoSession session ) throws SSLException
     {
         // Create an SSL handler
         createSSLSessionHandler( session );
@@ -284,7 +284,7 @@ public class SSLFilter extends IoFilterAdapter
         nextFilter.dataWritten( session, marker );
     }
 
-    public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker )
+    public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker ) throws SSLException
     {
 
         SSLHandler handler = createSSLSessionHandler( session );
@@ -309,29 +309,21 @@ public class SSLFilter extends IoFilterAdapter
             if( handler.isInitialHandshakeComplete() )
             {
                 // SSL encrypt
-                try
+                if( log.isLoggable( Level.FINEST ) )
                 {
-                    if( log.isLoggable( Level.FINEST ) )
-                    {
-                        log.log( Level.FINEST, session + " encrypt: " + buf );
-                    }
-                    handler.encrypt( buf.buf() );
-                    ByteBuffer encryptedBuffer = copy( handler
-                            .getOutNetBuffer() );
+                    log.log( Level.FINEST, session + " encrypt: " + buf );
+                }
+                handler.encrypt( buf.buf() );
+                ByteBuffer encryptedBuffer = copy( handler
+                        .getOutNetBuffer() );
 
-                    if( log.isLoggable( Level.FINEST ) )
-                    {
-                        log.log( Level.FINEST, session + " encrypted buf: " + encryptedBuffer);
-                    }
-                    buf.release();
-                    nextFilter.filterWrite( session, encryptedBuffer, marker );
-                    return;
-                }
-                catch( SSLException ssle )
+                if( log.isLoggable( Level.FINEST ) )
                 {
-                    throw new RuntimeException(
-                            "Unexpected SSLException.", ssle );
+                    log.log( Level.FINEST, session + " encrypted buf: " + encryptedBuffer);
                 }
+                buf.release();
+                nextFilter.filterWrite( session, encryptedBuffer, marker );
+                return;
             }
             else
             {
@@ -478,7 +470,7 @@ public class SSLFilter extends IoFilterAdapter
 
     // Utilities to mainpulate SSLHandler based on IoSession
 
-    private SSLHandler createSSLSessionHandler( IoSession session )
+    private SSLHandler createSSLSessionHandler( IoSession session ) throws SSLException
     {
         SSLHandler handler = ( SSLHandler ) sslSessionHandlerMap.get( session );
         if( handler == null )
@@ -488,18 +480,21 @@ public class SSLFilter extends IoFilterAdapter
                 handler = ( SSLHandler ) sslSessionHandlerMap.get( session );
                 if( handler == null )
                 {
+                    boolean done = false;
                     try
                     {
                         handler =
                             new SSLHandler( this, sslContext, session );
                         sslSessionHandlerMap.put( session, handler );
                         handler.doHandshake();
+                        done = true;
                     }
-                    catch( SSLException e )
+                    finally 
                     {
-                        sslSessionHandlerMap.remove( session );
-                        throw new RuntimeException(
-                                "Failed to initialize SSLEngine.", e );
+                        if( !done )
+                        {
+                            sslSessionHandlerMap.remove( session );
+                        }
                     }
                 }
             }
