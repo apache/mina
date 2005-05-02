@@ -22,8 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.protocol.ProtocolFilter;
+import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolSession;
 
 /**
@@ -33,7 +33,8 @@ import org.apache.mina.protocol.ProtocolSession;
  * {@link #log(ProtocolSession, String, Throwable)} to log protocol-specific messages.
  * <p>
  * Set {@link #PREFIX}, {@link #LOGGER}, {@link #LEVEL} session attributes
- * to override prefix string, logger, and log level. (See {@link SessionInitializer})
+ * to override prefix string, logger, and log level in
+ * {@link ProtocolHandler#sessionCreated(ProtocolSession)}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @author Trustin Lee (trustin@apache.org)

@@ -20,12 +20,9 @@ package org.apache.mina.examples.echoserver;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.Session;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.registry.Service;
 import org.apache.mina.registry.ServiceRegistry;
@@ -39,17 +36,12 @@ import org.apache.mina.registry.SimpleServiceRegistry;
  */
 public class AbstractTest extends TestCase
 {
-    private final boolean testInitializer;
-    
-    private MarkingInitializer initializer;
-
     protected int port;
 
     protected ServiceRegistry registry;
     
-    protected AbstractTest( boolean testInitializer )
+    protected AbstractTest()
     {
-        this.testInitializer = testInitializer;
     }
 
     protected static void assertEquals( byte[] expected, byte[] actual )
@@ -82,11 +74,6 @@ public class AbstractTest extends TestCase
     {
         registry = new SimpleServiceRegistry();
         
-        if( testInitializer )
-        {
-            initializer = new MarkingInitializer();
-        }
-
         // Find an availble test port and bind to it.
         boolean socketBound = false;
         boolean datagramBound = false;
@@ -104,13 +91,10 @@ public class AbstractTest extends TestCase
             
             try
             {
-                registry.bind( socketService,
-                               new EchoProtocolHandler(), initializer );
+                registry.bind( socketService, new EchoProtocolHandler() );
                 socketBound = true;
 
-                registry.bind( datagramService,
-                               new EchoProtocolHandler(),
-                               initializer );
+                registry.bind( datagramService, new EchoProtocolHandler() );
                 datagramBound = true;
 
                 break;
@@ -139,19 +123,5 @@ public class AbstractTest extends TestCase
     protected void tearDown() throws Exception
     {
         registry.unbindAll();
-        if( initializer != null  )
-        {
-            Assert.assertTrue( initializer.executed );
-        }
-    }
-
-    private static class MarkingInitializer implements SessionInitializer
-    {
-        private boolean executed;
-
-        public void initializeSession(Session session) throws IOException
-        {
-            executed = true;
-        }
     }
 }

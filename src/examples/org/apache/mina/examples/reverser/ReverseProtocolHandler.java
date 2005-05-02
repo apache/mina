@@ -18,8 +18,8 @@
  */
 package org.apache.mina.examples.reverser;
 
-import org.apache.mina.common.IdleStatus;
 import org.apache.mina.protocol.ProtocolHandler;
+import org.apache.mina.protocol.ProtocolHandlerAdapter;
 import org.apache.mina.protocol.ProtocolSession;
 
 /**
@@ -28,25 +28,8 @@ import org.apache.mina.protocol.ProtocolSession;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$,
  */
-public class ReverseProtocolHandler implements ProtocolHandler
+public class ReverseProtocolHandler extends ProtocolHandlerAdapter
 {
-
-    public void sessionOpened( ProtocolSession session )
-    {
-        System.out.println( session.getRemoteAddress() + " OPENED" );
-    }
-
-    public void sessionClosed( ProtocolSession session )
-    {
-        System.out.println( session.getRemoteAddress() + " CLOSED" );
-    }
-
-    public void sessionIdle( ProtocolSession session, IdleStatus status )
-    {
-        System.out.println( session.getRemoteAddress() + " IDLE(" + status
-                            + ")" );
-    }
-
     public void exceptionCaught( ProtocolSession session, Throwable cause )
     {
         System.out.println( session.getRemoteAddress() + " EXCEPTION" );
@@ -70,11 +53,5 @@ public class ReverseProtocolHandler implements ProtocolHandler
 
         // and write it back.
         session.write( buf.toString() );
-    }
-
-    public void messageSent( ProtocolSession session, Object message )
-    {
-        // Invoked the reversed string is actually written to socket channel.
-        System.out.println( session.getRemoteAddress() + " SENT: " + message );
     }
 }

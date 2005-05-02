@@ -120,43 +120,43 @@ public abstract class AbstractProtocolFilterChain implements ProtocolFilterChain
     {
         return new ProtocolFilter()
         {
-            public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
+            public void sessionOpened( NextFilter nextFilter, ProtocolSession session ) throws Exception
             {
                 session.getHandler().sessionOpened( session );
             }
 
-            public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
+            public void sessionClosed( NextFilter nextFilter, ProtocolSession session ) throws Exception
             {
                 session.getHandler().sessionClosed( session );
             }
 
             public void sessionIdle( NextFilter nextFilter, ProtocolSession session,
-                                    IdleStatus status )
+                                    IdleStatus status ) throws Exception
             {
                 session.getHandler().sessionIdle( session, status );
             }
 
             public void exceptionCaught( NextFilter nextFilter,
-                                        ProtocolSession session, Throwable cause )
+                                        ProtocolSession session, Throwable cause ) throws Exception
             {
                 session.getHandler().exceptionCaught( session, cause );
             }
 
             public void messageReceived( NextFilter nextFilter, ProtocolSession session,
-                                         Object message )
+                                         Object message ) throws Exception
             {
                 ProtocolHandler handler = session.getHandler();
                 handler.messageReceived( session, message );
             }
 
             public void messageSent( NextFilter nextFilter, ProtocolSession session,
-                                     Object message )
+                                     Object message ) throws Exception
             {
                 session.getHandler().messageSent( session, message );
             }
 
             public void filterWrite( NextFilter nextFilter,
-                                     ProtocolSession session, Object message )
+                                     ProtocolSession session, Object message ) throws Exception
             {
                 nextFilter.filterWrite( session, message );
             }

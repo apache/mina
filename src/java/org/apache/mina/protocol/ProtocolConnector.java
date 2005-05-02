@@ -21,8 +21,6 @@ package org.apache.mina.protocol;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.SessionInitializer;
-
 /**
  * Connects to endpoint, communicates with the server, and fires events to
  * {@link ProtocolProvider}s.
@@ -41,8 +39,6 @@ import org.apache.mina.common.SessionInitializer;
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
- * 
- * @see SessionInitializer
  */
 public interface ProtocolConnector extends ProtocolSessionManager
 {
@@ -87,50 +83,4 @@ public interface ProtocolConnector extends ProtocolSessionManager
      */
     ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
                              int timeout, ProtocolProvider protocolProvider ) throws IOException;
-
-    /**
-     * Connects to the specified <code>address</code>.  If communication starts
-     * successfully, events are fired to the specified
-     * <code>protocolProvider</code>.  This method blocks.
-     * 
-     * @throws IOException if failed to connect
-     */
-    ProtocolSession connect( SocketAddress address,
-                             ProtocolProvider protocolProvider,
-                             SessionInitializer initializer ) throws IOException;
-
-    /**
-     * Connects to the specified <code>address</code>.  If communication starts
-     * successfully, events are fired to the specified
-     * <code>protocolProvider</code>.  This method blocks.
-     * 
-     * @param localAddress the local address the channel is bound to
-     * @throws IOException if failed to connect
-     */
-    ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
-                             ProtocolProvider protocolProvider,
-                             SessionInitializer initializer ) throws IOException;
-
-    /**
-     * Connects to the specified <code>address</code> with timeout.  If
-     * communication starts successfully, events are fired to the specified
-     * <code>protocolProvider</code>.  This method blocks.
-     * 
-     * @throws IOException if failed to connect
-     */
-    ProtocolSession connect( SocketAddress address, int timeout,
-                             ProtocolProvider protocolProvider,
-                             SessionInitializer initializer ) throws IOException;
-
-    /**
-     * Connects to the specified <code>address</code> with timeout.  If
-     * communication starts successfully, events are fired to the specified
-     * <code>protocolProvider</code>.  This method blocks.
-     * 
-     * @param localAddress the local address the channel is bound to
-     * @throws IOException if failed to connect
-     */
-    ProtocolSession connect( SocketAddress address, SocketAddress localAddress,
-                             int timeout, ProtocolProvider protocolProvider,
-                             SessionInitializer initializer ) throws IOException;
 }

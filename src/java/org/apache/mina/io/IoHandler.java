@@ -41,29 +41,35 @@ import org.apache.mina.common.IdleStatus;
 public interface IoHandler
 {
     /**
+     * Invoked when the session is created.  Initialize default socket
+     * parameters and user-defined attributes here.
+     */
+    void sessionCreated( IoSession session ) throws Exception;
+    
+    /**
      * Invoked when the connection is opened.  This method is not invoked if the
      * transport type is UDP.
      */
-    void sessionOpened( IoSession session );
+    void sessionOpened( IoSession session ) throws Exception;
 
     /**
      * Invoked when the connection is closed.  This method is not invoked if the
      * transport type is UDP.
      */
-    void sessionClosed( IoSession session );
+    void sessionClosed( IoSession session ) throws Exception;
 
     /**
      * Invoked when the connection is idle.  Refer to {@link IdleStatus}.  This
      * method is not invoked if the transport type is UDP.
      */
-    void sessionIdle( IoSession session, IdleStatus status );
+    void sessionIdle( IoSession session, IdleStatus status ) throws Exception;
 
     /**
      * Invoked when any exception is thrown by user {@link IoHandler}
      * implementation or by MINA.  If <code>cause</code> is instanceof
      * {@link IOException}, MINA will close the connection automatically.
      */
-    void exceptionCaught( IoSession session, Throwable cause );
+    void exceptionCaught( IoSession session, Throwable cause ) throws Exception;
 
     /**
      * Invoked when data is read from the connection.  You can access
@@ -71,12 +77,12 @@ public interface IoHandler
      * the internal buffer pool of MINA after this method is invoked, so
      * please don't try to reuse it.
      */
-    void dataRead( IoSession session, ByteBuffer buf );
+    void dataRead( IoSession session, ByteBuffer buf ) throws Exception;
 
     /**
      * Invoked when MINA wrote {@link IoSession#write(ByteBuffer, Object)}
      * request successfully.  <code>marker</code> is what you specified at the
      * point of invocation of {@link IoSession#write(ByteBuffer, Object)}.
      */
-    void dataWritten( IoSession session, Object marker );
+    void dataWritten( IoSession session, Object marker ) throws Exception;
 }

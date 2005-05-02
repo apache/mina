@@ -18,12 +18,6 @@
  */
 package org.apache.mina.common;
 
-import org.apache.mina.common.DefaultExceptionMonitor;
-import org.apache.mina.common.DefaultSessionInitializer;
-import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.SessionInitializer;
-import org.apache.mina.common.SessionManager;
-
 /**
  * Base implementation of {@link SessionManager}s.
  * 
@@ -33,32 +27,12 @@ import org.apache.mina.common.SessionManager;
 public class BaseSessionManager implements SessionManager {
 
     /**
-     * Default session initializer.
-     */
-    protected SessionInitializer defaultInitializer = new DefaultSessionInitializer();
-
-    /**
      * Current exception monitor.
      */
     protected ExceptionMonitor exceptionMonitor = new DefaultExceptionMonitor();
     
     protected BaseSessionManager()
     {
-    }
-
-    public SessionInitializer getDefaultSessionInitializer()
-    {
-        return defaultInitializer;
-    }
-
-    public void setDefaultSessionInitializer( SessionInitializer defaultInitializer )
-    {
-        if( defaultInitializer == null )
-        {
-            defaultInitializer = new DefaultSessionInitializer();
-        }
-        
-        this.defaultInitializer = defaultInitializer;
     }
 
     public ExceptionMonitor getExceptionMonitor()

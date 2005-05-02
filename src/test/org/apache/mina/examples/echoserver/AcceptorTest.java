@@ -47,7 +47,6 @@ public class AcceptorTest extends AbstractTest
 {
     public AcceptorTest()
     {
-        super( true );
     }
 
     public void testTCP() throws Exception

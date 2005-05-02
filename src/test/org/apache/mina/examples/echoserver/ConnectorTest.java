@@ -18,7 +18,6 @@
  */
 package org.apache.mina.examples.echoserver;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -26,8 +25,6 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.Session;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.io.IoAcceptor;
@@ -51,7 +48,6 @@ public class ConnectorTest extends AbstractTest
     
     public ConnectorTest()
     {
-        super( false );
     }
 
     public void setUp() throws Exception
@@ -99,16 +95,13 @@ public class ConnectorTest extends AbstractTest
     
     private void testConnector( IoConnector connector ) throws Exception
     {
-        MarkingInitializer marker;
         InetSocketAddress localAddress = new InetSocketAddress( clientPort );
 
         System.out.println("* Without localAddress and initializer");
-        testConnector( connector, null, null );
+        testConnector( connector, null );
         
         System.out.println("* Without localAddress and with initializer");
-        marker = new MarkingInitializer();
-        testConnector( connector, null, marker );
-        Assert.assertTrue( marker.executed );
+        testConnector( connector, null );
 
         // Tests below fail in Windows platform.
         if( System.getProperty("os.name").toLowerCase().indexOf( "windows" ) >= 0 )
@@ -119,7 +112,7 @@ public class ConnectorTest extends AbstractTest
         }
         
         System.out.println("* With localAddress and without initializer");
-        testConnector( connector, localAddress, null );
+        testConnector( connector, localAddress );
         
         // It takes some time for local address to be cleared by OS,
         // so let's just get a new one rather than waiting for it.
@@ -127,21 +120,17 @@ public class ConnectorTest extends AbstractTest
         localAddress = new InetSocketAddress( clientPort );
 
         System.out.println("* With localAddress and initializer");
-        marker = new MarkingInitializer();
-        testConnector( connector, localAddress, marker );
-        Assert.assertTrue( marker.executed );
+        testConnector( connector, localAddress );
     }
     
-    private void testConnector( IoConnector connector, SocketAddress localAddress,
-                                SessionInitializer initializer ) throws Exception
+    private void testConnector( IoConnector connector, SocketAddress localAddress ) throws Exception
     {
         EchoConnectorHandler handler = new EchoConnectorHandler();
         ByteBuffer readBuf = handler.readBuf;
         IoSession session = connector.connect(
                 new InetSocketAddress( InetAddress.getLocalHost(), port ),
                 localAddress,
-                handler,
-                initializer );
+                handler );
         
         for( int i = 0; i < 10; i ++ )
         {
@@ -241,16 +230,6 @@ public class ConnectorTest extends AbstractTest
         public void exceptionCaught( IoSession session, Throwable cause )
         {
             cause.printStackTrace();
-        }
-    }
-    
-    private static class MarkingInitializer implements SessionInitializer
-    {
-        private boolean executed;
-
-        public void initializeSession(Session session) throws IOException
-        {
-            executed = true;
         }
     }
 }

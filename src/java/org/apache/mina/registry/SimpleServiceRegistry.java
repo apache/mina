@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
@@ -64,31 +63,17 @@ public class SimpleServiceRegistry implements ServiceRegistry
 
     public void bind( Service service, IoHandler ioHandler ) throws IOException
     {
-        bind( service, ioHandler, null );
-    }
-
-    public synchronized void bind( Service service,
-                                   ProtocolProvider protocolProvider ) throws IOException
-    {
-        bind( service, protocolProvider, null );
-    }
-    
-    public synchronized void bind( Service service,
-                                   IoHandler ioHandler,
-                                   SessionInitializer initializer ) throws IOException
-    {
         IoAcceptor acceptor = findIoAcceptor( service.getTransportType() );
-        acceptor.bind( service.getAddress(), ioHandler, initializer );
+        acceptor.bind( service.getAddress(), ioHandler );
         startThreadPools();
         services.add( service );
     }
 
     public synchronized void bind( Service service,
-                                   ProtocolProvider protocolProvider,
-                                   SessionInitializer initializer ) throws IOException
+                                   ProtocolProvider protocolProvider ) throws IOException
     {
         ProtocolAcceptor acceptor = findProtocolAcceptor( service.getTransportType() );
-        acceptor.bind( service.getAddress(), protocolProvider, initializer );
+        acceptor.bind( service.getAddress(), protocolProvider );
         startThreadPools();
         services.add( service );
     }

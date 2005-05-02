@@ -8,15 +8,15 @@ import java.net.SocketAddress;
 
 import org.apache.mina.common.BaseSession;
 import org.apache.mina.common.SessionConfig;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.protocol.ProtocolDecoder;
 import org.apache.mina.protocol.ProtocolEncoder;
-import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolFilterChain;
+import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.protocol.ProtocolSessionFilterChain;
 import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
+import org.apache.mina.util.ExceptionUtil;
 
 /**
  * A {@link ProtocolSession} for in-VM transport (VM_PIPE).
@@ -50,7 +50,6 @@ class VmPipeSession extends BaseSession implements ProtocolSession
     VmPipeSession( Object lock, SocketAddress localAddress,
                    VmPipeSessionManagerFilterChain managerFilterChain,
                    ProtocolHandler handler,
-                   SessionInitializer initializer,
                    Entry remoteEntry ) throws IOException
     {
         this.lock = lock;
@@ -65,7 +64,7 @@ class VmPipeSession extends BaseSession implements ProtocolSession
         // initialize remote session
         try
         {
-            remoteEntry.initializer.initializeSession( remoteSession );
+            remoteEntry.handler.sessionCreated( remoteSession );
         }
         catch( Throwable t )
         {
@@ -76,7 +75,14 @@ class VmPipeSession extends BaseSession implements ProtocolSession
         }
         
         // initialize client session
-        initializer.initializeSession( this );
+        try
+        {
+            handler.sessionCreated( this );
+        }
+        catch( Throwable t )
+        {
+            ExceptionUtil.throwException( t );
+        }
 
         remoteEntry.managerFilterChain.sessionOpened( remoteSession );
         managerFilterChain.sessionOpened( this );

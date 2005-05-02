@@ -28,10 +28,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoConnector;
-import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoFilterChain;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.ExceptionUtil;
@@ -74,41 +73,21 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
 
     public IoSession connect( SocketAddress address, IoHandler handler ) throws IOException
     {
-        return connect( address, null, handler, null );
-    }
-
-    public IoSession connect( SocketAddress address, SocketAddress localAddress, IoHandler handler ) throws IOException
-    {
-        return connect( address, localAddress, handler, null );
+        return connect( address, null, handler);
     }
 
     public IoSession connect( SocketAddress address, int timeout, IoHandler handler ) throws IOException
     {
-        return connect( address, null, handler, null );
+        return connect( address, null, handler );
     }
 
     public IoSession connect( SocketAddress address, SocketAddress localAddress, int timeout, IoHandler handler ) throws IOException
     {
-        return connect( address, localAddress, handler, null );
-    }
-
-    public IoSession connect( SocketAddress address, IoHandler handler, SessionInitializer initializer ) throws IOException
-    {
-        return connect( address, null, handler, initializer );
-    }
-
-    public IoSession connect( SocketAddress address, int timeout, IoHandler handler, SessionInitializer initializer ) throws IOException
-    {
-        return connect( address, null, handler, initializer );
-    }
-
-    public IoSession connect( SocketAddress address, SocketAddress localAddress, int timeout, IoHandler handler, SessionInitializer initializer ) throws IOException
-    {
-        return connect( address, localAddress, handler, initializer );
+        return connect( address, localAddress, handler );
     }
 
     public IoSession connect( SocketAddress address, SocketAddress localAddress,
-                              IoHandler handler, SessionInitializer initializer ) throws IOException
+                              IoHandler handler ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -125,11 +104,6 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                                                 + localAddress.getClass() );
         }
         
-        if( initializer == null )
-        {
-            initializer = defaultInitializer;
-        }
-
         DatagramChannel ch = DatagramChannel.open();
         boolean initialized = false;
         try
@@ -151,7 +125,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
             }
         }
 
-        RegistrationRequest request = new RegistrationRequest( ch, handler, initializer );
+        RegistrationRequest request = new RegistrationRequest( ch, handler );
         synchronized( this )
         {
             synchronized( registerQueue )
@@ -446,7 +420,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
 
             try
             {
-                req.initializer.initializeSession( session );
+                req.handler.sessionCreated( session );
 
                 SelectionKey key = req.channel.register( selector,
                         SelectionKey.OP_READ, session );
@@ -524,8 +498,6 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
 
         private final IoHandler handler;
         
-        private final SessionInitializer initializer;
-
         private boolean done;
         
         private DatagramSession session;
@@ -533,11 +505,10 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
         private Throwable exception;
 
         private RegistrationRequest( DatagramChannel channel,
-                                     IoHandler handler, SessionInitializer initializer )
+                                     IoHandler handler )
         {
             this.channel = channel;
             this.handler = handler;
-            this.initializer = initializer;
         }
     }
 }

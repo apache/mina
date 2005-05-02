@@ -19,9 +19,9 @@
 package org.apache.mina.examples.echoserver;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.io.IoHandler;
+import org.apache.mina.io.IoHandlerAdapter;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.socket.SocketSessionConfig;
 
@@ -31,13 +31,10 @@ import org.apache.mina.io.socket.SocketSessionConfig;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$,
  */
-public class EchoProtocolHandler implements IoHandler
+public class EchoProtocolHandler extends IoHandlerAdapter
 {
     public void sessionOpened( IoSession session )
     {
-        System.out.println( Thread.currentThread().getName() + ' '
-                            + session.getRemoteAddress() + ": OPEN" );
-        
         SessionConfig cfg = session.getConfig();
         if( cfg instanceof SocketSessionConfig )
         {
@@ -45,23 +42,8 @@ public class EchoProtocolHandler implements IoHandler
         }
     }
 
-    public void sessionClosed( IoSession session )
-    {
-        System.out.println( Thread.currentThread().getName() + ' '
-                            + session.getRemoteAddress() + ": CLOSED" );
-    }
-
-    public void sessionIdle( IoSession session, IdleStatus status )
-    {
-        System.out.println( Thread.currentThread().getName() + ' '
-                            + session.getRemoteAddress() + ": IDLE" );
-    }
-
     public void exceptionCaught( IoSession session, Throwable cause )
     {
-        System.out.println( Thread.currentThread().getName() + ' '
-                            + session.getRemoteAddress() + ": EXCEPTION" );
-        cause.printStackTrace( System.out );
         session.close();
     }
 
@@ -71,15 +53,6 @@ public class EchoProtocolHandler implements IoHandler
         ByteBuffer wb = ByteBuffer.allocate( rb.remaining() );
         wb.put( rb );
         wb.flip();
-        System.out.println( Thread.currentThread().getName() + ' '
-                            + session.getRemoteAddress() + ": READ ("
-                            + wb.remaining() + "B)" );
         session.write( wb, null );
-    }
-
-    public void dataWritten( IoSession session, Object marker )
-    {
-        System.out.println( Thread.currentThread().getName() + ' '
-                            + session.getRemoteAddress() + ": WRITTEN" );
     }
 }

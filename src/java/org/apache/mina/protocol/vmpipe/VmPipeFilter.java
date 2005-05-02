@@ -4,7 +4,6 @@
 package org.apache.mina.protocol.vmpipe;
 
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolFilterAdapter;
 import org.apache.mina.protocol.ProtocolSession;
 
@@ -32,7 +31,7 @@ class VmPipeFilter extends ProtocolFilterAdapter
         nextFilter.messageReceived( session, message );
     }
 
-    public void messageSent( ProtocolHandler nextHandler,
+    public void messageSent( NextFilter nextFilter,
                             ProtocolSession session, Object message )
     {
         VmPipeSession vps = ( VmPipeSession ) session;
@@ -40,6 +39,6 @@ class VmPipeFilter extends ProtocolFilterAdapter
         vps.setIdle( IdleStatus.WRITER_IDLE, false );
         vps.increaseWrittenBytes( 1 );
 
-        nextHandler.messageSent( session, message );
+        nextFilter.messageSent( session, message );
     }
 }

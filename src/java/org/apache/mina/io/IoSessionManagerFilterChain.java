@@ -50,42 +50,42 @@ public abstract class IoSessionManagerFilterChain extends AbstractIoFilterChain 
     {
         return new IoFilter()
         {
-            public void sessionOpened( NextFilter nextFilter, IoSession session )
+            public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
             {
                 ( ( IoSessionFilterChain ) session.getFilterChain() ).sessionOpened( session );
             }
 
-            public void sessionClosed( NextFilter nextFilter, IoSession session )
+            public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
             {
                 ( ( IoSessionFilterChain ) session.getFilterChain() ).sessionClosed( session );
             }
 
             public void sessionIdle( NextFilter nextFilter, IoSession session,
-                                    IdleStatus status )
+                                    IdleStatus status ) throws Exception
             {
                 ( ( IoSessionFilterChain ) session.getFilterChain() ).sessionIdle( session, status );
             }
 
             public void exceptionCaught( NextFilter nextFilter,
-                                        IoSession session, Throwable cause )
+                                        IoSession session, Throwable cause ) throws Exception
             {
                 ( ( IoSessionFilterChain ) session.getFilterChain() ).exceptionCaught( session, cause );
             }
 
             public void dataRead( NextFilter nextFilter, IoSession session,
-                                 ByteBuffer buf )
+                                 ByteBuffer buf ) throws Exception
             {
                 ( ( IoSessionFilterChain ) session.getFilterChain() ).dataRead( session, buf );
             }
 
             public void dataWritten( NextFilter nextFilter, IoSession session,
-                                    Object marker )
+                                    Object marker ) throws Exception
             {
                 ( ( IoSessionFilterChain ) session.getFilterChain() ).dataWritten( session, marker );
             }
 
             public void filterWrite( NextFilter nextFilter,
-                                     IoSession session, ByteBuffer buf, Object marker )
+                                     IoSession session, ByteBuffer buf, Object marker ) throws Exception
             {
                 nextFilter.filterWrite( session, buf, marker );
             }

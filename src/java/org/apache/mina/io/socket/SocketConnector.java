@@ -29,12 +29,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.mina.common.BaseSessionManager;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoConnector;
-import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoFilterChain;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionManagerFilterChain;
+import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
 /**
@@ -69,42 +69,21 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
     public IoSession connect( SocketAddress address, IoHandler handler ) throws IOException
     {
-        return connect( address, null, Integer.MAX_VALUE, handler, null);
+        return connect( address, null, Integer.MAX_VALUE, handler);
     }
 
     public IoSession connect( SocketAddress address, SocketAddress localAddress, IoHandler handler ) throws IOException
     {
-        return connect( address, localAddress, Integer.MAX_VALUE, handler, null);
+        return connect( address, localAddress, Integer.MAX_VALUE, handler);
     }
 
     public IoSession connect( SocketAddress address, int timeout, IoHandler handler ) throws IOException
     {
-        return connect( address, null, timeout, handler, null);
-    }
-
-    public IoSession connect( SocketAddress address, SocketAddress localAddress, int timeout, IoHandler handler ) throws IOException
-    {
-        return connect( address, localAddress, timeout, handler, null);
-    }
-
-    public IoSession connect( SocketAddress address, IoHandler handler, SessionInitializer initializer ) throws IOException
-    {
-        return connect( address, null, Integer.MAX_VALUE, handler, initializer );
-    }
-
-    public IoSession connect( SocketAddress address, SocketAddress localAddress, IoHandler handler, SessionInitializer initializer ) throws IOException
-    {
-        return connect( address, localAddress, Integer.MAX_VALUE, handler, initializer );
-    }
-
-    public IoSession connect( SocketAddress address, int timeout, IoHandler handler, SessionInitializer initializer ) throws IOException
-    {
-        return connect( address, null, timeout, handler, initializer );
+        return connect( address, null, timeout, handler);
     }
 
     public IoSession connect( SocketAddress address, SocketAddress localAddress,
-                              int timeout, IoHandler handler,
-                              SessionInitializer initializer ) throws IOException
+                              int timeout, IoHandler handler ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -122,11 +101,6 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
             throw new IllegalArgumentException( "Unexpected local address type: "
                                                 + localAddress.getClass() );
 
-        if( initializer == null )
-        {
-            initializer = defaultInitializer;
-        }
-
         SocketChannel ch = SocketChannel.open();
         boolean success = false;
         try
@@ -141,7 +115,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
             if( ch.connect( address ) )
             {
-                SocketSession session = newSession( ch, handler, initializer );
+                SocketSession session = newSession( ch, handler );
                 success = true;
                 return session;
             }
@@ -156,7 +130,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
             }
         }
         
-        ConnectionRequest request = new ConnectionRequest( ch, timeout, handler, initializer );
+        ConnectionRequest request = new ConnectionRequest( ch, timeout, handler );
         synchronized( this )
         {
             synchronized( connectQueue )
@@ -183,7 +157,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
         if( request.exception != null )
         {
-            throw request.exception;
+            ExceptionUtil.throwException( request.exception );
         }
 
         return request.session;
@@ -248,10 +222,10 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
             try
             {
                 ch.finishConnect();
-                SocketSession session = newSession( ch, entry.handler, entry.initializer );
+                SocketSession session = newSession( ch, entry.handler );
                 entry.session = session;
             }
-            catch( IOException e )
+            catch( Throwable e )
             {
                 entry.exception = e;
             }
@@ -310,10 +284,17 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
         }
     }
 
-    private SocketSession newSession( SocketChannel ch, IoHandler handler, SessionInitializer initializer ) throws IOException
+    private SocketSession newSession( SocketChannel ch, IoHandler handler ) throws IOException
     {
         SocketSession session = new SocketSession( filters, ch, handler );
-        initializer.initializeSession( session );
+        try
+        {
+            handler.sessionCreated( session );
+        }
+        catch( Throwable e )
+        {
+            ExceptionUtil.throwException( e );
+        }
         SocketIoProcessor.getInstance().addSession( session );
         return session;
     }
@@ -379,20 +360,17 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
         private final IoHandler handler;
         
-        private final SessionInitializer initializer;
-
         private SocketSession session;
 
         private boolean done;
 
-        private IOException exception;
+        private Throwable exception;
 
-        private ConnectionRequest( SocketChannel channel, int timeout, IoHandler handler, SessionInitializer initializer )
+        private ConnectionRequest( SocketChannel channel, int timeout, IoHandler handler )
         {
             this.channel = channel;
             this.deadline = System.currentTimeMillis() + timeout * 1000L;
             this.handler = handler;
-            this.initializer = initializer;
         }
     }
 

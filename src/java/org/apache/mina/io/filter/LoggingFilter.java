@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoFilter;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
 
 /**
@@ -34,7 +34,8 @@ import org.apache.mina.io.IoSession;
  * {@link #log(IoSession, String, Throwable)} to log protocol-specific messages.
  * <p>
  * Set {@link #PREFIX}, {@link #LOGGER}, {@link #LEVEL} session attributes
- * to override prefix string, logger, and log level. (See {@link SessionInitializer})
+ * to override prefix string, logger, and log level.
+ * (See {@link IoHandler#sessionCreated(IoSession)}))
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @author Trustin Lee (trustin@apache.org)

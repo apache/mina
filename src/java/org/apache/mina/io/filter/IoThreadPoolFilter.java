@@ -117,7 +117,7 @@ public class IoThreadPoolFilter extends BaseThreadPool implements ThreadPool, Io
         }
     }
 
-    public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker )
+    public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker ) throws Exception
     {
         nextFilter.filterWrite( session, buf, marker );
     }

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolAcceptor;
@@ -57,12 +56,6 @@ public class IoProtocolAcceptor implements ProtocolAcceptor
         acceptor.bind( address, adapter.adapt( provider ) );
     }
     
-    public void bind( SocketAddress address, ProtocolProvider provider,
-                      SessionInitializer initializer ) throws IOException
-    {
-        acceptor.bind( address, adapter.adapt( provider ), initializer );
-    }
-
     public void unbind( SocketAddress address )
     {
         acceptor.unbind( address );
@@ -73,16 +66,6 @@ public class IoProtocolAcceptor implements ProtocolAcceptor
         return adapter.getFilterChain();
     }
     
-    public SessionInitializer getDefaultSessionInitializer()
-    {
-        return acceptor.getDefaultSessionInitializer();
-    }
-    
-    public void setDefaultSessionInitializer( SessionInitializer defaultInitializer )
-    {
-        acceptor.setDefaultSessionInitializer( defaultInitializer );
-    }
-
     public ExceptionMonitor getExceptionMonitor()
     {
         return acceptor.getExceptionMonitor();
