@@ -34,6 +34,7 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.examples.echoserver.ssl.SSLServerSocketFactory;
 import org.apache.mina.examples.echoserver.ssl.SSLSocketFactory;
+import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.filter.SSLFilter;
 
 /**
@@ -61,7 +62,8 @@ public class AcceptorTest extends AbstractTest
         SSLFilter sslFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
         //sslFilter.setDebug( SSLFilter.Debug.ON );
-        registry.getIoFilterChain( TransportType.SOCKET ).addLast( "SSL", sslFilter );
+        IoAcceptor acceptor = registry.getIoAcceptor( TransportType.SOCKET );
+        acceptor.getFilterChain().addLast( "SSL", sslFilter );
         
         // Create a commons-net socket factory
         SSLSocketFactory.setSslEnabled(true);

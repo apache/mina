@@ -18,15 +18,12 @@
  */
 package org.apache.mina.common;
 
-import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A default {@link ExceptionMonitor} implementation that logs uncaught
- * exceptions using <a href="http://jakarta.apache.org/commons/logging/">Apache
- * Jakarta Commons Logging</a> if available.  If not available, it prints it
- * out to {@link System#err}.
+ * exceptions using {@link Logger}.
  * <p>
  * All {@link SessionManager}s have this implementation as a default exception
  * monitor.
@@ -36,83 +33,10 @@ import java.util.Date;
  */
 public class DefaultExceptionMonitor implements ExceptionMonitor
 {
-    private static final Object log;
-
-    private static final Method errorMethod;
-
-    static
-    {
-        Object tempLog = null;
-        Method tempErrorMethod = null;
-
-        try
-        {
-            Class logCls = Class.forName( "org.apache.commons.logging.Log" );
-            Class logFactoryCls = Class
-                    .forName( "org.apache.commons.logging.LogFactory" );
-            Method getLogMethod = logFactoryCls
-                    .getMethod( "getLog", new Class[] { String.class } );
-            tempLog = getLogMethod
-                    .invoke( null,
-                             new Object[] { DefaultExceptionMonitor.class
-                                     .getPackage().getName() } );
-            tempErrorMethod = logCls
-                    .getMethod( "error", new Class[] { Object.class,
-                                                      Throwable.class } );
-        }
-        catch( Exception e )
-        {
-            tempLog = null;
-            tempErrorMethod = null;
-        }
-
-        log = tempLog;
-        errorMethod = tempErrorMethod;
-    }
-
-    private final DateFormat df = DateFormat
-            .getDateTimeInstance( DateFormat.MEDIUM, DateFormat.MEDIUM );
-
-    private final Date date = new Date();
+    private static final Logger log = Logger.getLogger( DefaultExceptionMonitor.class.getName() );
 
     public void exceptionCaught( Object source, Throwable cause )
     {
-        if( log == null )
-        {
-            logToStdErr( cause );
-        }
-        else
-        {
-            logToCommonsLogging( cause );
-        }
+        log.log( Level.WARNING, "Unexpected exception.", cause );
     }
-
-    private void logToCommonsLogging( Throwable cause )
-    {
-        try
-        {
-            errorMethod.invoke( log, new Object[] { "Uncaught exception: ",
-                                                   cause } );
-        }
-        catch( Exception e )
-        {
-            logToStdErr( cause );
-        }
-    }
-
-    private void logToStdErr( Throwable cause )
-    {
-        synchronized( System.err )
-        {
-            date.setTime( System.currentTimeMillis() );
-
-            System.err.print( '[' );
-            System.err.print( df.format( date ) );
-            System.err.print( "] [" );
-            System.err.print( Thread.currentThread().getName() );
-            System.err.print( "] Uncaught exception: " );
-            cause.printStackTrace();
-        }
-    }
-
 }
