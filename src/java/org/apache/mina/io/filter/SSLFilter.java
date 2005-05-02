@@ -18,9 +18,6 @@
  */
 package org.apache.mina.io.filter;
 
-import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,9 +29,8 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.DefaultExceptionMonitor;
-import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoFilterAdapter;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSession;
 
 /**
@@ -522,127 +518,6 @@ public class SSLFilter extends IoFilterAdapter
         synchronized( sslSessionHandlerMap )
         {
             sslSessionHandlerMap.remove( session );
-        }
-    }
-
-    /**
-     * An interface that users can log debug messages from an {@link SSLFilter}.
-     * 
-     * @author Trustin Lee (trustin@apache.org)
-     * @version $Rev$, $Date$
-     */
-    public static interface Debug
-    {
-        /**
-         * This will print out the messages to Commons-Logging or stdout.
-         */
-        static final Debug ON = new DebugOn();
-
-        /**
-         * This will suppress debug messages.
-         */
-        static final Debug OFF = new DebugOff();
-
-        /**
-         * Prints out the specified debug messages.
-         */
-        void print( SSLFilter filter, String message );
-    }
-
-    private static class DebugOn implements Debug
-    {
-        private static final Object log;
-
-        private static final Method debugMethod;
-
-        static
-        {
-            Object tempLog = null;
-            Method tempDebugMethod = null;
-
-            try
-            {
-                Class logCls = Class
-                        .forName( "org.apache.commons.logging.Log" );
-                Class logFactoryCls = Class
-                        .forName( "org.apache.commons.logging.LogFactory" );
-                Method getLogMethod = logFactoryCls.getMethod( "getLog",
-                        new Class[] { String.class } );
-                tempLog = getLogMethod.invoke( null,
-                        new Object[] { DefaultExceptionMonitor.class
-                                .getPackage().getName() } );
-                tempDebugMethod = logCls.getMethod( "debug",
-                        new Class[] { Object.class } );
-            }
-            catch( Exception e )
-            {
-                tempLog = null;
-                tempDebugMethod = null;
-            }
-
-            log = tempLog;
-            debugMethod = tempDebugMethod;
-        }
-
-        private final DateFormat df = DateFormat.getDateTimeInstance(
-                DateFormat.MEDIUM, DateFormat.MEDIUM );
-
-        private final Date date = new Date();
-
-        public void print( SSLFilter filter, String message )
-        {
-            if( filter.isUseClientMode() )
-            {
-                message = "[CLIENT] " + message;
-            }
-            else
-            {
-                message = "[SERVER] " + message;
-            }
-
-            if( log == null )
-            {
-                logToStdOut( message );
-            }
-            else
-            {
-                logToCommonsLogging( message );
-            }
-        }
-
-        private void logToCommonsLogging( String message )
-        {
-            try
-            {
-                debugMethod.invoke( log, new Object[] { message } );
-            }
-            catch( Exception e )
-            {
-                logToStdOut( message );
-            }
-        }
-
-        private void logToStdOut( String message )
-        {
-            synchronized( System.out )
-            {
-                date.setTime( System.currentTimeMillis() );
-
-                System.out.print( '[' );
-                System.out.print( df.format( date ) );
-                System.out.print( "] [" );
-                System.out.print( Thread.currentThread().getName() );
-                System.out.print( "] " );
-                System.out.println( message );
-            }
-        }
-    }
-
-    private static class DebugOff implements Debug
-    {
-        public void print( SSLFilter filter, String message )
-        {
-            // do nothing
         }
     }
 }

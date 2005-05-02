@@ -19,6 +19,8 @@
 package org.apache.mina.examples.reverser;
 
 import org.apache.mina.common.TransportType;
+import org.apache.mina.protocol.ProtocolAcceptor;
+import org.apache.mina.protocol.filter.LoggingFilter;
 import org.apache.mina.registry.Service;
 import org.apache.mina.registry.ServiceRegistry;
 import org.apache.mina.registry.SimpleServiceRegistry;
@@ -38,10 +40,18 @@ public class Main
     {
         ServiceRegistry registry = new SimpleServiceRegistry();
 
+        addLogger( registry );
         // Bind
         Service service = new Service( "reverse", TransportType.SOCKET, PORT );
         registry.bind( service, new ReverseProtocolProvider() );
 
         System.out.println( "Listening on port " + PORT );
+    }
+
+    private static void addLogger( ServiceRegistry registry )
+    {
+        ProtocolAcceptor acceptor = registry.getProtocolAcceptor( TransportType.SOCKET );
+        acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+        System.out.println( "Logging ON" );
     }
 }

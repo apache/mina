@@ -21,6 +21,7 @@ package org.apache.mina.examples.echoserver;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.io.IoAcceptor;
+import org.apache.mina.io.filter.LoggingFilter;
 import org.apache.mina.io.filter.SSLFilter;
 import org.apache.mina.registry.Service;
 import org.apache.mina.registry.ServiceRegistry;
@@ -49,7 +50,9 @@ public class Main
         {
             addSSLSupport( registry );
         }
-
+        
+        addLogger( registry );
+        
         // Bind
         Service service = new Service( "echo", TransportType.SOCKET, PORT );
         registry.bind( service, new EchoProtocolHandler() );
@@ -60,10 +63,17 @@ public class Main
     private static void addSSLSupport( ServiceRegistry registry )
         throws Exception
     {
-        System.out.println( "SSL is enabled." );
         SSLFilter sslFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
         IoAcceptor acceptor = registry.getIoAcceptor( TransportType.SOCKET );
         acceptor.getFilterChain().addLast( "sslFilter", sslFilter );
+        System.out.println( "SSL ON" );
+    }
+    
+    private static void addLogger( ServiceRegistry registry )
+    {
+        IoAcceptor acceptor = registry.getIoAcceptor( TransportType.SOCKET );
+        acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+        System.out.println( "Logging ON" );
     }
 }
