@@ -19,7 +19,6 @@
 package org.apache.mina.examples.echoserver;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -27,10 +26,10 @@ import junit.framework.TestCase;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.Session;
 import org.apache.mina.common.SessionInitializer;
-import org.apache.mina.io.IoAcceptor;
-import org.apache.mina.io.datagram.DatagramAcceptor;
-import org.apache.mina.io.filter.IoThreadPoolFilter;
-import org.apache.mina.io.socket.SocketAcceptor;
+import org.apache.mina.common.TransportType;
+import org.apache.mina.registry.Service;
+import org.apache.mina.registry.ServiceRegistry;
+import org.apache.mina.registry.SimpleServiceRegistry;
 
 /**
  * Tests echo server example.
@@ -46,11 +45,7 @@ public class AbstractTest extends TestCase
 
     protected int port;
 
-    protected IoAcceptor acceptor;
-
-    protected IoAcceptor datagramAcceptor;
-
-    protected IoThreadPoolFilter threadPoolFilter;
+    protected ServiceRegistry registry;
     
     protected AbstractTest( boolean testInitializer )
     {
@@ -85,8 +80,7 @@ public class AbstractTest extends TestCase
 
     protected void setUp() throws Exception
     {
-        acceptor = new SocketAcceptor();
-        datagramAcceptor = new DatagramAcceptor();
+        registry = new SimpleServiceRegistry();
         
         if( testInitializer )
         {
@@ -104,15 +98,19 @@ public class AbstractTest extends TestCase
         {
             socketBound = false;
             datagramBound = false;
+            
+            Service socketService = new Service( "echo", TransportType.SOCKET, port );
+            Service datagramService = new Service( "echo", TransportType.DATAGRAM, port );
+            
             try
             {
-                acceptor.bind( new InetSocketAddress( port ),
+                registry.bind( socketService,
                                new EchoProtocolHandler(), initializer );
                 socketBound = true;
 
-                datagramAcceptor.bind( new InetSocketAddress( port ),
-                                       new EchoProtocolHandler(),
-                                       initializer );
+                registry.bind( datagramService,
+                               new EchoProtocolHandler(),
+                               initializer );
                 datagramBound = true;
 
                 break;
@@ -124,15 +122,7 @@ public class AbstractTest extends TestCase
             {
                 if( !socketBound || !datagramBound )
                 {
-                    if( socketBound )
-                    {
-                        acceptor.unbind( new InetSocketAddress( port ) );
-                    }
-                    if( datagramBound )
-                    {
-                        datagramAcceptor
-                                .unbind( new InetSocketAddress( port ) );
-                    }
+                    registry.unbindAll();
                 }
             }
         }
@@ -144,20 +134,11 @@ public class AbstractTest extends TestCase
         }
 
         System.out.println( "Using port " + port + " for testing." );
-
-        threadPoolFilter = new IoThreadPoolFilter();
-        threadPoolFilter.start();
-
-        acceptor.getFilterChain().addFirst( "threadPool", threadPoolFilter );
-        datagramAcceptor.getFilterChain().addFirst( "threadPool", threadPoolFilter );
     }
 
     protected void tearDown() throws Exception
     {
-        acceptor.unbind( new InetSocketAddress( port ) );
-        datagramAcceptor.unbind( new InetSocketAddress( port ) );
-        threadPoolFilter.stop();
-        
+        registry.unbindAll();
         if( initializer != null  )
         {
             Assert.assertTrue( initializer.executed );

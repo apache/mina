@@ -21,9 +21,10 @@ package org.apache.mina.registry;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoFilterChain;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolProvider;
 
@@ -48,12 +49,29 @@ public interface ServiceRegistry
     void bind( Service service, ProtocolProvider protocolProvider )
             throws IOException;
 
-    
+    /**
+     * Binds the specified I/O handler to the specified service.
+     */
+    void bind( Service service,
+               IoHandler ioHandler, SessionInitializer initializer ) throws IOException;
+
+    /**
+     * Binds the specified protocol provider to the specified service.
+     */
+    void bind( Service service, ProtocolProvider protocolProvider,
+               SessionInitializer initializer ) throws IOException;
+
     /**
      * Unbinds the specified service (and its aggregated I/O handler or
      * protocol provider). 
      */
     void unbind( Service service );
+    
+    /**
+     * Unbinds all services (and their aggregated I/O handlers or
+     * protocol providers). 
+     */
+    void unbindAll();
 
     IoFilterChain getIoFilterChain( TransportType transportType );
     

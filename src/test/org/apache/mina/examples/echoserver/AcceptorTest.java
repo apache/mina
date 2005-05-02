@@ -30,6 +30,7 @@ import javax.net.SocketFactory;
 
 import org.apache.commons.net.EchoTCPClient;
 import org.apache.commons.net.EchoUDPClient;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.examples.echoserver.ssl.SSLServerSocketFactory;
 import org.apache.mina.examples.echoserver.ssl.SSLSocketFactory;
@@ -60,7 +61,7 @@ public class AcceptorTest extends AbstractTest
         SSLFilter sslFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
         //sslFilter.setDebug( SSLFilter.Debug.ON );
-        acceptor.getFilterChain().addLast( "SSL", sslFilter );
+        registry.getIoFilterChain( TransportType.SOCKET ).addLast( "SSL", sslFilter );
         
         // Create a commons-net socket factory
         SSLSocketFactory.setSslEnabled(true);

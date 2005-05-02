@@ -18,14 +18,13 @@
  */
 package org.apache.mina.examples.echoserver;
 
-import java.net.InetSocketAddress;
-
+import org.apache.mina.common.TransportType;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.io.IoAcceptor;
-import org.apache.mina.io.datagram.DatagramAcceptor;
-import org.apache.mina.io.filter.IoThreadPoolFilter;
+import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.filter.SSLFilter;
-import org.apache.mina.io.socket.SocketAcceptor;
+import org.apache.mina.registry.Service;
+import org.apache.mina.registry.ServiceRegistry;
+import org.apache.mina.registry.SimpleServiceRegistry;
 
 /**
  * (<b>Entry point</b>) Echo server
@@ -43,40 +42,28 @@ public class Main
 
     public static void main( String[] args ) throws Exception
     {
-        // Create a I/O thread pool filter 
-        IoThreadPoolFilter threadPoolFilter = new IoThreadPoolFilter();
-        threadPoolFilter.start(); // and start it
-
-        // Create a TCP/IP acceptor
-        IoAcceptor acceptor = new SocketAcceptor();
-
-        // Add thread pool filter
-        // MINA runs in a single thread if you don't add this filter.
-        acceptor.getFilterChain().addFirst( "threadPool", threadPoolFilter );
-
+        ServiceRegistry registry = new SimpleServiceRegistry();
+        
         // Add SSL filter if SSL is enabled.
         if( USE_SSL )
         {
-            System.out.println( "SSL is enabled." );
-            SSLFilter sslFilter = new SSLFilter( BogusSSLContextFactory
-                    .getInstance( true ) );
-            acceptor.getFilterChain().addLast( "sslFilter", sslFilter );
+            addSSLSupport( registry );
         }
 
         // Bind
-        acceptor.bind( new InetSocketAddress( PORT ),
-                new EchoProtocolHandler() );
-
-        // Create a UDP/IP acceptor
-        IoAcceptor datagramAcceptor = new DatagramAcceptor();
-
-        // Add thread pool filter
-        datagramAcceptor.getFilterChain().addFirst( "threadPool", threadPoolFilter );
-
-        // Bind
-        datagramAcceptor.bind( new InetSocketAddress( PORT ),
-                new EchoProtocolHandler() );
+        Service service = new Service( "echo", TransportType.SOCKET, PORT );
+        registry.bind( service, new EchoProtocolHandler() );
 
         System.out.println( "Listening on port " + PORT );
+    }
+
+    private static void addSSLSupport( ServiceRegistry registry )
+        throws Exception
+    {
+        System.out.println( "SSL is enabled." );
+        SSLFilter sslFilter =
+            new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
+        IoFilterChain filters = registry.getIoFilterChain( TransportType.SOCKET );
+        filters.addLast( "sslFilter", sslFilter );
     }
 }

@@ -28,6 +28,7 @@ import junit.framework.Assert;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.Session;
 import org.apache.mina.common.SessionInitializer;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.io.IoConnector;
 import org.apache.mina.io.IoHandlerAdapter;
@@ -63,7 +64,6 @@ public class ConnectorTest extends AbstractTest
     public void testTCP() throws Exception
     {
         IoConnector connector = new SocketConnector();
-        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
         testConnector( connector );
     }
     
@@ -76,11 +76,10 @@ public class ConnectorTest extends AbstractTest
         SSLFilter acceptorSSLFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
         //acceptorSSLFilter.setDebug( SSLFilter.Debug.ON );
-        acceptor.getFilterChain().addLast( "SSL", acceptorSSLFilter );
+        registry.getIoFilterChain( TransportType.SOCKET ).addLast( "SSL", acceptorSSLFilter );
 
         // Create a connector
         IoConnector connector = new SocketConnector();
-        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
         
         // Add an SSL filter to connector
         SSLFilter connectorSSLFilter =
@@ -95,7 +94,6 @@ public class ConnectorTest extends AbstractTest
     public void testUDP() throws Exception
     {
         IoConnector connector = new DatagramConnector();
-        connector.getFilterChain().addFirst( "threadPool", super.threadPoolFilter );
         testConnector( connector );
     }
     
