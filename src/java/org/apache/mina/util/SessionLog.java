@@ -8,8 +8,8 @@ import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolSession;
 
 /**
- * Call {@link #getLogger(Session)}, {@link #log(Session, String)}, and
- * {@link #log(Session, String, Throwable)} to log protocol-specific messages.
+ * Call {@link #getLogger(Session)}, {@link #log(Level,Session, String)}, and
+ * {@link #log(Level,Session, String, Throwable)} to log protocol-specific messages.
  * <p>
  * Set {@link #PREFIX}, {@link #LOGGER}, {@link #LEVEL} session attributes
  * to override prefix string, logger, and log level.
@@ -70,20 +70,18 @@ public class SessionLog {
             return ( ( ProtocolSession ) session ).getHandler().getClass().getName();
     }
 
-    public static void log( Session session, String message )
+    public static void log( Level level, Session session, String message )
     {
         Logger log = getLogger( session );
-        Level level = ( Level ) session.getAttribute( LEVEL );
         if( log.isLoggable( level ) )
         {
             log.log( level, message );
         }
     }
 
-    public static void log( Session session, String message, Throwable cause )
+    public static void log( Level level, Session session, String message, Throwable cause )
     {
         Logger log = getLogger( session );
-        Level level = ( Level ) session.getAttribute( LEVEL );
         if( log.isLoggable( level ) )
         {
             log.log( level, message, cause );
