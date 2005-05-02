@@ -32,17 +32,12 @@ public class ReverseProtocolHandler extends ProtocolHandlerAdapter
 {
     public void exceptionCaught( ProtocolSession session, Throwable cause )
     {
-        System.out.println( session.getRemoteAddress() + " EXCEPTION" );
-        cause.printStackTrace( System.out );
-
         // Close connection when unexpected exception is caught.
         session.close();
     }
 
     public void messageReceived( ProtocolSession session, Object message )
     {
-        System.out.println( session.getRemoteAddress() + " RCVD: " + message );
-
         // Reverse reveiced string
         String str = message.toString();
         StringBuffer buf = new StringBuffer( str.length() );
