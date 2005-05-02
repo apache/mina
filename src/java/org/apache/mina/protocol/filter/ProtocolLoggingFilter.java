@@ -52,6 +52,23 @@ public class ProtocolLoggingFilter implements ProtocolFilter
      */
     public static final String LEVEL = SessionLog.LEVEL;
     
+    private static final ProtocolLoggingFilter INSTANCE = new ProtocolLoggingFilter();
+
+    /**
+     * Returns a logging filter.
+     */
+    public static ProtocolLoggingFilter getInstance()
+    {
+        return INSTANCE;
+    }
+    
+    /**
+     * Creates a new instance.
+     */
+    protected ProtocolLoggingFilter()
+    {
+    }
+    
     public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
     {
         SessionLog.log( session, "OPENED" );
