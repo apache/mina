@@ -11,7 +11,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * Call {@link #getLogger(Session)}, {@link #log(Level,Session, String)}, and
  * {@link #log(Level,Session, String, Throwable)} to log protocol-specific messages.
  * <p>
- * Set {@link #PREFIX}, {@link #LOGGER}, {@link #LEVEL} session attributes
+ * Set {@link #PREFIX} and {@link #LOGGER} session attributes
  * to override prefix string, logger, and log level.
  *
  * @author The Apache Directory Project (dev@directory.apache.org)
@@ -30,11 +30,6 @@ public class SessionLog {
      */
     public static final String LOGGER = SessionLog.class.getName() + ".logger";
     
-    /**
-     * Session attribute key: {@link Level}
-     */
-    public static final String LEVEL = SessionLog.class.getName() + ".level";
-
     public static Logger getLogger( Session session )
     {
         
@@ -47,13 +42,6 @@ public class SessionLog {
             {
                 prefix = "[" + session.getRemoteAddress() + "] ";
                 session.setAttribute( PREFIX, prefix );
-            }
-            
-            Level level = ( Level ) session.getAttribute( LEVEL );
-            if( level == null )
-            {
-                level = Level.INFO;
-                session.setAttribute( LEVEL, level );
             }
                 
             session.setAttribute( LOGGER, log );
