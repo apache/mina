@@ -23,6 +23,8 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -40,12 +42,15 @@ import org.apache.mina.io.IoSession;
  * This filter uses an {@link SSLEngine} which was introduced in Java 5, so 
  * Java version 5 or above is mandatory to use this filter. And please note that
  * this filter only works for TCP/IP connections.
+ * <p>
+ * This filter logs debug information in {@link Level#FINEST} using {@link Logger}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SSLFilter extends IoFilterAdapter
 {
+    private static final Logger log = Logger.getLogger( SSLFilter.class.getName() );
     /**
      * A marker which is passed with {@link IoHandler#dataWritten(IoSession, Object)}
      * when <tt>SSLFilter</tt> writes data other then user actually requested.
@@ -63,9 +68,6 @@ public class SSLFilter extends IoFilterAdapter
 
     // Map used to map SSLHandler objects per session (key is IoSession)
     private Map sslSessionHandlerMap = new IdentityHashMap();
-
-    /** debug interface */
-    Debug debug = null;
 
     private boolean client;
     private boolean needClientAuth;
@@ -184,41 +186,6 @@ public class SSLFilter extends IoFilterAdapter
         this.enabledProtocols = protocols;
     }
 
-    /**
-     * Sets the debug message auditter.
-     */
-    public void setDebug( Debug debug )
-    {
-        if( debug == null )
-        {
-            throw new NullPointerException( "debug" );
-        }
-
-        if( debug == Debug.OFF )
-        {
-            this.debug = null;
-        }
-        else
-        {
-            this.debug = debug;
-        }
-    }
-
-    /**
-     * Gets the debug message auditter.
-     */
-    public Debug getDebug()
-    {
-        if( debug == null )
-        {
-            return Debug.OFF;
-        }
-        else
-        {
-            return debug;
-        }
-    }
-
     // IoFilter impl.
 
     public void sessionOpened( NextFilter nextFilter, IoSession session )
@@ -231,9 +198,9 @@ public class SSLFilter extends IoFilterAdapter
     public void sessionClosed( NextFilter nextFilter, IoSession session )
     {
         SSLHandler sslHandler = getSSLSessionHandler( session );
-        if( debug != null )
+        if( log.isLoggable( Level.FINEST ) )
         {
-            debug.print( this, "Closed: " + sslHandler );
+            log.log( Level.FINEST, session + " Closed: " + sslHandler );
         }
         if( sslHandler != null )
         {
@@ -271,9 +238,9 @@ public class SSLFilter extends IoFilterAdapter
         SSLHandler sslHandler = getSSLSessionHandler( session );
         if( sslHandler != null )
         {
-            if( debug != null )
+            if( log.isLoggable( Level.FINEST ) )
             {
-                debug.print( this, "Data Read: " + sslHandler + " (" + buf+ ')' );
+                log.log( Level.FINEST, session + " Data Read: " + sslHandler + " (" + buf+ ')' );
             }
             synchronized( sslHandler )
             {
@@ -287,11 +254,10 @@ public class SSLFilter extends IoFilterAdapter
 
                     if( sslHandler.isClosed() )
                     {
-                        if( debug != null )
+                        if( log.isLoggable( Level.FINEST ) )
                         {
-                            debug.print(
-                                    this,
-                                    "SSL Session closed. Closing connection.." );
+                            log.log( Level.FINEST,
+                                     session + " SSL Session closed. Closing connection.." );
                         }
                         session.close();
                     }
@@ -326,9 +292,9 @@ public class SSLFilter extends IoFilterAdapter
     {
 
         SSLHandler handler = createSSLSessionHandler( session );
-        if( debug != null )
+        if( log.isLoggable( Level.FINEST ) )
         {
-            debug.print( this, "Filtered Write: " + handler );
+            log.log( Level.FINEST, session + " Filtered Write: " + handler );
         }
 
         synchronized( handler )
@@ -336,9 +302,9 @@ public class SSLFilter extends IoFilterAdapter
             if( handler.isWritingEncryptedData() )
             {
                 // data already encrypted; simply return buffer
-                if( debug != null )
+                if( log.isLoggable( Level.FINEST ) )
                 {
-                    debug.print( this, "  already encrypted: " + buf );
+                    log.log( Level.FINEST, session + "   already encrypted: " + buf );
                 }
                 nextFilter.filterWrite( session, buf, marker );
                 return;
@@ -349,17 +315,17 @@ public class SSLFilter extends IoFilterAdapter
                 // SSL encrypt
                 try
                 {
-                    if( debug != null )
+                    if( log.isLoggable( Level.FINEST ) )
                     {
-                        debug.print( this, "encrypt: " + buf );
+                        log.log( Level.FINEST, session + " encrypt: " + buf );
                     }
                     handler.encrypt( buf.buf() );
                     ByteBuffer encryptedBuffer = copy( handler
                             .getOutNetBuffer() );
 
-                    if( debug != null )
+                    if( log.isLoggable( Level.FINEST ) )
                     {
-                        debug.print( this, "encrypted buf: " + encryptedBuffer);
+                        log.log( Level.FINEST, session + " encrypted buf: " + encryptedBuffer);
                     }
                     buf.release();
                     nextFilter.filterWrite( session, encryptedBuffer, marker );
@@ -375,16 +341,16 @@ public class SSLFilter extends IoFilterAdapter
             {
                 if( !session.isConnected() )
                 {
-                    if( debug != null )
+                    if( log.isLoggable( Level.FINEST ) )
                     {
-                        debug.print( this, "Write request on closed session." );
+                        log.log( Level.FINEST, session + " Write request on closed session." );
                     }
                 }
                 else
                 {
-                    if( debug != null )
+                    if( log.isLoggable( Level.FINEST ) )
                     {
-                        debug.print( this, "Handshaking is not complete yet. Buffering write request." );
+                        log.log( Level.FINEST, session + " Handshaking is not complete yet. Buffering write request." );
                     }
                     handler.scheduleWrite( nextFilter, buf, marker );
                 }
@@ -413,17 +379,17 @@ public class SSLFilter extends IoFilterAdapter
     private void handleAppDataRead( NextFilter nextFilter, IoSession session,
                                    SSLHandler sslHandler )
     {
-        if( debug != null )
+        if( log.isLoggable( Level.FINEST ) )
         {
-            debug.print( this, "appBuffer: " + sslHandler.getAppBuffer() );
+            log.log( Level.FINEST, session + " appBuffer: " + sslHandler.getAppBuffer() );
         }
         if( sslHandler.getAppBuffer().hasRemaining() )
         {
             // forward read app data
             ByteBuffer readBuffer = copy( sslHandler.getAppBuffer() );
-            if( debug != null )
+            if( log.isLoggable( Level.FINEST ) )
             {
-                debug.print( this, "app data read: " + readBuffer + " (" + readBuffer.getHexDump() + ')' );
+                log.log( Level.FINEST, session + " app data read: " + readBuffer + " (" + readBuffer.getHexDump() + ')' );
             }
             nextFilter.dataRead( session, readBuffer );
         }
@@ -450,15 +416,15 @@ public class SSLFilter extends IoFilterAdapter
 
         try
         {
-            if( debug != null )
+            if( log.isLoggable( Level.FINEST ) )
             {
-                debug.print( this, "write outNetBuffer: " +
+                log.log( Level.FINEST, session + " write outNetBuffer: " +
                                    sslHandler.getOutNetBuffer() );
             }
             ByteBuffer writeBuffer = copy( sslHandler.getOutNetBuffer() );
-            if( debug != null )
+            if( log.isLoggable( Level.FINEST ) )
             {
-                debug.print( this, "session write: " + writeBuffer );
+                log.log( Level.FINEST, session + " session write: " + writeBuffer );
             }
             //debug("outNetBuffer (after copy): {0}", sslHandler.getOutNetBuffer());
             session.write( writeBuffer, SSL_MARKER );
@@ -479,9 +445,9 @@ public class SSLFilter extends IoFilterAdapter
                 }
                 if( sslHandler.getOutNetBuffer().hasRemaining() )
                 {
-                    if( debug != null )
+                    if( log.isLoggable( Level.FINEST ) )
                     {
-                        debug.print( this, "write outNetBuffer2: " +
+                        log.log( Level.FINEST, session + " write outNetBuffer2: " +
                                            sslHandler.getOutNetBuffer() );
                     }
                     ByteBuffer writeBuffer2 = copy( sslHandler

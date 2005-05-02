@@ -61,7 +61,6 @@ public class AcceptorTest extends AbstractTest
         // Add an SSL filter
         SSLFilter sslFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
-        //sslFilter.setDebug( SSLFilter.Debug.ON );
         IoAcceptor acceptor = registry.getIoAcceptor( TransportType.SOCKET );
         acceptor.getFilterChain().addLast( "SSL", sslFilter );
         
