@@ -31,10 +31,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.BaseSessionManager;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
-import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoFilterChain;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
@@ -84,19 +83,6 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
      */
     public void bind( SocketAddress address, IoHandler handler ) throws IOException
     {
-        bind( address, handler, null );
-    }
-
-    /**
-     * Binds to the specified <code>address</code> and handles incoming
-     * connections with the specified <code>handler</code>.  Backlog value
-     * is configured to the value of <code>backlog</code> property.
-     *
-     * @throws IOException if failed to bind
-     */
-    public void bind( SocketAddress address, IoHandler handler,
-                      SessionInitializer initializer ) throws IOException
-    {
         if( address == null )
         {
             throw new NullPointerException( "address" );
@@ -117,12 +103,7 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
             throw new IllegalArgumentException( "Unsupported port number: 0" );
         }
         
-        if( initializer == null )
-        {
-            initializer = defaultInitializer;
-        }
-
-        RegistrationRequest request = new RegistrationRequest( address, backlog, handler, initializer );
+        RegistrationRequest request = new RegistrationRequest( address, backlog, handler );
 
         synchronized( this )
         {
@@ -310,7 +291,7 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
                 {
                     RegistrationRequest req = ( RegistrationRequest ) key.attachment();
                     SocketSession session = new SocketSession( filters, ch, req.handler );
-                    req.initializer.initializeSession( session );
+                    req.handler.sessionCreated( session );
                     SocketIoProcessor.getInstance().addSession( session );
                     success = true;
                 }
@@ -461,19 +442,15 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
 
         private final IoHandler handler;
         
-        private final SessionInitializer initializer;
-        
         private IOException exception; 
         
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, int backlog, IoHandler handler,
-                                     SessionInitializer initializer )
+        private RegistrationRequest( SocketAddress address, int backlog, IoHandler handler )
         {
             this.address = address;
             this.backlog = backlog;
             this.handler = handler;
-            this.initializer = initializer;
         }
     }
 

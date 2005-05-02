@@ -103,7 +103,7 @@ public class ProtocolFilterChainTest extends TestCase
 
     private class TestSession extends BaseSession implements ProtocolSession
     {
-        private ProtocolHandler handler = new ProtocolHandler()
+        private ProtocolHandler handler = new ProtocolHandlerAdapter()
         {
             public void sessionOpened(ProtocolSession session) {
                 result += "HSO";

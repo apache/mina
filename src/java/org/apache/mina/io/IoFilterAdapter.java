@@ -35,42 +35,42 @@ import org.apache.mina.common.IdleStatus;
  */
 public class IoFilterAdapter implements IoFilter
 {
-    public void sessionOpened( NextFilter nextFilter, IoSession session )
+    public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
     {
         nextFilter.sessionOpened( session );
     }
 
-    public void sessionClosed( NextFilter nextFilter, IoSession session )
+    public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
     {
         nextFilter.sessionClosed( session );
     }
 
     public void sessionIdle( NextFilter nextFilter, IoSession session,
-                            IdleStatus status )
+                            IdleStatus status ) throws Exception
     {
         nextFilter.sessionIdle( session, status );
     }
 
     public void exceptionCaught( NextFilter nextFilter, IoSession session,
-                                Throwable cause )
+                                Throwable cause ) throws Exception
     {
         nextFilter.exceptionCaught( session, cause );
     }
 
     public void dataRead( NextFilter nextFilter, IoSession session,
-                         ByteBuffer buf )
+                         ByteBuffer buf ) throws Exception
     {
         nextFilter.dataRead( session, buf );
     }
 
     public void dataWritten( NextFilter nextFilter, IoSession session,
-                            Object marker )
+                            Object marker ) throws Exception
     {
         nextFilter.dataWritten( session, marker );
     }
 
     public void filterWrite( NextFilter nextFilter, IoSession session,
-                             ByteBuffer buf, Object marker )
+                             ByteBuffer buf, Object marker ) throws Exception
     {
         nextFilter.filterWrite( session, buf, marker );
     }

@@ -9,10 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.mina.common.BaseSessionManager;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.protocol.ProtocolAcceptor;
-import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolFilterChain;
+import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolProvider;
 
 /**
@@ -39,12 +38,6 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
     
     public void bind( SocketAddress address, ProtocolProvider protocolProvider ) throws IOException
     {
-        bind( address, protocolProvider, null );
-    }
-
-    public void bind( SocketAddress address, ProtocolProvider protocolProvider,
-                      SessionInitializer initializer ) throws IOException
-    {
         if( address == null )
             throw new NullPointerException( "address" );
         if( protocolProvider == null )
@@ -52,10 +45,6 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
         if( !( address instanceof VmPipeAddress ) )
             throw new IllegalArgumentException(
                     "address must be VmPipeAddress." );
-        if( initializer == null )
-        {
-            initializer = defaultInitializer;
-        }
 
         synchronized( boundHandlers )
         {
@@ -68,8 +57,7 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
                                new Entry( this,
                                           ( VmPipeAddress ) address,
                                           filterChain,
-                                          protocolProvider.getHandler(),
-                                          initializer ) );
+                                          protocolProvider.getHandler() ) );
         }
     }
 
@@ -99,19 +87,15 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
 
         final ProtocolHandler handler;
         
-        final SessionInitializer initializer;
-
         private Entry( VmPipeAcceptor acceptor,
                        VmPipeAddress address,
                        VmPipeSessionManagerFilterChain managerFilterChain,
-                       ProtocolHandler handler,
-                       SessionInitializer initializer )
+                       ProtocolHandler handler )
         {
             this.acceptor = acceptor;
             this.address = address;
             this.managerFilterChain = managerFilterChain;
             this.handler = handler;
-            this.initializer = initializer;
         }
     }
 }

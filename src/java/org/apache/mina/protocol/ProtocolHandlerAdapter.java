@@ -19,6 +19,7 @@
 package org.apache.mina.protocol;
 
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.util.SessionUtil;
 
 /**
  * An abstract adapter class for {@link ProtocolHandler}.  You can extend this
@@ -30,28 +31,32 @@ import org.apache.mina.common.IdleStatus;
  */
 public class ProtocolHandlerAdapter implements ProtocolHandler
 {
+    public void sessionCreated( ProtocolSession session ) throws Exception
+    {
+        SessionUtil.initialize( session );
+    }
 
-    public void sessionOpened( ProtocolSession session )
+    public void sessionOpened( ProtocolSession session ) throws Exception
     {
     }
 
-    public void sessionClosed( ProtocolSession session )
+    public void sessionClosed( ProtocolSession session ) throws Exception
     {
     }
 
-    public void sessionIdle( ProtocolSession session, IdleStatus status )
+    public void sessionIdle( ProtocolSession session, IdleStatus status ) throws Exception
     {
     }
 
-    public void exceptionCaught( ProtocolSession session, Throwable cause )
+    public void exceptionCaught( ProtocolSession session, Throwable cause ) throws Exception
     {
     }
 
-    public void messageReceived( ProtocolSession session, Object message )
+    public void messageReceived( ProtocolSession session, Object message ) throws Exception
     {
     }
 
-    public void messageSent( ProtocolSession session, Object message )
+    public void messageSent( ProtocolSession session, Object message ) throws Exception
     {
     }
 }

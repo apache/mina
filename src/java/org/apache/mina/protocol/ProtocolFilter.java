@@ -46,48 +46,54 @@ public interface ProtocolFilter
     /**
      * Filters {@link ProtocolHandler#sessionOpened(ProtocolSession)} event.
      */
-    void sessionOpened( NextFilter nextFilter, ProtocolSession session );
+    void sessionOpened( NextFilter nextFilter, ProtocolSession session ) throws Exception;
 
     /**
      * Filters {@link ProtocolHandler#sessionClosed(ProtocolSession)} event.
      */
-    void sessionClosed( NextFilter nextFilter, ProtocolSession session );
+    void sessionClosed( NextFilter nextFilter, ProtocolSession session ) throws Exception;
 
     /**
      * Filters {@link ProtocolHandler#sessionIdle(ProtocolSession,IdleStatus)}
      * event.
      */
     void sessionIdle( NextFilter nextFilter, ProtocolSession session,
-                     IdleStatus status );
+                     IdleStatus status ) throws Exception;
 
     /**
      * Filters {@link ProtocolHandler#exceptionCaught(ProtocolSession,Throwable)}
      * event.
      */
     void exceptionCaught( NextFilter nextFilter,
-                         ProtocolSession session, Throwable cause );
+                         ProtocolSession session, Throwable cause ) throws Exception;
 
     /**
      * Filters {@link ProtocolHandler#messageReceived(ProtocolSession,Object)}
      * event.
      */
     void messageReceived( NextFilter nextFilter,
-                         ProtocolSession session, Object message );
+                         ProtocolSession session, Object message ) throws Exception;
 
     /**
      * Filters {@link ProtocolHandler#messageSent(ProtocolSession,Object)}
      * event.
      */
     void messageSent( NextFilter nextFilter, ProtocolSession session,
-                     Object message );
+                     Object message ) throws Exception;
 
     /**
      * Filters {@link ProtocolSession#write(Object)} method invocation.
      */
-    void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message );
+    void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message ) throws Exception;
     
-    public interface NextFilter extends ProtocolHandler
+    public interface NextFilter
     {
+        void sessionOpened( ProtocolSession session );
+        void sessionClosed( ProtocolSession session );
+        void sessionIdle( ProtocolSession session, IdleStatus status );
+        void exceptionCaught( ProtocolSession session, Throwable cause );
+        void messageReceived( ProtocolSession session, Object message );
+        void messageSent( ProtocolSession session, Object message );
         void filterWrite( ProtocolSession session, Object message );
     }
 }

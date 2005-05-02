@@ -30,10 +30,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.io.IoAcceptor;
-import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoFilterChain;
+import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
@@ -78,12 +77,6 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
     public void bind( SocketAddress address, IoHandler handler )
             throws IOException
     {
-        bind( address, handler, null );
-    }
-
-    public void bind( SocketAddress address, IoHandler handler, SessionInitializer initializer )
-            throws IOException
-    {
         if( address == null )
             throw new NullPointerException( "address" );
         if( handler == null )
@@ -95,12 +88,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
         if( ( ( InetSocketAddress ) address ).getPort() == 0 )
             throw new IllegalArgumentException( "Unsupported port number: 0" );
         
-        if( initializer == null )
-        {
-            initializer = defaultInitializer;
-        }
-
-        RegistrationRequest request = new RegistrationRequest( address, handler, initializer );
+        RegistrationRequest request = new RegistrationRequest( address, handler );
         synchronized( this )
         {
             synchronized( registerQueue )
@@ -268,7 +256,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
             
             try
             {
-                req.initializer.initializeSession( session );
+                req.handler.sessionCreated( session );
 
                 if( key.isReadable() )
                 {
@@ -528,18 +516,14 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
         
         private final IoHandler handler;
         
-        private final SessionInitializer initializer;
-        
         private Throwable exception; 
         
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, IoHandler handler,
-                                     SessionInitializer initializer )
+        private RegistrationRequest( SocketAddress address, IoHandler handler )
         {
             this.address = address;
             this.handler = handler;
-            this.initializer = initializer;
         }
     }
 

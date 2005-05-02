@@ -21,8 +21,6 @@ package org.apache.mina.protocol;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.SessionInitializer;
-
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
  * {@link ProtocolHandler}s.
@@ -41,8 +39,6 @@ import org.apache.mina.common.SessionInitializer;
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
- * 
- * @see SessionInitializer
  */
 public interface ProtocolAcceptor extends ProtocolSessionManager
 {
@@ -53,15 +49,6 @@ public interface ProtocolAcceptor extends ProtocolSessionManager
      * @throws IOException if failed to bind
      */
     void bind( SocketAddress address, ProtocolProvider protocolProvider )
-            throws IOException;
-
-    /**
-     * Binds to the specified <code>address</code> and handles incoming
-     * connections with the specified <code>protocolProvider</code>.
-     * 
-     * @throws IOException if failed to bind
-     */
-    void bind( SocketAddress address, ProtocolProvider protocolProvider, SessionInitializer initializer )
             throws IOException;
 
     /**

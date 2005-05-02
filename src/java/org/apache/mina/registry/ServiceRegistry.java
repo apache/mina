@@ -21,7 +21,6 @@ package org.apache.mina.registry;
 import java.io.IOException;
 import java.util.Set;
 
-import org.apache.mina.common.SessionInitializer;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoHandler;
@@ -48,18 +47,6 @@ public interface ServiceRegistry
      */
     void bind( Service service, ProtocolProvider protocolProvider )
             throws IOException;
-
-    /**
-     * Binds the specified I/O handler to the specified service.
-     */
-    void bind( Service service,
-               IoHandler ioHandler, SessionInitializer initializer ) throws IOException;
-
-    /**
-     * Binds the specified protocol provider to the specified service.
-     */
-    void bind( Service service, ProtocolProvider protocolProvider,
-               SessionInitializer initializer ) throws IOException;
 
     /**
      * Unbinds the specified service (and its aggregated I/O handler or

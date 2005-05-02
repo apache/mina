@@ -20,6 +20,7 @@ package org.apache.mina.io;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.util.SessionUtil;
 
 /**
  * An abstract adapter class for {@link IoHandler}.  You can extend this class
@@ -35,28 +36,32 @@ import org.apache.mina.common.IdleStatus;
  */
 public class IoHandlerAdapter implements IoHandler
 {
+    public void sessionCreated( IoSession session ) throws Exception
+    {
+        SessionUtil.initialize( session );
+    }
 
-    public void sessionOpened( IoSession session )
+    public void sessionOpened( IoSession session ) throws Exception
     {
     }
 
-    public void sessionClosed( IoSession session )
+    public void sessionClosed( IoSession session ) throws Exception
     {
     }
 
-    public void sessionIdle( IoSession session, IdleStatus status )
+    public void sessionIdle( IoSession session, IdleStatus status ) throws Exception
     {
     }
 
-    public void exceptionCaught( IoSession session, Throwable cause )
+    public void exceptionCaught( IoSession session, Throwable cause ) throws Exception
     {
     }
 
-    public void dataRead( IoSession session, ByteBuffer buf )
+    public void dataRead( IoSession session, ByteBuffer buf ) throws Exception
     {
     }
 
-    public void dataWritten( IoSession session, Object marker )
+    public void dataWritten( IoSession session, Object marker ) throws Exception
     {
     }
 }

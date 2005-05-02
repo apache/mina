@@ -104,7 +104,7 @@ public class IoFilterChainTest extends TestCase
 
     private class TestSession extends BaseSession implements IoSession
     {
-        private IoHandler handler = new IoHandler()
+        private IoHandler handler = new IoHandlerAdapter()
         {
             public void sessionOpened(IoSession session) {
                 result += "HSO ";

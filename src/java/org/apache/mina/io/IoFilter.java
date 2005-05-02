@@ -49,42 +49,48 @@ public interface IoFilter
     /**
      * Filters {@link IoHandler#sessionOpened(IoSession)} event.
      */
-    void sessionOpened( NextFilter nextFilter, IoSession session );
+    void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionClosed(IoSession)} event.
      */
-    void sessionClosed( NextFilter nextFilter, IoSession session );
+    void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionIdle(IoSession, IdleStatus)} event.
      */
     void sessionIdle( NextFilter nextFilter, IoSession session,
-                      IdleStatus status );
+                      IdleStatus status ) throws Exception;
 
     /**
      * Filters {@link IoHandler#exceptionCaught(IoSession, Throwable)} event.
      */
     void exceptionCaught( NextFilter nextFilter, IoSession session,
-                          Throwable cause );
+                          Throwable cause ) throws Exception;
 
     /**
      * Filters {@link IoHandler#dataRead(IoSession, ByteBuffer)} event.
      */
-    void dataRead( NextFilter nextFilter, IoSession session, ByteBuffer buf );
+    void dataRead( NextFilter nextFilter, IoSession session, ByteBuffer buf ) throws Exception;
 
     /**
      * Filters {@link IoHandler#dataWritten(IoSession, Object)} event.
      */
-    void dataWritten( NextFilter nextFilter, IoSession session, Object marker );
+    void dataWritten( NextFilter nextFilter, IoSession session, Object marker ) throws Exception;
 
     /**
      * Filters {@link IoSession#write(ByteBuffer, Object)} method invocation.
      */
-    void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker );
+    void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker ) throws Exception;
     
-    public interface NextFilter extends IoHandler
+    public interface NextFilter
     {
+        void sessionOpened( IoSession session );
+        void sessionClosed( IoSession session );
+        void sessionIdle( IoSession session, IdleStatus status );
+        void exceptionCaught( IoSession session, Throwable cause );
+        void dataRead( IoSession session, ByteBuffer buf );
+        void dataWritten( IoSession session, Object marker );
         void filterWrite( IoSession session, ByteBuffer buf, Object marker );
     }
 }

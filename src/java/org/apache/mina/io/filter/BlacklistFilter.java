@@ -61,7 +61,7 @@ public class BlacklistFilter extends IoFilterAdapter
      * blacklisted.
      */
     public void dataRead( NextFilter nextFilter, IoSession session,
-                         ByteBuffer buf )
+                         ByteBuffer buf ) throws Exception
     {
         if( !isBlocked( session ) )
         {
@@ -74,7 +74,7 @@ public class BlacklistFilter extends IoFilterAdapter
      * Close connection immediately if the remote address of session is
      * blacklisted.
      */
-    public void sessionOpened( NextFilter nextFilter, IoSession session )
+    public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
     {
         if( isBlocked( session ) )
         {

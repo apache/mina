@@ -40,39 +40,45 @@ import org.apache.mina.common.IdleStatus;
 public interface ProtocolHandler
 {
     /**
+     * Invoked when the session is created.  Initialize default socket
+     * parameters and user-defined attributes here.
+     */
+    void sessionCreated( ProtocolSession session ) throws Exception;
+    
+    /**
      * Invoked when the connection is opened.  This method is not invoked if the
      * transport type is UDP.
      */
-    void sessionOpened( ProtocolSession session );
+    void sessionOpened( ProtocolSession session ) throws Exception;
 
     /**
      * Invoked when the connection is closed.  This method is not invoked if the
      * transport type is UDP.
      */
-    void sessionClosed( ProtocolSession session );
+    void sessionClosed( ProtocolSession session ) throws Exception;
 
     /**
      * Invoked when the connection is idle.  Refer to {@link IdleStatus}.  This
      * method is not invoked if the transport type is UDP.
      */
-    void sessionIdle( ProtocolSession session, IdleStatus status );
+    void sessionIdle( ProtocolSession session, IdleStatus status ) throws Exception;
 
     /**
      * Invoked when any exception is thrown by user {@link ProtocolHandler}
      * implementation or by MINA.  If <code>cause</code> is instanceof
      * {@link IOException}, MINA will close the connection automatically.
      */
-    void exceptionCaught( ProtocolSession session, Throwable cause );
+    void exceptionCaught( ProtocolSession session, Throwable cause ) throws Exception;
 
     /**
      * Invoked when protocol message is received.  Implement your protocol flow
      * here.
      */
-    void messageReceived( ProtocolSession session, Object message );
+    void messageReceived( ProtocolSession session, Object message ) throws Exception;
 
     /**
      * Invoked when protocol message that user requested by
      * {@link ProtocolSession#write(Object)} is sent out actually.
      */
-    void messageSent( ProtocolSession session, Object message );
+    void messageSent( ProtocolSession session, Object message ) throws Exception;
 }

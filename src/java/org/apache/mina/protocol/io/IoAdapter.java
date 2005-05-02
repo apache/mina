@@ -99,6 +99,10 @@ class IoAdapter
             codecFactory = protocolProvider.getCodecFactory();
             this.handler = protocolProvider.getHandler();
         }
+        
+        public void sessionCreated( IoSession session )
+        {
+        }
 
         public void sessionOpened( IoSession session )
         {

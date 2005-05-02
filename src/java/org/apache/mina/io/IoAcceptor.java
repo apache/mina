@@ -21,8 +21,6 @@ package org.apache.mina.io;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.SessionInitializer;
-
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
  * {@link IoHandler}s.
@@ -41,8 +39,6 @@ import org.apache.mina.common.SessionInitializer;
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
- * 
- * @see SessionInitializer
  */
 public interface IoAcceptor extends IoSessionManager
 {
@@ -53,14 +49,6 @@ public interface IoAcceptor extends IoSessionManager
      * @throws IOException if failed to bind
      */
     void bind( SocketAddress address, IoHandler handler ) throws IOException;
-
-    /**
-     * Binds to the specified <code>address</code> and handles incoming
-     * connections with the specified <code>handler</code>.
-     * 
-     * @throws IOException if failed to bind
-     */
-    void bind( SocketAddress address, IoHandler handler, SessionInitializer initializer ) throws IOException;
 
     /**
      * Unbinds from the specified <code>address</code>.

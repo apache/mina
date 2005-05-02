@@ -21,8 +21,6 @@ package org.apache.mina.io;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.SessionInitializer;
-
 /**
  * Connects to endpoint, communicates with the server, and fires events to
  * {@link IoHandler}s.
@@ -41,8 +39,6 @@ import org.apache.mina.common.SessionInitializer;
  * 
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
- * 
- * @see SessionInitializer
  */
 public interface IoConnector extends IoSessionManager
 {
@@ -87,47 +83,4 @@ public interface IoConnector extends IoSessionManager
      */
     IoSession connect( SocketAddress address, SocketAddress localAddress,
                        int timeout, IoHandler handler ) throws IOException;
-
-    /**
-     * Connects to the specified <code>address</code>.  If communication starts
-     * successfully, events are fired to the specified
-     * <code>handler</code>.  This method blocks.
-     * 
-     * @throws IOException if failed to connect
-     */
-    IoSession connect( SocketAddress address, IoHandler handler,
-                       SessionInitializer initializer ) throws IOException;
-
-    /**
-     * Connects to the specified <code>address</code>.  If communication starts
-     * successfully, events are fired to the specified
-     * <code>handler</code>.  This method blocks.
-     * 
-     * @param localAddress the local address the channel is bound to
-     * @throws IOException if failed to connect
-     */
-    IoSession connect( SocketAddress address, SocketAddress localAddress,
-                       IoHandler handler, SessionInitializer initializer ) throws IOException;
-
-    /**
-     * Connects to the specified <code>address</code> with timeout.  If
-     * communication starts successfully, events are fired to the specified
-     * <code>handler</code>.  This method blocks.
-     * 
-     * @throws IOException if failed to connect
-     */
-    IoSession connect( SocketAddress address, int timeout, IoHandler handler,
-                       SessionInitializer initializer ) throws IOException;
-    
-    /**
-     * Connects to the specified <code>address</code> with timeout.  If
-     * communication starts successfully, events are fired to the specified
-     * <code>handler</code>.  This method blocks.
-     * 
-     * @param localAddress the local address the channel is bound to
-     * @throws IOException if failed to connect
-     */
-    IoSession connect( SocketAddress address, SocketAddress localAddress,
-                       int timeout, IoHandler handler,
-                       SessionInitializer initializer ) throws IOException;
 }
