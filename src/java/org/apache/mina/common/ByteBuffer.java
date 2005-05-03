@@ -203,6 +203,7 @@ public abstract class ByteBuffer
         }
         
         buf.clear();
+        buf.order( ByteOrder.BIG_ENDIAN );
         return buf;
     }
     
