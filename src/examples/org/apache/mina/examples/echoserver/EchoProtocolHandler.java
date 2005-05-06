@@ -33,7 +33,7 @@ import org.apache.mina.io.socket.SocketSessionConfig;
  */
 public class EchoProtocolHandler extends IoHandlerAdapter
 {
-    public void sessionOpened( IoSession session )
+    public void sessionCreated( IoSession session )
     {
         SessionConfig cfg = session.getConfig();
         if( cfg instanceof SocketSessionConfig )
