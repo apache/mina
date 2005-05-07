@@ -8,7 +8,10 @@
 	<body>
 
 		<section name="Roadmap">
-			
+			<p>
+        We have chosen versioning strategy similar to that of Linux.
+        Odd version numbers mean feature release, and even mean stable.
+			</p>
 			<subsection name="0.7 (May 2005)">
 				<p>
 					<ul>
@@ -22,21 +25,11 @@
 							</ul>
 						</li>
 						<li>Stream-based I/O</li>
-						<li>SSL Filter based on Java 5 SSLEngine</li>
-					</ul>
-				</p>
-			</subsection>
-
-			<subsection name="0.8 (no date set)">
-				<p>
-					<ul>
-						<li>Useful IoHandlerFilters and ProtocolHandlerFilters
-							<ul>
-								<li>Performance tracing</li>
-								<li>Event logging</li>
-								<li>Traffic throttling</li>
-								<li>Overload prevention</li>
-							</ul></li>
+						<li>Essential filters
+              <ul>
+                <li>SSL Filter based on Java 5 SSLEngine</li>
+                <li>Event logger</li>
+              </ul></li>
 					</ul>
 				</p>
 			</subsection>
@@ -44,15 +37,13 @@
 			<subsection name="0.9 (no date set)">
 				<p>
 					<ul>
-						<li>Integration with containers: Spring and OSGi</li>
-					</ul>
-				</p>
-			</subsection>
-
-			<subsection name="1.0 (no date set)">
-				<p>
-					<ul>
-						<li>JMX compliance</li>
+						<li>More useful filters
+							<ul>
+								<li>Performance tracing</li>
+								<li>Traffic throttling</li>
+								<li>Overload prevention</li>
+                <li>StartTLS</li>
+							</ul></li>
 					</ul>
 				</p>
 			</subsection>
@@ -60,7 +51,8 @@
 			<subsection name="1.1 (no date set)">
 				<p>
 					<ul>
-						<li>More useful IoHandlerFilters and ProtocolHandlerFilters</li>
+						<li>Integration with containers: Spring and OSGi</li>
+						<li>JMX compliance</li>
 					</ul>
 				</p>
 			</subsection>
