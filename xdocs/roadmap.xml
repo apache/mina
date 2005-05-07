@@ -11,48 +11,53 @@
 			<p>
         We have chosen versioning strategy similar to that of Linux.
         Odd version numbers mean feature release, and even mean stable.
+        <ul>
+          <li><a href="http://issues.apache.org/jira/secure/BrowseProject.jspa?id=10670&amp;subset=-1">List of all issues</a></li>
+        </ul>
 			</p>
+
 			<subsection name="0.7 (May 2005)">
 				<p>
-					<ul>
-						<li>Stable core API and its implementation</li>
-						<li>Frontend API</li>
-						<li>Support for various transport types:
-							<ul>
-								<li>TCP/IP</li>
-								<li>UDP/IP</li>
-								<li>In-VM pipe communication</li>
-							</ul>
-						</li>
-						<li>Stream-based I/O</li>
-						<li>Essential filters
-              <ul>
-                <li>SSL Filter based on Java 5 SSLEngine</li>
-                <li>Event logger</li>
-              </ul></li>
-					</ul>
-				</p>
+          <ul>
+            <li>The first official release</li>
+            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11067">List of issues</a></li>
+          </ul>
+        </p>
 			</subsection>
+      
+      <subsection name="0.8 (no date set)">
+        <p>
+          <ul>
+            <li>Maintenance release</li>
+            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11068">List of issues</a></li>
+          </ul>
+        </p>
+      </subsection>
 
 			<subsection name="0.9 (no date set)">
 				<p>
 					<ul>
-						<li>More useful filters
-							<ul>
-								<li>Performance tracing</li>
-								<li>Traffic throttling</li>
-								<li>Overload prevention</li>
-                <li>StartTLS</li>
-							</ul></li>
-					</ul>
-				</p>
+            <li>More transport types and filters</li>
+            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11069">List of issues</a></li>
+          </ul>
+        </p>
 			</subsection>
+
+      <subsection name="1.0 (no date set)">
+        <p>
+          <ul>
+            <li>Maintenance release</li>
+            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11070">List of issues</a></li>
+          </ul>
+        </p>
+      </subsection>
 
 			<subsection name="1.1 (no date set)">
 				<p>
 					<ul>
-						<li>Integration with containers: Spring and OSGi</li>
-						<li>JMX compliance</li>
+						<li>Integration with well known containers: Spring and OSGi</li>
+						<li>JMX integration</li>
+            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11071">List of issues</a></li>
 					</ul>
 				</p>
 			</subsection>
