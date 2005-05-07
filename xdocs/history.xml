@@ -11,7 +11,8 @@
         by Trustin Lee (trustin at apache dot org)
       </p>
       <p>
-        In June 2004, I released a network application framework, ‘Netty2’.
+        In June 2004, I released a network application framework,
+        '<a href="http://gleamynode.net/dev/tl-netty2/docs/" target="_blank">Netty2</a>'.
         It was the first network application framework that provides event-based
         architecture in Java community.  It attracted network application
         programmers because of its simplicity and ease of use.  As Netty2
