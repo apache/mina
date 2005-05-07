@@ -18,8 +18,8 @@
 
    <menu name="MINA">
      <item name="Overview" href="/index.html"/>
-     <item name="Introduction" href="/mina.pdf"/>
-     <item name="Tutorial" href="http://wiki.apache.org/directory/MinaTutorial"/>
+     <item name="Features" href="/features.html"/>
+     <item name="Getting Started" href="/getting_started.html"/>
      <item name="Roadmap" href="/roadmap.html"/>
    </menu>
 		
@@ -27,7 +27,7 @@
      <item name="JavaDocs" href="/apidocs/index.html" target="_blank"/>
      <item name="Source code" href="/xref/index.html" target="_blank"/>
      <item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/directory/network/mina/trunk/?root=Apache-SVN" target="_blank"/>
-     <item name="Wiki" href="http://wiki.apache.org/directory/MinaHome"/>
+     <item name="Wiki" href="http://wiki.apache.org/directory/MinaHome" target="_blank"/>
    </menu>
 		
    <menu name="MINA Examples">
