@@ -40,59 +40,5 @@
         </ul>
       </p>
     </section>
-		
-    <section name="Getting Started">
-      <p>
-        Please look at <a href="mina.pdf">this presentation</a> first of all.
-      </p>
-      <p>
-        Are you interested?  Now check out the source code from SVN repository:
-<source>
-$ svn co https://svn.apache.org/repos/asf/directory/network/trunk mina
-$ cd mina
-$ maven jar     # Build JAR
-$ maven site    # Generate documentation
-$ maven eclipse # Generate Eclipse project file if you want
-</source>
-      </p>
-      <p>
-        Tutorial is under construction.  Please start from
-        <a target="_blank" href="xref-examples/index.html">examples</a>
-        referring to
-        <a target="_blank" href="apidocs/index.html">JavaDocs</a>.
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Feature it demonstrates</th>
-            <th>Side</th>
-          </tr>
-          <tr>
-            <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/reverser/package-summary.html">Reverser</a></td>
-            <td>High-level protocol layer</td>
-            <td>Server</td>
-          </tr>
-          <tr>
-            <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/echoserver/package-summary.html">Echo server</a></td>
-            <td>Low-level I/O layer and SSL support</td>
-            <td>Server</td>
-          </tr>
-          <tr>
-            <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/netcat/package-summary.html">NetCat</a></td>
-            <td>Low-level I/O layer</td>
-            <td>Client</td>
-          </tr>
-          <tr>
-            <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/httpserver/package-summary.html">HTTP server</a></td>
-            <td>Stream-based synchronous I/O support.</td>
-            <td>Server</td>
-          </tr>
-          <tr>
-            <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/tennis/package-summary.html">Tennis</a></td>
-            <td>In-VM pipe communication support in protocol layer.</td>
-            <td>Both</td>
-          </tr>
-        </table>
-      </p>
-    </section>
   </body>
 </document>
