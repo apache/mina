@@ -5,7 +5,7 @@
   <id>mina</id>
   <name>MINA</name>
   <package>org.apache.mina</package>
-  <currentVersion>0.7-SNAPSHOT</currentVersion>
+  <currentVersion>0.7</currentVersion>
   <inceptionYear>2004</inceptionYear>
 
   <organization>
