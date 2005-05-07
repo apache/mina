@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <properties>
+    <author email="trustin@apache.org">Trustin Lee</author>
+    <title>History</title>
+  </properties>
+
+  <body>
+    <section name="History">
+      <p>
+        by Trustin Lee (trustin at apache dot org)
+      </p>
+      <p>
+        In June 2004, I released a network application framework, ‘Netty2’.
+        It was the first network application framework that provides event-based
+        architecture in Java community.  It attracted network application
+        programmers because of its simplicity and ease of use.  As Netty2
+        community grows up, its problems also arose.  Netty2 didn’t work fine
+        with text protocols and had severe architectural flaw that prevents users
+        from using it for applications with many concurrent clients.
+      </p>
+      <p>
+        Quite large amount of information was collected about what users like
+        about Netty2 and what improvements they want from it for 6 months.  It
+        was clear they like its ease of use and unit-testability.  They wanted
+        support for UDP/IP and text protocols.  I had to invent cleaner, more
+        flexible, and more extensible API so that it is easy to learn yet
+        full-featured.
+      </p>
+      <p>
+        In September 2004, I joined the Apache Directory team to improve
+        another network application framework, Apache SEDA.  It was based
+        on generic event model with predefined stages.  I liked its main idea,
+        but its core was too abstract to call it a network application
+        framework.  I saw many highly abstract but dead frameworks claiming
+        they can do whatever users want, and it was one of them.  So I urged
+        to create a new network application framework ‘MINA’ which is based on
+        my idea on Netty2-NG.
+      </p>
+      <p>
+         Although there was some competition between next generations of
+         Apache SEDA, MINA has finally won and it is now the only network
+         application framework our team uses.  We have implemented several
+         complex protocols such as LDAP, Kerberos, DNS and NTP, and realized
+         that implementing protocols can be a lot of fun instead of tedious
+         coding.
+      </p>
+    </section>
+  </body>
+</document>
