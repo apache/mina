@@ -8,12 +8,7 @@
   <currentVersion>0.7.1-SNAPSHOT</currentVersion>
   <inceptionYear>2004</inceptionYear>
 
-  <organization>
-    <name>The Apache Software Foundation</name>
-    <url>http://www.apache.org</url>
-  </organization>
-
-  <logo>/images/apache-directory-logo.png</logo>
+  <logo>http://directory.apache.org/images/apache-directory-logo.png</logo>
   <url>http://directory.apache.org/</url>
 
   <issueTrackingUrl>
