@@ -212,19 +212,16 @@ public class ConnectorTest extends AbstractTest
         
         public void dataWritten( IoSession session, Object marker )
         {
-            if( marker != SSLFilter.SSL_MARKER )
+            if( ( counter & 1 ) == 0 )
             {
-                if( ( counter & 1 ) == 0 )
-                {
-                    Assert.assertEquals( new Integer( counter ), marker );
-                }
-                else
-                {
-                    Assert.assertNull( marker );
-                }
-                
-                counter ++;
+                Assert.assertEquals( new Integer( counter ), marker );
             }
+            else
+            {
+                Assert.assertNull( marker );
+            }
+            
+            counter ++;
         }
 
         public void exceptionCaught( IoSession session, Throwable cause )

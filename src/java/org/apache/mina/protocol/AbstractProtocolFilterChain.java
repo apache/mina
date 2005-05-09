@@ -425,7 +425,7 @@ public abstract class AbstractProtocolFilterChain implements ProtocolFilterChain
         
         try
         {
-            entry.filter.filterWrite( entry.prevFilter, session, message );
+            entry.filter.filterWrite( entry.nextFilter, session, message );
         }
         catch( Throwable e )
         {
@@ -472,8 +472,6 @@ public abstract class AbstractProtocolFilterChain implements ProtocolFilterChain
 
         private final NextFilter nextFilter;
         
-        private final NextFilter prevFilter;
-
         private Entry( Entry prevEntry, Entry nextEntry,
                        String name, ProtocolFilter filter )
         {
@@ -528,46 +526,6 @@ public abstract class AbstractProtocolFilterChain implements ProtocolFilterChain
                 {
                     Entry nextEntry = Entry.this.nextEntry;
                     callNextMessageSent( nextEntry, session, message );
-                }
-                
-                public void filterWrite( ProtocolSession session, Object message )
-                {
-                    throw new IllegalStateException();
-                }
-            };
-            
-            this.prevFilter = new NextFilter()
-            {
-
-                public void sessionOpened( ProtocolSession session )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void sessionClosed( ProtocolSession session )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void sessionIdle( ProtocolSession session, IdleStatus status )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void exceptionCaught( ProtocolSession session,
-                                            Throwable cause )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void messageReceived( ProtocolSession session, Object message )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void messageSent( ProtocolSession session, Object message )
-                {
-                    throw new IllegalStateException();
                 }
                 
                 public void filterWrite( ProtocolSession session, Object message )

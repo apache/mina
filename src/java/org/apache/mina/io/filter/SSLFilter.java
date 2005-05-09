@@ -47,11 +47,12 @@ import org.apache.mina.io.IoSession;
 public class SSLFilter extends IoFilterAdapter
 {
     private static final Logger log = Logger.getLogger( SSLFilter.class.getName() );
+
     /**
      * A marker which is passed with {@link IoHandler#dataWritten(IoSession, Object)}
      * when <tt>SSLFilter</tt> writes data other then user actually requested.
      */
-    public static final Object SSL_MARKER = new Object()
+    private static final Object SSL_MARKER = new Object()
     {
         public String toString()
         {
@@ -187,7 +188,7 @@ public class SSLFilter extends IoFilterAdapter
     public void sessionOpened( NextFilter nextFilter, IoSession session ) throws SSLException
     {
         // Create an SSL handler
-        createSSLSessionHandler( session );
+        createSSLSessionHandler( nextFilter, session );
         nextFilter.sessionOpened( session );
     }
 
@@ -209,7 +210,7 @@ public class SSLFilter extends IoFilterAdapter
                   sslHandler.shutdown();
                   
                   // there might be data to write out here?
-                  writeNetBuffer( session, sslHandler );
+                  writeNetBuffer( nextFilter, session, sslHandler );
                }
                catch( SSLException ssle )
                {
@@ -243,7 +244,7 @@ public class SSLFilter extends IoFilterAdapter
                 try
                 {
                     // forward read encrypted data to SSL handler
-                    sslHandler.dataRead( buf.buf() );
+                    sslHandler.dataRead( nextFilter, buf.buf() );
 
                     // Handle data to be forwarded to application or written to net
                     handleSSLData( nextFilter, session, sslHandler );
@@ -281,13 +282,16 @@ public class SSLFilter extends IoFilterAdapter
     public void dataWritten( NextFilter nextFilter, IoSession session,
                             Object marker )
     {
-        nextFilter.dataWritten( session, marker );
+        if( marker != SSL_MARKER )
+        {
+            nextFilter.dataWritten( session, marker );
+        }
     }
 
     public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker ) throws SSLException
     {
 
-        SSLHandler handler = createSSLSessionHandler( session );
+        SSLHandler handler = createSSLSessionHandler( nextFilter, session );
         if( log.isLoggable( Level.FINEST ) )
         {
             log.log( Level.FINEST, session + " Filtered Write: " + handler );
@@ -358,7 +362,7 @@ public class SSLFilter extends IoFilterAdapter
         }
 
         // Write encrypted data to be written (if any)
-        writeNetBuffer( session, handler );
+        writeNetBuffer( nextFilter, session, handler );
 
         // handle app. data read (if any)
         handleAppDataRead( nextFilter, session, handler );
@@ -383,7 +387,7 @@ public class SSLFilter extends IoFilterAdapter
         }
     }
 
-    void writeNetBuffer( IoSession session, SSLHandler sslHandler )
+    void writeNetBuffer( NextFilter nextFilter, IoSession session, SSLHandler sslHandler )
             throws SSLException
     {
         // Check if any net data needed to be writen
@@ -415,14 +419,14 @@ public class SSLFilter extends IoFilterAdapter
                 log.log( Level.FINEST, session + " session write: " + writeBuffer );
             }
             //debug("outNetBuffer (after copy): {0}", sslHandler.getOutNetBuffer());
-            session.write( writeBuffer, SSL_MARKER );
+            filterWrite( nextFilter, session, writeBuffer, SSL_MARKER );
 
             // loop while more writes required to complete handshake
             while( sslHandler.needToCompleteInitialHandshake() )
             {
                 try
                 {
-                    sslHandler.continueHandshake();
+                    sslHandler.continueHandshake( nextFilter );
                 }
                 catch( SSLException ssle )
                 {
@@ -440,7 +444,7 @@ public class SSLFilter extends IoFilterAdapter
                     }
                     ByteBuffer writeBuffer2 = copy( sslHandler
                             .getOutNetBuffer() );
-                    session.write( writeBuffer2, SSL_MARKER );
+                    filterWrite( nextFilter, session, writeBuffer2, SSL_MARKER );
                 }
             }
         }
@@ -470,7 +474,7 @@ public class SSLFilter extends IoFilterAdapter
 
     // Utilities to mainpulate SSLHandler based on IoSession
 
-    private SSLHandler createSSLSessionHandler( IoSession session ) throws SSLException
+    private SSLHandler createSSLSessionHandler( NextFilter nextFilter, IoSession session ) throws SSLException
     {
         SSLHandler handler = ( SSLHandler ) sslSessionHandlerMap.get( session );
         if( handler == null )
@@ -486,7 +490,7 @@ public class SSLFilter extends IoFilterAdapter
                         handler =
                             new SSLHandler( this, sslContext, session );
                         sslSessionHandlerMap.put( session, handler );
-                        handler.doHandshake();
+                        handler.doHandshake( nextFilter );
                         done = true;
                     }
                     finally 
