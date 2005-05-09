@@ -426,7 +426,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         
         try
         {
-            entry.filter.filterWrite( entry.prevFilter, session, buf, marker );
+            entry.filter.filterWrite( entry.nextFilter, session, buf, marker );
         }
         catch( Throwable e )
         {
@@ -473,8 +473,6 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
         private final NextFilter nextFilter;
         
-        private final NextFilter prevFilter;
-
         private Entry( Entry prevEntry, Entry nextEntry,
                        String name, IoFilter filter )
         {
@@ -529,46 +527,6 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                 {
                     Entry nextEntry = Entry.this.nextEntry;
                     callNextDataWritten( nextEntry, session, marker );
-                }
-                
-                public void filterWrite( IoSession session, ByteBuffer buf, Object marker )
-                {
-                    throw new IllegalStateException();
-                }
-            };
-            
-            this.prevFilter = new NextFilter()
-            {
-
-                public void sessionOpened( IoSession session )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void sessionClosed( IoSession session )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void sessionIdle( IoSession session, IdleStatus status )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void exceptionCaught( IoSession session,
-                                            Throwable cause )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void dataRead( IoSession session, ByteBuffer buf )
-                {
-                    throw new IllegalStateException();
-                }
-
-                public void dataWritten( IoSession session, Object marker )
-                {
-                    throw new IllegalStateException();
                 }
                 
                 public void filterWrite( IoSession session, ByteBuffer buf, Object marker )

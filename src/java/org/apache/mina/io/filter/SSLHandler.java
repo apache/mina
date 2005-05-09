@@ -213,7 +213,7 @@ class SSLHandler
      * @param buf buffer to decrypt
      * @throws SSLException on errors
      */
-    public void dataRead( ByteBuffer buf ) throws SSLException
+    public void dataRead( NextFilter nextFilter, ByteBuffer buf ) throws SSLException
     {
         if ( buf.limit() > inNetBuffer.remaining() ) {
             // We have to expand inNetBuffer
@@ -236,7 +236,7 @@ class SSLHandler
         inNetBuffer.put( buf );
         if( !initialHandshakeComplete )
         {
-            doHandshake();
+            doHandshake( nextFilter );
         }
         else
         {
@@ -249,13 +249,13 @@ class SSLHandler
      *
      * @throws SSLException on errors
      */
-    public void continueHandshake() throws SSLException
+    public void continueHandshake( NextFilter nextFilter ) throws SSLException
     {
         if( log.isLoggable( Level.FINEST ) )
         {
             log.log( Level.FINEST, session + " continueHandshake()" );
         }
-        doHandshake();
+        doHandshake( nextFilter );
     }
 
     /**
@@ -403,7 +403,7 @@ class SSLHandler
     /**
      * Perform any handshaking processing.
      */
-    synchronized void doHandshake() throws SSLException
+    synchronized void doHandshake( NextFilter nextFilter ) throws SSLException
     {
 
         if( log.isLoggable( Level.FINEST ) )
@@ -474,7 +474,7 @@ class SSLHandler
 
                 outNetBuffer.flip();
                 initialHandshakeStatus = result.getHandshakeStatus();
-                parent.writeNetBuffer( session, this );
+                parent.writeNetBuffer( nextFilter, session, this );
                 // return to allow data on out buffer being sent
                 // TODO: We might want to send more data immidiatley?
             }
