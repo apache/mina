@@ -12,7 +12,7 @@
         We have chosen versioning strategy similar to that of Linux.
         Odd version numbers mean feature release, and even mean stable.
         <ul>
-          <li><a href="http://issues.apache.org/jira/secure/BrowseProject.jspa?id=10670&amp;subset=-1">List of all issues</a></li>
+          <li><a href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:roadmap-panel&amp;subset=-1">List of all issues</a></li>
         </ul>
 			</p>
 
