@@ -18,8 +18,8 @@
  */
 package org.apache.mina.protocol.codec;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -49,12 +49,8 @@ import org.apache.mina.protocol.ProtocolViolationException;
  */
 public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
 
-    private MessageDecoder[] decoders = new MessageDecoder[0];
-    private final Map encoders = new HashMap();
-    
-    private final ProtocolEncoder protocolEncoder = new ProtocolEncoderImpl();
-
-    private final ProtocolDecoder protocolDecoder = new ProtocolDecoderImpl();
+    private MessageDecoderFactory[] decoderFactories = new MessageDecoderFactory[0];
+    private MessageEncoderFactory[] encoderFactories = new MessageEncoderFactory[0];
     
     public DemuxingProtocolCodecFactory()
     {
@@ -62,37 +58,67 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     
     public void register( MessageEncoder encoder )
     {
-        Iterator it = encoder.getMessageTypes().iterator();
-        while( it.hasNext() )
-        {
-            Class type = (Class) it.next();
-            encoders.put( type, encoder );
-        }
+        register( new SingletonMessageEncoderFactory( encoder ) );
     }
     
-    public void register( MessageDecoder decoder )
+    public void register( MessageEncoderFactory factory )
     {
-        if( decoder == null )
+        if( factory == null )
         {
-            throw new NullPointerException( "decoder" );
+            throw new NullPointerException( "factory" );
         }
-        MessageDecoder[] decoders = this.decoders;
-        MessageDecoder[] newDecoders = new MessageDecoder[ decoders.length + 1 ];
-        System.arraycopy( decoders, 0, newDecoders, 0, decoders.length );
-        newDecoders[ decoders.length ] = decoder;
-        this.decoders = newDecoders;
+        MessageEncoderFactory[] encoderFactories = this.encoderFactories;
+        MessageEncoderFactory[] newEncoderFactories = new MessageEncoderFactory[ encoderFactories.length + 1 ];
+        System.arraycopy( encoderFactories, 0, newEncoderFactories, 0, encoderFactories.length );
+        newEncoderFactories[ encoderFactories.length ] = factory;
+        this.encoderFactories = newEncoderFactories;
+    }
+    
+    public void register( final MessageDecoder decoder )
+    {
+        register( new SingletonMessageDecoderFactory( decoder ) );
+    }
+    
+    public void register( MessageDecoderFactory factory )
+    {
+        if( factory == null )
+        {
+            throw new NullPointerException( "factory" );
+        }
+        MessageDecoderFactory[] decoderFactories = this.decoderFactories;
+        MessageDecoderFactory[] newDecoderFactories = new MessageDecoderFactory[ decoderFactories.length + 1 ];
+        System.arraycopy( decoderFactories, 0, newDecoderFactories, 0, decoderFactories.length );
+        newDecoderFactories[ decoderFactories.length ] = factory;
+        this.decoderFactories = newDecoderFactories;
     }
     
     public ProtocolEncoder newEncoder() {
-        return protocolEncoder;
+        return new ProtocolEncoderImpl();
     }
 
     public ProtocolDecoder newDecoder() {
-        return protocolDecoder;
+        return new ProtocolDecoderImpl();
     }
     
     private class ProtocolEncoderImpl implements ProtocolEncoder
     {
+        private final Map encoders = new IdentityHashMap();
+        
+        private ProtocolEncoderImpl()
+        {
+            MessageEncoderFactory[] encoderFactories = DemuxingProtocolCodecFactory.this.encoderFactories;
+            for( int i = encoderFactories.length - 1; i >= 0; i-- )
+            {
+                MessageEncoder encoder = encoderFactories[ i ].newEncoder();
+                Iterator it = encoder.getMessageTypes().iterator();
+                while( it.hasNext() )
+                {
+                    Class type = ( Class ) it.next();
+                    encoders.put( type, encoder );
+                }
+            }
+        }
+        
         public void encode( ProtocolSession session, Object message,
                             ProtocolEncoderOutput out ) throws ProtocolViolationException
         {
@@ -149,11 +175,19 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     
     private class ProtocolDecoderImpl extends CumulativeProtocolDecoder
     {
+        private final MessageDecoder[] decoders;
         private MessageDecoder currentDecoder;
 
         protected ProtocolDecoderImpl()
         {
             super( 16 );
+            
+            MessageDecoderFactory[] decoderFactories = DemuxingProtocolCodecFactory.this.decoderFactories;
+            decoders = new MessageDecoder[ decoderFactories.length ];
+            for( int i = decoderFactories.length - 1; i >= 0; i-- )
+            {
+                decoders[ i ] = decoderFactories[ i ].newDecoder();
+            }
         }
 
         protected boolean doDecode( ProtocolSession session, ByteBuffer in,
@@ -161,7 +195,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         {
             if( currentDecoder == null )
             {
-                MessageDecoder[] decoders = DemuxingProtocolCodecFactory.this.decoders;
+                MessageDecoder[] decoders = this.decoders;
                 int undecodables = 0;
                 for( int i = decoders.length - 1; i >= 0; i -- ) 
                 {
@@ -220,6 +254,44 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             {
                 throw new IllegalStateException( "Unexpected decode result (see your decode()): " + result );
             }
+        }
+    }
+    
+    private static class SingletonMessageEncoderFactory implements MessageEncoderFactory
+    {
+        private final MessageEncoder encoder;
+        
+        private SingletonMessageEncoderFactory( MessageEncoder encoder )
+        {
+            if( encoder == null )
+            {
+                throw new NullPointerException( "encoder" );
+            }
+            this.encoder = encoder;
+        }
+
+        public MessageEncoder newEncoder()
+        {
+            return encoder;
+        }
+    }
+
+    private static class SingletonMessageDecoderFactory implements MessageDecoderFactory
+    {
+        private final MessageDecoder decoder;
+        
+        private SingletonMessageDecoderFactory( MessageDecoder decoder )
+        {
+            if( decoder == null )
+            {
+                throw new NullPointerException( "decoder" );
+            }
+            this.decoder = decoder;
+        }
+
+        public MessageDecoder newDecoder()
+        {
+            return decoder;
         }
     }
 }
