@@ -56,6 +56,22 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     {
     }
     
+    public void register( Class encoderOrDecoderClass )
+    {
+        if( MessageEncoder.class.isAssignableFrom( encoderOrDecoderClass ) )
+        {
+            register( new DefaultConstructorMessageEncoderFactory( encoderOrDecoderClass ) );
+        }
+        else if( MessageDecoder.class.isAssignableFrom( encoderOrDecoderClass ) )
+        {
+            register( new DefaultConstructorMessageDecoderFactory( encoderOrDecoderClass ) );
+        }
+        else
+        {
+            throw new IllegalArgumentException();
+        }
+    }
+    
     public void register( MessageEncoder encoder )
     {
         register( new SingletonMessageEncoderFactory( encoder ) );
@@ -74,7 +90,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         this.encoderFactories = newEncoderFactories;
     }
     
-    public void register( final MessageDecoder decoder )
+    public void register( MessageDecoder decoder )
     {
         register( new SingletonMessageDecoderFactory( decoder ) );
     }
@@ -292,6 +308,68 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         public MessageDecoder newDecoder()
         {
             return decoder;
+        }
+    }
+    
+    private static class DefaultConstructorMessageEncoderFactory implements MessageEncoderFactory
+    {
+        private final Class encoderClass;
+        
+        private DefaultConstructorMessageEncoderFactory( Class encoderClass )
+        {
+            if( encoderClass == null )
+            {
+                throw new NullPointerException( "encoderClass" );
+            }
+            
+            if( !MessageEncoder.class.isAssignableFrom( encoderClass ) )
+            {
+                throw new IllegalArgumentException( "encoderClass is not assignable to MessageEncoder" );
+            }
+            this.encoderClass = encoderClass;
+        }
+
+        public MessageEncoder newEncoder()
+        {
+            try
+            {
+                return ( MessageEncoder ) encoderClass.newInstance();
+            }
+            catch( Exception e )
+            {
+                throw new RuntimeException( "Failed to create a new instance of " + encoderClass, e );
+            }
+        }
+    }
+
+    private static class DefaultConstructorMessageDecoderFactory implements MessageDecoderFactory
+    {
+        private final Class decoderClass;
+        
+        private DefaultConstructorMessageDecoderFactory( Class decoderClass )
+        {
+            if( decoderClass == null )
+            {
+                throw new NullPointerException( "decoderClass" );
+            }
+            
+            if( !MessageDecoder.class.isAssignableFrom( decoderClass ) )
+            {
+                throw new IllegalArgumentException( "decoderClass is not assignable to MessageDecoder" );
+            }
+            this.decoderClass = decoderClass;
+        }
+
+        public MessageDecoder newDecoder()
+        {
+            try
+            {
+                return ( MessageDecoder ) decoderClass.newInstance();
+            }
+            catch( Exception e )
+            {
+                throw new RuntimeException( "Failed to create a new instance of " + decoderClass, e );
+            }
         }
     }
 }
