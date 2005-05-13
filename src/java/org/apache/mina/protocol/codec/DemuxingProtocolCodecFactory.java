@@ -58,17 +58,27 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     
     public void register( Class encoderOrDecoderClass )
     {
+        if( encoderOrDecoderClass == null )
+        {
+            throw new NullPointerException( "encoderOrDecoderClass" );
+        }
+
+        boolean registered = false;
         if( MessageEncoder.class.isAssignableFrom( encoderOrDecoderClass ) )
         {
             register( new DefaultConstructorMessageEncoderFactory( encoderOrDecoderClass ) );
+            registered = true;
         }
-        else if( MessageDecoder.class.isAssignableFrom( encoderOrDecoderClass ) )
+        
+        if( MessageDecoder.class.isAssignableFrom( encoderOrDecoderClass ) )
         {
             register( new DefaultConstructorMessageDecoderFactory( encoderOrDecoderClass ) );
+            registered = true;
         }
-        else
+        
+        if( !registered )
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException( "Unregisterable type: " + encoderOrDecoderClass );
         }
     }
     
