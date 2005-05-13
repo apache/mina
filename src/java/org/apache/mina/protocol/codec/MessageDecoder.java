@@ -31,6 +31,7 @@ import org.apache.mina.protocol.ProtocolViolationException;
  * @version $Rev$, $Date$
  * 
  * @see DemuxingProtocolCodecFactory
+ * @see MessageDecoderFactory
  */
 public interface MessageDecoder {
     /**

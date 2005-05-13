@@ -18,24 +18,19 @@
  */
 package org.apache.mina.protocol.codec;
 
-import java.util.Set;
-
-import org.apache.mina.protocol.ProtocolEncoder;
-
 /**
- * Encodes messages of specific types specified by {@link #getMessageTypes()}.
+ * A factory that creates a new instance of {@link MessageEncoder}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see DemuxingProtocolCodecFactory
- * @see MessageEncoderFactory
  */
-public interface MessageEncoder extends ProtocolEncoder
-{  
+public interface MessageEncoderFactory
+{
     /**
-     * Returns the set of message classes this encoder can encode.
+     * Creates a new message encoder.
      */
-    Set getMessageTypes();
+    MessageEncoder newEncoder();
 }
