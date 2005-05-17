@@ -60,7 +60,7 @@
         <p>
           Source code:
 <source>
-$ svn co https://svn.apache.org/repos/asf/directory/network/trunk mina
+$ svn co https://svn.apache.org/repos/asf/directory/network/branches/0.7 mina
 $ cd mina
 $ maven jar     # Build JAR
 $ maven site    # Generate documentation
