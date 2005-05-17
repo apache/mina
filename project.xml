@@ -24,13 +24,13 @@
 
   <repository>
     <connection>
-      scm:svn:http://svn.apache.org/repos/asf/directory:network/trunk
+      scm:svn:http://svn.apache.org/repos/asf/directory:network/branches/0.7
     </connection>
     <url>
-      http://svn.apache.org/viewcvs.cgi/directory/network/trunk/?root=Apache-SVN
+      http://svn.apache.org/viewcvs.cgi/directory/network/branches/0.7/?root=Apache-SVN
     </url>
     <developerConnection>
-      scm:svn:https://svn.apache.org/repos/asf/directory:network/trunk
+      scm:svn:https://svn.apache.org/repos/asf/directory:network/branches/0.7
     </developerConnection>
   </repository>
 
@@ -154,7 +154,9 @@
     <report>maven-changes-plugin</report>
     <report>maven-jxr-plugin</report>
     <report>maven-junit-report-plugin</report>
+    <!-- Test fails if enabled.
     <report>maven-emma-plugin</report>
+    -->
     <report>maven-jdepend-plugin</report>
     <report>maven-simian-plugin</report>
     <report>maven-tasklist-plugin</report>
