@@ -230,9 +230,9 @@ public class SSLFilter extends IoFilterAdapter
     }
    
     public void dataRead( NextFilter nextFilter, IoSession session,
-                         ByteBuffer buf )
+                          ByteBuffer buf ) throws SSLException
     {
-        SSLHandler sslHandler = getSSLSessionHandler( session );
+        SSLHandler sslHandler = createSSLSessionHandler( nextFilter, session );
         if( sslHandler != null )
         {
             if( log.isLoggable( Level.FINEST ) )
