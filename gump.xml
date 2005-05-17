@@ -14,13 +14,11 @@
     <package>org.apache.mina</package>
     <depend project="commons-net">
     </depend>
-    <depend project="directory-asn1">
+    <depend project="emma">
     </depend>
     <depend project="jakarta-ant">
     </depend>
     <depend project="junit">
-    </depend>
-    <depend project="tl-netty2">
     </depend>
     <depend project="xml-xerces">
     </depend>
