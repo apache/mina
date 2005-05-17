@@ -27,7 +27,7 @@
    <menu name="MINA References">
      <item name="JavaDocs" href="/apidocs/index.html" target="_blank"/>
      <item name="Source code" href="/xref/index.html" target="_blank"/>
-     <item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/directory/network/mina/trunk/?root=Apache-SVN" target="_blank"/>
+     <item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/directory/network/branches/0.7/?root=Apache-SVN" target="_blank"/>
      <item name="Wiki" href="http://wiki.apache.org/directory/MinaHome" target="_blank"/>
    </menu>
 		
