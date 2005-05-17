@@ -71,8 +71,8 @@ import org.apache.mina.util.Stack;
  * 
  * <h2>Acquire/Release</h2>
  * <p>
- * <b>Please note that you never need to release the allocated buffer because
- * MINA will release it automatically when:
+ * <b>Please note that you never need to release the allocated buffer</b>
+ * because MINA will release it automatically when:
  * <ul>
  *   <li>You pass the buffer by calling {@link IoSession#write(ByteBuffer, Object)}.</li>
  *   <li>You pass the buffer by calling {@link ProtocolEncoderOutput#write(ByteBuffer)}.</li>
@@ -168,8 +168,14 @@ public abstract class ByteBuffer
     public static ByteBuffer allocate( int capacity, boolean direct )
     {
         java.nio.ByteBuffer nioBuffer = allocate0( capacity, direct );
+        DefaultByteBuffer buf = allocateContainer();
+        buf.init( nioBuffer );
+        return buf;
+    }
+
+    private static DefaultByteBuffer allocateContainer()
+    {
         DefaultByteBuffer buf;
-        
         synchronized( containerStack )
         {
             buf = ( DefaultByteBuffer ) containerStack.pop();
@@ -179,8 +185,6 @@ public abstract class ByteBuffer
         {
             buf = new DefaultByteBuffer();
         }
-
-        buf.init( nioBuffer );
         return buf;
     }
     
@@ -226,7 +230,7 @@ public abstract class ByteBuffer
      */
     public static ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
-        DefaultByteBuffer buf = new DefaultByteBuffer();
+        DefaultByteBuffer buf = allocateContainer();
         buf.init( nioBuffer );
         return buf;
     }
