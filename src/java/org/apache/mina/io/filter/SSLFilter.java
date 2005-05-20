@@ -192,7 +192,7 @@ public class SSLFilter extends IoFilterAdapter
         nextFilter.sessionOpened( session );
     }
 
-    public void sessionClosed( NextFilter nextFilter, IoSession session )
+    public void sessionClosed( NextFilter nextFilter, IoSession session ) throws SSLException
     {
         SSLHandler sslHandler = getSSLSessionHandler( session );
         if( log.isLoggable( Level.FINEST ) )
@@ -211,10 +211,6 @@ public class SSLFilter extends IoFilterAdapter
                   
                   // there might be data to write out here?
                   writeNetBuffer( nextFilter, session, sslHandler );
-               }
-               catch( SSLException ssle )
-               {
-                  nextFilter.exceptionCaught( session, ssle );
                }
                finally
                {
@@ -269,7 +265,7 @@ public class SSLFilter extends IoFilterAdapter
                         ssle = newSSLE;
                     }
 
-                    nextFilter.exceptionCaught( session, ssle );
+                    throw ssle;
                 }
             }
         }
