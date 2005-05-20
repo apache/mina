@@ -87,6 +87,36 @@ import org.apache.mina.util.Stack;
  *   <li>You called {@link #acquire()} to prevent the buffer from being released.</li>
  * </ul>
  * 
+ * <h2>Wrapping existing NIO buffers and arrays</h2>
+ * <p>
+ * This class provides a few <tt>wrap(...)</tt> methods that wraps
+ * any NIO buffers and byte arrays.  But please be careful and use these
+ * methods at your own risk.  Using those methods can cause memory leakage
+ * if you keep wrapping new NIO buffers and arrays because even wrapped
+ * MINA buffers are going to be pooled when they are released by MINA.
+ * <p>
+ * To resolve this issue, please do not keeping wrapping NIO buffers if
+ * possible.  If you're working with any third party component that keeps
+ * creating NIO buffers, please call {@link #acquire()} once more and
+ * don't call {@link #release()} for it, then it will not be returned to
+ * the pool and GC'd eventually.  Here's the example:
+ * <pre>
+ * import org.apache.mina.common.*;
+ * import org.apache.mina.io.*;
+ *
+ * IoSession session = ...;
+ * for (;;) {
+ *     // readData() returns a newly allocate NIO buffer.
+ *     java.nio.ByteBuffer newBuffer = otherApplication.readData();
+ *     
+ *     // Wrap it.
+ *     ByteBuffer wrappedBuffer = ByteBuffer.wrap(newBuffer);
+ *     // Acquire once and don't call release to prevent MINA from pooling it. 
+ *     wrappedBuffer.acquire();
+ *     session.write(wrappedBuffer, marker);
+ * }
+ * </pre>
+ * 
  * <h2>AutoExpand</h2>
  * <p>
  * Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
@@ -224,9 +254,6 @@ public abstract class ByteBuffer
     
     /**
      * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
-     * Please note that MINA buffers are going to be pooled, and
-     * therefore there can be waste of memory if you specified
-     * a sliced buffer.
      */
     public static ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
