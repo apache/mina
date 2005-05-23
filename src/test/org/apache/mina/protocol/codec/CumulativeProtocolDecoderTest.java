@@ -130,6 +130,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
         protected boolean doDecode( ProtocolSession session, ByteBuffer in,
                                     ProtocolDecoderOutput out ) throws ProtocolViolationException
         {
+            Assert.assertTrue( in.hasRemaining() );
             if( in.remaining() < 4 )
                 return false;
             
