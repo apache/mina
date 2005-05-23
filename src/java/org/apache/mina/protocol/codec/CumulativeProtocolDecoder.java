@@ -101,15 +101,23 @@ public abstract class CumulativeProtocolDecoder implements ProtocolDecoder {
             for( ;; )
             {
                 int oldPos = buf.position();
-                if( !doDecode( session, buf, out ) )
+                boolean decoded = doDecode( session, buf, out );
+                if( decoded )
+                {
+                    if( buf.position() == oldPos )
+                    {
+                        throw new IllegalStateException(
+                                "doDecode() can't return true when buffer is not consumed." );
+                    }
+                    
+                    if( !buf.hasRemaining() )
+                    {
+                        break;
+                    }
+                }
+                else
                 {
                     break;
-                }
-                
-                if( buf.position() == oldPos )
-                {
-                    throw new IllegalStateException(
-                            "doDecode() can't return true when buffer is not consumed." );
                 }
             }
         }
