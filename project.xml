@@ -154,9 +154,7 @@
     <report>maven-changes-plugin</report>
     <report>maven-jxr-plugin</report>
     <report>maven-junit-report-plugin</report>
-    <!-- Test fails if enabled.
     <report>maven-emma-plugin</report>
-    -->
     <report>maven-jdepend-plugin</report>
     <report>maven-simian-plugin</report>
     <report>maven-tasklist-plugin</report>

@@ -190,7 +190,16 @@ class SocketIoProcessor
 
             SocketChannel ch = session.getChannel();
             SelectionKey key = session.getSelectionKey();
-            if( !key.isValid() ) // skip if channel is already closed
+            // Retry later if session is not yet fully initialized.
+            // (In case that Session.close() is called before addSession() is processed)
+            if( key == null )
+            {
+                scheduleRemove( session );
+                break;
+            }
+
+            // skip if channel is already closed
+            if( !key.isValid() )
             {
                 continue;
             }
@@ -366,6 +375,7 @@ class SocketIoProcessor
     {
         if( writeTimeout > 0
             && ( currentTime - lastIoTime ) >= writeTimeout
+            && session.getSelectionKey() != null
             && ( session.getSelectionKey().interestOps() & SelectionKey.OP_WRITE ) != 0 )
         {
             session
@@ -397,14 +407,25 @@ class SocketIoProcessor
                 continue;
             }
 
-            try
+            // If encountered write request before session is initialized, 
+            // (In case that Session.write() is called before addSession() is processed)
+            if( session.getSelectionKey() == null )
             {
-                flush( session );
+                // Reschedule for later write
+                scheduleFlush( session );
+                break;
             }
-            catch( IOException e )
+            else
             {
-                scheduleRemove( session );
-                session.getManagerFilterChain().exceptionCaught( session, e );
+                try
+                {
+                    flush( session );
+                }
+                catch( IOException e )
+                {
+                    scheduleRemove( session );
+                    session.getManagerFilterChain().exceptionCaught( session, e );
+                }
             }
         }
     }
