@@ -227,10 +227,18 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
                 {
                     MessageDecoder decoder = decoders[i];
                     int limit = in.limit();
-                    in.position( 0 );
-                    MessageDecoderResult result = decoder.decodable( session, in );
-                    in.position( 0 );
-                    in.limit( limit );
+                    int pos = in.position();
+
+                    MessageDecoderResult result;
+                    try
+                    {
+                        result = decoder.decodable( session, in );
+                    }
+                    finally
+                    {
+                        in.position( pos );
+                        in.limit( limit );
+                    }
                     
                     if( result == MessageDecoder.OK )
                     {
