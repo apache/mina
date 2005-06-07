@@ -100,7 +100,7 @@ class IoAdapter
             this.handler = protocolProvider.getHandler();
         }
         
-        public void sessionCreated( IoSession session )
+        public void sessionCreated( IoSession session ) throws Exception
         {
             handler.sessionCreated( getProtocolSession( session ) );
         }

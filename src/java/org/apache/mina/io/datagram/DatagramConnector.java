@@ -51,7 +51,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
 
     private final int id = nextId ++ ;
 
-    private final Selector selector;
+    private Selector selector;
 
     private final Queue registerQueue = new Queue();
 
@@ -63,12 +63,9 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
 
     /**
      * Creates a new instance.
-     * 
-     * @throws IOException if failed to open a selector
      */
-    public DatagramConnector() throws IOException
+    public DatagramConnector()
     {
-        selector = Selector.open();
     }
 
     public IoSession connect( SocketAddress address, IoHandler handler ) throws IOException
@@ -159,10 +156,11 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
         return request.session;
     }
     
-    private synchronized void startupWorker()
+    private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
         {
+            selector = Selector.open();
             worker = new Worker();
             worker.start();
         }
@@ -172,12 +170,25 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
     {
         synchronized( this )
         {
+            try
+            {
+                startupWorker();
+            }
+            catch( IOException e )
+            {
+                // IOException is thrown only when Worker thread is not
+                // running and failed to open a selector.  We simply return
+                // silently here because it we can simply conclude that
+                // this session is not managed by this connector or
+                // already closed.
+                return;
+            }
+
             SelectionKey key = session.getSelectionKey();
             synchronized( cancelQueue )
             {
                 cancelQueue.push( key );
             }
-            startupWorker();
         }
 
         selector.wakeup();
@@ -231,6 +242,18 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                                 cancelQueue.isEmpty() )
                             {
                                 worker = null;
+                                try
+                                {
+                                    selector.close();
+                                }
+                                catch( IOException e )
+                                {
+                                    exceptionMonitor.exceptionCaught( DatagramConnector.this, e );
+                                }
+                                finally
+                                {
+                                    selector = null;
+                                }
                                 break;
                             }
                         }
