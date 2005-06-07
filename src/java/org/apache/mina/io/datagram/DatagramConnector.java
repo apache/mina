@@ -184,10 +184,9 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 return;
             }
 
-            SelectionKey key = session.getSelectionKey();
             synchronized( cancelQueue )
             {
-                cancelQueue.push( key );
+                cancelQueue.push( session );
             }
         }
 
@@ -485,16 +484,16 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
 
         for( ;; )
         {
-            SelectionKey key;
+            DatagramSession session;
             synchronized( cancelQueue )
             {
-                key = ( SelectionKey ) cancelQueue.pop();
+                session = ( DatagramSession ) cancelQueue.pop();
             }
-
-            if( key == null )
+            if( session == null )
                 break;
             else
             {
+                SelectionKey key = session.getSelectionKey();
                 DatagramChannel ch = ( DatagramChannel ) key.channel();
                 try
                 {
@@ -504,6 +503,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 {
                     exceptionMonitor.exceptionCaught( this, e );
                 }
+                session.notifyClose();
                 key.cancel();
                 selector.wakeup(); // wake up again to trigger thread death
             }
