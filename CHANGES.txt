@@ -1,0 +1,16 @@
+Changes introducted in 0.7.1
+============================
+
+ o fixed performance bug in JIRA 123456
+ o added feature xyz
+ o changed API where now we require a abc123() method in ProtocolProvider
+...
+
+Changes introducted in 0.7.2
+============================
+
+ o fixed performance bug in JIRA 123456
+ o added feature xyz
+ o changed API where now we require a abc123() method in ProtocolProvider
+...
+
