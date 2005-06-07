@@ -57,7 +57,7 @@ class SSLHandler
     
     private final Queue writeMarkerQueue = new Queue();
 
-    private SSLEngine sslEngine;
+    private final SSLEngine sslEngine;
 
     /**
      * Encrypted data from the net
