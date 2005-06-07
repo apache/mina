@@ -46,6 +46,12 @@ import org.apache.mina.io.IoSession;
  */
 public class SSLFilter extends IoFilterAdapter
 {
+    /**
+     * Session attribute key that stores underlying {@link javax.net.ssl.SSLSession}
+     * for each session.
+     */
+    public static final String SSL_SESSION = SSLFilter.class.getName() + ".SSLSession";
+
     private static final Logger log = Logger.getLogger( SSLFilter.class.getName() );
 
     /**
