@@ -37,7 +37,7 @@ public abstract class DemuxingProtocolHandler implements ProtocolHandler
      * Registers a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
      */
-    protected void registerMessageType( Class type, MessageHandler handler )
+    public void registerMessageType( Class type, MessageHandler handler )
     {
         synchronized( type2handler )
         {
@@ -49,7 +49,7 @@ public abstract class DemuxingProtocolHandler implements ProtocolHandler
      * Deregisters a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
      */
-    protected void deregisterMessageType( Class clazz )
+    public void deregisterMessageType( Class clazz )
     {
         synchronized( type2handler )
         {
