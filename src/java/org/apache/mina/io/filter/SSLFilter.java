@@ -18,8 +18,6 @@
  */
 package org.apache.mina.io.filter;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +25,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLSession;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.io.IoFilterAdapter;
@@ -47,10 +46,12 @@ import org.apache.mina.io.IoSession;
 public class SSLFilter extends IoFilterAdapter
 {
     /**
-     * Session attribute key that stores underlying {@link javax.net.ssl.SSLSession}
+     * Session attribute key that stores underlying {@link SSLSession}
      * for each session.
      */
     public static final String SSL_SESSION = SSLFilter.class.getName() + ".SSLSession";
+    
+    private static final String SSL_HANDLER = SSLFilter.class.getName() + ".SSLHandler";
 
     private static final Logger log = Logger.getLogger( SSLFilter.class.getName() );
 
@@ -69,9 +70,6 @@ public class SSLFilter extends IoFilterAdapter
     // SSL Context
     private SSLContext sslContext;
 
-    // Map used to map SSLHandler objects per session (key is IoSession)
-    private Map sslSessionHandlerMap = new IdentityHashMap();
-
     private boolean client;
     private boolean needClientAuth;
     private boolean wantClientAuth;
@@ -89,6 +87,16 @@ public class SSLFilter extends IoFilterAdapter
         }
 
         this.sslContext = sslContext;
+    }
+    
+    /**
+     * Returns the underlying {@link SSLSession} for the specified session.
+     * 
+     * @return <tt>null</tt> if no {@link SSLSession} is initialized yet.
+     */
+    public SSLSession getSSLSession( IoSession session )
+    {
+        return ( SSLSession ) session.getAttribute( SSL_SESSION );
     }
 
     /**
@@ -478,12 +486,12 @@ public class SSLFilter extends IoFilterAdapter
 
     private SSLHandler createSSLSessionHandler( NextFilter nextFilter, IoSession session ) throws SSLException
     {
-        SSLHandler handler = ( SSLHandler ) sslSessionHandlerMap.get( session );
+        SSLHandler handler = getSSLSessionHandler( session );
         if( handler == null )
         {
-            synchronized( sslSessionHandlerMap )
+            synchronized( session )
             {
-                handler = ( SSLHandler ) sslSessionHandlerMap.get( session );
+                handler = getSSLSessionHandler( session );
                 if( handler == null )
                 {
                     boolean done = false;
@@ -491,7 +499,7 @@ public class SSLFilter extends IoFilterAdapter
                     {
                         handler =
                             new SSLHandler( this, sslContext, session );
-                        sslSessionHandlerMap.put( session, handler );
+                        session.setAttribute( SSL_HANDLER, handler );
                         handler.doHandshake( nextFilter );
                         done = true;
                     }
@@ -499,7 +507,7 @@ public class SSLFilter extends IoFilterAdapter
                     {
                         if( !done )
                         {
-                            sslSessionHandlerMap.remove( session );
+                            session.removeAttribute( SSL_HANDLER );
                         }
                     }
                 }
@@ -511,14 +519,11 @@ public class SSLFilter extends IoFilterAdapter
 
     private SSLHandler getSSLSessionHandler( IoSession session )
     {
-        return ( SSLHandler ) sslSessionHandlerMap.get( session );
+        return ( SSLHandler ) session.getAttribute( SSL_HANDLER );
     }
 
     private void removeSSLSessionHandler( IoSession session )
     {
-        synchronized( sslSessionHandlerMap )
-        {
-            sslSessionHandlerMap.remove( session );
-        }
+        session.removeAttribute( SSL_HANDLER );
     }
 }
