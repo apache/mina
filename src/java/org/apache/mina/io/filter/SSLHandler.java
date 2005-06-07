@@ -111,8 +111,16 @@ class SSLHandler
         this.session = session;
         sslEngine = sslc.createSSLEngine();
         sslEngine.setUseClientMode( parent.isUseClientMode() );
-        sslEngine.setNeedClientAuth( parent.isNeedClientAuth() );
-        sslEngine.setWantClientAuth( parent.isWantClientAuth() );
+
+        if ( parent.isWantClientAuth() )
+        {
+            sslEngine.setWantClientAuth( true );
+        }
+
+        if ( parent.isNeedClientAuth() )
+        {
+            sslEngine.setNeedClientAuth( true );
+        }
   
         if( parent.getEnabledCipherSuites() != null )
         {
@@ -127,7 +135,6 @@ class SSLHandler
         sslEngine.beginHandshake();   
         initialHandshakeStatus = sslEngine.getHandshakeStatus();//SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
         initialHandshakeComplete = false;
-        //SSLSession sslSession = sslEngine.getSession
         
         SSLByteBufferPool.initiate( sslEngine );
 
@@ -415,11 +422,12 @@ class SSLHandler
         {
             if( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED )
             {
+                session.setAttribute( SSLFilter.SSL_SESSION, sslEngine.getSession() );
                 if( log.isLoggable( Level.FINEST ) )
                 {
                     SSLSession sslSession = sslEngine.getSession();
                     log.log( Level.FINEST, session + "  initialHandshakeStatus=FINISHED" );
-                    log.log( Level.FINEST, session + "  sslSession CipherSuite used " + sslSession.getCipherSuite());
+                    log.log( Level.FINEST, session + "  sslSession CipherSuite used " + sslSession.getCipherSuite() );
                 }
                 initialHandshakeComplete = true;
                 return;
