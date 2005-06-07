@@ -102,6 +102,7 @@ class IoAdapter
         
         public void sessionCreated( IoSession session )
         {
+            handler.sessionCreated( getProtocolSession( session ) );
         }
 
         public void sessionOpened( IoSession session )
