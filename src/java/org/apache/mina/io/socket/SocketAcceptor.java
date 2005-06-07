@@ -51,7 +51,7 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
 
     private final int id = nextId ++ ;
 
-    private final Selector selector;
+    private Selector selector;
 
     private final Map channels = new HashMap();
 
@@ -66,12 +66,9 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
 
     /**
      * Creates a new instance.
-     * 
-     * @throws IOException
      */
-    public SocketAcceptor() throws IOException
+    public SocketAcceptor()
     {
-        selector = Selector.open();
     }
 
     /**
@@ -137,10 +134,11 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
     }
 
 
-    private synchronized void startupWorker()
+    private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
         {
+            selector = Selector.open();
             worker = new Worker();
 
             worker.start();
@@ -158,11 +156,23 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
         CancellationRequest request = new CancellationRequest( address );
         synchronized( this )
         {
+            try
+            {
+                startupWorker();
+            }
+            catch( IOException e )
+            {
+                // IOException is thrown only when Worker thread is not
+                // running and failed to open a selector.  We simply throw
+                // IllegalArgumentException here because we can simply
+                // conclude that nothing is bound to the selector.
+                throw new IllegalArgumentException( "Address not bound: " + address );
+            }
+
             synchronized( cancelQueue )
             {
                 cancelQueue.push( request );
             }
-            startupWorker();
         }
         
         selector.wakeup();
@@ -242,7 +252,18 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
                                 cancelQueue.isEmpty() )
                             {
                                 worker = null;
-
+                                try
+                                {
+                                    selector.close();
+                                }
+                                catch( IOException e )
+                                {
+                                    exceptionMonitor.exceptionCaught( SocketAcceptor.this, e );
+                                }
+                                finally
+                                {
+                                    selector = null;
+                                }
                                 break;
                             }
                         }

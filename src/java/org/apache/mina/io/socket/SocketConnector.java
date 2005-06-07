@@ -51,7 +51,7 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
     private final IoSessionManagerFilterChain filters = new SocketSessionManagerFilterChain( this );
 
-    private final Selector selector;
+    private Selector selector;
 
     private final Queue connectQueue = new Queue();
 
@@ -59,12 +59,9 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
 
     /**
      * Creates a new instance.
-     * 
-     * @throws IOException
      */
-    public SocketConnector() throws IOException
+    public SocketConnector()
     {
-        selector = Selector.open();
     }
 
     public IoSession connect( SocketAddress address, IoHandler handler ) throws IOException
@@ -163,10 +160,11 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
         return request.session;
     }
     
-    private synchronized void startupWorker()
+    private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
         {
+            selector = Selector.open();
             worker = new Worker();
             worker.start();
         }
@@ -331,6 +329,18 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
                                 connectQueue.isEmpty() )
                             {
                                 worker = null;
+                                try
+                                {
+                                    selector.close();
+                                }
+                                catch( IOException e )
+                                {
+                                    exceptionMonitor.exceptionCaught( SocketConnector.this, e );
+                                }
+                                finally
+                                {
+                                    selector = null;
+                                }
                                 break;
                             }
                         }

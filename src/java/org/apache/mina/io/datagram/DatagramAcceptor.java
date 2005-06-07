@@ -52,7 +52,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
 
     private final int id = nextId ++ ;
 
-    private final Selector selector;
+    private Selector selector;
 
     private final Map channels = new HashMap();
 
@@ -66,12 +66,9 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
 
     /**
      * Creates a new instance.
-     * 
-     * @throws IOException if failed to open a selector.
      */
-    public DatagramAcceptor() throws IOException
+    public DatagramAcceptor()
     {
-        selector = Selector.open();
     }
 
     public void bind( SocketAddress address, IoHandler handler )
@@ -127,11 +124,23 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
         CancellationRequest request = new CancellationRequest( address );
         synchronized( this )
         {
+            try
+            {
+                startupWorker();
+            }
+            catch( IOException e )
+            {
+                // IOException is thrown only when Worker thread is not
+                // running and failed to open a selector.  We simply throw
+                // IllegalArgumentException here because we can simply
+                // conclude that nothing is bound to the selector.
+                throw new IllegalArgumentException( "Address not bound: " + address );
+            }
+
             synchronized( cancelQueue )
             {
                 cancelQueue.push( request );
             }
-            startupWorker();
         }
         selector.wakeup();
         
@@ -156,10 +165,11 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
         }
     }
     
-    private synchronized void startupWorker()
+    private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
         {
+            selector = Selector.open();
             worker = new Worker();
             worker.start();
         }
@@ -217,6 +227,18 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
                                 cancelQueue.isEmpty() )
                             {
                                 worker = null;
+                                try
+                                {
+                                    selector.close();
+                                }
+                                catch( IOException e )
+                                {
+                                    exceptionMonitor.exceptionCaught( DatagramAcceptor.this, e );
+                                }
+                                finally
+                                {
+                                    selector = null;
+                                }
                                 break;
                             }
                         }
