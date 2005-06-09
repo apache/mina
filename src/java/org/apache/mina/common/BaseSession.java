@@ -52,6 +52,7 @@ public abstract class BaseSession implements Session
 
     protected BaseSession()
     {
+        lastReadTime = lastWriteTime = System.currentTimeMillis();
     }
     
     public void close()
