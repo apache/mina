@@ -52,7 +52,7 @@ public class SimpleServiceRegistry implements ServiceRegistry
 
     private final Set services = new HashSet();
 
-    public SimpleServiceRegistry() throws IOException
+    public SimpleServiceRegistry()
     {
         socketIoAcceptor.getFilterChain().addFirst( "threadPool", ioThreadPoolFilter );
         datagramIoAcceptor.getFilterChain().addFirst( "threadPool", ioThreadPoolFilter );
