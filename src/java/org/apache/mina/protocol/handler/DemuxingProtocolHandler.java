@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.protocol.ProtocolHandler;
+import org.apache.mina.protocol.ProtocolHandlerAdapter;
 import org.apache.mina.protocol.ProtocolSession;
 
 /**
@@ -22,7 +23,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * @author The Apache Directory Project
  * @version $Rev$, $Date$
  */
-public abstract class DemuxingProtocolHandler implements ProtocolHandler
+public class DemuxingProtocolHandler extends ProtocolHandlerAdapter
 {
     private final Map type2handler = new HashMap();
 
