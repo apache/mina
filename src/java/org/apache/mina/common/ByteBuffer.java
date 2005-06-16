@@ -1464,8 +1464,7 @@ public abstract class ByteBuffer
             }
             
             java.nio.ByteBuffer oldBuf = this.buf;
-            java.nio.ByteBuffer newBuf = isDirect() ? java.nio.ByteBuffer.allocateDirect( newCapacity ) :
-                                                      java.nio.ByteBuffer.allocate( newCapacity );
+            java.nio.ByteBuffer newBuf = allocate0( newCapacity, isDirect() );
             
             int pos = oldBuf.position();
             int limit = oldBuf.limit();
