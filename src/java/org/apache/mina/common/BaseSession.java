@@ -36,17 +36,14 @@ public abstract class BaseSession implements Session
     private final Map attributes = new HashMap();
 
     private long readBytes;
-    
     private long writtenBytes;
+    private long writtenWriteRequests;
     
     private long lastReadTime;
-    
     private long lastWriteTime;
 
     private boolean idleForBoth;
-
     private boolean idleForRead;
-
     private boolean idleForWrite;
 
 
@@ -111,6 +108,11 @@ public abstract class BaseSession implements Session
         return writtenBytes;
     }
 
+    public long getWrittenWriteRequests()
+    {
+        return writtenWriteRequests;
+    }
+    
     public void increaseReadBytes( int increment )
     {
         readBytes += increment;
@@ -121,6 +123,11 @@ public abstract class BaseSession implements Session
     {
         writtenBytes += increment;
         lastWriteTime = System.currentTimeMillis();
+    }
+
+    public void increaseWrittenWriteRequests()
+    {
+        writtenWriteRequests ++;
     }
 
     public long getLastIoTime()

@@ -131,6 +131,16 @@ public class IoProtocolSession implements ProtocolSession
         filterChain.filterWrite( this, message );
     }
 
+    public long getWrittenWriteRequests()
+    {
+        return session.getWrittenWriteRequests();
+    }
+
+    public int getScheduledWriteRequests()
+    {
+        return session.getScheduledWriteRequests();
+    }
+
     public TransportType getTransportType()
     {
         return session.getTransportType();

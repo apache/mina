@@ -391,6 +391,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                     session.getManagerFilterChain().exceptionCaught( session, e );
                 }
 
+                session.increaseWrittenWriteRequests();
                 session.getManagerFilterChain().dataWritten( session, marker );
                 continue;
             }
@@ -416,6 +417,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
+                session.increaseWrittenWriteRequests();
                 session.getManagerFilterChain().dataWritten( session, marker );
             }
         }

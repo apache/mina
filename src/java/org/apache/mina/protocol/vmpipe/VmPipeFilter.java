@@ -38,6 +38,7 @@ class VmPipeFilter extends ProtocolFilterAdapter
         vps.setIdle( IdleStatus.BOTH_IDLE, false );
         vps.setIdle( IdleStatus.WRITER_IDLE, false );
         vps.increaseWrittenBytes( 1 );
+        vps.increaseWrittenWriteRequests();
 
         nextFilter.messageSent( session, message );
     }

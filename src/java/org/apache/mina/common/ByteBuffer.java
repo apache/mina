@@ -1465,7 +1465,9 @@ public abstract class ByteBuffer
             
             java.nio.ByteBuffer oldBuf = this.buf;
             java.nio.ByteBuffer newBuf = allocate0( newCapacity, isDirect() );
-            
+            newBuf.clear();
+            newBuf.order( oldBuf.order() );
+
             int pos = oldBuf.position();
             int limit = oldBuf.limit();
             oldBuf.clear();
