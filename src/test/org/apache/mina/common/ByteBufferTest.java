@@ -219,6 +219,12 @@ public class ByteBufferTest extends TestCase
         {
             // ignore
         }
+
+        // Test getting strings from an empty buffer.
+        buf.clear();
+        buf.limit( 0 );
+        Assert.assertEquals( "", buf.getString( decoder ) );
+        Assert.assertEquals( "", buf.getString( 2, decoder ) );
     }
     
     public void testPutString() throws Exception
@@ -279,5 +285,13 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 'F', buf.get( 3 ) );
         Assert.assertEquals( 0, buf.get( 4 ) );   // C may not be overwritten
         Assert.assertEquals( 'C', buf.get( 5 ) ); // C may not be overwritten
+
+        // Test putting an emptry string
+        buf.putString( "", encoder );
+        Assert.assertEquals( 0, buf.position() );
+        buf.putString( "", 4, encoder );
+        Assert.assertEquals( 4, buf.position() );
+        Assert.assertEquals( 0, buf.get( 0 ) );
+        Assert.assertEquals( 0, buf.get( 1 ) );
     }
 }
