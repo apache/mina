@@ -129,6 +129,17 @@ public interface Session {
     long getWrittenBytes();
 
     /**
+     * Returns the total number of write requests which were written to this session.
+     */
+    long getWrittenWriteRequests();
+    
+    /**
+     * Returns the number of write requests which are scheduled to be written
+     * to this session.
+     */
+    int getScheduledWriteRequests();
+
+    /**
      * Returns the time in millis when I/O occurred lastly.
      */
     long getLastIoTime();

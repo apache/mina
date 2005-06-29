@@ -145,6 +145,11 @@ class VmPipeSession extends BaseSession implements ProtocolSession
         this.filterChain.filterWrite( this, message );
     }
 
+    public int getScheduledWriteRequests()
+    {
+        return 0;
+    }
+
     public TransportType getTransportType()
     {
         return TransportType.VM_PIPE;

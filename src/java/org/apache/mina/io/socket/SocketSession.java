@@ -158,6 +158,14 @@ class SocketSession extends BaseSession implements IoSession
         filterChain.filterWrite( this, buf, marker );
     }
 
+    public int getScheduledWriteRequests()
+    {
+        synchronized( writeBufferQueue )
+        {
+            return writeBufferQueue.size();
+        }
+    }
+
     public TransportType getTransportType()
     {
         return TransportType.SOCKET;

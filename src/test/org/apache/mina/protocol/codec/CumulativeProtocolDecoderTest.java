@@ -194,6 +194,11 @@ public class CumulativeProtocolDecoderTest extends TestCase
         public void write(Object message) {
         }
 
+        public int getScheduledWriteRequests()
+        {
+            return 0;
+        }
+
         public TransportType getTransportType() {
             return TransportType.SOCKET;
         }

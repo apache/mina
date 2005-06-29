@@ -485,6 +485,7 @@ class SocketIoProcessor
                     session.getManagerFilterChain().exceptionCaught( session, e );
                 }
 
+                session.increaseWrittenWriteRequests();
                 session.getManagerFilterChain().dataWritten( session, marker );
                 continue;
             }

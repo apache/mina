@@ -394,6 +394,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
                     session.getManagerFilterChain().exceptionCaught( session, e );
                 }
 
+                session.increaseWrittenWriteRequests();
                 session.getManagerFilterChain().dataWritten( session, marker );
                 continue;
             }
@@ -420,6 +421,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
+                session.increaseWrittenWriteRequests();
                 session.getManagerFilterChain().dataWritten( session, marker );
             }
         }

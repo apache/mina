@@ -148,6 +148,11 @@ public class IoFilterChainTest extends TestCase
         {
         }
 
+        public int getScheduledWriteRequests()
+        {
+            return 0;
+        }
+
         public TransportType getTransportType()
         {
             return null;
