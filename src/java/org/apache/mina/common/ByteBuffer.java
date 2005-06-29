@@ -1015,6 +1015,11 @@ public abstract class ByteBuffer
 
         public String getString( CharsetDecoder decoder ) throws CharacterCodingException
         {
+            if( !buf.hasRemaining() )
+            {
+                return "";
+            }
+
             boolean utf16 = decoder.charset().name().startsWith( "UTF-16" );
 
             int oldPos = buf.position();
@@ -1106,6 +1111,11 @@ public abstract class ByteBuffer
             checkFieldSize( fieldSize );
 
             if( fieldSize == 0 )
+            {
+                return "";
+            }
+
+            if( !buf.hasRemaining() )
             {
                 return "";
             }
@@ -1215,7 +1225,6 @@ public abstract class ByteBuffer
             
             autoExpand( fieldSize );
             
-            CharBuffer in = CharBuffer.wrap( val ); 
             boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
 
             if( utf16 && ( ( fieldSize & 1 ) != 0 ) )
@@ -1231,6 +1240,22 @@ public abstract class ByteBuffer
                 throw new BufferOverflowException();
             }
 
+            if( val.length() == 0 )
+            {
+                if( !utf16 )
+                {
+                    buf.put( ( byte ) 0x00 );
+                }
+                else
+                {
+                    buf.put( ( byte ) 0x00 );
+                    buf.put( ( byte ) 0x00 );
+                }
+                buf.position( end );
+                return this;
+            }
+            
+            CharBuffer in = CharBuffer.wrap( val ); 
             buf.limit( end );
             encoder.reset();
 
@@ -1274,6 +1299,11 @@ public abstract class ByteBuffer
         public ByteBuffer putString(
                 CharSequence val, CharsetEncoder encoder ) throws CharacterCodingException
         {
+            if( val.length() == 0 )
+            {
+                return this;
+            }
+            
             CharBuffer in = CharBuffer.wrap( val ); 
             int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar());
 
