@@ -228,7 +228,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     /**
      * Removes the interceptor with the specified name from this chain.
      */
-    public synchronized void remove( String name )
+    public synchronized IoFilter remove( String name )
     {
         Entry entry = checkOldName( name );
         Entry prevEntry = entry.prevEntry;
@@ -239,6 +239,8 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         name2entry.remove( name );
         IoFilter filter = entry.filter;
         filter2entry.remove( filter );
+        
+        return filter;
     }
 
 

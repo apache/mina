@@ -226,7 +226,7 @@ public abstract class AbstractProtocolFilterChain implements ProtocolFilterChain
     /**
      * Removes the interceptor with the specified name from this chain.
      */
-    public synchronized void remove( String name )
+    public synchronized ProtocolFilter remove( String name )
     {
         Entry entry = checkOldName( name );
         Entry prevEntry = entry.prevEntry;
@@ -237,6 +237,8 @@ public abstract class AbstractProtocolFilterChain implements ProtocolFilterChain
         name2entry.remove( name );
         ProtocolFilter filter = entry.filter;
         filter2entry.remove( filter );
+        
+        return filter;
     }
 
 
