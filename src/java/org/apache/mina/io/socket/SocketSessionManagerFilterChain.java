@@ -29,8 +29,11 @@ class SocketSessionManagerFilterChain extends IoSessionManagerFilterChain {
         {
             writeBufferQueue.push( buf );
             writeMarkerQueue.push( marker );
+            if( writeBufferQueue.size() == 1 )
+            {
+                // Notify SocketIoProcessor only when writeBufferQueue was empty.
+                SocketIoProcessor.getInstance().flushSession( s );
+            }
         }
-
-        SocketIoProcessor.getInstance().flushSession( s );
     }
 }

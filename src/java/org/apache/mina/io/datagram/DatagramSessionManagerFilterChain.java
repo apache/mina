@@ -28,8 +28,11 @@ class DatagramSessionManagerFilterChain extends IoSessionManagerFilterChain {
         {
             writeBufferQueue.push( buf );
             writeMarkerQueue.push( marker );
+            if( writeBufferQueue.size() == 1 )
+            {
+                // Notify DatagramSessionManager only when writeBufferQueue was empty.
+                ( ( DatagramSessionManager ) getManager() ).flushSession( s );
+            }
         }
-
-        ( ( DatagramSessionManager ) getManager() ).flushSession( s );
     }
 }
