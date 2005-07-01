@@ -11,6 +11,6 @@ public interface ProtocolFilterChain {
     void addLast( String name, ProtocolFilter filter );
     void addBefore( String baseName, String name, ProtocolFilter filter );
     void addAfter( String baseName, String name, ProtocolFilter filter );
-    void remove( String name );
+    ProtocolFilter remove( String name );
     void clear();
 }

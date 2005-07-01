@@ -11,6 +11,6 @@ public interface IoFilterChain {
     void addLast( String name, IoFilter filter );
     void addBefore( String baseName, String name, IoFilter filter );
     void addAfter( String baseName, String name, IoFilter filter );
-    void remove( String name );
+    IoFilter remove( String name );
     void clear();
 }
