@@ -33,6 +33,11 @@
               <td>Server</td>
             </tr>
             <tr>
+              <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/sumup/package-summary.html">Reverser</a></td>
+              <td>DemuxingProtocolCodecFactory</td>
+              <td>Server</td>
+            </tr>
+            <tr>
               <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/echoserver/package-summary.html">Echo server</a></td>
               <td>Low-level I/O layer and SSL support</td>
               <td>Server</td>
