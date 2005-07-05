@@ -33,9 +33,9 @@
               <td>Server</td>
             </tr>
             <tr>
-              <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/sumup/package-summary.html">Reverser</a></td>
-              <td>DemuxingProtocolCodecFactory</td>
-              <td>Server</td>
+              <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/sumup/package-summary.html">SumUp server</a></td>
+              <td>High-level protocol layer and DemuxingProtocolCodec</td>
+              <td>Both</td>
             </tr>
             <tr>
               <td><a target="classFrame" href="xref-examples/org/apache/mina/examples/echoserver/package-summary.html">Echo server</a></td>
