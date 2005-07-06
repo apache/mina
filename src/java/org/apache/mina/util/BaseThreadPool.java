@@ -175,17 +175,18 @@ public abstract class BaseThreadPool implements ThreadPool
     {
         final BlockingSet readySessionBuffers = this.readySessionBuffers;
         final Set busySessionBuffers = this.busySessionBuffers;
-        final SessionBuffer buf = getSessionBuffer( session );
-        final Queue eventQueue = buf.eventQueue;
         final Event event = new Event( type, nextFilter, data );
-
-        synchronized( buf )
-        {
-            eventQueue.push( event );
-        }
 
         synchronized( readySessionBuffers )
         {
+            final SessionBuffer buf = getSessionBuffer( session );
+            final Queue eventQueue = buf.eventQueue;
+
+            synchronized( buf )
+            {
+                eventQueue.push( event );
+            }
+
             if( !busySessionBuffers.contains( buf ) )
             {
                 busySessionBuffers.add( buf );
