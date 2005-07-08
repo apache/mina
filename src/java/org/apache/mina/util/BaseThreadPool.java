@@ -367,9 +367,9 @@ public abstract class BaseThreadPool implements ThreadPool
 
             synchronized( readySessionBuffers )
             {
-                busySessionBuffers.remove( buf );
                 if( eventQueue.isEmpty() )
                 {
+                    busySessionBuffers.remove( buf );
                     removeSessionBuffer( buf );
                 }
                 else
