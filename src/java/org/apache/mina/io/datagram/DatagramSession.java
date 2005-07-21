@@ -133,7 +133,7 @@ class DatagramSession extends BaseSession implements IoSession
             ( ( DatagramConnector ) manager ).closeSession( this );
             if( wait )
             {
-                while( disposed )
+                while( !disposed )
                 {
                     try
                     {
