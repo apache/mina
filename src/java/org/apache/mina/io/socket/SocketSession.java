@@ -130,7 +130,7 @@ class SocketSession extends BaseSession implements IoSession
         SocketIoProcessor.getInstance().removeSession( this );
         if( wait )
         {
-            while( disposed )
+            while( !disposed )
             {
                 try
                 {
