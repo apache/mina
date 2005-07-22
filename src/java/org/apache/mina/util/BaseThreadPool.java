@@ -47,36 +47,78 @@ public abstract class BaseThreadPool implements ThreadPool
      */
     public static final int DEFAULT_KEEP_ALIVE_TIME = 60 * 1000;
 
-    private static volatile int threadId = 0;
+    /**
+     * A queue which contains {@link Integer}s which represents reusable
+     * thread IDs.  {@link Worker} first checks this queue and then
+     * uses {@link #threadId} when no reusable thread ID is available.
+     */
+    private static final Queue threadIdReuseQueue = new Queue();
+    private static int threadId = 0;
+    
+    private static int acquireThreadId()
+    {
+        synchronized( threadIdReuseQueue )
+        {
+            Integer id = ( Integer ) threadIdReuseQueue.pop();
+            if( id == null )
+            {
+                return ++ threadId;
+            }
+            else
+            {
+                return id.intValue();
+            }
+        }
+    }
+    
+    private static void releaseThreadId( int id )
+    {
+        synchronized( threadIdReuseQueue )
+        {
+            threadIdReuseQueue.push( new Integer( id ) );
+        }
+    }
 
+    private final String threadNamePrefix;
     private final Map buffers = new IdentityHashMap();
-
     private final Stack followers = new Stack();
-
     private final BlockingSet readySessionBuffers = new BlockingSet();
-
     private final Set busySessionBuffers = new HashSet();
 
     private Worker leader;
 
     private int maximumPoolSize = DEFAULT_MAXIMUM_POOL_SIZE;
-
     private int keepAliveTime = DEFAULT_KEEP_ALIVE_TIME;
 
     private boolean started;
-
     private boolean shuttingDown;
 
     private int poolSize;
-
     private final Object poolSizeLock = new Object();
 
     /**
      * Creates a new instance with default thread pool settings.
      * You'll have to invoke {@link #start()} method to start threads actually.
+     *
+     * @param threadNamePrefix the prefix of the thread names this pool will create.
      */
-    protected BaseThreadPool()
+    public BaseThreadPool( String threadNamePrefix )
     {
+        if( threadNamePrefix == null )
+        {
+            throw new NullPointerException( "threadNamePrefix" );
+        }
+        threadNamePrefix = threadNamePrefix.trim();
+        if( threadNamePrefix.length() == 0 )
+        {
+            throw new IllegalArgumentException( "threadNamePrefix is empty." );
+        }
+        this.threadNamePrefix = threadNamePrefix;
+    }
+    
+    public String getThreadNamePrefix()
+    {
+        return threadNamePrefix;
     }
 
     public int getPoolSize()
@@ -244,11 +286,14 @@ public abstract class BaseThreadPool implements ThreadPool
 
     private class Worker extends Thread
     {
+        private final int id;
         private final Object promotionLock = new Object();
 
         private Worker()
         {
-            super( "IoThreadPool-" + ( threadId++ ) );
+            int id = acquireThreadId();
+            this.id = id;
+            this.setName( threadNamePrefix + '-' + id );
             increasePoolSize();
         }
 
@@ -283,6 +328,7 @@ public abstract class BaseThreadPool implements ThreadPool
             }
 
             decreasePoolSize();
+            releaseThreadId( id );
         }
 
         private SessionBuffer fetchBuffer()

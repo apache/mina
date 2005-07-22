@@ -46,6 +46,18 @@ public class ProtocolThreadPoolFilter extends BaseThreadPool implements ThreadPo
      */
     public ProtocolThreadPoolFilter()
     {
+        this( "ProtocolThreadPool" );
+    }
+
+    /**
+     * Creates a new instance of this filter with default thread pool settings.
+     * You'll have to invoke {@link #start()} method to start threads actually.
+     * 
+     * @param threadNamePrefix the prefix of the thread names this pool will create.
+     */
+    public ProtocolThreadPoolFilter( String threadNamePrefix )
+    {
+        super( threadNamePrefix );
     }
 
     public void sessionOpened( NextFilter nextFilter,
