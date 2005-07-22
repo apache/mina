@@ -41,11 +41,23 @@ import org.apache.mina.util.ThreadPool;
 public class IoThreadPoolFilter extends BaseThreadPool implements ThreadPool, IoFilter
 {
     /**
-     * Creates a new instanceof this filter with default thread pool settings.
+     * Creates a new instance of this filter with default thread pool settings.
      * You'll have to invoke {@link #start()} method to start threads actually.
      */
     public IoThreadPoolFilter()
     {
+        this( "IoThreadPool" );
+    }
+    
+    /**
+     * Creates a new instance of this filter with default thread pool settings.
+     * You'll have to invoke {@link #start()} method to start threads actually.
+     * 
+     * @param threadNamePrefix the prefix of the thread names this pool will create.
+     */
+    public IoThreadPoolFilter( String threadNamePrefix )
+    {
+        super( threadNamePrefix );
     }
 
     public void sessionOpened( NextFilter nextFilter, IoSession session )
