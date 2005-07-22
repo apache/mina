@@ -20,22 +20,29 @@
      <item name="Overview" href="/index.html"/>
      <item name="Features" href="/features.html"/>
      <item name="Getting Started" href="/getting_started.html"/>
-     <item name="Downloads" href="http://cvs.apache.org/repository/directory-network/" target="_blank"/>
+     <item name="Downloads" href="http://cvs.apache.org/repository/directory-network/"/>
      <item name="Roadmap" href="/roadmap.html"/>
      <item name="Changes" href="/changes-report.html"/>
      <item name="History" href="/history.html"/>
    </menu>
 		
-   <menu name="MINA References">
-     <item name="JavaDocs" href="/apidocs/index.html" target="_blank"/>
-     <item name="Source code" href="/xref/index.html" target="_blank"/>
-     <item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/directory/network/branches/0.7/?root=Apache-SVN" target="_blank"/>
-     <item name="Wiki" href="http://wiki.apache.org/directory/MinaHome" target="_blank"/>
+   <menu name="MINA Community">
+     <item name="Mailing List" href="mail-lists.html"/>
+     <item name="Support Forum" href="http://gleamynode.net/dev/forum/list.php?1"/>
+     <item name="Issue Tracker" href="http://issues.apache.org/jira/browse/DIRMINA"/>
+     <item name="Wiki Pages" href="http://wiki.apache.org/directory/MinaHome"/>
    </menu>
-		
+
    <menu name="MINA Examples">
-     <item name="JavaDocs" href="/apidocs-examples/index.html" target="_blank"/>
-     <item name="Source code" href="/xref-examples/index.html" target="_blank"/>
+     <item name="JavaDocs" href="/apidocs-examples/index.html"/>
+     <item name="Source code" href="/xref-examples/index.html"/>
+   </menu>
+   
+   <menu name="MINA References">
+     <item name="JavaDocs" href="/apidocs/index.html"/>
+     <item name="Source code" href="/xref/index.html"/>
+     <item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/directory/network/branches/0.7/?root=Apache-SVN"/>
+     <item name="Wiki Pages" href="http://wiki.apache.org/directory/MinaHome"/>
    </menu>
 
    <menu name="ApacheCon Europe 2005">
