@@ -147,6 +147,17 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 4, buf.capacity() );
     }
     
+    public void testPooledProperty() throws Exception
+    {
+        ByteBuffer buf = ByteBuffer.allocate( 16 );
+        java.nio.ByteBuffer nioBuf = buf.buf();
+        buf.release();
+        Assert.assertSame( nioBuf, ByteBuffer.allocate( 16 ).buf() );
+        buf.setPooled( false );
+        buf.release();
+        Assert.assertNotSame( nioBuf, ByteBuffer.allocate( 16 ).buf() );
+    }
+    
     public void testGetString() throws Exception
     {
         ByteBuffer buf = ByteBuffer.allocate( 16 );

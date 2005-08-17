@@ -506,4 +506,14 @@ public class ByteBufferProxy extends ByteBuffer
         buf.setAutoExpand( autoExpand );
         return this;
     }
+
+    public boolean isPooled()
+    {
+        return buf.isPooled();
+    }
+    
+    public void setPooled( boolean pooled )
+    {
+        buf.setPooled( pooled );
+    }
 }
