@@ -90,33 +90,11 @@ import org.apache.mina.util.Stack;
  * <h2>Wrapping existing NIO buffers and arrays</h2>
  * <p>
  * This class provides a few <tt>wrap(...)</tt> methods that wraps
- * any NIO buffers and byte arrays.  But please be careful and use these
- * methods at your own risk.  Using those methods can cause memory leakage
- * if you keep wrapping new NIO buffers and arrays because even wrapped
- * MINA buffers are going to be pooled when they are released by MINA.
- * <p>
- * To resolve this issue, please do not keeping wrapping NIO buffers if
- * possible.  If you're working with any third party component that keeps
- * creating NIO buffers, please call {@link #acquire()} once more and
- * don't call {@link #release()} for it, then it will not be returned to
- * the pool and GC'd eventually.  Here's the example:
- * <pre>
- * import org.apache.mina.common.*;
- * import org.apache.mina.io.*;
+ * any NIO buffers and byte arrays.  Wrapped MINA buffers are not returned
+ * to the buffer pool by default to prevent unexpected memory leakage by default.
+ * In case you want to make it pooled, you can call {@link #setPooled(boolean)}
+ * with <tt>true</tt> flag to enable pooling.
  *
- * IoSession session = ...;
- * for (;;) {
- *     // readData() returns a newly allocate NIO buffer.
- *     java.nio.ByteBuffer newBuffer = otherApplication.readData();
- *     
- *     // Wrap it.
- *     ByteBuffer wrappedBuffer = ByteBuffer.wrap(newBuffer);
- *     // Acquire once and don't call release to prevent MINA from pooling it. 
- *     wrappedBuffer.acquire();
- *     session.write(wrappedBuffer, marker);
- * }
- * </pre>
- * 
  * <h2>AutoExpand</h2>
  * <p>
  * Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
@@ -259,6 +237,7 @@ public abstract class ByteBuffer
     {
         DefaultByteBuffer buf = allocateContainer();
         buf.init( nioBuffer );
+        buf.setPooled( false );
         return buf;
     }
     
@@ -339,6 +318,27 @@ public abstract class ByteBuffer
      * Turns on or off <tt>autoExpand</tt>.
      */
     public abstract ByteBuffer setAutoExpand( boolean autoExpand );
+    
+    /**
+     * Returns <tt>true</tt> if and only if this buffer is returned back
+     * to the buffer pool when released.
+     * <p>
+     * The default value of this property is <tt>true</tt> if and only if you
+     * allocated this buffer using {@link #allocate(int)} or {@link #allocate(int, boolean)},
+     * or <tt>false</tt> otherwise. (i.e. {@link #wrap(byte[])}, {@link #wrap(byte[], int, int)},
+     * and {@link #wrap(java.nio.ByteBuffer)})
+     */
+    public abstract boolean isPooled();
+
+    /**
+     * Sets whether this buffer is returned back to the buffer pool when released.
+     * <p>
+     * The default value of this property is <tt>true</tt> if and only if you
+     * allocated this buffer using {@link #allocate(int)} or {@link #allocate(int, boolean)},
+     * or <tt>false</tt> otherwise. (i.e. {@link #wrap(byte[])}, {@link #wrap(byte[], int, int)},
+     * and {@link #wrap(java.nio.ByteBuffer)})
+     */
+    public abstract void setPooled( boolean pooled );
     
     public abstract int position();
 
@@ -557,6 +557,7 @@ public abstract class ByteBuffer
         private java.nio.ByteBuffer buf;
         private int refCount = 1;
         private boolean autoExpand;
+        private boolean pooled;
 
         protected DefaultByteBuffer()
         {
@@ -566,6 +567,7 @@ public abstract class ByteBuffer
         {
             this.buf = buf;
             autoExpand = false;
+            pooled = true;
             refCount = 1;
         }
         
@@ -597,7 +599,11 @@ public abstract class ByteBuffer
                 }
             }
 
-            release0( buf );
+            if( pooled )
+            {
+                release0( buf );
+            }
+
             synchronized( containerStack )
             {
                 containerStack.push( this );
@@ -628,6 +634,16 @@ public abstract class ByteBuffer
         {
             this.autoExpand = autoExpand;
             return this;
+        }
+
+        public boolean isPooled()
+        {
+            return pooled;
+        }
+        
+        public void setPooled( boolean pooled )
+        {
+            this.pooled = pooled;
         }
 
         public int capacity()
