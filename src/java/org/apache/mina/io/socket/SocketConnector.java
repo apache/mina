@@ -135,8 +135,8 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
                 connectQueue.push( request );
             }
             startupWorker();
+            selector.wakeup();
         }
-        selector.wakeup();
 
         synchronized( request )
         {
