@@ -319,7 +319,14 @@ public abstract class BaseThreadPool implements ThreadPool
 
                 if( buf == null )
                 {
-                    break;
+                    if( shuttingDown )
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
 
                 processEvents( buf );
@@ -429,25 +436,41 @@ public abstract class BaseThreadPool implements ThreadPool
         {
             final Object promotionLock = this.promotionLock;
 
+            final long startTime = System.currentTimeMillis();
+            long currentTime = startTime;
+            
             synchronized( promotionLock )
             {
-                if( this != leader )
+                while( this != leader )
                 {
+                    // Calculate remaining keep-alive time
+                    int keepAliveTime = getKeepAliveTime();
+                    if( keepAliveTime > 0 )
+                    {
+                        keepAliveTime -= ( currentTime - startTime );
+                    }
+                    else
+                    {
+                        keepAliveTime = Integer.MAX_VALUE;
+                    }
+                    
+                    // Break the loop if there's no remaining keep-alive time.
+                    if( keepAliveTime <= 0 )
+                    {
+                        break;
+                    }
+
+                    // Wait for promotion
                     try
                     {
-                        int keepAliveTime = getKeepAliveTime();
-                        if( keepAliveTime > 0 )
-                        {
-                            promotionLock.wait( keepAliveTime );
-                        }
-                        else
-                        {
-                            promotionLock.wait();
-                        }
+                        promotionLock.wait( keepAliveTime );
                     }
                     catch( InterruptedException e )
                     {
                     }
+
+                    // Update currentTime for the next iteration
+                    currentTime = System.currentTimeMillis();
                 }
 
                 boolean timeToLead = this == leader;
