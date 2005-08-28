@@ -288,6 +288,7 @@ public abstract class BaseThreadPool implements ThreadPool
     {
         private final int id;
         private final Object promotionLock = new Object();
+        private boolean dead;
 
         private Worker()
         {
@@ -297,14 +298,21 @@ public abstract class BaseThreadPool implements ThreadPool
             increasePoolSize();
         }
 
-        public void lead()
+        public boolean lead()
         {
             final Object promotionLock = this.promotionLock;
             synchronized( promotionLock )
             {
+                if( dead )
+                {
+                    return false;
+                }
+
                 leader = this;
                 promotionLock.notify();
             }
+            
+            return true;
         }
 
         public void run()
@@ -319,14 +327,7 @@ public abstract class BaseThreadPool implements ThreadPool
 
                 if( buf == null )
                 {
-                    if( shuttingDown )
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    break;
                 }
 
                 processEvents( buf );
@@ -340,42 +341,40 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private SessionBuffer fetchBuffer()
         {
-            SessionBuffer buf = null;
-            BlockingSet readySessionBuffers = BaseThreadPool.this.readySessionBuffers;
+            SessionBuffer buf;
+            BlockingSet readySessionBuffers = ThreadPoolFilter.this.readySessionBuffers;
             synchronized( readySessionBuffers )
             {
-                do
+                for( ;; )
                 {
-                    buf = null;
                     try
                     {
                         readySessionBuffers.waitForNewItem();
                     }
                     catch( InterruptedException e )
                     {
-                        break;
+                        if( shuttingDown )
+                        {
+                            return null;
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
 
                     Iterator it = readySessionBuffers.iterator();
-                    if( !it.hasNext() )
+                    while( it.hasNext() )
                     {
-                        // exceeded keepAliveTime
-                        break;
-                    }
-
-                    do
-                    {
-                        buf = null;
                         buf = ( SessionBuffer ) it.next();
                         it.remove();
+                        if( buf != null && !buf.eventQueue.isEmpty() )
+                        {
+                            return buf;
+                        }
                     }
-                    while( buf != null && buf.eventQueue.isEmpty()
-                           && it.hasNext() );
                 }
-                while( buf != null && buf.eventQueue.isEmpty() );
             }
-
-            return buf;
         }
 
         private void processEvents( SessionBuffer buf )
@@ -482,6 +481,9 @@ public abstract class BaseThreadPool implements ThreadPool
                     {
                         followers.remove( this );
                     }
+
+                    // Mark as dead explicitly when we've got promotionLock.
+                    dead = true;
                 }
 
                 return timeToLead;
@@ -490,33 +492,34 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private void giveUpLead()
         {
-            final Stack followers = BaseThreadPool.this.followers;
+            final Stack followers = ThreadPoolFilter.this.followers;
             Worker worker;
-            synchronized( followers )
+            do
             {
-                worker = ( Worker ) followers.pop();
-            }
-
-            if( worker != null )
-            {
-                worker.lead();
-            }
-            else
-            {
-                if( !shuttingDown )
+                synchronized( followers )
                 {
-                    synchronized( BaseThreadPool.this )
+                    worker = ( Worker ) followers.pop();
+                }
+
+                if( worker == null )
+                {
+                    // Increase the number of threads if we
+                    // are not shutting down and we can increase the number.
+                    if( !shuttingDown
+                        && getPoolSize() < getMaximumPoolSize() )
                     {
-                        if( !shuttingDown
-                            && getPoolSize() < getMaximumPoolSize() )
-                        {
-                            worker = new Worker();
-                            worker.start();
-                            worker.lead();
-                        }
+                        worker = new Worker();
+                        worker.lead();
+                        worker.start();
                     }
+
+                    // This loop should end because:
+                    // 1) lead() is called already,
+                    // 2) or it is shutting down and there's no more threads left.
+                    break;
                 }
             }
+            while( !worker.lead() );
         }
     }
 }
