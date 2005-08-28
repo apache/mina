@@ -342,7 +342,7 @@ public abstract class BaseThreadPool implements ThreadPool
         private SessionBuffer fetchBuffer()
         {
             SessionBuffer buf;
-            BlockingSet readySessionBuffers = ThreadPoolFilter.this.readySessionBuffers;
+            BlockingSet readySessionBuffers = BaseThreadPool.this.readySessionBuffers;
             synchronized( readySessionBuffers )
             {
                 for( ;; )
@@ -492,7 +492,7 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private void giveUpLead()
         {
-            final Stack followers = ThreadPoolFilter.this.followers;
+            final Stack followers = BaseThreadPool.this.followers;
             Worker worker;
             do
             {

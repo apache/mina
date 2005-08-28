@@ -421,6 +421,11 @@ class SocketIoProcessor
                 {
                     flush( session );
                 }
+                catch( CancelledKeyException e )
+                {
+                    // Connection is closed unexpectedly.
+                    scheduleRemove( session );
+                }
                 catch( IOException e )
                 {
                     scheduleRemove( session );
