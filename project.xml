@@ -5,7 +5,7 @@
   <id>mina</id>
   <name>MINA</name>
   <package>org.apache.mina</package>
-  <currentVersion>0.7.4-SNAPSHOT</currentVersion>
+  <currentVersion>0.7.5-SNAPSHOT</currentVersion>
   <inceptionYear>2004</inceptionYear>
 
   <logo>http://directory.apache.org/images/apache-directory-logo.png</logo>
