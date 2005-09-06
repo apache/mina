@@ -18,7 +18,10 @@
  */
 package org.apache.mina.examples.echoserver;
 
+import java.util.logging.Logger;
+
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerAdapter;
@@ -33,6 +36,8 @@ import org.apache.mina.io.socket.SocketSessionConfig;
  */
 public class EchoProtocolHandler extends IoHandlerAdapter
 {
+    private static final Logger log = Logger.getLogger( EchoProtocolHandler.class.getName() );
+
     public void sessionCreated( IoSession session )
     {
         SessionConfig cfg = session.getConfig();
@@ -40,6 +45,16 @@ public class EchoProtocolHandler extends IoHandlerAdapter
         {
             ( ( SocketSessionConfig ) cfg ).setSessionReceiveBufferSize( 2048 );
         }
+        
+        cfg.setIdleTime( IdleStatus.BOTH_IDLE, 10 );
+    }
+
+    public void sessionIdle( IoSession session, IdleStatus status )
+    {
+        log.info(
+                "*** IDLE #" +
+                session.getIdleCount( IdleStatus.BOTH_IDLE ) +
+                " ***" );
     }
 
     public void exceptionCaught( IoSession session, Throwable cause )

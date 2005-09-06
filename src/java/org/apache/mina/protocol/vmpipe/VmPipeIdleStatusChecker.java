@@ -71,51 +71,45 @@ class VmPipeIdleStatusChecker
                         }
                         else
                         {
-                            long idleTime;
-                            SessionConfig config = session.getConfig();
-
-                            if( !session.isIdle( IdleStatus.BOTH_IDLE ) )
-                            {
-                                idleTime = config
-                                        .getIdleTimeInMillis( IdleStatus.BOTH_IDLE );
-                                session.setIdle( IdleStatus.BOTH_IDLE,
-                                                 idleTime > 0L
-                                                 && ( currentTime - session.getLastIoTime() ) > idleTime );
-                                if( session.isIdle( IdleStatus.BOTH_IDLE ) )
-                                    session.getManagerFilterChain()
-                                            .sessionIdle( session,
-                                                          IdleStatus.BOTH_IDLE );
-                            }
-
-                            if( !session.isIdle( IdleStatus.READER_IDLE ) )
-                            {
-                                idleTime = config
-                                        .getIdleTimeInMillis( IdleStatus.READER_IDLE );
-                                session.setIdle( IdleStatus.READER_IDLE,
-                                                 idleTime > 0L
-                                                 && ( currentTime - session.getLastReadTime() ) > idleTime );
-                                if( session.isIdle( IdleStatus.READER_IDLE ) )
-                                    session.getManagerFilterChain()
-                                            .sessionIdle( session,
-                                                          IdleStatus.READER_IDLE );
-                            }
-
-                            if( !session.isIdle( IdleStatus.WRITER_IDLE ) )
-                            {
-                                idleTime = config
-                                        .getIdleTimeInMillis( IdleStatus.WRITER_IDLE );
-                                session.setIdle( IdleStatus.WRITER_IDLE,
-                                                 idleTime > 0L
-                                                 && ( currentTime - session.getLastWriteTime() ) > idleTime );
-                                if( session.isIdle( IdleStatus.WRITER_IDLE ) )
-                                    session.getManagerFilterChain()
-                                            .sessionIdle( session,
-                                                          IdleStatus.WRITER_IDLE );
-                            }
+                            notifyIdleSession( session, currentTime );
                         }
                     }
                 }
             }
         }
     }
+    
+    private void notifyIdleSession( VmPipeSession session, long currentTime )
+    {
+        SessionConfig config = session.getConfig();
+
+        notifyIdleSession0(
+                session, currentTime,
+                config.getIdleTimeInMillis( IdleStatus.BOTH_IDLE ),
+                IdleStatus.BOTH_IDLE,
+                Math.max( session.getLastIoTime(), session.getLastIdleTime( IdleStatus.BOTH_IDLE ) ) );
+        notifyIdleSession0(
+                session, currentTime,
+                config.getIdleTimeInMillis( IdleStatus.READER_IDLE ),
+                IdleStatus.READER_IDLE,
+                Math.max( session.getLastReadTime(), session.getLastIdleTime( IdleStatus.READER_IDLE ) ) );
+        notifyIdleSession0(
+                session, currentTime,
+                config.getIdleTimeInMillis( IdleStatus.WRITER_IDLE ),
+                IdleStatus.WRITER_IDLE,
+                Math.max( session.getLastWriteTime(), session.getLastIdleTime( IdleStatus.WRITER_IDLE ) ) );
+    }
+
+    private void notifyIdleSession0( VmPipeSession session, long currentTime,
+                                    long idleTime, IdleStatus status,
+                                    long lastIoTime )
+    {
+        if( idleTime > 0 && lastIoTime != 0
+            && ( currentTime - lastIoTime ) >= idleTime )
+        {
+            session.increaseIdleCount( status );
+            session.getManagerFilterChain().sessionIdle( session, status );
+        }
+    }
+
 }

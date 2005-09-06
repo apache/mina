@@ -273,8 +273,8 @@ class SocketIoProcessor
             }
 
             session.increaseReadBytes( readBytes );
-            session.setIdle( IdleStatus.BOTH_IDLE, false );
-            session.setIdle( IdleStatus.READER_IDLE, false );
+            session.resetIdleCount( IdleStatus.BOTH_IDLE );
+            session.resetIdleCount( IdleStatus.READER_IDLE );
 
             if( readBytes > 0 )
             {
@@ -344,15 +344,21 @@ class SocketIoProcessor
     {
         SessionConfig config = session.getConfig();
 
-        notifyIdleSession0( session, currentTime, config
-                .getIdleTimeInMillis( IdleStatus.BOTH_IDLE ),
-                            IdleStatus.BOTH_IDLE, session.getLastIoTime() );
-        notifyIdleSession0( session, currentTime, config
-                .getIdleTimeInMillis( IdleStatus.READER_IDLE ),
-                            IdleStatus.READER_IDLE, session.getLastReadTime() );
-        notifyIdleSession0( session, currentTime, config
-                .getIdleTimeInMillis( IdleStatus.WRITER_IDLE ),
-                            IdleStatus.WRITER_IDLE, session.getLastWriteTime() );
+        notifyIdleSession0(
+                session, currentTime,
+                config.getIdleTimeInMillis( IdleStatus.BOTH_IDLE ),
+                IdleStatus.BOTH_IDLE,
+                Math.max( session.getLastIoTime(), session.getLastIdleTime( IdleStatus.BOTH_IDLE ) ) );
+        notifyIdleSession0(
+                session, currentTime,
+                config.getIdleTimeInMillis( IdleStatus.READER_IDLE ),
+                IdleStatus.READER_IDLE,
+                Math.max( session.getLastReadTime(), session.getLastIdleTime( IdleStatus.READER_IDLE ) ) );
+        notifyIdleSession0(
+                session, currentTime,
+                config.getIdleTimeInMillis( IdleStatus.WRITER_IDLE ),
+                IdleStatus.WRITER_IDLE,
+                Math.max( session.getLastWriteTime(), session.getLastIdleTime( IdleStatus.WRITER_IDLE ) ) );
 
         notifyWriteTimeoutSession( session, currentTime, config
                 .getWriteTimeoutInMillis(), session.getLastWriteTime() );
@@ -362,10 +368,10 @@ class SocketIoProcessor
                                     long idleTime, IdleStatus status,
                                     long lastIoTime )
     {
-        if( idleTime > 0 && !session.isIdle( status ) && lastIoTime != 0
+        if( idleTime > 0 && lastIoTime != 0
             && ( currentTime - lastIoTime ) >= idleTime )
         {
-            session.setIdle( status, true );
+            session.increaseIdleCount( status );
             session.getManagerFilterChain().sessionIdle( session, status );
         }
     }
@@ -506,8 +512,8 @@ class SocketIoProcessor
                 if( writtenBytes > 0 )
                 {
                     session.increaseWrittenBytes( writtenBytes );
-                    session.setIdle( IdleStatus.BOTH_IDLE, false );
-                    session.setIdle( IdleStatus.WRITER_IDLE, false );
+                    session.resetIdleCount( IdleStatus.BOTH_IDLE );
+                    session.resetIdleCount( IdleStatus.WRITER_IDLE );
                 }
 
                 SelectionKey key = session.getSelectionKey();

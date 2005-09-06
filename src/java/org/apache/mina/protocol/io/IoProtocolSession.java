@@ -176,6 +176,11 @@ public class IoProtocolSession implements ProtocolSession
         return session.getWrittenBytes();
     }
 
+    public long getCreationTime()
+    {
+        return session.getCreationTime();
+    }
+
     public long getLastIoTime()
     {
         return session.getLastIoTime();
@@ -194,5 +199,15 @@ public class IoProtocolSession implements ProtocolSession
     public boolean isIdle( IdleStatus status )
     {
         return session.isIdle( status );
+    }
+
+    public int getIdleCount( IdleStatus status )
+    {
+        return session.getIdleCount( status );
+    }
+
+    public long getLastIdleTime( IdleStatus status )
+    {
+        return session.getLastIdleTime( status );
     }
 }
