@@ -20,6 +20,7 @@
      <item name="Overview" href="/index.html"/>
      <item name="Features" href="/features.html"/>
      <item name="Getting Started" href="/getting_started.html"/>
+     <item name="F.A.Q" href="/faq.html"/>
      <item name="Downloads" href="http://cvs.apache.org/repository/directory-network/"/>
      <item name="Roadmap" href="/roadmap.html"/>
      <item name="Changes" href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:changelog-panel"/>
