@@ -34,6 +34,7 @@ import org.apache.mina.common.Session;
 public abstract class BaseSession implements Session
 {
     private final Map attributes = new HashMap();
+    private final long creationTime;
 
     private long readBytes;
     private long writtenBytes;
@@ -42,14 +43,19 @@ public abstract class BaseSession implements Session
     private long lastReadTime;
     private long lastWriteTime;
 
-    private boolean idleForBoth;
-    private boolean idleForRead;
-    private boolean idleForWrite;
-
+    private int idleCountForBoth;
+    private int idleCountForRead;
+    private int idleCountForWrite;
+    
+    private long lastIdleTimeForBoth;
+    private long lastIdleTimeForRead;
+    private long lastIdleTimeForWrite;
 
     protected BaseSession()
     {
-        lastReadTime = lastWriteTime = System.currentTimeMillis();
+        creationTime = lastReadTime = lastWriteTime =
+            lastIdleTimeForBoth = lastIdleTimeForRead = lastIdleTimeForWrite =
+                System.currentTimeMillis();
     }
     
     public void close()
@@ -129,6 +135,11 @@ public abstract class BaseSession implements Session
     {
         writtenWriteRequests ++;
     }
+    
+    public long getCreationTime()
+    {
+        return creationTime;
+    }
 
     public long getLastIoTime()
     {
@@ -148,25 +159,75 @@ public abstract class BaseSession implements Session
     public boolean isIdle( IdleStatus status )
     {
         if( status == IdleStatus.BOTH_IDLE )
-            return idleForBoth;
+            return idleCountForBoth > 0;
 
         if( status == IdleStatus.READER_IDLE )
-            return idleForRead;
+            return idleCountForRead > 0;
 
         if( status == IdleStatus.WRITER_IDLE )
-            return idleForWrite;
+            return idleCountForWrite > 0;
 
         throw new IllegalArgumentException( "Unknown idle status: " + status );
     }
 
-    public void setIdle( IdleStatus status, boolean value )
+    public int getIdleCount( IdleStatus status )
     {
         if( status == IdleStatus.BOTH_IDLE )
-            idleForBoth = value;
+            return idleCountForBoth;
+
+        if( status == IdleStatus.READER_IDLE )
+            return idleCountForRead;
+
+        if( status == IdleStatus.WRITER_IDLE )
+            return idleCountForWrite;
+
+        throw new IllegalArgumentException( "Unknown idle status: " + status );
+    }
+    
+    public long getLastIdleTime( IdleStatus status )
+    {
+        if( status == IdleStatus.BOTH_IDLE )
+            return lastIdleTimeForBoth;
+
+        if( status == IdleStatus.READER_IDLE )
+            return lastIdleTimeForRead;
+
+        if( status == IdleStatus.WRITER_IDLE )
+            return lastIdleTimeForWrite;
+
+        throw new IllegalArgumentException( "Unknown idle status: " + status );
+    }
+
+    public void increaseIdleCount( IdleStatus status )
+    {
+        if( status == IdleStatus.BOTH_IDLE )
+        {
+            idleCountForBoth ++;
+            lastIdleTimeForBoth = System.currentTimeMillis();
+        }
         else if( status == IdleStatus.READER_IDLE )
-            idleForRead = value;
+        {
+            idleCountForRead ++;
+            lastIdleTimeForRead = System.currentTimeMillis();
+        }
         else if( status == IdleStatus.WRITER_IDLE )
-            idleForWrite = value;
+        {
+            idleCountForWrite ++;
+            lastIdleTimeForWrite = System.currentTimeMillis();
+        }
+        else
+            throw new IllegalArgumentException( "Unknown idle status: "
+                                                + status );
+    }
+
+    public void resetIdleCount( IdleStatus status )
+    {
+        if( status == IdleStatus.BOTH_IDLE )
+            idleCountForBoth = 0;
+        else if( status == IdleStatus.READER_IDLE )
+            idleCountForRead = 0;
+        else if( status == IdleStatus.WRITER_IDLE )
+            idleCountForWrite = 0;
         else
             throw new IllegalArgumentException( "Unknown idle status: "
                                                 + status );

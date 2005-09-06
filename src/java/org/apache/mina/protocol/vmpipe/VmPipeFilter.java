@@ -20,8 +20,8 @@ class VmPipeFilter extends ProtocolFilterAdapter
     {
         VmPipeSession vps = ( VmPipeSession ) session;
 
-        vps.setIdle( IdleStatus.BOTH_IDLE, false );
-        vps.setIdle( IdleStatus.READER_IDLE, false );
+        vps.resetIdleCount( IdleStatus.BOTH_IDLE );
+        vps.resetIdleCount( IdleStatus.READER_IDLE );
         vps.increaseReadBytes( 1 );
 
         // fire messageSent event first
@@ -35,8 +35,8 @@ class VmPipeFilter extends ProtocolFilterAdapter
                             ProtocolSession session, Object message )
     {
         VmPipeSession vps = ( VmPipeSession ) session;
-        vps.setIdle( IdleStatus.BOTH_IDLE, false );
-        vps.setIdle( IdleStatus.WRITER_IDLE, false );
+        vps.resetIdleCount( IdleStatus.BOTH_IDLE );
+        vps.resetIdleCount( IdleStatus.WRITER_IDLE );
         vps.increaseWrittenBytes( 1 );
         vps.increaseWrittenWriteRequests();
 

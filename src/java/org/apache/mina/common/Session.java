@@ -140,6 +140,11 @@ public interface Session {
     int getScheduledWriteRequests();
 
     /**
+     * Returns the time in millis when this session is created.
+     */
+    long getCreationTime();
+    
+    /**
      * Returns the time in millis when I/O occurred lastly.
      */
     long getLastIoTime();
@@ -159,4 +164,22 @@ public interface Session {
      * {@link IdleStatus}.
      */
     boolean isIdle( IdleStatus status );
+
+    /**
+     * Returns the number of the fired continuous <tt>sessionIdle</tt> events
+     * for the specified {@link IdleStatus}.
+     * <p>
+     * If <tt>sessionIdle</tt> event is fired first after some time after I/O,
+     * <tt>idleCount</tt> becomes <tt>1</tt>.  <tt>idleCount</tt> resets to
+     * <tt>0</tt> if any I/O occurs again, otherwise it increases to
+     * <tt>2</tt> and so on if <tt>sessionIdle</tt> event is fired again without
+     * any I/O between two (or more) <tt>sessionIdle</tt> events.
+     */
+    int getIdleCount( IdleStatus status );
+    
+    /**
+     * Returns the time in millis when the last <tt>sessionIdle</tt> event
+     * is fired for the specified {@link IdleStatus}.
+     */
+    long getLastIdleTime( IdleStatus status );
 }
