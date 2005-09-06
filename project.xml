@@ -158,6 +158,7 @@
     <report>maven-jdepend-plugin</report>
     <report>maven-simian-plugin</report>
     <report>maven-tasklist-plugin</report>
+    <report>maven-faq-plugin</report>
   </reports>
 
 </project>
