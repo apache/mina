@@ -147,8 +147,14 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                                  ByteBuffer buf ) throws Exception
             {
                 IoHandler handler = session.getHandler();
-                handler.dataRead( session, buf );
-                buf.release();
+                try
+                {
+                    handler.dataRead( session, buf );
+                }
+                finally
+                {
+                    buf.release();
+                }
             }
 
             public void dataWritten( NextFilter nextFilter, IoSession session,
