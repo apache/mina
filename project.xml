@@ -22,6 +22,25 @@
     /www/cvs.apache.org/dist/directory
   </distributionDirectory>
 
+  <developers>
+    <developer>
+      <name>Trustin Lee</name>
+      <id>trustin</id>
+      <email>trustin@gmail.com</email>
+      <organization>Solarsis LLC</organization>
+      <url>http://gleamynode.net/</url>
+      <timezone>+9</timezone>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Jan Andersson</name>
+    </contributor>
+    <contributor>
+      <name>Vinod Panicker</name>
+    </contributor>
+  </contributors>
+
   <repository>
     <connection>
       scm:svn:http://svn.apache.org/repos/asf/directory:network/branches/0.7
