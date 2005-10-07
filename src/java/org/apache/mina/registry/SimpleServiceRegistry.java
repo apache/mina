@@ -218,6 +218,9 @@ public class SimpleServiceRegistry implements ServiceRegistry
 
     private void startThreadPools()
     {
+        // Start thread pools only when the first service is bound.
+        // If any services are bound, it means that thread pools are started
+        // already.
         if( !services.isEmpty() )
             return;
 
@@ -227,6 +230,7 @@ public class SimpleServiceRegistry implements ServiceRegistry
 
     private void stopThreadPools()
     {
+        // Stop thread pools only when all services are unbound.
         if( !services.isEmpty() )
             return;
 

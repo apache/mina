@@ -307,6 +307,21 @@ public void sessionClosed( ProtocolSession session ) throws Exception
         corresponding response message.
       </answer>
     </faq>
+    
+    <faq id="adding-filters-per-session">
+      <question>
+        How can I add filters to a specific session or port?
+      </question>
+      <answer>
+        There is <tt>IoSession.getFilterChain()</tt> and
+        <tt>ProtocolSession.getFilterChain()</tt> that returns
+        <tt>IoFilterChain</tt> and <tt>ProtocolFilterChain</tt> respectively.
+        You can add any session-specific filters using the returned chain.
+        But you cannot add port-specific filters right now.  You'll have to
+        create more than one <tt>IoAcceptor</tt> or <tt>ProtocolAcceptor</tt>
+        because each acceptors have one filter chain you can adjust.
+      </answer>
+    </faq>
   </part>
   
   <part id="troubleshooting">
@@ -337,6 +352,17 @@ public void sessionClosed( ProtocolSession session ) throws Exception
         </p>
       </answer>
     </faq>
+    
+    <faq id="ssl-client-hangs">
+      <question>
+        I created an SSL client with MINA, but it doesn't initiate any handshake
+        after the session is open.
+      </question>
+      <answer>
+        Please make sure you called <tt>SSLFilter.setUseClientMode(true)</tt>
+        before you initiate a connection.  Server developers will also have to
+        disconnect users who doesn't initiate SSL handshake.
+      </answer>
+    </faq>
   </part>
 </faqs>
-   
