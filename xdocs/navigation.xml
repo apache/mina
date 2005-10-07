@@ -45,9 +45,9 @@
      <item name="Wiki Pages" href="http://wiki.apache.org/directory/MinaHome"/>
    </menu>
 
-   <menu name="ApacheCon Europe 2005">
-     <item name="ApacheCon Europe 2005" href="http://www.apachecon.com/"
-       img="http://apache.org/images/ac2005eu_135x50.gif" />
+   <menu name="ApacheCon US 2005">
+     <item name="ApacheCon US 2005" href="http://www.apachecon.com/"
+       img="http://apache.org/images/ac2005us_white_184x80.jpg" />
    </menu>
  </body>
 </project>
