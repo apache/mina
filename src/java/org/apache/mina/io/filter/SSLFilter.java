@@ -40,16 +40,52 @@ import org.apache.mina.io.IoSession;
  * <p>
  * This filter logs debug information in {@link Level#FINEST} using {@link Logger}.
  * 
+ * <h2>Implementing StartTLS</h2>
+ * <p>
+ * You can use {@link #DISABLE_ENCRYPTION_ONCE} attribute to implement StartTLS:
+ * <pre>
+ * public void messageReceived(ProtocolSession session, Object message) {
+ *    if (message instanceof MyStartTLSRequest) {
+ *        // Insert SSLFilter to get ready for handshaking
+ *        IoSession ioSession = ((IoProtocolSession) session).getIoSession();
+ *        ioSession.getFilterChain().addLast(sslFilter);
+ *
+ *        // Disable encryption temporarilly.
+ *        // This attribute will be removed by SSLFilter
+ *        // inside the Session.write() call below.
+ *        session.setAttribute(SSLFilter.DISABLE_ENCRYPTION_ONCE, Boolean.TRUE);
+ *
+ *        // Write StartTLSResponse which won't be encrypted.
+ *        session.write(new MyStartTLSResponse(OK));
+ *        
+ *        // Now DISABLE_ENCRYPTION_ONCE attribute is cleared.
+ *        assert session.getAttribute(SSLFilter.DISABLE_ENCRYPTION_ONCE) == null;
+ *    }
+ * }
+ * </pre>
+ * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SSLFilter extends IoFilterAdapter
 {
     /**
-     * Session attribute key that stores underlying {@link SSLSession}
+     * A session attribute key that stores underlying {@link SSLSession}
      * for each session.
      */
     public static final String SSL_SESSION = SSLFilter.class.getName() + ".SSLSession";
+    
+    /**
+     * A session attribute key that makes next one write request bypass
+     * this filter (not encrypting the data).  This is a marker attribute,
+     * which means that you can put whatever as its value. ({@link Boolean#TRUE}
+     * is preferred.)  The attribute is automatically removed from the session
+     * attribute map as soon as {@link IoSession#write(Object)} is invoked,
+     * and therefore should be put again if you want to make more messages
+     * bypass this filter.  This is especially useful when you implement
+     * StartTLS.   
+     */
+    public static final String DISABLE_ENCRYPTION_ONCE = SSLFilter.class.getName() + ".DisableEncryptionOnce";
     
     private static final String SSL_HANDLER = SSLFilter.class.getName() + ".SSLHandler";
 
@@ -300,7 +336,16 @@ public class SSLFilter extends IoFilterAdapter
 
     public void filterWrite( NextFilter nextFilter, IoSession session, ByteBuffer buf, Object marker ) throws SSLException
     {
-
+        // Don't encrypt the data if encryption is disabled.
+        if( session.getAttribute(DISABLE_ENCRYPTION_ONCE) != null )
+        {
+            // Remove the marker attribute because it is temporary.
+            session.removeAttribute(DISABLE_ENCRYPTION_ONCE);
+            nextFilter.filterWrite( session, buf, marker );
+            return;
+        }
+        
+        // Otherwise, encrypt the buffer.
         SSLHandler handler = createSSLSessionHandler( nextFilter, session );
         if( log.isLoggable( Level.FINEST ) )
         {
