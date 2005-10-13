@@ -80,10 +80,10 @@ public class SSLFilter extends IoFilterAdapter
      * this filter (not encrypting the data).  This is a marker attribute,
      * which means that you can put whatever as its value. ({@link Boolean#TRUE}
      * is preferred.)  The attribute is automatically removed from the session
-     * attribute map as soon as {@link IoSession#write(Object)} is invoked,
-     * and therefore should be put again if you want to make more messages
-     * bypass this filter.  This is especially useful when you implement
-     * StartTLS.   
+     * attribute map as soon as {@link IoSession#write(ByteBuffer, Object)} is
+     * invoked, and therefore should be put again if you want to make more
+     * messages bypass this filter.  This is especially useful when you
+     * implement StartTLS.   
      */
     public static final String DISABLE_ENCRYPTION_ONCE = SSLFilter.class.getName() + ".DisableEncryptionOnce";
     
