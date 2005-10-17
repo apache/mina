@@ -82,8 +82,8 @@ public abstract class BaseThreadPool implements ThreadPool
     private final String threadNamePrefix;
     private final Map buffers = new IdentityHashMap();
     private final Stack followers = new Stack();
-    private final BlockingSet readySessionBuffers = new BlockingSet();
-    private final Set busySessionBuffers = new HashSet();
+    private final BlockingSet unfetchedSessionBuffers = new BlockingSet();
+    private final Set allSessionBuffers = new HashSet();
 
     private Worker leader;
 
@@ -215,11 +215,11 @@ public abstract class BaseThreadPool implements ThreadPool
     protected void fireEvent( Object nextFilter, Session session,
                               EventType type, Object data )
     {
-        final BlockingSet readySessionBuffers = this.readySessionBuffers;
-        final Set busySessionBuffers = this.busySessionBuffers;
+        final BlockingSet unfetchedSessionBuffers = this.unfetchedSessionBuffers;
+        final Set allSessionBuffers = this.allSessionBuffers;
         final Event event = new Event( type, nextFilter, data );
 
-        synchronized( readySessionBuffers )
+        synchronized( unfetchedSessionBuffers )
         {
             final SessionBuffer buf = getSessionBuffer( session );
             final Queue eventQueue = buf.eventQueue;
@@ -229,10 +229,10 @@ public abstract class BaseThreadPool implements ThreadPool
                 eventQueue.push( event );
             }
 
-            if( !busySessionBuffers.contains( buf ) )
+            if( !allSessionBuffers.contains( buf ) )
             {
-                busySessionBuffers.add( buf );
-                readySessionBuffers.add( buf );
+                allSessionBuffers.add( buf );
+                unfetchedSessionBuffers.add( buf );
             }
         }
     }
@@ -342,14 +342,14 @@ public abstract class BaseThreadPool implements ThreadPool
         private SessionBuffer fetchBuffer()
         {
             SessionBuffer buf;
-            BlockingSet readySessionBuffers = BaseThreadPool.this.readySessionBuffers;
-            synchronized( readySessionBuffers )
+            BlockingSet unfetchedSessionBuffers = BaseThreadPool.this.unfetchedSessionBuffers;
+            synchronized( unfetchedSessionBuffers )
             {
                 for( ;; )
                 {
                     try
                     {
-                        readySessionBuffers.waitForNewItem();
+                        unfetchedSessionBuffers.waitForNewItem();
                     }
                     catch( InterruptedException e )
                     {
@@ -363,15 +363,12 @@ public abstract class BaseThreadPool implements ThreadPool
                         }
                     }
 
-                    Iterator it = readySessionBuffers.iterator();
+                    Iterator it = unfetchedSessionBuffers.iterator();
                     while( it.hasNext() )
                     {
                         buf = ( SessionBuffer ) it.next();
                         it.remove();
-                        if( buf != null && !buf.eventQueue.isEmpty() )
-                        {
-                            return buf;
-                        }
+                        return buf;
                     }
                 }
             }
@@ -413,20 +410,20 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private void releaseBuffer( SessionBuffer buf )
         {
-            final BlockingSet readySessionBuffers = BaseThreadPool.this.readySessionBuffers;
-            final Set busySessionBuffers = BaseThreadPool.this.busySessionBuffers;
+            final BlockingSet unfetchedSessionBuffers = BaseThreadPool.this.unfetchedSessionBuffers;
+            final Set allSessionBuffers = BaseThreadPool.this.allSessionBuffers;
             final Queue eventQueue = buf.eventQueue;
 
-            synchronized( readySessionBuffers )
+            synchronized( unfetchedSessionBuffers )
             {
                 if( eventQueue.isEmpty() )
                 {
-                    busySessionBuffers.remove( buf );
+                    allSessionBuffers.remove( buf );
                     removeSessionBuffer( buf );
                 }
                 else
                 {
-                    readySessionBuffers.add( buf );
+                    unfetchedSessionBuffers.add( buf );
                 }
             }
         }
