@@ -294,6 +294,16 @@ public abstract class BaseThreadPool implements ThreadPool
         {
             this.session = session;
         }
+        
+        public Session getSession()
+        {
+            return session;
+        }
+        
+        public Queue getEventQueue()
+        {
+            return eventQueue;
+        }
     }
 
     private class Worker extends Thread
