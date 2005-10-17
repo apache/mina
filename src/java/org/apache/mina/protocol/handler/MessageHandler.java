@@ -24,7 +24,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * A handler interface that {@link DemuxingProtocolHandler} forwards
  * <code>messageReceived</code> events to.  You have to register your
  * handler with the type of message you want to get notified using
- * {@link DemuxingProtocolHandler#registerMessageType(Class, MessageHandler)}.
+ * {@link DemuxingProtocolHandler#addMessageHandler(Class, MessageHandler)}.
  * 
  * @author The Apache Directory Project
  * @version $Rev$, $Date$
