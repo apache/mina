@@ -20,7 +20,6 @@ package org.apache.mina.util;
 
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -82,7 +81,7 @@ public abstract class BaseThreadPool implements ThreadPool
     private final String threadNamePrefix;
     private final Map buffers = new IdentityHashMap();
     private final Stack followers = new Stack();
-    private final BlockingSet unfetchedSessionBuffers = new BlockingSet();
+    private final BlockingQueue unfetchedSessionBuffers = new BlockingQueue();
     private final Set allSessionBuffers = new HashSet();
 
     private Worker leader;
@@ -215,7 +214,7 @@ public abstract class BaseThreadPool implements ThreadPool
     protected void fireEvent( Object nextFilter, Session session,
                               EventType type, Object data )
     {
-        final BlockingSet unfetchedSessionBuffers = this.unfetchedSessionBuffers;
+        final BlockingQueue unfetchedSessionBuffers = this.unfetchedSessionBuffers;
         final Set allSessionBuffers = this.allSessionBuffers;
         final Event event = new Event( type, nextFilter, data );
 
@@ -232,7 +231,7 @@ public abstract class BaseThreadPool implements ThreadPool
             if( !allSessionBuffers.contains( buf ) )
             {
                 allSessionBuffers.add( buf );
-                unfetchedSessionBuffers.add( buf );
+                unfetchedSessionBuffers.push( buf );
             }
         }
     }
@@ -242,6 +241,19 @@ public abstract class BaseThreadPool implements ThreadPool
      */
     protected abstract void processEvent( Object nextFilter, Session session,
                                           EventType type, Object data );
+
+    
+    /**
+     * Implement this method to fetch (or pop) a {@link SessionBuffer} from
+     * the given <tt>unfetchedSessionBuffers</tt>.  The default implementation
+     * simply pops the buffer from it.  You could prioritize the fetch order.
+     * 
+     * @return A non-null {@link SessionBuffer}
+     */
+    protected SessionBuffer fetchSessionBuffer( Queue unfetchedSessionBuffers )
+    {
+        return ( SessionBuffer ) unfetchedSessionBuffers.pop();
+    }
 
     private SessionBuffer getSessionBuffer( Session session )
     {
@@ -272,7 +284,7 @@ public abstract class BaseThreadPool implements ThreadPool
         }
     }
 
-    private static class SessionBuffer
+    protected static class SessionBuffer
     {
         private final Session session;
 
@@ -341,8 +353,7 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private SessionBuffer fetchBuffer()
         {
-            SessionBuffer buf;
-            BlockingSet unfetchedSessionBuffers = BaseThreadPool.this.unfetchedSessionBuffers;
+            BlockingQueue unfetchedSessionBuffers = BaseThreadPool.this.unfetchedSessionBuffers;
             synchronized( unfetchedSessionBuffers )
             {
                 for( ;; )
@@ -363,13 +374,7 @@ public abstract class BaseThreadPool implements ThreadPool
                         }
                     }
 
-                    Iterator it = unfetchedSessionBuffers.iterator();
-                    while( it.hasNext() )
-                    {
-                        buf = ( SessionBuffer ) it.next();
-                        it.remove();
-                        return buf;
-                    }
+                    return BaseThreadPool.this.fetchSessionBuffer( unfetchedSessionBuffers );
                 }
             }
         }
@@ -410,7 +415,7 @@ public abstract class BaseThreadPool implements ThreadPool
 
         private void releaseBuffer( SessionBuffer buf )
         {
-            final BlockingSet unfetchedSessionBuffers = BaseThreadPool.this.unfetchedSessionBuffers;
+            final BlockingQueue unfetchedSessionBuffers = BaseThreadPool.this.unfetchedSessionBuffers;
             final Set allSessionBuffers = BaseThreadPool.this.allSessionBuffers;
             final Queue eventQueue = buf.eventQueue;
 
@@ -423,7 +428,7 @@ public abstract class BaseThreadPool implements ThreadPool
                 }
                 else
                 {
-                    unfetchedSessionBuffers.add( buf );
+                    unfetchedSessionBuffers.push( buf );
                 }
             }
         }
