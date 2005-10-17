@@ -151,8 +151,7 @@ class IoAdapter
             }
             catch( ProtocolViolationException pve )
             {
-                in.acquire();  // Prevent the buffer from being released.
-                pve.setBuffer( in );
+                pve.setHexdump( in.getHexDump() );
                 managerFilterChain.exceptionCaught( psession, pve );
             }
             catch( Throwable t )

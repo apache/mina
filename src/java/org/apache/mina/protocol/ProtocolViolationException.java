@@ -33,7 +33,7 @@ public class ProtocolViolationException extends Exception
 {
     private static final long serialVersionUID = 3545799879533408565L;
 
-	private ByteBuffer buffer;
+	private String hexdump;
 
     /**
      * Constructs a new instance.
@@ -79,10 +79,10 @@ public class ProtocolViolationException extends Exception
             message = "";
         }
 
-        if( buffer != null )
+        if( hexdump != null )
         {
             return message + ( ( message.length() > 0 ) ? " " : "" )
-                   + "(Hexdump: " + buffer.getHexDump() + ')';
+                   + "(Hexdump: " + hexdump + ')';
         }
         else
         {
@@ -91,18 +91,22 @@ public class ProtocolViolationException extends Exception
     }
 
     /**
-     * Returns unknown message part.
+     * Returns the hexdump of the unknown message part.
      */
-    public ByteBuffer getBuffer()
+    public String getHexdump()
     {
-        return buffer;
+        return hexdump;
     }
 
     /**
-     * Sets unknown message part.
+     * Sets the hexdump of the unknown message part.
      */
-    public void setBuffer( ByteBuffer buffer )
+    public void setHexdump( String hexdump )
     {
-        this.buffer = buffer;
+        if( this.hexdump != null )
+        {
+            throw new IllegalStateException( "Hexdump cannot be set more than once." );
+        }
+        this.hexdump = hexdump;
     }
 }
