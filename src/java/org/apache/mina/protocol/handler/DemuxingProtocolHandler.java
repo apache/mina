@@ -38,24 +38,29 @@ public class DemuxingProtocolHandler extends ProtocolHandlerAdapter
     /**
      * Registers a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
+     * 
+     * @return the old handler if there is already a registered handler for
+     *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
-    public void addMessageHandler( Class type, MessageHandler handler )
+    public MessageHandler addMessageHandler( Class type, MessageHandler handler )
     {
         synchronized( type2handler )
         {
-            type2handler.put( type, handler );
+            return ( MessageHandler ) type2handler.put( type, handler );
         }
     }
 
     /**
      * Deregisters a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
+     * 
+     * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
-    public void removeMessageHandler( Class type )
+    public MessageHandler removeMessageHandler( Class type )
     {
         synchronized( type2handler )
         {
-            type2handler.remove( type );
+            return (MessageHandler) type2handler.remove( type );
         }
     }
     
