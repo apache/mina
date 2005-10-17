@@ -3,6 +3,7 @@
  */
 package org.apache.mina.protocol.handler;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,8 +18,8 @@ import org.apache.mina.protocol.ProtocolSession;
  * to the appropriate {@link MessageHandler}.
  * 
  * You can freely register and deregister {@link MessageHandler}s using
- * {@link #registerMessageType(Class, MessageHandler)} and
- * {@link #deregisterMessageType(Class)}.
+ * {@link #addMessageHandler(Class, MessageHandler)} and
+ * {@link #removeMessageHandler(Class)}.
  * 
  * @author The Apache Directory Project
  * @version $Rev$, $Date$
@@ -38,7 +39,7 @@ public class DemuxingProtocolHandler extends ProtocolHandlerAdapter
      * Registers a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
      */
-    public void registerMessageType( Class type, MessageHandler handler )
+    public void addMessageHandler( Class type, MessageHandler handler )
     {
         synchronized( type2handler )
         {
@@ -50,17 +51,35 @@ public class DemuxingProtocolHandler extends ProtocolHandlerAdapter
      * Deregisters a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
      */
-    public void deregisterMessageType( Class clazz )
+    public void removeMessageHandler( Class type )
     {
         synchronized( type2handler )
         {
-            type2handler.remove( clazz );
+            type2handler.remove( type );
         }
+    }
+    
+    /**
+     * Returns the {@link MessageHandler} which is registered to process
+     * the specified <code>type</code>. 
+     */
+    public MessageHandler getMessageHandler( Class type )
+    {
+        return ( MessageHandler ) type2handler.get( type );
+    }
+    
+    /**
+     * Returns the {@link Map} which contains all messageType-{@link MessageHandler}
+     * pairs registered to this handler.
+     */
+    public Map getMessageHandlerMap()
+    {
+        return Collections.unmodifiableMap( type2handler );
     }
 
     /**
      * Forwards the received events into the appropriate {@link MessageHandler}
-     * which is registered by {@link #registerMessageType(Class, MessageHandler)}.
+     * which is registered by {@link #addMessageHandler(Class, MessageHandler)}.
      */
     public void messageReceived( ProtocolSession session, Object message )
     {

@@ -23,7 +23,7 @@ package org.apache.mina.protocol.handler;
  * An exception that is thrown when {@link DemuxingProtocolHandler}
  * cannot find any {@link MessageHandler}s associated with the specific
  * message type.  You have to use
- * {@link DemuxingProtocolHandler#registerMessageType(Class, MessageHandler)}
+ * {@link DemuxingProtocolHandler#addMessageHandler(Class, MessageHandler)}
  * to associate a message type and a message handler. 
  * 
  * @author The Apache Directory Project
