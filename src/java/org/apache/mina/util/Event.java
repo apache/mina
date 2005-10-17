@@ -25,7 +25,7 @@ package org.apache.mina.util;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-class Event
+public class Event
 {
     private final EventType type;
     private final Object nextFilter;
