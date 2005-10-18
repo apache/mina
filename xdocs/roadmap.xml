@@ -1,66 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
-	<properties>
-		<author email="trustin@apache.org">Trustin Lee</author>
-		<title>Roadmap</title>
-	</properties>
-  
-	<body>
-
-		<section name="Roadmap">
-			<p>
-        We have chosen versioning strategy similar to that of Linux.
-        Odd version numbers mean feature release, and even mean stable.
-        <ul>
-          <li><a href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:roadmap-panel&amp;subset=-1">List of all issues</a></li>
-        </ul>
-			</p>
-
-			<subsection name="0.7 (May 2005)">
-				<p>
-          <ul>
-            <li>The first official release</li>
-            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11067">List of issues</a></li>
-          </ul>
-        </p>
-			</subsection>
-      
-      <subsection name="0.8 (no date set)">
-        <p>
-          <ul>
-            <li>Maintenance release</li>
-            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11068">List of issues</a></li>
-          </ul>
-        </p>
-      </subsection>
-
-			<subsection name="0.9 (no date set)">
-				<p>
-					<ul>
-            <li>More transport types and filters</li>
-            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11069">List of issues</a></li>
-          </ul>
-        </p>
-			</subsection>
-
-      <subsection name="1.0 (no date set)">
-        <p>
-          <ul>
-            <li>Maintenance release</li>
-            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11070">List of issues</a></li>
-          </ul>
-        </p>
-      </subsection>
-
-			<subsection name="1.1 (no date set)">
-				<p>
-					<ul>
-						<li>Integration with well known containers: Spring and OSGi</li>
-						<li>JMX integration</li>
-            <li><a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?reset=true&amp;pid=10670&amp;fixfor=11071">List of issues</a></li>
-					</ul>
-				</p>
-			</subsection>
-		</section>
-	</body>
+  <properties>
+    <author email="trustin@apache.org">Trustin Lee</author>
+    <title>Roadmap</title>
+  </properties>
+  <body>
+    <section name="Roadmap">
+      <p>
+        We have chosen versioning scheme similar to that of Linux.
+        Odd version numbers mean a feature release; this means that API and
+        festure set can change radically at any time.  Even version numbers
+        mean a stable release; there will be only bug fixes and no feature
+        updates in a stable release.
+      </p>
+      <p>
+        Please take a look at
+        <a href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:roadmap-panel&subset=-1">our issue tracker page</a>
+        to see the full roadmap of MINA.
+      </p>
+    </section>
+  </body>
 </document>
