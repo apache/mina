@@ -19,7 +19,9 @@
 package org.apache.mina.util;
 
 import java.io.Serializable;
+import java.util.AbstractList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A unbounded circular queue.
@@ -27,7 +29,7 @@ import java.util.Arrays;
  * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
-public class Queue implements Serializable
+public class Queue extends AbstractList implements List, Serializable
 {
     private static final long serialVersionUID = 3835151744526464313L;
 
@@ -88,9 +90,7 @@ public class Queue implements Serializable
 
         Object ret = items[ first ];
         items[ first ] = null;
-        first = ( first + 1 ) & mask;
-
-        size--;
+        decreaseSize();
 
         return ret;
     }
@@ -100,31 +100,9 @@ public class Queue implements Serializable
      */
     public void push( Object obj )
     {
-        if( size == items.length )
-        {
-            // expand queue
-            final int oldLen = items.length;
-            Object[] tmp = new Object[ oldLen * 2 ];
-
-            if( first < last )
-            {
-                System.arraycopy( items, first, tmp, 0, last - first );
-            }
-            else
-            {
-                System.arraycopy( items, first, tmp, 0, oldLen - first );
-                System.arraycopy( items, 0, tmp, oldLen - first, last );
-            }
-
-            first = 0;
-            last = oldLen;
-            items = tmp;
-            mask = tmp.length - 1;
-        }
-
+        ensureCapacity();
         items[ last ] = obj;
-        last = ( last + 1 ) & mask;
-        size++;
+        increaseSize();
     }
 
     /**
@@ -143,6 +121,12 @@ public class Queue implements Serializable
         return items[ first ];
     }
 
+    /**
+     * Returns the last element of the queue.
+     * 
+     * @return <code>null</code>, if the queue is empty, or the element is
+     *         really <code>null</code>.
+     */
     public Object last()
     {
         if( size == 0 )
@@ -155,7 +139,8 @@ public class Queue implements Serializable
     
     public Object get( int idx )
     {
-        return items[ ( first + idx ) & mask ];
+        checkIndex(idx);
+        return items[ getRealIndex(idx) ];
     }
 
     /**
@@ -177,5 +162,148 @@ public class Queue implements Serializable
     public String toString()
     {
         return "first=" + first + ", last=" + last + ", size=" + size + ", mask = " + mask;
+    }
+
+    private void checkIndex( int idx )
+    {
+        if( idx < 0 || idx >= size )
+        {
+            throw new IndexOutOfBoundsException( String.valueOf( idx ) );
+        }
+    }
+
+    private int getRealIndex( int idx )
+    {
+        return ( first + idx ) & mask;
+    }
+
+    private void increaseSize()
+    {
+        last = ( last + 1 ) & mask;
+        size++;
+    }
+
+    private void decreaseSize() {
+        first = ( first + 1 ) & mask;
+        size--;
+    }
+
+    private void ensureCapacity()
+    {
+        if( size < items.length )
+        {
+            return;
+        }
+        
+        // expand queue
+        final int oldLen = items.length;
+        Object[] tmp = new Object[ oldLen * 2 ];
+
+        if( first < last )
+        {
+            System.arraycopy( items, first, tmp, 0, last - first );
+        }
+        else
+        {
+            System.arraycopy( items, first, tmp, 0, oldLen - first );
+            System.arraycopy( items, 0, tmp, oldLen - first, last );
+        }
+
+        first = 0;
+        last = oldLen;
+        items = tmp;
+        mask = tmp.length - 1;
+    }
+
+    //////////////////////////////////////////
+    // java.util.List compatibility methods //
+    //////////////////////////////////////////
+
+    public boolean add( Object o )
+    {
+        push( o );
+        return true;
+    }
+
+    public Object set(int idx, Object o) {
+        checkIndex(idx);
+        
+        int realIdx = getRealIndex(idx);
+        Object old = items[ realIdx ];
+        items[ realIdx ] = o;
+        return old;
+    }
+
+    public void add( int idx, Object o )
+    {
+        if( idx == size )
+        {
+            push( o );
+            return;
+        }
+        
+        checkIndex( idx );
+        ensureCapacity();
+        
+        int realIdx = getRealIndex( idx );
+        
+        // Make a room for a new element.
+        if( first < last )
+        {
+            System.arraycopy( items, realIdx, items, realIdx + 1, last - realIdx );
+        }
+        else
+        {
+            if( realIdx >= first )
+            {
+                System.arraycopy( items, 0, items, 1, last );
+                items[ 0 ] = items[ items.length - 1 ];
+                System.arraycopy( items, realIdx, items, realIdx + 1, items.length - realIdx - 1 );
+            }
+            else
+            {
+                System.arraycopy( items, realIdx, items, realIdx + 1, last - realIdx );
+            }
+        }
+        
+        items[ realIdx ] = o;
+        increaseSize();
+    }
+
+    public Object remove( int idx )
+    {
+        if( idx == 0 )
+        {
+            return pop();
+        }
+        
+        checkIndex( idx );
+        
+        int realIdx = getRealIndex( idx );
+        Object removed = items[ realIdx ];
+        
+        // Remove a room for the removed element.
+        if( first < last )
+        {
+            System.arraycopy( items, first, items, first + 1, realIdx - first );
+        }
+        else
+        {
+            if( realIdx >= first )
+            {
+                System.arraycopy( items, first, items, first + 1, realIdx - first );
+            }
+            else
+            {
+                System.arraycopy( items, 0, items, 1, realIdx );
+                items[ 0 ] = items[ items.length - 1 ];
+                System.arraycopy( items, first, items, first + 1, items.length - first - 1 );
+            }
+        }
+        
+        items[ first ] = null;
+        decreaseSize();
+
+        return removed;
     }
 }

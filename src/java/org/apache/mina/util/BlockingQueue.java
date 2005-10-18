@@ -18,9 +18,14 @@
  */
 package org.apache.mina.util;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
 /**
  * A synchronized version of {@link Queue}.
- *
+ * 
  * @author Trustin Lee
  * @version $Rev$, $Date$
  */
@@ -32,6 +37,85 @@ public class BlockingQueue extends Queue
 
     public BlockingQueue()
     {
+    }
+
+    /**
+     * Waits until any elements are in this queue.
+     * 
+     * @throws InterruptedException
+     *             if the current thread is interrupted
+     */
+    public synchronized void waitForNewItem() throws InterruptedException
+    {
+        waiters++;
+        try
+        {
+            while( super.isEmpty() )
+            {
+                wait();
+            }
+        }
+        finally
+        {
+            waiters--;
+        }
+    }
+
+    public synchronized void push( Object obj )
+    {
+        super.push( obj );
+        notifyAdded();
+    }
+
+    public synchronized void add( int idx, Object o )
+    {
+        super.add( idx, o );
+        notifyAdded();
+    }
+
+    public synchronized boolean add( Object o )
+    {
+        if( super.add( o ) )
+        {
+            notifyAdded();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public synchronized boolean addAll( int arg0, Collection arg1 )
+    {
+        if( super.addAll( arg0, arg1 ) )
+        {
+            notifyAdded();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public synchronized boolean addAll( Collection arg0 )
+    {
+        if( super.addAll( arg0 ) )
+        {
+            notifyAdded();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private void notifyAdded()
+    {
+        if( waiters > 0 )
+            notify();
     }
 
     public synchronized int capacity()
@@ -69,13 +153,6 @@ public class BlockingQueue extends Queue
         return super.pop();
     }
 
-    public synchronized void push( Object obj )
-    {
-        super.push( obj );
-        if( waiters > 0 )
-            notify();
-    }
-
     public synchronized int size()
     {
         return super.size();
@@ -86,24 +163,88 @@ public class BlockingQueue extends Queue
         return super.toString();
     }
 
-    /**
-     * Waits until any elements are in this queue.
-     * 
-     * @throws InterruptedException if the current thread is interrupted
-     */
-    public synchronized void waitForNewItem() throws InterruptedException
+    public synchronized Object remove( int idx )
     {
-        waiters++;
-        try
-        {
-            while( super.isEmpty() )
-            {
-                wait();
-            }
-        }
-        finally
-        {
-            waiters--;
-        }
+        return super.remove( idx );
+    }
+
+    public synchronized Object set( int idx, Object o )
+    {
+        return super.set( idx, o );
+    }
+
+    public synchronized boolean equals( Object o )
+    {
+        return super.equals( o );
+    }
+
+    public synchronized int hashCode()
+    {
+        return super.hashCode();
+    }
+
+    public synchronized int indexOf( Object o )
+    {
+        return super.indexOf( o );
+    }
+
+    public synchronized Iterator iterator()
+    {
+        return super.iterator();
+    }
+
+    public synchronized int lastIndexOf( Object o )
+    {
+        return super.lastIndexOf( o );
+    }
+
+    public synchronized ListIterator listIterator()
+    {
+        return super.listIterator();
+    }
+
+    public synchronized ListIterator listIterator( int index )
+    {
+        return super.listIterator( index );
+    }
+
+    public synchronized List subList( int fromIndex, int toIndex )
+    {
+        return super.subList( fromIndex, toIndex );
+    }
+
+    public synchronized boolean contains( Object o )
+    {
+        return super.contains( o );
+    }
+
+    public synchronized boolean containsAll( Collection arg0 )
+    {
+        return super.containsAll( arg0 );
+    }
+
+    public synchronized boolean remove( Object o )
+    {
+        return super.remove( o );
+    }
+
+    public synchronized boolean removeAll( Collection arg0 )
+    {
+        return super.removeAll( arg0 );
+    }
+
+    public synchronized boolean retainAll( Collection arg0 )
+    {
+        return super.retainAll( arg0 );
+    }
+
+    public synchronized Object[] toArray()
+    {
+        return super.toArray();
+    }
+
+    public synchronized Object[] toArray( Object[] arg0 )
+    {
+        return super.toArray( arg0 );
     }
 }
