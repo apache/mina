@@ -368,6 +368,11 @@ public abstract class BaseThreadPool implements ThreadPool
             {
                 for( ;; )
                 {
+                    if( shuttingDown )
+                    {
+                        return null;
+                    }
+
                     try
                     {
                         unfetchedSessionBuffers.waitForNewItem();
@@ -484,7 +489,7 @@ public abstract class BaseThreadPool implements ThreadPool
                     currentTime = System.currentTimeMillis();
                 }
 
-                boolean timeToLead = this == leader;
+                boolean timeToLead = this == leader && !shuttingDown;
 
                 if( !timeToLead )
                 {
