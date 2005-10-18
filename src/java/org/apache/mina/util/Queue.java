@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * A unbounded circular queue.
@@ -305,5 +306,43 @@ public class Queue extends AbstractList implements List, Serializable
         decreaseSize();
 
         return removed;
+    }
+
+    ///////////////////////////////////////////
+    // java.util.Queue compatibility methods //
+    ///////////////////////////////////////////
+
+    public boolean offer( Object o )
+    {
+        push( o );
+        return true;
+    }
+
+    public Object poll()
+    {
+        return pop();
+    }
+
+    public Object remove()
+    {
+        if( size == 0 )
+        {
+            throw new NoSuchElementException();
+        }
+        return pop();
+    }
+
+    public Object peek()
+    {
+        return first();
+    }
+
+    public Object element()
+    {
+        if( size == 0 )
+        {
+            throw new NoSuchElementException();
+        }
+        return first();
     }
 }
