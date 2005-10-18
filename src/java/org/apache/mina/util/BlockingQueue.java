@@ -112,6 +112,19 @@ public class BlockingQueue extends Queue
         }
     }
 
+    public synchronized boolean offer( Object o )
+    {
+        if( super.offer( o ) )
+        {
+            notifyAdded();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     private void notifyAdded()
     {
         if( waiters > 0 )
@@ -247,4 +260,26 @@ public class BlockingQueue extends Queue
     {
         return super.toArray( arg0 );
     }
+
+    public synchronized Object element()
+    {
+        return super.element();
+    }
+
+    public synchronized Object peek()
+    {
+        return super.peek();
+    }
+
+    public synchronized Object poll()
+    {
+        return super.poll();
+    }
+
+    public synchronized Object remove()
+    {
+        return super.remove();
+    }
+    
+    
 }
