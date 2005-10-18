@@ -14,7 +14,11 @@
         
         <ul>
           <li><a href="features.html">Feature List</a></li>
+          <li><a href="testimonials.html">Testimonials</a></li>
           <li><a href="getting_started.html">Getting Started</a></li>
+          <li><a href="http://svn.apache.org/repository/directory-network/">Downloads</a></li>
+          <li><a href="apidocs/index.html">JavaDocs</a></li>
+          <li><a href="faq.html">F.A.Q</a></li>
         </ul>
       </p>
     </section>

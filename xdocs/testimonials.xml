@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+  <properties>
+    <author email="trustin@apache.org">Trustin Lee</author>
+    <title>Testimonials</title>
+  </properties>
+
+  <body>
+    <section name="Testimonials">
+      <p>
+        Alex Burmester says:
+        <blockquote>
+          <p>
+            We are using MINA at a telco to route low level protocol packets
+            to a third party.  We already had a SOAP and also a CORBA interface
+            but for speed purposes we are trying out a lower level protocol and
+            we needed a gateway of sorts to route messages between our cluster of
+            servers and the third party's servers.
+          </p>
+          <p>
+            I had been planning on using NIO and some aspects of
+            <a href="http://www.eecs.harvard.edu/~mdw/proj/seda/">SEDA</a> but
+            finding MINA was a real treat as it saved a lot of time, is well
+            written and gets more testing than our in house QA would be able to
+            cover.
+          </p>
+          <p>
+            The speed and stability of our app on top of MINA has been excellent.
+          </p>
+        </blockquote>
+      </p>
+      
+      <p>Thomas Muller says:
+        <blockquote>
+          What a fantastic API! Definately the best I've seen since
+          <a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html">Doug Lea's Concurrency API</a>.
+        </blockquote>
+      </p>
+      
+      <p>Luke Hubbard says:
+        <blockquote>
+          We are using it for the network layer of
+          <a href="http://www.osflash.org/red5">Red5</a>, an open source flash
+          server. At the moment we have RTMP and AMF working and hope to add
+          more protocols in the future.  MINA's design and ease of use has
+          helped us get a prototype up and running quickly.
+        </blockquote>
+      </p>
+      
+      <p>Jean-François Daune says:
+        <blockquote>
+          <p>
+            We use MINA to communicate with
+            <a href="http://www.banksys.com/">Banksys</a> 'point of sale'
+            terminals (Visa, Mastercard...) for technical management operations.
+            (software upgrade, remote monitoring, log transfer...)
+          </p>
+          <p>
+            So far, MINA has worked really well for us. We used
+            <a href="http://gleamynode.net/dev/tl-netty2/docs/">Netty2</a>,
+            and clearly saw the improvements in MINA. I like the MINA API
+            more. MINA really makes it easier to write applications using NIO.
+          </p>
+        </blockquote>
+      </p>
+    </section>
+  </body>
+</document>
