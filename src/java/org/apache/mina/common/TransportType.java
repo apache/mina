@@ -111,18 +111,18 @@ public final class TransportType implements Serializable
 
     private final String[] names;
 
-    private final transient boolean stateless;
+    private final transient boolean connectionless;
 
     /**
      * Creates a new instance.  New transport type is automatically registered
      * to internal registry so that you can look it up using {@link #getInstance(String)}.
      * 
      * @param names the name or aliases of this transport type
-     * @param stateless <tt>true</tt> if and only if this transport type is stateless
+     * @param connectionless <tt>true</tt> if and only if this transport type is connectionless
      * 
      * @throws IllegalArgumentException if <tt>names</tt> are already registered or empty
      */
-    public TransportType( String[] names, boolean stateless )
+    public TransportType( String[] names, boolean connectionless )
     {
         if( names == null )
         {
@@ -145,16 +145,16 @@ public final class TransportType implements Serializable
 
         register( names, this );
         this.names = names;
-        this.stateless = stateless;
+        this.connectionless = connectionless;
     }
 
     /**
      * Returns <code>true</code> if the session of this transport type is
-     * stateless.
+     * connectionless.
      */
-    public boolean isStateless()
+    public boolean isConnectionless()
     {
-        return stateless;
+        return connectionless;
     }
     
     /**
