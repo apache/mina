@@ -61,6 +61,11 @@ public class IoProtocolAcceptor implements ProtocolAcceptor
         acceptor.unbind( address );
     }
     
+    public ProtocolSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
+    {
+        return adapter.toProtocolSession( acceptor.newSession( remoteAddress, localAddress ) );
+    }
+
     public ProtocolFilterChain getFilterChain()
     {
         return adapter.getFilterChain();

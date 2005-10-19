@@ -13,6 +13,7 @@ import org.apache.mina.protocol.ProtocolAcceptor;
 import org.apache.mina.protocol.ProtocolFilterChain;
 import org.apache.mina.protocol.ProtocolHandler;
 import org.apache.mina.protocol.ProtocolProvider;
+import org.apache.mina.protocol.ProtocolSession;
 
 /**
  * Binds the specified {@link ProtocolProvider} to the specified
@@ -97,5 +98,10 @@ public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAccept
             this.managerFilterChain = managerFilterChain;
             this.handler = handler;
         }
+    }
+
+    public ProtocolSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
+    {
+        throw new UnsupportedOperationException();
     }
 }
