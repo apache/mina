@@ -26,7 +26,7 @@ import org.apache.mina.common.SessionConfig;
  * An {@link IOException} which is thrown when write buffer is not flushed for
  * {@link SessionConfig#getWriteTimeout()} seconds.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$, 
  */
 public class WriteTimeoutException extends IOException

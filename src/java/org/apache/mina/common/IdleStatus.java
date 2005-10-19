@@ -33,7 +33,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * Idle time settings are all disabled by default.  You can enable them
  * using {@link SessionConfig#setIdleTime(IdleStatus,int)}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class IdleStatus

@@ -22,7 +22,6 @@ package org.apache.mina.util;
  * A generic thread pool interface.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public interface ThreadPool {

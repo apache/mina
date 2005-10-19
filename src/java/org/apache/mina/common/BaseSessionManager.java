@@ -21,7 +21,7 @@ package org.apache.mina.common;
 /**
  * Base implementation of {@link SessionManager}s.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class BaseSessionManager implements SessionManager {

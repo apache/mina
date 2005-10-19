@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@link TransportType}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public class TransportTypeTest extends TestCase {

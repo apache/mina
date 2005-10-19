@@ -29,7 +29,7 @@ import org.apache.mina.protocol.vmpipe.VmPipeAddress;
  * This service registry supports socket, datagram, VM-pipe transport types,
  * and thread pools were added by default. 
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$, 
  */
 public class SimpleServiceRegistry implements ServiceRegistry

@@ -30,7 +30,7 @@ import org.apache.mina.examples.echoserver.EchoProtocolHandler;
 /**
  * Tests {@link IoAcceptor} resource leakage by repeating bind and unbind.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
 public class AbstractBindTest extends TestCase

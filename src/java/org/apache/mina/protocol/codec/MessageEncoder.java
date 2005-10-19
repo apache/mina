@@ -26,7 +26,6 @@ import org.apache.mina.protocol.ProtocolEncoder;
  * Encodes messages of specific types specified by {@link #getMessageTypes()}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see DemuxingProtocolCodecFactory

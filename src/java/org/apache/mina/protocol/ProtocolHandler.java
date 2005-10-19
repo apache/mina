@@ -31,8 +31,7 @@ import org.apache.mina.common.IdleStatus;
  * <a href="../../../../../xref-examples/org/apache/mina/examples/reverser/ReverseProtocolHandler.html"><code>ReverseProtocolHandler</code></a>
  * example.
  * 
- * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see ProtocolHandlerAdapter

@@ -29,7 +29,7 @@ import org.apache.mina.util.Stack;
  * ByteBuffers are by default allocated as direct byte buffers. To use non-direct
  * ByteBuffers, set system property mina.sslfilter.directbuffer to false.
  *
- * @author Jan Andersson (janne@minq.se)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class SSLByteBufferPool

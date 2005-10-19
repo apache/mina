@@ -19,8 +19,6 @@
 package org.apache.mina.io.filter;
 
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -31,6 +29,8 @@ import javax.net.ssl.SSLSession;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoFilter.NextFilter;
 import org.apache.mina.util.Queue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A helper class using the SSLEngine API to decrypt/encrypt data.
@@ -40,12 +40,12 @@ import org.apache.mina.util.Queue;
  * These buffers handle all of the intermediary data for the SSL connection. To make things easy,
  * we'll require outNetBuffer be completely flushed before trying to wrap any more data.
  *
- * @author Jan Andersson (janne@minq.se)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class SSLHandler
 {
-    private static final Logger log = Logger.getLogger( SSLFilter.class.getName() );
+    private static final Logger log = LoggerFactory.getLogger( SSLFilter.class );
 
     private final SSLFilter parent;
 
@@ -202,9 +202,9 @@ class SSLHandler
         
         while( ( scheduledBuf = ( org.apache.mina.common.ByteBuffer ) writeBufferQueue.pop() ) != null )
         {
-            if( log.isLoggable( Level.FINEST ) )
+            if( log.isDebugEnabled() )
             {
-                log.log( Level.FINEST, session + " Flushing buffered write request: " + scheduledBuf );
+                log.debug( session + " Flushing buffered write request: " + scheduledBuf );
             }
             nextFilter = ( NextFilter ) nextFilterQueue.pop();
             scheduledMarker = writeMarkerQueue.pop();
@@ -230,11 +230,11 @@ class SSLHandler
             appBuffer = SSLByteBufferPool.expandBuffer( appBuffer, inNetBuffer.capacity() * 2);
             appBuffer.position( 0 );
             appBuffer.limit( 0 );
-            if( log.isLoggable( Level.FINEST ) )
+            if( log.isDebugEnabled() )
             {
-                log.log( Level.FINEST, session + 
+                log.debug( session + 
                                     " expanded inNetBuffer:" + inNetBuffer );
-                log.log( Level.FINEST, session + 
+                log.debug( session + 
                                     " expanded appBuffer:" + appBuffer );
             }
         }
@@ -258,9 +258,9 @@ class SSLHandler
      */
     public void continueHandshake( NextFilter nextFilter ) throws SSLException
     {
-        if( log.isLoggable( Level.FINEST ) )
+        if( log.isDebugEnabled() )
         {
-            log.log( Level.FINEST, session + " continueHandshake()" );
+            log.debug( session + " continueHandshake()" );
         }
         doHandshake( nextFilter );
     }
@@ -334,8 +334,8 @@ class SSLHandler
 
         if( appBuffer.hasRemaining() )
         {
-             if ( log.isLoggable( Level.FINEST ) ) {
-                 log.log( Level.FINEST, session + " Error: appBuffer not empty!" );
+             if ( log.isDebugEnabled() ) {
+                 log.debug( session + " Error: appBuffer not empty!" );
              }
             //still app data in buffer!?
             throw new IllegalStateException();
@@ -383,14 +383,14 @@ class SSLHandler
                 // Note: there is no way to know the exact size required, but enrypted data
                 // shouln't need to be larger than twice the source data size?
                 outNetBuffer = SSLByteBufferPool.expandBuffer( outNetBuffer, src.capacity() * 2 );
-                if ( log.isLoggable( Level.FINEST ) ) {
-                    log.log( Level.FINEST, session + " expanded outNetBuffer:" + outNetBuffer );
+                if ( log.isDebugEnabled() ) {
+                    log.debug( session + " expanded outNetBuffer:" + outNetBuffer );
                 }
             }
 
             result = sslEngine.wrap( src, outNetBuffer );
-            if ( log.isLoggable( Level.FINEST ) ) {
-                log.log( Level.FINEST, session + " Wrap res:" + result );
+            if ( log.isDebugEnabled() ) {
+                log.debug( session + " Wrap res:" + result );
             }
 
             if ( result.getStatus() == SSLEngineResult.Status.OK ) {
@@ -413,9 +413,9 @@ class SSLHandler
     synchronized void doHandshake( NextFilter nextFilter ) throws SSLException
     {
 
-        if( log.isLoggable( Level.FINEST ) )
+        if( log.isDebugEnabled() )
         {
-            log.log( Level.FINEST, session + " doHandshake()" );
+            log.debug( session + " doHandshake()" );
         }
 
         while( !initialHandshakeComplete )
@@ -423,29 +423,29 @@ class SSLHandler
             if( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED )
             {
                 session.setAttribute( SSLFilter.SSL_SESSION, sslEngine.getSession() );
-                if( log.isLoggable( Level.FINEST ) )
+                if( log.isDebugEnabled() )
                 {
                     SSLSession sslSession = sslEngine.getSession();
-                    log.log( Level.FINEST, session + "  initialHandshakeStatus=FINISHED" );
-                    log.log( Level.FINEST, session + "  sslSession CipherSuite used " + sslSession.getCipherSuite() );
+                    log.debug( session + "  initialHandshakeStatus=FINISHED" );
+                    log.debug( session + "  sslSession CipherSuite used " + sslSession.getCipherSuite() );
                 }
                 initialHandshakeComplete = true;
                 return;
             }
             else if( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_TASK )
             {
-                if( log.isLoggable( Level.FINEST ) )
+                if( log.isDebugEnabled() )
                 {
-                    log.log( Level.FINEST, session + "  initialHandshakeStatus=NEED_TASK" );
+                    log.debug( session + "  initialHandshakeStatus=NEED_TASK" );
                 }
                 initialHandshakeStatus = doTasks();
             }
             else if( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP )
             {
                 // we need more data read
-                if( log.isLoggable( Level.FINEST ) )
+                if( log.isDebugEnabled() )
                 {
-                    log.log( Level.FINEST, session +
+                    log.debug( session +
                              "  initialHandshakeStatus=NEED_UNWRAP" );
                 }
                 SSLEngineResult.Status status = unwrapHandshake();
@@ -459,25 +459,25 @@ class SSLHandler
             }
             else if( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP )
             {
-                if( log.isLoggable( Level.FINEST ) )
+                if( log.isDebugEnabled() )
                 {
-                    log.log( Level.FINEST, session + "  initialHandshakeStatus=NEED_WRAP" );
+                    log.debug( session + "  initialHandshakeStatus=NEED_WRAP" );
                 }
                 // First make sure that the out buffer is completely empty. Since we
                 // cannot call wrap with data left on the buffer
                 if( outNetBuffer.hasRemaining() )
                 {
-                    if( log.isLoggable( Level.FINEST ) )
+                    if( log.isDebugEnabled() )
                     {
-                        log.log( Level.FINEST, session + "  Still data in out buffer!" );
+                        log.debug( session + "  Still data in out buffer!" );
                     }
                     return;
                 }
                 outNetBuffer.clear();
                 SSLEngineResult result = sslEngine.wrap( hsBB, outNetBuffer );
-                if( log.isLoggable( Level.FINEST ) )
+                if( log.isDebugEnabled() )
                 {
-                    log.log( Level.FINEST, session + " Wrap res:" + result );
+                    log.debug( session + " Wrap res:" + result );
                 }
 
                 outNetBuffer.flip();
@@ -496,9 +496,9 @@ class SSLHandler
 
     SSLEngineResult.Status unwrap() throws SSLException
     {
-        if( log.isLoggable( Level.FINEST ) )
+        if( log.isDebugEnabled() )
         {
-            log.log( Level.FINEST, session + " unwrap()" );
+            log.debug( session + " unwrap()" );
         }
         // Prepare the application buffer to receive decrypted data
         appBuffer.clear();
@@ -509,15 +509,15 @@ class SSLHandler
         SSLEngineResult res;
         do
         {
-            if( log.isLoggable( Level.FINEST ) )
+            if( log.isDebugEnabled() )
             {
-                log.log( Level.FINEST, session + "   inNetBuffer: " + inNetBuffer );
-                log.log( Level.FINEST, session + "   appBuffer: " + appBuffer );
+                log.debug( session + "   inNetBuffer: " + inNetBuffer );
+                log.debug( session + "   appBuffer: " + appBuffer );
             }
             res = sslEngine.unwrap( inNetBuffer, appBuffer );
-            if( log.isLoggable( Level.FINEST ) )
+            if( log.isDebugEnabled() )
             {
-                log.log( Level.FINEST, session + " Unwrap res:" + res );
+                log.debug( session + " Unwrap res:" + res );
             }
         }
         while( res.getStatus() == SSLEngineResult.Status.OK );
@@ -546,9 +546,9 @@ class SSLHandler
 
     private SSLEngineResult.Status unwrapHandshake() throws SSLException
     {
-        if( log.isLoggable( Level.FINEST ) )
+        if( log.isDebugEnabled() )
         {
-            log.log( Level.FINEST, session + " unwrapHandshake()" );
+            log.debug( session + " unwrapHandshake()" );
         }
         // Prepare the application buffer to receive decrypted data
         appBuffer.clear();
@@ -559,15 +559,15 @@ class SSLHandler
         SSLEngineResult res;
         do
         {
-            if( log.isLoggable( Level.FINEST ) )
+            if( log.isDebugEnabled() )
             {
-                log.log( Level.FINEST, session + "   inNetBuffer: " + inNetBuffer );
-                log.log( Level.FINEST, session + "   appBuffer: " + appBuffer );
+                log.debug( session + "   inNetBuffer: " + inNetBuffer );
+                log.debug( session + "   appBuffer: " + appBuffer );
             }
             res = sslEngine.unwrap( inNetBuffer, appBuffer );
-            if( log.isLoggable( Level.FINEST ) )
+            if( log.isDebugEnabled() )
             {
-                log.log( Level.FINEST, session + " Unwrap res:" + res );
+                log.debug( session + " Unwrap res:" + res );
             }
 
         }
@@ -583,14 +583,14 @@ class SSLHandler
 				&& res.getStatus() == SSLEngineResult.Status.OK
 				&& inNetBuffer.hasRemaining()) {
 			do {
-				if (log.isLoggable( Level.FINEST )) {
-					log.log( Level.FINEST, session + "  extra handshake unwrap" );
-                    log.log( Level.FINEST, session + "   inNetBuffer: " + inNetBuffer );
-                    log.log( Level.FINEST, session + "   appBuffer: " + appBuffer );
+				if (log.isDebugEnabled()) {
+					log.debug( session + "  extra handshake unwrap" );
+                    log.debug( session + "   inNetBuffer: " + inNetBuffer );
+                    log.debug( session + "   appBuffer: " + appBuffer );
 				}
 				res = sslEngine.unwrap(inNetBuffer, appBuffer);
-				if (log.isLoggable( Level.FINEST )) {
-                    log.log( Level.FINEST, session + " Unwrap res:" + res );
+				if (log.isDebugEnabled()) {
+                    log.debug( session + " Unwrap res:" + res );
 				}
 			} while (res.getStatus() == SSLEngineResult.Status.OK);
 		}
@@ -624,9 +624,9 @@ class SSLHandler
      */
     private SSLEngineResult.HandshakeStatus doTasks()
     {
-        if( log.isLoggable( Level.FINEST ) )
+        if( log.isDebugEnabled() )
         {
-            log.log( Level.FINEST, session + "   doTasks()" );
+            log.debug( session + "   doTasks()" );
         }
 
         /*
@@ -636,15 +636,15 @@ class SSLHandler
         Runnable runnable;
         while( ( runnable = sslEngine.getDelegatedTask() ) != null )
         {
-            if( log.isLoggable( Level.FINEST ) )
+            if( log.isDebugEnabled() )
             {
-                log.log( Level.FINEST, session + "    doTask: " + runnable );
+                log.debug( session + "    doTask: " + runnable );
             }
             runnable.run();
         }
-        if( log.isLoggable( Level.FINEST ) )
+        if( log.isDebugEnabled() )
         {
-            log.log( Level.FINEST, session + "   doTasks(): "
+            log.debug( session + "   doTasks(): "
                     + sslEngine.getHandshakeStatus() );
         }
         return sslEngine.getHandshakeStatus();

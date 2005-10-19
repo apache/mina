@@ -27,7 +27,6 @@ import org.apache.mina.common.SessionManager;
  * events just like Servlet filters and they are effective immediately.
  *
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public interface ProtocolSessionManager extends SessionManager {

@@ -15,7 +15,7 @@
       </p>
       <p>
         Please take a look at
-        <a href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:roadmap-panel&subset=-1">our issue tracker page</a>
+        <a href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:roadmap-panel&amp;subset=-1">our issue tracker page</a>
         to see the full roadmap of MINA.
       </p>
     </section>

@@ -26,7 +26,7 @@ import org.apache.mina.protocol.ProtocolFilterChain;
  * Bogus implementation of {@link ProtocolFilter} to test
  * {@link ProtocolFilterChain}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ProtocolFilterImpl extends ProtocolFilterAdapter

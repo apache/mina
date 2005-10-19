@@ -33,7 +33,7 @@ import org.apache.mina.common.IdleStatus;
  * <a href="../../../../../xref-examples/org/apache/mina/examples/echoserver/EchoProtocolHandler.html"><code>EchoProtocolHandler</code></a>
  * example. 
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see IoHandlerAdapter

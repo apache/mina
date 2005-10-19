@@ -36,7 +36,7 @@ import org.apache.mina.util.Queue;
 /**
  * An {@link IoSession} for socket transport (TCP/IP).
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class SocketSession extends BaseSession implements IoSession

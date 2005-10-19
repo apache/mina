@@ -31,7 +31,7 @@ import org.apache.mina.common.Session;
  * <a href="http://deuce.doc.wustl.edu/doc/pspdfs/lf.pdf">Leader/Followers
  * thread pool</a> by Douglas C. Schmidt et al.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseThreadPool implements ThreadPool
@@ -483,6 +483,10 @@ public abstract class BaseThreadPool implements ThreadPool
                     }
                     catch( InterruptedException e )
                     {
+                        if( shuttingDown )
+                        {
+                            break;
+                        }
                     }
 
                     // Update currentTime for the next iteration

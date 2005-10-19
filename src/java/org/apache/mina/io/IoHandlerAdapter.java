@@ -31,7 +31,7 @@ import org.apache.mina.util.SessionUtil;
  * <a href="../../../../../xref-examples/org/apache/mina/examples/netcat/NetCatProtocolHandler.html"><code>NetCatProtocolHandler</code></a>
  * example. 
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class IoHandlerAdapter implements IoHandler

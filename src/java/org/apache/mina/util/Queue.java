@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
 /**
  * A unbounded circular queue.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Queue extends AbstractList implements List, Serializable

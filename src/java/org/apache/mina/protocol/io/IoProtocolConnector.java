@@ -21,7 +21,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * Please note that the user-defined attributes of {@link ProtocolSession}
  * and its wrapping {@link IoSession} are shared.
  *
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class IoProtocolConnector implements ProtocolConnector

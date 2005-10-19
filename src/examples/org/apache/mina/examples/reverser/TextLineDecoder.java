@@ -27,7 +27,7 @@ import org.apache.mina.protocol.ProtocolViolationException;
 /**
  * Decodes a text line into a string.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class TextLineDecoder implements ProtocolDecoder

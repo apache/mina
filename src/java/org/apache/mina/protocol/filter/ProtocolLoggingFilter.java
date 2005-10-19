@@ -18,19 +18,16 @@
  */
 package org.apache.mina.protocol.filter;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.protocol.ProtocolFilter;
 import org.apache.mina.protocol.ProtocolSession;
 import org.apache.mina.util.SessionLog;
+import org.slf4j.Logger;
 
 /**
  * Logs all MINA protocol events to {@link Logger}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see SessionLog
@@ -47,8 +44,6 @@ public class ProtocolLoggingFilter implements ProtocolFilter
      */
     public static final String LOGGER = SessionLog.LOGGER;
     
-    private Level defaultLevel = Level.INFO;
-    
     /**
      * Creates a new instance.
      */
@@ -56,64 +51,45 @@ public class ProtocolLoggingFilter implements ProtocolFilter
     {
     }
     
-    
-    /**
-     * Returns the default level of log entry this filter logs. 
-     */
-    public Level getDefaultLevel() {
-        return defaultLevel;
-    }
-    
-    /**
-     * Sets the default level of log entry this filter logs. 
-     */
-    public void setDefaultLevel(Level defaultLevel) {
-        if( defaultLevel == null )
-        {
-            defaultLevel = Level.INFO;
-        }
-        this.defaultLevel = defaultLevel;
-    }
-    
     public void sessionOpened( NextFilter nextFilter, ProtocolSession session )
     {
-        SessionLog.log( defaultLevel, session, "OPENED" );
+        SessionLog.info( session, "OPENED" );
         nextFilter.sessionOpened( session );
     }
 
     public void sessionClosed( NextFilter nextFilter, ProtocolSession session )
     {
-        SessionLog.log( defaultLevel, session, "CLOSED" );
+        SessionLog.info( session, "CLOSED" );
         nextFilter.sessionClosed( session );
     }
 
     public void sessionIdle( NextFilter nextFilter, ProtocolSession session, IdleStatus status )
     {
-        SessionLog.log( defaultLevel, session, "IDLE: " + status );
+        SessionLog.info( session, "IDLE: " + status );
         nextFilter.sessionIdle( session, status );
     }
 
     public void exceptionCaught( NextFilter nextFilter, ProtocolSession session, Throwable cause )
     {
-        SessionLog.log( defaultLevel, session, "EXCEPTION:", cause );
+        SessionLog.error( session, "EXCEPTION:", cause );
         nextFilter.exceptionCaught( session, cause );
     }
 
     public void messageReceived( NextFilter nextFilter, ProtocolSession session, Object message )
     {
-        SessionLog.log( defaultLevel, session, "RECEIVED: " + message );
+        SessionLog.info( session, "RECEIVED: " + message );
         nextFilter.messageReceived( session, message );
     }
 
     public void messageSent( NextFilter nextFilter, ProtocolSession session, Object message )
     {
-        SessionLog.log( defaultLevel, session, "SENT: " + message );
+        SessionLog.info( session, "SENT: " + message );
         nextFilter.messageSent( session, message );
     }
 
     public void filterWrite( NextFilter nextFilter, ProtocolSession session, Object message)
     {
-        SessionLog.log( defaultLevel, session, "WRITE: " + message );
+        SessionLog.info( session, "WRITE: " + message );
         nextFilter.filterWrite( session, message );
     }
 }

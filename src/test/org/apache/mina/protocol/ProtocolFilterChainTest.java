@@ -31,7 +31,7 @@ import org.apache.mina.common.TransportType;
 /**
  * Tests {@link AbstractProtocolFilterChain}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
 public class ProtocolFilterChainTest extends TestCase

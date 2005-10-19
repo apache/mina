@@ -27,7 +27,7 @@ import org.apache.mina.io.socket.SocketConnector;
  * endpoint and prints out received data.  NetCat client disconnects
  * automatically when no data is read for 10 seconds. 
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class Main

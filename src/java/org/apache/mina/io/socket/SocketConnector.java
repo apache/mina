@@ -40,7 +40,7 @@ import org.apache.mina.util.Queue;
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SocketConnector extends BaseSessionManager implements IoConnector

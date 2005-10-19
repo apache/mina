@@ -18,8 +18,6 @@
  */
 package org.apache.mina.examples.sumup;
 
-import java.util.logging.Level;
-
 import org.apache.mina.examples.sumup.message.AddMessage;
 import org.apache.mina.examples.sumup.message.ResultMessage;
 import org.apache.mina.protocol.ProtocolHandler;
@@ -82,7 +80,7 @@ public class ClientSessionHandler extends ProtocolHandlerAdapter
             if( rm.getSequence() == values.length - 1 )
             {
                 // print the sum and disconnect.
-                SessionLog.log( Level.INFO, session, "The sum: " + rm.getValue() );
+                SessionLog.info( session, "The sum: " + rm.getValue() );
                 session.close();
                 finished = true;
             }
@@ -90,7 +88,7 @@ public class ClientSessionHandler extends ProtocolHandlerAdapter
         else
         {
             // seever returned error code because of overflow, etc.
-            SessionLog.log( Level.WARNING, session, "Server error, disconnecting..." );
+            SessionLog.warn( session, "Server error, disconnecting..." );
             session.close();
             finished = true;
         }

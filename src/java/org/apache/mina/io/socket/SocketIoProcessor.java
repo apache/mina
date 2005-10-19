@@ -36,7 +36,7 @@ import org.apache.mina.util.Queue;
  * Performs all I/O operations for sockets which is connected or bound.
  * This class is used by MINA internally.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 class SocketIoProcessor

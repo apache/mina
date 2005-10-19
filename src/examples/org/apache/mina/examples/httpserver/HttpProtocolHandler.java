@@ -39,7 +39,6 @@ import org.apache.mina.io.handler.StreamIoHandler;
  * which a client requested.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpProtocolHandler extends StreamIoHandler

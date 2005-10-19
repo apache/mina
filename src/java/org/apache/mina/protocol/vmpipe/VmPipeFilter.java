@@ -10,7 +10,7 @@ import org.apache.mina.protocol.ProtocolSession;
 /**
  * Sets last(Read|Write)Time for {@link VmPipeSession}s. 
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class VmPipeFilter extends ProtocolFilterAdapter

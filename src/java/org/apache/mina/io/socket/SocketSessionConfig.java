@@ -32,7 +32,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * if you've created datagram session using {@link SocketAcceptor} or 
  * {@link SocketConnector}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class SocketSessionConfig extends BaseSessionConfig

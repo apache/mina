@@ -31,8 +31,7 @@ import org.apache.mina.protocol.ProtocolProvider;
  * Interface for the internet service registry. The registry is used by MINA
  * to associate services with ports and transport protocols.
  * 
- * @author akarasulu@apache.org
- * @author trustin@apache.org
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface ServiceRegistry

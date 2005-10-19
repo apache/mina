@@ -26,7 +26,7 @@ import org.apache.mina.io.IoSessionManager;
  * Session interacts with this abstract class instead of those two concrete
  * classes.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 abstract class DatagramSessionManager extends BaseSessionManager implements IoSessionManager

@@ -24,7 +24,7 @@ import java.util.Iterator;
 /**
  * A {@link HashSet} that can wait until it is not empty.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class BlockingSet extends HashSet

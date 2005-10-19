@@ -18,8 +18,6 @@
  */
 package org.apache.mina.examples.sumup;
 
-import java.util.logging.Level;
-
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.examples.sumup.message.AddMessage;
 import org.apache.mina.examples.sumup.message.ResultMessage;
@@ -99,7 +97,7 @@ public class ServerSessionHandler implements ProtocolHandler
 
     public void sessionIdle( ProtocolSession session, IdleStatus status )
     {
-        SessionLog.log( Level.WARNING, session, "Disconnecting the idle." );
+        SessionLog.warn( session, "Disconnecting the idle." );
         // disconnect an idle client
         session.close();
     }

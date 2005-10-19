@@ -28,7 +28,7 @@ import org.apache.mina.common.Session;
 /**
  * Base implementation of {@link Session}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseSession implements Session

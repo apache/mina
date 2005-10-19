@@ -26,7 +26,7 @@ package org.apache.mina.common;
  * by calling {@link #setExceptionMonitor(ExceptionMonitor)}.  The default
  * monitor is {@link DefaultExceptionMonitor}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface SessionManager {

@@ -25,7 +25,7 @@ import org.apache.mina.protocol.ProtocolSession;
 /**
  * {@link ProtocolHandler} implementation of reverser server protocol.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class ReverseProtocolHandler extends ProtocolHandlerAdapter

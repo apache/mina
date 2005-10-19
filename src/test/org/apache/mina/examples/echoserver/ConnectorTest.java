@@ -39,7 +39,7 @@ import org.apache.mina.util.AvailablePortFinder;
 /**
  * Tests echo server example.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ConnectorTest extends AbstractTest

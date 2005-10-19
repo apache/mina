@@ -25,7 +25,7 @@ import org.apache.mina.util.Queue;
 /**
  * A {@link ProtocolSession} that is backed by {@link IoSession}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class IoProtocolSession implements ProtocolSession

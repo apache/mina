@@ -33,7 +33,7 @@ import org.apache.mina.io.IoSession;
  * A {@link IoFilter} which blocks connections from blacklisted remote
  * address.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class BlacklistFilter extends IoFilterAdapter

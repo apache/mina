@@ -22,7 +22,7 @@ import org.apache.mina.registry.SimpleServiceRegistry;
  *   <li>Who gets the ball with 0 TTL loses.</li>
  * </ol> 
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Main

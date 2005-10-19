@@ -18,8 +18,8 @@
  */
 package org.apache.mina.common;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A default {@link ExceptionMonitor} implementation that logs uncaught
@@ -28,15 +28,15 @@ import java.util.logging.Logger;
  * All {@link SessionManager}s have this implementation as a default exception
  * monitor.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultExceptionMonitor implements ExceptionMonitor
 {
-    private static final Logger log = Logger.getLogger( DefaultExceptionMonitor.class.getName() );
+    private static final Logger log = LoggerFactory.getLogger( DefaultExceptionMonitor.class );
 
     public void exceptionCaught( Object source, Throwable cause )
     {
-        log.log( Level.WARNING, "Unexpected exception.", cause );
+        log.warn( "Unexpected exception.", cause );
     }
 }

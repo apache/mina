@@ -18,8 +18,6 @@
  */
 package org.apache.mina.examples.echoserver;
 
-import java.util.logging.Logger;
-
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
@@ -27,16 +25,18 @@ import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerAdapter;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.io.socket.SocketSessionConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link IoHandler} implementation for echo server. 
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class EchoProtocolHandler extends IoHandlerAdapter
 {
-    private static final Logger log = Logger.getLogger( EchoProtocolHandler.class.getName() );
+    private static final Logger log = LoggerFactory.getLogger( EchoProtocolHandler.class );
 
     public void sessionCreated( IoSession session )
     {

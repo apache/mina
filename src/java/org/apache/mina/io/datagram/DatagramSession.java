@@ -37,7 +37,7 @@ import org.apache.mina.util.Queue;
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class DatagramSession extends BaseSession implements IoSession

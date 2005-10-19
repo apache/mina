@@ -16,7 +16,7 @@
   </issueTrackingUrl>
   <siteAddress>minotaur.apache.org</siteAddress>
   <siteDirectory>
-    /www/directory.apache.org/subprojects/network
+    /www/directory.apache.org/subprojects/network/branches/0.8
   </siteDirectory>
   <distributionDirectory>
     /www/cvs.apache.org/dist/directory
@@ -43,13 +43,13 @@
 
   <repository>
     <connection>
-      scm:svn:http://svn.apache.org/repos/asf/directory:network/branches/0.7
+      scm:svn:http://svn.apache.org/repos/asf/directory:network/branches/0.8
     </connection>
     <url>
-      http://svn.apache.org/viewcvs.cgi/directory/network/branches/0.7/?root=Apache-SVN
+      http://svn.apache.org/viewcvs.cgi/directory/network/branches/0.8/?root=Apache-SVN
     </url>
     <developerConnection>
-      scm:svn:https://svn.apache.org/repos/asf/directory:network/branches/0.7
+      scm:svn:https://svn.apache.org/repos/asf/directory:network/branches/0.8
     </developerConnection>
   </repository>
 
@@ -89,6 +89,13 @@
   </licenses>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.0-beta7</version>
+      <url>http://www.slf4j.org/</url>
+    </dependency>
 
     <!-- ========================================================= -->
     <!-- Dependencies required for running test cases and examples -->

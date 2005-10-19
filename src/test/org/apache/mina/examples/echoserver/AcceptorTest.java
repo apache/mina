@@ -40,7 +40,7 @@ import org.apache.mina.io.filter.SSLFilter;
 /**
  * Tests echo server example.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class AcceptorTest extends AbstractTest

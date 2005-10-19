@@ -28,7 +28,7 @@ import org.apache.mina.protocol.vmpipe.VmPipeAddress;
 /**
  * Represents a service that is registered to {@link ServiceRegistry}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Service implements Serializable, Cloneable

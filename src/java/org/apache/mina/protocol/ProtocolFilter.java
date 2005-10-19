@@ -36,7 +36,7 @@ import org.apache.mina.common.IdleStatus;
  * {@link ProtocolSession}s.</strong> Users can cache the reference to the
  * session, which might malfunction if any filters are added or removed later.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see ProtocolFilterAdapter

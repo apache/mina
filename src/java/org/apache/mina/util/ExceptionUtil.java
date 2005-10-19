@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * Exception utility.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ExceptionUtil {

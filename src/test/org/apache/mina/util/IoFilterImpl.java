@@ -26,7 +26,7 @@ import org.apache.mina.io.IoFilterChain;
  * Bogus implementation of {@link IoFilter} to test
  * {@link IoFilterChain}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class IoFilterImpl extends IoFilterAdapter

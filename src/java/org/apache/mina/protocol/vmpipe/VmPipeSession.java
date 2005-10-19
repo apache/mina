@@ -21,7 +21,7 @@ import org.apache.mina.util.ExceptionUtil;
 /**
  * A {@link ProtocolSession} for in-VM transport (VM_PIPE).
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class VmPipeSession extends BaseSession implements ProtocolSession

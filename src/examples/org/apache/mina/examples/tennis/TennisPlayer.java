@@ -12,7 +12,7 @@ import org.apache.mina.protocol.ProtocolSession;
 /**
  * A {@link ProtocolHandler} implementation which plays a tennis game.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class TennisPlayer implements ProtocolProvider

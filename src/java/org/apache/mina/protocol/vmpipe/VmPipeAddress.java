@@ -8,7 +8,7 @@ import java.net.SocketAddress;
 /**
  * A {@link SocketAddress} which represents in-VM pipe port number.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeAddress extends SocketAddress implements Comparable
