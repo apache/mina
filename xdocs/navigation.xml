@@ -24,7 +24,7 @@
      <item name="Downloads" href="http://svn.apache.org/repository/directory-network/"/>
      <item name="F.A.Q" href="/faq.html"/>
      <item name="Roadmap" href="/roadmap.html"/>
-     <item name="Changes" href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:changelog-panel"/>
+     <item name="Changes" href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:changelog-panel&subset=-1"/>
      <item name="History" href="/history.html"/>
    </menu>
 		
