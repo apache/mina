@@ -40,7 +40,7 @@ import org.apache.mina.protocol.ProtocolViolationException;
 /**
  * Tests {@link CumulativeProtocolDecoder}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
 public class CumulativeProtocolDecoderTest extends TestCase

@@ -22,7 +22,6 @@ package org.apache.mina.protocol.codec;
  * A factory that creates a new instance of {@link MessageEncoder}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see DemuxingProtocolCodecFactory

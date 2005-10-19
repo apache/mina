@@ -23,7 +23,7 @@ package org.apache.mina.protocol;
  * {@link ProtocolDecoder} must call {@link #write(Object)} for each decoded
  * messages.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface ProtocolDecoderOutput

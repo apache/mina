@@ -25,7 +25,7 @@ import org.apache.mina.common.Session;
  * A {@link Session} that represents low-level I/O connection between two
  * endpoints regardless of underlying transport types.
  *   
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see Session

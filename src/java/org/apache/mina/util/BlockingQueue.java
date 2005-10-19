@@ -26,7 +26,7 @@ import java.util.ListIterator;
 /**
  * A synchronized version of {@link Queue}.
  * 
- * @author Trustin Lee
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class BlockingQueue extends Queue

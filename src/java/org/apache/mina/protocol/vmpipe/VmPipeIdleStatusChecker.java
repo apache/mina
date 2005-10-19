@@ -13,7 +13,7 @@ import org.apache.mina.common.SessionConfig;
 /**
  * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them. 
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class VmPipeIdleStatusChecker

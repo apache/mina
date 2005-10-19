@@ -24,7 +24,7 @@ import org.apache.mina.common.SessionConfig;
 /**
  * Base implementation of {@link SessionConfig}s.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseSessionConfig implements SessionConfig

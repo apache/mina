@@ -37,7 +37,7 @@ import java.net.SocketAddress;
  * {@link #bind(SocketAddress, IoHandler)} is invoked, and stop when all
  * addresses are unbound.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoAcceptor extends IoSessionManager

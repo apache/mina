@@ -72,6 +72,17 @@
           SSLEngine.  This means JDK 1.5 or above is required for you to
           use SSL with MINA.
         </p>
+        <p>
+          MINA depends on <a href="http://www.slf4j.org">SLF4J (Simple Logging
+          Facade for Java)</a>, a logging framework from the author of
+          <a href="http://logging.apache.org/log4j/docs/index.html">Log4J</a>.
+          SLF4J is very similar to
+          <a href="http://jakarta.apache.org/commons/logging/">Commons-Logging</a>,
+          but it doesn't cause any class loader issues at all.  SLF4J provides
+          bindings for Log4J, JDK 1.4 logging API, and NLog4J.  Please put an
+          appropriate SLF4J JAR file which corresponds to your favorite logging
+          framework to the classpath as SLF4J documentation explains.
+        </p>
       </answer>
     </faq>
 
@@ -320,6 +331,23 @@ public void sessionClosed( ProtocolSession session ) throws Exception
         But you cannot add port-specific filters right now.  You'll have to
         create more than one <tt>IoAcceptor</tt> or <tt>ProtocolAcceptor</tt>
         because each acceptors have one filter chain you can adjust.
+      </answer>
+    </faq>
+
+    <faq id="logging-framework">
+      <question>
+        How can I let MINA log messages using my favorite logging framework (i.e. Log4J)?
+      </question>
+      <answer>
+        MINA depends on <a href="http://www.slf4j.org">SLF4J (Simple Logging
+        Facade for Java)</a>, a logging framework from the author of
+        <a href="http://logging.apache.org/log4j/docs/index.html">Log4J</a>.
+        SLF4J is very similar to
+        <a href="http://jakarta.apache.org/commons/logging/">Commons-Logging</a>,
+        but it doesn't cause any class loader issues at all.  SLF4J provides
+        bindings for Log4J, JDK 1.4 logging API, and NLog4J.  Please put an
+        appropriate SLF4J JAR file which corresponds to your favorite logging
+        framework to the classpath as SLF4J documentation explains.
       </answer>
     </faq>
   </part>

@@ -17,7 +17,7 @@ import org.apache.mina.protocol.vmpipe.VmPipeAcceptor.Entry;
  * Connects to {@link ProtocolProvider}s which is bound on the specified
  * {@link VmPipeAddress}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeConnector extends BaseSessionManager implements ProtocolConnector

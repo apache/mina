@@ -29,7 +29,6 @@ import org.apache.mina.io.socket.SocketSessionConfig;
  * Exception utility.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public class SessionUtil

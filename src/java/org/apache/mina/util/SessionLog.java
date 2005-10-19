@@ -18,22 +18,19 @@
  */
 package org.apache.mina.util;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.mina.common.Session;
 import org.apache.mina.io.IoSession;
 import org.apache.mina.protocol.ProtocolSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Call {@link #getLogger(Session)}, {@link #log(Level,Session, String)}, and
- * {@link #log(Level,Session, String, Throwable)} to log protocol-specific messages.
+ * Provides utility methods to log protocol-specific messages.
  * <p>
  * Set {@link #PREFIX} and {@link #LOGGER} session attributes
- * to override prefix string, logger, and log level.
+ * to override prefix string and logger.
  *
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  *
  */
@@ -50,11 +47,10 @@ public class SessionLog {
     
     public static Logger getLogger( Session session )
     {
-        
         Logger log = (Logger) session.getAttribute( LOGGER );
         if( log == null )
         {
-            log = Logger.getLogger( getClassName( session ) );
+            log = LoggerFactory.getLogger( getClass( session ) );
             String prefix = ( String ) session.getAttribute( PREFIX );
             if( prefix == null )
             {
@@ -68,29 +64,83 @@ public class SessionLog {
         return log;
     }
     
-    private static String getClassName( Session session )
+    private static Class getClass( Session session )
     {
         if( session instanceof IoSession )
-            return ( ( IoSession ) session ).getHandler().getClass().getName();
+            return ( ( IoSession ) session ).getHandler().getClass();
         else
-            return ( ( ProtocolSession ) session ).getHandler().getClass().getName();
+            return ( ( ProtocolSession ) session ).getHandler().getClass();
     }
 
-    public static void log( Level level, Session session, String message )
+    public static void debug( Session session, String message )
     {
         Logger log = getLogger( session );
-        if( log.isLoggable( level ) )
+        if( log.isDebugEnabled() )
         {
-            log.log( level, String.valueOf( session.getAttribute( PREFIX ) ) + message );
+            log.debug( String.valueOf( session.getAttribute( PREFIX ) ) + message );
         }
     }
 
-    public static void log( Level level, Session session, String message, Throwable cause )
+    public static void debug( Session session, String message, Throwable cause )
     {
         Logger log = getLogger( session );
-        if( log.isLoggable( level ) )
+        if( log.isDebugEnabled() )
         {
-            log.log( level, String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+            log.debug( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+        }
+    }
+
+    public static void info( Session session, String message )
+    {
+        Logger log = getLogger( session );
+        if( log.isInfoEnabled() )
+        {
+            log.info( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+        }
+    }
+
+    public static void info( Session session, String message, Throwable cause )
+    {
+        Logger log = getLogger( session );
+        if( log.isInfoEnabled() )
+        {
+            log.info( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+        }
+    }
+
+    public static void warn( Session session, String message )
+    {
+        Logger log = getLogger( session );
+        if( log.isWarnEnabled() )
+        {
+            log.warn( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+        }
+    }
+
+    public static void warn( Session session, String message, Throwable cause )
+    {
+        Logger log = getLogger( session );
+        if( log.isWarnEnabled() )
+        {
+            log.warn( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+        }
+    }
+
+    public static void error( Session session, String message )
+    {
+        Logger log = getLogger( session );
+        if( log.isErrorEnabled() )
+        {
+            log.error( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+        }
+    }
+
+    public static void error( Session session, String message, Throwable cause )
+    {
+        Logger log = getLogger( session );
+        if( log.isErrorEnabled() )
+        {
+            log.error( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
         }
     }
 }

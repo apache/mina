@@ -39,7 +39,7 @@ import org.apache.mina.util.Queue;
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DatagramConnector extends DatagramSessionManager implements IoConnector

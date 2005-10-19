@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 /**
  * Tests {@link ByteBuffer}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
 public class ByteBufferTest extends TestCase

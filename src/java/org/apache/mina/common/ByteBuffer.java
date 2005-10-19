@@ -115,7 +115,7 @@ import org.apache.mina.util.Stack;
  * increase by two times, and its limit will increase to the last position
  * the string is written.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class ByteBuffer

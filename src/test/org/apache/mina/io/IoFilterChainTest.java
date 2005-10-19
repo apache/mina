@@ -32,7 +32,7 @@ import org.apache.mina.common.TransportType;
 /**
  * Tests {@link AbstractIoFilterChain}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
 public class IoFilterChainTest extends TestCase

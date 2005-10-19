@@ -23,7 +23,7 @@ package org.apache.mina.util;
  * Used by {@link ThreadPool}s when they push events to event queue.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class EventType

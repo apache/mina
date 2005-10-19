@@ -29,7 +29,7 @@ import org.apache.mina.registry.SimpleServiceRegistry;
  * (<b>Entry point</b>) Reverser server which reverses all text lines from
  * clients.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class Main

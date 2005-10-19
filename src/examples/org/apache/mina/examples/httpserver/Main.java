@@ -29,7 +29,7 @@ import org.apache.mina.registry.SimpleServiceRegistry;
 /**
  * (<b>Entry point</b>) HTTP server
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Main

@@ -27,7 +27,6 @@ import org.apache.mina.protocol.ProtocolViolationException;
  * Decodes specific messages.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see DemuxingProtocolCodecFactory

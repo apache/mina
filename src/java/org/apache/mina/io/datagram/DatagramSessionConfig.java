@@ -33,7 +33,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * if you've created datagram session using {@link DatagramAcceptor} or 
  * {@link DatagramConnector}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class DatagramSessionConfig extends BaseSessionConfig

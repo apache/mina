@@ -21,7 +21,6 @@ import org.apache.mina.io.IoSession;
  * the process request to other thread or thread pool.</b>
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class StreamIoHandler extends IoHandlerAdapter

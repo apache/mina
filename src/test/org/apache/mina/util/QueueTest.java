@@ -27,7 +27,6 @@ import junit.framework.TestCase;
  * Tests {@link Queue}
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public class QueueTest extends TestCase

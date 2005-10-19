@@ -42,7 +42,7 @@ import org.apache.mina.util.Queue;
  * cannot do any real I/O, but it translates I/O events to more higher level
  * ones and vice versa.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class IoAdapter

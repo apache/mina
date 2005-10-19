@@ -30,7 +30,7 @@ import org.apache.mina.common.IdleStatus;
  * <a href="../../../../../xref/org/apache/mina/io/filter/BlacklistFilter.html"><code>BlacklistFilter</code></a>
  * example.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class IoFilterAdapter implements IoFilter

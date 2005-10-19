@@ -55,7 +55,7 @@ import org.apache.mina.protocol.ProtocolViolationException;
  * }
  * </pre>
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class CumulativeProtocolDecoder implements ProtocolDecoder {

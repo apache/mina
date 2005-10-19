@@ -29,7 +29,6 @@ import org.apache.mina.common.IdleStatus;
  * This filter chain is used by implementations of {@link IoSessionManager}s.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class IoSessionManagerFilterChain extends AbstractIoFilterChain {

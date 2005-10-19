@@ -30,7 +30,7 @@ import java.util.Set;
  * It often contains objects that represents the state of a higher-level protocol
  * and becomes a way to exchange data between filters and handlers.
  *   
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface Session {

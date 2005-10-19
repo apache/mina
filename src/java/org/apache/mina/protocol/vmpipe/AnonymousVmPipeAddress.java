@@ -8,7 +8,7 @@ import java.net.SocketAddress;
 /**
  * A {@link SocketAddress} which represents anonymous in-VM pipe port.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class AnonymousVmPipeAddress extends SocketAddress implements Comparable

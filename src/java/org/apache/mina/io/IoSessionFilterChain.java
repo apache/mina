@@ -27,7 +27,6 @@ import org.apache.mina.common.ByteBuffer;
  * This filter chain is used by implementations of {@link IoSession}s.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  */
 public class IoSessionFilterChain extends AbstractIoFilterChain {

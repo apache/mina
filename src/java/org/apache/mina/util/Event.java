@@ -22,7 +22,7 @@ package org.apache.mina.util;
  * MINA Event used by {@link BaseThreadPool} internally.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Event

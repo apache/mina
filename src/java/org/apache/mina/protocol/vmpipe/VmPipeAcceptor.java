@@ -19,7 +19,7 @@ import org.apache.mina.protocol.ProtocolSession;
  * Binds the specified {@link ProtocolProvider} to the specified
  * {@link VmPipeAddress}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeAcceptor extends BaseSessionManager implements ProtocolAcceptor

@@ -25,7 +25,7 @@ import org.apache.mina.common.IdleStatus;
  * this class and selectively override required event filter methods only.  All
  * methods forwards events to the next filter by default.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ProtocolFilterAdapter implements ProtocolFilter

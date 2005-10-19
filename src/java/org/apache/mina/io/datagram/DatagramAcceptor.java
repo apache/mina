@@ -41,7 +41,7 @@ import org.apache.mina.util.Queue;
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DatagramAcceptor extends DatagramSessionManager implements IoAcceptor

@@ -41,7 +41,6 @@ import org.apache.mina.protocol.ProtocolViolationException;
  * appropriate {@link MessageEncoder}s and {@link MessageDecoder}s. 
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see MessageEncoder

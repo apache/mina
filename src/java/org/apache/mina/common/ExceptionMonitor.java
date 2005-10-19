@@ -22,7 +22,7 @@ package org.apache.mina.common;
  * Monitors uncaught exceptions.  {@link #exceptionCaught(Object, Throwable)} is
  * invoked when there are any uncaught exceptions.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see DefaultExceptionMonitor

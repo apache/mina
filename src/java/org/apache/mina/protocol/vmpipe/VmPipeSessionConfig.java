@@ -9,7 +9,7 @@ import org.apache.mina.common.SessionConfig;
 /**
  * A {@link SessionConfig} for in-VM pipe transport.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeSessionConfig extends BaseSessionConfig

@@ -32,9 +32,7 @@ import javax.net.ssl.X509TrustManager;
 /**
  * Bogus trust manager factory. Creates BogusX509TrustManager
  *
- * @author Per Widerlund (per@minq.se)
- * @author Jan Andersson (janne@minq.se)
- * 
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class BogusTrustManagerFactory extends TrustManagerFactorySpi

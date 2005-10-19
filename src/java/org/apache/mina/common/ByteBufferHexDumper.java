@@ -23,7 +23,7 @@ import org.apache.mina.common.ByteBuffer;
 /**
  * Provides utility methods for ByteBuffers.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 class ByteBufferHexDumper

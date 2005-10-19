@@ -23,7 +23,7 @@ import org.apache.mina.io.AbstractBindTest;
 /**
  * Tests {@link DatagramAcceptor} resource leakage.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
 public class BindTest extends AbstractBindTest

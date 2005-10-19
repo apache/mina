@@ -41,7 +41,7 @@ import org.apache.mina.util.Queue;
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).
  * 
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SocketAcceptor extends BaseSessionManager implements IoAcceptor

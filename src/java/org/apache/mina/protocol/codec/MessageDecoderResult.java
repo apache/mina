@@ -26,7 +26,6 @@ import org.apache.mina.protocol.ProtocolSession;
  * Represents results from {@link MessageDecoder}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @author Trustin Lee (trustin@apache.org)
  * @version $Rev$, $Date$
  * 
  * @see MessageDecoder

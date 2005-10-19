@@ -31,7 +31,7 @@ import org.apache.mina.util.ThreadPool;
  * A Thread-pooling filter.  This filter forwards {@link ProtocolHandler} events
  * to its thread pool.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see ThreadPool

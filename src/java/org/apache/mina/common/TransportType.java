@@ -39,7 +39,7 @@ import java.util.TreeSet;
  * You can also create your own transport type.  Please refer to
  * {@link #TransportType(String[], boolean)}.
  * 
- * @author Trustin Lee (trustin@apache.org)
+ * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public final class TransportType implements Serializable
