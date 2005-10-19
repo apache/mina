@@ -33,6 +33,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.IoHandler;
+import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
@@ -165,6 +166,47 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
         }
     }
     
+    public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
+    {
+        if( remoteAddress == null )
+        {
+            throw new NullPointerException( "remoteAddress" );
+        }
+        if( localAddress == null )
+        {
+            throw new NullPointerException( "localAddress" );
+        }
+        
+        Selector selector = this.selector;
+        DatagramChannel ch = ( DatagramChannel ) channels.get( localAddress );
+        if( selector == null || ch == null )
+        {
+            throw new IllegalArgumentException( "Unknown localAddress: " + localAddress );
+        }
+            
+        SelectionKey key = ch.keyFor( selector );
+        if( key == null )
+        {
+            throw new IllegalArgumentException( "Unknown lodalAddress: " + localAddress );
+        }
+
+        RegistrationRequest req = ( RegistrationRequest ) key.attachment();
+        DatagramSession s = new DatagramSession( filters, ch, req.handler );
+        s.setRemoteAddress( remoteAddress );
+        s.setSelectionKey( key );
+        
+        try
+        {
+            req.handler.sessionCreated( s );
+        }
+        catch( Throwable t )
+        {
+            exceptionMonitor.exceptionCaught( this, t );
+        }
+        
+        return s;
+    }
+
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )

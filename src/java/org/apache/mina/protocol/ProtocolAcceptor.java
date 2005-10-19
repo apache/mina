@@ -55,4 +55,20 @@ public interface ProtocolAcceptor extends ProtocolSessionManager
      * Unbinds from the specified <code>address</code>.
      */
     void unbind( SocketAddress address );
+    
+    /**
+     * (Optional) Returns a {@link ProtocolSession} that is bound to the specified
+     * <tt>localAddress</tt> and <tt>remoteAddress</tt> which reuses
+     * the <tt>localAddress</tt> that is already bound by {@link ProtocolAcceptor}
+     * via {@link #bind(SocketAddress, ProtocolProvider)}.
+     * <p>
+     * This operation is optional.  Please throw {@link UnsupportedOperationException}
+     * if the transport type doesn't support this operation.  This operation is
+     * usually implemented for connectionless transport types.
+     * 
+     * @throws UnsupportedOperationException if this operation is not supported
+     * @throws IllegalArgumentException if the specified <tt>localAddress</tt> is
+     *                                  not bound yet. (see {@link #bind(SocketAddress, ProtocolProvider)})
+     */
+    ProtocolSession newSession( SocketAddress remoteAddress, SocketAddress localAddress );
 }

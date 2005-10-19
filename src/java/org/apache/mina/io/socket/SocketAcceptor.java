@@ -34,6 +34,7 @@ import org.apache.mina.common.BaseSessionManager;
 import org.apache.mina.io.IoAcceptor;
 import org.apache.mina.io.IoFilterChain;
 import org.apache.mina.io.IoHandler;
+import org.apache.mina.io.IoSession;
 import org.apache.mina.io.IoSessionManagerFilterChain;
 import org.apache.mina.util.Queue;
 
@@ -488,5 +489,11 @@ public class SocketAcceptor extends BaseSessionManager implements IoAcceptor
         {
             this.address = address;
         }
+    }
+
+
+    public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
+    {
+        throw new UnsupportedOperationException();
     }
 }

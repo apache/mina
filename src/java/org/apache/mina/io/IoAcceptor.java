@@ -54,4 +54,20 @@ public interface IoAcceptor extends IoSessionManager
      * Unbinds from the specified <code>address</code>.
      */
     void unbind( SocketAddress address );
+
+    /**
+     * (Optional) Returns an {@link IoSession} that is bound to the specified
+     * <tt>localAddress</tt> and <tt>remoteAddress</tt> which reuses
+     * the <tt>localAddress</tt> that is already bound by {@link IoAcceptor}
+     * via {@link #bind(SocketAddress, IoHandler)}.
+     * <p>
+     * This operation is optional.  Please throw {@link UnsupportedOperationException}
+     * if the transport type doesn't support this operation.  This operation is
+     * usually implemented for connectionless transport types.
+     * 
+     * @throws UnsupportedOperationException if this operation is not supported
+     * @throws IllegalArgumentException if the specified <tt>localAddress</tt> is
+     *                                  not bound yet. (see {@link #bind(SocketAddress, IoHandler)})
+     */
+    IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress );
 }
