@@ -502,34 +502,24 @@ class SocketIoProcessor
                 continue;
             }
 
-            int writtenBytes = 0;
-            try
+            int writtenBytes = ch.write( buf.buf() );
+            if( writtenBytes > 0 )
             {
-                writtenBytes = ch.write( buf.buf() );
+                session.increaseWrittenBytes( writtenBytes );
+                session.resetIdleCount( IdleStatus.BOTH_IDLE );
+                session.resetIdleCount( IdleStatus.WRITER_IDLE );
             }
-            finally
-            {
-                if( writtenBytes > 0 )
-                {
-                    session.increaseWrittenBytes( writtenBytes );
-                    session.resetIdleCount( IdleStatus.BOTH_IDLE );
-                    session.resetIdleCount( IdleStatus.WRITER_IDLE );
-                }
 
-                SelectionKey key = session.getSelectionKey();
-                if( buf.hasRemaining() )
-                {
-                    // Kernel buffer is full
-                    key
-                            .interestOps( key.interestOps()
-                                          | SelectionKey.OP_WRITE );
-                    break;
-                }
-                else
-                {
-                    key.interestOps( key.interestOps()
-                                     & ( ~SelectionKey.OP_WRITE ) );
-                }
+            SelectionKey key = session.getSelectionKey();
+            if( buf.hasRemaining() )
+            {
+                // Kernel buffer is full
+                key.interestOps( key.interestOps() | SelectionKey.OP_WRITE );
+                break;
+            }
+            else
+            {
+                key.interestOps( key.interestOps() & ( ~SelectionKey.OP_WRITE ) );
             }
         }
     }
