@@ -18,9 +18,9 @@
  */
 package org.apache.mina.examples.echoserver;
 
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 import junit.framework.Assert;
 
@@ -44,20 +44,10 @@ import org.apache.mina.util.AvailablePortFinder;
  */
 public class ConnectorTest extends AbstractTest
 {
-    private int clientPort;
-    
     public ConnectorTest()
     {
     }
 
-    public void setUp() throws Exception
-    {
-        super.setUp();
-        clientPort = port;
-        clientPort = AvailablePortFinder.getNextAvailable( clientPort + 1 );
-        System.out.println( "Using port " + clientPort + " as local address" );
-    }
-    
     public void testTCP() throws Exception
     {
         IoConnector connector = new SocketConnector();
@@ -95,42 +85,50 @@ public class ConnectorTest extends AbstractTest
     
     private void testConnector( IoConnector connector ) throws Exception
     {
-        InetSocketAddress localAddress = new InetSocketAddress( clientPort );
-
-        System.out.println("* Without localAddress and initializer");
-        testConnector( connector, null );
+        System.out.println("* Without localAddress");
+        testConnector( connector, false );
         
-        System.out.println("* Without localAddress and with initializer");
-        testConnector( connector, null );
-
-        // Tests below fail in Windows platform.
-        if( System.getProperty("os.name").toLowerCase().indexOf( "windows" ) >= 0 )
-        {
-            // skip further tests
-            System.out.println( "** Skipping some tests that fails in Windows platform." );
-            return;
-        }
-        
-        System.out.println("* With localAddress and without initializer");
-        testConnector( connector, localAddress );
-        
-        // It takes some time for local address to be cleared by OS,
-        // so let's just get a new one rather than waiting for it.
-        clientPort = AvailablePortFinder.getNextAvailable( clientPort + 1 );
-        localAddress = new InetSocketAddress( clientPort );
-
-        System.out.println("* With localAddress and initializer");
-        testConnector( connector, localAddress );
+        System.out.println("* With localAddress");
+        testConnector( connector, true );
     }
     
-    private void testConnector( IoConnector connector, SocketAddress localAddress ) throws Exception
+    private void testConnector( IoConnector connector, boolean useLocalAddress ) throws Exception
     {
         EchoConnectorHandler handler = new EchoConnectorHandler();
         ByteBuffer readBuf = handler.readBuf;
-        IoSession session = connector.connect(
-                new InetSocketAddress( InetAddress.getLocalHost(), port ),
-                localAddress,
-                handler );
+
+        IoSession session = null;
+        if( !useLocalAddress )
+        {
+            session = connector.connect(
+                    new InetSocketAddress( InetAddress.getLocalHost(), port ),
+                    handler );
+        }
+        else
+        {
+            int clientPort = port;
+            for( int i = 0; i < 65536; i ++ )
+            {
+                clientPort = AvailablePortFinder.getNextAvailable( clientPort + 1 );
+                try
+                {
+                    session = connector.connect(
+                            new InetSocketAddress( InetAddress.getLocalHost(), port ),
+                            new InetSocketAddress( clientPort ),
+                            handler );
+                    break;
+                }
+                catch( BindException e )
+                {
+                    // Try again until we succeed to bind.
+                }
+            }
+
+            if( session == null )
+            {
+                Assert.fail( "Failed to find out an appropriate local address." );
+            }
+        }
         
         for( int i = 0; i < 10; i ++ )
         {
