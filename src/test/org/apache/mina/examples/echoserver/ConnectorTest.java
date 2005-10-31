@@ -54,9 +54,6 @@ public class ConnectorTest extends AbstractTest
         testConnector( connector );
     }
     
-    /**
-     * Client-side SSL doesn't work for now.
-     */
     public void testTCPWithSSL() throws Exception
     {
         // Add an SSL filter to acceptor
@@ -150,7 +147,7 @@ public class ConnectorTest extends AbstractTest
             session.write( buf, marker );
 
             // This will align message arrival order in UDP
-            for( int j = 0; j < 30; j ++ )
+            for( int j = 0; j < 100; j ++ )
             {
                 if( readBuf.position() == ( i + 1 ) * 16 )
                 {
@@ -160,14 +157,14 @@ public class ConnectorTest extends AbstractTest
             }
         }
         
-        for( int i = 0; i < 30; i++ ) {
+        for( int i = 0; i < 100; i++ ) {
             if( readBuf.position() == 160 )
             {
                 break;
             }
             else
             {
-                Thread.sleep( 100 );
+                Thread.sleep( 10 );
             }
         }
 
