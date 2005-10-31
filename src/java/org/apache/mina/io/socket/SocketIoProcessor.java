@@ -318,24 +318,20 @@ class SocketIoProcessor
 
     private void notifyIdleSessions()
     {
-        Set keys = selector.keys();
-        Iterator it;
-        SocketSession session;
-
         // process idle sessions
         long currentTime = System.currentTimeMillis();
-
-        if( ( keys != null ) && ( ( currentTime - lastIdleCheckTime ) >= 1000 ) )
+        if( ( currentTime - lastIdleCheckTime ) >= 1000 )
         {
             lastIdleCheckTime = currentTime;
-            it = keys.iterator();
-
-            while( it.hasNext() )
+            Set keys = selector.keys();
+            if( keys != null )
             {
-                SelectionKey key = ( SelectionKey ) it.next();
-                session = ( SocketSession ) key.attachment();
-
-                notifyIdleSession( session, currentTime );
+                for( Iterator it = keys.iterator(); it.hasNext(); )
+                {
+                    SelectionKey key = ( SelectionKey ) it.next();
+                    SocketSession session = ( SocketSession ) key.attachment();
+                    notifyIdleSession( session, currentTime );
+                }
             }
         }
     }
