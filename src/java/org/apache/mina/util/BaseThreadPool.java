@@ -182,7 +182,10 @@ public abstract class BaseThreadPool implements ThreadPool
                 leader.interrupt();
                 try
                 {
-                    leader.join();
+                    // This timeout (100) will help us from 
+                    // infinite lock-up and interrupt workers again.
+                    // (Or we could acquire a monitor for unfetchedSessionBuffers.)
+                    leader.join( 100 );
                 }
                 catch( InterruptedException e )
                 {
@@ -368,11 +371,6 @@ public abstract class BaseThreadPool implements ThreadPool
             {
                 for( ;; )
                 {
-                    if( shuttingDown )
-                    {
-                        return null;
-                    }
-
                     try
                     {
                         unfetchedSessionBuffers.waitForNewItem();
