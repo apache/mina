@@ -459,6 +459,10 @@ class SocketIoProcessor
 
     private void flush( SocketSession session ) throws IOException
     {
+        // Clear OP_WRITE
+        SelectionKey key = session.getSelectionKey();
+        key.interestOps( key.interestOps() & ( ~SelectionKey.OP_WRITE ) );
+
         SocketChannel ch = session.getChannel();
 
         Queue writeBufferQueue = session.getWriteBufferQueue();
@@ -506,16 +510,11 @@ class SocketIoProcessor
                 session.resetIdleCount( IdleStatus.WRITER_IDLE );
             }
 
-            SelectionKey key = session.getSelectionKey();
             if( buf.hasRemaining() )
             {
                 // Kernel buffer is full
                 key.interestOps( key.interestOps() | SelectionKey.OP_WRITE );
                 break;
-            }
-            else
-            {
-                key.interestOps( key.interestOps() & ( ~SelectionKey.OP_WRITE ) );
             }
         }
     }
