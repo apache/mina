@@ -31,6 +31,8 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.SessionConfig;
 import org.apache.mina.io.WriteTimeoutException;
 import org.apache.mina.util.Queue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs all I/O operations for sockets which is connected or bound.
@@ -41,6 +43,7 @@ import org.apache.mina.util.Queue;
  */
 class SocketIoProcessor
 {
+    private static final Logger log = LoggerFactory.getLogger( SocketIoProcessor.class );
     private static final SocketIoProcessor instance;
 
     static
@@ -557,9 +560,9 @@ class SocketIoProcessor
                         }
                     }
                 }
-                catch( IOException e )
+                catch( Throwable t )
                 {
-                    e.printStackTrace();
+                    log.warn( "Unexpected exception.", t );
 
                     try
                     {
