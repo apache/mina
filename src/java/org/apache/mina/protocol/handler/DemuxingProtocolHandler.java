@@ -86,7 +86,7 @@ public class DemuxingProtocolHandler extends ProtocolHandlerAdapter
      * Forwards the received events into the appropriate {@link MessageHandler}
      * which is registered by {@link #addMessageHandler(Class, MessageHandler)}.
      */
-    public void messageReceived( ProtocolSession session, Object message )
+    public void messageReceived( ProtocolSession session, Object message ) throws Exception
     {
         MessageHandler handler = findHandler( message.getClass() );
         if( handler != null )

@@ -46,5 +46,5 @@ public interface MessageHandler
      * Invoked when the specific type of message is received from the
      * specified <code>session</code>.
      */
-    void messageReceived( ProtocolSession session, Object message );
+    void messageReceived( ProtocolSession session, Object message ) throws Exception;
 }
