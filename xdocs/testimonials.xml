@@ -37,6 +37,25 @@
         </blockquote>
       </p>
       
+      <p>Julien Vermillard says:
+        <blockquote>
+          I'm using MINA for supervisory control and data acquisition (SCADA)
+          embedded application. It's used for several tasks; connecting
+          supervision clients to the server, interaction of the server with
+          different hardware (other SCADA systems, media stream matrix,
+          programmable automaton, remote data aquisition systems), custom
+          replication protocols for fail-over service. I found MINA when I
+          started implementation using NIO and it was a great time saver.
+          You can switch from RS232 to TCP/IP and add SSL connectivity easly.
+          The stability and the support is really great. The code and the
+          design are simple and efficient, so you can easly implement high
+          quality protocol logic without bothering with all the NIO quirks.
+          I didn't really tested the maximum performance you can get out of
+          MINA, but all I can say is that MINA is running 24/7 with an amazing
+          stability and I'm not afraid of using it in harsh evironement.
+        </blockquote>
+      </p>
+
       <p>Luke Hubbard says:
         <blockquote>
           We are using it for the network layer of
