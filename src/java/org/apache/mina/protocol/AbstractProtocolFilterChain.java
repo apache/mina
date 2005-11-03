@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.protocol.ProtocolFilter.NextFilter;
+import org.apache.mina.util.SessionLog;
 
 /**
  * An abstract implementation of {@link ProtocolFilterChain} that provides
@@ -406,7 +407,9 @@ public abstract class AbstractProtocolFilterChain implements ProtocolFilterChain
         }
         catch( Throwable e )
         {
-            e.printStackTrace();
+            SessionLog.warn(
+                    session,
+                    "Unexpected exception from exceptionCaught handler.", e );
         }
     }
     

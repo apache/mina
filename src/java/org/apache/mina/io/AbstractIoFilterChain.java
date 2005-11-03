@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.io.IoFilter.NextFilter;
+import org.apache.mina.util.SessionLog;
 
 /**
  * An abstract implementation of {@link IoFilterChain} that provides
@@ -413,7 +414,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            e.printStackTrace();
+            SessionLog.warn(
+                    session,
+                    "Unexpected exception from exceptionCaught handler.", e );
         }
     }
     

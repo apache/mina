@@ -11,6 +11,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.io.IoHandler;
 import org.apache.mina.io.IoHandlerAdapter;
 import org.apache.mina.io.IoSession;
+import org.apache.mina.util.SessionLog;
 
 /**
  * A {@link IoHandler} that adapts asynchronous MINA events to stream I/O.
@@ -176,7 +177,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
         }
         else
         {
-            cause.printStackTrace();
+            SessionLog.warn( session, "Unexpected exception.", cause );
             session.close();
         }
     }
