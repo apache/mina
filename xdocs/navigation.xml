@@ -15,6 +15,10 @@
      <item name="MINA" href="http://directory.apache.org/subprojects/network/"/>
      <item name="Protocols" href="http://directory.apache.org/subprojects/providers.html"/>
    </links>
+   
+   <menu name="Unstable Version">
+     <item name="The Latest Version" href="http://directory.apache.org/subprojects/network/"/>
+   </menu>
 
    <menu name="MINA">
      <item name="Overview" href="/index.html"/>
