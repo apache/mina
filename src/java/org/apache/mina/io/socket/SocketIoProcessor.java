@@ -19,7 +19,6 @@
 package org.apache.mina.io.socket;
 
 import java.io.IOException;
-import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -379,10 +378,11 @@ class SocketIoProcessor
                                            long currentTime,
                                            long writeTimeout, long lastIoTime )
     {
+        SelectionKey key = session.getSelectionKey();
         if( writeTimeout > 0
             && ( currentTime - lastIoTime ) >= writeTimeout
-            && session.getSelectionKey() != null
-            && ( session.getSelectionKey().interestOps() & SelectionKey.OP_WRITE ) != 0 )
+            && key != null && key.isValid()
+            && ( key.interestOps() & SelectionKey.OP_WRITE ) != 0 )
         {
             session
                     .getManagerFilterChain()
@@ -415,28 +415,26 @@ class SocketIoProcessor
 
             // If encountered write request before session is initialized, 
             // (In case that Session.write() is called before addSession() is processed)
-            if( session.getSelectionKey() == null )
+            SelectionKey key = session.getSelectionKey();
+            if( key == null )
             {
                 // Reschedule for later write
                 scheduleFlush( session );
                 break;
             }
-            else
+            if( !key.isValid() )
             {
-                try
-                {
-                    flush( session );
-                }
-                catch( CancelledKeyException e )
-                {
-                    // Connection is closed unexpectedly.
-                    scheduleRemove( session );
-                }
-                catch( IOException e )
-                {
-                    scheduleRemove( session );
-                    session.getManagerFilterChain().exceptionCaught( session, e );
-                }
+                continue;
+            }
+            
+            try
+            {
+                flush( session );
+            }
+            catch( IOException e )
+            {
+                scheduleRemove( session );
+                session.getManagerFilterChain().exceptionCaught( session, e );
             }
         }
     }
