@@ -441,10 +441,20 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
                 continue;
             }
 
+            SelectionKey key = session.getSelectionKey();
+            if( key == null )
+            {
+                scheduleFlush( session );
+                break;
+            }
+            if( !key.isValid() )
+            {
+                continue;
+            }
+
             int writtenBytes = ch
                     .send( buf.buf(), session.getRemoteAddress() );
 
-            SelectionKey key = session.getSelectionKey();
             if( writtenBytes == 0 )
             {
                 // Kernel buffer is full

@@ -396,9 +396,19 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 continue;
             }
 
+            SelectionKey key = session.getSelectionKey();
+            if( key == null )
+            {
+                scheduleFlush( session );
+                break;
+            }
+            if( !key.isValid() )
+            {
+                continue;
+            }
+
             int writtenBytes = ch.write( buf.buf() );
 
-            SelectionKey key = session.getSelectionKey();
             if( writtenBytes == 0 )
             {
                 // Kernel buffer is full
