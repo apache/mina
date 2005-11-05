@@ -198,6 +198,12 @@ public abstract class BaseThreadPool implements ThreadPool
             }
         }
 
+        this.allSessionBuffers.clear();
+        this.unfetchedSessionBuffers.clear();
+        this.buffers.clear();
+        this.followers.clear();
+        this.leader = null;
+
         started = false;
     }
 
