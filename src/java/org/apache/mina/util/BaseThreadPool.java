@@ -18,8 +18,10 @@
  */
 package org.apache.mina.util;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,11 +82,12 @@ public abstract class BaseThreadPool implements ThreadPool
 
     private final String threadNamePrefix;
     private final Map buffers = new IdentityHashMap();
-    private final Stack followers = new Stack();
     private final BlockingQueue unfetchedSessionBuffers = new BlockingQueue();
-    private final Set allSessionBuffers = new HashSet();
+    private final Set allSessionBuffers = new IdentityHashSet();
 
     private Worker leader;
+    private final Stack followers = new Stack();
+    private final Set allWorkers = new IdentityHashSet();
 
     private int maximumPoolSize = DEFAULT_MAXIMUM_POOL_SIZE;
     private int keepAliveTime = DEFAULT_KEEP_ALIVE_TIME;
@@ -170,47 +173,49 @@ public abstract class BaseThreadPool implements ThreadPool
             return;
 
         shuttingDown = true;
-        Worker lastLeader = null;
-        for( ;; )
+        while( getPoolSize() != 0 )
         {
-            Worker leader = this.leader;
-            if( lastLeader == leader )
-                break;
-
-            while( leader.isAlive() )
+            List allWorkers;
+            synchronized( poolSizeLock )
             {
-                leader.interrupt();
-                try
+                allWorkers = new ArrayList( this.allWorkers );
+            }
+            
+            for( Iterator i = allWorkers.iterator(); i.hasNext(); )
+            {
+                Worker worker = ( Worker ) i.next();
+                while( worker.isAlive() )
                 {
-                    // This timeout (100) will help us from 
-                    // infinite lock-up and interrupt workers again.
-                    // (Or we could acquire a monitor for unfetchedSessionBuffers.)
-                    leader.join( 100 );
-                }
-                catch( InterruptedException e )
-                {
+                    worker.interrupt();
+                    try
+                    {
+                        worker.join(); 
+                    }
+                    catch( InterruptedException e )
+                    {
+                    }
                 }
             }
-
-            lastLeader = leader;
         }
 
         started = false;
     }
 
-    private void increasePoolSize()
+    private void increasePoolSize( Worker worker )
     {
         synchronized( poolSizeLock )
         {
             poolSize++;
+            allWorkers.add( worker );
         }
     }
 
-    private void decreasePoolSize()
+    private void decreasePoolSize( Worker worker )
     {
         synchronized( poolSizeLock )
         {
             poolSize--;
+            allWorkers.remove( worker );
         }
     }
 
@@ -320,7 +325,7 @@ public abstract class BaseThreadPool implements ThreadPool
             int id = acquireThreadId();
             this.id = id;
             this.setName( threadNamePrefix + '-' + id );
-            increasePoolSize();
+            increasePoolSize( this );
         }
 
         public boolean lead()
@@ -360,7 +365,7 @@ public abstract class BaseThreadPool implements ThreadPool
                 releaseBuffer( buf );
             }
 
-            decreasePoolSize();
+            decreasePoolSize( this );
             releaseThreadId( id );
         }
 
