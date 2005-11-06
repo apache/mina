@@ -30,10 +30,48 @@
         </blockquote>
       </p>
       
+      <p>Jean-François Daune says:
+        <blockquote>
+          <p>
+            We use MINA to communicate with
+            <a href="http://www.banksys.com/">Banksys</a> 'point of sale'
+            terminals (Visa, Mastercard...) for technical management operations.
+            (software upgrade, remote monitoring, log transfer...)
+          </p>
+          <p>
+            So far, MINA has worked really well for us. We used
+            <a href="http://gleamynode.net/dev/tl-netty2/docs/">Netty2</a>,
+            and clearly saw the improvements in MINA. I like the MINA API
+            more. MINA really makes it easier to write applications using NIO.
+          </p>
+        </blockquote>
+      </p>
+
+      <p>Luke Hubbard says:
+        <blockquote>
+          We are using it for the network layer of
+          <a href="http://www.osflash.org/red5">Red5</a>, an open source flash
+          server. At the moment we have RTMP and AMF working and hope to add
+          more protocols in the future.  MINA's design and ease of use has
+          helped us get a prototype up and running quickly.
+        </blockquote>
+      </p>
+      
       <p>Thomas Muller says:
         <blockquote>
           What a fantastic API! Definately the best I've seen since
           <a href="http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html">Doug Lea's Concurrency API</a>.
+        </blockquote>
+      </p>
+      
+      <p>Paolo Perrucci says:
+        <blockquote>
+          We are using MINA to build the network layer of our multiplayer
+          game server at <a href="http://ludonet.leonardo.it/">Leonardo.it</a>.
+          Using MINA, we implemented different protocols in a few days;
+          Game and HTTP tunneling.  In the past, we used NIO, and the advantage
+          of using MINA is evident; the MINA API is elegant and very simple to
+          use.  Last, but not least, MINA have a really responsive support.
         </blockquote>
       </p>
       
@@ -56,32 +94,6 @@
         </blockquote>
       </p>
 
-      <p>Luke Hubbard says:
-        <blockquote>
-          We are using it for the network layer of
-          <a href="http://www.osflash.org/red5">Red5</a>, an open source flash
-          server. At the moment we have RTMP and AMF working and hope to add
-          more protocols in the future.  MINA's design and ease of use has
-          helped us get a prototype up and running quickly.
-        </blockquote>
-      </p>
-      
-      <p>Jean-François Daune says:
-        <blockquote>
-          <p>
-            We use MINA to communicate with
-            <a href="http://www.banksys.com/">Banksys</a> 'point of sale'
-            terminals (Visa, Mastercard...) for technical management operations.
-            (software upgrade, remote monitoring, log transfer...)
-          </p>
-          <p>
-            So far, MINA has worked really well for us. We used
-            <a href="http://gleamynode.net/dev/tl-netty2/docs/">Netty2</a>,
-            and clearly saw the improvements in MINA. I like the MINA API
-            more. MINA really makes it easier to write applications using NIO.
-          </p>
-        </blockquote>
-      </p>
     </section>
   </body>
 </document>
