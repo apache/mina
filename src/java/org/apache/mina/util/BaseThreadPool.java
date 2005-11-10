@@ -189,7 +189,9 @@ public abstract class BaseThreadPool implements ThreadPool
                     worker.interrupt();
                     try
                     {
-                        worker.join(); 
+                        // This timeout will help us from 
+                        // infinite lock-up and interrupt workers again.
+                        worker.join( 100 ); 
                     }
                     catch( InterruptedException e )
                     {
@@ -380,7 +382,7 @@ public abstract class BaseThreadPool implements ThreadPool
             BlockingQueue unfetchedSessionBuffers = BaseThreadPool.this.unfetchedSessionBuffers;
             synchronized( unfetchedSessionBuffers )
             {
-                for( ;; )
+                while( !shuttingDown )
                 {
                     try
                     {
@@ -388,19 +390,14 @@ public abstract class BaseThreadPool implements ThreadPool
                     }
                     catch( InterruptedException e )
                     {
-                        if( shuttingDown )
-                        {
-                            return null;
-                        }
-                        else
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     return BaseThreadPool.this.fetchSessionBuffer( unfetchedSessionBuffers );
                 }
             }
+            
+            return null;
         }
 
         private void processEvents( SessionBuffer buf )
@@ -466,7 +463,7 @@ public abstract class BaseThreadPool implements ThreadPool
             
             synchronized( promotionLock )
             {
-                while( this != leader )
+                while( this != leader && !shuttingDown )
                 {
                     // Calculate remaining keep-alive time
                     int keepAliveTime = getKeepAliveTime();
@@ -492,10 +489,6 @@ public abstract class BaseThreadPool implements ThreadPool
                     }
                     catch( InterruptedException e )
                     {
-                        if( shuttingDown )
-                        {
-                            break;
-                        }
                     }
 
                     // Update currentTime for the next iteration
