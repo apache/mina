@@ -1084,6 +1084,10 @@ public abstract class ByteBuffer
             }
 
             buf.position( oldPos );
+            if( !buf.hasRemaining() )
+            {
+                return "";
+            }
             decoder.reset();
 
             int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() );
@@ -1193,6 +1197,10 @@ public abstract class ByteBuffer
             }
 
             buf.position( oldPos );
+            if( !buf.hasRemaining() )
+            {
+                return "";
+            }
             decoder.reset();
 
             int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() );
