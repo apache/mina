@@ -1086,6 +1086,8 @@ public abstract class ByteBuffer
             buf.position( oldPos );
             if( !buf.hasRemaining() )
             {
+                buf.limit( oldLimit );
+                buf.position( end );
                 return "";
             }
             decoder.reset();
@@ -1199,6 +1201,8 @@ public abstract class ByteBuffer
             buf.position( oldPos );
             if( !buf.hasRemaining() )
             {
+                buf.limit( oldLimit );
+                buf.position( end );
                 return "";
             }
             decoder.reset();

@@ -236,6 +236,20 @@ public class ByteBufferTest extends TestCase
         buf.limit( 0 );
         Assert.assertEquals( "", buf.getString( decoder ) );
         Assert.assertEquals( "", buf.getString( 2, decoder ) );
+
+        // Test getting strings from non-empty buffer which is filled with 0x00
+        buf.clear();
+        buf.putInt( 0 );
+        buf.clear();
+        buf.limit( 4 );
+        Assert.assertEquals( "", buf.getString( decoder ) );
+        Assert.assertEquals( 2, buf.position() );
+        Assert.assertEquals( 4, buf.limit() );
+        
+        buf.position( 0 );
+        Assert.assertEquals( "", buf.getString( 2, decoder ) );
+        Assert.assertEquals( 2, buf.position() );
+        Assert.assertEquals( 4, buf.limit() );
     }
     
     public void testPutString() throws Exception
