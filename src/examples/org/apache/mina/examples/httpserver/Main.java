@@ -35,9 +35,9 @@ import org.apache.mina.registry.SimpleServiceRegistry;
 public class Main
 {
     /** Choose your favorite port number. */
-    private static final int PORT = 8081;
+    private static final int PORT = 8080;
     
-    private static final boolean USE_SSL = true;
+    private static final boolean USE_SSL = false;
 
     public static void main( String[] args ) throws Exception
     {
