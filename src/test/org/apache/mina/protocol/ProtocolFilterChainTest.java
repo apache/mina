@@ -19,6 +19,7 @@
 package org.apache.mina.protocol;
 
 import java.net.SocketAddress;
+import java.util.Iterator;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -49,6 +50,57 @@ public class ProtocolFilterChainTest extends TestCase
     
     public void tearDown()
     {
+    }
+    
+    public void testAdd() throws Exception
+    {
+        chain.addFirst( "A", new TestFilter( 'A' ) );
+        chain.addLast( "B", new TestFilter( 'B' ) );
+        chain.addFirst( "C", new TestFilter( 'C' ) );
+        chain.addLast( "D", new TestFilter( 'D' ) );
+        chain.addBefore( "B", "E", new TestFilter( 'E' ) );
+        chain.addBefore( "C", "F", new TestFilter( 'F' ) );
+        chain.addAfter( "B", "G", new TestFilter( 'G' ) );
+        chain.addAfter( "D", "H", new TestFilter( 'H' ) );
+        
+        String actual = "";
+        for( Iterator i = chain.getChildren().iterator(); i.hasNext(); ) 
+        {
+            TestFilter f = ( TestFilter ) i.next();
+            actual += f.id;
+        }
+        
+        Assert.assertEquals( "FCAEBGDH", actual );
+    }
+    
+    public void testRemove() throws Exception
+    {
+        chain.addLast( "A", new TestFilter( 'A' ) );
+        chain.addLast( "B", new TestFilter( 'B' ) );
+        chain.addLast( "C", new TestFilter( 'C' ) );
+        chain.addLast( "D", new TestFilter( 'D' ) );
+        chain.addLast( "E", new TestFilter( 'E' ) );
+        
+        chain.remove( "A" );
+        chain.remove( "E" );
+        chain.remove( "C" );
+        chain.remove( "B" );
+        chain.remove( "D" );
+        
+        Assert.assertEquals( 0, chain.getChildren().size() );
+    }
+    
+    public void testClear() throws Exception
+    {
+        chain.addLast( "A", new TestFilter( 'A' ) );
+        chain.addLast( "B", new TestFilter( 'B' ) );
+        chain.addLast( "C", new TestFilter( 'C' ) );
+        chain.addLast( "D", new TestFilter( 'D' ) );
+        chain.addLast( "E", new TestFilter( 'E' ) );
+        
+        chain.clear();
+        
+        Assert.assertEquals( 0, chain.getChildren().size() );
     }
     
     public void testDefault()
