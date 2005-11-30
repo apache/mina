@@ -214,7 +214,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     {
         Entry baseEntry = checkOldName( baseName );
         checkAddable( name );
-        register( baseEntry, name, filter );
+        register( baseEntry.prevEntry, name, filter );
     }
 
 
@@ -228,7 +228,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     {
         Entry baseEntry = checkOldName( baseName );
         checkAddable( name );
-        register( baseEntry.prevEntry, name, filter );
+        register( baseEntry, name, filter );
     }
 
 
