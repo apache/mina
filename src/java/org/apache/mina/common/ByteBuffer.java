@@ -1092,7 +1092,7 @@ public abstract class ByteBuffer
             }
             decoder.reset();
 
-            int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() );
+            int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() ) + 1;
             CharBuffer out = CharBuffer.allocate( expectedLength );
             for( ;; )
             {
@@ -1207,7 +1207,7 @@ public abstract class ByteBuffer
             }
             decoder.reset();
 
-            int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() );
+            int expectedLength = (int) ( buf.remaining() * decoder.averageCharsPerByte() ) + 1;
             CharBuffer out = CharBuffer.allocate( expectedLength );
             for( ;; )
             {
@@ -1333,7 +1333,7 @@ public abstract class ByteBuffer
             }
             
             CharBuffer in = CharBuffer.wrap( val ); 
-            int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar());
+            int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar()) + 1;
 
             encoder.reset();
 
