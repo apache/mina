@@ -10,9 +10,7 @@
     <module>../mina</module>
     <module>../mina-asn1</module>
     <module>../mina-ssl</module>
-    <!-- tests not working yet
     <module>../mina-examples</module>
     <module>../mina-spring</module>
-    -->
   </modules>
 </project>
