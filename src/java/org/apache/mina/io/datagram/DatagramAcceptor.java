@@ -520,6 +520,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
                 {
                     try
                     {
+                        ch.disconnect();
                         ch.close();
                     }
                     catch( Throwable e )
@@ -563,6 +564,7 @@ public class DatagramAcceptor extends DatagramSessionManager implements IoAccept
                     SelectionKey key = ch.keyFor( selector );
                     key.cancel();
                     selector.wakeup(); // wake up again to trigger thread death
+                    ch.disconnect();
                     ch.close();
                 }
             }
