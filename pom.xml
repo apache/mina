@@ -13,7 +13,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>../mina</module>
-    <module>../asn1</module>
     <module>../mina-asn1</module>
     <module>../mina-ssl</module>
     <module>../mina-examples</module>
