@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.directory</groupId>
+    <artifactId>build</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
   <groupId>org.apache.mina</groupId>
   <version>0.9.1-SNAPSHOT</version>
-  <artifactId>mina-build</artifactId>
+  <artifactId>build</artifactId>
   <name>mina-build</name>
   <packaging>pom</packaging>
   <modules>
     <module>../mina</module>
+    <module>../asn1</module>
     <module>../mina-asn1</module>
     <module>../mina-ssl</module>
     <module>../mina-examples</module>
