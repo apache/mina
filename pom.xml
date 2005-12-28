@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.mina</groupId>
+  <version>0.9.1-SNAPSHOT</version>
+  <artifactId>mina-build</artifactId>
+  <name>mina-build</name>
+  <packaging>pom</packaging>
+  <modules>
+    <module>../mina</module>
+    <module>../mina-asn1</module>
+    <module>../mina-ssl</module>
+    <!-- tests not working yet
+    <module>../mina-examples</module>
+    <module>../mina-spring</module>
+    -->
+  </modules>
+</project>
