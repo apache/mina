@@ -118,6 +118,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
         {
             if( !initialized )
             {
+                ch.disconnect();
                 ch.close();
             }
         }
@@ -478,6 +479,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 {
                     try
                     {
+                        req.channel.disconnect();
                         req.channel.close();
                     }
                     catch (IOException e)
@@ -509,6 +511,7 @@ public class DatagramConnector extends DatagramSessionManager implements IoConne
                 DatagramChannel ch = ( DatagramChannel ) key.channel();
                 try
                 {
+                    ch.disconnect();
                     ch.close();
                 }
                 catch( IOException e )
