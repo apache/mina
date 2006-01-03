@@ -11,11 +11,68 @@
   <artifactId>build</artifactId>
   <name>mina-build</name>
   <packaging>pom</packaging>
-  <modules>
-    <module>../mina</module>
-    <module>../mina-asn1</module>
-    <module>../mina-ssl</module>
-    <module>../mina-examples</module>
-    <module>../mina-spring</module>
-  </modules>
+
+  <dependencies>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>jdk1.5</id>
+      <activation>
+        <jdk>1.5</jdk>
+      </activation>
+      <modules>
+        <module>../mina</module>
+        <module>../mina-asn1</module>
+        <module>../mina-ssl</module>
+        <module>../mina-examples</module>
+        <module>../mina-spring</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>jdk1.4</id>
+      <activation>
+        <jdk>1.4</jdk>
+      </activation>
+      <modules>
+        <module>../mina</module>
+        <module>../mina-asn1</module>
+      </modules>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>validate</phase>
+                <configuration>
+                  <tasks>
+                    <echo>
+====================================================================
+                       W A R N I N G
+                       -------------
+
+Build with 1.4 jvm will not include modules:
+ 
+ o mina-ssl
+ o mina-spring
+ o mina-examples
+
+Use JDK 1.5 to make sure these modules build.
+====================================================================
+                    </echo>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
