@@ -6,9 +6,9 @@
     <artifactId>build</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.apache.mina</groupId>
+  <groupId>org.apache.directory.mina</groupId>
   <version>0.9.1-SNAPSHOT</version>
-  <artifactId>build</artifactId>
+  <artifactId>mina-build</artifactId>
   <name>mina-build</name>
   <packaging>pom</packaging>
 
