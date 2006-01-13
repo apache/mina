@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.apache.directory.mina</groupId>
   <version>0.9.1-SNAPSHOT</version>
-  <artifactId>mina-build</artifactId>
+  <artifactId>build</artifactId>
   <name>mina-build</name>
   <packaging>pom</packaging>
 
