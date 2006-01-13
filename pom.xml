@@ -22,11 +22,11 @@
         <jdk>1.5</jdk>
       </activation>
       <modules>
-        <module>../mina</module>
-        <module>../mina-asn1</module>
-        <module>../mina-ssl</module>
-        <module>../mina-examples</module>
-        <module>../mina-spring</module>
+        <module>core</module>
+        <module>asn1</module>
+        <module>ssl</module>
+        <module>examples</module>
+        <module>spring</module>
       </modules>
     </profile>
 
@@ -36,8 +36,8 @@
         <jdk>1.4</jdk>
       </activation>
       <modules>
-        <module>../mina</module>
-        <module>../mina-asn1</module>
+        <module>mina</module>
+        <module>asn1</module>
       </modules>
       <build>
         <plugins>
