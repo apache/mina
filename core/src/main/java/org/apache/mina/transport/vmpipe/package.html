@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+</head>
+<body>
+In-VM pipe support which removes the overhead of local loopback communication.
+
+<h1>What is 'in-VM pipe'?</h1>
+<p>
+    In-VM pipe is a direct event forwarding mechanism between two
+	<a href="../ProtocolHandler.html"><code>ProtocolHandler</code></a>s in the
+    same Java Virtual Machine.  Using in-VM pipe, you can remove the overhead
+    of encoding and decoding which is caused uselessly by local loopback
+    network communication.  Here are some useful situations possible:
+    <ul>
+        <li>SMTP server and SPAM filtering server,</li>
+        <li>web server and Servlet/JSP container.</li>
+    </ul>
+</p>
+<p>
+    Please refer to
+    <a href="../../../../../../xref-examples/org/apache/mina/examples/tennis/Main.html">Tennis</a>
+    example.
+</p>
+</body>
+</html>
