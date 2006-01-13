@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.directory.mina</groupId>
-    <artifactId>mina-build</artifactId>
+    <artifactId>build</artifactId>
     <version>0.9.1-SNAPSHOT</version>
   </parent>
   <artifactId>org.apache.mina.asn1</artifactId>
