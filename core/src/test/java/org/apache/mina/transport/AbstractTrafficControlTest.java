@@ -1,0 +1,197 @@
+/*
+ *   @(#) $Id$
+ *
+ *   Copyright 2004 The Apache Software Foundation
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+package org.apache.mina.transport;
+
+import java.net.SocketAddress;
+
+import junit.framework.TestCase;
+
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoHandlerAdapter;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.TransportType;
+import org.apache.mina.registry.Service;
+import org.apache.mina.registry.SimpleServiceRegistry;
+import org.apache.mina.util.AvailablePortFinder;
+
+/**
+ * Abstract base class for testing suspending and resuming reads and
+ * writes.
+ *
+ * @author The Apache Directory Project (dev@directory.apache.org)
+ * @version $Rev$, $Date$
+ */
+public abstract class AbstractTrafficControlTest extends TestCase
+{
+    protected int port = 0;
+    protected SimpleServiceRegistry registry;
+    protected TransportType transportType;
+    
+    public AbstractTrafficControlTest( TransportType transportType )
+    {
+        this.transportType = transportType;
+    }
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        
+        port = AvailablePortFinder.getNextAvailable();
+        
+        registry = new SimpleServiceRegistry();
+        registry.bind( new Service( "traffic", transportType, 
+                                    createServerSocketAddress( port ) ), 
+                       new ServerIoHandler() );
+        
+    }
+
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+        
+        registry.unbindAll();
+    }
+
+    protected abstract ConnectFuture connect( int port, IoHandler handler) throws Exception;
+    protected abstract SocketAddress createServerSocketAddress( int port );
+    
+    public void testSuspendResumeReadWrite() throws Exception
+    {
+        ConnectFuture future = connect( port, new ClientIoHandler() );
+        future.join();
+        IoSession session = future.getSession();
+        
+        write( session, "1" );
+        Thread.sleep( 250 );
+        assertEquals( "1", getReceived( session ) );
+        assertEquals( "1", getSent( session ) );
+        
+        session.suspendRead();
+        
+        write( session, "2" );
+        Thread.sleep( 250 );
+        assertEquals( "1", getReceived( session ) );
+        assertEquals( "12", getSent( session ) );
+        
+        session.suspendWrite();
+        
+        write( session, "3" );
+        Thread.sleep( 250 );
+        assertEquals( "1", getReceived( session ) );
+        assertEquals( "12", getSent( session ) );
+        
+        session.resumeRead();
+        
+        write( session, "4" );
+        Thread.sleep( 250 );
+        assertEquals( "12", getReceived( session ) );
+        assertEquals( "12", getSent( session ) );
+        
+        session.resumeWrite();
+        
+        write( session, "5" );
+        Thread.sleep( 250 );
+        assertEquals( "12345", getReceived( session ) );
+        assertEquals( "12345", getSent( session ) );
+        
+        session.suspendWrite();
+        
+        write( session, "6" );
+        Thread.sleep( 250 );
+        assertEquals( "12345", getReceived( session ) );
+        assertEquals( "12345", getSent( session ) );
+        
+        session.suspendRead();
+        session.resumeWrite();
+        
+        write( session, "7" );
+        Thread.sleep( 250 );
+        assertEquals( "12345", getReceived( session ) );
+        assertEquals( "1234567", getSent( session ) );
+        
+        session.resumeRead();
+        
+        Thread.sleep( 250 );
+        assertEquals( "1234567", getReceived( session ) );
+        assertEquals( "1234567", getSent( session ) );
+        
+        session.close().join();
+    }
+
+    private void write( IoSession session, String s ) throws Exception
+    {
+        session.write( ByteBuffer.wrap( s.getBytes( "ASCII" ) ) );
+    }
+    
+    private static String getReceived( IoSession session ) 
+    {
+        return session.getAttribute( "received" ).toString();
+    }
+    
+    private static String getSent( IoSession session ) 
+    {
+        return session.getAttribute( "sent" ).toString();
+    }
+    
+    public static class ClientIoHandler extends IoHandlerAdapter
+    {
+        public void sessionCreated( IoSession session ) throws Exception
+        {
+            super.sessionCreated( session );
+            session.setAttribute( "received", new StringBuffer() );
+            session.setAttribute( "sent", new StringBuffer() );
+        }
+
+        public void messageReceived( IoSession session, Object message ) throws Exception
+        {
+            ByteBuffer buffer = ( ByteBuffer ) message;
+            byte[] data = new byte[ buffer.remaining() ];
+            buffer.get( data );
+            StringBuffer sb = ( StringBuffer ) session.getAttribute( "received" );
+            sb.append( new String( data, "ASCII" ) );
+        }
+
+        public void messageSent( IoSession session, Object message ) throws Exception
+        {
+            ByteBuffer buffer = ( ByteBuffer ) message;
+            buffer.rewind();
+            byte[] data = new byte[ buffer.remaining() ];
+            buffer.get( data );
+            StringBuffer sb = ( StringBuffer ) session.getAttribute( "sent" );
+            sb.append( new String( data, "ASCII" ) );
+        }
+        
+    }
+    
+    public static class ServerIoHandler extends IoHandlerAdapter
+    {
+        public void messageReceived( IoSession session, Object message )
+                throws Exception
+        {
+            // Just echo the received bytes.
+            ByteBuffer rb = ( ByteBuffer ) message;
+            ByteBuffer wb = ByteBuffer.allocate( rb.remaining() );
+            wb.put( rb );
+            wb.flip();
+            session.write( wb );                
+        }    
+    }    
+}

@@ -1,0 +1,116 @@
+/*
+ *   @(#) $Id$
+ *
+ *   Copyright 2004 The Apache Software Foundation
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+package org.apache.mina.filter.codec.textline;
+
+import java.net.SocketAddress;
+import java.nio.charset.Charset;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.TransportType;
+import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
+
+/**
+ * Tests {@link TextLineEncoder}.
+ *
+ * @author The Apache Directory Project (dev@directory.apache.org)
+ * @version $Rev$, $Date$
+ */
+public class TextLineEncoderTest extends TestCase
+{
+    public static void main( String[] args )
+    {
+        junit.textui.TestRunner.run( TextLineEncoderTest.class );
+    }
+
+    public void testEncode() throws Exception
+    {
+        TextLineEncoder encoder = new TextLineEncoder(
+                Charset.forName( "UTF-8" ), LineDelimiter.WINDOWS );
+        IoSession session = new DummySession();
+        SimpleProtocolEncoderOutput out =
+            new SimpleProtocolEncoderOutput()
+            {
+                protected WriteFuture doFlush( ByteBuffer buf )
+                {
+                    return null;
+                }
+            };
+        
+        encoder.encode( session, "ABC", out );
+        Assert.assertEquals( 1, out.getBufferQueue().size() );
+        ByteBuffer buf = ( ByteBuffer ) out.getBufferQueue().pop();
+        Assert.assertEquals( 5, buf.remaining() );
+        Assert.assertEquals( 'A', buf.get() );
+        Assert.assertEquals( 'B', buf.get() );
+        Assert.assertEquals( 'C', buf.get() );
+        Assert.assertEquals( '\r', buf.get() );
+        Assert.assertEquals( '\n', buf.get() );
+    }
+
+    private static class DummySession extends BaseIoSession
+    {
+        protected void updateTrafficMask()
+        {
+        }
+
+        public IoSessionManager getManager()
+        {
+            return null;
+        }
+
+        public IoHandler getHandler()
+        {
+            return null;
+        }
+
+        public IoFilterChain getFilterChain()
+        {
+            return null;
+        }
+
+        public TransportType getTransportType()
+        {
+            return null;
+        }
+
+        public SocketAddress getRemoteAddress()
+        {
+            return null;
+        }
+
+        public SocketAddress getLocalAddress()
+        {
+            return null;
+        }
+
+        public int getScheduledWriteRequests()
+        {
+            return 0;
+        }
+    }
+}
