@@ -79,60 +79,69 @@ public abstract class AbstractTrafficControlTest extends TestCase
         future.join();
         IoSession session = future.getSession();
         
-        write( session, "1" );
-        Thread.sleep( 250 );
-        assertEquals( "1", getReceived( session ) );
-        assertEquals( "1", getSent( session ) );
+        Object lock = session.getAttribute( "lock" );
+        synchronized( lock )
+        {
         
-        session.suspendRead();
+            write( session, "1" );
+            assertEquals( '1', read( session ) );
+            assertEquals( "1", getReceived( session ) );
+            assertEquals( "1", getSent( session ) );
+            
+            session.suspendRead();
+            
+            write( session, "2" );
+            assertFalse( canRead( session ) );
+            assertEquals( "1", getReceived( session ) );
+            assertEquals( "12", getSent( session ) );
+            
+            session.suspendWrite();
+            
+            write( session, "3" );
+            assertFalse( canRead( session ) );
+            assertEquals( "1", getReceived( session ) );
+            assertEquals( "12", getSent( session ) );
+            
+            session.resumeRead();
+            
+            write( session, "4" );
+            assertEquals( '2', read( session ) );
+            assertEquals( "12", getReceived( session ) );
+            assertEquals( "12", getSent( session ) );
+            
+            session.resumeWrite();
+            assertEquals( '3', read( session ) );
+            assertEquals( '4', read( session ) );
+            
+            write( session, "5" );
+            assertEquals( '5', read( session ) );
+            assertEquals( "12345", getReceived( session ) );
+            assertEquals( "12345", getSent( session ) );
+            
+            session.suspendWrite();
+            
+            write( session, "6" );
+            assertFalse( canRead( session ) );
+            assertEquals( "12345", getReceived( session ) );
+            assertEquals( "12345", getSent( session ) );
+            
+            session.suspendRead();
+            session.resumeWrite();
+            
+            write( session, "7" );
+            assertFalse( canRead( session ) );
+            assertEquals( "12345", getReceived( session ) );
+            assertEquals( "1234567", getSent( session ) );
+            
+            session.resumeRead();
+            assertEquals( '6', read( session ) );
+            assertEquals( '7', read( session ) );
+            
+            assertEquals( "1234567", getReceived( session ) );
+            assertEquals( "1234567", getSent( session ) );
         
-        write( session, "2" );
-        Thread.sleep( 250 );
-        assertEquals( "1", getReceived( session ) );
-        assertEquals( "12", getSent( session ) );
-        
-        session.suspendWrite();
-        
-        write( session, "3" );
-        Thread.sleep( 250 );
-        assertEquals( "1", getReceived( session ) );
-        assertEquals( "12", getSent( session ) );
-        
-        session.resumeRead();
-        
-        write( session, "4" );
-        Thread.sleep( 250 );
-        assertEquals( "12", getReceived( session ) );
-        assertEquals( "12", getSent( session ) );
-        
-        session.resumeWrite();
-        
-        write( session, "5" );
-        Thread.sleep( 250 );
-        assertEquals( "12345", getReceived( session ) );
-        assertEquals( "12345", getSent( session ) );
-        
-        session.suspendWrite();
-        
-        write( session, "6" );
-        Thread.sleep( 250 );
-        assertEquals( "12345", getReceived( session ) );
-        assertEquals( "12345", getSent( session ) );
-        
-        session.suspendRead();
-        session.resumeWrite();
-        
-        write( session, "7" );
-        Thread.sleep( 250 );
-        assertEquals( "12345", getReceived( session ) );
-        assertEquals( "1234567", getSent( session ) );
-        
-        session.resumeRead();
-        
-        Thread.sleep( 250 );
-        assertEquals( "1234567", getReceived( session ) );
-        assertEquals( "1234567", getSent( session ) );
-        
+        }
+            
         session.close().join();
     }
 
@@ -140,13 +149,34 @@ public abstract class AbstractTrafficControlTest extends TestCase
     {
         session.write( ByteBuffer.wrap( s.getBytes( "ASCII" ) ) );
     }
+
+    private int read( IoSession session ) throws Exception
+    {
+        int pos = ( ( Integer) session.getAttribute( "pos" ) ).intValue();
+        for( int i = 0; i < 10 && pos == getReceived( session ).length(); i++ )
+        {
+            Object lock = session.getAttribute( "lock" );
+            lock.wait( 200 );
+        }
+        session.setAttribute( "pos", new Integer( pos + 1 ) );
+        return getReceived( session ).charAt( pos );
+    }
     
-    private static String getReceived( IoSession session ) 
+    private boolean canRead( IoSession session ) throws Exception
+    {
+        int pos = ( ( Integer) session.getAttribute( "pos" ) ).intValue();
+        Object lock = session.getAttribute( "lock" );
+        lock.wait( 250 );
+        String received = getReceived( session );
+        return pos < received.length();
+    }
+    
+    private String getReceived( IoSession session ) throws Exception
     {
         return session.getAttribute( "received" ).toString();
     }
     
-    private static String getSent( IoSession session ) 
+    private String getSent( IoSession session ) throws Exception
     {
         return session.getAttribute( "sent" ).toString();
     }
@@ -156,8 +186,10 @@ public abstract class AbstractTrafficControlTest extends TestCase
         public void sessionCreated( IoSession session ) throws Exception
         {
             super.sessionCreated( session );
+            session.setAttribute( "pos", new Integer( 0 ) );
             session.setAttribute( "received", new StringBuffer() );
             session.setAttribute( "sent", new StringBuffer() );
+            session.setAttribute( "lock", new Object() );
         }
 
         public void messageReceived( IoSession session, Object message ) throws Exception
@@ -165,8 +197,13 @@ public abstract class AbstractTrafficControlTest extends TestCase
             ByteBuffer buffer = ( ByteBuffer ) message;
             byte[] data = new byte[ buffer.remaining() ];
             buffer.get( data );
-            StringBuffer sb = ( StringBuffer ) session.getAttribute( "received" );
-            sb.append( new String( data, "ASCII" ) );
+            Object lock = session.getAttribute( "lock" );
+            synchronized ( lock )
+            {
+                StringBuffer sb = ( StringBuffer ) session.getAttribute( "received" );
+                sb.append( new String( data, "ASCII" ) );
+                lock.notifyAll();
+            }
         }
 
         public void messageSent( IoSession session, Object message ) throws Exception
