@@ -78,8 +78,8 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         // initialize client session
         try
         {
-            manager.getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
-            filterChainBuilder.buildFilterChain( remoteSession.getFilterChain() );
+            manager.getFilterChainBuilder().buildFilterChain( filterChain );
+            filterChainBuilder.buildFilterChain( filterChain );
             handler.sessionCreated( this );
         }
         catch( Throwable t )
