@@ -60,7 +60,7 @@ public class SocketBindTest extends AbstractBindTest
         IoSession[] sessions = new IoSession[ 5 ];
         for( int i = 0; i < sessions.length; i++ )
         {
-            ConnectFuture future = connector.connect( addr, new IoHandlerAdapter() );
+            ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ), new IoHandlerAdapter() );
             future.join();
             sessions[ i ] = future.getSession();
             Assert.assertTrue( sessions[ i ].isConnected() );
