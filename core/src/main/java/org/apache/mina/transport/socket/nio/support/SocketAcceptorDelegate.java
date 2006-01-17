@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -43,8 +44,6 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.transport.socket.nio.SocketSessionManager;
 import org.apache.mina.util.Queue;
-
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).
