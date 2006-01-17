@@ -36,7 +36,7 @@
         <jdk>1.4</jdk>
       </activation>
       <modules>
-        <module>mina</module>
+        <module>core</module>
         <module>asn1</module>
       </modules>
       <build>
