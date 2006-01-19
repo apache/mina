@@ -55,6 +55,7 @@ public class AbstractIoConnectorFactoryBeanTest extends TestCase
         mockFactory = MockClassControl
                 .createControl(
                         TestIoConnectorFactoryBean.class,
+                        new Class[ 0 ], new Object[ 0 ],
                         new Method[] {
                                 TestIoConnectorFactoryBean.class
                                         .getDeclaredMethod(

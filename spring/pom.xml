@@ -25,13 +25,13 @@
     </dependency>
 
     <dependency>
-      <groupId>springframework</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
       <version>1.2.5</version>
     </dependency>
 
     <dependency>
-      <groupId>springframework</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
       <version>1.2.5</version>
     </dependency>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>easymock</groupId>
       <artifactId>easymockclassextension</artifactId>
-      <version>1.2</version>
+      <version>1.1</version>
       <scope>test</scope>
     </dependency>
 

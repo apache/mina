@@ -67,6 +67,7 @@ public class AbstractIoAcceptorFactoryBeanTest extends TestCase
         mockFactory = MockClassControl
                 .createNiceControl(
                         TestIoAcceptorFactoryBean.class,
+                        new Class[ 0 ], new Object[ 0 ],
                         new Method[] {
                                 TestIoAcceptorFactoryBean.class
                                         .getDeclaredMethod( "createIoAcceptor",
