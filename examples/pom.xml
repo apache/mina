@@ -19,7 +19,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>nlog4j</artifactId>
-      <version>1.2.17</version>
+      <version>1.2.21</version>
       <scope>provided</scope>
     </dependency>
 
