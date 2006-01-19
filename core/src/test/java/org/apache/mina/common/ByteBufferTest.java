@@ -166,7 +166,20 @@ public class ByteBufferTest extends TestCase
         ByteBuffer buf = ByteBuffer.allocate( 16 );
         CharsetDecoder decoder;
 
+        Charset charset = Charset.forName( "UTF-8" );
+        buf.clear();
+        buf.putString( "hello", charset.newEncoder() );
+        buf.put( (byte)0 );
+        buf.flip();
+        Assert.assertEquals( "hello", buf.getString( charset.newDecoder() ) );
+        
+        buf.clear();
+        buf.putString( "hello", charset.newEncoder() );
+        buf.flip();
+        Assert.assertEquals( "hello", buf.getString( charset.newDecoder() ) );
+
         decoder = Charset.forName( "ISO-8859-1" ).newDecoder();
+        buf.clear();
         buf.put( (byte) 'A' );
         buf.put( (byte) 'B' );
         buf.put( (byte) 'C' );
