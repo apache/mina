@@ -19,12 +19,12 @@
 package org.apache.mina.integration.spring;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import junit.framework.TestCase;
 
 /**
- * Tests {@link org.apache.mina.integration.spring.InetAddressEditor}. NOTE:
- * This test does DNS queries so it needs network access to succeed.
+ * Tests {@link org.apache.mina.integration.spring.InetAddressEditor}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
@@ -40,9 +40,19 @@ public class InetAddressEditorTest extends TestCase
 
     public void testSetAsTextWithHostName() throws Exception
     {
-        editor.setAsText( "www.google.com" );
-        assertEquals( InetAddress.getByName( "www.google.com" ), editor
-                .getValue() );
+        try
+        {
+            InetAddress expected = InetAddress.getByName( "www.google.com" );
+            editor.setAsText( "www.google.com" );
+            assertEquals( expected, editor.getValue() );
+        }
+        catch( UnknownHostException uhe )
+        {
+            // No DNS. Skip the test.
+        }
+        
+        editor.setAsText( "localhost" );
+        assertEquals( InetAddress.getByName( "localhost" ), editor.getValue() );
     }
 
     public void testSetAsTextWithIpAddress() throws Exception
