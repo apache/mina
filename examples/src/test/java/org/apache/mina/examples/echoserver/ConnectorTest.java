@@ -19,7 +19,6 @@
 package org.apache.mina.examples.echoserver;
 
 import java.net.BindException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import junit.framework.Assert;
@@ -105,7 +104,7 @@ public class ConnectorTest extends AbstractTest
         if( !useLocalAddress )
         {
             ConnectFuture future = connector.connect(
-                    new InetSocketAddress( InetAddress.getLocalHost(), port ),
+                    new InetSocketAddress( "localhost", port ),
                     handler );
             future.join();
             session = future.getSession();
@@ -119,7 +118,7 @@ public class ConnectorTest extends AbstractTest
                 try
                 {
                     ConnectFuture future = connector.connect(
-                            new InetSocketAddress( InetAddress.getLocalHost(), port ),
+                            new InetSocketAddress( "localhost", port ),
                             new InetSocketAddress( clientPort ),
                             handler );
                     future.join();

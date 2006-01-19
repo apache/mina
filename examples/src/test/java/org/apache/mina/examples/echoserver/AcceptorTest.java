@@ -116,7 +116,7 @@ public class AcceptorTest extends AbstractTest
     
     private void testTCP0( EchoTCPClient client ) throws Exception
     {
-        client.connect( InetAddress.getLocalHost(), port );
+        client.connect( "localhost", port );
         byte[] writeBuf = new byte[ 16 ];
 
         for( int i = 0; i < 10; i ++ )
@@ -177,7 +177,7 @@ public class AcceptorTest extends AbstractTest
         {
             fillWriteBuffer( writeBuf, i );
             client.send( writeBuf, writeBuf.length, InetAddress
-                    .getLocalHost(), port );
+                    .getByName( null ), port );
 
             assertEquals( readBuf.length, client.receive( readBuf,
                     readBuf.length ) );
