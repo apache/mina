@@ -18,7 +18,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -47,8 +46,7 @@ public class DatagramTrafficControlTest extends AbstractTrafficControlTest
             throws Exception
     {
         IoConnector connector = new DatagramConnector();
-        SocketAddress addr = new InetSocketAddress( InetAddress.getLocalHost(), 
-                                                    port );
+        SocketAddress addr = new InetSocketAddress( "localhost", port );
         return connector.connect( addr, handler );
     }
 
