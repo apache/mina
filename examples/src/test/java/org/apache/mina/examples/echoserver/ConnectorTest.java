@@ -18,7 +18,7 @@
  */
 package org.apache.mina.examples.echoserver;
 
-import java.net.BindException;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import junit.framework.Assert;
@@ -125,7 +125,7 @@ public class ConnectorTest extends AbstractTest
                     session = future.getSession();
                     break;
                 }
-                catch( BindException e )
+                catch( IOException e )
                 {
                     // Try again until we succeed to bind.
                 }
