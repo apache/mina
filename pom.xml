@@ -47,10 +47,10 @@
       </activation>
       <modules>
         <module>core</module>
-        <module>asn1</module>
-        <module>ssl</module>
+        <module>filter-ssl</module>
+        <module>filter-codec-asn1</module>
+        <module>integration-spring</module>
         <module>examples</module>
-        <module>spring</module>
       </modules>
     </profile>
 
@@ -61,7 +61,7 @@
       </activation>
       <modules>
         <module>core</module>
-        <module>asn1</module>
+        <module>filter-codec-asn1</module>
       </modules>
       <build>
         <plugins>
