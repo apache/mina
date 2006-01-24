@@ -37,7 +37,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
 /**
@@ -118,7 +117,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         
         if( request.exception != null )
         {
-            ExceptionUtil.throwException( request.exception );
+            throw ( IOException ) new IOException( "Failed to bind" ).initCause( request.exception );
         }
     }
 
@@ -167,8 +166,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         
         if( request.exception != null )
         {
-            request.exception.fillInStackTrace();
-            throw request.exception;
+            throw new RuntimeException( "Failed to unbind" , request.exception );
         }
     }
     

@@ -20,7 +20,6 @@ import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.transport.vmpipe.VmPipeSession;
-import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
 /**
@@ -84,7 +83,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         }
         catch( Throwable t )
         {
-            ExceptionUtil.throwException( t );
+            throw ( IOException ) new IOException( "Failed to create a session." ).initCause( t );
         }
 
         VmPipeIdleStatusChecker.getInstance().addSession( remoteSession );
