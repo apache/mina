@@ -7,7 +7,7 @@
     <version>0.9.1-SNAPSHOT</version>
   </parent>
   <artifactId>org.apache.mina.filter.ssl</artifactId>
-  <name>mina-ssl</name>
+  <name>mina-filter-ssl</name>
   <packaging>jar</packaging>  
 
   <dependencies>
