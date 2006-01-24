@@ -37,7 +37,6 @@ import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.transport.socket.nio.SocketSessionManager;
-import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
 /**
@@ -282,7 +281,7 @@ public class SocketConnectorDelegate extends BaseIoConnector implements SocketSe
         }
         catch( Throwable e )
         {
-            ExceptionUtil.throwException( e );
+            throw ( IOException ) new IOException( "Failed to create a session." ).initCause( e );
         }
         session.getManagedSessions().add( session );
         session.getIoProcessor().addNew( session );
