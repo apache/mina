@@ -79,8 +79,8 @@
 
 Build with 1.4 jvm will not include modules:
  
- o mina-ssl
- o mina-spring
+ o mina-filter-ssl
+ o mina-integration-spring
  o mina-examples
 
 Use JDK 1.5 to make sure these modules build.
