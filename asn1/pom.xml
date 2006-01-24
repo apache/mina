@@ -6,8 +6,8 @@
     <artifactId>build</artifactId>
     <version>0.9.1-SNAPSHOT</version>
   </parent>
-  <artifactId>org.apache.mina.asn1</artifactId>
-  <name>mina-asn1</name>
+  <artifactId>org.apache.mina.filter.codec.asn1</artifactId>
+  <name>mina-filter-codec-asn1</name>
   <packaging>jar</packaging>
 
   <dependencies>

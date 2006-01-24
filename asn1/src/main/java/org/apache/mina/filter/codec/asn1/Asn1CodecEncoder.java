@@ -1,7 +1,7 @@
 /*
  * @(#) $Id$
  */
-package org.apache.asn1.codec.mina;
+package org.apache.mina.filter.codec.asn1;
 
 import java.util.Collection;
 import java.util.Enumeration;
