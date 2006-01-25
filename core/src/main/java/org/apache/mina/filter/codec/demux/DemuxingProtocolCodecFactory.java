@@ -148,6 +148,9 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     protected void disposeCodecResources( IoSession session )
     {
         // Do nothing by default; let users implement it as they want.
+        
+        // This statement is just to avoid compiler warning.  Please ignore. 
+        session.getTransportType();
     }
     
     private class ProtocolEncoderImpl implements ProtocolEncoder
