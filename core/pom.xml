@@ -6,8 +6,8 @@
     <artifactId>build</artifactId>
     <version>0.9.1-SNAPSHOT</version>
   </parent>
-  <artifactId>org.apache.mina</artifactId>
-  <name>mina-core</name>
+  <artifactId>mina-core</artifactId>
+  <name>MINA Core API</name>
   <inceptionYear>2004</inceptionYear>
 
   <url>http://directory.apache.org/subprojects/network/</url>
