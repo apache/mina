@@ -39,7 +39,7 @@ import java.net.SocketAddress;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoConnector extends IoSessionManager
+public interface IoConnector extends IoService
 {
     /**
      * Connects to the specified <code>address</code>.  If communication starts

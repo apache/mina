@@ -25,7 +25,7 @@ package org.apache.mina.transport.socket.nio.support;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-interface DatagramSessionManager extends org.apache.mina.transport.socket.nio.DatagramSessionManager
+interface DatagramService extends org.apache.mina.transport.socket.nio.DatagramService
 {
     /**
      * Requests this processor to flush the write buffer of the specified

@@ -18,6 +18,7 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import org.apache.mina.common.IoSession;

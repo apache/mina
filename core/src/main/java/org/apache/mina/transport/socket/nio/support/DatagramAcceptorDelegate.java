@@ -45,7 +45,7 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAcceptor, DatagramSessionManager
+public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAcceptor, DatagramService
 {
     private static volatile int nextId = 0;
 

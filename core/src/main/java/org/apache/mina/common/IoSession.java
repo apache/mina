@@ -50,9 +50,9 @@ import java.util.Set;
 public interface IoSession {
     
     /**
-     * Returns the {@link IoSessionManager} which manages this session.
+     * Returns the {@link IoService} which manages this session.
      */
-    IoSessionManager getManager();
+    IoService getManager();
 
     /**
      * Returns the {@link IoHandler} which handles this session.
@@ -209,7 +209,7 @@ public interface IoSession {
     
     /**
      * Sets the {@link TrafficMask} of this session which will result
-     * the parent {@link IoSessionManager} to start to control the traffic
+     * the parent {@link IoService} to start to control the traffic
      * of this session immediately.
      */
     void setTrafficMask( TrafficMask trafficMask );

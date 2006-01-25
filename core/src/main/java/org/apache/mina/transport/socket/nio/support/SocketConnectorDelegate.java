@@ -36,7 +36,6 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.support.BaseIoConnector;
-import org.apache.mina.transport.socket.nio.SocketSessionManager;
 import org.apache.mina.util.Queue;
 
 /**
@@ -45,7 +44,7 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketConnectorDelegate extends BaseIoConnector implements SocketSessionManager
+public class SocketConnectorDelegate extends BaseIoConnector
 {
     private static volatile int nextId = 0;
 
@@ -286,16 +285,6 @@ public class SocketConnectorDelegate extends BaseIoConnector implements SocketSe
         session.getManagedSessions().add( session );
         session.getIoProcessor().addNew( session );
         return session;
-    }
-
-    public int getProcessors()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setProcessors( int nProcessor )
-    {
-        throw new UnsupportedOperationException();
     }
 
     private class Worker extends Thread

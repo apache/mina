@@ -20,17 +20,17 @@ package org.apache.mina.transport.socket.nio;
 
 import java.net.DatagramSocket;
 
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 
 /**
- * An {@link IoSessionManager} which provides some common properties related with
+ * An {@link IoService} which provides some common properties related with
  * NIO UDP/IP sockets.
  *
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  *
  */
-public interface DatagramSessionManager extends IoSessionManager
+public interface DatagramService extends IoService
 {
     /**
      * @see DatagramSocket#getBroadcast()

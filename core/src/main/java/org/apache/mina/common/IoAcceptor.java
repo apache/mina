@@ -41,7 +41,7 @@ import java.util.Collection;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoAcceptor extends IoSessionManager
+public interface IoAcceptor extends IoService
 {
     /**
      * Binds to the specified <code>address</code> and handles incoming

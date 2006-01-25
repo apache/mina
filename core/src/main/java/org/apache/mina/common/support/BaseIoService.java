@@ -19,29 +19,23 @@
 package org.apache.mina.common.support;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
-import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChainBuilder;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 
 /**
- * Base implementation of {@link IoSessionManager}s.
+ * Base implementation of {@link IoService}s.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoSessionManager implements IoSessionManager {
+public abstract class BaseIoService implements IoService {
 
-    /**
-     * Current exception monitor.
-     */
-    protected ExceptionMonitor exceptionMonitor = new DefaultExceptionMonitor();
-    
     /**
      * Current filter chain builder.
      */
     protected IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
 
-    protected BaseIoSessionManager()
+    protected BaseIoService()
     {
     }
     
@@ -70,20 +64,5 @@ public abstract class BaseIoSessionManager implements IoSessionManager {
             throw new IllegalStateException(
                     "Current filter chain builder is not a DefaultIoFilterChainBuilder." );
         }
-    }
-
-    public ExceptionMonitor getExceptionMonitor()
-    {
-        return exceptionMonitor;
-    }
-
-    public void setExceptionMonitor( ExceptionMonitor monitor )
-    {
-        if( monitor == null )
-        {
-            monitor = new DefaultExceptionMonitor();
-        }
-
-        this.exceptionMonitor = monitor;
     }
 }

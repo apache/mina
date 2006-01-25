@@ -28,7 +28,7 @@ import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
@@ -45,7 +45,7 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession
 {
     private static final int DEFAULT_READ_BUFFER_SIZE = 1024;
 
-    private final IoSessionManager manager;
+    private final IoService manager;
     private final SocketIoProcessor ioProcessor;
     private final SocketFilterChain filterChain;
     private final SocketChannel ch;
@@ -61,7 +61,7 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession
      * Creates a new instance.
      */
     public SocketSessionImpl(
-            IoSessionManager manager, Set managedSessions,
+            IoService manager, Set managedSessions,
             SocketChannel ch, IoHandler defaultHandler )
     {
         this.manager = manager;
@@ -75,7 +75,7 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
     
-    public IoSessionManager getManager()
+    public IoService getManager()
     {
         return manager;
     }

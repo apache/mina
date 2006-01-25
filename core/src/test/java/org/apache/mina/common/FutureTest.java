@@ -102,7 +102,7 @@ public class FutureTest extends TestCase
                 return false;
             }
 
-            public IoSessionManager getManager()
+            public IoService getManager()
             {
                 return null;
             }

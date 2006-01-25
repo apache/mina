@@ -43,7 +43,7 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnectorDelegate extends BaseIoConnector implements DatagramSessionManager
+public class DatagramConnectorDelegate extends BaseIoConnector implements DatagramService
 {
     private static volatile int nextId = 0;
 
