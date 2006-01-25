@@ -117,7 +117,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         return managedSessions;
     }
 
-    public IoService getManager()
+    public IoService getService()
     {
         return manager;
     }

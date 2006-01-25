@@ -78,7 +78,7 @@ public class TextLineEncoderTest extends TestCase
         {
         }
 
-        public IoService getManager()
+        public IoService getService()
         {
             return null;
         }
