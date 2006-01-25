@@ -58,7 +58,7 @@ public class ChainedIoHandlerTest extends TestCase
                     {
                     }
 
-                    public IoService getManager()
+                    public IoService getService()
                     {
                         return null;
                     }

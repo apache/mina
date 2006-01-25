@@ -50,9 +50,9 @@ import java.util.Set;
 public interface IoSession {
     
     /**
-     * Returns the {@link IoService} which manages this session.
+     * Returns the {@link IoService} which provides I/O service to this session.
      */
-    IoService getManager();
+    IoService getService();
 
     /**
      * Returns the {@link IoHandler} which handles this session.

@@ -228,7 +228,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
             return false;
         }
 
-        public IoService getManager()
+        public IoService getService()
         {
             return null;
         }

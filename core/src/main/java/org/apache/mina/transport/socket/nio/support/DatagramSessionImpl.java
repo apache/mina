@@ -69,7 +69,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
     
-    public IoService getManager()
+    public IoService getService()
     {
         return wrapperManager;
     }

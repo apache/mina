@@ -184,7 +184,7 @@ public class TextLineDecoderTest extends TestCase
         {
         }
 
-        public IoService getManager()
+        public IoService getService()
         {
             return null;
         }

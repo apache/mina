@@ -75,7 +75,7 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
     
-    public IoService getManager()
+    public IoService getService()
     {
         return manager;
     }
