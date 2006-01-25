@@ -19,7 +19,7 @@
 package org.apache.mina.integration.spring.support;
 
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 
 /**
  * Abstract Spring FactoryBean which creates {@link IoConnector} instances and
@@ -29,7 +29,7 @@ import org.apache.mina.common.IoSessionManager;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoConnectorFactoryBean extends
-        AbstractIoSessionManagerFactoryBean
+        AbstractIoServiceFactoryBean
 {
 
     private int connectTimeout = 60;
@@ -44,7 +44,7 @@ public abstract class AbstractIoConnectorFactoryBean extends
 
     /**
      * Creates a new {@link IoConnector}. Calls {@link #createIoConnector()} to
-     * get the new instance and then calls {@link AbstractIoSessionManagerFactoryBean#initIoSessionManager(IoSessionManager)}
+     * get the new instance and then calls {@link AbstractIoServiceFactoryBean#initIoService(IoService)}
      * followed by {@link #initIoConnector(IoConnector)}.
      * 
      * @return the new instance
@@ -53,7 +53,7 @@ public abstract class AbstractIoConnectorFactoryBean extends
     {
         IoConnector connector = createIoConnector();
 
-        initIoSessionManager( connector );
+        initIoService( connector );
         initIoConnector( connector );
 
         return connector;
@@ -72,7 +72,7 @@ public abstract class AbstractIoConnectorFactoryBean extends
 
     /**
      * Destroys an IoConnector created by the factory bean by calling
-     * {@link AbstractIoSessionManagerFactoryBean#destroyIoSessionManager(IoSessionManager)}.
+     * {@link AbstractIoServiceFactoryBean#destroyIoService(IoService)}.
      * This method may be overridden by extending classes if additional calls
      * are necessary to shutdown the IoConnector or if the sequence of calls
      * should be different.
@@ -88,7 +88,7 @@ public abstract class AbstractIoConnectorFactoryBean extends
     protected void destroyInstance( Object instance ) throws Exception
     {
         IoConnector connector = ( IoConnector ) instance;
-        destroyIoSessionManager( connector );
+        destroyIoService( connector );
     }
 
     public Class getObjectType()

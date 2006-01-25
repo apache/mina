@@ -20,16 +20,16 @@ package org.apache.mina.integration.spring.support;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.integration.spring.IoFilterMapping;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.util.Assert;
 
 /**
  * Abstract Spring {@link org.springframework.beans.factory.FactoryBean}
- * which creates {@link org.apache.mina.common.IoSessionManager} instances. This
+ * which creates {@link org.apache.mina.common.IoService} instances. This
  * factory bean makes it possible to configure the filters to be added to all the
- * sessions created by the {@link org.apache.mina.common.IoSessionManager} using
+ * sessions created by the {@link org.apache.mina.common.IoService} using
  * Spring.
  * <p>
  * The filters may be set up in two ways. By creating
@@ -47,18 +47,18 @@ import org.springframework.util.Assert;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractIoSessionManagerFactoryBean extends
+public abstract class AbstractIoServiceFactoryBean extends
         AbstractFactoryBean
 {
     private IoFilterMapping[] filterMappings = new IoFilterMapping[ 0 ];
 
     /**
-     * Initializes an {@link IoSessionManager} configured by this factory bean.
+     * Initializes an {@link IoService} configured by this factory bean.
      * 
-     * @param sessionManager the {@link IoSessionManager}.
+     * @param sessionManager the {@link IoService}.
      * @throws Exception on errors.
      */
-    protected void initIoSessionManager( IoSessionManager sessionManager )
+    protected void initIoService( IoService sessionManager )
             throws Exception
     {
         /*
@@ -73,11 +73,11 @@ public abstract class AbstractIoSessionManagerFactoryBean extends
     }
 
     /**
-     * Destroys an {@link IoSessionManager} created by the factory bean.
+     * Destroys an {@link IoService} created by the factory bean.
      * 
-     * @param sessionManager the IoSessionManager instance to be destroyed.
+     * @param sessionManager the IoService instance to be destroyed.
      */
-    protected void destroyIoSessionManager( IoSessionManager sessionManager )
+    protected void destroyIoService( IoService sessionManager )
             throws Exception
     {
 
@@ -89,7 +89,7 @@ public abstract class AbstractIoSessionManagerFactoryBean extends
 
     /**
      * Sets a number of unnamed filters which will be added to the filter
-     * chain of all sessions created by the {@link IoSessionManager} created by 
+     * chain of all sessions created by the {@link IoService} created by 
      * this factory bean. The filters will be assigned automatically generated 
      * names (<code>managerFilter0</code>, <code>managerFilter1</code>, etc).
      * 
@@ -112,7 +112,7 @@ public abstract class AbstractIoSessionManagerFactoryBean extends
 
     /**
      * Sets a number of named filters which will be added to the filter
-     * chain of all sessions created by the {@link IoSessionManager} created by 
+     * chain of all sessions created by the {@link IoService} created by 
      * this factory bean. 
      * 
      * @param filterMappings the name to filter mappings.

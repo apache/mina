@@ -29,7 +29,7 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoFilterChain.Entry;
 import org.apache.mina.integration.spring.Binding;
 import org.easymock.AbstractMatcher;
@@ -61,7 +61,7 @@ public class AbstractIoAcceptorFactoryBeanTest extends TestCase
         /*
          * Create the object to be tested. We're using EasyMock to mock some of
          * the methods in the super class since we're already testing those in
-         * AbstractIoSessionManagerFactoryBeanTest and we don't want to test
+         * AbstractIoServiceFactoryBeanTest and we don't want to test
          * them in this test again.
          */
         mockFactory = MockClassControl
@@ -72,14 +72,14 @@ public class AbstractIoAcceptorFactoryBeanTest extends TestCase
                                 TestIoAcceptorFactoryBean.class
                                         .getDeclaredMethod( "createIoAcceptor",
                                                 new Class[ 0 ] ),
-                                AbstractIoSessionManagerFactoryBean.class
+                                AbstractIoServiceFactoryBean.class
                                         .getDeclaredMethod(
-                                                "initIoSessionManager",
-                                                new Class[] { IoSessionManager.class } ),
-                                AbstractIoSessionManagerFactoryBean.class
+                                                "initIoService",
+                                                new Class[] { IoService.class } ),
+                                AbstractIoServiceFactoryBean.class
                                         .getDeclaredMethod(
-                                                "destroyIoSessionManager",
-                                                new Class[] { IoSessionManager.class } ) } );
+                                                "destroyIoService",
+                                                new Class[] { IoService.class } ) } );
 
         factory = ( AbstractIoAcceptorFactoryBean ) mockFactory.getMock();
 
@@ -126,7 +126,7 @@ public class AbstractIoAcceptorFactoryBeanTest extends TestCase
         factory.createIoAcceptor();
         mockFactory.setReturnValue( ioAcceptor );
         ioAcceptor.setDisconnectClientsOnUnbind( true );
-        factory.initIoSessionManager( ioAcceptor );
+        factory.initIoService( ioAcceptor );
         ioAcceptor.bind( new DummySocketAddress( ":110" ), popHandler, builder1 );
         mockIoAcceptor.setMatcher( new IoAcceptorBindArgumentsMatcher() );
         ioAcceptor.bind( new DummySocketAddress( "127.0.0.1:22" ), sshHandler, builder2 );
@@ -164,7 +164,7 @@ public class AbstractIoAcceptorFactoryBeanTest extends TestCase
         // ignored.
         mockIoAcceptor.setThrowable( new NullPointerException() );
         ioAcceptor.unbind( new DummySocketAddress( "192.168.0.1:80" ) );
-        factory.destroyIoSessionManager( ioAcceptor );
+        factory.destroyIoService( ioAcceptor );
 
         /*
          * Replay.
