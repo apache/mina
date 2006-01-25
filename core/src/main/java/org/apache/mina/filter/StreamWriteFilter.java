@@ -162,7 +162,6 @@ public class StreamWriteFilter extends IoFilterAdapter
      * Sets the size of the write buffer in bytes. Data will be read from the 
      * stream in chunks of this size and then written to the next filter.
      * 
-     * @return the write buffer size.
      * @throws IllegalArgumentException if the specified size is &lt; 1.
      */
     public void setWriteBufferSize( int writeBufferSize )
