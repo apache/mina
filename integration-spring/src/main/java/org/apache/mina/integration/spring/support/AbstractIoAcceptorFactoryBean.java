@@ -24,7 +24,7 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.integration.spring.Binding;
 import org.apache.mina.integration.spring.IoFilterMapping;
 import org.springframework.util.Assert;
@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoAcceptorFactoryBean extends
-        AbstractIoSessionManagerFactoryBean
+        AbstractIoServiceFactoryBean
 {
 
     protected Binding[] bindings = new Binding[ 0 ];
@@ -61,7 +61,7 @@ public abstract class AbstractIoAcceptorFactoryBean extends
     /**
      * Creates a new {@link IoAcceptor}. Calls {@link #createIoAcceptor()} to 
      * get the new {@link IoAcceptor} instance and then calls
-     * {@link AbstractIoSessionManagerFactoryBean#initIoSessionManager(IoSessionManager)}
+     * {@link AbstractIoServiceFactoryBean#initIoService(IoService)}
      * followed by {@link #initIoAcceptor(IoAcceptor)}.
      * 
      * @return the {@link IoAcceptor} instance.
@@ -72,7 +72,7 @@ public abstract class AbstractIoAcceptorFactoryBean extends
 
         acceptor.setDisconnectClientsOnUnbind( disconnectClientsOnUnbind );
         
-        initIoSessionManager( acceptor );
+        initIoService( acceptor );
         initIoAcceptor( acceptor );
 
         return acceptor;
@@ -112,7 +112,7 @@ public abstract class AbstractIoAcceptorFactoryBean extends
     /**
      * Destroys an {@link IoAcceptor} created by the factory bean by calling
      * {@link #destroyIoAcceptor(IoAcceptor)} and then
-     * {@link AbstractIoSessionManagerFactoryBean#destroyIoSessionManager(IoSessionManager)}.
+     * {@link AbstractIoServiceFactoryBean#destroyIoService(IoService)}.
      * This method may be overridden by extending classes if additional calls
      * are necessary to shutdown the {@link IoAcceptor} or if the sequence of 
      * calls should be different.
@@ -128,7 +128,7 @@ public abstract class AbstractIoAcceptorFactoryBean extends
     {
         IoAcceptor acceptor = ( IoAcceptor ) instance;
         destroyIoAcceptor( acceptor );
-        destroyIoSessionManager( acceptor );
+        destroyIoService( acceptor );
     }
 
     /**

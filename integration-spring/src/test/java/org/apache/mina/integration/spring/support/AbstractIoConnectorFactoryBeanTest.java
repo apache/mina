@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.easymock.MockControl;
 import org.easymock.classextension.MockClassControl;
 
@@ -49,7 +49,7 @@ public class AbstractIoConnectorFactoryBeanTest extends TestCase
         /*
          * Create the object to be tested. We're using EasyMock to mock some of
          * the methods in the super class since we're already testing those in
-         * AbstractIoSessionManagerFactoryBeanTest and we don't want to test
+         * AbstractIoServiceFactoryBeanTest and we don't want to test
          * them in this test again.
          */
         mockFactory = MockClassControl
@@ -61,14 +61,14 @@ public class AbstractIoConnectorFactoryBeanTest extends TestCase
                                         .getDeclaredMethod(
                                                 "createIoConnector",
                                                 new Class[ 0 ] ),
-                                AbstractIoSessionManagerFactoryBean.class
+                                AbstractIoServiceFactoryBean.class
                                         .getDeclaredMethod(
-                                                "initIoSessionManager",
-                                                new Class[] { IoSessionManager.class } ),
-                                AbstractIoSessionManagerFactoryBean.class
+                                                "initIoService",
+                                                new Class[] { IoService.class } ),
+                                AbstractIoServiceFactoryBean.class
                                         .getDeclaredMethod(
-                                                "destroyIoSessionManager",
-                                                new Class[] { IoSessionManager.class } ) } );
+                                                "destroyIoService",
+                                                new Class[] { IoService.class } ) } );
 
         factory = ( AbstractIoConnectorFactoryBean ) mockFactory.getMock();
 
@@ -86,7 +86,7 @@ public class AbstractIoConnectorFactoryBeanTest extends TestCase
          */
         factory.createIoConnector();
         mockFactory.setReturnValue( ioConnector );
-        factory.initIoSessionManager( ioConnector );
+        factory.initIoService( ioConnector );
         ioConnector.setConnectTimeout( 30 );
 
         /*
@@ -112,7 +112,7 @@ public class AbstractIoConnectorFactoryBeanTest extends TestCase
         /*
          * Record expectations.
          */
-        factory.destroyIoSessionManager( ioConnector );
+        factory.destroyIoService( ioConnector );
 
         /*
          * Replay.

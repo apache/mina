@@ -22,28 +22,28 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.integration.spring.IoFilterMapping;
 import org.easymock.MockControl;
 import org.easymock.classextension.MockClassControl;
 
 /**
  * Tests
- * {@link org.apache.mina.integration.spring.support.AbstractIoSessionManagerFactoryBean}.
+ * {@link org.apache.mina.integration.spring.support.AbstractIoServiceFactoryBean}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
+public class AbstractIoServiceFactoryBeanTest extends TestCase
 {
-    AbstractIoSessionManagerFactoryBean factory;
+    AbstractIoServiceFactoryBean factory;
 
     protected void setUp() throws Exception
     {
         /*
          * Create the object under test.
          */
-        factory = new AbstractIoSessionManagerFactoryBean()
+        factory = new AbstractIoServiceFactoryBean()
         {
             public Class getObjectType()
             {
@@ -61,7 +61,7 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
 
     /**
      * Tests that
-     * {@link AbstractIoSessionManagerFactoryBean#initIoSessionManager(IoSessionManager)}
+     * {@link AbstractIoServiceFactoryBean#initIoService(IoService)}
      * initializes the filter chain in the expected order and using auto
      * generated names.
      */
@@ -72,8 +72,8 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
          */
         MockControl mockIoFilterChainBuilder = MockClassControl
                 .createStrictControl( DefaultIoFilterChainBuilder.class );
-        MockControl mockIoSessionManager = MockControl
-                .createControl( IoSessionManager.class );
+        MockControl mockIoService = MockControl
+                .createControl( IoService.class );
 
         IoFilter[] filters = new IoFilter[] {
                 ( IoFilter ) MockControl.createControl( IoFilter.class )
@@ -83,8 +83,8 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
                 ( IoFilter ) MockControl.createControl( IoFilter.class )
                         .getMock() };
 
-        IoSessionManager ioSessionManager = 
-            ( IoSessionManager ) mockIoSessionManager.getMock();
+        IoService ioSessionManager = 
+            ( IoService ) mockIoService.getMock();
         DefaultIoFilterChainBuilder ioFilterChainBuilder = 
             ( DefaultIoFilterChainBuilder ) mockIoFilterChainBuilder.getMock();
 
@@ -96,27 +96,27 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
         ioFilterChainBuilder.addLast( "managerFilter2", filters[ 2 ] );
 
         ioSessionManager.getFilterChain();
-        mockIoSessionManager.setReturnValue( mockIoFilterChainBuilder.getMock() );
+        mockIoService.setReturnValue( mockIoFilterChainBuilder.getMock() );
 
         /*
          * Replay.
          */
         mockIoFilterChainBuilder.replay();
-        mockIoSessionManager.replay();
+        mockIoService.replay();
 
         factory.setFilters( filters );
-        factory.initIoSessionManager( ioSessionManager );
+        factory.initIoService( ioSessionManager );
 
         /*
          * Verify.
          */
         mockIoFilterChainBuilder.verify();
-        mockIoSessionManager.verify();
+        mockIoService.verify();
     }
 
     /**
      * Tests that
-     * {@link AbstractIoSessionManagerFactoryBean#initIoSessionManager(IoSessionManager)}
+     * {@link AbstractIoServiceFactoryBean#initIoService(IoService)}
      * initializes the filter chain in the expected order and using the
      * specified names.
      */
@@ -127,8 +127,8 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
          */
         MockControl mockIoFilterChainBuilder = MockClassControl
                 .createStrictControl( DefaultIoFilterChainBuilder.class );
-        MockControl mockIoSessionManager = MockControl
-                .createControl( IoSessionManager.class );
+        MockControl mockIoService = MockControl
+                .createControl( IoService.class );
 
         IoFilterMapping[] mappings = new IoFilterMapping[] {
                 new IoFilterMapping( "first", ( IoFilter ) MockControl
@@ -138,7 +138,7 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
                 new IoFilterMapping( "third", ( IoFilter ) MockControl
                         .createControl( IoFilter.class ).getMock() ) };
 
-        IoSessionManager ioSessionManager = ( IoSessionManager ) mockIoSessionManager
+        IoService ioSessionManager = ( IoService ) mockIoService
                 .getMock();
         DefaultIoFilterChainBuilder ioFilterChainBuilder = ( DefaultIoFilterChainBuilder ) mockIoFilterChainBuilder
                 .getMock();
@@ -151,38 +151,38 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
         ioFilterChainBuilder.addLast( "third", mappings[ 2 ].getFilter() );
 
         ioSessionManager.getFilterChain();
-        mockIoSessionManager.setReturnValue( mockIoFilterChainBuilder.getMock() );
+        mockIoService.setReturnValue( mockIoFilterChainBuilder.getMock() );
 
         /*
          * Replay.
          */
         mockIoFilterChainBuilder.replay();
-        mockIoSessionManager.replay();
+        mockIoService.replay();
 
         factory.setFilterMappings( mappings );
-        factory.initIoSessionManager( ioSessionManager );
+        factory.initIoService( ioSessionManager );
 
         /*
          * Verify.
          */
         mockIoFilterChainBuilder.verify();
-        mockIoSessionManager.verify();
+        mockIoService.verify();
     }
 
     /**
      * Tests that
-     * {@link AbstractIoSessionManagerFactoryBean#initIoSessionManager(IoSessionManager)}
-     * sets the configured ExceptionManager on the IoSessionManager.
+     * {@link AbstractIoServiceFactoryBean#initIoService(IoService)}
+     * sets the configured ExceptionManager on the IoService.
      */
     public void testInitWithExceptionMonitor() throws Exception
     {
         /*
          * Create EasyMock mocks.
          */
-        MockControl mockIoSessionManager = MockControl
-                .createControl( IoSessionManager.class );
+        MockControl mockIoService = MockControl
+                .createControl( IoService.class );
 
-        IoSessionManager ioSessionManager = ( IoSessionManager ) mockIoSessionManager
+        IoService ioSessionManager = ( IoService ) mockIoService
                 .getMock();
         DefaultIoFilterChainBuilder ioFilterChainBuilder = ( DefaultIoFilterChainBuilder ) MockClassControl
                 .createControl( DefaultIoFilterChainBuilder.class ).getMock();
@@ -191,37 +191,37 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
          * Record expectations.
          */
         ioSessionManager.getFilterChain();
-        mockIoSessionManager.setReturnValue( ioFilterChainBuilder );
+        mockIoService.setReturnValue( ioFilterChainBuilder );
 
         /*
          * Replay.
          */
-        mockIoSessionManager.replay();
+        mockIoService.replay();
 
-        factory.initIoSessionManager( ioSessionManager );
+        factory.initIoService( ioSessionManager );
 
         /*
          * Verify.
          */
-        mockIoSessionManager.verify();
+        mockIoService.verify();
     }
 
     /**
      * Tests that
-     * {@link AbstractIoSessionManagerFactoryBean#destroyIoSessionManager(IoSessionManager)}
-     * clears the filter chain of the IoSessionManager.
+     * {@link AbstractIoServiceFactoryBean#destroyIoService(IoService)}
+     * clears the filter chain of the IoService.
      */
-    public void testDestroyIoSessionManager() throws Exception
+    public void testDestroyIoService() throws Exception
     {
         /*
          * Create EasyMock mocks.
          */
         MockControl mockIoFilterChainBuilder = MockClassControl
                 .createStrictControl( DefaultIoFilterChainBuilder.class );
-        MockControl mockIoSessionManager = MockControl
-                .createControl( IoSessionManager.class );
+        MockControl mockIoService = MockControl
+                .createControl( IoService.class );
 
-        IoSessionManager ioSessionManager = ( IoSessionManager ) mockIoSessionManager
+        IoService ioSessionManager = ( IoService ) mockIoService
                 .getMock();
         DefaultIoFilterChainBuilder ioFilterChainBuilder = ( DefaultIoFilterChainBuilder ) mockIoFilterChainBuilder
                 .getMock();
@@ -230,27 +230,27 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
          * Record expectations.
          */
         ioSessionManager.getFilterChain();
-        mockIoSessionManager.setReturnValue( ioFilterChainBuilder );
+        mockIoService.setReturnValue( ioFilterChainBuilder );
         ioFilterChainBuilder.clear();
 
         /*
          * Replay.
          */
         mockIoFilterChainBuilder.replay();
-        mockIoSessionManager.replay();
+        mockIoService.replay();
 
-        factory.destroyIoSessionManager( ioSessionManager );
+        factory.destroyIoService( ioSessionManager );
 
         /*
          * Verify.
          */
         mockIoFilterChainBuilder.verify();
-        mockIoSessionManager.verify();
+        mockIoService.verify();
     }
 
     /**
      * Tests that
-     * {@link AbstractIoSessionManagerFactoryBean#setFilters(IoFilter[])}
+     * {@link AbstractIoServiceFactoryBean#setFilters(IoFilter[])}
      * validates the method arguments.
      */
     public void testSetIoFilters()
@@ -267,7 +267,7 @@ public class AbstractIoSessionManagerFactoryBeanTest extends TestCase
 
     /**
      * Tests that
-     * {@link AbstractIoSessionManagerFactoryBean#setFilterMappings(IoFilterMapping[])}
+     * {@link AbstractIoServiceFactoryBean#setFilterMappings(IoFilterMapping[])}
      * validates the method arguments.
      */
     public void testSetIoFilterMappings()
