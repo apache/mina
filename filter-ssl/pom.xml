@@ -6,8 +6,8 @@
     <artifactId>build</artifactId>
     <version>0.9.1-SNAPSHOT</version>
   </parent>
-  <artifactId>org.apache.mina.filter.ssl</artifactId>
-  <name>mina-filter-ssl</name>
+  <artifactId>mina-filter-ssl</artifactId>
+  <name>MINA SSL Filter</name>
   <packaging>jar</packaging>  
 
   <dependencies>

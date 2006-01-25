@@ -6,13 +6,13 @@
     <artifactId>build</artifactId>
     <version>0.9.1-SNAPSHOT</version>
   </parent>
-  <artifactId>org.apache.mina.examples</artifactId>
-  <name>mina-examples</name>
+  <artifactId>mina-examples</artifactId>
+  <name>MINA Examples</name>
   <packaging>jar</packaging>  
   <dependencies>
     <dependency>
       <groupId>org.apache.directory.mina</groupId>
-      <artifactId>org.apache.mina.filter.ssl</artifactId>
+      <artifactId>mina-filter-ssl</artifactId>
       <version>0.9.1-SNAPSHOT</version>
     </dependency>
 
