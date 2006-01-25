@@ -63,7 +63,7 @@
       <modules>
         <module>core</module>
         <module>filter-codec-asn1</module>
-        <module>filter-codec-netty2</module>
+        <module>filter-codec-netty</module>
       </modules>
       <build>
         <plugins>
