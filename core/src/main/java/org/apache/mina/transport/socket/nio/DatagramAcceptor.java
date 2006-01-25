@@ -28,7 +28,7 @@ import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptor extends DelegatedIoAcceptor implements DatagramSessionManager
+public class DatagramAcceptor extends DelegatedIoAcceptor implements DatagramService
 {
     /**
      * Creates a new instance.

@@ -295,7 +295,7 @@ public class IoFilterChainTest extends TestCase
             return false;
         }
 
-        public IoSessionManager getManager()
+        public IoService getManager()
         {
             return null;
         }
@@ -381,7 +381,7 @@ public class IoFilterChainTest extends TestCase
                 {
                 }
 
-                public IoSessionManager getManager()
+                public IoService getManager()
                 {
                     return null;
                 }

@@ -27,7 +27,7 @@ import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
@@ -42,8 +42,8 @@ import org.apache.mina.util.Queue;
  */
 class DatagramSessionImpl extends BaseIoSession implements DatagramSession
 {
-    private final IoSessionManager wrapperManager;
-    private final DatagramSessionManager managerDelegate;
+    private final IoService wrapperManager;
+    private final DatagramService managerDelegate;
     private final DatagramFilterChain filterChain;
     private final DatagramChannel ch;
     private final Queue writeRequestQueue;
@@ -55,8 +55,8 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
     /**
      * Creates a new instance.
      */
-    DatagramSessionImpl( IoSessionManager wrapperManager,
-                         DatagramSessionManager managerDelegate,
+    DatagramSessionImpl( IoService wrapperManager,
+                         DatagramService managerDelegate,
                          DatagramChannel ch, IoHandler defaultHandler )
     {
         this.wrapperManager = wrapperManager;
@@ -69,12 +69,12 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
         this.localAddress = ch.socket().getLocalSocketAddress();
     }
     
-    public IoSessionManager getManager()
+    public IoService getManager()
     {
         return wrapperManager;
     }
     
-    DatagramSessionManager getManagerDelegate()
+    DatagramService getManagerDelegate()
     {
         return managerDelegate;
     }

@@ -47,7 +47,7 @@ class DatagramFilterChain extends AbstractIoFilterChain {
             writeRequestQueue.push( writeRequest );
             if( writeRequestQueue.size() == 1 && session.getTrafficMask().isWritable() )
             {
-                // Notify DatagramSessionManager only when writeRequestQueue was empty.
+                // Notify DatagramService only when writeRequestQueue was empty.
                 s.getManagerDelegate().flushSession( s );
             }
         }
@@ -56,7 +56,7 @@ class DatagramFilterChain extends AbstractIoFilterChain {
     protected void doClose( IoSession session, CloseFuture closeFuture )
     {
         DatagramSessionImpl s = ( DatagramSessionImpl ) session;
-        DatagramSessionManager manager = s.getManagerDelegate();
+        DatagramService manager = s.getManagerDelegate();
         if( manager instanceof DatagramConnectorDelegate )
         {
             ( ( DatagramConnectorDelegate ) manager ).closeSession( s );

@@ -26,7 +26,7 @@ import java.util.Set;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
@@ -303,7 +303,7 @@ public abstract class BaseIoSession implements IoSession
     }
 
     /**
-     * Signals the {@link IoSessionManager} that the {@link TrafficMask} of this
+     * Signals the {@link IoService} that the {@link TrafficMask} of this
      * session has been changed.
      */
     protected abstract void updateTrafficMask();

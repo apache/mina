@@ -20,13 +20,13 @@ package org.apache.mina.common;
 
 
 /**
- * Base interface for all acceptors and connectors that manage
- * sessions.
+ * Base interface for all {@link IoAcceptor}s and {@link IoConnector}s
+ * that provide I/O service and manage {@link IoSession}s.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoSessionManager {
+public interface IoService {
     
     /**
      * Returns the {@link IoFilterChainBuilder} which will modify the

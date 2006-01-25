@@ -10,7 +10,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.NextFilter;
@@ -186,7 +186,7 @@ public class ThreadPoolFilterRegressionTest extends TestCase
             return false;
         }
 
-        public IoSessionManager getManager()
+        public IoService getManager()
         {
             return null;
         }
@@ -290,7 +290,7 @@ public class ThreadPoolFilterRegressionTest extends TestCase
             return false;
         }
 
-        public IoSessionManager getManager()
+        public IoService getManager()
         {
             return null;
         }

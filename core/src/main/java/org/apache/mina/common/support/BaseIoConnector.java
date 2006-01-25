@@ -31,7 +31,7 @@ import org.apache.mina.common.IoHandler;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoConnector extends BaseIoSessionManager implements IoConnector
+public abstract class BaseIoConnector extends BaseIoService implements IoConnector
 {
     private int defaultConnectTimeout = 60; // 1 minute
 

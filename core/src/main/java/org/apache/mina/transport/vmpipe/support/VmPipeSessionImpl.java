@@ -13,7 +13,7 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
@@ -30,7 +30,7 @@ import org.apache.mina.util.Queue;
  */
 public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
 {
-    private final IoSessionManager manager;
+    private final IoService manager;
     private final SocketAddress localAddress;
     private final SocketAddress remoteAddress;
     private final IoHandler handler;
@@ -43,7 +43,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
     /**
      * Constructor for client-side session.
      */
-    public VmPipeSessionImpl( IoSessionManager manager, Object lock, SocketAddress localAddress,
+    public VmPipeSessionImpl( IoService manager, Object lock, SocketAddress localAddress,
                    IoHandler handler, IoFilterChainBuilder filterChainBuilder,
                    VmPipe remoteEntry ) throws IOException
     {
@@ -99,7 +99,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
     /**
      * Constructor for server-side session.
      */
-    private VmPipeSessionImpl( IoSessionManager manager, VmPipeSessionImpl remoteSession, VmPipe entry )
+    private VmPipeSessionImpl( IoService manager, VmPipeSessionImpl remoteSession, VmPipe entry )
     {
         this.manager = manager;
         this.lock = remoteSession.lock;
@@ -117,7 +117,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         return managedSessions;
     }
 
-    public IoSessionManager getManager()
+    public IoService getManager()
     {
         return manager;
     }

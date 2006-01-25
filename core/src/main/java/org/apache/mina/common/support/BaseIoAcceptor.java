@@ -33,7 +33,7 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoAcceptor extends BaseIoSessionManager implements IoAcceptor
+public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor
 {
     private boolean disconnectClientsOnUnbind = true;
     

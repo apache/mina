@@ -42,7 +42,6 @@ import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.transport.socket.nio.SocketSessionManager;
 import org.apache.mina.util.Queue;
 
 /**
@@ -51,7 +50,7 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptorDelegate extends BaseIoAcceptor implements SocketSessionManager
+public class SocketAcceptorDelegate extends BaseIoAcceptor
 {
     private static volatile int nextId = 0;
 

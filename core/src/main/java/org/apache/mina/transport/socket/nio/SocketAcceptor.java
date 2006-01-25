@@ -28,7 +28,7 @@ import org.apache.mina.transport.socket.nio.support.SocketAcceptorDelegate;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor extends DelegatedIoAcceptor implements SocketSessionManager
+public class SocketAcceptor extends DelegatedIoAcceptor
 {
     /**
      * Creates a new instance.
