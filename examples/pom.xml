@@ -7,7 +7,7 @@
     <version>0.9.1-SNAPSHOT</version>
   </parent>
   <artifactId>mina-examples</artifactId>
-  <name>MINA Examples</name>
+  <name>Apache MINA Examples</name>
   <packaging>jar</packaging>  
   <dependencies>
     <dependency>
