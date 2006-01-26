@@ -63,7 +63,7 @@ class SocketSessionImpl extends BaseIoSession
      */
     public SocketSessionImpl(
             IoService manager, Set managedSessions,
-            SocketSessionConfig config,
+            IoSessionConfig config,
             SocketChannel ch, IoHandler defaultHandler )
     {
         this.manager = manager;
@@ -77,15 +77,19 @@ class SocketSessionImpl extends BaseIoSession
         this.localAddress = ch.socket().getLocalSocketAddress();
         
         // Apply the initial session settings
-        this.config.setKeepAlive( config.isKeepAlive() );
-        this.config.setOobInline( config.isOobInline() );
-        this.config.setReceiveBufferSize( config.getReceiveBufferSize() );
-        this.readBufferSize = config.getReceiveBufferSize();
-        this.config.setReuseAddress( config.isReuseAddress() );
-        this.config.setSendBufferSize( config.getSendBufferSize() );
-        this.config.setSoLinger( config.getSoLinger() );
-        this.config.setTcpNoDelay( config.isTcpNoDelay() );
-        this.config.setTrafficClass( config.getTrafficClass() );
+        if( config instanceof SocketSessionConfig )
+        {
+            SocketSessionConfig cfg = ( SocketSessionConfig ) config;
+            this.config.setKeepAlive( cfg.isKeepAlive() );
+            this.config.setOobInline( cfg.isOobInline() );
+            this.config.setReceiveBufferSize( cfg.getReceiveBufferSize() );
+            this.readBufferSize = cfg.getReceiveBufferSize();
+            this.config.setReuseAddress( cfg.isReuseAddress() );
+            this.config.setSendBufferSize( cfg.getSendBufferSize() );
+            this.config.setSoLinger( cfg.getSoLinger() );
+            this.config.setTcpNoDelay( cfg.isTcpNoDelay() );
+            this.config.setTrafficClass( cfg.getTrafficClass() );
+        }
     }
     
     public IoService getService()

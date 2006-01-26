@@ -22,7 +22,6 @@ import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoHandler;
 
 /**
@@ -39,11 +38,11 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
     
     public ConnectFuture connect( SocketAddress address, IoHandler handler )
     {
-        return connect( address, handler, ( IoConnectorConfig ) getDefaultConfig() );
+        return connect( address, handler, getDefaultConfig() );
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler )
     {
-        return connect( address, localAddress, handler, ( IoConnectorConfig ) getDefaultConfig() );
+        return connect( address, localAddress, handler, getDefaultConfig() );
     }
 }

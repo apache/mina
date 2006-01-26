@@ -23,7 +23,6 @@ import java.net.SocketAddress;
 import java.util.Set;
 
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
@@ -59,7 +58,7 @@ public class DelegatedIoAcceptor implements IoAcceptor
         delegate.bind( address, handler );
     }
 
-    public void bind( SocketAddress address, IoHandler handler, IoAcceptorConfig config ) throws IOException
+    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
     {
         delegate.bind( address, handler, config );
     }

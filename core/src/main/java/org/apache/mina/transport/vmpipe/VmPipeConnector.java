@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSessionConfig;
@@ -35,12 +34,12 @@ public class VmPipeConnector extends BaseIoConnector
         }
     };
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoConnectorConfig config ) 
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config ) 
     {
         return connect( address, null, handler, config );
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler, IoConnectorConfig config )
+    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler, IoServiceConfig config )
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -52,7 +51,7 @@ public class VmPipeConnector extends BaseIoConnector
 
         if( config == null )
         {
-            config = ( IoConnectorConfig ) getDefaultConfig();
+            config = getDefaultConfig();
         }
 
         VmPipe entry = ( VmPipe ) VmPipeAcceptor.boundHandlers.get( address );

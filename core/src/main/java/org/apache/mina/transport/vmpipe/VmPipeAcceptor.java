@@ -42,7 +42,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         }
     };
 
-    public void bind( SocketAddress address, IoHandler handler, IoAcceptorConfig config ) throws IOException
+    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -54,7 +54,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
 
         if( config == null )
         {
-            config = ( IoAcceptorConfig ) getDefaultConfig();
+            config = getDefaultConfig();
         }
 
         synchronized( boundHandlers )
@@ -109,7 +109,17 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         
         Set managedSessions = pipe.getManagedServerSessions();
         
-        if( pipe.getConfig().isDisconnectOnUnbind() && managedSessions != null )
+        IoServiceConfig cfg = pipe.getConfig();
+        boolean disconnectOnUnbind;
+        if( cfg instanceof IoAcceptorConfig )
+        {
+            disconnectOnUnbind = ( ( IoAcceptorConfig ) cfg ).isDisconnectOnUnbind();
+        }
+        else
+        {
+            disconnectOnUnbind = ( ( IoAcceptorConfig ) getDefaultConfig() ).isDisconnectOnUnbind();
+        }
+        if( disconnectOnUnbind && managedSessions != null )
         {
             IoSession[] tempSessions = ( IoSession[] ) 
                                   managedSessions.toArray( new IoSession[ 0 ] );

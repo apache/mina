@@ -32,7 +32,6 @@ import java.util.Set;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
@@ -70,7 +69,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         this.wrapper = wrapper;
     }
 
-    public void bind( SocketAddress address, IoHandler handler, IoAcceptorConfig config )
+    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config )
             throws IOException
     {
         if( address == null )
@@ -79,7 +78,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             throw new NullPointerException( "handler" );
         if( config == null )
         {
-            config = ( IoAcceptorConfig ) getDefaultConfig();
+            config = getDefaultConfig();
         }
 
         if( !( address instanceof InetSocketAddress ) )
@@ -195,7 +194,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         RegistrationRequest req = ( RegistrationRequest ) key.attachment();
         DatagramSessionImpl s = new DatagramSessionImpl(
                 wrapper, this,
-                ( DatagramSessionConfig ) req.config, ch, req.handler );
+                req.config.getSessionConfig(), ch, req.handler );
         s.setRemoteAddress( remoteAddress );
         s.setSelectionKey( key );
         
@@ -329,7 +328,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             RegistrationRequest req = ( RegistrationRequest ) key.attachment();
             DatagramSessionImpl session = new DatagramSessionImpl(
                     wrapper, this,
-                    ( DatagramSessionConfig ) req.config.getSessionConfig(),
+                    req.config.getSessionConfig(),
                     ch, req.handler );
             session.setSelectionKey( key );
             
@@ -615,12 +614,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     {
         private final SocketAddress address;
         private final IoHandler handler;
-        private final IoAcceptorConfig config;
+        private final IoServiceConfig config;
 
         private Throwable exception; 
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, IoHandler handler, IoAcceptorConfig config )
+        private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
         {
             this.address = address;
             this.handler = handler;

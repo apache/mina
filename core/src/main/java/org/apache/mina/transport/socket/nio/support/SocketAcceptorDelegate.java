@@ -85,7 +85,7 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
      *
      * @throws IOException if failed to bind
      */
-    public void bind( SocketAddress address, IoHandler handler, IoAcceptorConfig config ) throws IOException
+    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
     {
         if( address == null )
         {
@@ -109,7 +109,7 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
         
         if( config == null )
         {
-            config = ( IoAcceptorConfig ) getDefaultConfig();
+            config = getDefaultConfig();
         }
         
         RegistrationRequest request = new RegistrationRequest( address, handler, config );
@@ -230,8 +230,18 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
         
         
         // Disconnect all clients
-        if( request.registrationRequest.config.isDisconnectOnUnbind() &&
-            managedSessions != null )
+        IoServiceConfig cfg = request.registrationRequest.config;
+        boolean disconnectOnUnbind;
+        if( cfg instanceof IoAcceptorConfig )
+        {
+            disconnectOnUnbind = ( ( IoAcceptorConfig ) cfg ).isDisconnectOnUnbind();
+        }
+        else
+        {
+            disconnectOnUnbind = ( ( IoAcceptorConfig ) getDefaultConfig() ).isDisconnectOnUnbind();
+        }
+
+        if( disconnectOnUnbind && managedSessions != null )
         {
             IoSession[] tempSessions = ( IoSession[] ) 
                                   managedSessions.toArray( new IoSession[ 0 ] );
@@ -543,11 +553,11 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
     {
         private final SocketAddress address;
         private final IoHandler handler;
-        private final IoAcceptorConfig config;
+        private final IoServiceConfig config;
         private IOException exception;
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, IoHandler handler, IoAcceptorConfig config )
+        private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
         {
             this.address = address;
             this.handler = handler;

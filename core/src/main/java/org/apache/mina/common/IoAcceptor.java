@@ -57,7 +57,7 @@ public interface IoAcceptor extends IoService
      * @param config the configuration
      * @throws IOException if failed to bind
      */
-    void bind( SocketAddress address, IoHandler handler, IoAcceptorConfig config ) throws IOException;
+    void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException;
 
     /**
      * Unbinds from the specified <code>address</code> and disconnects all clients

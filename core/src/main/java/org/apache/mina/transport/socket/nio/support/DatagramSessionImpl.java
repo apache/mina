@@ -61,7 +61,7 @@ class DatagramSessionImpl extends BaseIoSession
      */
     DatagramSessionImpl( IoService wrapperManager,
                          DatagramService managerDelegate,
-                         DatagramSessionConfig config,
+                         IoSessionConfig config,
                          DatagramChannel ch, IoHandler defaultHandler )
     {
         this.wrapperManager = wrapperManager;
@@ -74,12 +74,16 @@ class DatagramSessionImpl extends BaseIoSession
         this.localAddress = ch.socket().getLocalSocketAddress();
         
         // Apply the initial session settings
-        this.config.setBroadcast( config.isBroadcast() );
-        this.config.setReceiveBufferSize( config.getReceiveBufferSize() );
-        this.readBufferSize = config.getReceiveBufferSize();
-        this.config.setReuseAddress( config.isReuseAddress() );
-        this.config.setSendBufferSize( config.getSendBufferSize() );
-        this.config.setTrafficClass( config.getTrafficClass() );
+        if( config instanceof DatagramSessionConfig )
+        {
+            DatagramSessionConfig cfg = ( DatagramSessionConfig ) config;
+            this.config.setBroadcast( cfg.isBroadcast() );
+            this.config.setReceiveBufferSize( cfg.getReceiveBufferSize() );
+            this.readBufferSize = cfg.getReceiveBufferSize();
+            this.config.setReuseAddress( cfg.isReuseAddress() );
+            this.config.setSendBufferSize( cfg.getSendBufferSize() );
+            this.config.setTrafficClass( cfg.getTrafficClass() );
+        }
     }
     
     public IoService getService()
