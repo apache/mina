@@ -33,9 +33,12 @@ import java.util.Set;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.BaseIoConnector;
+import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
+import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.apache.mina.util.Queue;
 
 /**
@@ -51,6 +54,7 @@ public class SocketConnectorDelegate extends BaseIoConnector
     private final IoConnector wrapper;
     private final int id = nextId++;
     private final String threadName = "SocketConnector-" + id;
+    private final IoServiceConfig defaultConfig = new SocketConnectorConfig();
     private Selector selector;
     private final Queue connectQueue = new Queue();
     private final Set managedSessions = Collections.synchronizedSet( new HashSet() );
@@ -64,13 +68,13 @@ public class SocketConnectorDelegate extends BaseIoConnector
         this.wrapper = wrapper;
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoConnectorConfig config )
     {
-        return connect( address, null, handler, filterChainBuilder );
+        return connect( address, null, handler, config );
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+                                  IoHandler handler, IoConnectorConfig config )
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -85,9 +89,9 @@ public class SocketConnectorDelegate extends BaseIoConnector
             throw new IllegalArgumentException( "Unexpected local address type: "
                                                 + localAddress.getClass() );
 
-        if( filterChainBuilder == null )
+        if( config == null )
         {
-            filterChainBuilder = IoFilterChainBuilder.NOOP;
+            config = ( IoConnectorConfig ) getDefaultConfig();
         }
         
         SocketChannel ch = null;
@@ -105,7 +109,7 @@ public class SocketConnectorDelegate extends BaseIoConnector
 
             if( ch.connect( address ) )
             {
-                SocketSessionImpl session = newSession( ch, handler, filterChainBuilder );
+                SocketSessionImpl session = newSession( ch, handler, config );
                 success = true;
                 ConnectFuture future = new ConnectFuture();
                 future.setSession( session );
@@ -133,7 +137,7 @@ public class SocketConnectorDelegate extends BaseIoConnector
             }
         }
         
-        ConnectionRequest request = new ConnectionRequest( ch, getConnectTimeout(), handler, filterChainBuilder );
+        ConnectionRequest request = new ConnectionRequest( ch, handler, config );
         synchronized( this )
         {
             try
@@ -161,6 +165,11 @@ public class SocketConnectorDelegate extends BaseIoConnector
         }
         
         return request;
+    }
+    
+    public IoServiceConfig getDefaultConfig()
+    {
+        return defaultConfig;
     }
     
     private synchronized void startupWorker() throws IOException
@@ -219,7 +228,7 @@ public class SocketConnectorDelegate extends BaseIoConnector
             try
             {
                 ch.finishConnect();
-                SocketSessionImpl session = newSession( ch, entry.handler, entry.filterChainBuilder );
+                SocketSessionImpl session = newSession( ch, entry.handler, entry.config );
                 entry.setSession( session );
                 success = true;
             }
@@ -269,13 +278,15 @@ public class SocketConnectorDelegate extends BaseIoConnector
         }
     }
 
-    private SocketSessionImpl newSession( SocketChannel ch, IoHandler handler, IoFilterChainBuilder filterChainBuilder ) throws IOException
+    private SocketSessionImpl newSession( SocketChannel ch, IoHandler handler, IoConnectorConfig config ) throws IOException
     {
-        SocketSessionImpl session = new SocketSessionImpl( wrapper, managedSessions, ch, handler );
+        SocketSessionImpl session = new SocketSessionImpl(
+                wrapper, managedSessions,
+                ( SocketSessionConfig ) config.getSessionConfig(),
+                ch, handler );
         try
         {
-            this.filterChainBuilder.buildFilterChain( session.getFilterChain() );
-            filterChainBuilder.buildFilterChain( session.getFilterChain() );
+            config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
             ( ( SocketFilterChain ) session.getFilterChain() ).sessionCreated( session );
         }
         catch( Throwable e )
@@ -357,14 +368,14 @@ public class SocketConnectorDelegate extends BaseIoConnector
         private final SocketChannel channel;
         private final long deadline;
         private final IoHandler handler;
-        private final IoFilterChainBuilder filterChainBuilder;
+        private final IoConnectorConfig config;
 
-        private ConnectionRequest( SocketChannel channel, int timeout, IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+        private ConnectionRequest( SocketChannel channel, IoHandler handler, IoConnectorConfig config )
         {
             this.channel = channel;
-            this.deadline = System.currentTimeMillis() + timeout * 1000L;
+            this.deadline = System.currentTimeMillis() + config.getConnectTimeoutMillis();
             this.handler = handler;
-            this.filterChainBuilder = filterChainBuilder;
+            this.config = config;
         }
     }
 }

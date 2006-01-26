@@ -18,25 +18,39 @@
  */
 package org.apache.mina.common.support;
 
-import java.net.SocketAddress;
-import java.util.Set;
-
-import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoConnectorConfig;
 
 /**
- * Base implementation of {@link IoService}s.
+ * A base implementation of {@link IoConnectorConfig}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoService implements IoService {
+public abstract class BaseIoConnectorConfig extends BaseIoServiceConfig implements IoConnectorConfig
+{
+    private int connectTimeout = 60; // 1 minute
 
-    protected BaseIoService()
+    protected BaseIoConnectorConfig()
     {
+        super();
     }
-    
-    public Set getManagedSessions( SocketAddress address )
+
+    public int getConnectTimeout()
     {
-        throw new UnsupportedOperationException();
+        return connectTimeout;
     }
+
+    public long getConnectTimeoutMillis()
+    {
+        return connectTimeout * 1000L;
+    }
+
+    public void setConnectTimeout( int connectTimeout )
+    {
+        if( connectTimeout <= 0 )
+        {
+            throw new IllegalArgumentException( "connectTimeout: " + connectTimeout );
+        }
+        this.connectTimeout = connectTimeout;
+    }    
 }

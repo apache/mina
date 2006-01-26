@@ -30,15 +30,14 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.registry.Service;
-import org.apache.mina.registry.ServiceRegistry;
-import org.apache.mina.registry.SimpleServiceRegistry;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 import org.easymock.AbstractMatcher;
@@ -317,20 +316,19 @@ public class StreamWriteFilterTest extends TestCase {
     
     public void testWriteUsingSocketTransport() throws Exception
     {
-        ServiceRegistry reg = new SimpleServiceRegistry();
-        ( ( SocketAcceptor ) reg.getAcceptor( TransportType.SOCKET ) ).setReuseAddress( true );
+        IoAcceptor acceptor = new SocketAcceptor();
+        ( ( SocketAcceptorConfig ) acceptor.getDefaultConfig() ).setReuseAddress( true );
         SocketAddress address = new InetSocketAddress( "localhost", AvailablePortFinder.getNextAvailable() );
-        Service service = new Service( "stream", TransportType.SOCKET, address );
 
-        SocketConnector connector = new SocketConnector();
-        connector.getFilterChain().addFirst( "threadPool", new ThreadPoolFilter() );
+        IoConnector connector = new SocketConnector();
+        connector.getDefaultConfig().getFilterChain().addFirst( "threadPool", new ThreadPoolFilter() );
         
         FixedRandomInputStream stream = new FixedRandomInputStream( 4 * 1024 * 1024 );
         
         SenderHandler sender = new SenderHandler( stream );
         ReceiverHandler receiver = new ReceiverHandler( stream.size );
         
-        reg.bind( service, sender );
+        acceptor.bind( address, sender );
         
         synchronized( sender.lock )
         {
@@ -343,7 +341,7 @@ public class StreamWriteFilterTest extends TestCase {
             }
         }
         
-        reg.unbindAll();
+        acceptor.unbind( address );
         
         assertEquals( stream.bytesRead, receiver.bytesRead );
         assertEquals( stream.size, receiver.bytesRead );

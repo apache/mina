@@ -16,25 +16,25 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
-
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.support.DelegatedIoAcceptor;
-import org.apache.mina.transport.socket.nio.support.SocketAcceptorDelegate;
+package org.apache.mina.common;
 
 /**
- * {@link IoAcceptor} for socket transport (TCP/IP).
+ * A configuration which is used to configure {@link IoAcceptor}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor extends DelegatedIoAcceptor
+public interface IoAcceptorConfig extends IoServiceConfig
 {
     /**
-     * Creates a new instance.
+     * Returns <tt>true</tt> if and only if all clients are disconnected
+     * when this acceptor unbinds the related local address.
      */
-    public SocketAcceptor()
-    {
-        init( new SocketAcceptorDelegate( this ) );
-    }
+    boolean isDisconnectOnUnbind();
+    
+    /**
+     * Sets whether all clients are disconnected when this acceptor unbinds the
+     * related local address.  The default value is <tt>true</tt>.
+     */
+    void setDisconnectOnUnbind( boolean disconnectOnUnbind );
 }

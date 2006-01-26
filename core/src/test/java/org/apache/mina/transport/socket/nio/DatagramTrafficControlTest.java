@@ -24,7 +24,6 @@ import java.net.SocketAddress;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.TransportType;
 import org.apache.mina.transport.AbstractTrafficControlTest;
 
 /**
@@ -39,7 +38,7 @@ public class DatagramTrafficControlTest extends AbstractTrafficControlTest
 
     public DatagramTrafficControlTest()
     {
-        super( TransportType.DATAGRAM );
+        super( new DatagramAcceptor() );
     }
 
     protected ConnectFuture connect( int port, IoHandler handler )

@@ -32,11 +32,14 @@ import java.util.Set;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
+import org.apache.mina.transport.socket.nio.DatagramAcceptorConfig;
+import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
 
 /**
@@ -52,11 +55,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private final IoAcceptor wrapper;
     private final int id = nextId ++ ;
     private Selector selector;
-    private boolean broadcast;
-    private boolean reuseAddress;
-    private int receiveBufferSize = -1;
-    private int sendBufferSize = -1;
-    private int trafficClass = -1;
+    private final DatagramAcceptorConfig defaultConfig = new DatagramAcceptorConfig();
     private final Map channels = new HashMap();
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
@@ -71,13 +70,17 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         this.wrapper = wrapper;
     }
 
-    public void bind( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+    public void bind( SocketAddress address, IoHandler handler, IoAcceptorConfig config )
             throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
         if( handler == null )
             throw new NullPointerException( "handler" );
+        if( config == null )
+        {
+            config = ( IoAcceptorConfig ) getDefaultConfig();
+        }
 
         if( !( address instanceof InetSocketAddress ) )
             throw new IllegalArgumentException( "Unexpected address type: "
@@ -85,12 +88,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         if( ( ( InetSocketAddress ) address ).getPort() == 0 )
             throw new IllegalArgumentException( "Unsupported port number: 0" );
         
-        if( filterChainBuilder == null )
-        {
-            filterChainBuilder = IoFilterChainBuilder.NOOP;
-        }
-
-        RegistrationRequest request = new RegistrationRequest( address, handler, filterChainBuilder );
+        RegistrationRequest request = new RegistrationRequest( address, handler, config );
         synchronized( this )
         {
             synchronized( registerQueue )
@@ -195,14 +193,15 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
 
         RegistrationRequest req = ( RegistrationRequest ) key.attachment();
-        DatagramSessionImpl s = new DatagramSessionImpl( wrapper, this, ch, req.handler );
+        DatagramSessionImpl s = new DatagramSessionImpl(
+                wrapper, this,
+                ( DatagramSessionConfig ) req.config, ch, req.handler );
         s.setRemoteAddress( remoteAddress );
         s.setSelectionKey( key );
         
         try
         {
-            this.filterChainBuilder.buildFilterChain( s.getFilterChain() );
-            req.filterChainBuilder.buildFilterChain( s.getFilterChain() );
+            req.config.getFilterChainBuilder().buildFilterChain( s.getFilterChain() );
             ( ( DatagramFilterChain ) s.getFilterChain() ).sessionCreated( s );
         }
         catch( Throwable t )
@@ -213,57 +212,11 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         return s;
     }
     
-    public boolean getBroadcast()
+    public IoServiceConfig getDefaultConfig()
     {
-        return broadcast;
+        return defaultConfig;
     }
     
-    public void setBroadcast( boolean broadcast )
-    {
-        this.broadcast = broadcast;
-    }
-    
-    public boolean getReuseAddress()
-    {
-        return reuseAddress;
-    }
-    
-    public void setReuseAddress( boolean reuseAddress )
-    {
-        this.reuseAddress = reuseAddress;
-    }
-
-
-    public int getReceiveBufferSize()
-    {
-        return receiveBufferSize;
-    }
-
-    public void setReceiveBufferSize( int receiveBufferSize )
-    {
-        this.receiveBufferSize = receiveBufferSize;
-    }
-
-    public int getSendBufferSize()
-    {
-        return sendBufferSize;
-    }
-
-    public void setSendBufferSize( int sendBufferSize )
-    {
-        this.sendBufferSize = sendBufferSize;
-    }
-
-    public int getTrafficClass()
-    {
-        return trafficClass;
-    }
-
-    public void setTrafficClass( int trafficClass )
-    {
-        this.trafficClass = trafficClass;
-    }
-
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
@@ -374,8 +327,10 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             DatagramChannel ch = ( DatagramChannel ) key.channel();
 
             RegistrationRequest req = ( RegistrationRequest ) key.attachment();
-            DatagramSessionImpl session =
-                new DatagramSessionImpl( wrapper, this, ch, req.handler );
+            DatagramSessionImpl session = new DatagramSessionImpl(
+                    wrapper, this,
+                    ( DatagramSessionConfig ) req.config.getSessionConfig(),
+                    ch, req.handler );
             session.setSelectionKey( key );
             
             try
@@ -402,7 +357,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private void readSession( DatagramSessionImpl session )
     {
 
-        ByteBuffer readBuf = ByteBuffer.allocate( 2048 );
+        ByteBuffer readBuf = ByteBuffer.allocate( session.getReadBufferSize() );
         try
         {
             SocketAddress remoteAddress = session.getChannel().receive(
@@ -549,20 +504,22 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             try
             {
                 ch = DatagramChannel.open();
-                ch.socket().setReuseAddress( reuseAddress );
-                ch.socket().setBroadcast( broadcast );
-                if( receiveBufferSize > 0 )
+                DatagramSessionConfig cfg;
+                if( req.config.getSessionConfig() instanceof DatagramSessionConfig )
                 {
-                    ch.socket().setReceiveBufferSize( receiveBufferSize );
+                    cfg = ( DatagramSessionConfig ) req.config.getSessionConfig();
                 }
-                if( sendBufferSize > 0 )
+                else
                 {
-                    ch.socket().setSendBufferSize( sendBufferSize );
+                    cfg = ( DatagramSessionConfig ) getDefaultConfig().getSessionConfig();
                 }
-                if( trafficClass > 0 )
-                {
-                    ch.socket().setTrafficClass( trafficClass );
-                }
+
+                ch.socket().setReuseAddress( cfg.isReuseAddress() );
+                ch.socket().setBroadcast( cfg.isBroadcast() );
+                ch.socket().setReceiveBufferSize( cfg.getReceiveBufferSize() );
+                ch.socket().setSendBufferSize( cfg.getSendBufferSize() );
+                ch.socket().setTrafficClass( cfg.getTrafficClass() );
+                
                 ch.configureBlocking( false );
                 ch.socket().bind( req.address );
                 ch.register( selector, SelectionKey.OP_READ, req );
@@ -658,16 +615,16 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     {
         private final SocketAddress address;
         private final IoHandler handler;
-        private final IoFilterChainBuilder filterChainBuilder;
+        private final IoAcceptorConfig config;
 
         private Throwable exception; 
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+        private RegistrationRequest( SocketAddress address, IoHandler handler, IoAcceptorConfig config )
         {
             this.address = address;
             this.handler = handler;
-            this.filterChainBuilder = filterChainBuilder;
+            this.config = config;
         }
     }
 

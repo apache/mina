@@ -16,25 +16,35 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
-
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.support.DelegatedIoAcceptor;
-import org.apache.mina.transport.socket.nio.support.SocketAcceptorDelegate;
+package org.apache.mina.common;
 
 /**
- * {@link IoAcceptor} for socket transport (TCP/IP).
- * 
+ * A unchecked version of {@link java.io.IOException}.
+ *
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor extends DelegatedIoAcceptor
+public class RuntimeIOException extends RuntimeException
 {
-    /**
-     * Creates a new instance.
-     */
-    public SocketAcceptor()
+    private static final long serialVersionUID = 9029092241311939548L;
+
+    public RuntimeIOException()
     {
-        init( new SocketAcceptorDelegate( this ) );
+        super();
+    }
+
+    public RuntimeIOException( String message )
+    {
+        super( message );
+    }
+
+    public RuntimeIOException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
+
+    public RuntimeIOException( Throwable cause )
+    {
+        super( cause );
     }
 }

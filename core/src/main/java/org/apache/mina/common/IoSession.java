@@ -60,6 +60,11 @@ public interface IoSession {
     IoHandler getHandler();
 
     /**
+     * Returns the configuration of this session.
+     */
+    IoSessionConfig getConfig();
+    
+    /**
      * Returns the filter chain that only affects this session.
      */
     IoFilterChain getFilterChain();

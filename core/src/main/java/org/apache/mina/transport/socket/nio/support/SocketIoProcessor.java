@@ -278,7 +278,7 @@ class SocketIoProcessor
 
     private void read( SocketSessionImpl session )
     {
-        ByteBuffer buf = ByteBuffer.allocate( session.getSessionReceiveBufferSize() ); 
+        ByteBuffer buf = ByteBuffer.allocate( session.getReadBufferSize() ); 
         SocketChannel ch = session.getChannel();
 
         try

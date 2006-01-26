@@ -106,6 +106,11 @@ public class FutureTest extends TestCase
             {
                 return null;
             }
+
+            public IoSessionConfig getConfig()
+            {
+                return null;
+            }
         };
         
         future.setSession( session );

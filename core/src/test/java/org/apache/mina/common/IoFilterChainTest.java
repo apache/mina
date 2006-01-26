@@ -299,6 +299,11 @@ public class IoFilterChainTest extends TestCase
         {
             return null;
         }
+
+        public IoSessionConfig getConfig()
+        {
+            return null;
+        }
     }
 
     private class EventOrderTestFilter extends IoFilterAdapter
@@ -414,6 +419,11 @@ public class IoFilterChainTest extends TestCase
                 public int getScheduledWriteRequests()
                 {
                     return 0;
+                }
+
+                public IoSessionConfig getConfig()
+                {
+                    return null;
                 }
             } );
         }

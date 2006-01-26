@@ -16,25 +16,33 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.common.support;
 
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.support.DelegatedIoAcceptor;
-import org.apache.mina.transport.socket.nio.support.SocketAcceptorDelegate;
+import org.apache.mina.common.IoAcceptorConfig;
 
 /**
- * {@link IoAcceptor} for socket transport (TCP/IP).
+ * A base implementation of {@link IoAcceptorConfig}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor extends DelegatedIoAcceptor
+public abstract class BaseIoAcceptorConfig extends BaseIoServiceConfig implements IoAcceptorConfig
 {
-    /**
-     * Creates a new instance.
-     */
-    public SocketAcceptor()
+    private boolean disconnectOnUnbind = true;
+    
+    protected BaseIoAcceptorConfig()
     {
-        init( new SocketAcceptorDelegate( this ) );
+        super();
+    }
+
+
+    public boolean isDisconnectOnUnbind()
+    {
+        return disconnectOnUnbind;
+    }
+
+    public void setDisconnectOnUnbind( boolean disconnectClientsOnUnbind )
+    {
+        this.disconnectOnUnbind = disconnectClientsOnUnbind;
     }
 }

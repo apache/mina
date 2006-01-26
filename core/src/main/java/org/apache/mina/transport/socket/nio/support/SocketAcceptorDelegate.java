@@ -26,7 +26,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,11 +36,15 @@ import java.util.Set;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.support.BaseIoAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
+import org.apache.mina.transport.socket.nio.SocketSessionConfig;
+import org.apache.mina.util.IdentityHashSet;
 import org.apache.mina.util.Queue;
 
 /**
@@ -57,9 +60,7 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
     private final IoAcceptor wrapper;
     private final int id = nextId ++ ;
     private final String threadName = "SocketAcceptor-" + id;
-    private boolean reuseAddress = false;
-    private int backlog = 50;
-    private int receiveBufferSize = -1;
+    private final IoServiceConfig defaultConfig = new SocketAcceptorConfig();
     private Selector selector;
     private final Map channels = new HashMap();
     private final Hashtable sessions = new Hashtable();
@@ -84,7 +85,7 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
      *
      * @throws IOException if failed to bind
      */
-    public void bind( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder ) throws IOException
+    public void bind( SocketAddress address, IoHandler handler, IoAcceptorConfig config ) throws IOException
     {
         if( address == null )
         {
@@ -106,12 +107,12 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
             throw new IllegalArgumentException( "Unsupported port number: 0" );
         }
         
-        if( filterChainBuilder == null )
+        if( config == null )
         {
-            filterChainBuilder = IoFilterChainBuilder.NOOP;
+            config = ( IoAcceptorConfig ) getDefaultConfig();
         }
         
-        RegistrationRequest request = new RegistrationRequest( address, handler, filterChainBuilder );
+        RegistrationRequest request = new RegistrationRequest( address, handler, config );
 
         synchronized( this )
         {
@@ -156,7 +157,7 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
         }
     }
 
-    public Collection getManagedSessions( SocketAddress address )
+    public Set getManagedSessions( SocketAddress address )
     {
         if( address == null )
         {
@@ -170,7 +171,8 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
             throw new IllegalArgumentException( "Address not bound: " + address );
         }
         
-        return Collections.unmodifiableCollection( Arrays.asList( managedSessions.toArray() ) );
+        return Collections.unmodifiableSet(
+                new IdentityHashSet( Arrays.asList( managedSessions.toArray() ) ) );
     }
     
     public void unbind( SocketAddress address )
@@ -228,7 +230,8 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
         
         
         // Disconnect all clients
-        if( isDisconnectClientsOnUnbind() && managedSessions != null )
+        if( request.registrationRequest.config.isDisconnectOnUnbind() &&
+            managedSessions != null )
         {
             IoSession[] tempSessions = ( IoSession[] ) 
                                   managedSessions.toArray( new IoSession[ 0 ] );
@@ -365,10 +368,12 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
                 try
                 {
                     RegistrationRequest req = ( RegistrationRequest ) key.attachment();
-                    session = new SocketSessionImpl( SocketAcceptorDelegate.this.wrapper, 
-                            ( Set ) sessions.get( req.address ), ch, req.handler );
-                    SocketAcceptorDelegate.this.filterChainBuilder.buildFilterChain( session.getFilterChain() );
-                    req.filterChainBuilder.buildFilterChain( session.getFilterChain() );
+                    session = new SocketSessionImpl(
+                            SocketAcceptorDelegate.this.wrapper,
+                            ( Set ) sessions.get( req.address ),
+                            ( SocketSessionConfig ) req.config.getSessionConfig(),
+                            ch, req.handler );
+                    req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     ( ( SocketFilterChain ) session.getFilterChain() ).sessionCreated( session );
                     session.getManagedSessions().add( session );
                     session.getIoProcessor().addNew( session );
@@ -393,6 +398,10 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
         }
     }
 
+    public IoServiceConfig getDefaultConfig()
+    {
+        return defaultConfig;
+    }
 
     private void registerNew()
     {
@@ -423,14 +432,22 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
                 ssc.configureBlocking( false );
                 
                 // Configure the server socket,
-                ssc.socket().setReuseAddress( isReuseAddress() );
-                if( getReceiveBufferSize() > 0 )
+                SocketAcceptorConfig cfg;
+                if( req.config instanceof SocketAcceptorConfig )
                 {
-                    ssc.socket().setReceiveBufferSize( getReceiveBufferSize() );
+                    cfg = ( SocketAcceptorConfig ) req.config;
+                }
+                else
+                {
+                    cfg = ( SocketAcceptorConfig ) getDefaultConfig();
                 }
                 
+                ssc.socket().setReuseAddress( cfg.isReuseAddress() );
+                ssc.socket().setReceiveBufferSize(
+                        ( ( SocketSessionConfig ) cfg.getSessionConfig() ).getReceiveBufferSize() );
+                
                 // and bind.
-                ssc.socket().bind( req.address, getBacklog() );
+                ssc.socket().bind( req.address, cfg.getBacklog() );
                 ssc.register( selector, SelectionKey.OP_ACCEPT, req );
 
                 channels.put( req.address, ssc );
@@ -499,7 +516,7 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
                 else
                 {
                     SelectionKey key = ssc.keyFor( selector );
-
+                    request.registrationRequest = ( RegistrationRequest ) key.attachment();
                     key.cancel();
 
                     selector.wakeup(); // wake up again to trigger thread death
@@ -516,63 +533,25 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
                 synchronized( request )
                 {
                     request.done = true;
-
                     request.notify();
                 }
             }
         }
     }
 
-    public int getReceiveBufferSize()
-    {
-        return receiveBufferSize;
-    }
-
-    /**
-     * @param receiveBufferSize <tt>-1</tt> to use the default value.
-     */
-    public void setReceiveBufferSize( int receiveBufferSize )
-    {
-        this.receiveBufferSize = receiveBufferSize;
-    }
-
-    public boolean isReuseAddress()
-    {
-        return reuseAddress;
-    }
-
-    public void setReuseAddress( boolean reuseAddress )
-    {
-        this.reuseAddress = reuseAddress;
-    }
-
-    public int getBacklog()
-    {
-        return backlog;
-    }
-
-    public void setBacklog( int backlog )
-    {
-        if( backlog <= 0 )
-        {
-            throw new IllegalArgumentException( "backlog: " + backlog );
-        }
-        this.backlog = backlog;
-    }
-
     private static class RegistrationRequest
     {
         private final SocketAddress address;
         private final IoHandler handler;
-        private final IoFilterChainBuilder filterChainBuilder;
+        private final IoAcceptorConfig config;
         private IOException exception;
         private boolean done;
         
-        private RegistrationRequest( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+        private RegistrationRequest( SocketAddress address, IoHandler handler, IoAcceptorConfig config )
         {
             this.address = address;
             this.handler = handler;
-            this.filterChainBuilder = filterChainBuilder;
+            this.config = config;
         }
     }
 
@@ -580,9 +559,8 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
     private static class CancellationRequest
     {
         private final SocketAddress address;
-
         private boolean done;
-
+        private RegistrationRequest registrationRequest;
         private RuntimeException exception;
         
         private CancellationRequest( SocketAddress address )

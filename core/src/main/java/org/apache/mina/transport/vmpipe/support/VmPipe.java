@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.transport.vmpipe.VmPipeAcceptor;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
@@ -17,19 +17,19 @@ public class VmPipe
     private final VmPipeAcceptor acceptor;
     private final VmPipeAddress address;
     private final IoHandler handler;
-    private final IoFilterChainBuilder filterChainBuilder;
+    private final IoAcceptorConfig config;
     private final Set managedClientSessions = Collections.synchronizedSet( new HashSet() );
     private final Set managedServerSessions = Collections.synchronizedSet( new HashSet() );
     
     public VmPipe( VmPipeAcceptor acceptor,
                    VmPipeAddress address,
                    IoHandler handler,
-                   IoFilterChainBuilder filterChainBuilder )
+                   IoAcceptorConfig config )
     {
         this.acceptor = acceptor;
         this.address = address;
         this.handler = handler;
-        this.filterChainBuilder = filterChainBuilder;
+        this.config = config;
     }
 
     public VmPipeAcceptor getAcceptor()
@@ -47,9 +47,9 @@ public class VmPipe
         return handler;
     }
     
-    public IoFilterChainBuilder getFilterChainBuilder()
+    public IoAcceptorConfig getConfig()
     {
-        return filterChainBuilder;
+        return config;
     }
 
     public Set getManagedClientSessions()
