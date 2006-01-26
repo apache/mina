@@ -6,7 +6,7 @@
     <artifactId>build</artifactId>
     <version>0.9.1-SNAPSHOT</version>
   </parent>
-  <artifactId>org.apache.mina.filter.codec.netty</artifactId>
+  <artifactId>mina-filter-codec-netty</artifactId>
   <name>MINA Netty Codec Filter</name>
   <packaging>jar</packaging>
 
