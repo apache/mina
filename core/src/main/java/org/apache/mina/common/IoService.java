@@ -53,7 +53,7 @@ public interface IoService
     IoServiceConfig getDefaultConfig();
     
     /**
-     * Returns the {@link IoFilterChainBuilder} which will modify the
+     * Returns the global {@link IoFilterChainBuilder} which will modify the
      * {@link IoFilterChain} of all {@link IoSession}s which is managed
      * by this service.
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
@@ -61,7 +61,7 @@ public interface IoService
     IoFilterChainBuilder getFilterChainBuilder();
     
     /**
-     * Sets the {@link IoFilterChainBuilder} which will modify the
+     * Sets the global {@link IoFilterChainBuilder} which will modify the
      * {@link IoFilterChain} of all {@link IoSession}s which is managed
      * by this service.
      * If you specify <tt>null</tt> this property will be set to
