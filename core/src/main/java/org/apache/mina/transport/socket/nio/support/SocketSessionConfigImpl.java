@@ -25,6 +25,7 @@ import java.net.SocketException;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 
@@ -34,7 +35,7 @@ import org.apache.mina.transport.socket.nio.SocketSessionConfig;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketSessionConfigImpl implements SocketSessionConfig
+public class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
 {
     private boolean reuseAddress;
     private int receiveBufferSize;

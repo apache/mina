@@ -18,6 +18,7 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.util.Queue;
@@ -30,7 +31,7 @@ import org.apache.mina.util.Queue;
  */
 public class VmPipeSessionImpl extends BaseIoSession
 {
-    private static final IoSessionConfig CONFIG = new IoSessionConfig() {};
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
     
     private final IoService manager;
     private final SocketAddress localAddress;

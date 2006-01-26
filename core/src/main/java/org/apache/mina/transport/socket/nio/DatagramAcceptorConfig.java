@@ -33,7 +33,7 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
  */
 public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements IoAcceptorConfig
 {
-    private final DatagramSessionConfig sessionConfig = new DatagramSessionConfigImpl();
+    private DatagramSessionConfig sessionConfig = new DatagramSessionConfigImpl();
 
     /**
      * Creates a new instance.
@@ -48,5 +48,12 @@ public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements IoAc
     public IoSessionConfig getSessionConfig()
     {
         return sessionConfig;
+    }
+    
+    public Object clone()
+    {
+        DatagramAcceptorConfig ret = ( DatagramAcceptorConfig ) super.clone();
+        ret.sessionConfig = ( DatagramSessionConfig ) this.sessionConfig.clone();
+        return ret;
     }
 }

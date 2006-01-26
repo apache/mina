@@ -18,6 +18,8 @@
  */
 package org.apache.mina.common.support;
 
+import java.lang.reflect.Method;
+
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoServiceConfig;
@@ -69,13 +71,30 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
     
     public Object clone()
     {
+        BaseIoServiceConfig ret;
         try
         {
-            return super.clone();
+            ret = ( BaseIoServiceConfig ) super.clone();
         }
         catch( CloneNotSupportedException e )
         {
             throw ( InternalError ) new InternalError().initCause( e );
         }
+        
+        
+        // Try to clone the chain builder.
+        try
+        {
+            Method cloneMethod = this.filterChainBuilder.getClass().getMethod( "clone", null );
+            if( cloneMethod.isAccessible() )
+            {
+                ret.filterChainBuilder = ( IoFilterChainBuilder ) cloneMethod.invoke( this.filterChainBuilder, null );
+            }
+        }
+        catch( Exception e )
+        {
+        }
+        
+        return ret;
     }
 }

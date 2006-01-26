@@ -59,4 +59,9 @@ public interface IoServiceConfig
      *                               not a {@link DefaultIoFilterChainBuilder}
      */
     DefaultIoFilterChainBuilder getFilterChain();
+    
+    /**
+     * Returns a deep clone of this configuration.
+     */
+    Object clone();
 }
