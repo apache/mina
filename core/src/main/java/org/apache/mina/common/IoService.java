@@ -51,4 +51,33 @@ public interface IoService
      * any configuration.
      */
     IoServiceConfig getDefaultConfig();
+    
+    /**
+     * Returns the {@link IoFilterChainBuilder} which will modify the
+     * {@link IoFilterChain} of all {@link IoSession}s which is managed
+     * by this service.
+     * The default value is an empty {@link DefaultIoFilterChainBuilder}.
+     */
+    IoFilterChainBuilder getFilterChainBuilder();
+    
+    /**
+     * Sets the {@link IoFilterChainBuilder} which will modify the
+     * {@link IoFilterChain} of all {@link IoSession}s which is managed
+     * by this service.
+     * If you specify <tt>null</tt> this property will be set to
+     * an empty {@link DefaultIoFilterChainBuilder}.
+     */
+    void setFilterChainBuilder( IoFilterChainBuilder builder );
+    
+    /**
+     * A shortcut for <tt>( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )</tt>.
+     * Please note that the returned object is not a <b>real</b> {@link IoFilterChain}
+     * but a {@link DefaultIoFilterChainBuilder}.  Modifying the returned builder
+     * won't affect the existing {@link IoSession}s at all, because
+     * {@link IoFilterChainBuilder}s affect only newly created {@link IoSession}s.
+     *
+     * @throws IllegalStateException if the current {@link IoFilterChainBuilder} is
+     *                               not a {@link DefaultIoFilterChainBuilder}
+     */
+    DefaultIoFilterChainBuilder getFilterChain();
 }

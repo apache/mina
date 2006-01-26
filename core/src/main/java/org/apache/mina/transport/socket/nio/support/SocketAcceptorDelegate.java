@@ -383,6 +383,7 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
                             ( Set ) sessions.get( req.address ),
                             ( SocketSessionConfig ) req.config.getSessionConfig(),
                             ch, req.handler );
+                    getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     ( ( SocketFilterChain ) session.getFilterChain() ).sessionCreated( session );
                     session.getManagedSessions().add( session );

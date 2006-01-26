@@ -65,6 +65,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         // initialize remote session
         try
         {
+            remoteEntry.getAcceptor().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
             remoteEntry.getConfig().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
             ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).sessionCreated( remoteSession );
         }
@@ -79,6 +80,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         // initialize client session
         try
         {
+            manager.getFilterChainBuilder().buildFilterChain( filterChain );
             filterChainBuilder.buildFilterChain( filterChain );
             handler.sessionCreated( this );
         }

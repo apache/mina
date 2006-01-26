@@ -545,6 +545,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             boolean success = false;
             try
             {
+                getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                 req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                 ( ( DatagramFilterChain ) session.getFilterChain() ).sessionCreated( session );
 
