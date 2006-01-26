@@ -7,7 +7,7 @@
     <version>0.9.1-SNAPSHOT</version>
   </parent>
   <artifactId>mina-integration-spring</artifactId>
-  <name>MINA Spring Integration</name>
+  <name>Apache MINA Spring Integration</name>
   <packaging>jar</packaging>  
   <dependencies>
 

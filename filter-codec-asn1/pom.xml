@@ -7,14 +7,14 @@
     <version>0.9.1-SNAPSHOT</version>
   </parent>
   <artifactId>mina-filter-codec-asn1</artifactId>
-  <name>MINA ASN.1 Codec Filter</name>
+  <name>Apache MINA ASN.1 Codec Filter</name>
   <packaging>jar</packaging>
 
   <dependencies>
 
     <dependency>
       <groupId>org.apache.directory</groupId>
-      <artifactId>org.apache.asn1</artifactId>
+      <artifactId>directory-asn1</artifactId>
       <version>0.3.4-SNAPSHOT</version>
     </dependency>
 
