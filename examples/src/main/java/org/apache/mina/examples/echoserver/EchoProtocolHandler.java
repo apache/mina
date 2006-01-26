@@ -23,8 +23,9 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.filter.SSLFilter;
-import org.apache.mina.transport.socket.nio.SocketSession;
+import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +41,9 @@ public class EchoProtocolHandler extends IoHandlerAdapter
 
     public void sessionCreated( IoSession session )
     {
-        if( session instanceof SocketSession )
+        if( session.getTransportType() == TransportType.SOCKET )
         {
-            ( ( SocketSession ) session ).setSessionReceiveBufferSize( 2048 );
+            ( ( SocketSessionConfig ) session.getConfig() ).setReceiveBufferSize( 2048 );
         }
         
         session.setIdleTime( IdleStatus.BOTH_IDLE, 10 );

@@ -30,12 +30,8 @@ import javax.net.SocketFactory;
 
 import org.apache.commons.net.EchoTCPClient;
 import org.apache.commons.net.EchoUDPClient;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.TransportType;
-import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.examples.echoserver.ssl.SSLServerSocketFactory;
 import org.apache.mina.examples.echoserver.ssl.SSLSocketFactory;
-import org.apache.mina.filter.SSLFilter;
 
 /**
  * Tests echo server example.
@@ -58,10 +54,7 @@ public class AcceptorTest extends AbstractTest
     public void testTCPWithSSL() throws Exception
     {
         // Add an SSL filter
-        SSLFilter sslFilter =
-            new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
-        IoAcceptor acceptor = registry.getAcceptor( TransportType.SOCKET );
-        acceptor.getFilterChain().addLast( "SSL", sslFilter );
+        useSSL = true;
         
         // Create a commons-net socket factory
         SSLSocketFactory.setSslEnabled(true);

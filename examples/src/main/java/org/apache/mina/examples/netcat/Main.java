@@ -20,6 +20,7 @@ package org.apache.mina.examples.netcat;
 
 import java.net.InetSocketAddress;
 
+import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 /**
@@ -44,7 +45,7 @@ public class Main
         SocketConnector connector = new SocketConnector();
 
         // Set connect timeout.
-        connector.setConnectTimeout( 30 );
+        ( ( IoConnectorConfig ) connector.getDefaultConfig()).setConnectTimeout( 30 );
         
         // Start communication.
         connector.connect( 
