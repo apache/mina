@@ -21,6 +21,8 @@ package org.apache.mina.common.support;
 import java.net.SocketAddress;
 import java.util.Set;
 
+import org.apache.mina.common.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoService;
 
 /**
@@ -29,7 +31,12 @@ import org.apache.mina.common.IoService;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoService implements IoService {
+public abstract class BaseIoService implements IoService
+{
+    /**
+     * Current filter chain builder.
+     */
+    private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
 
     protected BaseIoService()
     {
@@ -38,5 +45,32 @@ public abstract class BaseIoService implements IoService {
     public Set getManagedSessions( SocketAddress address )
     {
         throw new UnsupportedOperationException();
+    }
+    
+    public IoFilterChainBuilder getFilterChainBuilder()
+    {
+        return filterChainBuilder;
+    }
+
+    public void setFilterChainBuilder( IoFilterChainBuilder builder )
+    {
+        if( builder == null )
+        {
+            builder = new DefaultIoFilterChainBuilder();
+        }
+        filterChainBuilder = builder;
+    }
+    
+    public DefaultIoFilterChainBuilder getFilterChain()
+    {
+        if( filterChainBuilder instanceof DefaultIoFilterChainBuilder )
+        {
+            return ( DefaultIoFilterChainBuilder ) filterChainBuilder;
+        }
+        else
+        {
+            throw new IllegalStateException(
+                    "Current filter chain builder is not a DefaultIoFilterChainBuilder." );
+        }
     }
 }

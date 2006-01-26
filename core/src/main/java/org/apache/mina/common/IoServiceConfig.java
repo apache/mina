@@ -33,16 +33,16 @@ public interface IoServiceConfig
     
     /**
      * Returns the {@link IoFilterChainBuilder} which will modify the
-     * {@link IoFilterChain} of all {@link IoSession}s which is managed
-     * by this manager.
+     * {@link IoFilterChain} of all {@link IoSession}s which is created
+     * with this configuration.
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
      */
     IoFilterChainBuilder getFilterChainBuilder();
     
     /**
      * Sets the {@link IoFilterChainBuilder} which will modify the
-     * {@link IoFilterChain} of all {@link IoSession}s which is managed
-     * by this manager.
+     * {@link IoFilterChain} of all {@link IoSession}s which is created
+     * with this configuration.
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
      */

@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Set;
 
+import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
@@ -81,5 +83,20 @@ public class DelegatedIoAcceptor implements IoAcceptor
     public IoServiceConfig getDefaultConfig()
     {
         return delegate.getDefaultConfig();
+    }
+
+    public IoFilterChainBuilder getFilterChainBuilder()
+    {
+        return delegate.getFilterChainBuilder();
+    }
+
+    public void setFilterChainBuilder( IoFilterChainBuilder builder )
+    {
+        delegate.setFilterChainBuilder( builder );
+    }
+
+    public DefaultIoFilterChainBuilder getFilterChain()
+    {
+        return delegate.getFilterChain();
     }
 }
