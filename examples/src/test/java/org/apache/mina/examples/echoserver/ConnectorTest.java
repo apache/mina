@@ -25,14 +25,11 @@ import junit.framework.Assert;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.transport.socket.nio.DatagramConnector;
 import org.apache.mina.transport.socket.nio.SocketConnector;
@@ -50,9 +47,19 @@ public class ConnectorTest extends AbstractTest
     private static final int TIMEOUT = 10000; // 10 seconds
     private final int COUNT = 10;
     private final int DATA_SIZE = 16;
+    private SSLFilter connectorSSLFilter;
 
     public ConnectorTest()
     {
+    }
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        connectorSSLFilter =
+            new SSLFilter( BogusSSLContextFactory.getInstance( false ) );
+        connectorSSLFilter.setUseClientMode( true ); // set client mode
     }
 
     public void testTCP() throws Exception
@@ -63,21 +70,12 @@ public class ConnectorTest extends AbstractTest
     
     public void testTCPWithSSL() throws Exception
     {
-        // Add an SSL filter to acceptor
-        SSLFilter acceptorSSLFilter =
-            new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
-        IoAcceptor acceptor = registry.getAcceptor( TransportType.SOCKET );
-        acceptor.getFilterChain().addLast( "SSL", acceptorSSLFilter );
-        
+        useSSL = true;
         // Create a connector
         IoConnector connector = new SocketConnector();
         
         // Add an SSL filter to connector
-        SSLFilter connectorSSLFilter =
-            new SSLFilter( BogusSSLContextFactory.getInstance( false ) );
-        connectorSSLFilter.setUseClientMode( true ); // set client mode
-        connector.getFilterChain().addLast( "SSL", connectorSSLFilter );
-
+        connector.getDefaultConfig().getFilterChain().addLast( "SSL", connectorSSLFilter );
         testConnector( connector );
     }
     
@@ -141,11 +139,9 @@ public class ConnectorTest extends AbstractTest
         testConnector0( session );
         
         // Send closeNotify to test TLS closure if it is TLS connection.
-        SSLFilter sslf = ( SSLFilter ) connector.getFilterChain().get( "SSL" );
-        if( sslf != null )
+        if( useSSL )
         {
-            connector.getFilterChain().addFirst( "log", new LoggingFilter() );
-            sslf.stopSSL( session ).join();
+            connectorSSLFilter.stopSSL( session ).join();
             
             System.out.println( "-------------------------------------------------------------------------------" );
             // Test again after we finished TLS session.
@@ -169,9 +165,8 @@ public class ConnectorTest extends AbstractTest
             Assert.assertEquals( ( byte ) '.', handler.readBuf.get() );
             
             // Now start TLS connection
-            Assert.assertTrue( sslf.startSSL( session ) );
+            Assert.assertTrue( connectorSSLFilter.startSSL( session ) );
             testConnector0( session );
-            connector.getFilterChain().remove( "log" );
         }
         
         session.close().join();
