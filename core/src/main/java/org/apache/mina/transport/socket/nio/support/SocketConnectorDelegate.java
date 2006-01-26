@@ -38,7 +38,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
-import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.apache.mina.util.Queue;
 
 /**
@@ -68,13 +67,13 @@ public class SocketConnectorDelegate extends BaseIoConnector
         this.wrapper = wrapper;
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoConnectorConfig config )
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
     {
         return connect( address, null, handler, config );
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoConnectorConfig config )
+                                  IoHandler handler, IoServiceConfig config )
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -91,7 +90,7 @@ public class SocketConnectorDelegate extends BaseIoConnector
 
         if( config == null )
         {
-            config = ( IoConnectorConfig ) getDefaultConfig();
+            config = getDefaultConfig();
         }
         
         SocketChannel ch = null;
@@ -278,11 +277,11 @@ public class SocketConnectorDelegate extends BaseIoConnector
         }
     }
 
-    private SocketSessionImpl newSession( SocketChannel ch, IoHandler handler, IoConnectorConfig config ) throws IOException
+    private SocketSessionImpl newSession( SocketChannel ch, IoHandler handler, IoServiceConfig config ) throws IOException
     {
         SocketSessionImpl session = new SocketSessionImpl(
                 wrapper, managedSessions,
-                ( SocketSessionConfig ) config.getSessionConfig(),
+                config.getSessionConfig(),
                 ch, handler );
         try
         {
@@ -363,17 +362,26 @@ public class SocketConnectorDelegate extends BaseIoConnector
         }
     }
 
-    private static class ConnectionRequest extends ConnectFuture
+    private class ConnectionRequest extends ConnectFuture
     {
         private final SocketChannel channel;
         private final long deadline;
         private final IoHandler handler;
-        private final IoConnectorConfig config;
+        private final IoServiceConfig config;
 
-        private ConnectionRequest( SocketChannel channel, IoHandler handler, IoConnectorConfig config )
+        private ConnectionRequest( SocketChannel channel, IoHandler handler, IoServiceConfig config )
         {
             this.channel = channel;
-            this.deadline = System.currentTimeMillis() + config.getConnectTimeoutMillis();
+            long timeout;
+            if( config instanceof IoConnectorConfig )
+            {
+                timeout = ( ( IoConnectorConfig ) config ).getConnectTimeoutMillis();
+            }
+            else
+            {
+                timeout = ( ( IoConnectorConfig ) getDefaultConfig() ).getConnectTimeoutMillis();
+            }
+            this.deadline = System.currentTimeMillis() + timeout;
             this.handler = handler;
             this.config = config;
         }

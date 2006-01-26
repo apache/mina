@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 
@@ -58,7 +57,7 @@ public class DelegatedIoConnector implements IoConnector
         return delegate.connect( address, handler );
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoConnectorConfig config )
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
     {
         return delegate.connect( address, handler, config );
     }
@@ -70,7 +69,7 @@ public class DelegatedIoConnector implements IoConnector
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoConnectorConfig config )
+                                  IoHandler handler, IoServiceConfig config )
     {
         return delegate.connect( address, localAddress, handler, config );
     }

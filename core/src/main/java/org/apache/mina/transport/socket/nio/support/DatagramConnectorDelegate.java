@@ -31,7 +31,6 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoFilter.WriteRequest;
@@ -68,13 +67,13 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         this.wrapper = wrapper;
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoConnectorConfig config )
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
     {
         return connect( address, null, handler, config );
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoConnectorConfig config )
+                                  IoHandler handler, IoServiceConfig config )
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -93,7 +92,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         
         if( config == null )
         {
-            config = ( IoConnectorConfig ) getDefaultConfig();
+            config = getDefaultConfig();
         }
         
         DatagramChannel ch = null;
@@ -540,7 +539,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             DatagramSessionImpl session = new DatagramSessionImpl(
                     wrapper, this,
-                    ( DatagramSessionConfig ) req.config.getSessionConfig(),
+                    req.config.getSessionConfig(),
                     req.channel, req.handler );
 
             boolean success = false;
@@ -618,11 +617,11 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     {
         private final DatagramChannel channel;
         private final IoHandler handler;
-        private final IoConnectorConfig config;
+        private final IoServiceConfig config;
 
         private RegistrationRequest( DatagramChannel channel,
                                      IoHandler handler,
-                                     IoConnectorConfig config )
+                                     IoServiceConfig config )
         {
             this.channel = channel;
             this.handler = handler;

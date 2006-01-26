@@ -59,7 +59,7 @@ public interface IoConnector extends IoService
      * @return {@link ConnectFuture} that will tell the result of the connection attempt
      */
     ConnectFuture connect( SocketAddress address, IoHandler handler,
-                           IoConnectorConfig config );
+                           IoServiceConfig config );
 
     /**
      * Connects to the specified <code>address</code>.  If communication starts
@@ -81,5 +81,5 @@ public interface IoConnector extends IoService
      * @return {@link ConnectFuture} that will tell the result of the connection attempt
      */
     ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                           IoHandler handler, IoConnectorConfig config );
+                           IoHandler handler, IoServiceConfig config );
 }

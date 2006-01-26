@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 
@@ -40,7 +39,7 @@ public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor
     
     public void bind( SocketAddress address, IoHandler handler ) throws IOException
     {
-        this.bind( address, handler, ( IoAcceptorConfig ) getDefaultConfig() );
+        this.bind( address, handler, getDefaultConfig() );
     }
     
     public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
