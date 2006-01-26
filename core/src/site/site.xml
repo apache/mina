@@ -10,16 +10,11 @@
   </bannerRight>
 
   <body>
-    <links>
-      <item name="Directory" href="../../index.html" />
-      <item name="ApacheDS" href="../apacheds/index.html"/>
-      <item name="LDAP" href="../ldap.html"/>
-      <item name="Naming" href="../naming/index.html"/>
-      <item name="ASN.1" href="../asn1/index.html"/>
-      <item name="Kerberos" href="../kerberos.html"/>
-      <item name="AuthX" href="../authx/index.html"/>
-      <item name="MINA" href="../network/index.html"/>
-      <item name="Protocols" href="../providers.html"/>
+     <links>
+       <item name="ApacheDS" href="http://directory.apache.org/newsite/subprojects/apacheds/index.html"/>
+       <item name="Naming" href="http://directory.apache.org/newsite/subprojects/naming/index.html"/>
+       <item name="Network Layer (MINA)" href="http://directory.apache.org/newsite/subprojects/network/index.html"/>
+       <item name="Directory" href="http://directory.apache.org/newsite/index.html"/>
     </links>
  
     <menu name="MINA">
