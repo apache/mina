@@ -30,6 +30,7 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.codec.support.SimpleProtocolDecoderOutput;
@@ -217,6 +218,11 @@ public class TextLineDecoderTest extends TestCase
         public int getScheduledWriteRequests()
         {
             return 0;
+        }
+
+        public IoSessionConfig getConfig()
+        {
+            return null;
         }
     }
 }

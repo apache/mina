@@ -26,12 +26,14 @@ import java.nio.channels.SelectionKey;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.transport.socket.nio.DatagramSession;
+import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
 
 /**
@@ -40,9 +42,10 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-class DatagramSessionImpl extends BaseIoSession implements DatagramSession
+class DatagramSessionImpl extends BaseIoSession
 {
     private final IoService wrapperManager;
+    private final DatagramSessionConfig config = new DatagramSessionConfigImpl();
     private final DatagramService managerDelegate;
     private final DatagramFilterChain filterChain;
     private final DatagramChannel ch;
@@ -51,12 +54,14 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
     private final SocketAddress localAddress;
     private SocketAddress remoteAddress;
     private SelectionKey key;
+    private int readBufferSize;
 
     /**
      * Creates a new instance.
      */
     DatagramSessionImpl( IoService wrapperManager,
                          DatagramService managerDelegate,
+                         DatagramSessionConfig config,
                          DatagramChannel ch, IoHandler defaultHandler )
     {
         this.wrapperManager = wrapperManager;
@@ -67,11 +72,24 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
         this.handler = defaultHandler;
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
+        
+        // Apply the initial session settings
+        this.config.setBroadcast( config.isBroadcast() );
+        this.config.setReceiveBufferSize( config.getReceiveBufferSize() );
+        this.readBufferSize = config.getReceiveBufferSize();
+        this.config.setReuseAddress( config.isReuseAddress() );
+        this.config.setSendBufferSize( config.getSendBufferSize() );
+        this.config.setTrafficClass( config.getTrafficClass() );
     }
     
     public IoService getService()
     {
         return wrapperManager;
+    }
+    
+    public IoSessionConfig getConfig()
+    {
+        return config;
     }
     
     DatagramService getManagerDelegate()
@@ -147,57 +165,137 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
         return localAddress;
     }
 
-    public boolean getReuseAddress() throws SocketException
-    {
-        return ch.socket().getReuseAddress();
-    }
-
-    public void setReuseAddress( boolean on ) throws SocketException
-    {
-        ch.socket().setReuseAddress( on );
-    }
-
-    public int getTrafficClass() throws SocketException
-    {
-        return ch.socket().getTrafficClass();
-    }
-
-    public void setTrafficClass( int tc ) throws SocketException
-    {
-        ch.socket().setTrafficClass( tc );
-    }
-
     protected void updateTrafficMask()
     {
         managerDelegate.updateTrafficMask( this );
     }
-
-    public int getReceiveBufferSize() throws SocketException {
-        return ch.socket().getReceiveBufferSize();
-    }
-
-    public void setReceiveBufferSize( int receiveBufferSize ) throws SocketException
+    
+    int getReadBufferSize()
     {
-        ch.socket().setReceiveBufferSize( receiveBufferSize );
+        return readBufferSize;
     }
-
-    public boolean getBroadcast() throws SocketException
+    
+    private class DatagramSessionConfigImpl implements DatagramSessionConfig
     {
-        return ch.socket().getBroadcast();
-    }
+        public int getReceiveBufferSize()
+        {
+            try
+            {
+                return ch.socket().getReceiveBufferSize();
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
 
-    public void setBroadcast( boolean broadcast ) throws SocketException
-    {
-        ch.socket().setBroadcast( broadcast );
-    }
+        public void setReceiveBufferSize( int receiveBufferSize )
+        {
+            try
+            {
+                ch.socket().setReceiveBufferSize( receiveBufferSize );
+                DatagramSessionImpl.this.readBufferSize = receiveBufferSize;
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
 
-    public int getSendBufferSize() throws SocketException
-    {
-        return ch.socket().getSendBufferSize();
-    }
+        public boolean isBroadcast()
+        {
+            try
+            {
+                return ch.socket().getBroadcast();
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
 
-    public void setSendBufferSize( int sendBufferSize ) throws SocketException
-    {
-        ch.socket().setSendBufferSize( sendBufferSize );
+        public void setBroadcast( boolean broadcast )
+        {
+            try
+            {
+                ch.socket().setBroadcast( broadcast );
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
+
+        public int getSendBufferSize()
+        {
+            try
+            {
+                return ch.socket().getSendBufferSize();
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
+
+        public void setSendBufferSize( int sendBufferSize )
+        {
+            try
+            {
+                ch.socket().setSendBufferSize( sendBufferSize );
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
+
+        public boolean isReuseAddress()
+        {
+            try
+            {
+                return ch.socket().getReuseAddress();
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
+
+        public void setReuseAddress( boolean reuseAddress )
+        {
+            try
+            {
+                ch.socket().setReuseAddress( reuseAddress );
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
+
+        public int getTrafficClass()
+        {
+            try
+            {
+                return ch.socket().getTrafficClass();
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
+
+        public void setTrafficClass( int trafficClass )
+        {
+            try
+            {
+                ch.socket().setTrafficClass( trafficClass );
+            }
+            catch( SocketException e )
+            {
+                throw new RuntimeIOException( e );
+            }
+        }
     }
 }

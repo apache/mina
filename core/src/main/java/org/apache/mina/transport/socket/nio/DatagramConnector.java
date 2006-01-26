@@ -28,7 +28,7 @@ import org.apache.mina.transport.socket.nio.support.DatagramConnectorDelegate;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends DelegatedIoConnector implements DatagramService
+public class DatagramConnector extends DelegatedIoConnector
 {
     /**
      * Creates a new instance.
@@ -36,56 +36,5 @@ public class DatagramConnector extends DelegatedIoConnector implements DatagramS
     public DatagramConnector()
     {
         init( new DatagramConnectorDelegate( this ) );
-    }
-
-    public int getReceiveBufferSize()
-    {
-        return ( ( DatagramConnectorDelegate ) delegate ).getReceiveBufferSize();
-    }
-
-    public void setReceiveBufferSize( int receiveBufferSize )
-    {
-        ( ( DatagramConnectorDelegate ) delegate ).setReceiveBufferSize( receiveBufferSize );
-    }
-
-    public boolean getBroadcast()
-    {
-        return ( ( DatagramConnectorDelegate ) delegate ).getBroadcast();
-    }
-
-    public void setBroadcast( boolean broadcast )
-    {
-        ( ( DatagramConnectorDelegate ) delegate ).setBroadcast( broadcast );
-    }
-
-    public int getSendBufferSize()
-    {
-        return ( ( DatagramConnectorDelegate ) delegate ).getSendBufferSize();
-    }
-
-    public void setSendBufferSize( int sendBufferSize )
-    {
-        ( ( DatagramConnectorDelegate ) delegate ).setSendBufferSize( sendBufferSize );
-    }
-
-    public int getTrafficClass()
-    {
-        return ( ( DatagramConnectorDelegate ) delegate ).getTrafficClass();
-    }
-
-    public void setTrafficClass( int trafficClass )
-    {
-        ( ( DatagramConnectorDelegate ) delegate ).setTrafficClass( trafficClass );
-    }
-
-
-    public boolean getReuseAddress()
-    {
-        return ( ( DatagramConnectorDelegate ) delegate ).getReuseAddress();
-    }
-
-    public void setReuseAddress( boolean reuseAddress )
-    {
-        ( ( DatagramConnectorDelegate ) delegate ).setReuseAddress( reuseAddress );
     }
 }

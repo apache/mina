@@ -16,25 +16,28 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
-
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.support.DelegatedIoAcceptor;
-import org.apache.mina.transport.socket.nio.support.SocketAcceptorDelegate;
+package org.apache.mina.common;
 
 /**
- * {@link IoAcceptor} for socket transport (TCP/IP).
+ * A configuration which is used to configure {@link IoConnector}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor extends DelegatedIoAcceptor
+public interface IoConnectorConfig extends IoServiceConfig
 {
     /**
-     * Creates a new instance.
+     * Returns the connect timeout in seconds.
      */
-    public SocketAcceptor()
-    {
-        init( new SocketAcceptorDelegate( this ) );
-    }
+    int getConnectTimeout();
+
+    /**
+     * Returns the connect timeout in milliseconds.
+     */
+    long getConnectTimeoutMillis();
+
+    /**
+     * Sets the connect timeout in seconds.
+     */
+    void setConnectTimeout( int connectTimeout );
 }

@@ -23,7 +23,6 @@ import java.net.SocketAddress;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.TransportType;
 import org.apache.mina.transport.AbstractTrafficControlTest;
 
 /**
@@ -38,7 +37,7 @@ public class VmPipeTrafficControlTest extends AbstractTrafficControlTest
 
     public VmPipeTrafficControlTest()
     {
-        super( TransportType.VM_PIPE );
+        super( new VmPipeAcceptor() );
     }
 
     protected ConnectFuture connect( int port, IoHandler handler )

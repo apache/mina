@@ -19,56 +19,64 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.net.DatagramSocket;
-import java.net.SocketException;
 
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 
 /**
- * An {@link IoSession} for datagram transport (UDP/IP).
- * 
+ * An {@link IoSessionConfig} for datagram transport type.
+ *
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface DatagramSession extends IoSession
+public interface DatagramSessionConfig extends IoSessionConfig
 {
-    /**
-     * @see DatagramSocket#getReceiveBufferSize()
-     */
-    int getReceiveBufferSize() throws SocketException;
-    /**
-     * @see DatagramSocket#setReceiveBufferSize(int)
-     */
-    void setReceiveBufferSize( int receiveBufferSize ) throws SocketException;
-    /**
-     * @see DatagramSocket#getReuseAddress()
-     */
-    boolean getReuseAddress() throws SocketException;
-    /**
-     * @see DatagramSocket#setReuseAddress(boolean)
-     */
-    void setReuseAddress( boolean reuseAddress ) throws SocketException;
     /**
      * @see DatagramSocket#getBroadcast()
      */
-    boolean getBroadcast() throws SocketException;
+    boolean isBroadcast();
+    
     /**
      * @see DatagramSocket#setBroadcast(boolean)
      */
-    void setBroadcast( boolean broadcast ) throws SocketException;
+    void setBroadcast( boolean broadcast );
+    
+    /**
+     * @see DatagramSocket#getReuseAddress()
+     */
+    boolean isReuseAddress();
+    
+    /**
+     * @see DatagramSocket#setReuseAddress(boolean)
+     */
+    void setReuseAddress( boolean reuseAddress );
+
+    /**
+     * @see DatagramSocket#getReceiveBufferSize()
+     */
+    int getReceiveBufferSize();
+
+    /**
+     * @see DatagramSocket#setReceiveBufferSize(int)
+     */
+    void setReceiveBufferSize( int receiveBufferSize );
+
     /**
      * @see DatagramSocket#getSendBufferSize()
      */
-    int getSendBufferSize() throws SocketException;
+    int getSendBufferSize();
+
     /**
      * @see DatagramSocket#setSendBufferSize(int)
      */
-    void setSendBufferSize( int sendBufferSize ) throws SocketException;
+    void setSendBufferSize( int sendBufferSize );
+
     /**
      * @see DatagramSocket#getTrafficClass()
      */
-    int getTrafficClass() throws SocketException;
+    int getTrafficClass();
+
     /**
      * @see DatagramSocket#setTrafficClass(int)
      */
-    void setTrafficClass( int trafficClass ) throws SocketException;
+    void setTrafficClass( int trafficClass );
 }

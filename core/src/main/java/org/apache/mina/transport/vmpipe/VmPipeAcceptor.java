@@ -6,18 +6,21 @@ package org.apache.mina.transport.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.BaseIoAcceptor;
+import org.apache.mina.common.support.BaseIoAcceptorConfig;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
+import org.apache.mina.util.IdentityHashSet;
 
 /**
  * Binds the specified {@link IoHandler} to the specified
@@ -29,8 +32,17 @@ import org.apache.mina.transport.vmpipe.support.VmPipe;
 public class VmPipeAcceptor extends BaseIoAcceptor
 {
     static final Map boundHandlers = new HashMap();
+    
+    private static final IoSessionConfig CONFIG = new IoSessionConfig() {};
+    private final IoServiceConfig defaultConfig = new BaseIoAcceptorConfig()
+    {
+        public IoSessionConfig getSessionConfig()
+        {
+            return CONFIG;
+        }
+    };
 
-    public void bind( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder ) throws IOException
+    public void bind( SocketAddress address, IoHandler handler, IoAcceptorConfig config ) throws IOException
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -40,9 +52,9 @@ public class VmPipeAcceptor extends BaseIoAcceptor
             throw new IllegalArgumentException(
                     "address must be VmPipeAddress." );
 
-        if( filterChainBuilder == null )
+        if( config == null )
         {
-            filterChainBuilder = IoFilterChainBuilder.NOOP;
+            config = ( IoAcceptorConfig ) getDefaultConfig();
         }
 
         synchronized( boundHandlers )
@@ -55,11 +67,11 @@ public class VmPipeAcceptor extends BaseIoAcceptor
             boundHandlers.put( address, 
                                new VmPipe( this,
                                           ( VmPipeAddress ) address,
-                                          handler, filterChainBuilder ) );
+                                          handler, config ) );
         }
     }
 
-    public Collection getManagedSessions( SocketAddress address )
+    public Set getManagedSessions( SocketAddress address )
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -75,7 +87,8 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         }
         
         Set managedSessions = pipe.getManagedServerSessions();
-        return Collections.unmodifiableCollection( Arrays.asList( managedSessions.toArray() ) );
+        return Collections.unmodifiableSet(
+                new IdentityHashSet( Arrays.asList( managedSessions.toArray() ) ) );
     }
 
     public void unbind( SocketAddress address )
@@ -96,7 +109,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         
         Set managedSessions = pipe.getManagedServerSessions();
         
-        if( isDisconnectClientsOnUnbind() && managedSessions != null )
+        if( pipe.getConfig().isDisconnectOnUnbind() && managedSessions != null )
         {
             IoSession[] tempSessions = ( IoSession[] ) 
                                   managedSessions.toArray( new IoSession[ 0 ] );
@@ -137,7 +150,11 @@ public class VmPipeAcceptor extends BaseIoAcceptor
             {
                 // Ignored
             }
-            
         }                
+    }
+    
+    public IoServiceConfig getDefaultConfig()
+    {
+        return defaultConfig;
     }
 }

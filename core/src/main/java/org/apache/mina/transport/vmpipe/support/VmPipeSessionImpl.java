@@ -12,14 +12,14 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.transport.vmpipe.VmPipeSession;
 import org.apache.mina.util.Queue;
 
 /**
@@ -28,8 +28,10 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
+public class VmPipeSessionImpl extends BaseIoSession
 {
+    private static final IoSessionConfig CONFIG = new IoSessionConfig() {};
+    
     private final IoService manager;
     private final SocketAddress localAddress;
     private final SocketAddress remoteAddress;
@@ -62,8 +64,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         // initialize remote session
         try
         {
-            remoteEntry.getAcceptor().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
-            remoteEntry.getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
+            remoteEntry.getConfig().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
             ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).sessionCreated( remoteSession );
         }
         catch( Throwable t )
@@ -77,7 +78,6 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         // initialize client session
         try
         {
-            manager.getFilterChainBuilder().buildFilterChain( filterChain );
             filterChainBuilder.buildFilterChain( filterChain );
             handler.sessionCreated( this );
         }
@@ -120,6 +120,11 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
     public IoService getService()
     {
         return manager;
+    }
+    
+    public IoSessionConfig getConfig()
+    {
+        return CONFIG;
     }
 
     public IoFilterChain getFilterChain()

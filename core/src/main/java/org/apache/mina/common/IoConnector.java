@@ -55,13 +55,11 @@ public interface IoConnector extends IoService
      * successfully, events are fired to the specified
      * <code>handler</code>.
      * 
-     * @param filterChainBuilder
-     *            an {@link IoFilterChainBuilder} that will modify the
-     *            {@link IoFilterChain} of a newly created {@link IoSession}
+     * @param config the configuration
      * @return {@link ConnectFuture} that will tell the result of the connection attempt
      */
     ConnectFuture connect( SocketAddress address, IoHandler handler,
-                           IoFilterChainBuilder filterChainBuilder );
+                           IoConnectorConfig config );
 
     /**
      * Connects to the specified <code>address</code>.  If communication starts
@@ -79,26 +77,9 @@ public interface IoConnector extends IoService
      * successfully, events are fired to the specified
      * <code>handler</code>.
      * 
-     * @param filterChainBuilder
-     *            an {@link IoFilterChainBuilder} that will modify the
-     *            {@link IoFilterChain} of a newly created {@link IoSession}
+     * @param config the configuration
      * @return {@link ConnectFuture} that will tell the result of the connection attempt
      */
     ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                           IoHandler handler, IoFilterChainBuilder filterChainBuilder );
-    
-    /**
-     * Returns the connect timeout in seconds.
-     */
-    int getConnectTimeout();
-
-    /**
-     * Returns the connect timeout in milliseconds.
-     */
-    long getConnectTimeoutMillis();
-
-    /**
-     * Sets the connect timeout in seconds.
-     */
-    void setConnectTimeout( int connectTimeout );
+                           IoHandler handler, IoConnectorConfig config );
 }

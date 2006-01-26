@@ -18,23 +18,35 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.support.DelegatedIoAcceptor;
-import org.apache.mina.transport.socket.nio.support.SocketAcceptorDelegate;
+import org.apache.mina.common.IoConnectorConfig;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.support.BaseIoConnectorConfig;
+import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
 
 /**
- * {@link IoAcceptor} for socket transport (TCP/IP).
- * 
+ * An {@link IoConnectorConfig} for {@link DatagramConnector}.
+ *
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor extends DelegatedIoAcceptor
+public class DatagramConnectorConfig extends BaseIoConnectorConfig
 {
+    private final DatagramSessionConfig sessionConfig = new DatagramSessionConfigImpl();
+
     /**
      * Creates a new instance.
+     * 
+     * @throws RuntimeIOException if failed to get the default configuration
      */
-    public SocketAcceptor()
+    public DatagramConnectorConfig()
     {
-        init( new SocketAcceptorDelegate( this ) );
+        super();
+    }
+
+
+    public IoSessionConfig getSessionConfig()
+    {
+        return sessionConfig;
     }
 }

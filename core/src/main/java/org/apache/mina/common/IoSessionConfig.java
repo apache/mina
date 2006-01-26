@@ -16,25 +16,14 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
-
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.support.DelegatedIoAcceptor;
-import org.apache.mina.transport.socket.nio.support.SocketAcceptorDelegate;
+package org.apache.mina.common;
 
 /**
- * {@link IoAcceptor} for socket transport (TCP/IP).
+ * The configuration of {@link IoSession}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor extends DelegatedIoAcceptor
+public interface IoSessionConfig
 {
-    /**
-     * Creates a new instance.
-     */
-    public SocketAcceptor()
-    {
-        init( new SocketAcceptorDelegate( this ) );
-    }
 }

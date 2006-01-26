@@ -31,10 +31,13 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoConnector;
+import org.apache.mina.transport.socket.nio.DatagramConnectorConfig;
+import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
 
 /**
@@ -50,11 +53,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private final IoConnector wrapper;
     private final int id = nextId ++ ;
     private Selector selector;
-    private boolean broadcast;
-    private boolean reuseAddress;
-    private int receiveBufferSize = -1;
-    private int sendBufferSize = -1;
-    private int trafficClass = -1;
+    private final DatagramConnectorConfig defaultConfig = new DatagramConnectorConfig();
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
     private final Queue flushingSessions = new Queue();
@@ -69,13 +68,13 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         this.wrapper = wrapper;
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoConnectorConfig config )
     {
-        return connect( address, null, handler, filterChainBuilder );
+        return connect( address, null, handler, config );
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+                                  IoHandler handler, IoConnectorConfig config )
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -92,9 +91,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                                                 + localAddress.getClass() );
         }
         
-        if( filterChainBuilder == null )
+        if( config == null )
         {
-            filterChainBuilder = IoFilterChainBuilder.NOOP;
+            config = ( IoConnectorConfig ) getDefaultConfig();
         }
         
         DatagramChannel ch = null;
@@ -102,20 +101,22 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         try
         {
             ch = DatagramChannel.open();
-            ch.socket().setReuseAddress( reuseAddress );
-            ch.socket().setBroadcast( broadcast );
-            if( receiveBufferSize > 0 )
+            DatagramSessionConfig cfg;
+            if( config.getSessionConfig() instanceof DatagramSessionConfig )
             {
-                ch.socket().setReceiveBufferSize( receiveBufferSize );
+                cfg = ( DatagramSessionConfig ) config.getSessionConfig();
             }
-            if( sendBufferSize > 0 )
+            else
             {
-                ch.socket().setSendBufferSize( sendBufferSize );
+                cfg = ( DatagramSessionConfig ) getDefaultConfig().getSessionConfig();
             }
-            if( trafficClass > 0 )
-            {
-                ch.socket().setTrafficClass( trafficClass );
-            }
+            
+            ch.socket().setReuseAddress( cfg.isReuseAddress() );
+            ch.socket().setBroadcast( cfg.isBroadcast() );
+            ch.socket().setReceiveBufferSize( cfg.getReceiveBufferSize() );
+            ch.socket().setSendBufferSize( cfg.getSendBufferSize() );
+            ch.socket().setTrafficClass( cfg.getTrafficClass() );
+
             if( localAddress != null )
             {
                 ch.socket().bind( localAddress );
@@ -144,7 +145,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             }
         }
 
-        RegistrationRequest request = new RegistrationRequest( ch, handler, filterChainBuilder );
+        RegistrationRequest request = new RegistrationRequest( ch, handler, config );
         synchronized( this )
         {
             try
@@ -176,54 +177,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         return request;
     }
     
-    public boolean getBroadcast()
+    public IoServiceConfig getDefaultConfig()
     {
-        return broadcast;
-    }
-    
-    public void setBroadcast( boolean broadcast )
-    {
-        this.broadcast = broadcast;
-    }
-    
-    public boolean getReuseAddress()
-    {
-        return reuseAddress;
-    }
-    
-    public void setReuseAddress( boolean reuseAddress )
-    {
-        this.reuseAddress = reuseAddress;
-    }
-
-    public int getReceiveBufferSize()
-    {
-        return receiveBufferSize;
-    }
-
-    public void setReceiveBufferSize( int receiveBufferSize )
-    {
-        this.receiveBufferSize = receiveBufferSize;
-    }
-
-    public int getSendBufferSize()
-    {
-        return sendBufferSize;
-    }
-
-    public void setSendBufferSize( int sendBufferSize )
-    {
-        this.sendBufferSize = sendBufferSize;
-    }
-
-    public int getTrafficClass()
-    {
-        return trafficClass;
-    }
-
-    public void setTrafficClass( int trafficClass )
-    {
-        this.trafficClass = trafficClass;
+        return defaultConfig;
     }
 
     private synchronized void startupWorker() throws IOException
@@ -443,7 +399,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private void readSession( DatagramSessionImpl session )
     {
 
-        ByteBuffer readBuf = ByteBuffer.allocate( 2048 );
+        ByteBuffer readBuf = ByteBuffer.allocate( session.getReadBufferSize() );
         try
         {
             int readBytes = session.getChannel().read( readBuf.buf() );
@@ -582,14 +538,15 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             if( req == null )
                 break;
 
-            DatagramSessionImpl session =
-                new DatagramSessionImpl( wrapper, this, req.channel, req.handler );
+            DatagramSessionImpl session = new DatagramSessionImpl(
+                    wrapper, this,
+                    ( DatagramSessionConfig ) req.config.getSessionConfig(),
+                    req.channel, req.handler );
 
             boolean success = false;
             try
             {
-                this.filterChainBuilder.buildFilterChain( session.getFilterChain() );
-                req.filterChainBuilder.buildFilterChain( session.getFilterChain() );
+                req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                 ( ( DatagramFilterChain ) session.getFilterChain() ).sessionCreated( session );
 
                 SelectionKey key = req.channel.register( selector,
@@ -661,15 +618,15 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     {
         private final DatagramChannel channel;
         private final IoHandler handler;
-        private final IoFilterChainBuilder filterChainBuilder;
+        private final IoConnectorConfig config;
 
         private RegistrationRequest( DatagramChannel channel,
                                      IoHandler handler,
-                                     IoFilterChainBuilder filterChainBuilder )
+                                     IoConnectorConfig config )
         {
             this.channel = channel;
             this.handler = handler;
-            this.filterChainBuilder = filterChainBuilder;
+            this.config = config;
         }
     }
 }

@@ -18,11 +18,10 @@
  */
 package org.apache.mina.util;
 
-import java.net.SocketException;
-
 import org.apache.mina.common.IoSession;
-import org.apache.mina.transport.socket.nio.DatagramSession;
-import org.apache.mina.transport.socket.nio.SocketSession;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
+import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 
 /**
  * Exception utility.
@@ -32,18 +31,19 @@ import org.apache.mina.transport.socket.nio.SocketSession;
  */
 public class SessionUtil
 {
-    public static void initialize( IoSession session ) throws SocketException
+    public static void initialize( IoSession session )
     {
-        if( session instanceof SocketSession )
+        IoSessionConfig cfg = session.getConfig();
+        if( cfg instanceof SocketSessionConfig )
         {
-            SocketSession ss = ( SocketSession ) session;
-            ss.setReuseAddress( true );
-            ss.setKeepAlive( true );
+            SocketSessionConfig sCfg = ( SocketSessionConfig ) cfg;
+            sCfg.setReuseAddress( true );
+            sCfg.setKeepAlive( true );
         }
-        else if( session instanceof DatagramSession )
+        else if( cfg instanceof DatagramSessionConfig )
         {
-            DatagramSession ds = ( DatagramSession ) session;
-            ds.setReuseAddress( true );
+            DatagramSessionConfig dCfg = ( DatagramSessionConfig ) cfg;
+            dCfg.setReuseAddress( true );
         }
     }
 

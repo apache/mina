@@ -19,12 +19,13 @@
 package org.apache.mina.common.support;
 
 import java.net.SocketAddress;
+import java.util.Set;
 
 import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
 
 /**
  * A delegated {@link IoConnector} that wraps the other {@link IoConnector}.
@@ -57,9 +58,9 @@ public class DelegatedIoConnector implements IoConnector
         return delegate.connect( address, handler );
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoConnectorConfig config )
     {
-        return delegate.connect( address, handler, filterChainBuilder );
+        return delegate.connect( address, handler, config );
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
@@ -69,38 +70,18 @@ public class DelegatedIoConnector implements IoConnector
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+                                  IoHandler handler, IoConnectorConfig config )
     {
-        return delegate.connect( address, localAddress, handler, filterChainBuilder );
+        return delegate.connect( address, localAddress, handler, config );
     }
 
-    public int getConnectTimeout()
+    public Set getManagedSessions( SocketAddress address )
     {
-        return delegate.getConnectTimeout();
+        return delegate.getManagedSessions( address );
     }
-
-    public long getConnectTimeoutMillis()
+    
+    public IoServiceConfig getDefaultConfig()
     {
-        return delegate.getConnectTimeoutMillis();
-    }
-
-    public void setConnectTimeout( int connectTimeout )
-    {
-        delegate.setConnectTimeout( connectTimeout );
-    }
-
-    public IoFilterChainBuilder getFilterChainBuilder()
-    {
-        return delegate.getFilterChainBuilder();
-    }
-
-    public void setFilterChainBuilder( IoFilterChainBuilder builder )
-    {
-        delegate.setFilterChainBuilder( builder );
-    }
-
-    public DefaultIoFilterChainBuilder getFilterChain()
-    {
-        return delegate.getFilterChain();
+        return delegate.getDefaultConfig();
     }
 }
