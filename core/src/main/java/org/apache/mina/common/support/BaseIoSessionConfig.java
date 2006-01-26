@@ -16,18 +16,34 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.common;
+package org.apache.mina.common.support;
+
+import org.apache.mina.common.IoSessionConfig;
 
 /**
- * The configuration of {@link IoSession}.
+ * A base implementation of {@link IoSessionConfig}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoSessionConfig
+public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable
 {
-    /**
-     * Returns a deep clone of this configuration.
-     */
-    Object clone();
+    protected BaseIoSessionConfig()
+    {
+    }
+
+    public Object clone()
+    {
+        BaseIoSessionConfig ret;
+        try
+        {
+            ret = ( BaseIoSessionConfig ) super.clone();
+        }
+        catch( CloneNotSupportedException e )
+        {
+            throw ( InternalError ) new InternalError().initCause( e );
+        }
+        
+        return ret;
+    }
 }

@@ -12,6 +12,7 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.BaseIoConnectorConfig;
+import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
 import org.apache.mina.util.AnonymousSocketAddress;
@@ -25,7 +26,7 @@ import org.apache.mina.util.AnonymousSocketAddress;
  */
 public class VmPipeConnector extends BaseIoConnector
 {
-    private static final IoSessionConfig CONFIG = new IoSessionConfig() {};
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
     private final IoServiceConfig defaultConfig = new BaseIoConnectorConfig()
     {
         public IoSessionConfig getSessionConfig()

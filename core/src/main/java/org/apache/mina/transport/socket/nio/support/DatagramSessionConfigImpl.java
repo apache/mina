@@ -7,9 +7,10 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 
-public class DatagramSessionConfigImpl implements DatagramSessionConfig
+public class DatagramSessionConfigImpl extends BaseIoSessionConfig implements DatagramSessionConfig
 {
     private boolean broadcast;
     private boolean reuseAddress;

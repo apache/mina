@@ -19,6 +19,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.BaseIoAcceptorConfig;
+import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 import org.apache.mina.util.IdentityHashSet;
 
@@ -33,7 +34,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
 {
     static final Map boundHandlers = new HashMap();
     
-    private static final IoSessionConfig CONFIG = new IoSessionConfig() {};
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
     private final IoServiceConfig defaultConfig = new BaseIoAcceptorConfig()
     {
         public IoSessionConfig getSessionConfig()

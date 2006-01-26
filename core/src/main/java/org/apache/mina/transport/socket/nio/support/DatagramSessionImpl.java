@@ -33,6 +33,7 @@ import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
 
@@ -179,7 +180,7 @@ class DatagramSessionImpl extends BaseIoSession
         return readBufferSize;
     }
     
-    private class DatagramSessionConfigImpl implements DatagramSessionConfig
+    private class DatagramSessionConfigImpl extends BaseIoSessionConfig implements DatagramSessionConfig
     {
         public int getReceiveBufferSize()
         {
