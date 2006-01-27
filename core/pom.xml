@@ -12,59 +12,6 @@
 
   <url>http://directory.apache.org/subprojects/network/</url>
 
-  <issueManagement>
-    <system>jira</system>
-    <url>http://issues.apache.org/jira/browse/DIRMINA</url>
-  </issueManagement>
-
-  <distributionManagement>
-    <site>
-      <id>apache.websites</id>
-      <url>scp://minotaur.apache.org/www/directory.apache.org/newsite/subprojects/network</url>
-    </site>
-  </distributionManagement>
-
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/directory/trunk/org.apache.mina</connection>
-    <url>http://svn.apache.org/viewcvs.cgi/directory/trunk/org.apache.mina/?root=Apache-SVN</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/directory/trunk/org.apache.mina</developerConnection>
-  </scm>
-
-  <ciManagement>
-    <notifiers>
-      <notifier>
-        <type>mail</type>
-        <address>mina-dev@directory.apache.org</address>
-      </notifier>
-    </notifiers>
-  </ciManagement>
-
-  <description>
-    MINA (Multipurpose Infrastructure for Network Applications) is a
-    network application framework which helps users develop high
-    performance and highly scalable network applications easily.
-  </description>
-
-  <mailingLists>
-    <mailingList>
-      <name>Apache MINA Developement</name>
-      <subscribe>mina-dev-subscribe@directory.apache.org</subscribe>
-      <unsubscribe>mina-dev-unsubscribe@directory.apache.org</unsubscribe>
-      <archive>http://mail-archives.apache.org/mod_mbox/mina-dev/</archive>
-      <otherArchives>
-        <otherArchive>http://www.archivum.info/mina-dev@directory.apache.org/</otherArchive>
-      </otherArchives>
-    </mailingList>
-  </mailingLists>
-
-  <licenses>
-    <license>
-      <name>Apache 2.0 License</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
   <dependencies>
 
     <dependency>
@@ -85,11 +32,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>2.0-beta-4</version>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -120,33 +62,5 @@
     </plugins>
   </build>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clover-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jxr-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>surefire-report-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>
 
