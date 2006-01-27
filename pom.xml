@@ -169,7 +169,7 @@ Use JDK 1.5 to make sure these modules build.
 
   <reporting>
     <plugins>
-      <!--<plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clover-plugin</artifactId>
       </plugin>
@@ -184,15 +184,15 @@ Use JDK 1.5 to make sure these modules build.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
-      </plugin> -->
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jxr-maven-plugin</artifactId>
       </plugin>
-      <!-- <plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>surefire-report-maven-plugin</artifactId>
-      </plugin> -->
+      </plugin>
     </plugins>
   </reporting>
 
