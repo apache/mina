@@ -71,11 +71,11 @@
         <p>
           Source code:
 <source>
-$ svn co https://svn.apache.org/repos/asf/directory/network/trunk mina
+$ svn co https://svn.apache.org/repos/asf/directory/trunks/mina mina
 $ cd mina
-$ maven jar     # Build JAR
-$ maven site    # Generate documentation
-$ maven eclipse # Generate Eclipse project file if you want
+$ mvn package         # Build packages (JARs) for the Core API and other extensions
+$ mvn site            # Generate documentation
+$ mvn eclipse:eclipse # Generate Eclipse projects files if you want
 </source>
         </p>
       </subsection>
