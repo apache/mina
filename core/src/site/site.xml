@@ -12,7 +12,7 @@
   <body>
      <links>
        <item name="ApacheDS" href="http://directory.apache.org/newsite/subprojects/apacheds/index.html"/>
-       <item name="Naming" href="http://directory.apache.org/newsite/subprojects/naming/index.html"/>
+       <item name="Naming" href="http://directory.apache.org/subprojects/naming/index.html"/>
        <item name="Network Layer (MINA)" href="http://directory.apache.org/newsite/subprojects/network/index.html"/>
        <item name="Directory" href="http://directory.apache.org/newsite/index.html"/>
     </links>
