@@ -29,6 +29,7 @@
       <version>1.3.0</version>
       <scope>test</scope>
     </dependency>
+    
   </dependencies>
   <build>
     <plugins>
@@ -42,33 +43,5 @@
       </plugin>
     </plugins>
   </build>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clover-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jxr-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>surefire-report-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>
 
