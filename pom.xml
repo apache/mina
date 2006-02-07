@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.apache.directory</groupId>
-    <artifactId>build</artifactId>
-    <version>1.1-SNAPSHOT</version>
-  </parent>
   <groupId>org.apache.directory.mina</groupId>
   <version>0.9.2-SNAPSHOT</version>
   <artifactId>build</artifactId>
@@ -22,8 +17,19 @@
   <distributionManagement>
     <site>
       <id>apache.websites</id>
+      <name>Apache Directory Project Web Site</name>
       <url>scp://minotaur.apache.org/www/directory.apache.org/newsite/projects/network/</url>
     </site>
+    <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Maven 2 Snapshot Repository</name>
+      <url>scpexe://cvs.apache.org/www/cvs.apache.org/maven-snapshot-repository</url>
+    </repository>
+    <snapshotRepository>
+      <id>apache.snapshots</id>
+      <name>Apache Maven 2 Snapshot Repository</name>
+      <url>scpexe://cvs.apache.org/www/cvs.apache.org/maven-snapshot-repository</url>
+    </snapshotRepository>
   </distributionManagement>
 
   <scm>
