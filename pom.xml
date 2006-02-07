@@ -2,7 +2,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.directory.mina</groupId>
-  <version>0.9.2-SNAPSHOT</version>
+  <version>0.9.1-SNAPSHOT</version>
   <artifactId>build</artifactId>
   <name>Apache MINA Parent Build</name>
   <packaging>pom</packaging>
