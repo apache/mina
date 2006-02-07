@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.directory.mina</groupId>
     <artifactId>build</artifactId>
-    <version>0.9.1-SNAPSHOT</version>
+    <version>0.9.2-SNAPSHOT</version>
   </parent>
   <artifactId>mina-integration-spring</artifactId>
   <name>Apache MINA Spring Integration</name>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>org.apache.directory.mina</groupId>
       <artifactId>mina-filter-ssl</artifactId>
-      <version>0.9.1-SNAPSHOT</version>
+      <version>0.9.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
