@@ -59,6 +59,57 @@
     </mailingList>
   </mailingLists>
 
+  <developers>
+    <developer>
+      <id>trustin</id>
+      <name>Trustin Lee</name>
+      <email>trustin@gmail.com</email>
+      <url>http://gleamynode.net/</url>
+      <organization>Chutnoon, Inc.</organization>
+      <organizationUrl>http://www.1nooncorp.com/</organizationUrl>
+      <roles>
+        <role>Project Lead</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>+9</timezone>
+    </developer>
+    <developer>
+      <id>niklas</id>
+      <name>Niklas Therning</name>
+      <email>niklas@trillian.se</email>
+      <url>http://therning.org/niklas/</url>
+      <organization>Trillian AB</organization>
+      <organizationUrl>http://www.trillian.se/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>akarasulu</id>
+      <name>Alex Karasulu</name>
+      <email>akarasulu@apache.org</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Jan Andersson</name>
+      <email>janne@minq.se</email>
+    </contributor>
+    <contributor>
+      <name>Julien Vermillard</name>
+      <email>jvermillard@archean.fr</email>
+    </contributor>
+    <contributor>
+      <name>Vinod Panicker</name>
+      <email>vinod.p@gmail.com</email>
+    </contributor>
+  </contributors>
+
   <licenses>
     <license>
       <name>Apache 2.0 License</name>
