@@ -70,9 +70,9 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
      * <p>
-     * This method does the same job with {@link ObjectSerializationEncoder#setMaxObjectSize(int)}.
+     * This method does the same job with {@link ObjectSerializationEncoder#getMaxObjectSize()}.
      */
-    public int gerEncoderMaxObjectSize()
+    public int getEncoderMaxObjectSize()
     {
         return encoder.getMaxObjectSize();
     }
@@ -98,7 +98,7 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link ObjectSerializationDecoder#getMaxObjectSize()}.
      */
-    public int gerDecoderMaxObjectSize()
+    public int getDecoderMaxObjectSize()
     {
         return decoder.getMaxObjectSize();
     }
