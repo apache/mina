@@ -19,24 +19,6 @@
     <url>http://issues.apache.org/jira/browse/DIRMINA</url>
   </issueManagement>
 
-  <distributionManagement>
-    <site>
-      <id>apache.websites</id>
-      <name>Apache Directory Project Web Site</name>
-      <url>scp://minotaur.apache.org/www/directory.apache.org/newsite/projects/network/</url>
-    </site>
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Maven 2 Snapshot Repository</name>
-      <url>scpexe://cvs.apache.org/www/cvs.apache.org/maven-snapshot-repository</url>
-    </repository>
-    <snapshotRepository>
-      <id>apache.snapshots</id>
-      <name>Apache Maven 2 Snapshot Repository</name>
-      <url>scpexe://cvs.apache.org/www/cvs.apache.org/maven-snapshot-repository</url>
-    </snapshotRepository>
-  </distributionManagement>
-
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/directory/trunks/mina</connection>
     <url>http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/?root=Apache-SVN</url>
@@ -138,24 +120,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <repositories>
-    <!-- For snapshots (no release jars or non-apache jars)           -->
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
-    </repository>
-    
-    <!-- Temp repo for 3rd party jars that are not in ibiblio.org yet.-->
-    <!-- Artifacts in repo should be requested for ibiblio upload &   -->
-    <!-- removed from this repository - this repo will disappear.     -->
-    <repository>
-      <id>safehaus</id>
-      <name>Alternate Repository for Missing Ibiblio Artifacts</name>
-      <url>http://m2.safehaus.org</url>
-    </repository>
-  </repositories>
 
   <profiles>
     <profile>
