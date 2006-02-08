@@ -13,9 +13,9 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.apache.directory</groupId>
-      <artifactId>directory-asn1</artifactId>
-      <version>0.3.4-SNAPSHOT</version>
+      <groupId>org.apache.directory.shared</groupId>
+      <artifactId>asn1-shared</artifactId>
+      <version>0.9.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
