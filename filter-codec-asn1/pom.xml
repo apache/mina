@@ -14,7 +14,7 @@
 
     <dependency>
       <groupId>org.apache.directory.shared</groupId>
-      <artifactId>asn1-shared</artifactId>
+      <artifactId>shared-asn1</artifactId>
       <version>0.9.4-SNAPSHOT</version>
     </dependency>
 
