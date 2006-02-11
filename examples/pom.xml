@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.directory.mina</groupId>
     <artifactId>build</artifactId>
-    <version>0.9.1-SNAPSHOT</version>
+    <version>0.9.1</version>
   </parent>
   <artifactId>mina-examples</artifactId>
   <name>Apache MINA Examples</name>
@@ -13,7 +13,7 @@
     <dependency>
       <groupId>org.apache.directory.mina</groupId>
       <artifactId>mina-filter-ssl</artifactId>
-      <version>0.9.1-SNAPSHOT</version>
+      <version>${pom.version}</version>
     </dependency>
 
     <dependency>
@@ -29,6 +29,7 @@
       <version>1.3.0</version>
       <scope>test</scope>
     </dependency>
+    
   </dependencies>
   <build>
     <plugins>

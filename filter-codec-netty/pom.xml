@@ -33,7 +33,7 @@
     <dependency>
       <groupId>org.apache.directory.mina</groupId>
       <artifactId>mina-core</artifactId>
-      <version>0.9.1-SNAPSHOT</version>
+      <version>${pom.version}</version>
     </dependency>
 
     <dependency>

@@ -10,16 +10,11 @@
   </bannerRight>
 
   <body>
-    <links>
-      <item name="Directory" href="../../index.html" />
-      <item name="ApacheDS" href="../apacheds/index.html"/>
-      <item name="LDAP" href="../ldap.html"/>
-      <item name="Naming" href="../naming/index.html"/>
-      <item name="ASN.1" href="../asn1/index.html"/>
-      <item name="Kerberos" href="../kerberos.html"/>
-      <item name="AuthX" href="../authx/index.html"/>
-      <item name="MINA" href="../network/index.html"/>
-      <item name="Protocols" href="../providers.html"/>
+     <links>
+       <item name="ApacheDS" href="http://directory.apache.org/newsite/projects/apacheds/index.html"/>
+       <item name="Naming" href="http://directory.apache.org/projects/naming/index.html"/>
+       <item name="Network Layer (MINA)" href="http://directory.apache.org/newsite/projects/mina/index.html"/>
+       <item name="Directory" href="http://directory.apache.org/newsite/index.html"/>
     </links>
  
     <menu name="MINA">
@@ -43,15 +38,19 @@
       <item name="JavaDocs" href="/apidocs-examples/index.html"/>
       <item name="Source code" href="/xref-examples/index.html"/>
     </menu>
- 
+
+-->
+
     <menu name="MINA References">
       <item name="JavaDocs" href="/apidocs/index.html"/>
+    </menu>
+<!--
       <item name="Source code" href="/xref/index.html"/>
       <item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/directory/network/trunk/?root=Apache-SVN"/>
       <item name="Wiki" href="http://wiki.apache.org/directory/MinaHome"/>
     </menu>
 -->
- 
+
     ${reports}
   </body>
 </project>
