@@ -18,34 +18,37 @@
  */
 package org.apache.mina.integration.spring;
 
+import java.beans.PropertyEditorSupport;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.apache.mina.integration.spring.support.AbstractIoAcceptorFactoryBean;
 import org.springframework.util.Assert;
 
 /**
- * Common base class for factory beans creating IoAcceptor instances which bind
- * to InetSocketAddress addresses.
+ * Java Bean {@link java.beans.PropertyEditor} which converts Strings into 
+ * {@link InetSocketAddress} objects. Valid values include a hostname or ip
+ * address and a port number separated by a ':'. If the hostname or ip address
+ * is omitted the wildcard address will be used. E.g.: 
+ * <code>google.com:80</code>, <code>:22</code>, <code>192.168.0.1:110</code>.
+ * <p>
+ * Use Spring's CustomEditorConfigurer to use this property editor in a Spring
+ * configuration file. See chapter 3.14 of the Spring Reference Documentation 
+ * for more info.
+ * </p>
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
- * @version $Rev$, $Date$
+ * @version $Revision$, $Date$
+ * 
+ * @see java.net.InetSocketAddress
  */
-public abstract class InetSocketAddressBindingIoAcceptorFactoryBean extends
-        AbstractIoAcceptorFactoryBean
+public class InetSocketAddressEditor extends PropertyEditorSupport
 {
-
-    /**
-     * Parses the specified string and returns a corresponding
-     * InetSocketAddress. E.g.: <code>google.com:80</code>, <code>:22</code>,
-     * <code>192.168.0.1:110</code>.
-     * 
-     * @param s
-     *            the string to parse. An optional host or ip address followed
-     *            by a colon and a port number (<em>[host|ip]:port</em>).
-     * @return the SocketAddress.
-     */
-    protected SocketAddress parseSocketAddress( String s )
+    public void setAsText( String text ) throws IllegalArgumentException
+    {
+        setValue( parseSocketAddress( text ) );
+    }
+    
+    private SocketAddress parseSocketAddress( String s )
     {
         Assert.notNull( s, "null SocketAddress string" );
         s = s.trim();
@@ -63,18 +66,7 @@ public abstract class InetSocketAddressBindingIoAcceptorFactoryBean extends
         }
     }
 
-    /**
-     * Parses a port number by calling
-     * {@link Integer#parseInt(java.lang.String)}.
-     * 
-     * @param s
-     *            the textual representation of the port.
-     * @return the port number.
-     * @throws IllegalArgumentException
-     *             if {@link Integer#parseInt(java.lang.String)} throws a
-     *             NumberFormatException.
-     */
-    protected int parsePort( String s )
+    private int parsePort( String s )
     {
         try
         {
@@ -84,5 +76,5 @@ public abstract class InetSocketAddressBindingIoAcceptorFactoryBean extends
         {
             throw new IllegalArgumentException( "Illegal port number: " + s );
         }
-    }
+    }    
 }

@@ -20,38 +20,38 @@ package org.apache.mina.integration.spring;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
 
 /**
- * Tests {@link org.apache.mina.integration.spring.VmPipeAcceptorFactoryBean}.
+ * Tests {@link VmPipeAddressEditor}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAcceptorFactoryBeanTest extends TestCase
+public class VmPipeAddressEditorTest extends TestCase
 {
+    VmPipeAddressEditor editor;
 
-    public void testParseSocketAddress() throws Exception
+    protected void setUp() throws Exception
     {
-        VmPipeAcceptorFactoryBean factory = new VmPipeAcceptorFactoryBean()
-        {
-            protected IoAcceptor createIoAcceptor() throws Exception
-            {
-                // Don't care. This will never be called.
-                return null;
-            }
-        };
-
-        assertEquals( new VmPipeAddress( 1 ), factory.parseSocketAddress( "1" ) );
-        assertEquals( new VmPipeAddress( 10 ), factory
-                .parseSocketAddress( ":10" ) );
-        assertEquals( new VmPipeAddress( 100 ), factory
-                .parseSocketAddress( " :100 " ) );
-
+        editor = new VmPipeAddressEditor();
+    }
+    
+    public void testSetAsTextWithLegalValues() throws Exception
+    {
+        editor.setAsText( "1" );
+        assertEquals( new VmPipeAddress( 1 ), editor.getValue() );
+        editor.setAsText( ":10" );
+        assertEquals( new VmPipeAddress( 10 ), editor.getValue() );
+        editor.setAsText( ":100" );
+        assertEquals( new VmPipeAddress( 100 ), editor.getValue() );
+    }
+    
+    public void testSetAsTextWithIllegalValues() throws Exception
+    {
         try
         {
-            factory.parseSocketAddress( null );
+            editor.setAsText( null );
             fail( "null string. IllegalArgumentException expected." );
         }
         catch( IllegalArgumentException iae )
@@ -59,7 +59,7 @@ public class VmPipeAcceptorFactoryBeanTest extends TestCase
         }
         try
         {
-            factory.parseSocketAddress( "bar" );
+            editor.setAsText( "bar" );
             fail( "Illegal port number. IllegalArgumentException expected." );
         }
         catch( IllegalArgumentException iae )
@@ -67,7 +67,7 @@ public class VmPipeAcceptorFactoryBeanTest extends TestCase
         }
         try
         {
-            factory.parseSocketAddress( ":foo" );
+            editor.setAsText( ":foo" );
             fail( "Illegal port number. IllegalArgumentException expected." );
         }
         catch( IllegalArgumentException iae )
