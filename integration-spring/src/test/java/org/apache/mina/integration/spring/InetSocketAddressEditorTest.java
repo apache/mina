@@ -22,40 +22,46 @@ import java.net.InetSocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoAcceptor;
-
 /**
- * Tests {@link InetSocketAddressBindingIoAcceptorFactoryBean}.
+ * Tests {@link InetSocketAddressEditor}.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class InetSocketAddressBindingIoAcceptorFactoryBeanTest extends TestCase
+public class InetSocketAddressEditorTest extends TestCase
 {
+    InetSocketAddressEditor editor;
 
-    public void testParseSocketAddress() throws Exception
+    protected void setUp() throws Exception
     {
-        InetSocketAddressBindingIoAcceptorFactoryBean factory = new InetSocketAddressBindingIoAcceptorFactoryBean()
-        {
-            protected IoAcceptor createIoAcceptor() throws Exception
-            {
-                // Don't care. This will never be called.
-                return null;
-            }
-        };
-
-        assertEquals( new InetSocketAddress( 1 ), factory
-                .parseSocketAddress( "1" ) );
-        assertEquals( new InetSocketAddress( 10 ), factory
-                .parseSocketAddress( ":10" ) );
-        assertEquals( new InetSocketAddress( "foo.bar.com", 100 ), factory
-                .parseSocketAddress( "foo.bar.com:100" ) );
-        assertEquals( new InetSocketAddress( "192.168.0.1", 1000 ), factory
-                .parseSocketAddress( "192.168.0.1:1000" ) );
-
+        editor = new InetSocketAddressEditor();
+    }
+    
+    public void testSetAsTextWithWildcardAddress() throws Exception
+    {
+        editor.setAsText( "1" );
+        assertEquals( new InetSocketAddress( 1 ), editor.getValue() );
+        editor.setAsText( ":10" );
+        assertEquals( new InetSocketAddress( 10 ), editor.getValue() );
+    }
+    
+    public void testSetAsTextWithHostName() throws Exception
+    {
+        editor.setAsText( "www.google.com:80" );
+        assertEquals( new InetSocketAddress( "www.google.com", 80 ), editor.getValue() );
+    }
+    
+    public void testSetAsTextWithIpAddress() throws Exception
+    {
+        editor.setAsText( "192.168.0.1:1000" );
+        assertEquals( new InetSocketAddress( "192.168.0.1", 1000 ), editor.getValue() );
+    }
+    
+    public void testSetAsTextWithIllegalValues() throws Exception
+    {
         try
         {
-            factory.parseSocketAddress( null );
+            editor.setAsText( null );
             fail( "null string. IllegalArgumentException expected." );
         }
         catch( IllegalArgumentException iae )
@@ -63,7 +69,7 @@ public class InetSocketAddressBindingIoAcceptorFactoryBeanTest extends TestCase
         }
         try
         {
-            factory.parseSocketAddress( "bar" );
+            editor.setAsText( "bar" );
             fail( "Illegal port number. IllegalArgumentException expected." );
         }
         catch( IllegalArgumentException iae )
@@ -71,7 +77,7 @@ public class InetSocketAddressBindingIoAcceptorFactoryBeanTest extends TestCase
         }
         try
         {
-            factory.parseSocketAddress( ":foo" );
+            editor.setAsText( ":foo" );
             fail( "Illegal port number. IllegalArgumentException expected." );
         }
         catch( IllegalArgumentException iae )
@@ -79,7 +85,7 @@ public class InetSocketAddressBindingIoAcceptorFactoryBeanTest extends TestCase
         }
         try
         {
-            factory.parseSocketAddress( "www.foo.com:yada" );
+            editor.setAsText( "www.foo.com:yada" );
             fail( "Illegal port number. IllegalArgumentException expected." );
         }
         catch( IllegalArgumentException iae )

@@ -18,14 +18,20 @@
  */
 package org.apache.mina.integration.spring;
 
+import java.net.SocketAddress;
+
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.integration.spring.support.AbstractIoAcceptorFactoryBean;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
+
 
 /**
- * {@link AbstractIoAcceptorFactoryBean} implementation which allows for easy
- * configuration of {@link SocketAcceptor} instances using Spring. Example of
- * usage:
+ * Spring {@link FactoryBean} which enables the bindings of an {@link IoAcceptor}
+ * to be configured using Spring. Example of usage:
  * <p>
  * 
  * <pre>
@@ -96,63 +102,86 @@ import org.apache.mina.transport.socket.nio.SocketAcceptor;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptorFactoryBean extends
-        InetSocketAddressBindingIoAcceptorFactoryBean
+public class IoAcceptorFactoryBean implements FactoryBean, InitializingBean, DisposableBean
 {
+    private Binding[] bindings = new Binding[ 0 ];
+    private IoAcceptor target;
 
-    private boolean reuseAddress = false;
-
-    private int backlog = 50;
-
-    private int receiveBufferSize = -1;
-
-    protected IoAcceptor createIoAcceptor() throws Exception
+    /**
+     * Sets the {@link IoAcceptor} to be configured using this factory bean.
+     * 
+     * @param target the target {@link IoAcceptor}.
+     */
+    public void setTarget( IoAcceptor target )
     {
-        SocketAcceptor acceptor = new SocketAcceptor();
-
-        acceptor.setBacklog( backlog );
-        acceptor.setReceiveBufferSize( receiveBufferSize );
-        acceptor.setReuseAddress( reuseAddress );
-
-        return acceptor;
+        this.target = target;
     }
 
     /**
-     * Sets the <code>backlog</code> property of the {@link SocketAcceptor}
-     * this factory bean will create.
+     * Sets the bindings to be used by the {@link IoAcceptor} configured by this 
+     * factory bean.
      * 
-     * @param backlog
-     *            the property value.
-     * @see SocketAcceptor#setBacklog(int)
+     * @param bindings the bindings.
+     * @throws IllegalArgumentException if the specified value is 
+     *         <code>null</code>.
+     * @see IoAcceptor#bind(SocketAddress, IoHandler)
+     * @see IoAcceptor#bind(SocketAddress, IoHandler, IoServiceConfig)
+     * @see Binding
      */
-    public void setBacklog( int backlog )
+    public void setBindings( Binding[] bindings )
     {
-        this.backlog = backlog;
+        Assert.notNull( bindings, "Property 'bindings' may not be null" );
+        this.bindings = bindings;
+    }
+    
+    public Object getObject() throws Exception
+    {
+        return target;
     }
 
-    /**
-     * Sets the <code>receiveBufferSize</code> property of the
-     * {@link SocketAcceptor} this factory bean will create.
-     * 
-     * @param receiveBufferSize
-     *            the property value.
-     * @see SocketAcceptor#setReceiveBufferSize(int)
-     */
-    public void setReceiveBufferSize( int receiveBufferSize )
+    public Class getObjectType()
     {
-        this.receiveBufferSize = receiveBufferSize;
+        return IoAcceptor.class;
     }
 
-    /**
-     * Sets the <code>reuseAddress</code> property of the
-     * {@link SocketAcceptor} this factory bean will create.
-     * 
-     * @param reuseAddress
-     *            the property value.
-     * @see SocketAcceptor#setReuseAddress(boolean)
-     */
-    public void setReuseAddress( boolean reuseAddress )
+    public boolean isSingleton()
     {
-        this.reuseAddress = reuseAddress;
+        return true;
+    }
+
+    public void afterPropertiesSet() throws Exception
+    {
+        Assert.notNull( target, "Property 'target' may not be null" );
+        
+        /*
+         * Bind all.
+         */
+        for( int i = 0; i < bindings.length; i++ )
+        {
+            Binding b = bindings[ i ];
+            if( b.getServiceConfig() != null )
+            {
+                target.bind( b.getAddress(), b.getHandler(), b.getServiceConfig() );
+            }
+            else
+            {
+                target.bind( b.getAddress(), b.getHandler() );
+            }
+        }
+    }
+
+    public void destroy() throws Exception
+    {
+        for( int i = 0; i < bindings.length; i++ )
+        {
+            Binding b = bindings[ i ];
+            try
+            {
+                target.unbind( b.getAddress() );
+            }
+            catch( Exception ignored )
+            {
+            }
+        }        
     }
 }

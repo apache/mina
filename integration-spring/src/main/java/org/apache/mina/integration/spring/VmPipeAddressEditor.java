@@ -19,16 +19,15 @@
 package org.apache.mina.integration.spring;
 
 import java.beans.PropertyEditorSupport;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.SocketAddress;
+
+import org.apache.mina.transport.vmpipe.VmPipeAddress;
+import org.springframework.util.Assert;
 
 /**
  * Java Bean {@link java.beans.PropertyEditor} which converts Strings into 
- * {@link InetAddress} objects. This may be used together with Spring to be able 
- * to set {@link InetAddress} bean properties, e.g.
- * {@link org.apache.mina.filter.BlacklistFilter#setBlacklist(InetAddress[])}.
- * Simply calls {@link InetAddress#getByName(java.lang.String)} when
- * converting from a String.
+ * {@link VmPipeAddress} objects. Valid values specify an integer port number
+ * optionally prefixed with a ':'. E.g.: <code>:80</code>, <code>22</code>.
  * <p>
  * Use Spring's CustomEditorConfigurer to use this property editor in a Spring
  * configuration file. See chapter 3.14 of the Spring Reference Documentation 
@@ -38,20 +37,30 @@ import java.net.UnknownHostException;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Revision$, $Date$
  * 
- * @see java.net.InetAddress
+ * @see org.apache.mina.transport.vmpipe.VmPipeAddress
  */
-public class InetAddressEditor extends PropertyEditorSupport
+public class VmPipeAddressEditor extends PropertyEditorSupport
 {
     public void setAsText( String text ) throws IllegalArgumentException
     {
+        setValue( parseSocketAddress( text ) );
+    }
+    
+    private SocketAddress parseSocketAddress( String s )
+    {
+        Assert.notNull( s, "null SocketAddress string" );
+        s = s.trim();
+        if( s.startsWith( ":" ) )
+        {
+            s = s.substring( 1 );
+        }
         try
         {
-            setValue( InetAddress.getByName( text ) );
+            return new VmPipeAddress( Integer.parseInt( s.trim() ) );
         }
-        catch( UnknownHostException uhe )
+        catch( NumberFormatException nfe )
         {
-            IllegalArgumentException iae = new IllegalArgumentException();
-            iae.initCause( uhe );
+            throw new IllegalArgumentException( "Illegal vm pipe address: " + s );
         }
     }
 }
