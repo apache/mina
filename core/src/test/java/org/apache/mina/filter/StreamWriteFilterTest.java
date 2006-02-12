@@ -34,12 +34,14 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.Queue;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 
@@ -165,6 +167,8 @@ public class StreamWriteFilterTest extends TestCase {
         mockSession.setReturnValue( stream );
         session.removeAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE );
         mockSession.setReturnValue( writeRequest.getFuture() );
+        session.removeAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
+        mockSession.setReturnValue( null );
         nextFilter.messageSent( session, stream );
         
         /*
@@ -225,6 +229,8 @@ public class StreamWriteFilterTest extends TestCase {
         mockSession.setReturnValue( stream );
         session.removeAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE );
         mockSession.setReturnValue( writeRequest.getFuture() );
+        session.removeAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
+        mockSession.setReturnValue( null );
         nextFilter.messageSent( session, stream );
         
         /*
@@ -251,6 +257,7 @@ public class StreamWriteFilterTest extends TestCase {
     {
         StreamWriteFilter filter = new StreamWriteFilter();
         
+        Queue queue = new Queue();
         InputStream stream = new ByteArrayInputStream( new byte[ 5 ] );
         
         /*
@@ -259,6 +266,8 @@ public class StreamWriteFilterTest extends TestCase {
         mockSession.reset();
         session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
         mockSession.setReturnValue( stream );
+        session.getAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
+        mockSession.setReturnValue( queue );
         
         /*
          * Replay.
@@ -266,14 +275,10 @@ public class StreamWriteFilterTest extends TestCase {
         mockNextFilter.replay();
         mockSession.replay();
 
-        try
-        {
-            filter.filterWrite( nextFilter, session, new WriteRequest( new Object() ) );
-            fail( "Alreday processing a stream. IllegalStateException expected." );
-        }
-        catch ( IllegalStateException ise )
-        {
-        }
+        WriteRequest wr = new WriteRequest( new Object() );
+        filter.filterWrite( nextFilter, session, wr );
+        assertEquals( 1, queue.size() );
+        assertSame( wr, queue.pop() );
         
         /*
          * Verify.
@@ -281,6 +286,63 @@ public class StreamWriteFilterTest extends TestCase {
         mockNextFilter.verify();
         mockSession.verify();
     }
+    
+    public void testWritesWriteRequestQueueWhenFinished() throws Exception
+    {
+        StreamWriteFilter filter = new StreamWriteFilter();
+
+        WriteRequest wrs[] = new WriteRequest[] { 
+                new WriteRequest( new Object() ),
+                new WriteRequest( new Object() ),
+                new WriteRequest( new Object() )
+        };
+        Queue queue = new Queue();
+        queue.push( wrs[ 0 ] );
+        queue.push( wrs[ 1 ] );
+        queue.push( wrs[ 2 ] );
+        InputStream stream = new ByteArrayInputStream( new byte[ 0 ] );
+        
+        /*
+         * Record expectations
+         */
+        mockSession.reset();
+        
+        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
+        mockSession.setReturnValue( stream );
+        session.removeAttribute( StreamWriteFilter.CURRENT_STREAM );
+        mockSession.setReturnValue( stream );
+        session.removeAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE );
+        mockSession.setReturnValue( new WriteFuture() );
+        session.removeAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
+        mockSession.setReturnValue( queue );
+        
+        nextFilter.filterWrite( session, wrs[ 0 ] );
+        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
+        mockSession.setReturnValue( null );
+        nextFilter.filterWrite( session, wrs[ 1 ] );
+        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
+        mockSession.setReturnValue( null );
+        nextFilter.filterWrite( session, wrs[ 2 ] );
+        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
+        mockSession.setReturnValue( null );
+        
+        nextFilter.messageSent( session, stream );
+        
+        /*
+         * Replay.
+         */
+        mockNextFilter.replay();
+        mockSession.replay();
+
+        filter.messageSent( nextFilter, session, new Object() );
+        assertEquals( 0, queue.size() );
+        
+        /*
+         * Verify.
+         */
+        mockNextFilter.verify();
+        mockSession.verify();
+    }    
     
     /**
      * Tests that {@link StreamWriteFilter#setWriteBufferSize(int)} checks the
@@ -404,12 +466,12 @@ public class StreamWriteFilterTest extends TestCase {
             this.inputStream = inputStream;
         }
 
-        public void sessionCreated(IoSession session) throws Exception {
+        public void sessionCreated( IoSession session ) throws Exception {
             super.sessionCreated( session );
             session.getFilterChain().addLast( "codec", streamWriteFilter );
         }
 
-        public void sessionOpened(IoSession session) throws Exception {
+        public void sessionOpened( IoSession session ) throws Exception {
             session.write( inputStream );
         }
 
