@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.ThreadPoolFilter;
 import org.apache.mina.transport.socket.nio.SocketConnector;
@@ -62,13 +63,13 @@ public class Client
         ThreadPoolFilter ioThreadPoolFilter = new ThreadPoolFilter();
         ThreadPoolFilter protocolThreadPoolFilter = new ThreadPoolFilter();
         IoConnector connector = new SocketConnector();
-        connector.getFilterChain().addFirst(
+        connector.getDefaultConfig().getFilterChain().addFirst(
                 "ioThreadPool", ioThreadPoolFilter );
-        connector.getFilterChain().addLast(
+        connector.getDefaultConfig().getFilterChain().addLast(
                 "protocolThreadPool", protocolThreadPoolFilter );
 
         // Set connect timeout.
-        connector.setConnectTimeout( CONNECT_TIMEOUT );
+        ( ( IoConnectorConfig ) connector.getDefaultConfig() ).setConnectTimeout( CONNECT_TIMEOUT );
         
         IoSession session;
         for( ;; )

@@ -4,11 +4,9 @@
 package org.apache.mina.examples.tennis;
 
 import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TransportType;
-import org.apache.mina.registry.Service;
-import org.apache.mina.registry.ServiceRegistry;
-import org.apache.mina.registry.SimpleServiceRegistry;
+import org.apache.mina.transport.vmpipe.VmPipeAcceptor;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
 import org.apache.mina.transport.vmpipe.VmPipeConnector;
 
@@ -31,13 +29,11 @@ public class Main
 
     public static void main( String[] args ) throws Exception
     {
-        ServiceRegistry registry = new SimpleServiceRegistry();
-
+        IoAcceptor acceptor = new VmPipeAcceptor();
         VmPipeAddress address = new VmPipeAddress( 8080 );
 
         // Set up server
-        Service service = new Service( "tennis", TransportType.VM_PIPE, address );
-        registry.bind( service, new TennisPlayer() );
+        acceptor.bind( address, new TennisPlayer() );
 
         // Connect to the server.
         VmPipeConnector connector = new VmPipeConnector();
@@ -52,6 +48,6 @@ public class Main
         // Wait until the match ends.
         session.getCloseFuture().join();
         
-        registry.unbind( service );
+        acceptor.unbind( address );
     }
 }

@@ -18,10 +18,10 @@
  */
 package org.apache.mina.examples.reverser;
 
-import org.apache.mina.common.TransportType;
-import org.apache.mina.registry.Service;
-import org.apache.mina.registry.ServiceRegistry;
-import org.apache.mina.registry.SimpleServiceRegistry;
+import java.net.InetSocketAddress;
+
+import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 /**
  * (<b>Entry point</b>) Reverser server which reverses all text lines from
@@ -36,11 +36,12 @@ public class Main
 
     public static void main( String[] args ) throws Exception
     {
-        ServiceRegistry registry = new SimpleServiceRegistry();
+        IoAcceptor acceptor = new SocketAcceptor();
 
         // Bind
-        Service service = new Service( "reverse", TransportType.SOCKET, PORT );
-        registry.bind( service, new ReverseProtocolHandler() );
+        acceptor.bind(
+                new InetSocketAddress( PORT ),
+                new ReverseProtocolHandler() );
 
         System.out.println( "Listening on port " + PORT );
     }

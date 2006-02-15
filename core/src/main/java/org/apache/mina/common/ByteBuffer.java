@@ -933,7 +933,7 @@ public abstract class ByteBuffer implements Comparable
             }
 
             end = position();
-            if( end == oldLimit )
+            if( end == oldLimit && get( end - 1 ) != 0 )
             {
                 limit( end );
             }

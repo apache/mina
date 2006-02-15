@@ -12,15 +12,15 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.transport.vmpipe.VmPipeSession;
-import org.apache.mina.util.ExceptionUtil;
 import org.apache.mina.util.Queue;
 
 /**
@@ -29,9 +29,11 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
+public class VmPipeSessionImpl extends BaseIoSession
 {
-    private final IoSessionManager manager;
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
+    
+    private final IoService manager;
     private final SocketAddress localAddress;
     private final SocketAddress remoteAddress;
     private final IoHandler handler;
@@ -44,7 +46,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
     /**
      * Constructor for client-side session.
      */
-    public VmPipeSessionImpl( IoSessionManager manager, Object lock, SocketAddress localAddress,
+    public VmPipeSessionImpl( IoService manager, Object lock, SocketAddress localAddress,
                    IoHandler handler, IoFilterChainBuilder filterChainBuilder,
                    VmPipe remoteEntry ) throws IOException
     {
@@ -64,7 +66,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         try
         {
             remoteEntry.getAcceptor().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
-            remoteEntry.getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
+            remoteEntry.getConfig().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
             ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).sessionCreated( remoteSession );
         }
         catch( Throwable t )
@@ -84,7 +86,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         }
         catch( Throwable t )
         {
-            ExceptionUtil.throwException( t );
+            throw ( IOException ) new IOException( "Failed to create a session." ).initCause( t );
         }
 
         VmPipeIdleStatusChecker.getInstance().addSession( remoteSession );
@@ -100,7 +102,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
     /**
      * Constructor for server-side session.
      */
-    private VmPipeSessionImpl( IoSessionManager manager, VmPipeSessionImpl remoteSession, VmPipe entry )
+    private VmPipeSessionImpl( IoService manager, VmPipeSessionImpl remoteSession, VmPipe entry )
     {
         this.manager = manager;
         this.lock = remoteSession.lock;
@@ -118,9 +120,14 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         return managedSessions;
     }
 
-    public IoSessionManager getManager()
+    public IoService getService()
     {
         return manager;
+    }
+    
+    public IoSessionConfig getConfig()
+    {
+        return CONFIG;
     }
 
     public IoFilterChain getFilterChain()

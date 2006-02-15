@@ -19,6 +19,7 @@
 package org.apache.mina.util;
 
 import java.util.AbstractSet;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,6 +37,11 @@ public class IdentityHashSet extends AbstractSet
 
     public IdentityHashSet()
     {
+    }
+    
+    public IdentityHashSet( Collection c )
+    {
+        addAll( c );
     }
 
     public int size()

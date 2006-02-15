@@ -20,12 +20,13 @@ package org.apache.mina.common.support;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Collection;
+import java.util.Set;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 
 /**
@@ -59,9 +60,9 @@ public class DelegatedIoAcceptor implements IoAcceptor
         delegate.bind( address, handler );
     }
 
-    public void bind( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder ) throws IOException
+    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
     {
-        delegate.bind( address, handler, filterChainBuilder );
+        delegate.bind( address, handler, config );
     }
 
     public void unbind( SocketAddress address )
@@ -69,7 +70,7 @@ public class DelegatedIoAcceptor implements IoAcceptor
         delegate.unbind( address );
     }
 
-    public Collection getManagedSessions( SocketAddress address )
+    public Set getManagedSessions( SocketAddress address )
     {
         return delegate.getManagedSessions( address );
     }
@@ -77,6 +78,11 @@ public class DelegatedIoAcceptor implements IoAcceptor
     public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
     {
         return delegate.newSession( remoteAddress, localAddress );
+    }
+
+    public IoServiceConfig getDefaultConfig()
+    {
+        return delegate.getDefaultConfig();
     }
 
     public IoFilterChainBuilder getFilterChainBuilder()
@@ -88,19 +94,9 @@ public class DelegatedIoAcceptor implements IoAcceptor
     {
         delegate.setFilterChainBuilder( builder );
     }
-    
+
     public DefaultIoFilterChainBuilder getFilterChain()
     {
         return delegate.getFilterChain();
-    }
-
-    public boolean isDisconnectClientsOnUnbind()
-    {
-        return delegate.isDisconnectClientsOnUnbind();
-    }
-
-    public void setDisconnectClientsOnUnbind( boolean disconnectClientsOnUnbind )
-    {
-        delegate.setDisconnectClientsOnUnbind( disconnectClientsOnUnbind );
     }
 }

@@ -31,8 +31,10 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
+import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketSession;
+import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
+import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,11 +94,11 @@ public abstract class AbstractBindTest extends TestCase
     {
         if( acceptor instanceof DatagramAcceptor )
         {
-            ( ( DatagramAcceptor ) acceptor ).setReuseAddress( reuseAddress );
+            ( ( DatagramSessionConfig ) acceptor.getDefaultConfig().getSessionConfig() ).setReuseAddress( reuseAddress );
         }
         else if( acceptor instanceof SocketAcceptor )
         {
-            ( ( SocketAcceptor ) acceptor ).setReuseAddress( reuseAddress );
+            ( ( SocketAcceptorConfig ) acceptor.getDefaultConfig() ).setReuseAddress( reuseAddress );
         }
     }
     
@@ -182,9 +184,9 @@ public abstract class AbstractBindTest extends TestCase
 
         public void sessionCreated( IoSession session )
         {
-            if( session instanceof SocketSession )
+            if( session.getConfig() instanceof SocketSessionConfig )
             {
-                ( ( SocketSession ) session ).setSessionReceiveBufferSize( 2048 );
+                ( ( SocketSessionConfig ) session.getConfig() ).setReceiveBufferSize( 2048 );
             }
 
             session.setIdleTime( IdleStatus.BOTH_IDLE, 10 );

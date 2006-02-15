@@ -19,18 +19,20 @@
 package org.apache.mina.examples.echoserver;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TransportType;
-import org.apache.mina.filter.LoggingFilter;
+import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.SSLFilter;
-import org.apache.mina.registry.Service;
-import org.apache.mina.registry.ServiceRegistry;
-import org.apache.mina.registry.SimpleServiceRegistry;
+import org.apache.mina.transport.socket.nio.DatagramAcceptor;
+import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -41,9 +43,12 @@ import org.apache.mina.util.SessionLog;
  */
 public abstract class AbstractTest extends TestCase
 {
+    protected boolean useSSL;
     protected int port;
 
-    protected ServiceRegistry registry;
+    protected SocketAddress boundAddress;
+    protected IoAcceptor datagramAcceptor;
+    protected IoAcceptor socketAcceptor;
     
     protected AbstractTest()
     {
@@ -77,30 +82,48 @@ public abstract class AbstractTest extends TestCase
 
     protected void setUp() throws Exception
     {
-        registry = new SimpleServiceRegistry();
+        // Disable SSL by default
+        useSSL = false;
+        final SSLFilter sslFilter =
+            new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
+
+        boundAddress = null;
+        datagramAcceptor = new DatagramAcceptor();
+        socketAcceptor = new SocketAcceptor();
+        
+        ( ( DatagramSessionConfig ) datagramAcceptor.getDefaultConfig().getSessionConfig() ).setReuseAddress( true );
+        ( ( SocketAcceptorConfig ) socketAcceptor.getDefaultConfig() ).setReuseAddress( true );
+        
 
         // Find an availble test port and bind to it.
         boolean socketBound = false;
         boolean datagramBound = false;
 
-        final SocketAcceptor acceptor = ( SocketAcceptor ) registry.getAcceptor( TransportType.SOCKET );
-        acceptor.setReuseAddress( true );
-
         // Let's start from port #1 to detect possible resource leak
         // because test will fail in port 1-1023 if user run this test
         // as a normal user.
+        
+        SocketAddress address = null;
+        
         for( port = 1; port <= 65535; port ++ )
         {
             socketBound = false;
             datagramBound = false;
             
-            Service socketService = new Service( "echo", TransportType.SOCKET, port );
-            Service datagramService = new Service( "echo", TransportType.DATAGRAM, port );
+            address = new InetSocketAddress( port );
             
             try
             {
-                registry.bind( socketService, new EchoProtocolHandler()
+                socketAcceptor.bind( address, new EchoProtocolHandler()
                 {
+                    public void sessionCreated( IoSession session )
+                    {
+                        if( useSSL )
+                        {
+                            session.getFilterChain().addFirst( "SSL", sslFilter );
+                        }
+                    }
+
                     // This is for TLS reentrance test
                     public void messageReceived( IoSession session, Object message ) throws Exception
                     {
@@ -110,10 +133,10 @@ public abstract class AbstractTest extends TestCase
                         }
                         
                         ByteBuffer buf = ( ByteBuffer ) message;
-                        if( buf.remaining() == 1 && buf.get() == ( byte ) '.' )
+                        if( session.getFilterChain().contains( "SSL" ) && buf.remaining() == 1 && buf.get() == ( byte ) '.' )
                         {
                             SessionLog.info( session, "TLS Reentrance" );
-                            ( ( SSLFilter ) acceptor.getFilterChain().get( "SSL" ) ).startSSL( session );
+                            ( ( SSLFilter ) session.getFilterChain().get( "SSL" ) ).startSSL( session );
 
                             // Send a response
                             buf = ByteBuffer.allocate( 1 );
@@ -130,7 +153,7 @@ public abstract class AbstractTest extends TestCase
                 } );
                 socketBound = true;
 
-                registry.bind( datagramService, new EchoProtocolHandler() );
+                datagramAcceptor.bind( address, new EchoProtocolHandler() );
                 datagramBound = true;
 
                 break;
@@ -140,9 +163,13 @@ public abstract class AbstractTest extends TestCase
             }
             finally
             {
-                if( !socketBound || !datagramBound )
+                if( socketBound && !datagramBound )
                 {
-                    registry.unbindAll();
+                    socketAcceptor.unbind( address );
+                }
+                if( datagramBound && !socketBound )
+                {
+                    datagramAcceptor.unbind( address );
                 }
             }
         }
@@ -153,16 +180,16 @@ public abstract class AbstractTest extends TestCase
             throw new IOException( "Cannot bind any test port." );
         }
 
-        registry.getAcceptor( TransportType.SOCKET ).getFilterChain().addLast( "logger", new LoggingFilter() );
-        registry.getAcceptor( TransportType.DATAGRAM ).getFilterChain().addLast( "logger", new LoggingFilter() );
-
+        boundAddress = address;
         System.out.println( "Using port " + port + " for testing." );
     }
 
     protected void tearDown() throws Exception
     {
-        registry.unbindAll();
-        registry.getAcceptor( TransportType.SOCKET ).getFilterChain().remove( "logger" );
-        registry.getAcceptor( TransportType.DATAGRAM ).getFilterChain().remove( "logger" );
+        if( boundAddress != null )
+        {
+            socketAcceptor.unbind( boundAddress );
+            datagramAcceptor.unbind( boundAddress );
+        }
     }
 }
