@@ -74,7 +74,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link TextLineEncoder#getMaxLineLength()}.
      */
-    public int gerEncoderMaxLineLength()
+    public int getEncoderMaxLineLength()
     {
         return encoder.getMaxLineLength();
     }
@@ -100,7 +100,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link TextLineDecoder#getMaxLineLength()}.
      */
-    public int gerDecoderMaxLineLength()
+    public int getDecoderMaxLineLength()
     {
         return decoder.getMaxLineLength();
     }

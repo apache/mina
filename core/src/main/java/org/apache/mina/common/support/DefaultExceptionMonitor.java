@@ -19,7 +19,7 @@
 package org.apache.mina.common.support;
 
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IoSessionManager;
+import org.apache.mina.common.IoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * A default {@link ExceptionMonitor} implementation that logs uncaught
  * exceptions using {@link Logger}.
  * <p>
- * All {@link IoSessionManager}s have this implementation as a default exception
+ * All {@link IoService}s have this implementation as a default exception
  * monitor.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)

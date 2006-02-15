@@ -7,9 +7,12 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.BaseIoConnector;
+import org.apache.mina.common.support.BaseIoConnectorConfig;
+import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
 import org.apache.mina.util.AnonymousSocketAddress;
@@ -23,12 +26,21 @@ import org.apache.mina.util.AnonymousSocketAddress;
  */
 public class VmPipeConnector extends BaseIoConnector
 {
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder ) 
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
+    private final IoServiceConfig defaultConfig = new BaseIoConnectorConfig()
     {
-        return connect( address, null, handler, filterChainBuilder );
+        public IoSessionConfig getSessionConfig()
+        {
+            return CONFIG;
+        }
+    };
+
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config ) 
+    {
+        return connect( address, null, handler, config );
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler, IoFilterChainBuilder filterChainBuilder )
+    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler, IoServiceConfig config )
     {
         if( address == null )
             throw new NullPointerException( "address" );
@@ -38,9 +50,9 @@ public class VmPipeConnector extends BaseIoConnector
             throw new IllegalArgumentException(
                                                 "address must be VmPipeAddress." );
 
-        if( filterChainBuilder == null )
+        if( config == null )
         {
-            filterChainBuilder = IoFilterChainBuilder.NOOP;
+            config = getDefaultConfig();
         }
 
         VmPipe entry = ( VmPipe ) VmPipeAcceptor.boundHandlers.get( address );
@@ -59,7 +71,7 @@ public class VmPipeConnector extends BaseIoConnector
                         new Object(), // lock
                         AnonymousSocketAddress.INSTANCE,
                         handler,
-                        filterChainBuilder,
+                        config.getFilterChainBuilder(),
                         entry );
             future.setSession( session );
         }
@@ -68,5 +80,10 @@ public class VmPipeConnector extends BaseIoConnector
             future.setException( e );
         }
         return future;
+    }
+    
+    public IoServiceConfig getDefaultConfig()
+    {
+        return defaultConfig;
     }
 }

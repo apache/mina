@@ -295,7 +295,12 @@ public class IoFilterChainTest extends TestCase
             return false;
         }
 
-        public IoSessionManager getManager()
+        public IoService getService()
+        {
+            return null;
+        }
+
+        public IoSessionConfig getConfig()
         {
             return null;
         }
@@ -381,7 +386,7 @@ public class IoFilterChainTest extends TestCase
                 {
                 }
 
-                public IoSessionManager getManager()
+                public IoService getService()
                 {
                     return null;
                 }
@@ -414,6 +419,11 @@ public class IoFilterChainTest extends TestCase
                 public int getScheduledWriteRequests()
                 {
                     return 0;
+                }
+
+                public IoSessionConfig getConfig()
+                {
+                    return null;
                 }
             } );
         }

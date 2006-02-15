@@ -50,15 +50,20 @@ import java.util.Set;
 public interface IoSession {
     
     /**
-     * Returns the {@link IoSessionManager} which manages this session.
+     * Returns the {@link IoService} which provides I/O service to this session.
      */
-    IoSessionManager getManager();
+    IoService getService();
 
     /**
      * Returns the {@link IoHandler} which handles this session.
      */
     IoHandler getHandler();
 
+    /**
+     * Returns the configuration of this session.
+     */
+    IoSessionConfig getConfig();
+    
     /**
      * Returns the filter chain that only affects this session.
      */
@@ -209,7 +214,7 @@ public interface IoSession {
     
     /**
      * Sets the {@link TrafficMask} of this session which will result
-     * the parent {@link IoSessionManager} to start to control the traffic
+     * the parent {@link IoService} to start to control the traffic
      * of this session immediately.
      */
     void setTrafficMask( TrafficMask trafficMask );

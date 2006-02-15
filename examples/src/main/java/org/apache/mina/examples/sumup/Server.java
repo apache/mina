@@ -18,10 +18,10 @@
  */
 package org.apache.mina.examples.sumup;
 
-import org.apache.mina.common.TransportType;
-import org.apache.mina.registry.Service;
-import org.apache.mina.registry.ServiceRegistry;
-import org.apache.mina.registry.SimpleServiceRegistry;
+import java.net.InetSocketAddress;
+
+import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 /**
  * (<strong>Entry Point</strong>) Starts SumUp server.
@@ -38,10 +38,10 @@ public class Server
     public static void main( String[] args ) throws Throwable
     {
         // Create ServiceRegistry.
-        ServiceRegistry registry = new SimpleServiceRegistry();
+        IoAcceptor acceptor = new SocketAcceptor();
 
-        registry.bind(
-                new Service( "sumUp", TransportType.SOCKET, SERVER_PORT ),
+        acceptor.bind(
+                new InetSocketAddress( SERVER_PORT ),
                 new ServerSessionHandler( USE_CUSTOM_CODEC ) );
 
         System.out.println( "Listening on port " + SERVER_PORT );

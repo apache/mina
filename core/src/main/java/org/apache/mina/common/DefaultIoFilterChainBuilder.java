@@ -53,7 +53,7 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev: 350135 $, $Date: 2005-12-01 12:43:29 +0900 $
  */
-public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder
+public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Cloneable
 {
     private List entries = new ArrayList();
     private final Map entriesByName = new HashMap();
@@ -276,6 +276,17 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder
         buf.append( " }" );
         
         return buf.toString();
+    }
+    
+    public Object clone()
+    {
+        DefaultIoFilterChainBuilder ret = new DefaultIoFilterChainBuilder();
+        for( Iterator i = entries.iterator(); i.hasNext(); )
+        {
+            Entry e = ( Entry ) i.next();
+            ret.addLast( e.getName(), e.getFilter() );
+        }
+        return ret;
     }
 
     private void checkBaseName( String baseName )

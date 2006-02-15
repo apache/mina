@@ -28,7 +28,7 @@ import org.apache.mina.transport.socket.nio.support.SocketAcceptorDelegate;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptor extends DelegatedIoAcceptor implements SocketSessionManager
+public class SocketAcceptor extends DelegatedIoAcceptor
 {
     /**
      * Creates a new instance.
@@ -36,38 +36,5 @@ public class SocketAcceptor extends DelegatedIoAcceptor implements SocketSession
     public SocketAcceptor()
     {
         init( new SocketAcceptorDelegate( this ) );
-    }
-
-    public int getReceiveBufferSize()
-    {
-        return ( ( SocketAcceptorDelegate ) delegate ).getReceiveBufferSize();
-    }
-
-    /**
-     * @param receiveBufferSize <tt>-1</tt> to use the default value.
-     */
-    public void setReceiveBufferSize( int receiveBufferSize )
-    {
-        ( ( SocketAcceptorDelegate ) delegate ).setReceiveBufferSize( receiveBufferSize );
-    }
-
-    public boolean isReuseAddress()
-    {
-        return ( ( SocketAcceptorDelegate ) delegate ).isReuseAddress();
-    }
-
-    public void setReuseAddress( boolean reuseAddress )
-    {
-        ( ( SocketAcceptorDelegate ) delegate ).setReuseAddress( reuseAddress );
-    }
-
-    public int getBacklog()
-    {
-        return ( ( SocketAcceptorDelegate ) delegate ).getBacklog();
-    }
-
-    public void setBacklog( int backlog )
-    {
-        ( ( SocketAcceptorDelegate ) delegate ).setBacklog( backlog );
     }
 }

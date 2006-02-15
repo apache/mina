@@ -18,13 +18,15 @@
  */
 package org.apache.mina.examples.httpserver;
 
+import java.net.InetSocketAddress;
+
+import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.SSLFilter;
-import org.apache.mina.registry.Service;
-import org.apache.mina.registry.ServiceRegistry;
-import org.apache.mina.registry.SimpleServiceRegistry;
+import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 
 /**
  * (<b>Entry point</b>) HTTP server
@@ -41,29 +43,32 @@ public class Main
 
     public static void main( String[] args ) throws Exception
     {
-        ServiceRegistry registry = new SimpleServiceRegistry();
-        
+        IoAcceptor acceptor = new SocketAcceptor();
+        IoAcceptorConfig config = new SocketAcceptorConfig();
+        DefaultIoFilterChainBuilder chain = config.getFilterChain();
+
         // Add SSL filter if SSL is enabled.
         if( USE_SSL )
         {
-            addSSLSupport( registry );
+            addSSLSupport( chain );
         }
 
         // Bind
-        Service service = new Service( "http", TransportType.SOCKET, PORT );
-        registry.bind( service, new HttpProtocolHandler() );
+        acceptor.bind(
+                new InetSocketAddress( PORT ),
+                new HttpProtocolHandler(),
+                config );
 
         System.out.println( "Listening on port " + PORT );
     }
 
 
-    private static void addSSLSupport( ServiceRegistry registry )
+    private static void addSSLSupport( DefaultIoFilterChainBuilder chain )
         throws Exception
     {
         System.out.println( "SSL is enabled." );
         SSLFilter sslFilter =
             new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
-        IoAcceptor acceptor = registry.getAcceptor( TransportType.SOCKET );
-        acceptor.getFilterChain().addLast( "sslFilter", sslFilter );
+        chain.addLast( "sslFilter", sslFilter );
     }
 }

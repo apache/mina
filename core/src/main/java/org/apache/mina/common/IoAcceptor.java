@@ -20,7 +20,6 @@ package org.apache.mina.common;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Collection;
 
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
@@ -41,7 +40,7 @@ import java.util.Collection;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoAcceptor extends IoSessionManager
+public interface IoAcceptor extends IoService
 {
     /**
      * Binds to the specified <code>address</code> and handles incoming
@@ -55,32 +54,16 @@ public interface IoAcceptor extends IoSessionManager
      * Binds to the specified <code>address</code> and handles incoming
      * connections with the specified <code>handler</code>.
      *
-     * @param filterChainBuilder
-     *            an {@link IoFilterChainBuilder} that will modify the
-     *            {@link IoFilterChain} of a newly created {@link IoSession}
+     * @param config the configuration
      * @throws IOException if failed to bind
      */
-    void bind( SocketAddress address, IoHandler handler, IoFilterChainBuilder filterChainBuilder ) throws IOException;
+    void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException;
 
     /**
      * Unbinds from the specified <code>address</code> and disconnects all clients
      * connected there.
      */
     void unbind( SocketAddress address );
-    
-    /**
-     * Returns all sessions currently connected to the specified local address.
-     * 
-     * @param address the local address to return all sessions for. Must have
-     *        been bound previously.
-     * @return the sessions.
-     * @throws IllegalArgumentException if the specified <tt>address</tt> has 
-     *         not been bound.
-     * @throws UnsupportedOperationException if this operation isn't supported
-     *         for the particular transport type implemented by this 
-     *         {@link IoAcceptor}.
-     */
-    Collection getManagedSessions( SocketAddress address );
     
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified
@@ -97,16 +80,4 @@ public interface IoAcceptor extends IoSessionManager
      *                                  not bound yet. (see {@link #bind(SocketAddress, IoHandler)})
      */
     IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress );
-    
-    /**
-     * Returns <tt>true</tt> if and only if all clients are disconnected
-     * when this acceptor unbinds the related local address.
-     */
-    boolean isDisconnectClientsOnUnbind();
-    
-    /**
-     * Sets whether all clients are disconnected when this acceptor unbinds the
-     * related local address.  The default value is <tt>true</tt>.
-     */
-    void setDisconnectClientsOnUnbind( boolean disconnectClientsOnUnbind );
 }

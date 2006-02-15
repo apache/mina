@@ -24,12 +24,11 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.registry.Service;
-import org.apache.mina.registry.SimpleServiceRegistry;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -42,12 +41,12 @@ import org.apache.mina.util.AvailablePortFinder;
 public abstract class AbstractTrafficControlTest extends TestCase
 {
     protected int port = 0;
-    protected SimpleServiceRegistry registry;
+    protected IoAcceptor acceptor;
     protected TransportType transportType;
     
-    public AbstractTrafficControlTest( TransportType transportType )
+    public AbstractTrafficControlTest( IoAcceptor acceptor )
     {
-        this.transportType = transportType;
+        this.acceptor = acceptor;
     }
 
     protected void setUp() throws Exception
@@ -56,9 +55,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
         
         port = AvailablePortFinder.getNextAvailable();
         
-        registry = new SimpleServiceRegistry();
-        registry.bind( new Service( "traffic", transportType, 
-                                    createServerSocketAddress( port ) ), 
+        acceptor.bind( createServerSocketAddress( port ), 
                        new ServerIoHandler() );
         
     }
@@ -67,7 +64,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
     {
         super.tearDown();
         
-        registry.unbindAll();
+        acceptor.unbind( createServerSocketAddress( port ) );
     }
 
     protected abstract ConnectFuture connect( int port, IoHandler handler) throws Exception;

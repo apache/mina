@@ -18,14 +18,12 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.TransportType;
 import org.apache.mina.transport.AbstractTrafficControlTest;
 
 /**
@@ -40,15 +38,14 @@ public class DatagramTrafficControlTest extends AbstractTrafficControlTest
 
     public DatagramTrafficControlTest()
     {
-        super( TransportType.DATAGRAM );
+        super( new DatagramAcceptor() );
     }
 
     protected ConnectFuture connect( int port, IoHandler handler )
             throws Exception
     {
         IoConnector connector = new DatagramConnector();
-        SocketAddress addr = new InetSocketAddress( InetAddress.getLocalHost(), 
-                                                    port );
+        SocketAddress addr = new InetSocketAddress( "localhost", port );
         return connector.connect( addr, handler );
     }
 

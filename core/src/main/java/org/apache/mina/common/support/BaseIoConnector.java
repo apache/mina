@@ -22,7 +22,6 @@ import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 
 /**
@@ -31,40 +30,19 @@ import org.apache.mina.common.IoHandler;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoConnector extends BaseIoSessionManager implements IoConnector
+public abstract class BaseIoConnector extends BaseIoService implements IoConnector
 {
-    private int defaultConnectTimeout = 60; // 1 minute
-
     protected BaseIoConnector()
     {
     }
     
     public ConnectFuture connect( SocketAddress address, IoHandler handler )
     {
-        return connect( address, handler, IoFilterChainBuilder.NOOP );
+        return connect( address, handler, getDefaultConfig() );
     }
 
     public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler )
     {
-        return connect( address, localAddress, handler, IoFilterChainBuilder.NOOP );
+        return connect( address, localAddress, handler, getDefaultConfig() );
     }
-
-    public int getConnectTimeout()
-    {
-        return defaultConnectTimeout;
-    }
-
-    public long getConnectTimeoutMillis()
-    {
-        return defaultConnectTimeout * 1000L;
-    }
-
-    public void setConnectTimeout( int defaultConnectTimeout )
-    {
-        if( defaultConnectTimeout <= 0 )
-        {
-            throw new IllegalArgumentException( "defaultConnectTimeout: " + defaultConnectTimeout );
-        }
-        this.defaultConnectTimeout = defaultConnectTimeout;
-    }    
 }

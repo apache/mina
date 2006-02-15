@@ -20,8 +20,6 @@ package org.apache.mina.common;
 
 import java.io.IOException;
 
-import org.apache.mina.util.ExceptionUtil;
-
 /**
  * An {@link IoFuture} for asynchronous connect requests.
  *
@@ -72,8 +70,7 @@ public class ConnectFuture extends IoFuture
         Object v = getValue();
         if( v instanceof Throwable )
         {
-            ExceptionUtil.throwException( ( Throwable ) v );
-            throw new InternalError(); // this cannot be executed
+            throw ( IOException ) new IOException( "Failed to get the session." ).initCause( ( Throwable ) v );
         }
         else
         {

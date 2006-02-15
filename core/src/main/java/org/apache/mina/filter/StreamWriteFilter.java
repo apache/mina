@@ -25,6 +25,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.util.Queue;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -63,6 +64,7 @@ public class StreamWriteFilter extends IoFilterAdapter
      */
     public static final String CURRENT_STREAM = StreamWriteFilter.class.getName() + ".stream";
 
+    protected static final String WRITE_REQUEST_QUEUE = StreamWriteFilter.class.getName() + ".queue";
     protected static final String INITIAL_WRITE_FUTURE = StreamWriteFilter.class.getName() + ".future";
 
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
@@ -70,10 +72,17 @@ public class StreamWriteFilter extends IoFilterAdapter
     public void filterWrite( NextFilter nextFilter, IoSession session, 
                             WriteRequest writeRequest ) throws Exception 
     {
-        // Make sure we're not already processing a stream.
+        // If we're already processing a stream we need to queue the WriteRequest.
         if( session.getAttribute( CURRENT_STREAM ) != null )
         {
-            throw new IllegalStateException( "Already processing a stream" );
+            Queue queue = ( Queue ) session.getAttribute( WRITE_REQUEST_QUEUE );
+            if( queue == null )
+            {
+                queue = new Queue();
+                session.setAttribute( WRITE_REQUEST_QUEUE, queue );
+            }
+            queue.push( writeRequest );
+            return;
         }
         
         Object message = writeRequest.getMessage();
@@ -122,6 +131,19 @@ public class StreamWriteFilter extends IoFilterAdapter
                 // End of stream reached.
                 session.removeAttribute( CURRENT_STREAM );
                 WriteFuture writeFuture = ( WriteFuture ) session.removeAttribute( INITIAL_WRITE_FUTURE );
+                
+                // Write queued WriteRequests.
+                Queue queue = ( Queue ) session.removeAttribute( WRITE_REQUEST_QUEUE );
+                if( queue != null )
+                {
+                    WriteRequest wr = ( WriteRequest ) queue.pop();
+                    while( wr != null )
+                    {
+                        filterWrite( nextFilter, session, wr );
+                        wr = ( WriteRequest ) queue.pop();
+                    }
+                }
+                
                 writeFuture.setWritten( true );
                 nextFilter.messageSent( session, inputStream );
             }
@@ -162,7 +184,6 @@ public class StreamWriteFilter extends IoFilterAdapter
      * Sets the size of the write buffer in bytes. Data will be read from the 
      * stream in chunks of this size and then written to the next filter.
      * 
-     * @return the write buffer size.
      * @throws IllegalArgumentException if the specified size is &lt; 1.
      */
     public void setWriteBufferSize( int writeBufferSize )
