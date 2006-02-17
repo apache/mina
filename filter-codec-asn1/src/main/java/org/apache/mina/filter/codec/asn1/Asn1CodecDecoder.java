@@ -3,9 +3,9 @@
  */
 package org.apache.mina.filter.codec.asn1;
 
-import org.apache.asn1.codec.DecoderException;
-import org.apache.asn1.codec.stateful.DecoderCallback;
-import org.apache.asn1.codec.stateful.StatefulDecoder;
+import org.apache.directory.shared.asn1.codec.DecoderException;
+import org.apache.directory.shared.asn1.codec.stateful.DecoderCallback;
+import org.apache.directory.shared.asn1.codec.stateful.StatefulDecoder;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;

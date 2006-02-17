@@ -7,9 +7,9 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-import org.apache.asn1.codec.EncoderException;
-import org.apache.asn1.codec.stateful.EncoderCallback;
-import org.apache.asn1.codec.stateful.StatefulEncoder;
+import org.apache.directory.shared.asn1.codec.EncoderException;
+import org.apache.directory.shared.asn1.codec.stateful.EncoderCallback;
+import org.apache.directory.shared.asn1.codec.stateful.StatefulEncoder;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
