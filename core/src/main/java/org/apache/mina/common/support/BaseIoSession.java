@@ -328,7 +328,7 @@ public abstract class BaseIoSession implements IoSession
         readBytes += increment;
         lastReadTime = System.currentTimeMillis();
         idleCountForBoth = 0;
-        idleCountForWrite = 0;
+        idleCountForRead = 0;
     }
 
     public void increaseWrittenBytes( int increment )
