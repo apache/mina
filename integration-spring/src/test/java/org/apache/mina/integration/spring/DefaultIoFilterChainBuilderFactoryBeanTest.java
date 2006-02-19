@@ -26,7 +26,7 @@ import org.easymock.MockControl;
 import junit.framework.TestCase;
 
 /**
- * Tests {@link DefaultFilterChainBuilderFactoryBean}.
+ * Tests {@link DefaultIoFilterChainBuilderFactoryBean}.
  *
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
