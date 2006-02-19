@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * Use this class when you want to configure the
  * filters added to the filter chain of all sessions created from a particular
  * {@link org.apache.mina.common.IoService} created using one of the
- * {@link org.apache.mina.integration.spring.support.AbstractIoServiceFactoryBean}
+ * {@link org.apache.mina.integration.spring.IoAcceptorFactoryBean}
  * sub-classes but you don't want the names to be generated automatically.
  * </p>
  * <p>
@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
- * @see org.apache.mina.integration.spring.support.AbstractIoServiceFactoryBean
+ * @see org.apache.mina.integration.spring.IoAcceptorFactoryBean
  * @see org.apache.mina.integration.spring.Binding
  */
 public class IoFilterMapping implements InitializingBean

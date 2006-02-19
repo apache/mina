@@ -70,7 +70,7 @@ public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean
 
     /**
      * Sets the prefix used to create the names for automatically named filters
-     * added using {@link #setFilters(IoFilter[]). The default prefix is 
+     * added using {@link #setFilters(IoFilter[])}. The default prefix is 
      * <tt>filter</tt>.
      * 
      * @param prefix the prefix.
