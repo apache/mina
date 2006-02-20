@@ -154,17 +154,24 @@ public class StreamWriteFilter extends IoFilterAdapter
         }
     }
 
-    private ByteBuffer getNextByteBuffer( InputStream inputStream ) throws IOException 
+    private ByteBuffer getNextByteBuffer( InputStream is ) throws IOException 
     {
         byte[] bytes = new byte[ writeBufferSize ];
-        int packetLength = inputStream.read( bytes );
-        if( packetLength == -1 )
+        
+        int off = 0;
+        int n = 0;
+        while( off < bytes.length && 
+              ( n = is.read( bytes, off, bytes.length - off ) ) != -1 )
+        {
+            off += n;
+        }
+        
+        if( n == -1 && off == 0 )
         {
             return null;
         }
 
-        ByteBuffer buffer = ByteBuffer.wrap( bytes, 0, packetLength );
-        buffer.acquire(); // prevent from being pooled.
+        ByteBuffer buffer = ByteBuffer.wrap( bytes, 0, off );
 
         return buffer;
     }
