@@ -238,5 +238,9 @@ public class CumulativeProtocolDecoderTest extends TestCase
         {
             return null;
         }
+
+        public SocketAddress getServiceAddress() {
+            return null;
+        }
     }
 }

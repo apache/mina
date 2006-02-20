@@ -118,5 +118,9 @@ public class TextLineEncoderTest extends TestCase
         {
             return null;
         }
+
+        public SocketAddress getServiceAddress() {
+            return null;
+        }
     }
 }

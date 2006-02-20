@@ -194,7 +194,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         RegistrationRequest req = ( RegistrationRequest ) key.attachment();
         DatagramSessionImpl s = new DatagramSessionImpl(
                 wrapper, this,
-                req.config.getSessionConfig(), ch, req.handler );
+                req.config.getSessionConfig(), ch, req.handler,
+                req.address );
         s.setRemoteAddress( remoteAddress );
         s.setSelectionKey( key );
         
@@ -330,7 +331,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             DatagramSessionImpl session = new DatagramSessionImpl(
                     wrapper, this,
                     req.config.getSessionConfig(),
-                    ch, req.handler );
+                    ch, req.handler,
+                    req.address );
             session.setSelectionKey( key );
             
             try

@@ -304,6 +304,10 @@ public class IoFilterChainTest extends TestCase
         {
             return null;
         }
+
+        public SocketAddress getServiceAddress() {
+            return null;
+        }
     }
 
     private class EventOrderTestFilter extends IoFilterAdapter
@@ -423,6 +427,10 @@ public class IoFilterChainTest extends TestCase
 
                 public IoSessionConfig getConfig()
                 {
+                    return null;
+                }
+
+                public SocketAddress getServiceAddress() {
                     return null;
                 }
             } );

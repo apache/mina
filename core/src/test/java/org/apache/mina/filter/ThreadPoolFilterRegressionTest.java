@@ -196,6 +196,10 @@ public class ThreadPoolFilterRegressionTest extends TestCase
         {
             return null;
         }
+
+        public SocketAddress getServiceAddress() {
+            return null;
+        }
     }
     
     private static class EventOrderChecker implements NextFilter
@@ -303,6 +307,10 @@ public class ThreadPoolFilterRegressionTest extends TestCase
 
         public IoSessionConfig getConfig()
         {
+            return null;
+        }
+
+        public SocketAddress getServiceAddress() {
             return null;
         }
     }

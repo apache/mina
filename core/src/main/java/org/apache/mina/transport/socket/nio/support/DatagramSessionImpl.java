@@ -53,6 +53,7 @@ class DatagramSessionImpl extends BaseIoSession
     private final Queue writeRequestQueue;
     private final IoHandler handler;
     private final SocketAddress localAddress;
+    private final SocketAddress serviceAddress;
     private SocketAddress remoteAddress;
     private SelectionKey key;
     private int readBufferSize;
@@ -63,7 +64,8 @@ class DatagramSessionImpl extends BaseIoSession
     DatagramSessionImpl( IoService wrapperManager,
                          DatagramService managerDelegate,
                          IoSessionConfig config,
-                         DatagramChannel ch, IoHandler defaultHandler )
+                         DatagramChannel ch, IoHandler defaultHandler,
+                         SocketAddress serviceAddress )
     {
         this.wrapperManager = wrapperManager;
         this.managerDelegate = managerDelegate;
@@ -73,6 +75,7 @@ class DatagramSessionImpl extends BaseIoSession
         this.handler = defaultHandler;
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
+        this.serviceAddress = serviceAddress;
         
         // Apply the initial session settings
         if( config instanceof DatagramSessionConfig )
@@ -168,6 +171,11 @@ class DatagramSessionImpl extends BaseIoSession
     public SocketAddress getLocalAddress()
     {
         return localAddress;
+    }
+    
+    public SocketAddress getServiceAddress()
+    {
+        return serviceAddress;
     }
 
     protected void updateTrafficMask()

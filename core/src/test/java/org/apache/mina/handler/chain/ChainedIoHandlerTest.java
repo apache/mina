@@ -98,6 +98,10 @@ public class ChainedIoHandlerTest extends TestCase
                     {
                         return null;
                     }
+
+                    public SocketAddress getServiceAddress() {
+                        return null;
+                    }
                 }, null );
         
         Assert.assertEquals( "ABC", buf.toString() );
