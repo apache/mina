@@ -176,6 +176,16 @@ public interface IoSession {
      * session.
      */
     SocketAddress getLocalAddress();
+    
+    /**
+     * Returns the socket address of the {@link IoService} listens to to manage
+     * this session.  If this session is managed by {@link IoAcceptor}, it
+     * returns the {@link SocketAddress} which is specified as a parameter of
+     * {@link IoAcceptor#bind(SocketAddress, IoHandler)}.  If this session is
+     * managed by {@link IoConnector}, this method returns the same address with
+     * that of {@link #getRemoteAddress()}.  
+     */
+    SocketAddress getServiceAddress();
 
     /**
      * Returns idle time for the specified type of idleness in seconds.

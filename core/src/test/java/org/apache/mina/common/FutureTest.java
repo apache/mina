@@ -111,6 +111,10 @@ public class FutureTest extends TestCase
             {
                 return null;
             }
+
+            public SocketAddress getServiceAddress() {
+                return null;
+            }
         };
         
         future.setSession( session );

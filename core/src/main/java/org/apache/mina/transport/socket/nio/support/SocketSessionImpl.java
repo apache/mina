@@ -55,6 +55,7 @@ class SocketSessionImpl extends BaseIoSession
     private final IoHandler handler;
     private final SocketAddress remoteAddress;
     private final SocketAddress localAddress;
+    private final SocketAddress serviceAddress;
     private final Set managedSessions;    
     private SelectionKey key;
     private int readBufferSize;
@@ -65,7 +66,8 @@ class SocketSessionImpl extends BaseIoSession
     public SocketSessionImpl(
             IoService manager, Set managedSessions,
             IoSessionConfig config,
-            SocketChannel ch, IoHandler defaultHandler )
+            SocketChannel ch, IoHandler defaultHandler,
+            SocketAddress serviceAddress )
     {
         this.manager = manager;
         this.managedSessions = managedSessions;
@@ -76,6 +78,7 @@ class SocketSessionImpl extends BaseIoSession
         this.handler = defaultHandler;
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
+        this.serviceAddress = serviceAddress;
         
         // Apply the initial session settings
         if( config instanceof SocketSessionConfig )
@@ -174,6 +177,11 @@ class SocketSessionImpl extends BaseIoSession
     public SocketAddress getLocalAddress()
     {
         return localAddress;
+    }
+    
+    public SocketAddress getServiceAddress()
+    {
+        return serviceAddress;
     }
     
     protected void updateTrafficMask()

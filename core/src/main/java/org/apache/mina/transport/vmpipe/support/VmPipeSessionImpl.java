@@ -36,6 +36,7 @@ public class VmPipeSessionImpl extends BaseIoSession
     private final IoService manager;
     private final SocketAddress localAddress;
     private final SocketAddress remoteAddress;
+    private final SocketAddress serviceAddress;
     private final IoHandler handler;
     private final VmPipeFilterChain filterChain;
     private final Set managedSessions;
@@ -53,7 +54,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.manager = manager;
         this.lock = lock;
         this.localAddress = localAddress;
-        this.remoteAddress = remoteEntry.getAddress();
+        this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
         this.filterChain = new VmPipeFilterChain( this );
         this.pendingDataQueue = new Queue();
@@ -106,7 +107,7 @@ public class VmPipeSessionImpl extends BaseIoSession
     {
         this.manager = manager;
         this.lock = remoteSession.lock;
-        this.localAddress = remoteSession.remoteAddress;
+        this.localAddress = this.serviceAddress = remoteSession.remoteAddress;
         this.remoteAddress = remoteSession.localAddress;
         this.handler = entry.getHandler();
         this.filterChain = new VmPipeFilterChain( this );
@@ -178,6 +179,11 @@ public class VmPipeSessionImpl extends BaseIoSession
     public SocketAddress getLocalAddress()
     {
         return localAddress;
+    }
+    
+    public SocketAddress getServiceAddress()
+    {
+        return serviceAddress;
     }
 
     protected void updateTrafficMask()

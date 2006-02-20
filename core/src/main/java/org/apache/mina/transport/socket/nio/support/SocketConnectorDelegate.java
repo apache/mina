@@ -282,7 +282,7 @@ public class SocketConnectorDelegate extends BaseIoConnector
         SocketSessionImpl session = new SocketSessionImpl(
                 wrapper, managedSessions,
                 config.getSessionConfig(),
-                ch, handler );
+                ch, handler, ch.socket().getRemoteSocketAddress() );
         try
         {
             getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
