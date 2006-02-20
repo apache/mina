@@ -35,62 +35,48 @@ import org.springframework.util.Assert;
  * <p>
  * 
  * <pre>
- *   &lt;!-- POP3 server IoHandler implementation--&gt;
- *   &lt;bean id=&quot;pop3Handler&quot; class=&quot;com.foo.bar.MyPop3Handler&quot;&gt;
- *       ...
- *   &lt;!-- IMAP server IoHandler implementation --&gt;
- *   &lt;bean id=&quot;imapHandler&quot; class=&quot;com.foo.bar.MyImapHandler&quot;&gt;
- *       ...
+ *   &lt;!-- This makes it possible to specify java.net.SocketAddress values 
+ *        (e.g. :80 below) as Strings.
+ *        They will be converted into java.net.InetSocketAddress objects by Spring.  --&gt;
+ *   &lt;bean class="org.springframework.beans.factory.config.CustomEditorConfigurer"&gt;
+ *     &lt;property name="customEditors"&gt;
+ *       &lt;map&gt;
+ *         &lt;entry key="java.net.SocketAddress"&gt;
+ *           &lt;bean class="org.apache.mina.integration.spring.InetSocketAddressEditor"/&gt;
+ *         &lt;/entry&gt;
+ *       &lt;/map&gt;
+ *     &lt;/property&gt;
  *   &lt;/bean&gt;
- *   &lt;!-- Telnet based admin console handler. Should only be 
- *        accessible from localhost --&gt;
- *   &lt;bean id=&quot;adminHandler&quot; class=&quot;com.foo.bar.MyAdminHandler&quot;&gt;
- *       ...
- *   &lt;/bean&gt;
- *   
- *   &lt;!-- Create a thread pool filter --&gt;
- *   &lt;bean id=&quot;threadPoolFilter&quot; 
- *         class=&quot;org.apache.mina.filter.ThreadPoolFilter&quot;&gt;
- *     &lt;!-- Threads will be named IoWorker-1, IoWorker-2, etc --&gt;
- *     &lt;constructor-arg value=&quot;IoWorker&quot;/&gt;
- *     &lt;property name=&quot;maximumPoolSize&quot; value=&quot;10&quot;/&gt;
- *   &lt;/bean&gt;
- *   
- *   &lt;!-- Create an SSL filter to be used for POP3 over SSL --&gt;
- *   &lt;bean id=&quot;sslFilter&quot; class=&quot;org.apache.mina.filter.SSLFilter&quot;&gt;
- *         ...
- *   &lt;/bean&gt;
- *   
- *   &lt;!-- Create the SocketAcceptor --&gt;
- *   &lt;bean id=&quot;socketAcceptor&quot; 
- *        class=&quot;org.apache.mina.integration.spring.SocketAcceptorFactoryBean&quot;&gt;
- *     &lt;property name=&quot;filters&quot;&gt;
+ * 
+ *   &lt;bean id="filterChainBuilder" 
+ *         class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean"&gt;
+ *     &lt;property name="filters"&gt;
  *       &lt;list&gt;
- *         &lt;ref local=&quot;threadPoolFilter&quot;/&gt;
+ *         &lt;bean class="org.apache.mina.filter.ThreadPoolFilter"&gt;
+ *           &lt;!-- Threads will be named IoWorker-1, IoWorker-2, etc --&gt;
+ *           &lt;constructor-arg value=&quot;IoWorker&quot;/&gt;
+ *           &lt;property name="maximumPoolSize" value="10"/&gt;
+ *         &lt;/bean&gt;
+ *         &lt;bean class="org.apache.mina.filter.LoggingFilter"/&gt;
  *       &lt;/list&gt;
  *     &lt;/property&gt;
- *     &lt;property name=&quot;bindings&quot;&gt;
+ *   &lt;/bean&gt;
+ *
+ *   &lt;bean id="ioAcceptor" class="org.apache.mina.integration.spring.IoAcceptorFactoryBean"&gt;
+ *     &lt;property name="target"&gt;
+ *       &lt;bean class="org.apache.mina.transport.socket.nio.SocketAcceptor"/&gt;
+ *     &lt;/property&gt;
+ *     &lt;property name="bindings"&gt;
  *       &lt;list&gt;
- *         &lt;bean class=&quot;org.apache.mina.integration.spring.Binding&quot;&gt;
- *           &lt;property name=&quot;address&quot; value=&quot;:110&quot;/&gt;
- *           &lt;property name=&quot;handler&quot; ref=&quot;pop3Handler&quot;/&gt;
- *         &lt;/bean&gt;
- *         &lt;bean class=&quot;org.apache.mina.integration.spring.Binding&quot;&gt;
- *           &lt;property name=&quot;address&quot; value=&quot;:995&quot;/&gt;
- *           &lt;property name=&quot;handler&quot; ref=&quot;pop3Handler&quot;/&gt;
- *           &lt;property name=&quot;filters&quot;&gt;
- *             &lt;list&gt;
- *               &lt;ref local=&quot;sslFilter&quot;/&gt;
- *             &lt;/list&gt;
+ *         &lt;bean class="org.apache.mina.integration.spring.Binding"&gt;
+ *           &lt;property name="address" value=":80"/&gt;
+ *           &lt;property name="handler" ref="httpHandler"/&gt;
+ *           &lt;property name="serviceConfig"&gt;
+ *             &lt;bean class="org.apache.mina.transport.socket.nio.SocketAcceptorConfig"&gt;
+ *               &lt;property name="filterChainBuilder" ref="filterChainBuilder"/&gt;
+ *               &lt;property name="reuseAddress" value="true"/&gt;
+ *             &lt;/bean&gt;
  *           &lt;/property&gt;
- *         &lt;/bean&gt;
- *         &lt;bean class=&quot;org.apache.mina.integration.spring.Binding&quot;&gt;
- *           &lt;property name=&quot;address&quot; value=&quot;:143&quot;/&gt;
- *           &lt;property name=&quot;handler&quot; ref=&quot;imapHandler&quot;/&gt;
- *         &lt;/bean&gt;
- *         &lt;bean class=&quot;org.apache.mina.integration.spring.Binding&quot;&gt;
- *           &lt;property name=&quot;address&quot; value=&quot;127.0.0.1:60987&quot;/&gt;
- *           &lt;property name=&quot;handler&quot; ref=&quot;adminHandler&quot;/&gt;
  *         &lt;/bean&gt;
  *       &lt;/list&gt;
  *     &lt;/property&gt;
