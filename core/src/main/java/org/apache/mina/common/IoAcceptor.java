@@ -64,6 +64,17 @@ public interface IoAcceptor extends IoService
      * connected there.
      */
     void unbind( SocketAddress address );
+
+    /**
+     * Unbinds all addresses which were bound by this acceptor.
+     */
+    void unbindAll();
+    
+    /**
+     * Returns <tt>true</tt> if and only if the specified <tt>address</tt> is
+     * bound by this acceptor.
+     */
+    boolean isBound( SocketAddress address );
     
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified

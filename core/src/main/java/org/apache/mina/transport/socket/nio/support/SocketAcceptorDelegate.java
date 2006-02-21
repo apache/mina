@@ -25,12 +25,14 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -286,6 +288,28 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
         }        
     }
     
+    public void unbindAll()
+    {
+        List addresses;
+        synchronized( channels )
+        {
+            addresses = new ArrayList( channels.keySet() );
+        }
+        
+        for( Iterator i = addresses.iterator(); i.hasNext(); )
+        {
+            unbind( ( SocketAddress ) i.next() );
+        }
+    }
+    
+    public boolean isBound( SocketAddress address )
+    {
+        synchronized( channels )
+        {
+            return channels.containsKey( address );
+        }
+    }
+    
     private class Worker extends Thread
     {
         public Worker()
@@ -462,7 +486,10 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
                 ssc.socket().bind( req.address, cfg.getBacklog() );
                 ssc.register( selector, SelectionKey.OP_ACCEPT, req );
 
-                channels.put( req.address, ssc );
+                synchronized( channels )
+                {
+                    channels.put( req.address, ssc );
+                }
                 sessions.put( req.address, Collections.synchronizedSet( new HashSet() ) );
             }
             catch( IOException e )
@@ -516,7 +543,11 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
             }
 
             sessions.remove( request.address );
-            ServerSocketChannel ssc = ( ServerSocketChannel ) channels.remove( request.address );
+            ServerSocketChannel ssc;
+            synchronized( channels )
+            {
+                ssc = ( ServerSocketChannel ) channels.remove( request.address );
+            }
             
             // close the channel
             try
