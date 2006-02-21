@@ -48,6 +48,11 @@ import org.springframework.util.Assert;
  *     &lt;/property&gt;
  *   &lt;/bean&gt;
  * 
+ *   &lt;!-- The IoHandler implementation --&gt;
+ *   &lt;bean id="httpHandler" class="com.example.MyHttpHandler"&gt;
+ *     ...
+ *   &lt;/bean&gt;
+ *     
  *   &lt;bean id="filterChainBuilder" 
  *         class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean"&gt;
  *     &lt;property name="filters"&gt;
