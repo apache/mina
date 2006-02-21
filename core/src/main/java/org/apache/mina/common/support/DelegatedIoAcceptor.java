@@ -69,6 +69,16 @@ public class DelegatedIoAcceptor implements IoAcceptor
     {
         delegate.unbind( address );
     }
+    
+    public void unbindAll()
+    {
+        delegate.unbindAll();
+    }
+    
+    public boolean isBound( SocketAddress address )
+    {
+        return delegate.isBound( address );
+    }
 
     public Set getManagedSessions( SocketAddress address )
     {

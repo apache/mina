@@ -5,9 +5,12 @@ package org.apache.mina.transport.vmpipe;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,7 +74,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
                                           handler, config ) );
         }
     }
-
+    
     public Set getManagedSessions( SocketAddress address )
     {
         if( address == null )
@@ -162,6 +165,26 @@ public class VmPipeAcceptor extends BaseIoAcceptor
                 // Ignored
             }
         }                
+    }
+    
+    public void unbindAll()
+    {
+        synchronized( boundHandlers )
+        {
+            List addresses = new ArrayList( boundHandlers.keySet() );
+            for( Iterator i = addresses.iterator(); i.hasNext(); )
+            {
+                unbind( ( SocketAddress ) i.next() );
+            }
+        }
+    }
+    
+    public boolean isBound( SocketAddress address )
+    {
+        synchronized( boundHandlers )
+        {
+            return boundHandlers.containsKey( address );
+        }
     }
     
     public IoServiceConfig getDefaultConfig()

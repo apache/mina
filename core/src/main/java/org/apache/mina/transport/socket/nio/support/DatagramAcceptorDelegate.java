@@ -24,8 +24,10 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -164,6 +166,28 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         if( request.exception != null )
         {
             throw new RuntimeException( "Failed to unbind" , request.exception );
+        }
+    }
+    
+    public void unbindAll()
+    {
+        List addresses;
+        synchronized( channels )
+        {
+            addresses = new ArrayList( channels.keySet() );
+        }
+        
+        for( Iterator i = addresses.iterator(); i.hasNext(); )
+        {
+            unbind( ( SocketAddress ) i.next() );
+        }
+    }
+    
+    public boolean isBound( SocketAddress address )
+    {
+        synchronized( channels )
+        {
+            return channels.containsKey( address );
         }
     }
     
@@ -525,7 +549,10 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 ch.configureBlocking( false );
                 ch.socket().bind( req.address );
                 ch.register( selector, SelectionKey.OP_READ, req );
-                channels.put( req.address, ch );
+                synchronized( channels )
+                {
+                    channels.put( req.address, ch );
+                }
             }
             catch( Throwable t )
             {
@@ -573,7 +600,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 break;
             }
 
-            DatagramChannel ch = ( DatagramChannel ) channels.remove( request.address );
+            DatagramChannel ch;
+            synchronized( channels )
+            {
+                ch = ( DatagramChannel ) channels.remove( request.address );
+            }
+
             // close the channel
             try
             {
