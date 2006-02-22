@@ -241,37 +241,37 @@ Use JDK 1.5 to make sure these modules build.
     </plugins>
   </build>
 
-  <reporting>
-    <plugins>
+  <!-- <reporting>
+    <plugins> -->
       <!-- This has been disabled to due license expiration issue. -->
       <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clover-plugin</artifactId>
       </plugin> -->
-      <plugin>
+      <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-      </plugin>
+      </plugin> -->
       <!-- This is no longer needed while it cannot do 
            fully connected multi module apidocs. -->
       <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
       </plugin> -->
-      <plugin>
+      <!-- <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
-      </plugin>
+      </plugin> -->
       <!-- This has been disabled due to incorrect functioning. -->
       <!-- <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jxr-maven-plugin</artifactId>
       </plugin> -->
-      <plugin>
+      <!-- <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>surefire-report-maven-plugin</artifactId>
       </plugin>
     </plugins>
-  </reporting>
+  </reporting> -->
 
 </project>
