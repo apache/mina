@@ -1,9 +1,9 @@
 ##############  W O R K  I N  P R O G R E S S  ############## 
 
-To generate the site for ApacheDS Project change to the
+To generate the site for MINA Project change to the
 master project's root directory and execute
 
-	mvn site --non-recursive
+	mvn site
 
 The site will be generated at
 
@@ -32,4 +32,4 @@ configuration would generally look as follows (for UNIX):
 
 To deploy the site to remote server execute
 
-	mvn site-deploy --non-recursive
+	mvn site-deploy
