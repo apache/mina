@@ -11,10 +11,10 @@
 
   <body>
      <links>
-       <item name="ApacheDS" href="http://directory.apache.org/newsite/projects/apacheds/index.html"/>
+       <item name="ApacheDS" href="http://directory.apache.org/subprojects/apacheds/index.html"/>
        <item name="Naming" href="http://directory.apache.org/projects/naming/index.html"/>
-       <item name="Network Layer (MINA)" href="http://directory.apache.org/newsite/projects/mina/index.html"/>
-       <item name="Directory" href="http://directory.apache.org/newsite/index.html"/>
+       <item name="Network Layer (MINA)" href="http://directory.apache.org/subprojects/mina/index.html"/>
+       <item name="Directory" href="http://directory.apache.org/index.html"/>
     </links>
  
     <menu name="MINA">
