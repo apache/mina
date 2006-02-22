@@ -188,7 +188,7 @@ public class IoFilterLifeCycleManager
         count.decrease();
     }
 
-    public synchronized void callDestroyIfNecessary( IoFilter filter )
+    public void callDestroyIfNecessary( IoFilter filter )
     {
         boolean callDestroy = false;
         
