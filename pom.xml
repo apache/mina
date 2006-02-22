@@ -12,12 +12,12 @@
   <name>Apache MINA</name>
   <packaging>pom</packaging>
 
-  <url>http://directory.apache.org/newsite/projects/mina/</url>
+  <url>http://directory.apache.org/subprojects/mina/</url>
 
   <distributionManagement>
     <site>
       <id>apache.websites</id>
-      <url>scp://minotaur.apache.org/www/directory.apache.org/newsite/projects/mina/</url>
+      <url>scp://minotaur.apache.org/www/directory.apache.org/subprojects/mina/</url>
     </site>
   </distributionManagement>
 
