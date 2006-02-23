@@ -154,7 +154,7 @@
         <module>core</module>
         <module>filter-ssl</module>
         <module>filter-codec-asn1</module>
-        <!-- <module>filter-codec-netty</module> -->
+        <module>filter-codec-netty</module>
         <module>integration-spring</module>
         <module>examples</module>
       </modules>
@@ -168,7 +168,7 @@
       <modules>
         <module>core</module>
         <module>filter-codec-asn1</module>
-        <!-- <module>filter-codec-netty</module> -->
+        <module>filter-codec-netty</module>
       </modules>
       <build>
         <plugins>
