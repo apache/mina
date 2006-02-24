@@ -52,10 +52,8 @@
       <name>Apache MINA Developement</name>
       <subscribe>mina-dev-subscribe@directory.apache.org</subscribe>
       <unsubscribe>mina-dev-unsubscribe@directory.apache.org</unsubscribe>
-      <archive>http://mail-archives.apache.org/mod_mbox/mina-dev/</archive>
-      <otherArchives>
-        <otherArchive>http://www.archivum.info/mina-dev@directory.apache.org/</otherArchive>
-      </otherArchives>
+      <post>mina-dev@directory.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/directory-mina-dev/</archive>
     </mailingList>
   </mailingLists>
 
