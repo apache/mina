@@ -213,7 +213,7 @@ Use JDK 1.5 to make sure these modules build.
         <artifactId>maven-site-plugin</artifactId>
       </plugin>
       <plugin>
-        <!-- <inherited>false</inherited> -->
+        <inherited>false</inherited>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
