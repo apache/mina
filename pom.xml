@@ -221,13 +221,21 @@ Use JDK 1.5 to make sure these modules build.
             <phase>site</phase>
             <configuration>
               <tasks>
-                <javadoc destdir="target/site/apidocs" author="true" use="true" windowtitle="Apache MINA">
+                <javadoc destdir="target/site/apidocs" author="true" use="true" windowtitle="Apache MINA API Documentation" encoding="UTF-8" docencoding="UTF-8">
+                  <package name="org.apache.mina.*"/>
+                  <excludepackage name="**.support"/>
+
                   <sourcepath>
                     <dirset dir=".">
-                      <include name="*/src/main/java"/>
+                      <include name="*/src/main/java" />
+                      <exclude name="examples/**" />
                     </dirset>
                   </sourcepath>
-                  <package name="org.apache.mina.*"/>
+
+                  <link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
+                  <link href="http://static.springframework.org/spring/docs/1.2.x/api/" />
+                  <link href="http://www.slf4j.org/api/" />
+                  <link href="http://gleamynode.net/dev/tl-netty2/docs/apidocs/" />
                 </javadoc>
               </tasks>
             </configuration>
