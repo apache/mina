@@ -76,7 +76,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         WriteFuture future = null;
         if( bufferQueue.isEmpty() )
         {
-            future = doFlush( ByteBuffer.allocate( 0 ).flip() ); // write zero bytes
+            return null;
         }
         else
         {
@@ -88,13 +88,12 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
                     break;
                 }
                 
-                future = doFlush( buf );
+                // Flush only when the buffer has remaining.
+                if( buf.hasRemaining() )
+                {
+                    future = doFlush( buf );
+                }
             }
-        }
-        
-        if( future == null )
-        {
-            throw new IllegalStateException( "doFlush must return future." );
         }
         
         return future;
