@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.directory.mina</groupId>
     <artifactId>build</artifactId>
-    <version>0.9.2</version>
+    <version>0.9.3-SNAPSHOT</version>
   </parent>
   <artifactId>mina-filter-ssl</artifactId>
   <name>Apache MINA SSL Filter</name>
