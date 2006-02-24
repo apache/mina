@@ -53,6 +53,8 @@ public interface ProtocolEncoderOutput
      * the session.  This operation is asynchronous; please wait for
      * the returned {@link WriteFuture} if you want to wait for
      * the buffers flushed.
+     * 
+     * @return <tt>null</tt> if there is nothing to flush at all.
      */
     WriteFuture flush();
 }
