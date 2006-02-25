@@ -20,36 +20,25 @@
     <menu name="MINA">
       <item name="Overview" href="/index.html"/>
       <item name="Features" href="/features.html"/>
+      <item name="Testimonials" href="/testimonials.html"/>
       <item name="Getting Started" href="/getting_started.html"/>
-      <item name="Downloads" href="http://cvs.apache.org/repository/directory-network/"/>
+      <item name="Downloads" href="http://www.apache.org/dyn/closer.cgi/directory/mina/"/>
+      <item name="F.A.Q" href="/faq.html"/>
       <item name="Roadmap" href="/roadmap.html"/>
       <item name="History" href="/history.html"/>
     </menu>
 	 	
     <menu name="MINA Community">
       <item name="Mailing List" href="mail-lists.html"/>
-      <item name="Support Forum" href="http://gleamynode.net/dev/forum/list.php?1"/>
       <item name="Issue Tracker" href="http://issues.apache.org/jira/browse/DIRMINA"/>
       <item name="Wiki Pages" href="http://wiki.apache.org/directory/MinaHome"/>
     </menu>
  
-<!-- TODO
-    <menu name="MINA Examples">
-      <item name="JavaDocs" href="/apidocs-examples/index.html"/>
-      <item name="Source code" href="/xref-examples/index.html"/>
-    </menu>
-
--->
-
     <menu name="MINA References">
       <item name="JavaDocs" href="/apidocs/index.html"/>
+      <item name="Examples" href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/"/>
+      <item name="Source code" href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/"/>
     </menu>
-<!--
-      <item name="Source code" href="/xref/index.html"/>
-      <item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/directory/network/trunk/?root=Apache-SVN"/>
-      <item name="Wiki" href="http://wiki.apache.org/directory/MinaHome"/>
-    </menu>
--->
 
     ${reports}
   </body>
