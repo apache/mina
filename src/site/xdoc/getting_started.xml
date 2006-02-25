@@ -24,7 +24,7 @@
       <subsection name="Examples">
         <p>
           You'll learn faster with
-          <a target="_blank" href="mina-examples/xref/index.html">examples</a>
+          <a target="_blank" href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/">examples</a>
           referring to
           <a target="_blank" href="apidocs/index.html">JavaDocs</a>.
           <table>
@@ -34,33 +34,33 @@
               <th>Side</th>
             </tr>
             <tr>
-              <td><a target="classFrame" href="mina-examples/xref/org/apache/mina/examples/reverser/package-summary.html">Reverser</a></td>
-              <td>High-level protocol layer</td>
+              <td><a href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/reverser/">Reverser</a></td>
+              <td>Text protocol based on a protocol codec</td>
               <td>Server</td>
             </tr>
             <tr>
-              <td><a target="classFrame" href="mina-examples/xref/org/apache/mina/examples/sumup/package-summary.html">SumUp server</a></td>
-              <td>High-level protocol layer and DemuxingProtocolCodec</td>
+              <td><a href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/sumup/">SumUp server</a></td>
+              <td>Complex binary protocol based on a protocol codec</td>
               <td>Both</td>
             </tr>
             <tr>
-              <td><a target="classFrame" href="mina-examples/xref/org/apache/mina/examples/echoserver/package-summary.html">Echo server</a></td>
-              <td>Low-level I/O layer and SSL support</td>
+              <td><a href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/echoserver/">Echo server</a></td>
+              <td>Low-level I/O and SSL</td>
               <td>Server</td>
             </tr>
             <tr>
-              <td><a target="classFrame" href="mina-examples/xref/org/apache/mina/examples/netcat/package-summary.html">NetCat</a></td>
-              <td>Low-level I/O layer</td>
+              <td><a href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/netcat/">NetCat</a></td>
+              <td>Client programming</td>
               <td>Client</td>
             </tr>
             <tr>
-              <td><a target="classFrame" href="mina-examples/xref/org/apache/mina/examples/httpserver/package-summary.html">HTTP server</a></td>
-              <td>Stream-based synchronous I/O support.</td>
+              <td><a href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/httpserver/">HTTP server</a></td>
+              <td>Stream-based synchronous I/O</td>
               <td>Server</td>
             </tr>
             <tr>
-              <td><a target="classFrame" href="mina-examples/xref/org/apache/mina/examples/tennis/package-summary.html">Tennis</a></td>
-              <td>In-VM pipe communication support in protocol layer.</td>
+              <td><a href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/tennis/">Tennis</a></td>
+              <td>In-VM pipe communication</td>
               <td>Both</td>
             </tr>
           </table>
@@ -71,12 +71,12 @@
         <p>
           Source code:
 <source>
-$ svn co https://svn.apache.org/repos/asf/directory/trunks/mina mina
+$ svn co https://svn.apache.org/repos/asf/directory/trunks/mina
 $ cd mina
-$ mvn package           # Build packages (JARs) for the Core API and other extensions
+$ mvn package           # Build packages (JARs) for the core API and other extensions
 $ mvn -N site           # Generate documentation
 $ mvn assembly:assembly # Generate a tarball
-$ mvn eclipse:eclipse   # Generate Eclipse projects files if you want
+$ mvn eclipse:eclipse   # Generate Eclipse project files if you want
 </source>
         </p>
       </subsection>
