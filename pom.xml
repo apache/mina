@@ -251,8 +251,7 @@ Use JDK 1.5 to make sure these modules build.
         <configuration>
           <descriptor>release.xml</descriptor>
           <finalName>mina-${pom.version}</finalName>
-          <outputDirectory>target</outputDirectory>
-          <workDirectory>target/assembly/work</workDirectory>
+          <includeSite>true</includeSite>
         </configuration>
       </plugin>
     </plugins>
