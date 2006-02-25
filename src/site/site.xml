@@ -40,6 +40,10 @@
       <item name="Source code" href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/"/>
     </menu>
 
+    <menu name="Old Releases">
+      <item name="0.8" href="/branches/0.8/index.html"/>
+    </menu>
+
     ${reports}
   </body>
 </project>
