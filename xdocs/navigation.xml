@@ -5,27 +5,18 @@
 
  <body>
    <links>
-     <item name="Directory" href="http://directory.apache.org/" />
-     <item name="ApacheDS" href="http://directory.apache.org/subprojects/apacheds/"/>
-     <item name="LDAP" href="http://directory.apache.org/subprojects/ldap.html"/>
-     <item name="Naming" href="http://directory.apache.org/subprojects/naming/"/>
-     <item name="ASN.1" href="http://directory.apache.org/subprojects/asn1/"/>
-     <item name="Kerberos" href="http://directory.apache.org/subprojects/"/>
-     <item name="AuthX" href="http://directory.apache.org/subprojects/authx/"/>
-     <item name="MINA" href="http://directory.apache.org/subprojects/network/"/>
-     <item name="Protocols" href="http://directory.apache.org/subprojects/providers.html"/>
+      <item name="ApacheDS" href="http://directory.apache.org/subprojects/apacheds/index.html"/>
+      <item name="Naming" href="http://directory.apache.org/projects/naming/index.html"/>
+      <item name="MINA (Network Layer)" href="http://directory.apache.org/subprojects/mina/index.html"/>
+      <item name="Directory" href="http://directory.apache.org/index.html"/>
    </links>
    
-   <menu name="Unstable Version">
-     <item name="The Latest Version" href="http://directory.apache.org/subprojects/network/"/>
-   </menu>
-
    <menu name="MINA">
      <item name="Overview" href="/index.html"/>
      <item name="Features" href="/features.html"/>
      <item name="Testimonials" href="/testimonials.html"/>
      <item name="Getting Started" href="/getting_started.html"/>
-     <item name="Downloads" href="http://svn.apache.org/repository/directory-network/"/>
+     <item name="Downloads" href="http://www.apache.org/dyn/closer.cgi/directory/mina/"/>
      <item name="F.A.Q" href="/faq.html"/>
      <item name="Roadmap" href="/roadmap.html"/>
      <item name="Changes" href="http://issues.apache.org/jira/browse/DIRMINA?report=com.atlassian.jira.plugin.system.project:changelog-panel&amp;subset=-1"/>
@@ -46,13 +37,13 @@
    <menu name="MINA References">
      <item name="JavaDocs" href="/apidocs/index.html"/>
      <item name="Source code" href="/xref/index.html"/>
-     <item name="Source code (SVN)" href="http://svn.apache.org/viewcvs.cgi/directory/network/branches/0.8/?root=Apache-SVN"/>
+     <item name="Source code (SVN)"
+         href="http://svn.apache.org/viewcvs.cgi/directory/branches/mina/0.8/"/>
      <item name="Wiki Pages" href="http://wiki.apache.org/directory/MinaHome"/>
    </menu>
 
-   <menu name="ApacheCon US 2005">
-     <item name="ApacheCon US 2005" href="http://www.apachecon.com/"
-       img="http://apache.org/images/ac2005us_white_184x80.jpg" />
+   <menu name="Newer Release">
+     <item name="SNAPSHOT" href="http://directory.apache.org/subprojects/mina/"/>
    </menu>
  </body>
 </project>
