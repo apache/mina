@@ -86,7 +86,11 @@ class DatagramSessionImpl extends BaseIoSession
             this.readBufferSize = cfg.getReceiveBufferSize();
             this.config.setReuseAddress( cfg.isReuseAddress() );
             this.config.setSendBufferSize( cfg.getSendBufferSize() );
-            this.config.setTrafficClass( cfg.getTrafficClass() );
+
+            if( this.config.getTrafficClass() != cfg.getTrafficClass() )
+            {
+                this.config.setTrafficClass( cfg.getTrafficClass() );
+            }
         }
     }
     

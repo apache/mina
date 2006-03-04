@@ -544,8 +544,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 ch.socket().setBroadcast( cfg.isBroadcast() );
                 ch.socket().setReceiveBufferSize( cfg.getReceiveBufferSize() );
                 ch.socket().setSendBufferSize( cfg.getSendBufferSize() );
-                ch.socket().setTrafficClass( cfg.getTrafficClass() );
-                
+
+                if( ch.socket().getTrafficClass() != cfg.getTrafficClass() )
+                {
+                    ch.socket().setTrafficClass( cfg.getTrafficClass() );
+                }
+
                 ch.configureBlocking( false );
                 ch.socket().bind( req.address );
                 ch.register( selector, SelectionKey.OP_READ, req );

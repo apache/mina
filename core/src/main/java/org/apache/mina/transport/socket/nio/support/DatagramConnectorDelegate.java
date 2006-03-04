@@ -114,7 +114,11 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             ch.socket().setBroadcast( cfg.isBroadcast() );
             ch.socket().setReceiveBufferSize( cfg.getReceiveBufferSize() );
             ch.socket().setSendBufferSize( cfg.getSendBufferSize() );
-            ch.socket().setTrafficClass( cfg.getTrafficClass() );
+
+            if( ch.socket().getTrafficClass() != cfg.getTrafficClass() )
+            {
+                ch.socket().setTrafficClass( cfg.getTrafficClass() );
+            }
 
             if( localAddress != null )
             {
