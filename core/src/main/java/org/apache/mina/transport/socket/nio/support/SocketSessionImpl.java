@@ -92,7 +92,11 @@ class SocketSessionImpl extends BaseIoSession
             this.config.setSendBufferSize( cfg.getSendBufferSize() );
             this.config.setSoLinger( cfg.getSoLinger() );
             this.config.setTcpNoDelay( cfg.isTcpNoDelay() );
-            this.config.setTrafficClass( cfg.getTrafficClass() );
+
+            if( this.config.getTrafficClass() != cfg.getTrafficClass() )
+            {
+                this.config.setTrafficClass( cfg.getTrafficClass() );
+            }
         }
     }
     
