@@ -47,23 +47,13 @@ public class IoFilterLifeCycleManager
     {
     }
     
-    public void callInitIfNecessary( IoFilter filter )
+    public synchronized void callInitIfNecessary( IoFilter filter )
     {
-        boolean callInit = false;
-        
-        synchronized( this )
+        ReferenceCount count = ( ReferenceCount ) counts.get( filter );
+        if( count == null )
         {
-            ReferenceCount count = ( ReferenceCount ) counts.get( filter );
-            if( count == null )
-            {
-                count = new ReferenceCount();
-                counts.put( filter, count );
-                callInit = true;
-            }
-        }
-        
-        if( callInit )
-        {
+            count = new ReferenceCount();
+            counts.put( filter, count );
             try
             {
                 filter.init();
@@ -76,19 +66,16 @@ public class IoFilterLifeCycleManager
         }
     }
     
-    public void callOnPreAdd( IoFilterChain chain, String name, IoFilter filter, NextFilter nextFilter )
+    public synchronized void callOnPreAdd( IoFilterChain chain, String name, IoFilter filter, NextFilter nextFilter )
     {
-        synchronized( this )
+        ReferenceCount count = ( ReferenceCount ) counts.get( filter );
+        if( count == null )
         {
-            ReferenceCount count = ( ReferenceCount ) counts.get( filter );
-            if( count == null )
-            {
-                throw new IllegalStateException();
-            }
-            
-            count.increase();
+            throw new IllegalStateException();
         }
         
+        count.increase();
+
         try
         {
             filter.onPreAdd( chain, name, nextFilter );
@@ -101,20 +88,17 @@ public class IoFilterLifeCycleManager
         }
     }
 
-    public void callOnPreRemove( IoFilterChain chain, String name, IoFilter filter, NextFilter nextFilter )
+    public synchronized void callOnPreRemove( IoFilterChain chain, String name, IoFilter filter, NextFilter nextFilter )
     {
-        synchronized( this )
+        ReferenceCount count = ( ReferenceCount ) counts.get( filter );
+        if( count == null || count.get() == 0 )
         {
-            ReferenceCount count = ( ReferenceCount ) counts.get( filter );
-            if( count == null || count.get() == 0 )
-            {
-                return;
-            }
+            return;
         }
 
         try
         {
-            filter.onPreRemove( chain, name, nextFilter );
+            filter.onPreRemove( chain, name, nextFilter);
         }
         catch( Throwable t )
         {
@@ -124,15 +108,12 @@ public class IoFilterLifeCycleManager
         }
     }
     
-    public void callOnPostAdd( IoFilterChain chain, String name, IoFilter filter, NextFilter nextFilter )
+    public synchronized void callOnPostAdd( IoFilterChain chain, String name, IoFilter filter, NextFilter nextFilter )
     {
-        synchronized( this )
+        ReferenceCount count = ( ReferenceCount ) counts.get( filter );
+        if( count == null )
         {
-            ReferenceCount count = ( ReferenceCount ) counts.get( filter );
-            if( count == null )
-            {
-                throw new IllegalStateException();
-            }
+            throw new IllegalStateException();
         }
         
         try
@@ -142,7 +123,7 @@ public class IoFilterLifeCycleManager
         catch( Throwable t )
         {
             // Revert back the reference count.
-            decreaseCountSafely( filter );
+            count.decrease();
 
             throw new IoFilterLifeCycleException(
                     "onPostAdd(): " + name + ':' + filter + " in " +
@@ -150,15 +131,12 @@ public class IoFilterLifeCycleManager
         }
     }
 
-    public void callOnPostRemove( IoFilterChain chain, String name, IoFilter filter, NextFilter nextFilter )
+    public synchronized void callOnPostRemove( IoFilterChain chain, String name, IoFilter filter, NextFilter nextFilter )
     {
-        synchronized( this )
+        ReferenceCount count = ( ReferenceCount ) counts.get( filter );
+        if( count == null || count.get() == 0 )
         {
-            ReferenceCount count = ( ReferenceCount ) counts.get( filter );
-            if( count == null || count.get() == 0 )
-            {
-                return;
-            }
+            return;
         }
 
         try
@@ -173,42 +151,21 @@ public class IoFilterLifeCycleManager
         }
         finally
         {
-            decreaseCountSafely( filter );
+            count.decrease();
         }
     }
 
-    private synchronized void decreaseCountSafely( IoFilter filter )
+    public synchronized void callDestroyIfNecessary( IoFilter filter )
     {
         ReferenceCount count = ( ReferenceCount ) counts.get( filter );
         if( count == null )
         {
-            throw new IllegalStateException();
+            return;
         }
         
-        count.decrease();
-    }
-
-    public void callDestroyIfNecessary( IoFilter filter )
-    {
-        boolean callDestroy = false;
-        
-        synchronized( this )
+        if( count.get() == 0 )
         {
-            ReferenceCount count = ( ReferenceCount ) counts.get( filter );
-            if( count == null )
-            {
-                return;
-            }
-            
-            if( count.get() == 0 )
-            {
-                counts.remove( filter );
-                callDestroy = true;
-            }
-        }
-
-        if( callDestroy )
-        {
+            counts.remove( filter );
             try
             {
                 filter.destroy();
