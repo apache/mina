@@ -383,36 +383,43 @@ public class StreamWriteFilterTest extends TestCase {
         SocketAddress address = new InetSocketAddress( "localhost", AvailablePortFinder.getNextAvailable() );
 
         IoConnector connector = new SocketConnector();
-        connector.getDefaultConfig().getFilterChain().addFirst( "threadPool", new ThreadPoolFilter() );
+        ThreadPoolFilter threadPoolFilter = new ThreadPoolFilter();
+        threadPoolFilter.start();
         
-        FixedRandomInputStream stream = new FixedRandomInputStream( 4 * 1024 * 1024 );
-        
-        SenderHandler sender = new SenderHandler( stream );
-        ReceiverHandler receiver = new ReceiverHandler( stream.size );
-        
-        acceptor.bind( address, sender );
-        
-        synchronized( sender.lock )
-        {
-            synchronized( receiver.lock )
+        try {
+            connector.getDefaultConfig().getFilterChain().addFirst( "threadPool", threadPoolFilter );
+            
+            FixedRandomInputStream stream = new FixedRandomInputStream( 4 * 1024 * 1024 );
+            
+            SenderHandler sender = new SenderHandler( stream );
+            ReceiverHandler receiver = new ReceiverHandler( stream.size );
+            
+            acceptor.bind( address, sender );
+            
+            synchronized( sender.lock )
             {
-                connector.connect( address, receiver );
-                
-                sender.lock.wait();
-                receiver.lock.wait();
+                synchronized( receiver.lock )
+                {
+                    connector.connect( address, receiver );
+                    
+                    sender.lock.wait();
+                    receiver.lock.wait();
+                }
             }
-        }
-        
-        acceptor.unbind( address );
-        
-        assertEquals( stream.bytesRead, receiver.bytesRead );
-        assertEquals( stream.size, receiver.bytesRead );
-        byte[] expectedMd5 = stream.digest.digest();
-        byte[] actualMd5 = receiver.digest.digest();
-        assertEquals( expectedMd5.length, actualMd5.length );
-        for( int i = 0; i < expectedMd5.length; i++ )
-        {
-            assertEquals( expectedMd5[ i ], actualMd5[ i ] );
+            
+            acceptor.unbind( address );
+            
+            assertEquals( stream.bytesRead, receiver.bytesRead );
+            assertEquals( stream.size, receiver.bytesRead );
+            byte[] expectedMd5 = stream.digest.digest();
+            byte[] actualMd5 = receiver.digest.digest();
+            assertEquals( expectedMd5.length, actualMd5.length );
+            for( int i = 0; i < expectedMd5.length; i++ )
+            {
+                assertEquals( expectedMd5[ i ], actualMd5[ i ] );
+            }
+        } finally {
+            threadPoolFilter.stop();
         }
     }
 
