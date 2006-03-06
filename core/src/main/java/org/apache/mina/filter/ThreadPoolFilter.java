@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.util.BlockingQueue;
@@ -170,7 +171,16 @@ public class ThreadPoolFilter extends IoFilterAdapter
         this.keepAliveTime = keepAliveTime;
     }
 
-    public void init()
+    public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) 
+        throws Exception
+    {
+        if( leader == null )
+        {
+            start();
+        }
+    }
+
+    public void start()
     {
         shuttingDown = false;
         leader = new Worker();
@@ -178,7 +188,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
         leader.lead();
     }
 
-    public void destroy()
+    public void stop()
     {
         shuttingDown = true;
         int expectedPoolSize = 0;
@@ -340,6 +350,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
             this.id = id;
             this.setName( threadNamePrefix + '-' + id );
             increasePoolSize( this );
+            setDaemon( true );
         }
 
         public boolean lead()
