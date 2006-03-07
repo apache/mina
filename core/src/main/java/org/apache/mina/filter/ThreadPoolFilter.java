@@ -44,6 +44,15 @@ import org.apache.mina.util.Stack;
  * This is an implementation of
  * <a href="http://deuce.doc.wustl.edu/doc/pspdfs/lf.pdf">Leader/Followers
  * thread pool</a> by Douglas C. Schmidt et al.
+ * </p>
+ * <p>
+ * Use the {@link #start()} and {@link #stop()} methods to force this filter
+ * to start/stop processing events. Alternatively, {@link #start()} will be
+ * called automatically the first time an instance of this filter is added
+ * to a filter chain. Calling {@link #stop()} is not required either since
+ * all workers are daemon threads which means that any workers still alive
+ * when the JVM terminates will die automatically.
+ * </p>
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
@@ -180,6 +189,10 @@ public class ThreadPoolFilter extends IoFilterAdapter
         }
     }
 
+    /**
+     * Starts handling new events. This will be called automatically if not
+     * already called the first time this filter is added to a filter chain. 
+     */
     public void start()
     {
         shuttingDown = false;
@@ -188,6 +201,9 @@ public class ThreadPoolFilter extends IoFilterAdapter
         leader.lead();
     }
 
+    /**
+     * Stops handling events and terminates all active worker threads.
+     */
     public void stop()
     {
         shuttingDown = true;
