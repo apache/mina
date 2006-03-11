@@ -1086,9 +1086,9 @@ public abstract class ByteBuffer implements Comparable
         }
         
         CharBuffer in = CharBuffer.wrap( val ); 
-        int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar()) + 1;
-        
         encoder.reset();
+        
+        int expandedState = 0;
         
         for (;;) {
             CoderResult cr;
@@ -1105,10 +1105,31 @@ public abstract class ByteBuffer implements Comparable
             {
                 break;
             }
-            if( cr.isOverflow() && isAutoExpand() )
+            if( cr.isOverflow() )
             {
-                autoExpand( limit() - position() + expectedLength );
-                continue;
+                if( isAutoExpand() )
+                {
+                    switch( expandedState )
+                    {
+                    case 0:
+                        autoExpand( ( int ) Math.ceil( in.remaining() * encoder.averageBytesPerChar() ) );
+                        expandedState ++;
+                        break;
+                    case 1:
+                        autoExpand( ( int ) Math.ceil( in.remaining() * encoder.maxBytesPerChar() ) );
+                        expandedState ++;
+                        break;
+                    default:
+                        throw new RuntimeException( "Expanded by " +
+                                ( int ) Math.ceil( in.remaining() * encoder.maxBytesPerChar() ) +
+                                " but that wasn't enough for '" + val + "'");
+                    }
+                    continue;
+                }
+            }
+            else
+            {
+                expandedState = 0;
             }
             cr.throwException();
         }
