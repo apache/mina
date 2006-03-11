@@ -19,6 +19,7 @@
 package org.apache.mina.common;
 
 import java.nio.BufferOverflowException;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -449,6 +450,48 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( ' ', buf.get( 4 ) );
     }
         
+    public void testWideUtf8Characters() throws Exception
+    {
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
+                ByteBuffer buffer = ByteBuffer.allocate( 1 );
+                buffer.setAutoExpand( true );
+
+                Charset charset = Charset.forName( "UTF-8" );
+
+                CharsetEncoder encoder = charset.newEncoder();
+
+                for( int i = 0; i < 5; i++ )
+                {
+                    System.out.println( i );
+                    try
+                    {
+                        buffer.putString( "\u89d2", encoder );
+                    }
+                    catch( CharacterCodingException e )
+                    {
+                        fail( e.getMessage() );
+                    }
+                }
+            }
+        };
+
+        Thread t = new Thread( r );
+        t.setDaemon( true );
+        t.start();
+
+        Thread.sleep( 5 * 1000 );
+
+        if( t.isAlive() )
+        {
+            t.interrupt();
+
+            fail( "Went into endless loop trying to encode character");
+        }
+    }
+
     public void testObjectSerialization() throws Exception
     {
         ByteBuffer buf = ByteBuffer.allocate( 16 );
