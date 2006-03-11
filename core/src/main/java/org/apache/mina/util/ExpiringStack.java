@@ -84,9 +84,12 @@ public class ExpiringStack implements Serializable
         {
             // expand queue
             final int oldLen = items.length;
-            Object[] tmp = new Object[ oldLen * 2 ];
-            System.arraycopy( items, 0, tmp, 0, size );
-            items = tmp;
+            Object[] tmpItems = new Object[ oldLen * 2 ];
+            System.arraycopy( items, 0, tmpItems, 0, size );
+            long[] tmpTimestamps = new long[ oldLen * 2 ];
+            System.arraycopy( timestamps, 0, tmpTimestamps, 0, size );
+            items = tmpItems;
+            timestamps = tmpTimestamps;
         }
 
         items[ size ] = obj;
