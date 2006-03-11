@@ -465,7 +465,6 @@ public class ByteBufferTest extends TestCase
 
                 for( int i = 0; i < 5; i++ )
                 {
-                    System.out.println( i );
                     try
                     {
                         buffer.putString( "\u89d2", encoder );
