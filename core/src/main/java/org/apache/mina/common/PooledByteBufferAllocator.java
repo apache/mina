@@ -46,11 +46,11 @@ import org.apache.mina.util.ExpiringStack;
  */
 public class PooledByteBufferAllocator implements ByteBufferAllocator
 {
-    private final int MINIMUM_CAPACITY = 1;
+    private static final int MINIMUM_CAPACITY = 1;
+    private static int threadId = 0;
 
+    private final Expirer expirer;
     private final ExpiringStack containerStack = new ExpiringStack();
-    private int timeout;
-
     private final ExpiringStack[] heapBufferStacks = new ExpiringStack[] {
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
@@ -63,7 +63,6 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
             new ExpiringStack(), new ExpiringStack(), };
-    
     private final ExpiringStack[] directBufferStacks = new ExpiringStack[] {
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
@@ -76,7 +75,9 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
             new ExpiringStack(), new ExpiringStack(), };
-    
+    private int timeout;
+    private boolean disposed;
+
     public PooledByteBufferAllocator()
     {
         this( 60 );
@@ -85,7 +86,40 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
     public PooledByteBufferAllocator( int timeout )
     {
         setTimeout( timeout );
-        new Expirer().start();
+        expirer = new Expirer();
+        expirer.start();
+    }
+    
+    public void dispose()
+    {
+        if( this == ByteBuffer.getAllocator() )
+        {
+            throw new IllegalStateException( "This allocator is in use." );
+        }
+
+        expirer.shutdown();
+        synchronized( containerStack )
+        {
+            containerStack.clear();
+        }
+        
+        for( int i = directBufferStacks.length - 1; i >= 0; i -- )
+        {
+            ExpiringStack stack = directBufferStacks[i];
+            synchronized( stack )
+            {
+                stack.clear();
+            }
+        }
+        for( int i = heapBufferStacks.length - 1; i >= 0; i -- )
+        {
+            ExpiringStack stack = heapBufferStacks[i];
+            synchronized( stack )
+            {
+                stack.clear();
+            }
+        }
+        disposed = true;
     }
     
     public int getTimeout()
@@ -115,6 +149,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
     
     public ByteBuffer allocate( int capacity, boolean direct )
     {
+        ensureNotDisposed();
         java.nio.ByteBuffer nioBuffer = allocate0( capacity, direct );
         PooledByteBuffer buf = allocateContainer();
         buf.init( nioBuffer, true );
@@ -170,6 +205,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
     
     public ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
+        ensureNotDisposed();
         PooledByteBuffer buf = allocateContainer();
         buf.init( nioBuffer, false );
         buf.setPooled( false );
@@ -193,19 +229,45 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
 
         return stackIdx;
     }
+    
+    private void ensureNotDisposed()
+    {
+        if( disposed )
+        {
+            throw new IllegalStateException( "This allocator is disposed already." );
+        }
+    }
 
     private class Expirer extends Thread
     {
+        private boolean timeToStop;
+
         public Expirer()
         {
-            super( "PooledByteBufferExpirer" );
+            super( "PooledByteBufferExpirer-" + threadId++ );
             setDaemon( true );
+        }
+        
+        public void shutdown()
+        {
+            timeToStop = true;
+            interrupt();
+            while( isAlive() )
+            {
+                try
+                {
+                    join();
+                }
+                catch ( InterruptedException e )
+                {
+                }
+            }
         }
         
         public void run()
         {
             // Expire unused buffers every seconds
-            for( ;; )
+            while( !timeToStop )
             {
                 try
                 {
@@ -301,6 +363,12 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
                 {
                     return;
                 }
+            }
+
+            // No need to return buffers to the pool if it is disposed already.
+            if( disposed )
+            {
+                return;
             }
 
             if( pooled )
