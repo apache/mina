@@ -524,4 +524,29 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 10, buf.limit() );
         Assert.assertEquals( 10, buf.capacity() );
     }
+    
+    public void testPoolExpiration() throws Exception
+    {
+        PooledByteBufferAllocator allocator =
+            ( PooledByteBufferAllocator ) ByteBuffer.getAllocator();
+        
+        // Make a buffer pooled.
+        ByteBuffer buf = ByteBuffer.allocate( 16 );
+        buf.release();
+        
+        // Let everything flushed.
+        allocator.setTimeout( 1 );
+        Thread.sleep( 2000 );
+        
+        // Make sure old buffers are flushed.
+        Assert.assertNotSame( buf, ByteBuffer.allocate( 16 ) );
+        
+        // Make sure new buffers are not flushed.
+        allocator.setTimeout( 10 );
+        buf = ByteBuffer.allocate( 16 );
+        buf.release();
+        Thread.sleep( 2000 );
+        Assert.assertSame( buf, ByteBuffer.allocate( 16 ) );
+
+    }
 }

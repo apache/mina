@@ -26,7 +26,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 
-import org.apache.mina.util.Stack;
+import org.apache.mina.util.ExpiringStack;
 
 /**
  * A {@link ByteBufferAllocator} which pools allocated buffers.
@@ -48,30 +48,69 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
 {
     private final int MINIMUM_CAPACITY = 1;
 
-    private final Stack containerStack = new Stack();
+    private final ExpiringStack containerStack = new ExpiringStack();
+    private int timeout;
 
-    private final Stack[] heapBufferStacks = new Stack[] {
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(), };
+    private final ExpiringStack[] heapBufferStacks = new ExpiringStack[] {
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), };
     
-    private final Stack[] directBufferStacks = new Stack[] {
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(), };
+    private final ExpiringStack[] directBufferStacks = new ExpiringStack[] {
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
+            new ExpiringStack(), new ExpiringStack(), };
     
     public PooledByteBufferAllocator()
     {
+        this( 60 );
+    }
+    
+    public PooledByteBufferAllocator( int timeout )
+    {
+        setTimeout( timeout );
+        new Expirer().start();
+    }
+    
+    public int getTimeout()
+    {
+        return timeout;
+    }
+    
+    public long getTimeoutMillis()
+    {
+        return timeout * 1000L;
+    }
+    
+    public void setTimeout( int timeout )
+    {
+        if( timeout < 0 )
+        {
+            timeout = 0;
+        }
+
+        this.timeout = timeout;
+        
+        if( timeout > 0 )
+        {
+            
+        }
     }
     
     public ByteBuffer allocate( int capacity, boolean direct )
@@ -99,9 +138,9 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
     
     private java.nio.ByteBuffer allocate0( int capacity, boolean direct )
     {
-        Stack[] bufferStacks = direct? directBufferStacks : heapBufferStacks;
+        ExpiringStack[] bufferStacks = direct? directBufferStacks : heapBufferStacks;
         int idx = getBufferStackIndex( bufferStacks, capacity );
-        Stack stack = bufferStacks[ idx ];
+        ExpiringStack stack = bufferStacks[ idx ];
 
         java.nio.ByteBuffer buf;
         synchronized( stack )
@@ -120,8 +159,8 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
     
     private void release0( java.nio.ByteBuffer buf )
     {
-        Stack[] bufferStacks = buf.isDirect()? directBufferStacks : heapBufferStacks;
-        Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, buf.capacity() ) ];
+        ExpiringStack[] bufferStacks = buf.isDirect()? directBufferStacks : heapBufferStacks;
+        ExpiringStack stack = bufferStacks[ getBufferStackIndex( bufferStacks, buf.capacity() ) ];
         synchronized( stack )
         {
             // push back
@@ -137,7 +176,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         return buf;
     }
 
-    private int getBufferStackIndex( Stack[] bufferStacks, int size )
+    private int getBufferStackIndex( ExpiringStack[] bufferStacks, int size )
     {
         int targetSize = MINIMUM_CAPACITY;
         int stackIdx = 0;
@@ -155,17 +194,74 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         return stackIdx;
     }
 
+    private class Expirer extends Thread
+    {
+        public Expirer()
+        {
+            super( "PooledByteBufferExpirer" );
+            setDaemon( true );
+        }
+        
+        public void run()
+        {
+            // Expire unused buffers every seconds
+            for( ;; )
+            {
+                try
+                {
+                    Thread.sleep( 1000 );
+                }
+                catch ( InterruptedException e )
+                {
+                }
+
+                // Check if expiration is disabled.
+                long timeout = getTimeoutMillis();
+                if( timeout <= 0L )
+                {
+                    continue;
+                }
+
+                // Expire old buffers
+                long expirationTime = System.currentTimeMillis() - timeout;
+                synchronized( containerStack )
+                {
+                    containerStack.expireBefore( expirationTime );
+                }
+                
+                for( int i = directBufferStacks.length - 1; i >= 0; i -- )
+                {
+                    ExpiringStack stack = directBufferStacks[ i ];
+                    synchronized( stack )
+                    {
+                        stack.expireBefore( expirationTime );
+                    }
+                }
+
+                for( int i = heapBufferStacks.length - 1; i >= 0; i -- )
+                {
+                    ExpiringStack stack = heapBufferStacks[ i ];
+                    synchronized( stack )
+                    {
+                        stack.expireBefore( expirationTime );
+                    }
+                }
+            }
+        }
+    }
+
     private class PooledByteBuffer extends ByteBuffer
     {
         private java.nio.ByteBuffer buf;
         private int refCount = 1;
         private boolean autoExpand;
         private boolean pooled;
+        private long timestamp;
 
         protected PooledByteBuffer()
         {
         }
-
+        
         private synchronized void init( java.nio.ByteBuffer buf, boolean clear )
         {
             this.buf = buf;
@@ -212,6 +308,9 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
                 release0( buf );
             }
 
+            // Update timestamp.
+            timestamp = System.currentTimeMillis();
+
             synchronized( containerStack )
             {
                 containerStack.push( this );
@@ -252,6 +351,11 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         public void setPooled( boolean pooled )
         {
             this.pooled = pooled;
+        }
+
+        public long getTimestamp()
+        {
+            return timestamp;
         }
 
         public int capacity()
