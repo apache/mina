@@ -1087,9 +1087,9 @@ public abstract class ByteBuffer implements Comparable
         
         CharBuffer in = CharBuffer.wrap( val ); 
         int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar()) + 1;
-
+        
         encoder.reset();
-
+        
         for (;;) {
             CoderResult cr;
             if( in.hasRemaining() )
@@ -1107,7 +1107,7 @@ public abstract class ByteBuffer implements Comparable
             }
             if( cr.isOverflow() && isAutoExpand() )
             {
-                autoExpand( expectedLength );
+                autoExpand( limit() - position() + expectedLength );
                 continue;
             }
             cr.throwException();
