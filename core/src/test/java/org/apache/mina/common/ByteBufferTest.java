@@ -547,6 +547,42 @@ public class ByteBufferTest extends TestCase
         buf.release();
         Thread.sleep( 2000 );
         Assert.assertSame( buf, ByteBuffer.allocate( 16 ) );
-
+        
+        // Return to the default settings
+        allocator.setTimeout( 60 );
+    }
+    
+    public void testAllocatorDisposal() throws Exception
+    {
+        PooledByteBufferAllocator allocator =
+            ( PooledByteBufferAllocator ) ByteBuffer.getAllocator();
+        
+        // dispose() should fail because the allocator is in use. 
+        try
+        {
+            allocator.dispose();
+            Assert.fail();
+        }
+        catch( IllegalStateException e )
+        {
+            // OK
+        }
+        
+        // Change the allocator.
+        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
+        
+        // Dispose the old allocator. 
+        allocator.dispose();
+        
+        // Allocation request to the disposed allocator should fail.
+        try
+        {
+            allocator.allocate( 16, true );
+            Assert.fail();
+        }
+        catch( IllegalStateException e )
+        {
+            // OK
+        }
     }
 }
