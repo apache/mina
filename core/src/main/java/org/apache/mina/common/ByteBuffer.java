@@ -40,10 +40,9 @@ import java.nio.charset.CoderResult;
 
 import org.apache.mina.common.support.ByteBufferHexDumper;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
-import org.apache.mina.util.Stack;
 
 /**
- * A pooled byte buffer used by MINA applications.
+ * A byte buffer used by MINA applications.
  * <p>
  * This is a replacement for {@link java.nio.ByteBuffer}. Please refer to
  * {@link java.nio.ByteBuffer} and {@link java.nio.Buffer} documentation for
@@ -121,34 +120,47 @@ import org.apache.mina.util.Stack;
  * increase by two times, and its limit will increase to the last position
  * the string is written.
  * 
+ * <h2>Changing Buffer Allocation and Management Policy</h2>
+ * <p>
+ * MINA provides a {@link ByteBufferAllocator} interface to let you override
+ * the default buffer management behavior.  There are two allocators provided
+ * out-of-the-box:
+ * <ul>
+ *   <li>{@link PooledByteBufferAllocator} (Default)</li>
+ *   <li>{@link SimpleByteBufferAllocator}</li>
+ * </ul>
+ * You can change the allocator by calling {@link #setAllocator(ByteBufferAllocator)}.
+ * </p>
+ * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @see ByteBufferAllocator
  */
 public abstract class ByteBuffer implements Comparable
 {
-    private static final int MINIMUM_CAPACITY = 1;
-
-    private static final Stack containerStack = new Stack();
-
-    private static final Stack[] heapBufferStacks = new Stack[] {
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(), };
+    private static ByteBufferAllocator allocator = new PooledByteBufferAllocator();
     
-    private static final Stack[] directBufferStacks = new Stack[] {
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(),
-            new Stack(), new Stack(), new Stack(), new Stack(), };
+    /**
+     * Returns the current allocator which manages the allocated buffers.
+     */
+    public static ByteBufferAllocator getAllocator()
+    {
+        return allocator;
+    }
+
+    /**
+     * Changes the current allocator with the specified one to manage
+     * the allocated buffers from now.
+     */
+    public static void setAllocator( ByteBufferAllocator newAllocator )
+    {
+        if( newAllocator == null )
+        {
+            throw new NullPointerException( "allocator" );
+        }
+        allocator = newAllocator;
+    }
     
     /**
      * Returns the direct or heap buffer which is capable of the specified
@@ -181,68 +193,15 @@ public abstract class ByteBuffer implements Comparable
      */
     public static ByteBuffer allocate( int capacity, boolean direct )
     {
-        java.nio.ByteBuffer nioBuffer = allocate0( capacity, direct );
-        DefaultByteBuffer buf = allocateContainer();
-        buf.init( nioBuffer, true );
-        return buf;
+        return allocator.allocate( capacity, direct );
     }
 
-    private static DefaultByteBuffer allocateContainer()
-    {
-        DefaultByteBuffer buf;
-        synchronized( containerStack )
-        {
-            buf = ( DefaultByteBuffer ) containerStack.pop();
-        }
-        
-        if( buf == null )
-        {
-            buf = new DefaultByteBuffer();
-        }
-        return buf;
-    }
-    
-    private static java.nio.ByteBuffer allocate0( int capacity, boolean direct )
-    {
-        Stack[] bufferStacks = direct? directBufferStacks : heapBufferStacks;
-        int idx = getBufferStackIndex( bufferStacks, capacity );
-        Stack stack = bufferStacks[ idx ];
-
-        java.nio.ByteBuffer buf;
-        synchronized( stack )
-        {
-            buf = ( java.nio.ByteBuffer ) stack.pop();
-        }
-
-        if( buf == null )
-        {
-            buf = direct ? java.nio.ByteBuffer.allocateDirect( MINIMUM_CAPACITY << idx ) :
-                           java.nio.ByteBuffer.allocate( MINIMUM_CAPACITY << idx );
-        }
-        
-        return buf;
-    }
-    
-    private static void release0( java.nio.ByteBuffer buf )
-    {
-        Stack[] bufferStacks = buf.isDirect()? directBufferStacks : heapBufferStacks;
-        Stack stack = bufferStacks[ getBufferStackIndex( bufferStacks, buf.capacity() ) ];
-        synchronized( stack )
-        {
-            // push back
-            stack.push( buf );
-        }
-    }
-    
     /**
      * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
      */
     public static ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
-        DefaultByteBuffer buf = allocateContainer();
-        buf.init( nioBuffer, false );
-        buf.setPooled( false );
-        return buf;
+        return allocator.wrap( nioBuffer );
     }
     
     /**
@@ -264,24 +223,6 @@ public abstract class ByteBuffer implements Comparable
         return wrap( java.nio.ByteBuffer.wrap( byteArray, offset, length ) );
     }
     
-    private static int getBufferStackIndex( Stack[] bufferStacks, int size )
-    {
-        int targetSize = MINIMUM_CAPACITY;
-        int stackIdx = 0;
-        while( size > targetSize )
-        {
-            targetSize <<= 1;
-            stackIdx ++ ;
-            if( stackIdx >= bufferStacks.length )
-            {
-                throw new IllegalArgumentException(
-                        "Buffer size is too big: " + size );
-            }
-        }
-
-        return stackIdx;
-    }
-
     protected ByteBuffer()
     {
     }
@@ -1844,475 +1785,12 @@ public abstract class ByteBuffer implements Comparable
         return this;
     }
     
-
     private static void checkFieldSize( int fieldSize )
     {
         if( fieldSize < 0 )
         {
             throw new IllegalArgumentException(
                     "fieldSize cannot be negative: " + fieldSize );
-        }
-    }
-    
-    private static class DefaultByteBuffer extends ByteBuffer
-    {
-        private java.nio.ByteBuffer buf;
-        private int refCount = 1;
-        private boolean autoExpand;
-        private boolean pooled;
-
-        protected DefaultByteBuffer()
-        {
-        }
-
-        private synchronized void init( java.nio.ByteBuffer buf, boolean clear )
-        {
-            this.buf = buf;
-            if( clear )
-            {
-                buf.clear();
-            }
-            buf.order( ByteOrder.BIG_ENDIAN );
-            autoExpand = false;
-            pooled = true;
-            refCount = 1;
-        }
-        
-        public synchronized void acquire()
-        {
-            if( refCount <= 0 )
-            {
-                throw new IllegalStateException( "Already released buffer." );
-            }
-
-            refCount ++;
-        }
-
-        public void release()
-        {
-            synchronized( this )
-            {
-                if( refCount <= 0 )
-                {
-                    refCount = 0;
-                    throw new IllegalStateException(
-                            "Already released buffer.  You released the buffer too many times." );
-                }
-
-                refCount --;
-                if( refCount > 0)
-                {
-                    return;
-                }
-            }
-
-            if( pooled )
-            {
-                release0( buf );
-            }
-
-            synchronized( containerStack )
-            {
-                containerStack.push( this );
-            }
-        }
-
-        public java.nio.ByteBuffer buf()
-        {
-            return buf;
-        }
-        
-        public boolean isDirect()
-        {
-            return buf.isDirect();
-        }
-        
-        public boolean isReadOnly()
-        {
-            return buf.isReadOnly();
-        }
-        
-        public boolean isAutoExpand()
-        {
-            return autoExpand;
-        }
-        
-        public ByteBuffer setAutoExpand( boolean autoExpand )
-        {
-            this.autoExpand = autoExpand;
-            return this;
-        }
-        
-        public boolean isPooled()
-        {
-            return pooled;
-        }
-        
-        public void setPooled( boolean pooled )
-        {
-            this.pooled = pooled;
-        }
-
-        public int capacity()
-        {
-            return buf.capacity();
-        }
-        
-        public int position()
-        {
-            return buf.position();
-        }
-
-        public ByteBuffer position( int newPosition )
-        {
-            autoExpand( newPosition, 0 );
-            buf.position( newPosition );
-            return this;
-        }
-
-        public int limit()
-        {
-            return buf.limit();
-        }
-
-        public ByteBuffer limit( int newLimit )
-        {
-            autoExpand( newLimit, 0 );
-            buf.limit( newLimit );
-            return this;
-        }
-
-        public ByteBuffer mark()
-        {
-            buf.mark();
-            return this;
-        }
-
-        public ByteBuffer reset()
-        {
-            buf.reset();
-            return this;
-        }
-
-        public ByteBuffer clear()
-        {
-            buf.clear();
-            return this;
-        }
-
-        public ByteBuffer flip()
-        {
-            buf.flip();
-            return this;
-        }
-
-        public ByteBuffer rewind()
-        {
-            buf.rewind();
-            return this;
-        }
-
-        public int remaining()
-        {
-            return buf.remaining();
-        }
-
-        public byte get()
-        {
-            return buf.get();
-        }
-
-        public ByteBuffer put( byte b )
-        {
-            autoExpand( 1 );
-            buf.put( b );
-            return this;
-        }
-
-        public byte get( int index )
-        {
-            return buf.get( index );
-        }
-
-        public ByteBuffer put( int index, byte b )
-        {
-            autoExpand( index, 1 );
-            buf.put( index, b );
-            return this;
-        }
-
-        public ByteBuffer get( byte[] dst, int offset, int length )
-        {
-            buf.get( dst, offset, length );
-            return this;
-        }
-
-        public ByteBuffer put( java.nio.ByteBuffer src )
-        {
-            autoExpand( src.remaining() );
-            buf.put( src );
-            return this;
-        }
-
-        public ByteBuffer put( byte[] src, int offset, int length )
-        {
-            autoExpand( length );
-            buf.put( src, offset, length );
-            return this;
-        }
-
-        public ByteBuffer compact()
-        {
-            buf.compact();
-            return this;
-        }
-
-        public int compareTo( ByteBuffer that )
-        {
-            return this.buf.compareTo( that.buf() );
-        }
-
-        public ByteOrder order()
-        {
-            return buf.order();
-        }
-
-        public ByteBuffer order( ByteOrder bo )
-        {
-            buf.order( bo );
-            return this;
-        }
-
-        public char getChar()
-        {
-            return buf.getChar();
-        }
-
-        public ByteBuffer putChar( char value )
-        {
-            autoExpand( 2 );
-            buf.putChar( value );
-            return this;
-        }
-
-        public char getChar( int index )
-        {
-            return buf.getChar( index );
-        }
-
-        public ByteBuffer putChar( int index, char value )
-        {
-            autoExpand( index, 2 );
-            buf.putChar( index, value );
-            return this;
-        }
-
-        public CharBuffer asCharBuffer()
-        {
-            return buf.asCharBuffer();
-        }
-
-        public short getShort()
-        {
-            return buf.getShort();
-        }
-
-        public ByteBuffer putShort( short value )
-        {
-            autoExpand( 2 );
-            buf.putShort( value );
-            return this;
-        }
-
-        public short getShort( int index )
-        {
-            return buf.getShort( index );
-        }
-
-        public ByteBuffer putShort( int index, short value )
-        {
-            autoExpand( index, 2 );
-            buf.putShort( index, value );
-            return this;
-        }
-
-        public ShortBuffer asShortBuffer()
-        {
-            return buf.asShortBuffer();
-        }
-
-        public int getInt()
-        {
-            return buf.getInt();
-        }
-
-        public ByteBuffer putInt( int value )
-        {
-            autoExpand( 4 );
-            buf.putInt( value );
-            return this;
-        }
-
-        public int getInt( int index )
-        {
-            return buf.getInt( index );
-        }
-
-        public ByteBuffer putInt( int index, int value )
-        {
-            autoExpand( index, 4 );
-            buf.putInt( index, value );
-            return this;
-        }
-
-        public IntBuffer asIntBuffer()
-        {
-            return buf.asIntBuffer();
-        }
-
-        public long getLong()
-        {
-            return buf.getLong();
-        }
-
-        public ByteBuffer putLong( long value )
-        {
-            autoExpand( 8 );
-            buf.putLong( value );
-            return this;
-        }
-
-        public long getLong( int index )
-        {
-            return buf.getLong( index );
-        }
-
-        public ByteBuffer putLong( int index, long value )
-        {
-            autoExpand( index, 8 );
-            buf.putLong( index, value );
-            return this;
-        }
-
-        public LongBuffer asLongBuffer()
-        {
-            return buf.asLongBuffer();
-        }
-
-        public float getFloat()
-        {
-            return buf.getFloat();
-        }
-
-        public ByteBuffer putFloat( float value )
-        {
-            autoExpand( 4 );
-            buf.putFloat( value );
-            return this;
-        }
-
-        public float getFloat( int index )
-        {
-            return buf.getFloat( index );
-        }
-
-        public ByteBuffer putFloat( int index, float value )
-        {
-            autoExpand( index, 4 );
-            buf.putFloat( index, value );
-            return this;
-        }
-
-        public FloatBuffer asFloatBuffer()
-        {
-            return buf.asFloatBuffer();
-        }
-
-        public double getDouble()
-        {
-            return buf.getDouble();
-        }
-
-        public ByteBuffer putDouble( double value )
-        {
-            autoExpand( 8 );
-            buf.putDouble( value );
-            return this;
-        }
-
-        public double getDouble( int index )
-        {
-            return buf.getDouble( index );
-        }
-
-        public ByteBuffer putDouble( int index, double value )
-        {
-            autoExpand( index, 8 );
-            buf.putDouble( index, value );
-            return this;
-        }
-
-        public DoubleBuffer asDoubleBuffer()
-        {
-            return buf.asDoubleBuffer();
-        }
-
-        public ByteBuffer expand( int expectedRemaining )
-        {
-            if( autoExpand )
-            {
-                int pos = buf.position();
-                int limit = buf.limit();
-                int end = pos + expectedRemaining;
-                if( end > limit ) {
-                    ensureCapacity( end );
-                    buf.limit( end );
-                }
-            }
-            return this;
-        }
-        
-        public ByteBuffer expand( int pos, int expectedRemaining )
-        {
-            if( autoExpand )
-            {
-                int limit = buf.limit();
-                int end = pos + expectedRemaining;
-                if( end > limit ) {
-                    ensureCapacity( end );
-                    buf.limit( end );
-                }
-            }
-            return this;
-        }
-        
-        private void ensureCapacity( int requestedCapacity )
-        {
-            if( requestedCapacity <= buf.capacity() )
-            {
-                return;
-            }
-            
-            int newCapacity = MINIMUM_CAPACITY;
-            while( newCapacity < requestedCapacity )
-            {
-                newCapacity <<= 1;
-            }
-            
-            java.nio.ByteBuffer oldBuf = this.buf;
-            java.nio.ByteBuffer newBuf = allocate0( newCapacity, isDirect() );
-            newBuf.clear();
-            newBuf.order( oldBuf.order() );
-
-            int pos = oldBuf.position();
-            int limit = oldBuf.limit();
-            oldBuf.clear();
-            newBuf.put( oldBuf );
-            newBuf.position( 0 );
-            newBuf.limit( limit );
-            newBuf.position( pos );
-            this.buf = newBuf;
-            release0( oldBuf );
         }
     }
 }
