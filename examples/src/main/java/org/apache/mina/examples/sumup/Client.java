@@ -25,7 +25,6 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.ThreadPoolFilter;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 /**
@@ -57,18 +56,8 @@ public class Client
             values[ i ] = Integer.parseInt( args[ i ] );
         }
 
-        // Create I/O and Protocol thread pool filter.
-        // I/O thread pool performs encoding and decoding of messages.
-        // Protocol thread pool performs actual protocol flow.
-        ThreadPoolFilter ioThreadPoolFilter = new ThreadPoolFilter();
-        ThreadPoolFilter protocolThreadPoolFilter = new ThreadPoolFilter();
-        IoConnector connector = new SocketConnector();
-        connector.getDefaultConfig().getFilterChain().addFirst(
-                "ioThreadPool", ioThreadPoolFilter );
-        connector.getDefaultConfig().getFilterChain().addLast(
-                "protocolThreadPool", protocolThreadPoolFilter );
-
         // Set connect timeout.
+        IoConnector connector = new SocketConnector();
         ( ( IoConnectorConfig ) connector.getDefaultConfig() ).setConnectTimeout( CONNECT_TIMEOUT );
         
         IoSession session;
