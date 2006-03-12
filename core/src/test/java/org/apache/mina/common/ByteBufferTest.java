@@ -481,7 +481,14 @@ public class ByteBufferTest extends TestCase
         t.setDaemon( true );
         t.start();
 
-        Thread.sleep( 5 * 1000 );
+        for( int i = 0; i < 50; i ++ )
+        {
+            Thread.sleep( 100 );
+            if( !t.isAlive() )
+            {
+                break;
+            }
+        }
 
         if( t.isAlive() )
         {

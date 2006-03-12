@@ -306,17 +306,14 @@ public class ThreadPoolFilter extends IoFilterAdapter
     private SessionBuffer getSessionBuffer( IoSession session )
     {
         final Map buffers = this.buffers;
-        SessionBuffer buf = ( SessionBuffer ) buffers.get( session );
-        if( buf == null )
+        SessionBuffer buf;
+        synchronized( buffers )
         {
-            synchronized( buffers )
+            buf = ( SessionBuffer ) buffers.get( session );
+            if( buf == null )
             {
-                buf = ( SessionBuffer ) buffers.get( session );
-                if( buf == null )
-                {
-                    buf = new SessionBuffer( session );
-                    buffers.put( session, buf );
-                }
+                buf = new SessionBuffer( session );
+                buffers.put( session, buf );
             }
         }
         return buf;
