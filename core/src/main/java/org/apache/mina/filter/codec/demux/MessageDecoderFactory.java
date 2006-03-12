@@ -31,5 +31,5 @@ public interface MessageDecoderFactory
     /**
      * Creates a new message decoder.
      */
-    MessageDecoder newDecoder();
+    MessageDecoder getDecoder() throws Exception;
 }

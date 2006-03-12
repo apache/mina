@@ -31,5 +31,5 @@ public interface MessageEncoderFactory
     /**
      * Creates a new message encoder.
      */
-    MessageEncoder newEncoder();
+    MessageEncoder getEncoder() throws Exception;
 }

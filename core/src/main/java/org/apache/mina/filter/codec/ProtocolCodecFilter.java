@@ -18,6 +18,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter
     public static final String ENCODER_OUT = ProtocolCodecFilter.class.getName() + ".encoderOutput";
     public static final String DECODER_OUT = ProtocolCodecFilter.class.getName() + ".decoderOutput";
     
+    private static final Class[] EMPTY_PARAMS = new Class[0];
+
     private final ProtocolCodecFactory factory;
     
     public ProtocolCodecFilter( ProtocolCodecFactory factory )
@@ -29,6 +31,80 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         this.factory = factory;
     }
     
+    public ProtocolCodecFilter( final ProtocolEncoder encoder, final ProtocolDecoder decoder )
+    {
+        if( encoder == null )
+        {
+            throw new NullPointerException( "encoder" );
+        }
+        if( decoder == null )
+        {
+            throw new NullPointerException( "decoder" );
+        }
+        
+        this.factory = new ProtocolCodecFactory()
+        {
+            public ProtocolEncoder getEncoder()
+            {
+                return encoder;
+            }
+
+            public ProtocolDecoder getDecoder()
+            {
+                return decoder;
+            }
+        };
+    }
+    
+    public ProtocolCodecFilter( final Class encoderClass, final Class decoderClass )
+    {
+        if( encoderClass == null )
+        {
+            throw new NullPointerException( "encoderClass" );
+        }
+        if( decoderClass == null )
+        {
+            throw new NullPointerException( "decoderClass" );
+        }
+        if( !ProtocolEncoder.class.isAssignableFrom( encoderClass ) )
+        {
+            throw new IllegalArgumentException( "encoderClass: " + encoderClass.getName() );
+        }
+        if( !ProtocolDecoder.class.isAssignableFrom( decoderClass ) )
+        {
+            throw new IllegalArgumentException( "decoderClass: " + decoderClass.getName() );
+        }
+        try
+        {
+            encoderClass.getConstructor( EMPTY_PARAMS );
+        }
+        catch( NoSuchMethodException e )
+        {
+            throw new IllegalArgumentException( "encoderClass doesn't have a public default constructor." );
+        }
+        try
+        {
+            decoderClass.getConstructor( EMPTY_PARAMS );
+        }
+        catch( NoSuchMethodException e )
+        {
+            throw new IllegalArgumentException( "decoderClass doesn't have a public default constructor." );
+        }
+        
+        this.factory = new ProtocolCodecFactory()
+        {
+            public ProtocolEncoder getEncoder() throws Exception
+            {
+                return ( ProtocolEncoder ) encoderClass.newInstance();
+            }
+
+            public ProtocolDecoder getDecoder() throws Exception
+            {
+                return ( ProtocolDecoder ) decoderClass.newInstance();
+            }
+        };
+    }
+
     public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
     {
         if( parent.contains( ProtocolCodecFilter.class ) )
@@ -165,7 +241,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         nextFilter.sessionClosed( session );
     }
 
-    private ProtocolEncoder getEncoder( IoSession session )
+    private ProtocolEncoder getEncoder( IoSession session ) throws Exception
     {
         ProtocolEncoder encoder = ( ProtocolEncoder ) session.getAttribute( ENCODER );
         if( encoder == null )
@@ -187,7 +263,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         return out;
     }
     
-    private ProtocolDecoder getDecoder( IoSession session )
+    private ProtocolDecoder getDecoder( IoSession session ) throws Exception
     {
         ProtocolDecoder decoder = ( ProtocolDecoder ) session.getAttribute( DECODER );
         if( decoder == null )

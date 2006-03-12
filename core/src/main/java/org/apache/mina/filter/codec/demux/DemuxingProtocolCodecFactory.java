@@ -63,6 +63,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     private MessageDecoderFactory[] decoderFactories = new MessageDecoderFactory[0];
     private MessageEncoderFactory[] encoderFactories = new MessageEncoderFactory[0];
     
+    private static final Class[] EMPTY_PARAMS = new Class[0];
+
     public DemuxingProtocolCodecFactory()
     {
     }
@@ -72,6 +74,15 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         if( encoderOrDecoderClass == null )
         {
             throw new NullPointerException( "encoderOrDecoderClass" );
+        }
+        
+        try
+        {
+            encoderOrDecoderClass.getConstructor( EMPTY_PARAMS );
+        }
+        catch( NoSuchMethodException e )
+        {
+            throw new IllegalArgumentException( "The specifiec class doesn't have a public default constructor." );
         }
 
         boolean registered = false;
@@ -130,11 +141,11 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         this.decoderFactories = newDecoderFactories;
     }
     
-    public ProtocolEncoder getEncoder() {
+    public ProtocolEncoder getEncoder() throws Exception {
         return new ProtocolEncoderImpl();
     }
 
-    public ProtocolDecoder getDecoder() {
+    public ProtocolDecoder getDecoder() throws Exception {
         return new ProtocolDecoderImpl();
     }
     
@@ -157,12 +168,12 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     {
         private final Map encoders = new IdentityHashMap();
         
-        private ProtocolEncoderImpl()
+        private ProtocolEncoderImpl() throws Exception
         {
             MessageEncoderFactory[] encoderFactories = DemuxingProtocolCodecFactory.this.encoderFactories;
             for( int i = encoderFactories.length - 1; i >= 0; i-- )
             {
-                MessageEncoder encoder = encoderFactories[ i ].newEncoder();
+                MessageEncoder encoder = encoderFactories[ i ].getEncoder();
                 Iterator it = encoder.getMessageTypes().iterator();
                 while( it.hasNext() )
                 {
@@ -236,7 +247,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         private final MessageDecoder[] decoders;
         private MessageDecoder currentDecoder;
 
-        protected ProtocolDecoderImpl()
+        protected ProtocolDecoderImpl() throws Exception
         {
             super( 16 );
             
@@ -244,7 +255,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             decoders = new MessageDecoder[ decoderFactories.length ];
             for( int i = decoderFactories.length - 1; i >= 0; i-- )
             {
-                decoders[ i ] = decoderFactories[ i ].newDecoder();
+                decoders[ i ] = decoderFactories[ i ].getDecoder();
             }
         }
 
@@ -344,7 +355,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             this.encoder = encoder;
         }
 
-        public MessageEncoder newEncoder()
+        public MessageEncoder getEncoder()
         {
             return encoder;
         }
@@ -363,7 +374,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             this.decoder = decoder;
         }
 
-        public MessageDecoder newDecoder()
+        public MessageDecoder getDecoder()
         {
             return decoder;
         }
@@ -388,16 +399,9 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             this.encoderClass = encoderClass;
         }
 
-        public MessageEncoder newEncoder()
+        public MessageEncoder getEncoder() throws Exception
         {
-            try
-            {
-                return ( MessageEncoder ) encoderClass.newInstance();
-            }
-            catch( Exception e )
-            {
-                throw new RuntimeException( "Failed to create a new instance of " + encoderClass, e );
-            }
+            return ( MessageEncoder ) encoderClass.newInstance();
         }
     }
 
@@ -419,16 +423,9 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             this.decoderClass = decoderClass;
         }
 
-        public MessageDecoder newDecoder()
+        public MessageDecoder getDecoder() throws Exception
         {
-            try
-            {
-                return ( MessageDecoder ) decoderClass.newInstance();
-            }
-            catch( Exception e )
-            {
-                throw new RuntimeException( "Failed to create a new instance of " + decoderClass, e );
-            }
+            return ( MessageDecoder ) decoderClass.newInstance();
         }
     }
 }
