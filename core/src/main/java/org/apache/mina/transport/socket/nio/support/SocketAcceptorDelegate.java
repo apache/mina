@@ -410,6 +410,7 @@ public class SocketAcceptorDelegate extends BaseIoAcceptor
                             req.address );
                     getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
+                    req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
                     ( ( SocketFilterChain ) session.getFilterChain() ).sessionCreated( session );
                     session.getManagedSessions().add( session );
                     session.getIoProcessor().addNew( session );

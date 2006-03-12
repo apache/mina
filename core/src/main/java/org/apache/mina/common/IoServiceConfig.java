@@ -61,6 +61,16 @@ public interface IoServiceConfig
     DefaultIoFilterChainBuilder getFilterChain();
     
     /**
+     * Returns the default {@link ThreadModel} of the {@link IoService}.
+     */
+    ThreadModel getThreadModel();
+    
+    /**
+     * Sets the default {@link ThreadModel} of the {@link IoService}.
+     */
+    void setThreadModel( ThreadModel threadModel );
+    
+    /**
      * Returns a deep clone of this configuration.
      */
     Object clone();

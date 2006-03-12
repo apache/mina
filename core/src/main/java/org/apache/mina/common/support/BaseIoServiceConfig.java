@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.PooledThreadModel;
+import org.apache.mina.common.ThreadModel;
 
 /**
  * A base implementation of {@link IoServiceConfig}.
@@ -36,6 +38,11 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
      * Current filter chain builder.
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
+    
+    /**
+     * Current thread model.
+     */
+    private ThreadModel threadModel = new PooledThreadModel();
 
     public BaseIoServiceConfig()
     {
@@ -69,6 +76,20 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
         }
     }
     
+    public ThreadModel getThreadModel()
+    {
+        return threadModel;
+    }
+
+    public void setThreadModel( ThreadModel threadModel )
+    {
+        if( threadModel == null )
+        {
+            throw new NullPointerException( "threadModel" );
+        }
+        this.threadModel = threadModel;
+    }
+
     public Object clone()
     {
         BaseIoServiceConfig ret;

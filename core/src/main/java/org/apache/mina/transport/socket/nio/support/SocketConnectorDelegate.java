@@ -287,6 +287,7 @@ public class SocketConnectorDelegate extends BaseIoConnector
         {
             getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
             config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
+            config.getThreadModel().buildFilterChain( session.getFilterChain() );
             ( ( SocketFilterChain ) session.getFilterChain() ).sessionCreated( session );
         }
         catch( Throwable e )
