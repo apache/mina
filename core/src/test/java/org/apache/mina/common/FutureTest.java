@@ -125,6 +125,7 @@ public class FutureTest extends TestCase
         assertTrue( future.isConnected() );
         assertEquals( session, future.getSession() );
         
+        future = new ConnectFuture();
         thread = new TestThread( future );
         thread.start();
         future.setException( new IOException() );
@@ -160,6 +161,7 @@ public class FutureTest extends TestCase
         assertTrue( future.isReady() );
         assertTrue( future.isWritten() );
 
+        future = new WriteFuture();
         thread = new TestThread( future );
         thread.start();
         
