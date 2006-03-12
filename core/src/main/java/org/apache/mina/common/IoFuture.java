@@ -160,6 +160,12 @@ public class IoFuture
     {
         synchronized( lock )
         {
+            // Allow only once.
+            if( ready )
+            {
+                return;
+            }
+
             result = newValue;
             ready = true;
             lock.notifyAll();
