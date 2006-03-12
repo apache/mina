@@ -15,9 +15,10 @@ public class PooledThreadModel implements ThreadModel
     public static final int DEFAULT_KEEP_ALIVE_TIME = ThreadPoolFilter.DEFAULT_KEEP_ALIVE_TIME;
     
     private static int id = 1;
+    private String threadNamePrefix;
+    private int keepAliveTime;
+    private int maximumPoolSize;
 
-    private final ThreadPoolFilter filter;
-    
     public PooledThreadModel()
     {
         this( "AnonymousIoService-" + id++, DEFAULT_MAXIMUM_POOL_SIZE );
@@ -30,48 +31,45 @@ public class PooledThreadModel implements ThreadModel
 
     public PooledThreadModel( String threadNamePrefix, int maxThreads )
     {
-        filter = new ThreadPoolFilter();
         setMaximumPoolSize( maxThreads );
         setThreadNamePrefix( threadNamePrefix );
     }
 
     public String getThreadNamePrefix()
     {
-        return filter.getThreadNamePrefix();
+        return threadNamePrefix;
     }
 
     public void setThreadNamePrefix( String threadNamePrefix )
     {
-        filter.setThreadNamePrefix( threadNamePrefix );
+        this.threadNamePrefix = threadNamePrefix;
     }
     
-    public int getPoolSize()
-    {
-        return filter.getPoolSize();
-    }
-
     public int getMaximumPoolSize()
     {
-        return filter.getMaximumPoolSize();
+        return maximumPoolSize;
     }
 
     public int getKeepAliveTime()
     {
-        return filter.getKeepAliveTime();
+        return keepAliveTime;
     }
 
     public void setMaximumPoolSize( int maximumPoolSize )
     {
-        filter.setMaximumPoolSize( maximumPoolSize );
+        this.maximumPoolSize = maximumPoolSize;
     }
 
     public void setKeepAliveTime( int keepAliveTime )
     {
-        filter.setKeepAliveTime( keepAliveTime );
+        this.keepAliveTime = keepAliveTime;
     }
 
     public void buildFilterChain( IoFilterChain chain ) throws Exception
     {
+        ThreadPoolFilter filter = new ThreadPoolFilter( threadNamePrefix );
+        filter.setKeepAliveTime( keepAliveTime );
+        filter.setMaximumPoolSize( maximumPoolSize );
         chain.addFirst( PooledThreadModel.class.getName(), filter );
     }
 }
