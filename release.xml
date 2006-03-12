@@ -16,6 +16,7 @@
         <include>**/*.txt</include>
         <include>**/*.xml</include>
         <include>**/src/**</include>
+        <include>**/lib/**</include> <!-- 3rd party libs -->
       </includes>
       <excludes>
         <exclude>**/target/**</exclude>
