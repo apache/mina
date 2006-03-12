@@ -36,9 +36,11 @@ import org.apache.mina.util.ExpiringStack;
  * buffer and the capacity you requested are same.
  * </p>
  * <p>
- * This allocator doesn't deallocate buffers once they are allocated, so the
- * overall memory usage increase as time goes by and cause some applications
- * get {@link OutOfMemoryError} under high load. 
+ * This allocator releases the buffers which have not been in use for a certain
+ * period.  You can adjust the period by calling {@link #setTimeout(int)}.
+ * The default timeout is 1 minute (60 seconds).  To release these buffers
+ * periodically, a daemon thread is started when a new instance of the allocator
+ * is created.  You can stop the thread by calling {@link #dispose()}.
  * </p>
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
@@ -78,18 +80,28 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
     private int timeout;
     private boolean disposed;
 
+    /**
+     * Creates a new instance with the default timeout.
+     */
     public PooledByteBufferAllocator()
     {
         this( 60 );
     }
-    
+
+    /**
+     * Creates a new instance with the specified <tt>timeout</tt>.
+     */
     public PooledByteBufferAllocator( int timeout )
     {
         setTimeout( timeout );
         expirer = new Expirer();
         expirer.start();
     }
-    
+
+    /**
+     * Stops the thread which releases unused buffers and make this allocator
+     * unusable from now on.
+     */
     public void dispose()
     {
         if( this == ByteBuffer.getAllocator() )
@@ -121,17 +133,28 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         }
         disposed = true;
     }
-    
+
+    /**
+     * Returns the timeout value of this allocator in seconds. 
+     */
     public int getTimeout()
     {
         return timeout;
     }
     
+    /**
+     * Returns the timeout value of this allocator in milliseconds. 
+     */
     public long getTimeoutMillis()
     {
         return timeout * 1000L;
     }
     
+    /**
+     * Sets the timeout value of this allocator in seconds.
+     * 
+     * @param timeout <tt>0</tt> or negative value to disable timeout.
+     */
     public void setTimeout( int timeout )
     {
         if( timeout < 0 )
