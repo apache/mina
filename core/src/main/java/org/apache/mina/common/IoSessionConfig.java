@@ -18,8 +18,6 @@
  */
 package org.apache.mina.common;
 
-import java.util.Set;
-
 /**
  * The configuration of {@link IoSession}.
  * 
@@ -32,49 +30,4 @@ public interface IoSessionConfig
      * Returns a deep clone of this configuration.
      */
     Object clone();
-    
-    /**
-     * Returns the value of user-defined attribute of this session.
-     * 
-     * @param key the key of the attribute
-     * @return <tt>null</tt> if there is no attribute with the specified key
-     */
-    Object getAttribute( String key );
-    
-    /**
-     * Sets a user-defined attribute.
-     * 
-     * @param key the key of the attribute
-     * @param value the value of the attribute
-     * @return The old value of the attribute.  <tt>null</tt> if it is new.
-     */
-    Object setAttribute( String key, Object value );
-    
-    /**
-     * Sets a user defined attribute without a value.  This is useful when
-     * you just want to put a 'mark' attribute.  Its value is set to
-     * {@link Boolean#TRUE}.
-     * 
-     * @param key the key of the attribute
-     * @return The old value of the attribute.  <tt>null</tt> if it is new.
-     */
-    Object setAttribute( String key );
-    
-    /**
-     * Removes a user-defined attribute with the specified key.
-     * 
-     * @return The old value of the attribute.  <tt>null</tt> if not found.
-     */
-    Object removeAttribute( String key );
-    
-    /**
-     * Returns <tt>true</tt> if this session contains the attribute with
-     * the specified <tt>key</tt>.
-     */
-    boolean containsAttribute( String key );
-    
-    /**
-     * Returns the set of keys of all user-defined attributes.
-     */
-    Set getAttributeKeys();    
 }

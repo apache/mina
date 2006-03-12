@@ -18,11 +18,6 @@
  */
 package org.apache.mina.common.support;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.mina.common.IoSessionConfig;
 
 /**
@@ -33,8 +28,6 @@ import org.apache.mina.common.IoSessionConfig;
  */
 public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable
 {
-    private Map attributes = new HashMap();
-    
     protected BaseIoSessionConfig()
     {
     }
@@ -45,8 +38,6 @@ public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable
         try
         {
             ret = ( BaseIoSessionConfig ) super.clone();
-            ret.attributes = new HashMap();
-            ret.attributes.putAll( attributes );
         }
         catch( CloneNotSupportedException e )
         {
@@ -55,62 +46,4 @@ public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable
         
         return ret;
     }
-    
-    public Object getAttachment()
-    {
-        synchronized( attributes )
-        {
-            return attributes.get( "" );
-        }
-    }
-
-    public Object setAttachment( Object attachment )
-    {
-        synchronized( attributes )
-        {
-            return attributes.put( "", attachment );
-        }
-    }
-
-    public Object getAttribute( String key )
-    {
-        synchronized( attributes )
-        {
-            return attributes.get( key );
-        }
-    }
-
-    public Object setAttribute( String key, Object value )
-    {
-        synchronized( attributes )
-        {
-            return attributes.put( key, value );
-        }
-    }
-    
-    public Object setAttribute( String key )
-    {
-        return setAttribute( key, Boolean.TRUE );
-    }
-    
-    public Object removeAttribute( String key )
-    {
-        synchronized( attributes )
-        {
-            return attributes.remove( key );
-        }
-    }
-    
-    public boolean containsAttribute( String key )
-    {
-        return getAttribute( key ) != null;
-    }
-
-    public Set getAttributeKeys()
-    {
-        synchronized( attributes )
-        {
-            return new HashSet( attributes.keySet() );
-        }
-    }    
 }
