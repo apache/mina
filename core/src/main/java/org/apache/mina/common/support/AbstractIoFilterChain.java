@@ -440,6 +440,17 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
     public void sessionClosed( IoSession session )
     {
+        // Update future.
+        try
+        {
+            session.getCloseFuture().setClosed();
+        }
+        catch( Throwable t )
+        {
+            exceptionCaught( session, t );
+        }
+        
+        // And start the chain.
         Entry head = this.head;
         callNextSessionClosed(head, session);
     }

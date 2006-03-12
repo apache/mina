@@ -248,7 +248,6 @@ class SocketIoProcessor
                 session.getManagedSessions().remove( session );
 
                 ( ( SocketFilterChain ) session.getFilterChain() ).sessionClosed( session );
-                session.getCloseFuture().setClosed();
             }
         }
     }
