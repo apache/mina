@@ -275,7 +275,7 @@ public class IoFilterChainTest extends TestCase
                 {
                 }
 
-                protected void doClose( IoSession session, CloseFuture closeFuture )
+                protected void doClose( IoSession session )
                 {
                 }
             };
@@ -361,9 +361,9 @@ public class IoFilterChainTest extends TestCase
             nextFilter.messageSent( session, message );
         }
 
-        public void filterClose( NextFilter nextFilter, IoSession session, CloseFuture closeFuture ) throws Exception
+        public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
         {
-            nextFilter.filterClose( session, closeFuture );
+            nextFilter.filterClose( session );
         }
     }
 
@@ -441,7 +441,7 @@ public class IoFilterChainTest extends TestCase
             messageSent( session, writeRequest.getMessage() );
         }
 
-        protected void doClose( IoSession session, CloseFuture closeFuture )
+        protected void doClose( IoSession session )
         {
         }
     }

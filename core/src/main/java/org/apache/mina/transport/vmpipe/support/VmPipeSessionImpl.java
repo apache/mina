@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Set;
 
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterChainBuilder;
@@ -19,8 +18,6 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
-import org.apache.mina.filter.codec.ProtocolDecoder;
-import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.util.Queue;
 
 /**
@@ -141,19 +138,9 @@ public class VmPipeSessionImpl extends BaseIoSession
         return handler;
     }
 
-    public ProtocolEncoder getEncoder()
+    protected void close0()
     {
-        return null;
-    }
-
-    public ProtocolDecoder getDecoder()
-    {
-        return null;
-    }
-    
-    protected void close0( CloseFuture closeFuture )
-    {
-        filterChain.filterClose( this, closeFuture );
+        filterChain.filterClose( this );
     }
     
     protected void write0( WriteRequest writeRequest )

@@ -26,7 +26,6 @@ import javax.net.ssl.SSLSession;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ByteBufferProxy;
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
@@ -526,7 +525,7 @@ public class SSLFilter extends IoFilterAdapter
         }
     }
     
-    public void filterClose( final NextFilter nextFilter, final IoSession session, final CloseFuture closeFuture ) throws SSLException
+    public void filterClose( final NextFilter nextFilter, final IoSession session ) throws SSLException
     {
         SSLHandler handler = getSSLSessionHandler( session );
 
@@ -544,7 +543,7 @@ public class SSLFilter extends IoFilterAdapter
             {
                 if( future == null )
                 {
-                    nextFilter.filterClose( session, closeFuture );
+                    nextFilter.filterClose( session );
                 }
                 else
                 {
@@ -552,7 +551,7 @@ public class SSLFilter extends IoFilterAdapter
                     {
                         public void operationComplete( IoFuture future )
                         {
-                            nextFilter.filterClose( session, closeFuture );
+                            nextFilter.filterClose( session );
                         }
                     });
                 }

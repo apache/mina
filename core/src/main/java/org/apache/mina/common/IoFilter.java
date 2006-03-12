@@ -18,8 +18,6 @@
  */
 package org.apache.mina.common;
 
-
-
 /**
  * A filter which intercepts {@link IoHandler} events like Servlet
  * filters.  Filters can be used for these purposes:
@@ -182,7 +180,7 @@ public interface IoFilter
     /**
      * Filters {@link IoSession#close()} method invocation.
      */
-    void filterClose( NextFilter nextFilter, IoSession session, CloseFuture closeFuture ) throws Exception;
+    void filterClose( NextFilter nextFilter, IoSession session ) throws Exception;
     
     /**
      * Filters {@link IoSession#write(Object)} method invocation.
@@ -237,7 +235,7 @@ public interface IoFilter
         /**
          * Forwards <tt>filterClose</tt> event to next filter.
          */
-        void filterClose( IoSession session, CloseFuture closeFuture );
+        void filterClose( IoSession session );
     }
     
     /**

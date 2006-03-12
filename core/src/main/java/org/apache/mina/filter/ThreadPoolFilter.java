@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
@@ -717,8 +716,8 @@ public class ThreadPoolFilter extends IoFilterAdapter
         nextFilter.filterWrite( session, writeRequest );
     }
 
-    public void filterClose( NextFilter nextFilter, IoSession session, CloseFuture closeFuture ) throws Exception
+    public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
     {
-        nextFilter.filterClose( session, closeFuture );
+        nextFilter.filterClose( session );
     }
 }
