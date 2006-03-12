@@ -153,6 +153,7 @@
         <module>filter-ssl</module>
         <module>filter-codec-asn1</module>
         <module>filter-codec-netty</module>
+        <module>filter-compression</module>
         <module>integration-spring</module>
         <module>examples</module>
       </modules>
@@ -167,6 +168,7 @@
         <module>core</module>
         <module>filter-codec-asn1</module>
         <module>filter-codec-netty</module>
+        <module>filter-compression</module>
       </modules>
       <build>
         <plugins>
@@ -253,6 +255,11 @@ Use JDK 1.5 to make sure these modules build.
           <finalName>mina-${pom.version}</finalName>
           <includeSite>true</includeSite>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.1</version>
       </plugin>
     </plugins>
   </build>
