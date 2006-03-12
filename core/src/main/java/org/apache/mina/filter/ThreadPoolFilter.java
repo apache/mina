@@ -100,7 +100,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
         }
     }
 
-    private final String threadNamePrefix;
+    private String threadNamePrefix;
     private final Map buffers = new IdentityHashMap();
     private final BlockingQueue unfetchedSessionBuffers = new BlockingQueue();
     private final Set allSessionBuffers = new IdentityHashSet();
@@ -132,6 +132,16 @@ public class ThreadPoolFilter extends IoFilterAdapter
      */
     public ThreadPoolFilter( String threadNamePrefix )
     {
+        setThreadNamePrefix( threadNamePrefix );
+    }
+    
+    public String getThreadNamePrefix()
+    {
+        return threadNamePrefix;
+    }
+
+    public void setThreadNamePrefix( String threadNamePrefix )
+    {
         if( threadNamePrefix == null )
         {
             throw new NullPointerException( "threadNamePrefix" );
@@ -142,13 +152,16 @@ public class ThreadPoolFilter extends IoFilterAdapter
             throw new IllegalArgumentException( "threadNamePrefix is empty." );
         }
         this.threadNamePrefix = threadNamePrefix;
+        
+        synchronized( poolSizeLock )
+        {
+            for( Iterator i = allWorkers.iterator(); i.hasNext(); )
+            {
+                ( ( Worker ) i.next() ).updateName();
+            }
+        }
     }
     
-    public String getThreadNamePrefix()
-    {
-        return threadNamePrefix;
-    }
-
     public int getPoolSize()
     {
         synchronized( poolSizeLock )
@@ -360,9 +373,14 @@ public class ThreadPoolFilter extends IoFilterAdapter
         {
             int id = acquireThreadId();
             this.id = id;
-            this.setName( threadNamePrefix + '-' + id );
+            updateName();
             increasePoolSize( this );
             setDaemon( true );
+        }
+        
+        public void updateName()
+        {
+            this.setName( threadNamePrefix + '-' + id );
         }
 
         public boolean lead()
