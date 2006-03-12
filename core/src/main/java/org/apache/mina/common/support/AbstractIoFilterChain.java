@@ -509,10 +509,30 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
     }
 
-    public void messageSent( IoSession session, Object message )
+    public void messageNotSent( IoSession session, WriteRequest request )
     {
+        try
+        {
+            request.getFuture().setWritten( false );
+        }
+        catch( Throwable t )
+        {
+            exceptionCaught( session, t );
+        }
+    }
+
+    public void messageSent( IoSession session, WriteRequest request )
+    {
+        try
+        {
+            request.getFuture().setWritten( true );
+        }
+        catch( Throwable t )
+        {
+            exceptionCaught( session, t );
+        }
         Entry head = this.head;
-        callNextMessageSent(head, session, message);
+        callNextMessageSent( head, session, request.getMessage() );
     }
 
     private void callNextMessageSent( Entry entry,

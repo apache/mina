@@ -459,7 +459,7 @@ class SocketIoProcessor
             }
             finally
             {
-                req.getFuture().setWritten( false );
+                ( ( SocketFilterChain ) session.getFilterChain() ).messageNotSent( session, req );
             }
         }
     }
@@ -492,9 +492,10 @@ class SocketIoProcessor
                     writeRequestQueue.pop();
                 }
                 
-                req.getFuture().setWritten( true );
                 session.increaseWrittenWriteRequests();
-                ( ( SocketFilterChain ) session.getFilterChain() ).messageSent( session, buf.reset() );
+                
+                buf.reset();
+                ( ( SocketFilterChain ) session.getFilterChain() ).messageSent( session, req );
                 continue;
             }
 
