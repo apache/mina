@@ -86,7 +86,7 @@ public abstract class BaseIoSession implements IoSession
     
     public synchronized boolean isClosing()
     {
-        return closing;
+        return closing || closeFuture.isClosed();
     }
     
     public CloseFuture getCloseFuture()
@@ -98,7 +98,11 @@ public abstract class BaseIoSession implements IoSession
     {
         synchronized( this )
         {
-            if( !closing )
+            if( isClosing() )
+            {
+                return closeFuture;
+            }
+            else
             {
                 closing = true;
             }
