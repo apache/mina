@@ -301,9 +301,10 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
                 if( undecodables == decoders.length )
                 {
                     // Throw an exception if all decoders cannot decode data.
+                    String dump = in.getHexDump();
                     in.position( in.limit() ); // Skip data
                     throw new ProtocolDecoderException(
-                            "No appropriate message decoder: " + in.getHexDump() );
+                            "No appropriate message decoder: " + dump );
                 }
                 
                 if( currentDecoder == null )
