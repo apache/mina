@@ -40,12 +40,12 @@ public class ThreadPoolFilterRegressionTest extends TestCase
     public void setUp() throws Exception
     {
         filter = new ThreadPoolFilter();
-        filter.init();
+        filter.start();
     }
     
     public void tearDown() throws Exception
     {
-        filter.destroy();
+        filter.stop();
         Assert.assertEquals( 0, filter.getPoolSize() );
         filter = null;
     }
