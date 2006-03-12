@@ -108,7 +108,7 @@ public abstract class BaseIoSession implements IoSession
             }
         }
 
-        close0( closeFuture );
+        close0();
         return closeFuture;
     }
 
@@ -116,10 +116,8 @@ public abstract class BaseIoSession implements IoSession
      * Implement this method to perform real close operation.
      * By default, this method is implemented to set the future to
      * 'closed' immediately.
-     * 
-     * @param closeFuture a future that should be set to 'closed'
      */
-    protected void close0( CloseFuture closeFuture )
+    protected void close0()
     {
         closeFuture.setClosed();
     }

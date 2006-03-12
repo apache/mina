@@ -92,8 +92,8 @@ public class IoFilterAdapter implements IoFilter
         nextFilter.filterWrite( session, writeRequest );
     }
 
-    public void filterClose( NextFilter nextFilter, IoSession session, CloseFuture closeFuture ) throws Exception
+    public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
     {
-        nextFilter.filterClose( session, closeFuture );
+        nextFilter.filterClose( session );
     }
 }

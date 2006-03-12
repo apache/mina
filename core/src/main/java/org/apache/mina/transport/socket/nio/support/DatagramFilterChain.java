@@ -18,7 +18,6 @@
  */
 package org.apache.mina.transport.socket.nio.support;
 
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
@@ -53,7 +52,7 @@ class DatagramFilterChain extends AbstractIoFilterChain {
         }
     }
 
-    protected void doClose( IoSession session, CloseFuture closeFuture )
+    protected void doClose( IoSession session )
     {
         DatagramSessionImpl s = ( DatagramSessionImpl ) session;
         DatagramService manager = s.getManagerDelegate();
@@ -63,7 +62,7 @@ class DatagramFilterChain extends AbstractIoFilterChain {
         }
         else
         {
-            closeFuture.setClosed();
+            session.getCloseFuture().setClosed();
         }
     }
 }

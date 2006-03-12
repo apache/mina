@@ -18,7 +18,6 @@
  */
 package org.apache.mina.filter;
 
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
@@ -99,9 +98,9 @@ public class LoggingFilter extends IoFilterAdapter
         nextFilter.filterWrite( session, writeRequest );
     }
 
-    public void filterClose( NextFilter nextFilter, IoSession session, CloseFuture closeFuture ) throws Exception
+    public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
     {
         SessionLog.info( session, "CLOSE" );
-        nextFilter.filterClose( session, closeFuture );
+        nextFilter.filterClose( session );
     }
 }

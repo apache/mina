@@ -3,7 +3,6 @@ package org.apache.mina.transport.socket.nio.support;
 import java.io.IOException;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
@@ -39,7 +38,7 @@ class SocketFilterChain extends AbstractIoFilterChain {
         }
     }
 
-    protected void doClose( IoSession session, CloseFuture closeFuture ) throws IOException
+    protected void doClose( IoSession session ) throws IOException
     {
         SocketSessionImpl s = ( SocketSessionImpl ) session;
         s.getIoProcessor().remove( s );

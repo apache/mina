@@ -23,7 +23,6 @@ import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -134,9 +133,9 @@ class DatagramSessionImpl extends BaseIoSession
         return handler;
     }
     
-    protected void close0( CloseFuture closeFuture )
+    protected void close0()
     {
-        filterChain.filterClose( this, closeFuture );
+        filterChain.filterClose( this );
     }
 
     Queue getWriteRequestQueue()

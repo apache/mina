@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
@@ -133,9 +132,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                 }
             }
 
-            public void filterClose( NextFilter nextFilter, IoSession session, CloseFuture closeFuture ) throws Exception
+            public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
             {
-                doClose( session, closeFuture );
+                doClose( session );
             }
         };
     }
@@ -213,9 +212,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                 nextFilter.filterWrite( session, writeRequest );
             }
 
-            public void filterClose( NextFilter nextFilter, IoSession session, CloseFuture closeFuture ) throws Exception
+            public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
             {
-                nextFilter.filterClose( session, closeFuture );
+                nextFilter.filterClose( session );
             }
         };
     }
@@ -561,19 +560,18 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
     }
 
-    public void filterClose( IoSession session, CloseFuture closeFuture )
+    public void filterClose( IoSession session )
     {
         Entry tail = this.tail;
-        callPreviousFilterClose( tail, session, closeFuture );
+        callPreviousFilterClose( tail, session );
     }
 
     private void callPreviousFilterClose( Entry entry,
-                                          IoSession session,
-                                          CloseFuture closeFuture )
+                                          IoSession session )
     {
         try
         {
-            entry.getFilter().filterClose( entry.getNextFilter(), session, closeFuture );
+            entry.getFilter().filterClose( entry.getNextFilter(), session );
         }
         catch( Throwable e )
         {
@@ -692,7 +690,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
     protected abstract void doWrite( IoSession session, WriteRequest writeRequest ) throws Exception;
     
-    protected abstract void doClose( IoSession session, CloseFuture closeFuture ) throws Exception;
+    protected abstract void doClose( IoSession session ) throws Exception;
 
     private class EntryImpl implements Entry
     {
@@ -773,10 +771,10 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                     callPreviousFilterWrite( nextEntry, session, writeRequest );
                 }
 
-                public void filterClose( IoSession session, CloseFuture closeFuture )
+                public void filterClose( IoSession session )
                 {
                     Entry nextEntry = EntryImpl.this.prevEntry;
-                    callPreviousFilterClose( nextEntry, session, closeFuture );
+                    callPreviousFilterClose( nextEntry, session );
                 }
             };
         }

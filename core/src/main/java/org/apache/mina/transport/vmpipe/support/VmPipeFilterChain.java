@@ -1,7 +1,6 @@
 package org.apache.mina.transport.vmpipe.support;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
@@ -89,16 +88,16 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
         }
     }
 
-    protected void doClose( IoSession session, CloseFuture closeFuture )
+    protected void doClose( IoSession session )
     {
         VmPipeSessionImpl s = ( VmPipeSessionImpl ) session;
         synchronized( s.lock )
         {
-            if( !closeFuture.isClosed() )
+            if( !session.getCloseFuture().isClosed() )
             {
                 s.getManagedSessions().remove( s );
                 ( ( VmPipeFilterChain ) s.getFilterChain() ).sessionClosed( session );
-                closeFuture.setClosed();
+                session.getCloseFuture().setClosed();
                 s.remoteSession.close();
             }
         }
