@@ -62,11 +62,14 @@ public interface IoServiceConfig
     
     /**
      * Returns the default {@link ThreadModel} of the {@link IoService}.
+     * The default value is <tt>new {@link PooledThreadModel}()</tt>.
      */
     ThreadModel getThreadModel();
     
     /**
      * Sets the default {@link ThreadModel} of the {@link IoService}.
+     * If you specify <tt>null</tt>, this property will be set to the
+     * default value.  The default value is <tt>new {@link PooledThreadModel}()</tt>.
      */
     void setThreadModel( ThreadModel threadModel );
     

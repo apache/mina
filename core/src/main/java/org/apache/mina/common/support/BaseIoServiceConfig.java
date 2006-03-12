@@ -39,10 +39,11 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
     
+    private final ThreadModel defaultThreadModel = new PooledThreadModel();
     /**
      * Current thread model.
      */
-    private ThreadModel threadModel = new PooledThreadModel();
+    private ThreadModel threadModel = defaultThreadModel;
 
     public BaseIoServiceConfig()
     {
@@ -85,7 +86,9 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
     {
         if( threadModel == null )
         {
-            throw new NullPointerException( "threadModel" );
+            // We reuse the previous default model to prevent too much
+            // daemon threads are created.
+            threadModel = defaultThreadModel;
         }
         this.threadModel = threadModel;
     }
