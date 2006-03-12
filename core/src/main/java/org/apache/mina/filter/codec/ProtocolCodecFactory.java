@@ -35,11 +35,11 @@ public interface ProtocolCodecFactory
      * Returns a new (or reusable) instance of {@link ProtocolEncoder} which
      * encodes message objects into binary or protocol-specific data.
      */
-    ProtocolEncoder getEncoder();
+    ProtocolEncoder getEncoder() throws Exception;
 
     /**
      * Returns a new (or reusable) instance of {@link ProtocolDecoder} which
      * decodes binary or protocol-specific data into message objects.
      */
-    ProtocolDecoder getDecoder();
+    ProtocolDecoder getDecoder() throws Exception;
 }
