@@ -59,9 +59,9 @@ import org.apache.mina.util.Stack;
 public class ThreadPoolFilter extends IoFilterAdapter
 {
     /**
-     * Default maximum size of thread pool (2G).
+     * Default maximum size of thread pool (16).
      */
-    public static final int DEFAULT_MAXIMUM_POOL_SIZE = Integer.MAX_VALUE;
+    public static final int DEFAULT_MAXIMUM_POOL_SIZE = 16;
 
     /**
      * Default keep-alive time of thread pool (1 min).

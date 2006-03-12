@@ -72,6 +72,7 @@ public class VmPipeConnector extends BaseIoConnector
                         AnonymousSocketAddress.INSTANCE,
                         handler,
                         config.getFilterChainBuilder(),
+                        config.getThreadModel(),
                         entry );
             future.setSession( session );
         }

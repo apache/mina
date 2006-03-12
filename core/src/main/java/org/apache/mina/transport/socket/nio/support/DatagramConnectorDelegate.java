@@ -551,6 +551,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             {
                 getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                 req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
+                req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
                 ( ( DatagramFilterChain ) session.getFilterChain() ).sessionCreated( session );
 
                 SelectionKey key = req.channel.register( selector,

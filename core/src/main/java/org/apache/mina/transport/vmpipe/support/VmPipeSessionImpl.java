@@ -14,6 +14,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.ThreadModel;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
@@ -45,7 +46,7 @@ public class VmPipeSessionImpl extends BaseIoSession
      * Constructor for client-side session.
      */
     public VmPipeSessionImpl( IoService manager, Object lock, SocketAddress localAddress,
-                   IoHandler handler, IoFilterChainBuilder filterChainBuilder,
+                   IoHandler handler, IoFilterChainBuilder filterChainBuilder, ThreadModel threadModel,
                    VmPipe remoteEntry ) throws IOException
     {
         this.manager = manager;
@@ -65,6 +66,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         {
             remoteEntry.getAcceptor().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
             remoteEntry.getConfig().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
+            remoteEntry.getConfig().getThreadModel().buildFilterChain( remoteSession.getFilterChain() );
             ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).sessionCreated( remoteSession );
         }
         catch( Throwable t )
@@ -80,6 +82,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         {
             manager.getFilterChainBuilder().buildFilterChain( filterChain );
             filterChainBuilder.buildFilterChain( filterChain );
+            threadModel.buildFilterChain( filterChain );
             handler.sessionCreated( this );
         }
         catch( Throwable t )

@@ -227,6 +227,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         {
             this.getFilterChainBuilder().buildFilterChain( s.getFilterChain() );
             req.config.getFilterChainBuilder().buildFilterChain( s.getFilterChain() );
+            req.config.getThreadModel().buildFilterChain( s.getFilterChain() );
             ( ( DatagramFilterChain ) s.getFilterChain() ).sessionCreated( s );
         }
         catch( Throwable t )
