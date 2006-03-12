@@ -465,9 +465,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                     writeRequestQueue.pop();
                 }
 
-                req.getFuture().setWritten( true );
                 session.increaseWrittenWriteRequests();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, buf );
+                buf.reset();
+                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, req );
                 continue;
             }
 
@@ -482,7 +482,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 continue;
             }
 
-            int pos = buf.position();
             int writtenBytes = ch
                     .send( buf.buf(), session.getRemoteAddress() );
 
@@ -503,9 +502,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
-                req.getFuture().setWritten( true );
                 session.increaseWrittenWriteRequests();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, buf.position( pos ) );
+                buf.reset();
+                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, req );
             }
         }
     }

@@ -64,26 +64,26 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                     if( message instanceof ByteBuffer )
                     {
                         ByteBuffer rb = ( ByteBuffer ) message;
+                        rb.mark();
                         byteCount = rb.remaining();
                         ByteBuffer wb = ByteBuffer.allocate( rb.remaining() );
                         wb.put( rb );
                         wb.flip();
+                        rb.reset();
                         messageCopy = wb;
                     }
                     
                     s.increaseWrittenBytes( byteCount );
                     s.increaseWrittenWriteRequests();
     
-                    ( ( VmPipeFilterChain ) s.getFilterChain() ).messageSent( s, message );
+                    ( ( VmPipeFilterChain ) s.getFilterChain() ).messageSent( s, writeRequest );
                     ( ( VmPipeFilterChain ) s.remoteSession.getFilterChain() )
                                 .messageReceived( s.remoteSession, messageCopy );
-                    
-                    writeRequest.getFuture().setWritten( true );
                 }
             }
             else 
             {
-                writeRequest.getFuture().setWritten( false );
+                ( ( VmPipeFilterChain ) s.getFilterChain() ).messageNotSent( s, writeRequest );
             }
         }
     }

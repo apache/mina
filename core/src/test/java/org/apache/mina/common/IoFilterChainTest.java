@@ -438,7 +438,7 @@ public class IoFilterChainTest extends TestCase
 
         protected void doWrite( IoSession session, WriteRequest writeRequest )
         {
-            messageSent( session, writeRequest.getMessage() );
+            messageSent( session, writeRequest );
         }
 
         protected void doClose( IoSession session )

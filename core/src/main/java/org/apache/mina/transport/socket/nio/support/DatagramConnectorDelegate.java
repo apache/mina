@@ -481,9 +481,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                     writeRequestQueue.pop();
                 }
 
-                req.getFuture().setWritten( true );
                 session.increaseWrittenWriteRequests();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, buf );
+                buf.reset();
+                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, req );
                 continue;
             }
 
@@ -498,7 +498,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 continue;
             }
 
-            int pos = buf.position();
             int writtenBytes = ch.write( buf.buf() );
 
             if( writtenBytes == 0 )
@@ -518,9 +517,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
-                req.getFuture().setWritten( true );
                 session.increaseWrittenWriteRequests();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, buf.position( pos ) );
+                buf.reset();
+                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, req );
             }
         }
     }

@@ -26,6 +26,8 @@ class SocketFilterChain extends AbstractIoFilterChain {
         SocketSessionImpl s = ( SocketSessionImpl ) session;
         Queue writeRequestQueue = s.getWriteRequestQueue();
         
+        // SocketIoProcessor.doFlush() will reset it after write is finished
+        // because the buffer will be passed with messageSent event. 
         ( ( ByteBuffer ) writeRequest.getMessage() ).mark();
         synchronized( writeRequestQueue )
         {

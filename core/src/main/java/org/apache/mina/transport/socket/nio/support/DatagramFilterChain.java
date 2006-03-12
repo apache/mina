@@ -18,6 +18,7 @@
  */
 package org.apache.mina.transport.socket.nio.support;
 
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
@@ -41,6 +42,9 @@ class DatagramFilterChain extends AbstractIoFilterChain {
         DatagramSessionImpl s = ( DatagramSessionImpl ) session;
         Queue writeRequestQueue = s.getWriteRequestQueue();
         
+        // SocketIoProcessor.doFlush() will reset it after write is finished
+        // because the buffer will be passed with messageSent event. 
+        ( ( ByteBuffer ) writeRequest.getMessage() ).mark();
         synchronized( writeRequestQueue )
         {
             writeRequestQueue.push( writeRequest );
