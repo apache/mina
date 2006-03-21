@@ -128,11 +128,13 @@
 
   <repositories>
     <!-- For releases -->
+    <!--
     <repository>
       <id>playboy.mirror</id>
       <name>Apache Repository @ Playboy</name>
       <url>http://mirrors.playboy.com/apache/maven-repository/</url>
     </repository>
+    -->
 
     <!-- For snapshots (no release jars or non-apache jars) -->
     <repository>
