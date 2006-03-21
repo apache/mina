@@ -70,31 +70,46 @@ public class LoggingFilter extends IoFilterAdapter
 
     public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status )
     {
-        SessionLog.info( session, "IDLE: " + status );
+        if( SessionLog.isInfoEnabled( session ) )
+        {
+            SessionLog.info( session, "IDLE: " + status );
+        }
         nextFilter.sessionIdle( session, status );
     }
 
     public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause )
     {
-        SessionLog.error( session, "EXCEPTION:", cause );
+        if( SessionLog.isInfoEnabled( session ) )
+        {
+            SessionLog.error( session, "EXCEPTION:", cause );
+        }
         nextFilter.exceptionCaught( session, cause );
     }
 
     public void messageReceived( NextFilter nextFilter, IoSession session, Object message )
     {
-        SessionLog.info( session, "RECEIVED: " + message );
+        if( SessionLog.isInfoEnabled( session ) )
+        {
+            SessionLog.info( session, "RECEIVED: " + message );
+        }
         nextFilter.messageReceived( session, message );
     }
 
     public void messageSent( NextFilter nextFilter, IoSession session, Object message )
     {
-        SessionLog.info( session, "SENT: " + message );
+        if( SessionLog.isInfoEnabled( session ) )
+        {
+            SessionLog.info( session, "SENT: " + message );
+        }
         nextFilter.messageSent( session, message );
     }
 
     public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest )
     {
-        SessionLog.info( session, "WRITE: " + writeRequest );
+        if( SessionLog.isInfoEnabled( session ) )
+        {
+            SessionLog.info( session, "WRITE: " + writeRequest );
+        }
         nextFilter.filterWrite( session, writeRequest );
     }
 
