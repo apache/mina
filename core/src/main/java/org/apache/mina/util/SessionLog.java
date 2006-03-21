@@ -142,7 +142,7 @@ public class SessionLog {
 
     private static Logger getLogger( IoSession session )
     {
-        Logger log = (Logger) session.getAttribute( LOGGER );
+        Logger log = ( Logger ) session.getAttribute( LOGGER );
         if( log == null )
         {
             log = LoggerFactory.getLogger( getClass( session ) );
@@ -152,10 +152,10 @@ public class SessionLog {
                 prefix = "[" + session.getRemoteAddress() + "] ";
                 session.setAttribute( PREFIX, prefix );
             }
-                
+
             session.setAttribute( LOGGER, log );
         }
-        
+
         return log;
     }
 }
