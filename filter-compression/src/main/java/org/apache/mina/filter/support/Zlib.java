@@ -27,7 +27,7 @@ import com.jcraft.jzlib.ZStream;
 /**
  * A helper class for interfacing with the JZlib library. This class acts both
  * as a compressor and decompressor, but only as one at a time.  The only
- * flush method supported is <tt>Z_FLUSH_SYNC</tt> also known as <tt>Z_PARTIAL_FLUSH</tt>
+ * flush method supported is <tt>Z_SYNC_FLUSH</tt> also known as <tt>Z_PARTIAL_FLUSH</tt>
  *
  * @author The Apache Directory MINA subproject (mina-dev@directory.apache.org)
  */
@@ -113,7 +113,7 @@ public class Zlib
 
         do
         {
-            retval = zStream.inflate( JZlib.Z_PARTIAL_FLUSH );
+            retval = zStream.inflate( JZlib.Z_SYNC_FLUSH );
             switch( retval )
             {
             case JZlib.Z_OK:
