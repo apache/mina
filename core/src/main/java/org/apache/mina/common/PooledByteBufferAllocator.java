@@ -236,6 +236,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         ensureNotDisposed();
         PooledByteBuffer buf = allocateContainer();
         buf.init( new UnexpandableByteBuffer( nioBuffer ), false );
+        buf.buf.init();
         buf.setPooled( false );
         return buf;
     }
