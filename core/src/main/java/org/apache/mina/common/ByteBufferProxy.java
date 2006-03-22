@@ -607,4 +607,19 @@ public class ByteBufferProxy extends ByteBuffer
     {
         return buf.asOutputStream();
     }
+
+    public ByteBuffer duplicate()
+    {
+        return buf.duplicate();
+    }
+
+    public ByteBuffer slice()
+    {
+        return buf.slice();
+    }
+
+    public ByteBuffer asReadOnlyBuffer()
+    {
+        return buf.asReadOnlyBuffer();
+    }
 }

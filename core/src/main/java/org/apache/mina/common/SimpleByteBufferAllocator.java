@@ -52,12 +52,12 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         {
             nioBuffer = java.nio.ByteBuffer.allocate( capacity );            
         }
-        return new SimpleByteBuffer( nioBuffer, true );
+        return new SimpleByteBuffer( nioBuffer );
     }
     
     public ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
-        return new SimpleByteBuffer( nioBuffer, false );
+        return new SimpleByteBuffer( nioBuffer );
     }
 
     private static class SimpleByteBuffer extends ByteBuffer
@@ -66,13 +66,9 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         private int refCount = 1;
         private boolean autoExpand;
 
-        protected SimpleByteBuffer( java.nio.ByteBuffer buf, boolean clear )
+        protected SimpleByteBuffer( java.nio.ByteBuffer buf )
         {
             this.buf = buf;
-            if( clear )
-            {
-                buf.clear();
-            }
             buf.order( ByteOrder.BIG_ENDIAN );
             autoExpand = false;
             refCount = 1;
@@ -510,6 +506,18 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
             newBuf.limit( limit );
             newBuf.position( pos );
             this.buf = newBuf;
+        }
+
+        public ByteBuffer duplicate() {
+            return new SimpleByteBuffer( this.buf.duplicate() );
+        }
+
+        public ByteBuffer slice() {
+            return new SimpleByteBuffer( this.buf.slice() );
+        }
+
+        public ByteBuffer asReadOnlyBuffer() {
+            return new SimpleByteBuffer( this.buf.asReadOnlyBuffer() );
         }
     }
 }
