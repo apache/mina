@@ -57,6 +57,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  *   <li>It is difficult to write variable-length data due to its fixed
  *       capacity</li>
  * </ul>
+ * </p>
  * 
  * <h2>Allocation</h2>
  * <p>
@@ -72,6 +73,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * <pre>
  * ByteBuffer buf = ByteBuffer.allocate(1024);
  * </pre>
+ * </p>
  * 
  * <h2>Acquire/Release</h2>
  * <p>
@@ -91,6 +93,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  *   <li>You allocated a buffer, but didn't pass the buffer to any of two methods above.</li>
  *   <li>You called {@link #acquire()} to prevent the buffer from being released.</li>
  * </ul>
+ * </p>
  * 
  * <h2>Wrapping existing NIO buffers and arrays</h2>
  * <p>
@@ -119,6 +122,17 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * the scene if the encoded data is larger than 16 bytes.  Its capacity will
  * increase by two times, and its limit will increase to the last position
  * the string is written.
+ * </p>
+ * 
+ * <h2>Derived Buffers</h2>
+ * <p> 
+ * Derived buffers are the buffers which were created by
+ * {@link #duplicate()}, {@link #slice()}, or {@link #asReadOnlyBuffer()}.
+ * They are useful especially when you broadcast the same messages to 
+ * multiple {@link IoSession}s.  Please note that the derived buffers are
+ * neither pooled nor auto-expandable.  Trying to expand a derived buffer will
+ * raise {@link IllegalStateException}.
+ * </p>
  * 
  * <h2>Changing Buffer Allocation and Management Policy</h2>
  * <p>
