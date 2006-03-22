@@ -381,6 +381,21 @@ public abstract class ByteBuffer implements Comparable
     {
         return remaining() > 0;
     }
+    
+    /**
+     * @see java.nio.ByteBuffer#duplicate()
+     */
+    public abstract ByteBuffer duplicate();
+
+    /**
+     * @see java.nio.ByteBuffer#slice()
+     */
+    public abstract ByteBuffer slice();
+    
+    /**
+     * @see java.nio.ByteBuffer#asReadOnlyBuffer()
+     */
+    public abstract ByteBuffer asReadOnlyBuffer();
 
     /**
      * @see java.nio.ByteBuffer#get()

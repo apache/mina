@@ -19,6 +19,7 @@
 package org.apache.mina.common;
 
 import java.nio.BufferOverflowException;
+import java.nio.ReadOnlyBufferException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
@@ -630,6 +631,148 @@ public class ByteBufferTest extends TestCase
             Assert.fail();
         }
         catch( IllegalStateException e )
+        {
+            // OK
+        }
+    }
+    
+    public void testDuplicate() throws Exception
+    {
+        java.nio.ByteBuffer nioBuf;
+        ByteBuffer original;
+        ByteBuffer duplicate;
+        
+        // Test if the buffer is duplicated correctly.
+        original = ByteBuffer.allocate( 16 ).sweep();
+        nioBuf = original.buf();
+        original.position( 4 );
+        original.limit( 10 );
+        duplicate = original.duplicate();
+        original.put( 4, ( byte ) 127 );
+        Assert.assertEquals( 4, duplicate.position() );
+        Assert.assertEquals( 10, duplicate.limit() );
+        Assert.assertEquals( 16, duplicate.capacity() );
+        Assert.assertNotSame( original.buf(), duplicate.buf() );
+        Assert.assertEquals( 127, duplicate.get( 4 ) );
+        original.release();
+        duplicate.release();
+
+        //// Check if pooled correctly.
+        original = ByteBuffer.allocate( 16 );
+        Assert.assertSame( nioBuf, original.buf() );
+        original.release();
+        
+        // Try to release duplicate first.
+        original = ByteBuffer.allocate( 16 );
+        duplicate = original.duplicate();
+        duplicate.release();
+        original.release();
+
+        //// Check if pooled correctly.
+        original = ByteBuffer.allocate( 16 );
+        Assert.assertSame( nioBuf, original.buf() );
+        original.release();
+        
+        // Test a duplicate of a duplicate.
+        original = ByteBuffer.allocate( 16 );
+        duplicate = original.duplicate();
+        ByteBuffer anotherDuplicate = duplicate.duplicate();
+        anotherDuplicate.release();
+        original.release();
+        duplicate.release();
+        try
+        {
+            duplicate.release();
+            Assert.fail();
+        }
+        catch( IllegalStateException e )
+        {
+            // OK
+        }
+        try
+        {
+            anotherDuplicate.release();
+            Assert.fail();
+        }
+        catch( IllegalStateException e )
+        {
+            // OK
+        }
+        
+        //// Check if pooled correctly.
+        original = ByteBuffer.allocate( 16 );
+        Assert.assertSame( nioBuf, original.buf() );
+        original.release();
+
+        
+        
+        // Try to expand.
+        try
+        {
+            original = ByteBuffer.allocate( 16 );
+            duplicate = original.duplicate();
+            duplicate.setAutoExpand( true );
+            duplicate.putString(
+                    "A very very very very looooooong string",
+                    Charset.forName( "ISO-8859-1" ).newEncoder() );
+            Assert.fail();
+        }
+        catch( IllegalStateException e )
+        {
+            // OK
+        }
+    }
+    
+    public void testSlice() throws Exception
+    {
+        ByteBuffer original;
+        ByteBuffer slice;
+        
+        // Test if the buffer is sliced correctly.
+        original = ByteBuffer.allocate( 16 ).sweep();
+        original.position( 4 );
+        original.limit( 10 );
+        slice = original.slice();
+        original.put( 4, ( byte ) 127 );
+        Assert.assertEquals( 0, slice.position() );
+        Assert.assertEquals( 6, slice.limit() );
+        Assert.assertEquals( 6, slice.capacity() );
+        Assert.assertNotSame( original.buf(), slice.buf() );
+        Assert.assertEquals( 127, slice.get( 0 ) );
+        original.release();
+        slice.release();
+    }
+
+    public void testReadOnlyBuffer() throws Exception
+    {
+        ByteBuffer original;
+        ByteBuffer duplicate;
+        
+        // Test if the buffer is duplicated correctly.
+        original = ByteBuffer.allocate( 16 ).sweep();
+        original.position( 4 );
+        original.limit( 10 );
+        duplicate = original.asReadOnlyBuffer();
+        original.put( 4, ( byte ) 127 );
+        Assert.assertEquals( 4, duplicate.position() );
+        Assert.assertEquals( 10, duplicate.limit() );
+        Assert.assertEquals( 16, duplicate.capacity() );
+        Assert.assertNotSame( original.buf(), duplicate.buf() );
+        Assert.assertEquals( 127, duplicate.get( 4 ) );
+        original.release();
+        duplicate.release();
+
+        // Try to expand.
+        try
+        {
+            original = ByteBuffer.allocate( 16 );
+            duplicate = original.asReadOnlyBuffer();
+            duplicate.putString(
+                    "A very very very very looooooong string",
+                    Charset.forName( "ISO-8859-1" ).newEncoder() );
+            Assert.fail();
+        }
+        catch( ReadOnlyBufferException e )
         {
             // OK
         }
