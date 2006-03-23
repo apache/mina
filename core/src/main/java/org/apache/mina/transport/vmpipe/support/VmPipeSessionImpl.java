@@ -156,6 +156,11 @@ public class VmPipeSessionImpl extends BaseIoSession
         return 0;
     }
 
+    public int getScheduledWriteBytes()
+    {
+        return 0;
+    }
+    
     public TransportType getTransportType()
     {
         return TransportType.VM_PIPE;

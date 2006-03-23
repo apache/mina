@@ -275,6 +275,12 @@ public interface IoSession {
     int getScheduledWriteRequests();
 
     /**
+     * Returns the number of bytes which are scheduled to be written to this
+     * session.
+     */
+    int getScheduledWriteBytes();
+
+    /**
      * Returns the time in millis when this session is created.
      */
     long getCreationTime();

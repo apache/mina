@@ -308,6 +308,10 @@ public class IoFilterChainTest extends TestCase
         public SocketAddress getServiceAddress() {
             return null;
         }
+
+        public int getScheduledWriteBytes() {
+            return 0;
+        }
     }
 
     private class EventOrderTestFilter extends IoFilterAdapter
@@ -430,8 +434,14 @@ public class IoFilterChainTest extends TestCase
                     return null;
                 }
 
-                public SocketAddress getServiceAddress() {
+                public SocketAddress getServiceAddress()
+                {
                     return null;
+                }
+
+                public int getScheduledWriteBytes()
+                {
+                    return 0;
                 }
             } );
         }
