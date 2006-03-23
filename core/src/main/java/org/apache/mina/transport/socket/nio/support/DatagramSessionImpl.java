@@ -155,7 +155,15 @@ class DatagramSessionImpl extends BaseIoSession
             return writeRequestQueue.size();
         }
     }
-
+    
+    public int getScheduledWriteBytes()
+    {
+        synchronized( writeRequestQueue )
+        {
+            return writeRequestQueue.byteSize();
+        }
+    }
+    
     public TransportType getTransportType()
     {
         return TransportType.DATAGRAM;

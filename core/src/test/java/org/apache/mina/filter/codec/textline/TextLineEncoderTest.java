@@ -119,8 +119,14 @@ public class TextLineEncoderTest extends TestCase
             return null;
         }
 
-        public SocketAddress getServiceAddress() {
+        public SocketAddress getServiceAddress()
+        {
             return null;
+        }
+
+        public int getScheduledWriteBytes()
+        {
+            return 0;
         }
     }
 }

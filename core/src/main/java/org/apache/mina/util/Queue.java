@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.apache.mina.common.ByteBuffer;
+
 /**
  * A unbounded circular queue.
  * 
@@ -162,6 +164,43 @@ public class Queue extends AbstractList implements List, Serializable
     public int size()
     {
         return size;
+    }
+    
+    /**
+     * Returns the sum of the '<tt>remaining</tt>' of all {@link ByteBuffer}s
+     * in this queue.
+     * 
+     * @throws ClassCastException if an element is not a {@link ByteBuffer}
+     */
+    public int byteSize()
+    {
+        if( isEmpty() )
+        {
+            return 0;
+        }
+        
+        int byteSize = 0;
+        
+        if( first < last )
+        {
+            for( int i = first; i < last; i++ )
+            {
+                byteSize += ( ( ByteBuffer ) items[ i ] ).remaining();
+            }
+        }
+        else
+        {
+            for( int i = first; i < items.length; i++ )
+            {
+                byteSize += ( ( ByteBuffer ) items[ i ] ).remaining();
+            }
+            for( int i = last - 1; i >= 0; i-- )
+            {
+                byteSize += ( ( ByteBuffer ) items[ i ] ).remaining();
+            }
+        }
+        
+        return byteSize;
     }
     
     public String toString()
