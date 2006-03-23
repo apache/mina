@@ -23,9 +23,9 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.util.SessionUtil;
 
 /**
- * Adapter class for implementors of the SingleSessionIoHandler interface. The
- * session to which the handler is assigned is accessible through the
- * {@link #getSession()} method.
+ * Adapter class for implementors of the {@link SingleSessionIoHandler}
+ * interface. The session to which the handler is assigned is accessible
+ * through the {@link #getSession()} method.
  * 
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev$, $Date$
@@ -39,8 +39,7 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler
     private final IoSession session;
 
     /**
-     * Creates a new SingleSessionIoHandlerAdapter that is assigned to the
-     * passed in session.
+     * Creates a new instance that is assigned to the passed in session.
      * 
      * @param session the session to which the handler is assigned
      */

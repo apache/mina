@@ -21,8 +21,8 @@ package org.apache.mina.handler.multiton;
 import org.apache.mina.common.IoSession;
 
 /**
- * A factory that creates {@link SingleSessionIoHandler}
- * to be used with one particular session.
+ * A factory that creates {@link SingleSessionIoHandler} to be used with one
+ * particular session.
  * 
  * @see SingleSessionIoHandler
  * 
@@ -37,5 +37,4 @@ public interface SingleSessionIoHandlerFactory {
 	 * @param session the session for which a handler is requested
 	 */
 	SingleSessionIoHandler getHandler(IoSession session);
-	
 }

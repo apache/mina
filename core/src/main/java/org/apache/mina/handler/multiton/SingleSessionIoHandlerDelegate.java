@@ -48,7 +48,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler
 
     /**
      * Creates a new instance that uses the passed in
-     * SingleSessionIoHandlerFactory to create new {@link SingleSessionIoHandler}s.
+     * {@link SingleSessionIoHandlerFactory} to create new
+     * {@link SingleSessionIoHandler}s.
      * 
      * @param factory  the factory for {@link SingleSessionIoHandler}s
      */
