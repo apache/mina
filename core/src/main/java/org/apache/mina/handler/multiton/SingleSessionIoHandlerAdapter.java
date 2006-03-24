@@ -40,7 +40,7 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler
 
     /**
      * Creates a new instance that is assigned to the passed in session.
-     * 
+     *
      * @param session the session to which the handler is assigned
      */
     public SingleSessionIoHandlerAdapter(IoSession session)
@@ -54,46 +54,40 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler
 
     /**
      * Retrieves the session to which this handler is assigned.
-     * 
+     *
      * @return the session
      */
-    protected IoSession getSession() 
+    protected IoSession getSession()
     {
         return session;
     }
 
-    public void exceptionCaught(Throwable th) throws Exception 
+    public void exceptionCaught(Throwable th) throws Exception
     {
-
     }
 
-    public void messageReceived(Object message) throws Exception 
+    public void messageReceived(Object message) throws Exception
     {
-
     }
 
-    public void messageSent(Object message) throws Exception 
+    public void messageSent(Object message) throws Exception
     {
-
     }
 
-    public void sessionClosed() throws Exception 
+    public void sessionClosed() throws Exception
+    {
+    }
+
+    public void sessionCreated() throws Exception
     {
         SessionUtil.initialize( getSession() );
     }
 
-    public void sessionCreated() throws Exception 
+    public void sessionIdle(IdleStatus status) throws Exception
     {
-
     }
 
-    public void sessionIdle(IdleStatus status) throws Exception 
+    public void sessionOpened() throws Exception
     {
-
-    }
-
-    public void sessionOpened() throws Exception 
-    {
-
     }
 }
