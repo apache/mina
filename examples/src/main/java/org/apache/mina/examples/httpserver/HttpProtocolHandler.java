@@ -38,7 +38,7 @@ import org.apache.mina.handler.StreamIoHandler;
  * A simplistic HTTP protocol handler that replies back the URL and headers
  * which a client requested.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpProtocolHandler extends StreamIoHandler

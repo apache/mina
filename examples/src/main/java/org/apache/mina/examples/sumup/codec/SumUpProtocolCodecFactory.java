@@ -25,7 +25,7 @@ import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;
  * A {@link ProtocolCodecFactory} that provides a protocol codec for
  * SumUp protocol.
  *
- * @author The Apache Directory Project
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SumUpProtocolCodecFactory extends DemuxingProtocolCodecFactory
