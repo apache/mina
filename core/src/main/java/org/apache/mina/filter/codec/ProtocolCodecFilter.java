@@ -127,10 +127,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         
         try
         {
-            synchronized( decoder )
-            {
-                decoder.decode( session, in, decoderOut );
-            }
+            decoder.decode( session, in, decoderOut );
         }
         catch( Throwable t )
         {
@@ -158,16 +155,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             in.release();
 
             Queue queue = decoderOut.getMessageQueue();
-            synchronized( queue )
+            while( !queue.isEmpty() )
             {
-                if( !queue.isEmpty() )
-                {
-                    do
-                    {
-                        nextFilter.messageReceived( session, queue.pop() );
-                    }
-                    while( !queue.isEmpty() );
-                }
+                nextFilter.messageReceived( session, queue.pop() );
             }
         }
     }
