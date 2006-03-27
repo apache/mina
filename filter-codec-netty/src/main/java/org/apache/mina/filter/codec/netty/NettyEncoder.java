@@ -1,5 +1,20 @@
 /*
- * @(#) $Id: NettyEncoder.java 4 2005-04-18 03:04:09Z trustin $
+ *   @(#) $Id$
+ *
+ *   Copyright 2004 The Apache Software Foundation
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
  */
 package org.apache.mina.filter.codec.netty;
 
@@ -14,8 +29,8 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * A MINA <tt>ProtocolEncoder</tt> that encodes Netty2 {@link Message}s
  * into byte buffers. 
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
- * @version $Rev: 4 $, $Date: 2005-04-18 12:04:09 +0900 (월, 18  4월 2005) $,
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$,
  */
 public class NettyEncoder implements org.apache.mina.filter.codec.ProtocolEncoder
 {
