@@ -1,5 +1,5 @@
 /*
- *   @(#) $Id: IoFilterLifeCycleException.java 350147 2005-12-01 04:06:11Z trustin $
+ *   @(#) $Id$
  *
  *   Copyright 2004 The Apache Software Foundation
  *
@@ -24,7 +24,7 @@ package org.apache.mina.common;
  * failed.
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev: 350147 $, $Date: 2005-12-01 13:06:11 +0900 $
+ * @version $Rev$, $Date$
  */
 public class IoFilterLifeCycleException extends RuntimeException
 {
