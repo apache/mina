@@ -44,7 +44,7 @@ import java.util.Set;
  * {@link IoFilter} implementations you're using are thread-safe, too. 
  * </p>
  *   
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoSession {

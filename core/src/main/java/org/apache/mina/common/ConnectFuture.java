@@ -32,7 +32,7 @@ import java.io.IOException;
  * session.write(...);
  * </pre>
  *
- * @author The Apache Directory Project
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ConnectFuture extends IoFuture

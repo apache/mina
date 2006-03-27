@@ -36,7 +36,7 @@ import java.net.SocketAddress;
  * {@link #connect(SocketAddress, IoHandler)} is invoked, and stop when all
  * connection attempts are finished.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoConnector extends IoService

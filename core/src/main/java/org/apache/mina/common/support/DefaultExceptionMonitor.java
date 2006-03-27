@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * All {@link IoService}s have this implementation as a default exception
  * monitor.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultExceptionMonitor extends ExceptionMonitor

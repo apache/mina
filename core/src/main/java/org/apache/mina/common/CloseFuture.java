@@ -31,7 +31,7 @@ package org.apache.mina.common;
  * assert future.isClosed();
  * </pre>
  * 
- * @author The Apache Directory Project
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class CloseFuture extends IoFuture

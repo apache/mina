@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Tests {@link IoAcceptor} resource leakage by repeating bind and unbind.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
 public abstract class AbstractBindTest extends TestCase

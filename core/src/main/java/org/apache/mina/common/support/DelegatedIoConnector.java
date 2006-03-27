@@ -31,7 +31,7 @@ import org.apache.mina.common.IoServiceConfig;
 /**
  * A delegated {@link IoConnector} that wraps the other {@link IoConnector}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DelegatedIoConnector implements IoConnector

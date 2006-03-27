@@ -28,7 +28,7 @@ import org.apache.mina.util.Queue;
 /**
  * An {@link IoFilterChain} for datagram transport (UDP/IP).
  * 
- * @author The Apache Directory Project
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  */
 class DatagramFilterChain extends AbstractIoFilterChain {
 

@@ -32,7 +32,7 @@ import org.apache.mina.util.CharsetUtil;
 /**
  * A {@link ProtocolDecoder} which decodes a text line into a string.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class TextLineDecoder implements ProtocolDecoder

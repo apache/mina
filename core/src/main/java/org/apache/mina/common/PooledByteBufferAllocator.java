@@ -43,7 +43,7 @@ import org.apache.mina.util.ExpiringStack;
  * is created.  You can stop the thread by calling {@link #dispose()}.
  * </p>
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class PooledByteBufferAllocator implements ByteBufferAllocator

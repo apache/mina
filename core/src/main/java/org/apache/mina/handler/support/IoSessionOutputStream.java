@@ -27,7 +27,7 @@ import org.apache.mina.common.IoSession;
  * An {@link OutputStream} that forwards all write operations to
  * the associated {@link IoSession}.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  *
  */

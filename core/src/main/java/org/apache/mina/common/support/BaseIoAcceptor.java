@@ -28,7 +28,7 @@ import org.apache.mina.common.IoSession;
 /**
  * A base implementation of {@link IoAcceptor}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor

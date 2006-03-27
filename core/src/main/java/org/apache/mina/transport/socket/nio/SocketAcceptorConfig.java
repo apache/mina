@@ -31,7 +31,7 @@ import org.apache.mina.transport.socket.nio.support.SocketSessionConfigImpl;
 /**
  * An {@link IoAcceptorConfig} for {@link SocketAcceptor}.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SocketAcceptorConfig extends BaseIoAcceptorConfig

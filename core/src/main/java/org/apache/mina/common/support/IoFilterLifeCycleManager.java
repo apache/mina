@@ -29,7 +29,7 @@ import org.apache.mina.common.IoFilter.NextFilter;
 /**
  * Manages the life cycle of {@link IoFilter}s globally.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 350148 $, $Date: 2005-12-01 13:13:18 +0900 $
  */
 public class IoFilterLifeCycleManager

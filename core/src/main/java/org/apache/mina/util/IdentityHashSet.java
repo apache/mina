@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * An {@link IdentityHashMap}-backed {@link Set}.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class IdentityHashSet extends AbstractSet

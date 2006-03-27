@@ -23,7 +23,7 @@ package org.apache.mina.common;
  * or {@link IoFilter#onPostAdd(IoFilterChain, String, org.apache.mina.common.IoFilter.NextFilter)}
  * failed.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 350147 $, $Date: 2005-12-01 13:06:11 +0900 $
  */
 public class IoFilterLifeCycleException extends RuntimeException

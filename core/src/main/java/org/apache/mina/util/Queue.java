@@ -29,7 +29,7 @@ import org.apache.mina.common.ByteBuffer;
 /**
  * A unbounded circular queue.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Queue extends AbstractList implements List, Serializable

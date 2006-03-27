@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utilities for dealing with Charsets.
  *
- * @author MINA Project Team (mina-dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$
  */
 public class CharsetUtil

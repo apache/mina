@@ -25,7 +25,7 @@ import org.apache.mina.transport.socket.nio.support.SocketConnectorDelegate;
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SocketConnector extends DelegatedIoConnector

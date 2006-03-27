@@ -22,7 +22,7 @@ package org.apache.mina.transport.socket.nio.support;
 /**
  * A base interface for {@link DatagramAcceptorDelegate} and {@link DatagramConnectorDelegate}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 interface DatagramService

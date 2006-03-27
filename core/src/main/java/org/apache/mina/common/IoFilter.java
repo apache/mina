@@ -63,7 +63,7 @@ package org.apache.mina.common;
  *   <li>{@link #destroy()} is invoked if the removed filter was the last one.</li>
  * </ol>      
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see IoFilterAdapter

@@ -23,7 +23,7 @@ import org.apache.mina.common.IoConnectorConfig;
 /**
  * A base implementation of {@link IoConnectorConfig}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseIoConnectorConfig extends BaseIoServiceConfig implements IoConnectorConfig

@@ -146,7 +146,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * You can change the allocator by calling {@link #setAllocator(ByteBufferAllocator)}.
  * </p>
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see ByteBufferAllocator

@@ -22,7 +22,7 @@ package org.apache.mina.common;
  * A {@link RuntimeException} which is thrown when the data the {@link ByteBuffer}
  * contains is corrupt.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  *
  */

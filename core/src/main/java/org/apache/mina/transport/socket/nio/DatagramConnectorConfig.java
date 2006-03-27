@@ -27,7 +27,7 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
 /**
  * An {@link IoConnectorConfig} for {@link DatagramConnector}.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DatagramConnectorConfig extends BaseIoConnectorConfig

@@ -34,7 +34,7 @@ import org.apache.mina.common.support.BaseIoSession;
 /**
  * A test case for {@link ChainedIoHandler}.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ChainedIoHandlerTest extends TestCase

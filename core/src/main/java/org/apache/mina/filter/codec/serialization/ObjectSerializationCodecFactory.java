@@ -28,7 +28,7 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  * This codec is very useful when you have to prototype your application rapidly
  * without any specific codec.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ObjectSerializationCodecFactory implements ProtocolCodecFactory

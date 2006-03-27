@@ -37,7 +37,7 @@ import org.apache.mina.common.IoSession;
  * conversational state as instance variables in this object.
  * </p>
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface SingleSessionIoHandler

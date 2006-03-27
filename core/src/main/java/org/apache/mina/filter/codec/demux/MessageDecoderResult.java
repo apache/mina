@@ -25,7 +25,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 /**
  * Represents results from {@link MessageDecoder}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see MessageDecoder

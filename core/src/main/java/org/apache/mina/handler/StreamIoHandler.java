@@ -40,7 +40,7 @@ import org.apache.mina.util.SessionLog;
  * execute your stream I/O logic; <b>please note that you must forward
  * the process request to other thread or thread pool.</b>
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class StreamIoHandler extends IoHandlerAdapter

@@ -31,7 +31,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * A {@link ProtocolEncoder} which serializes {@link Serializable} Java objects
  * using {@link ByteBuffer#putObject(Object)}.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ObjectSerializationEncoder extends ProtocolEncoderAdapter
