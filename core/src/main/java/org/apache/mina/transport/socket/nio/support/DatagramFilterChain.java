@@ -1,5 +1,5 @@
 /*
- *   @(#) $Id: DatagramConnectorDelegate.java 351888 2005-12-03 04:39:53Z trustin $
+ *   @(#) $Id$
  *
  *   Copyright 2004 The Apache Software Foundation
  *

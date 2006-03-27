@@ -1,5 +1,5 @@
 /*
- *   @(#) $Id: StreamIoHandler.java 350169 2005-12-01 05:17:41Z trustin $
+ *   @(#) $Id$
  *
  *   Copyright 2004 The Apache Software Foundation
  *
@@ -25,7 +25,7 @@ import org.apache.mina.common.support.AbstractIoFilterChain;
 
 /**
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev: 350169 $, $Date: 2005-12-01 14:17:41 +0900 (Thu, 01 Dec 2005) $
+ * @version $Rev$, $Date$
  */
 public class VmPipeFilterChain extends AbstractIoFilterChain {
 

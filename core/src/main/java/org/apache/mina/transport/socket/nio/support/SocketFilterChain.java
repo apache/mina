@@ -1,5 +1,5 @@
 /*
- *   @(#) $Id: StreamIoHandler.java 350169 2005-12-01 05:17:41Z trustin $
+ *   @(#) $Id$
  *
  *   Copyright 2004 The Apache Software Foundation
  *

@@ -1,5 +1,5 @@
 /*
- *   @(#) $Id: IoFilterChainBuilder.java 349941 2005-11-30 13:10:31Z trustin $
+ *   @(#) $Id$
  *
  *   Copyright 2004 The Apache Software Foundation
  *
@@ -32,7 +32,7 @@ package org.apache.mina.common;
  * </pre>
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev: 349941 $, $Date: 2005-11-30 22:10:31 +0900 (Wed, 30 Nov 2005) $
+ * @version $Rev$, $Date$
  */
 public interface IoFilterChainBuilder
 {
