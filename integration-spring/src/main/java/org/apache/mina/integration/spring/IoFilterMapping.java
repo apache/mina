@@ -41,8 +41,9 @@ import org.springframework.util.Assert;
  * instances directly to the {@link Binding}.
  * </p>
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
+ * 
  * @see org.apache.mina.integration.spring.IoAcceptorFactoryBean
  * @see org.apache.mina.integration.spring.Binding
  */

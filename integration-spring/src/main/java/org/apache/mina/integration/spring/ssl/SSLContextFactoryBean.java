@@ -51,7 +51,7 @@ import org.springframework.util.Assert;
  * the creation of the {@link javax.net.ssl.TrustManagerFactory} to be used.
  * </p>
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SSLContextFactoryBean extends AbstractFactoryBean

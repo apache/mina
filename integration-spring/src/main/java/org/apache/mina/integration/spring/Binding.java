@@ -50,7 +50,7 @@ import org.springframework.util.Assert;
  * on port 443 but not on port 80). 
  * </p>
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Binding implements InitializingBean

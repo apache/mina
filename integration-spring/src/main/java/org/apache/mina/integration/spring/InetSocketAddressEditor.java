@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
  * for more info.
  * </p>
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Revision$, $Date$
  * 
  * @see java.net.InetSocketAddress
