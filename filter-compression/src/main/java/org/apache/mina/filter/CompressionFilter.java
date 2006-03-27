@@ -1,4 +1,6 @@
 /*
+ *   @(#) $Id$
+ *
  *   Copyright 2004 The Apache Software Foundation
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +16,6 @@
  *   limitations under the License.
  *
  */
-
 package org.apache.mina.filter;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ import org.apache.mina.filter.support.Zlib;
  * compatible compressor/decompressor using the same algorithm.
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$
  */
 public class CompressionFilter extends IoFilterAdapter
 {
