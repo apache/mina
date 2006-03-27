@@ -1,4 +1,6 @@
 /*
+ *   @(#) $Id$
+ *
  *   Copyright 2004 The Apache Software Foundation
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +16,6 @@
  *   limitations under the License.
  *
  */
-
 package org.apache.mina.filter.support;
 
 import java.io.IOException;
@@ -25,7 +26,8 @@ import org.apache.mina.common.ByteBuffer;
 import junit.framework.TestCase;
 
 /**
- * @author The Apache Directory MINA subproject (mina-dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$
  */
 public class ZlibTest extends TestCase
 {

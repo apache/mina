@@ -1,4 +1,6 @@
 /*
+ *   @(#) $Id$
+ *
  *   Copyright 2004 The Apache Software Foundation
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +16,6 @@
  *   limitations under the License.
  *
  */
-
 package org.apache.mina.filter.support;
 
 import java.io.IOException;
@@ -29,7 +30,8 @@ import com.jcraft.jzlib.ZStream;
  * as a compressor and decompressor, but only as one at a time.  The only
  * flush method supported is <tt>Z_SYNC_FLUSH</tt> also known as <tt>Z_PARTIAL_FLUSH</tt>
  *
- * @author The Apache Directory MINA subproject (mina-dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$
  */
 public class Zlib
 {
