@@ -27,7 +27,7 @@ import org.apache.mina.transport.socket.nio.SocketAcceptor;
  * (<b>Entry point</b>) Reverser server which reverses all text lines from
  * clients.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class Main

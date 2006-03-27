@@ -29,7 +29,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 /**
  * {@link IoHandler} implementation of reverser server protocol.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class ReverseProtocolHandler extends IoHandlerAdapter

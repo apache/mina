@@ -26,7 +26,7 @@ import org.apache.mina.transport.socket.nio.SocketAcceptor;
 /**
  * (<strong>Entry Point</strong>) Starts SumUp server.
  * 
- * @author The Apache Directory Project
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Server

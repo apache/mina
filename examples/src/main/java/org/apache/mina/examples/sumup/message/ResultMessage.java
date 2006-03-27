@@ -21,7 +21,7 @@ package org.apache.mina.examples.sumup.message;
 /**
  * <code>RESULT</code> message in SumUp protocol.
  * 
- * @author The Apache Directory Project
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ResultMessage extends AbstractMessage
