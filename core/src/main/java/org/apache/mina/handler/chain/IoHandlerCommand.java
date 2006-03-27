@@ -95,7 +95,7 @@ public interface IoHandlerCommand
      * the {@link IoHandlerChain}.  This interface provides a way to forward
      * the request to the next {@link IoHandlerCommand}.
      *
-     * @author The Apache Directory Project (dev@directory.apache.org)
+     * @author The Apache Directory Project (mina-dev@directory.apache.org)
      * @version $Rev$, $Date$
      */
     public interface NextCommand

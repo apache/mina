@@ -35,7 +35,7 @@ import org.apache.mina.util.AvailablePortFinder;
  * Abstract base class for testing suspending and resuming reads and
  * writes.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class AbstractTrafficControlTest extends TestCase

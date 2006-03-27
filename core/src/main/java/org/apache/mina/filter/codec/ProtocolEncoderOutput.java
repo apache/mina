@@ -26,7 +26,7 @@ import org.apache.mina.common.WriteFuture;
  * {@link ProtocolEncoder} must call {@link #write(ByteBuffer)} for each decoded
  * messages.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface ProtocolEncoderOutput

@@ -45,7 +45,7 @@ import org.apache.mina.util.SessionLog;
  * {@link IoFilter#filterWrite(NextFilter, IoSession, IoFilter.WriteRequest)} and 
  * finally to be written out.
  * 
- * @author The Apache Directory Project
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoFilterChain implements IoFilterChain

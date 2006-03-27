@@ -25,7 +25,7 @@ package org.apache.mina.common;
  * you specified.  However, please don't abuse this internal behavior; it can
  * change.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface ThreadModel extends IoFilterChainBuilder

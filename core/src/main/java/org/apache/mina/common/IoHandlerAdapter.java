@@ -25,7 +25,7 @@ import org.apache.mina.util.SessionUtil;
  * class and selectively override required event handler methods only.  All
  * methods do nothing by default. 
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class IoHandlerAdapter implements IoHandler

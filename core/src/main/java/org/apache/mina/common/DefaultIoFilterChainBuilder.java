@@ -50,7 +50,7 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * ...
  * </pre>
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 350135 $, $Date: 2005-12-01 12:43:29 +0900 $
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Cloneable

@@ -22,7 +22,7 @@ package org.apache.mina.common;
  * Allocates {@link ByteBuffer}s and manages them.  Please implement this
  * interface if you need more advanced memory management scheme.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface ByteBufferAllocator

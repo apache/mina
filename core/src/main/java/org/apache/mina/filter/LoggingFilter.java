@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 /**
  * Logs all MINA protocol events to {@link Logger}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see SessionLog

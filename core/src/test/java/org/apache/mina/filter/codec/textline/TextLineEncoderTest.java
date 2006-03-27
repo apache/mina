@@ -38,7 +38,7 @@ import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
 /**
  * Tests {@link TextLineEncoder}.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class TextLineEncoderTest extends TestCase

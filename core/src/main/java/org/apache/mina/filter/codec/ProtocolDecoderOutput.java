@@ -23,7 +23,7 @@ package org.apache.mina.filter.codec;
  * {@link ProtocolDecoder} must call {@link #write(Object)} for each decoded
  * messages.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public interface ProtocolDecoderOutput

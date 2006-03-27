@@ -29,7 +29,7 @@ import java.io.IOException;
  * <a href="../../../../../xref-examples/org/apache/mina/examples/reverser/ReverseIoHandler.html"><code>ReverseIoHandler</code></a>
  * example.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see IoHandlerAdapter

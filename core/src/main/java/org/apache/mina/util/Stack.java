@@ -24,7 +24,7 @@ import java.util.Arrays;
 /**
  * A unbounded stack.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class Stack implements Serializable

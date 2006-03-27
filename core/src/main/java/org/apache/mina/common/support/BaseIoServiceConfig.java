@@ -29,7 +29,7 @@ import org.apache.mina.common.ThreadModel;
 /**
  * A base implementation of {@link IoServiceConfig}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable

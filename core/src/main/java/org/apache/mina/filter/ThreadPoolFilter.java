@@ -53,7 +53,7 @@ import org.apache.mina.util.Stack;
  * when the JVM terminates will die automatically.
  * </p>
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ThreadPoolFilter extends IoFilterAdapter

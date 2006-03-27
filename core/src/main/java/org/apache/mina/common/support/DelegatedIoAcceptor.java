@@ -32,7 +32,7 @@ import org.apache.mina.common.IoSession;
 /**
  * A delegated {@link IoAcceptor} that wraps the other {@link IoAcceptor}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DelegatedIoAcceptor implements IoAcceptor

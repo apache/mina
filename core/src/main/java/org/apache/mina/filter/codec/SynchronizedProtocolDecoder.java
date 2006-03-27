@@ -27,7 +27,7 @@ import org.apache.mina.common.IoSession;
  * because it can be a root of performance degradation in a multi-thread
  * environment.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SynchronizedProtocolDecoder implements ProtocolDecoder

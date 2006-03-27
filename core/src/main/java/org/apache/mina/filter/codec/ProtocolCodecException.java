@@ -23,7 +23,7 @@ package org.apache.mina.filter.codec;
  * {@link ProtocolDecoder} cannot understand or failed to validate
  * data to process.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ProtocolCodecException extends Exception

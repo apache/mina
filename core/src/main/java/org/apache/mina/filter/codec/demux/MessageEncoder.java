@@ -27,7 +27,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 /**
  * Encodes messages of specific types specified by {@link #getMessageTypes()}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see DemuxingProtocolCodecFactory

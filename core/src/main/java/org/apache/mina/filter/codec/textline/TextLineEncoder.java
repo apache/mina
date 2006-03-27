@@ -32,7 +32,7 @@ import org.apache.mina.util.CharsetUtil;
  * A {@link ProtocolEncoder} which encodes a string into a text line
  * which ends with the delimiter.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class TextLineEncoder extends ProtocolEncoderAdapter

@@ -30,7 +30,7 @@ import java.nio.ShortBuffer;
  * A simplistic {@link ByteBufferAllocator} which simply allocates a new
  * buffer every time.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class SimpleByteBufferAllocator implements ByteBufferAllocator

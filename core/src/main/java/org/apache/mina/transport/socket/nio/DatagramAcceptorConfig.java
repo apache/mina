@@ -28,7 +28,7 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
 /**
  * An {@link IoAcceptorConfig} for {@link DatagramAcceptor}.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements IoAcceptorConfig

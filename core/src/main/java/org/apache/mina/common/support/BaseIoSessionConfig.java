@@ -23,7 +23,7 @@ import org.apache.mina.common.IoSessionConfig;
 /**
  * A base implementation of {@link IoSessionConfig}.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable

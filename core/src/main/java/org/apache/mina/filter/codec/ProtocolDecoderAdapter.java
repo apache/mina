@@ -24,7 +24,7 @@ import org.apache.mina.common.IoSession;
  * An abstract {@link ProtocolDecoder} implementation for those who don't have any
  * resources to dispose.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class ProtocolDecoderAdapter implements ProtocolDecoder

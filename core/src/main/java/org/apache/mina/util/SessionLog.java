@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * Set {@link #PREFIX} and {@link #LOGGER} session attributes
  * to override prefix string and logger.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  *
  */

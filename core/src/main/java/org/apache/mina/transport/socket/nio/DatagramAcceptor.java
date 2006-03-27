@@ -25,7 +25,7 @@ import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DatagramAcceptor extends DelegatedIoAcceptor

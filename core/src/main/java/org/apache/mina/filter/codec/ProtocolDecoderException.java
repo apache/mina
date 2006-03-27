@@ -25,7 +25,7 @@ import org.apache.mina.common.ByteBuffer;
  * cannot understand or failed to validate the specified {@link ByteBuffer}
  * content.
  * 
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class ProtocolDecoderException extends ProtocolCodecException
