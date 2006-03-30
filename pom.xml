@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.directory</groupId>
     <artifactId>build</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
   </parent>
   <groupId>org.apache.directory.mina</groupId>
   <version>0.9.3-SNAPSHOT</version>
