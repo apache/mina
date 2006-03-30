@@ -34,7 +34,7 @@ public interface ProtocolEncoderOutput
     /**
      * Callback for {@link ProtocolEncoder} to generate encoded
      * {@link ByteBuffer}s. {@link ProtocolEncoder} must call
-     * {@link #write(ByteBuffer)} for each decoded messages.
+     * {@link #write(ByteBuffer)} for each encoded message.
      * 
      * @param buf the buffer which contains encoded data
      */
