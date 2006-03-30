@@ -23,8 +23,8 @@ import org.apache.mina.common.WriteFuture;
 
 /**
  * Callback for {@link ProtocolEncoder} to generate encoded {@link ByteBuffer}s.
- * {@link ProtocolEncoder} must call {@link #write(ByteBuffer)} for each decoded
- * messages.
+ * {@link ProtocolEncoder} must call {@link #write(ByteBuffer)} for each encoded
+ * message.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
