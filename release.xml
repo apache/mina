@@ -47,6 +47,13 @@
       </includes>
     </fileSet>
     <fileSet>
+      <directory>filter-compression/target</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>filter-ssl/target</directory>
       <outputDirectory></outputDirectory>
       <includes>
