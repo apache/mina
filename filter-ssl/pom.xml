@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.directory.mina</groupId>
     <artifactId>build</artifactId>
-    <version>0.9.3-SNAPSHOT</version>
+    <version>0.9.4-SNAPSHOT</version>
   </parent>
   <artifactId>mina-filter-ssl</artifactId>
   <name>Apache MINA SSL Filter</name>
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>1.0-rc5</version>
+      <version>1.0</version>
       <scope>provided</scope>
     </dependency>
 
