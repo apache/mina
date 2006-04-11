@@ -120,10 +120,6 @@ public class CumulativeProtocolDecoderTest extends TestCase
     
     private static class IntegerDecoder extends CumulativeProtocolDecoder
     {
-        protected IntegerDecoder()
-        {
-            super( 4 );
-        }
 
         protected boolean doDecode( IoSession session, ByteBuffer in,
                                     ProtocolDecoderOutput out ) throws Exception
@@ -164,10 +160,6 @@ public class CumulativeProtocolDecoderTest extends TestCase
     
     private static class WrongDecoder extends CumulativeProtocolDecoder
     {
-        public WrongDecoder()
-        {
-            super( 4 );
-        }
 
         protected boolean doDecode( IoSession session, ByteBuffer in,
                                     ProtocolDecoderOutput out ) throws Exception {

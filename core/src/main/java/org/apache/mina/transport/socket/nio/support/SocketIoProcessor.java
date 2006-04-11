@@ -303,10 +303,8 @@ class SocketIoProcessor
 
             if( readBytes > 0 )
             {
-                ByteBuffer newBuf = ByteBuffer.allocate( readBytes );
-                newBuf.put( buf );
-                newBuf.flip();
-                ( ( SocketFilterChain ) session.getFilterChain() ).messageReceived( session, newBuf );
+                ( ( SocketFilterChain ) session.getFilterChain() ).messageReceived( session, buf );
+                buf = null;
             }
             if( ret < 0 )
             {
@@ -321,7 +319,8 @@ class SocketIoProcessor
         }
         finally
         {
-            buf.release();
+            if( buf != null )
+                buf.release();
         }
     }
 

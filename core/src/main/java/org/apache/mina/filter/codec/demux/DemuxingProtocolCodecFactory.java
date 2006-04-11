@@ -249,8 +249,6 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
 
         protected ProtocolDecoderImpl() throws Exception
         {
-            super( 16 );
-            
             MessageDecoderFactory[] decoderFactories = DemuxingProtocolCodecFactory.this.decoderFactories;
             decoders = new MessageDecoder[ decoderFactories.length ];
             for( int i = decoderFactories.length - 1; i >= 0; i-- )

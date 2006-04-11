@@ -59,31 +59,11 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     
     private static final String BUFFER = CumulativeProtocolDecoder.class.getName() + ".Buffer";
     
-    private final int initialCapacity;
-    
     /**
-     * Creates a new instance with the 16 bytes initial capacity of
-     * cumulative buffer.  Please note that the capacity increases
-     * automatically.
+     * Creates a new instance.
      */
     protected CumulativeProtocolDecoder()
     {
-        this( 16 );
-    }
-    
-    /**
-     * Creates a new instance with the specified initial capacity of
-     * cumulative buffer.  Please note that the capacity increases
-     * automatically.
-     */
-    protected CumulativeProtocolDecoder( int initialCapacity )
-    {
-        if( initialCapacity < 0 )
-        {
-            throw new IllegalArgumentException( "initialCapacity: " + initialCapacity );
-        }
-        
-        this.initialCapacity = initialCapacity;
     }
     
     /**
@@ -99,45 +79,52 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
                         ProtocolDecoderOutput out ) throws Exception
     {
         ByteBuffer buf = ( ByteBuffer ) session.getAttribute( BUFFER );
-        if( buf == null )
+        // if we have a session buffer, append data to that otherwise
+        // use the buffer read from the network directly
+        if( buf != null )
         {
-            buf = ByteBuffer.allocate( initialCapacity );
-            buf.setAutoExpand( true );
-            session.setAttribute( BUFFER, buf );
+            buf.put( in );
+            buf.flip();
+        }
+        else
+        {
+            buf = in;
         }
         
-        buf.put( in );
-        buf.flip();
-
-        try
+        for( ;; )
         {
-            for( ;; )
+            int oldPos = buf.position();
+            boolean decoded = doDecode( session, buf, out );
+            if( decoded )
             {
-                int oldPos = buf.position();
-                boolean decoded = doDecode( session, buf, out );
-                if( decoded )
+                if( buf.position() == oldPos )
                 {
-                    if( buf.position() == oldPos )
-                    {
-                        throw new IllegalStateException(
-                                "doDecode() can't return true when buffer is not consumed." );
-                    }
-                    
-                    if( !buf.hasRemaining() )
-                    {
-                        break;
-                    }
+                    throw new IllegalStateException(
+                            "doDecode() can't return true when buffer is not consumed." );
                 }
-                else
+                
+                if( !buf.hasRemaining() )
                 {
                     break;
                 }
             }
+            else
+            {
+                break;
+            }
         }
-        finally
+        
+        // if there is any data left that cannot be decoded, we store
+        // it in a buffer in the session and next time this decoder is
+        // invoked the session buffer gets appended to
+        if ( buf.hasRemaining() )
         {
-            buf.compact();
+            storeRemainingInSession( buf, session );
         }
+        else
+        {
+            removeSessionBuffer( session );
+        }        
     }
     
     /**
@@ -161,6 +148,11 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      */
     public void dispose( IoSession session ) throws Exception
     {
+        removeSessionBuffer( session );
+    }
+    
+    private void removeSessionBuffer(IoSession session)
+    {        
         ByteBuffer buf = ( ByteBuffer ) session.getAttribute( BUFFER );
         if( buf != null )
         {
@@ -168,4 +160,12 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
             session.removeAttribute( BUFFER );
         }
     }
+    
+    private void storeRemainingInSession(ByteBuffer buf, IoSession session)
+    {
+        ByteBuffer remainingBuf = ByteBuffer.allocate( buf.remaining() );
+        remainingBuf.setAutoExpand( true );
+        remainingBuf.put( buf );
+        session.setAttribute( BUFFER, remainingBuf );
+    }    
 }
