@@ -36,48 +36,26 @@ public class CharsetUtil
 {
     public static final Logger log = LoggerFactory.getLogger( CharsetUtil.class );
     
-    
-    public static final String getDefaultEncoding()
+    public static final String getDefaultCharsetName()
     {
-        String encoding = null;
-        String version = System.getProperty( "java.version" );
-        
-        if ( version.startsWith( "1.5" ) || version.startsWith( "5.0" ) )
+        // Use reflection here to be able to compile mina with jdk 1.4.
+        try
         {
-            // Use reflection here to be able to compile mina with jdk 1.4
-            try
-            {
-                Class charsetClass = Class.forName( "java.nio.charset.Charset" );
-                Object charSet = charsetClass.getMethod( "defaultCharset", null ).invoke( null, null );
-                encoding = ( String ) charsetClass.getMethod( "name", null ).invoke( charSet, null );
-            }
-            catch ( Exception e )
-            {
-                log.error( "Failed to call java.nio.charset.Charset.defaultCharset().name() on JDK 1.5" );
-                throw new RuntimeException( e );
-            }
+            Class charsetClass = Class.forName( "java.nio.charset.Charset" );
+            Object charSet = charsetClass.getMethod( "defaultCharset", null ).invoke( null, null );
+            return ( String ) charsetClass.getMethod( "name", null ).invoke( charSet, null );
         }
-        else if ( version.startsWith( "1.4" ) )
+        catch ( Exception e )
         {
-            OutputStreamWriter writer = new OutputStreamWriter( new ByteArrayOutputStream() );
-            encoding = writer.getEncoding();
         }
-        else if ( version.startsWith( "1.3" ) )
-        {
-            log.warn( "Character encoding determined in non-standard manner for JDK 1.3" );
-            encoding = System.getProperty( "file.encoding" );
-        }
-        else
-        {
-            throw new IllegalStateException( "JDK version is not compatible." );
-        }
-        
-        return encoding;
-    }
 
+        // Try to use OutputStreamWriter instead.
+        OutputStreamWriter writer = new OutputStreamWriter( new ByteArrayOutputStream() );
+        return writer.getEncoding();
+    }
 
     public static Charset getDefaultCharset()
     {
-        return Charset.forName( getDefaultEncoding() );
+        return Charset.forName( getDefaultCharsetName() );
     }
 }
