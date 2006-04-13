@@ -28,10 +28,10 @@ import junit.framework.TestCase;
  */
 public class CharsetUtilTest extends TestCase
 {
-    public void testGetDefaultEncoding()
+    public void testGetDefaultCharsetName()
     {
         // @todo How the heck do I test this so it works on all machines running test?
-        String encoding = CharsetUtil.getDefaultEncoding();
+        String encoding = CharsetUtil.getDefaultCharsetName();
         assertNotNull( encoding );
     }
 }

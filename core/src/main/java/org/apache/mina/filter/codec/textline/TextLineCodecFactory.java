@@ -44,7 +44,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
      */
     public TextLineCodecFactory()
     {
-        this( Charset.forName( CharsetUtil.getDefaultEncoding() ) );
+        this( Charset.forName( CharsetUtil.getDefaultCharsetName() ) );
     }
     
     /**
