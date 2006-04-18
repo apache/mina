@@ -46,7 +46,7 @@ import org.apache.mina.util.Queue;
 class SocketSessionImpl extends BaseIoSession
 {
     private final IoService manager;
-    private final SocketSessionConfig config = new SocketSessionConfigImpl();
+    private final SocketSessionConfig config = new SessionConfigImpl();
     private final SocketIoProcessor ioProcessor;
     private final SocketFilterChain filterChain;
     private final SocketChannel ch;
@@ -205,7 +205,7 @@ class SocketSessionImpl extends BaseIoSession
         return readBufferSize;
     }
 
-    private class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
+    private class SessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
     {
         public boolean isKeepAlive()
         {
@@ -336,26 +336,36 @@ class SocketSessionImpl extends BaseIoSession
     
         public int getTrafficClass()
         {
-            try
-            {
-                return ch.socket().getTrafficClass();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+        	if( SocketSessionConfigImpl.isGetTrafficClassAvailable() )
+        	{
+	            try
+	            {
+	                return ch.socket().getTrafficClass();
+	            }
+	            catch( SocketException e )
+	            {
+	                throw new RuntimeIOException( e );
+	            }
+        	}
+        	else
+        	{
+        		return 0;
+        	}
         }
     
         public void setTrafficClass( int tc )
         {
-            try
-            {
-                ch.socket().setTrafficClass( tc );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+        	if( SocketSessionConfigImpl.isSetTrafficClassAvailable() )
+        	{
+	            try
+	            {
+	                ch.socket().setTrafficClass( tc );
+	            }
+	            catch( SocketException e )
+	            {
+	                throw new RuntimeIOException( e );
+	            }
+        	}
         }
     
         public int getSendBufferSize()
@@ -372,14 +382,17 @@ class SocketSessionImpl extends BaseIoSession
     
         public void setSendBufferSize( int size )
         {
-            try
-            {
-                ch.socket().setSendBufferSize( size );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+        	if( SocketSessionConfigImpl.isSetSendBufferSizeAvailable() )
+        	{
+	            try
+	            {
+	                ch.socket().setSendBufferSize( size );
+	            }
+	            catch( SocketException e )
+	            {
+	                throw new RuntimeIOException( e );
+	            }
+        	}
         }
     
         public int getReceiveBufferSize()
@@ -396,15 +409,18 @@ class SocketSessionImpl extends BaseIoSession
     
         public void setReceiveBufferSize( int size )
         {
-            try
-            {
-                ch.socket().setReceiveBufferSize( size );
-                SocketSessionImpl.this.readBufferSize = size;
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+        	if( SocketSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
+        	{
+	            try
+	            {
+	                ch.socket().setReceiveBufferSize( size );
+	                SocketSessionImpl.this.readBufferSize = size;
+	            }
+	            catch( SocketException e )
+	            {
+	                throw new RuntimeIOException( e );
+	            }
+        	}
         }
     }
 }
