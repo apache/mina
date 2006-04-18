@@ -24,7 +24,6 @@ import java.net.SocketException;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnectorConfig;
-import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.transport.socket.nio.SocketSessionConfig;
@@ -37,53 +36,122 @@ import org.apache.mina.transport.socket.nio.SocketSessionConfig;
  */
 public class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
 {
-    private boolean reuseAddress;
-    private int receiveBufferSize;
-    private int sendBufferSize;
-    private int trafficClass;
-    private boolean keepAlive;
-    private boolean oobInline;
-    private int soLinger;
-    private boolean tcpNoDelay;
+	private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
+	private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
+	private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
+	private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
+
+	private static boolean DEFAULT_REUSE_ADDRESS;
+    private static int DEFAULT_RECEIVE_BUFFER_SIZE;
+    private static int DEFAULT_SEND_BUFFER_SIZE;
+    private static int DEFAULT_TRAFFIC_CLASS;
+    private static boolean DEFAULT_KEEP_ALIVE;
+    private static boolean DEFAULT_OOB_INLINE;
+    private static int DEFAULT_SO_LINGER;
+    private static boolean DEFAULT_TCP_NO_DELAY;
+    
+    static
+    {
+    	initialize();
+    }
+    
+    private static void initialize()
+    {
+    	Socket socket = null;
+    	
+		socket = new Socket();
+
+		try
+		{
+			DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
+			DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
+			DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
+			DEFAULT_KEEP_ALIVE = socket.getKeepAlive();
+			DEFAULT_OOB_INLINE = socket.getOOBInline();
+			DEFAULT_SO_LINGER = socket.getSoLinger();
+			DEFAULT_TCP_NO_DELAY = socket.getTcpNoDelay();
+			
+			// Check if setReceiveBufferSize is supported.
+			try
+			{
+				socket.setReceiveBufferSize(DEFAULT_RECEIVE_BUFFER_SIZE);
+				SET_RECEIVE_BUFFER_SIZE_AVAILABLE = true;
+			}
+			catch( SocketException e )
+			{
+				SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
+			}
+			
+			// Check if setSendBufferSize is supported.
+			try
+			{
+				socket.setSendBufferSize(DEFAULT_SEND_BUFFER_SIZE);
+				SET_SEND_BUFFER_SIZE_AVAILABLE = true;
+			}
+			catch( SocketException e )
+			{
+				SET_SEND_BUFFER_SIZE_AVAILABLE = false;
+			}
+			
+			// Check if getTrafficClass is supported.
+			try
+			{
+				DEFAULT_TRAFFIC_CLASS = socket.getTrafficClass();
+				GET_TRAFFIC_CLASS_AVAILABLE = true;
+			}
+			catch( SocketException e )
+			{
+				GET_TRAFFIC_CLASS_AVAILABLE = false;
+				DEFAULT_TRAFFIC_CLASS = 0;
+			}
+		} catch (SocketException e) {
+			throw new ExceptionInInitializerError(e);
+		}
+		finally {
+			if( socket != null )
+			{
+				try
+				{
+					socket.close();
+				}
+				catch( IOException e )
+				{
+					ExceptionMonitor.getInstance().exceptionCaught(e);
+				}
+			}
+		}
+    }
+    
+    public static boolean isSetReceiveBufferSizeAvailable() {
+    	return SET_RECEIVE_BUFFER_SIZE_AVAILABLE;
+    }
+	
+    public static boolean isSetSendBufferSizeAvailable() {
+    	return SET_SEND_BUFFER_SIZE_AVAILABLE;
+    }
+	
+    public static boolean isGetTrafficClassAvailable() {
+    	return GET_TRAFFIC_CLASS_AVAILABLE;
+    }
+	
+    public static boolean isSetTrafficClassAvailable() {
+    	return SET_TRAFFIC_CLASS_AVAILABLE;
+    }
+	
+    private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
+    private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
+    private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
+    private int trafficClass = DEFAULT_TRAFFIC_CLASS;
+    private boolean keepAlive = DEFAULT_KEEP_ALIVE;
+    private boolean oobInline = DEFAULT_OOB_INLINE;
+    private int soLinger = DEFAULT_SO_LINGER;
+    private boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
 
     /**
      * Creates a new instance.
-     * 
-     * @throws RuntimeIOException if failed to get the default configuration
      */
     public SocketSessionConfigImpl()
     {
-        Socket s = null;
-        try
-        {
-            s = new Socket();
-            reuseAddress = s.getReuseAddress();
-            receiveBufferSize = s.getReceiveBufferSize();
-            sendBufferSize = s.getSendBufferSize();
-            trafficClass = s.getTrafficClass();
-            keepAlive = s.getKeepAlive();
-            oobInline = s.getOOBInline();
-            soLinger = s.getSoLinger();
-            tcpNoDelay = s.getTcpNoDelay();
-        }
-        catch( SocketException e )
-        {
-            throw new RuntimeIOException( "Failed to get the default configuration.", e );
-        }
-        finally
-        {
-            if( s != null )
-            {
-                try
-                {
-                    s.close();
-                }
-                catch( IOException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                }
-            }
-        }
     }
 
     public boolean isReuseAddress()

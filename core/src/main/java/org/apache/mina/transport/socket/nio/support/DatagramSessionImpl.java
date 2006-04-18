@@ -45,7 +45,7 @@ import org.apache.mina.util.Queue;
 class DatagramSessionImpl extends BaseIoSession
 {
     private final IoService wrapperManager;
-    private final DatagramSessionConfig config = new DatagramSessionConfigImpl();
+    private final DatagramSessionConfig config = new SessionConfigImpl();
     private final DatagramService managerDelegate;
     private final DatagramFilterChain filterChain;
     private final DatagramChannel ch;
@@ -199,7 +199,7 @@ class DatagramSessionImpl extends BaseIoSession
         return readBufferSize;
     }
     
-    private class DatagramSessionConfigImpl extends BaseIoSessionConfig implements DatagramSessionConfig
+    private class SessionConfigImpl extends BaseIoSessionConfig implements DatagramSessionConfig
     {
         public int getReceiveBufferSize()
         {
@@ -215,15 +215,18 @@ class DatagramSessionImpl extends BaseIoSession
 
         public void setReceiveBufferSize( int receiveBufferSize )
         {
-            try
-            {
-                ch.socket().setReceiveBufferSize( receiveBufferSize );
-                DatagramSessionImpl.this.readBufferSize = receiveBufferSize;
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+        	if( DatagramSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
+        	{
+	            try
+	            {
+	                ch.socket().setReceiveBufferSize( receiveBufferSize );
+	                DatagramSessionImpl.this.readBufferSize = receiveBufferSize;
+	            }
+	            catch( SocketException e )
+	            {
+	                throw new RuntimeIOException( e );
+	            }
+        	}
         }
 
         public boolean isBroadcast()
@@ -264,14 +267,17 @@ class DatagramSessionImpl extends BaseIoSession
 
         public void setSendBufferSize( int sendBufferSize )
         {
-            try
-            {
-                ch.socket().setSendBufferSize( sendBufferSize );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+        	if( DatagramSessionConfigImpl.isSetSendBufferSizeAvailable() )
+        	{
+	            try
+	            {
+	                ch.socket().setSendBufferSize( sendBufferSize );
+	            }
+	            catch( SocketException e )
+	            {
+	                throw new RuntimeIOException( e );
+	            }
+        	}
         }
 
         public boolean isReuseAddress()
@@ -300,26 +306,36 @@ class DatagramSessionImpl extends BaseIoSession
 
         public int getTrafficClass()
         {
-            try
-            {
-                return ch.socket().getTrafficClass();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+        	if( DatagramSessionConfigImpl.isGetTrafficClassAvailable() )
+        	{
+	            try
+	            {
+	                return ch.socket().getTrafficClass();
+	            }
+	            catch( SocketException e )
+	            {
+	                throw new RuntimeIOException( e );
+	            }
+        	}
+        	else
+        	{
+        		return 0;
+        	}
         }
 
         public void setTrafficClass( int trafficClass )
         {
-            try
-            {
-                ch.socket().setTrafficClass( trafficClass );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+        	if( DatagramSessionConfigImpl.isSetTrafficClassAvailable() )
+        	{
+	            try
+	            {
+	                ch.socket().setTrafficClass( trafficClass );
+	            }
+	            catch( SocketException e )
+	            {
+	                throw new RuntimeIOException( e );
+	            }
+        	}
         }
     }
 }
