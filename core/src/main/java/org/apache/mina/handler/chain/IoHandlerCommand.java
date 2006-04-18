@@ -30,41 +30,25 @@ import org.apache.mina.common.IoSession;
  * <p>{@link IoHandlerCommand} implementations typically retrieve and store state
  * information in the {@link IoSession} that is passed as a parameter to
  * the {@link #execute(NextCommand,IoSession,Object)} method, using custom
- * session attributes.  To improve interoperability of {@link IoHandlerCommand}
- * implementations, a useful design pattern is to expose the key values
- * used as JavaBeans properties of the {@link IoHandlerCommand} implementation class
- * itself.  For example, a {@link IoHandlerCommand} that requires an input and an
- * output key might implement the following properties:</p>
+ * session attributes.  If you think getting attributes is tedious process,
+ * you can create a bean which contains getters and setters of all properties
+ * and store the bean as a session attribute:</p>
  *
  * <pre>
- *   private String inputKey = "input";
- *   public String getInputKey() {
- *     return (this.inputKey);
+ * public class MyContext {
+ *   public String getPropertyX() { ... };
+ *   public void setPropertyX(String propertyX) { ... };
+ *   public int getPropertyZ() { ... };
+ *   public void setPropertyZ(int propertyZ) { ... };
+ * }
+ * 
+ * public class MyHandlderCommand implements IoHandlerCommand {
+ *   public void execute( NextCommand next, IoSession session, Object message ) throws Exception {
+ *     MyContext ctx = session.getAttribute( "mycontext" );
+ *     ...
  *   }
- *   public void setInputKey(String inputKey) {
- *     this.inputKey = inputKey;
- *   }
- *
- *   private String outputKey = "output";
- *   public String getOutputKey() {
- *     return (this.outputKey);
- *   }
- *   public void setOutputKey(String outputKey) {
- *     this.outputKey = outputKey;
- *   }
+ * }
  * </pre>
- *
- * <p>And the operation of accessing the "input" information in the context
- * would be executed by calling:</p>
- *
- * <pre>
- *   String input = (String) session.getAttribute(getInputKey());
- * </pre>
- *
- * <p>instead of hard coding the attribute name.  The use of the "Key"
- * suffix on such property names is a useful convention to identify properties
- * being used in this fashion, as opposed to JavaBeans properties that simply
- * configure the internal operation of this {@link IoHandlerCommand}.</p>
  *
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
