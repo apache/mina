@@ -56,7 +56,7 @@ import java.util.Set;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ThreadPoolFilter extends IoFilterAdapter implements ThreadPoolFilterMBean
+public class ThreadPoolFilter extends IoFilterAdapter
 {
     /**
      * Default maximum size of thread pool (16).
