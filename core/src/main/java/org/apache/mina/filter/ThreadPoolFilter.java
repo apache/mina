@@ -18,13 +18,6 @@
  */
 package org.apache.mina.filter;
 
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
@@ -35,6 +28,13 @@ import org.apache.mina.util.ByteBufferUtil;
 import org.apache.mina.util.IdentityHashSet;
 import org.apache.mina.util.Queue;
 import org.apache.mina.util.Stack;
+
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A Thread-pooling filter.  This filter forwards {@link IoHandler} events
@@ -56,7 +56,7 @@ import org.apache.mina.util.Stack;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ThreadPoolFilter extends IoFilterAdapter
+public class ThreadPoolFilter extends IoFilterAdapter implements ThreadPoolFilterMBean
 {
     /**
      * Default maximum size of thread pool (16).
@@ -132,9 +132,21 @@ public class ThreadPoolFilter extends IoFilterAdapter
      */
     public ThreadPoolFilter( String threadNamePrefix )
     {
-        setThreadNamePrefix( threadNamePrefix );
+        this( threadNamePrefix, DEFAULT_MAXIMUM_POOL_SIZE );
     }
-    
+
+    /**
+     * Creates a new instance of this filter with the specified thread name prefix
+     * and other default settings.
+     * @param threadNamePrefix the prefix of the thread names this pool will create.
+     * @param maximumPoolSize Maximum size of thread pool
+     */
+    public ThreadPoolFilter( String threadNamePrefix, int maximumPoolSize )
+    {
+        setThreadNamePrefix( threadNamePrefix );
+        setMaximumPoolSize( maximumPoolSize );
+    }
+
     public String getThreadNamePrefix()
     {
         return threadNamePrefix;
