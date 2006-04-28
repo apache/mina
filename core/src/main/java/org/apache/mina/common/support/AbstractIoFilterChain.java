@@ -18,22 +18,22 @@
  */
 package org.apache.mina.common.support;
 
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFilter;
+import org.apache.mina.common.IoFilter.NextFilter;
+import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoFilterLifeCycleException;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.util.ByteBufferUtil;
+import org.apache.mina.util.SessionLog;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoFilterLifeCycleException;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.util.ByteBufferUtil;
-import org.apache.mina.util.SessionLog;
 
 /**
  * An abstract implementation of {@link IoFilterChain} that provides
@@ -42,9 +42,9 @@ import org.apache.mina.util.SessionLog;
  * The only method a developer should implement is
  * {@link #doWrite(IoSession, IoFilter.WriteRequest)}.  This method is invoked
  * when filter chain is evaluated for
- * {@link IoFilter#filterWrite(NextFilter, IoSession, IoFilter.WriteRequest)} and 
+ * {@link IoFilter#filterWrite(NextFilter, IoSession, IoFilter.WriteRequest)} and
  * finally to be written out.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -53,7 +53,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     private final IoSession session;
 
     private final Map name2entry = new HashMap();
-    
+
     private final EntryImpl head;
     private final EntryImpl tail;
 
@@ -63,13 +63,13 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         {
             throw new NullPointerException( "session" );
         }
-        
+
         this.session = session;
         head = new EntryImpl( null, null, "head", createHeadFilter() );
         tail = new EntryImpl( head, null, "tail", createTailFilter() );
         head.nextEntry = tail;
     }
-    
+
     /**
      * Override this method to create custom head of this filter chain.
      */
@@ -115,7 +115,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             {
                 nextFilter.messageSent( session, message );
             }
-            
+
             public void filterWrite( NextFilter nextFilter, IoSession session,
                                      WriteRequest writeRequest ) throws Exception
             {
@@ -126,7 +126,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                 else
                 {
                     throw new IllegalStateException(
-                            "Write requests must be transformed to " + 
+                            "Write requests must be transformed to " +
                             session.getTransportType().getEnvelopeType() +
                             ": " + writeRequest );
                 }
@@ -138,7 +138,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             }
         };
     }
-    
+
     /**
      * Override this method to create custom head of this filter chain.
      */
@@ -218,12 +218,12 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             }
         };
     }
-    
+
     public IoSession getSession()
     {
         return session;
     }
-    
+
     public Entry getEntry( String name )
     {
         Entry e = ( Entry ) name2entry.get( name );
@@ -233,7 +233,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         return e;
     }
-    
+
     public IoFilter get( String name )
     {
         Entry e = getEntry( name );
@@ -241,10 +241,10 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         {
             return null;
         }
-        
+
         return e.getFilter();
     }
-    
+
     public NextFilter getNextFilter( String name )
     {
         Entry e = getEntry( name );
@@ -252,10 +252,10 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         {
             return null;
         }
-        
+
         return e.getNextFilter();
     }
-    
+
     public synchronized void addFirst( String name,
                                        IoFilter filter )
     {
@@ -308,58 +308,55 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     {
         EntryImpl newEntry = new EntryImpl( prevEntry, prevEntry.nextEntry, name, filter );
 
-        IoFilterLifeCycleManager lifeCycleManager = IoFilterLifeCycleManager.getInstance();
-        
-        synchronized( lifeCycleManager )
+
+        try
         {
-            lifeCycleManager.callInitIfNecessary( filter );
+            filter.onPreAdd( this, name, newEntry.getNextFilter() );
+        }
+        catch( Exception e )
+        {
+            throw new IoFilterLifeCycleException( "onPreAdd(): " + name + ':' + filter + " in " + getSession(), e );
+        }
 
-            try
-            {
-                lifeCycleManager.callOnPreAdd( this, name, filter, newEntry.getNextFilter() );
-            }
-            finally
-            {
-                lifeCycleManager.callDestroyIfNecessary( filter );
-            }
+        prevEntry.nextEntry.prevEntry = newEntry;
+        prevEntry.nextEntry = newEntry;
+        name2entry.put( name, newEntry );
 
-            prevEntry.nextEntry.prevEntry = newEntry;
-            prevEntry.nextEntry = newEntry;
-            name2entry.put( name, newEntry );
-
-            try
-            {
-                lifeCycleManager.callOnPostAdd( this, name, filter, newEntry.getNextFilter() );
-            }
-            catch( IoFilterLifeCycleException e )
-            {
-                deregister0( newEntry );
-                throw e;
-            }
-            finally
-            {
-                lifeCycleManager.callDestroyIfNecessary( filter );
-            }
+        try
+        {
+            filter.onPostAdd( this, name, newEntry.getNextFilter() );
+        }
+        catch( Exception e )
+        {
+            deregister0( newEntry );
+            throw new IoFilterLifeCycleException( "onPostAdd(): " + name + ':' + filter + " in " + getSession(), e );
         }
     }
-    
+
     private void deregister( EntryImpl entry )
     {
         IoFilter filter = entry.getFilter();
-        IoFilterLifeCycleManager lifeCycleManager = IoFilterLifeCycleManager.getInstance();
-        
-        lifeCycleManager.callOnPreRemove( this, entry.getName(), filter, entry.getNextFilter() );
-        
+
+        try
+        {
+            filter.onPreRemove( this, entry.getName(), entry.getNextFilter() );
+        }
+        catch( Exception e )
+        {
+            throw new IoFilterLifeCycleException( "onPreRemove(): " + entry.getName() + ':' + filter
+                                                  + " in " + getSession(), e );
+        }
+
         deregister0( entry );
 
         try
         {
-            lifeCycleManager.callOnPostRemove(
-                    this, entry.getName(), filter, entry.getNextFilter() );
+            filter.onPostRemove( this, entry.getName(), entry.getNextFilter() );
         }
-        finally
+        catch( Exception e )
         {
-            lifeCycleManager.callDestroyIfNecessary( filter );
+            throw new IoFilterLifeCycleException( "onPostRemove(): " + entry.getName() + ':' + filter
+                                                  + " in " + getSession(), e );
         }
     }
 
@@ -449,7 +446,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         {
             exceptionCaught( session, t );
         }
-        
+
         // And start the chain.
         Entry head = this.head;
         callNextSessionClosed(head, session);
@@ -461,7 +458,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         try
         {
             entry.getFilter().sessionClosed( entry.getNextFilter(), session );
-                
+
         }
         catch( Throwable e )
         {
@@ -537,7 +534,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
     private void callNextMessageSent( Entry entry,
                                       IoSession session,
-                                      Object message ) 
+                                      Object message )
     {
         try
         {
@@ -570,7 +567,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                     "Unexpected exception from exceptionCaught handler.", e );
         }
     }
-    
+
     public void filterWrite( IoSession session, WriteRequest writeRequest )
     {
         Entry tail = this.tail;
@@ -634,7 +631,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         return list;
     }
-    
+
     public boolean contains( String name )
     {
         return getEntry( name ) != null;
@@ -672,9 +669,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     {
         StringBuffer buf = new StringBuffer();
         buf.append( "{ " );
-        
+
         boolean empty = true;
-        
+
         EntryImpl e = head.nextEntry;
         while( e != tail )
         {
@@ -686,7 +683,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             {
                 empty = false;
             }
-            
+
             buf.append( '(' );
             buf.append( e.getName() );
             buf.append( ':' );
@@ -700,13 +697,13 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         {
             buf.append( "empty" );
         }
-        
+
         buf.append( " }" );
-        
+
         return buf.toString();
     }
 
-    
+
     protected void finalize() throws Throwable
     {
         try
@@ -720,7 +717,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     }
 
     protected abstract void doWrite( IoSession session, WriteRequest writeRequest ) throws Exception;
-    
+
     protected abstract void doClose( IoSession session ) throws Exception;
 
     private class EntryImpl implements Entry
@@ -730,11 +727,11 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         private EntryImpl nextEntry;
 
         private final String name;
-        
+
         private final IoFilter filter;
 
         private final NextFilter nextFilter;
-        
+
         private EntryImpl( EntryImpl prevEntry, EntryImpl nextEntry,
                        String name, IoFilter filter )
         {
@@ -746,7 +743,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             {
                 throw new NullPointerException( "name" );
             }
-            
+
             this.prevEntry = prevEntry;
             this.nextEntry = nextEntry;
             this.name = name;
@@ -795,7 +792,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                     Entry nextEntry = EntryImpl.this.nextEntry;
                     callNextMessageSent( nextEntry, session, message );
                 }
-                
+
                 public void filterWrite( IoSession session, WriteRequest writeRequest )
                 {
                     Entry nextEntry = EntryImpl.this.prevEntry;
