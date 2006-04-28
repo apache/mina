@@ -150,10 +150,13 @@ import java.nio.charset.CoderResult;
  * @version $Rev$, $Date$
  *
  * @see ByteBufferAllocator
+ * @noinspection StaticNonFinalField
  */
 public abstract class ByteBuffer implements Comparable
 {
     private static ByteBufferAllocator allocator = new PooledByteBufferAllocator();
+
+    private static boolean useDirectBuffers = true;
 
     /**
      * Returns the current allocator which manages the allocated buffers.
@@ -183,6 +186,16 @@ public abstract class ByteBuffer implements Comparable
         }
     }
 
+    public static boolean isUseDirectBuffers()
+    {
+        return useDirectBuffers;
+    }
+
+    public static void setUseDirectBuffers( boolean useDirectBuffers )
+    {
+        ByteBuffer.useDirectBuffers = useDirectBuffers;
+    }
+
     /**
      * Returns the direct or heap buffer which is capable of the specified
      * size.  This method tries to allocate direct buffer first, and then
@@ -193,16 +206,20 @@ public abstract class ByteBuffer implements Comparable
      */
     public static ByteBuffer allocate( int capacity )
     {
-        try
+        if( useDirectBuffers )
         {
-            // first try to allocate direct buffer
-            return allocate( capacity, true );
+            try
+            {
+                // first try to allocate direct buffer
+                return allocate( capacity, true );
+            }
+            catch( OutOfMemoryError e )
+            {
+                // fall through to heap buffer
+            }
         }
-        catch( OutOfMemoryError e )
-        {
-            // if failed, try heap
-            return allocate( capacity, false );
-        }
+
+        return allocate( capacity, false );
     }
 
     /**
