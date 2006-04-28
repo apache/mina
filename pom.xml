@@ -92,6 +92,16 @@
       </roles>
       <timezone>-5</timezone>
     </developer>
+    <developer>
+      <id>proyal</id>
+      <name>Peter Royal</name>
+      <email>proyal@apache.org</email>
+      <url>http://fotap.org/~osi</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
   </developers>
 
   <contributors>
