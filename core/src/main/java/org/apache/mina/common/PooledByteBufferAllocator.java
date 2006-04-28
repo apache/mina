@@ -18,6 +18,8 @@
  */
 package org.apache.mina.common;
 
+import org.apache.mina.util.ExpiringStack;
+
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
@@ -25,8 +27,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
-
-import org.apache.mina.util.ExpiringStack;
 
 /**
  * A {@link ByteBufferAllocator} which pools allocated buffers.
@@ -52,7 +52,6 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
     private static int threadId = 0;
 
     private final Expirer expirer;
-    private final ExpiringStack containerStack = new ExpiringStack();
     private final ExpiringStack[] heapBufferStacks = new ExpiringStack[] {
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
             new ExpiringStack(), new ExpiringStack(), new ExpiringStack(),
@@ -110,11 +109,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         }
 
         expirer.shutdown();
-        synchronized( containerStack )
-        {
-            containerStack.clear();
-        }
-        
+
         for( int i = directBufferStacks.length - 1; i >= 0; i -- )
         {
             ExpiringStack stack = directBufferStacks[i];
@@ -181,17 +176,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
 
     private PooledByteBuffer allocateContainer()
     {
-        PooledByteBuffer buf;
-        synchronized( containerStack )
-        {
-            buf = ( PooledByteBuffer ) containerStack.pop();
-        }
-        
-        if( buf == null )
-        {
-            buf = new PooledByteBuffer();
-        }
-        return buf;
+		return new PooledByteBuffer();
     }
     
     private UnexpandableByteBuffer allocate0( int capacity, boolean direct )
@@ -271,7 +256,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
     {
         private boolean timeToStop;
 
-        public Expirer()
+        Expirer()
         {
             super( "PooledByteBufferExpirer-" + threadId++ );
             setDaemon( true );
@@ -289,6 +274,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
                 }
                 catch ( InterruptedException e )
                 {
+                    //ignore since this is shutdown time
                 }
             }
         }
@@ -304,6 +290,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
                 }
                 catch ( InterruptedException e )
                 {
+                    //ignore
                 }
 
                 // Check if expiration is disabled.
@@ -315,11 +302,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
 
                 // Expire old buffers
                 long expirationTime = System.currentTimeMillis() - timeout;
-                synchronized( containerStack )
-                {
-                    containerStack.expireBefore( expirationTime );
-                }
-                
+
                 for( int i = directBufferStacks.length - 1; i >= 0; i -- )
                 {
                     ExpiringStack stack = directBufferStacks[ i ];
@@ -398,11 +381,6 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
             }
 
             buf.release();
-
-            synchronized( containerStack )
-            {
-                containerStack.push( this );
-            }
         }
 
         public java.nio.ByteBuffer buf()
