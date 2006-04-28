@@ -16,14 +16,9 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio.support;
+package org.apache.mina.transport.socket.nio;
 
-import java.net.SocketAddress;
-import java.net.SocketException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.SocketChannel;
-import java.util.Set;
-
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -31,15 +26,19 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
-import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.apache.mina.util.Queue;
+
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
+import java.util.Set;
 
 /**
  * An {@link IoSession} for socket transport (TCP/IP).
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -55,22 +54,24 @@ class SocketSessionImpl extends BaseIoSession
     private final SocketAddress remoteAddress;
     private final SocketAddress localAddress;
     private final SocketAddress serviceAddress;
-    private final Set managedSessions;    
+    private final Set managedSessions;
     private SelectionKey key;
     private int readBufferSize;
 
     /**
      * Creates a new instance.
      */
-    public SocketSessionImpl(
-            IoService manager, Set managedSessions,
-            IoSessionConfig config,
-            SocketChannel ch, IoHandler defaultHandler,
-            SocketAddress serviceAddress )
+    SocketSessionImpl( IoService manager,
+                       SocketIoProcessor ioProcessor,
+                       Set managedSessions,
+                       IoSessionConfig config,
+                       SocketChannel ch,
+                       IoHandler defaultHandler,
+                       SocketAddress serviceAddress )
     {
         this.manager = manager;
         this.managedSessions = managedSessions;
-        this.ioProcessor = SocketIoProcessor.getInstance();
+        this.ioProcessor = ioProcessor;
         this.filterChain = new SocketFilterChain( this );
         this.ch = ch;
         this.writeRequestQueue = new Queue();
@@ -78,7 +79,7 @@ class SocketSessionImpl extends BaseIoSession
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
         this.serviceAddress = serviceAddress;
-        
+
         // Apply the initial session settings
         if( config instanceof SocketSessionConfig )
         {
@@ -98,22 +99,22 @@ class SocketSessionImpl extends BaseIoSession
             }
         }
     }
-    
+
     public IoService getService()
     {
         return manager;
     }
-    
+
     public IoSessionConfig getConfig()
     {
         return config;
     }
-    
+
     SocketIoProcessor getIoProcessor()
     {
         return ioProcessor;
     }
-    
+
     public IoFilterChain getFilterChain()
     {
         return filterChain;
@@ -143,12 +144,12 @@ class SocketSessionImpl extends BaseIoSession
     {
         return handler;
     }
-    
+
     protected void close0()
     {
         filterChain.filterClose( this );
     }
-    
+
     Queue getWriteRequestQueue()
     {
         return writeRequestQueue;
@@ -169,7 +170,7 @@ class SocketSessionImpl extends BaseIoSession
             return writeRequestQueue.byteSize();
         }
     }
-    
+
     protected void write0( WriteRequest writeRequest )
     {
         filterChain.filterWrite( this, writeRequest );
@@ -189,17 +190,17 @@ class SocketSessionImpl extends BaseIoSession
     {
         return localAddress;
     }
-    
+
     public SocketAddress getServiceAddress()
     {
         return serviceAddress;
     }
-    
+
     protected void updateTrafficMask()
     {
         this.ioProcessor.updateTrafficMask( this );
     }
-    
+
     int getReadBufferSize()
     {
         return readBufferSize;
@@ -218,7 +219,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public void setKeepAlive( boolean on )
         {
             try
@@ -230,7 +231,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public boolean isOobInline()
         {
             try
@@ -242,7 +243,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public void setOobInline( boolean on )
         {
             try
@@ -254,7 +255,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public boolean isReuseAddress()
         {
             try
@@ -266,7 +267,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public void setReuseAddress( boolean on )
         {
             try
@@ -278,7 +279,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public int getSoLinger()
         {
             try
@@ -290,7 +291,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public void setSoLinger( int linger )
         {
             try
@@ -309,7 +310,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public boolean isTcpNoDelay()
         {
             try
@@ -321,7 +322,7 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public void setTcpNoDelay( boolean on )
         {
             try
@@ -333,41 +334,41 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public int getTrafficClass()
         {
-        	if( SocketSessionConfigImpl.isGetTrafficClassAvailable() )
-        	{
-	            try
-	            {
-	                return ch.socket().getTrafficClass();
-	            }
-	            catch( SocketException e )
-	            {
-	                throw new RuntimeIOException( e );
-	            }
-        	}
-        	else
-        	{
-        		return 0;
-        	}
+            if( SocketSessionConfigImpl.isGetTrafficClassAvailable() )
+            {
+                try
+                {
+                    return ch.socket().getTrafficClass();
+                }
+                catch( SocketException e )
+                {
+                    throw new RuntimeIOException( e );
+                }
+            }
+            else
+            {
+                return 0;
+            }
         }
-    
+
         public void setTrafficClass( int tc )
         {
-        	if( SocketSessionConfigImpl.isSetTrafficClassAvailable() )
-        	{
-	            try
-	            {
-	                ch.socket().setTrafficClass( tc );
-	            }
-	            catch( SocketException e )
-	            {
-	                throw new RuntimeIOException( e );
-	            }
-        	}
+            if( SocketSessionConfigImpl.isSetTrafficClassAvailable() )
+            {
+                try
+                {
+                    ch.socket().setTrafficClass( tc );
+                }
+                catch( SocketException e )
+                {
+                    throw new RuntimeIOException( e );
+                }
+            }
         }
-    
+
         public int getSendBufferSize()
         {
             try
@@ -379,22 +380,22 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public void setSendBufferSize( int size )
         {
-        	if( SocketSessionConfigImpl.isSetSendBufferSizeAvailable() )
-        	{
-	            try
-	            {
-	                ch.socket().setSendBufferSize( size );
-	            }
-	            catch( SocketException e )
-	            {
-	                throw new RuntimeIOException( e );
-	            }
-        	}
+            if( SocketSessionConfigImpl.isSetSendBufferSizeAvailable() )
+            {
+                try
+                {
+                    ch.socket().setSendBufferSize( size );
+                }
+                catch( SocketException e )
+                {
+                    throw new RuntimeIOException( e );
+                }
+            }
         }
-    
+
         public int getReceiveBufferSize()
         {
             try
@@ -406,21 +407,21 @@ class SocketSessionImpl extends BaseIoSession
                 throw new RuntimeIOException( e );
             }
         }
-    
+
         public void setReceiveBufferSize( int size )
         {
-        	if( SocketSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
-        	{
-	            try
-	            {
-	                ch.socket().setReceiveBufferSize( size );
-	                SocketSessionImpl.this.readBufferSize = size;
-	            }
-	            catch( SocketException e )
-	            {
-	                throw new RuntimeIOException( e );
-	            }
-        	}
+            if( SocketSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
+            {
+                try
+                {
+                    ch.socket().setReceiveBufferSize( size );
+                    SocketSessionImpl.this.readBufferSize = size;
+                }
+                catch( SocketException e )
+                {
+                    throw new RuntimeIOException( e );
+                }
+            }
         }
     }
 }

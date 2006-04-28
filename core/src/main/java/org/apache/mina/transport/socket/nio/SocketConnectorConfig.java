@@ -22,7 +22,6 @@ import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoConnectorConfig;
-import org.apache.mina.transport.socket.nio.support.SocketSessionConfigImpl;
 
 /**
  * An {@link IoConnectorConfig} for {@link SocketConnector}.

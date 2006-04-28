@@ -16,17 +16,15 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio.support;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.net.SocketException;
+package org.apache.mina.transport.socket.nio;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.support.BaseIoSessionConfig;
-import org.apache.mina.transport.socket.nio.SocketConnector;
-import org.apache.mina.transport.socket.nio.SocketSessionConfig;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * An {@link IoConnectorConfig} for {@link SocketConnector}.

@@ -3,16 +3,14 @@
 <head>
 </head>
 <body>
-Socket (TCP/IP) and Datagram (UDP/IP) support based on Java <a href="http://java.sun.com/j2se/1.5.0/docs/guide/nio/">NIO (New I/O) API</a>.
+Socket (TCP/IP) and Datagram (UDP/IP) support based on Java
+<a href="http://java.sun.com/j2se/1.5.0/docs/guide/nio/">NIO (New I/O) API</a>.
 
 <h3>Configuring the number of NIO selector loops</h3>
 <p>
 You can specify the number of Socket I/O thread to utilize multi-processors
-efficiently, using a Java system property, '<tt>mina.socket.processors':
-<pre>
-java -Dmina.socket.processors=2 com.example.mina.Main
-</pre>
-The default number of processors is '<tt>1</tt>'.
+efficiently by specifying the number of processing threads in the constructor. The default is <tt>1</tt>
+</p>
 
 </body>
 </html>
