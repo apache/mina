@@ -18,6 +18,9 @@
  */
 package org.apache.mina.common;
 
+import org.apache.mina.common.support.ByteBufferHexDumper;
+import org.apache.mina.filter.codec.ProtocolEncoderOutput;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -38,9 +41,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
-import org.apache.mina.common.support.ByteBufferHexDumper;
-import org.apache.mina.filter.codec.ProtocolEncoderOutput;
-
 /**
  * A byte buffer used by MINA applications.
  * <p>
@@ -58,7 +58,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  *       capacity</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>Allocation</h2>
  * <p>
  * You can get a heap buffer from buffer pool:
@@ -74,7 +74,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * ByteBuffer buf = ByteBuffer.allocate(1024);
  * </pre>
  * </p>
- * 
+ *
  * <h2>Acquire/Release</h2>
  * <p>
  * <b>Please note that you never need to release the allocated buffer</b>
@@ -94,7 +94,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  *   <li>You called {@link #acquire()} to prevent the buffer from being released.</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>Wrapping existing NIO buffers and arrays</h2>
  * <p>
  * This class provides a few <tt>wrap(...)</tt> methods that wraps
@@ -123,17 +123,17 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * increase by two times, and its limit will increase to the last position
  * the string is written.
  * </p>
- * 
+ *
  * <h2>Derived Buffers</h2>
- * <p> 
+ * <p>
  * Derived buffers are the buffers which were created by
  * {@link #duplicate()}, {@link #slice()}, or {@link #asReadOnlyBuffer()}.
- * They are useful especially when you broadcast the same messages to 
+ * They are useful especially when you broadcast the same messages to
  * multiple {@link IoSession}s.  Please note that the derived buffers are
  * neither pooled nor auto-expandable.  Trying to expand a derived buffer will
  * raise {@link IllegalStateException}.
  * </p>
- * 
+ *
  * <h2>Changing Buffer Allocation and Management Policy</h2>
  * <p>
  * MINA provides a {@link ByteBufferAllocator} interface to let you override
@@ -145,16 +145,16 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * </ul>
  * You can change the allocator by calling {@link #setAllocator(ByteBufferAllocator)}.
  * </p>
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
- * 
+ *
  * @see ByteBufferAllocator
  */
 public abstract class ByteBuffer implements Comparable
 {
     private static ByteBufferAllocator allocator = new PooledByteBufferAllocator();
-    
+
     /**
      * Returns the current allocator which manages the allocated buffers.
      */
@@ -173,15 +173,22 @@ public abstract class ByteBuffer implements Comparable
         {
             throw new NullPointerException( "allocator" );
         }
+
+        ByteBufferAllocator oldAllocator = allocator;
+
         allocator = newAllocator;
+
+        if( null != oldAllocator ) {
+            oldAllocator.dispose();
+        }
     }
-    
+
     /**
      * Returns the direct or heap buffer which is capable of the specified
      * size.  This method tries to allocate direct buffer first, and then
      * tries heap buffer if direct buffer memory is exhausted.  Please use
      * {@link #allocate(int, boolean)} to allocate buffers of specific type.
-     * 
+     *
      * @param capacity the capacity of the buffer
      */
     public static ByteBuffer allocate( int capacity )
@@ -197,10 +204,10 @@ public abstract class ByteBuffer implements Comparable
             return allocate( capacity, false );
         }
     }
-    
+
     /**
      * Returns the buffer which is capable of the specified size.
-     * 
+     *
      * @param capacity the capacity of the buffer
      * @param direct <tt>true</tt> to get a direct buffer,
      *               <tt>false</tt> to get a heap buffer.
@@ -217,7 +224,7 @@ public abstract class ByteBuffer implements Comparable
     {
         return allocator.wrap( nioBuffer );
     }
-    
+
     /**
      * Wraps the specified byte array into MINA heap buffer.
      */
@@ -225,7 +232,7 @@ public abstract class ByteBuffer implements Comparable
     {
         return wrap( java.nio.ByteBuffer.wrap( byteArray ) );
     }
-    
+
     /**
      * Wraps the specified byte array into MINA heap buffer.
      * Please note that MINA buffers are going to be pooled, and
@@ -236,7 +243,7 @@ public abstract class ByteBuffer implements Comparable
     {
         return wrap( java.nio.ByteBuffer.wrap( byteArray, offset, length ) );
     }
-    
+
     protected ByteBuffer()
     {
     }
@@ -245,7 +252,7 @@ public abstract class ByteBuffer implements Comparable
      * Increases the internal reference count of this buffer to defer
      * automatic release.  You have to invoke {@link #release()} as many
      * as you invoked this method to release this buffer.
-     * 
+     *
      * @throws IllegalStateException if you attempt to acquire already
      *                               released buffer.
      */
@@ -253,7 +260,7 @@ public abstract class ByteBuffer implements Comparable
 
     /**
      * Releases the specified buffer to buffer pool.
-     * 
+     *
      * @throws IllegalStateException if you attempt to release already
      *                               released buffer.
      */
@@ -263,21 +270,21 @@ public abstract class ByteBuffer implements Comparable
      * Returns the underlying NIO buffer instance.
      */
     public abstract java.nio.ByteBuffer buf();
-    
+
     public abstract boolean isDirect();
-    
+
     public abstract int capacity();
-    
+
     /**
      * Returns <tt>true</tt> if and only if <tt>autoExpand</tt> is turned on.
      */
     public abstract boolean isAutoExpand();
-    
+
     /**
      * Turns on or off <tt>autoExpand</tt>.
      */
     public abstract ByteBuffer setAutoExpand( boolean autoExpand );
-    
+
     /**
      * Changes the capacity and limit of this buffer so this buffer get
      * the specified <tt>expectedRemaining</tt> room from the current position.
@@ -285,7 +292,7 @@ public abstract class ByteBuffer implements Comparable
      * <tt>true</tt>.
      */
     public abstract ByteBuffer expand( int expectedRemaining );
-    
+
     /**
      * Changes the capacity and limit of this buffer so this buffer get
      * the specified <tt>expectedRemaining</tt> room from the specified
@@ -294,7 +301,7 @@ public abstract class ByteBuffer implements Comparable
      * <tt>true</tt>.
      */
     public abstract ByteBuffer expand( int pos, int expectedRemaining );
-    
+
     /**
      * Returns <tt>true</tt> if and only if this buffer is returned back
      * to the buffer pool when released.
@@ -315,7 +322,7 @@ public abstract class ByteBuffer implements Comparable
      * and {@link #wrap(java.nio.ByteBuffer)})
      */
     public abstract void setPooled( boolean pooled );
-    
+
     /**
      * @see java.nio.Buffer#position()
      */
@@ -350,7 +357,7 @@ public abstract class ByteBuffer implements Comparable
      * @see java.nio.Buffer#clear()
      */
     public abstract ByteBuffer clear();
-    
+
     /**
      * Clears this buffer and fills its content with <tt>NUL</tt>.
      * The position is set to zero, the limit is set to the capacity,
@@ -361,7 +368,7 @@ public abstract class ByteBuffer implements Comparable
         clear();
         return fillAndReset( remaining() );
     }
-    
+
     /**
      * Clears this buffer and fills its content with <tt>value</tt>.
      * The position is set to zero, the limit is set to the capacity,
@@ -395,7 +402,7 @@ public abstract class ByteBuffer implements Comparable
     {
         return remaining() > 0;
     }
-    
+
     /**
      * @see java.nio.ByteBuffer#duplicate()
      */
@@ -405,7 +412,7 @@ public abstract class ByteBuffer implements Comparable
      * @see java.nio.ByteBuffer#slice()
      */
     public abstract ByteBuffer slice();
-    
+
     /**
      * @see java.nio.ByteBuffer#asReadOnlyBuffer()
      */
@@ -531,13 +538,13 @@ public abstract class ByteBuffer implements Comparable
         {
             return false;
         }
-        
+
         ByteBuffer that = ( ByteBuffer ) o;
         if( this.remaining() != that.remaining() )
         {
             return false;
         }
-        
+
         int p = this.position();
         for( int i = this.limit() - 1, j = that.limit() - 1; i >= p; i --, j --)
         {
@@ -567,7 +574,7 @@ public abstract class ByteBuffer implements Comparable
             {
                 return -1;
             }
-            
+
             return +1;
         }
         return this.remaining() - that.remaining();
@@ -764,7 +771,7 @@ public abstract class ByteBuffer implements Comparable
      * @see java.nio.ByteBuffer#asDoubleBuffer()
      */
     public abstract DoubleBuffer asDoubleBuffer();
-    
+
     /**
      * Returns an {@link InputStream} that reads the data from this buffer.
      * {@link InputStream#read()} returns <tt>-1</tt> if the buffer position
@@ -774,7 +781,7 @@ public abstract class ByteBuffer implements Comparable
     {
         return new InputStream()
         {
-            public int available() throws IOException
+            public int available()
             {
                 return ByteBuffer.this.remaining();
             }
@@ -789,7 +796,7 @@ public abstract class ByteBuffer implements Comparable
                 return true;
             }
 
-            public int read() throws IOException
+            public int read()
             {
                 if( ByteBuffer.this.hasRemaining() )
                 {
@@ -801,7 +808,7 @@ public abstract class ByteBuffer implements Comparable
                 }
             }
 
-            public int read( byte[] b, int off, int len ) throws IOException
+            public int read( byte[] b, int off, int len )
             {
                 int remaining = ByteBuffer.this.remaining();
                 if( remaining > 0 )
@@ -816,12 +823,12 @@ public abstract class ByteBuffer implements Comparable
                 }
             }
 
-            public synchronized void reset() throws IOException
+            public synchronized void reset()
             {
                 ByteBuffer.this.reset();
             }
 
-            public long skip( long n ) throws IOException
+            public long skip( long n )
             {
                 int bytes;
                 if( n > Integer.MAX_VALUE )
@@ -837,7 +844,7 @@ public abstract class ByteBuffer implements Comparable
             }
         };
     }
-    
+
     /**
      * Returns an {@link OutputStream} that appends the data into this buffer.
      * Please note that the {@link OutputStream#write(int)} will throw a
@@ -850,12 +857,12 @@ public abstract class ByteBuffer implements Comparable
     {
         return new OutputStream()
         {
-            public void write( byte[] b, int off, int len ) throws IOException
+            public void write( byte[] b, int off, int len )
             {
                 ByteBuffer.this.put( b, off, len );
             }
 
-            public void write( int b ) throws IOException
+            public void write( int b )
             {
                 ByteBuffer.this.put( ( byte ) b );
             }
@@ -955,12 +962,12 @@ public abstract class ByteBuffer implements Comparable
             {
                 cr = decoder.flush( out );
             }
-            
+
             if ( cr.isUnderflow() )
             {
                 break;
             }
-            
+
             if ( cr.isOverflow() )
             {
                 CharBuffer o = CharBuffer.allocate( out.capacity() + expectedLength );
@@ -972,7 +979,7 @@ public abstract class ByteBuffer implements Comparable
 
             cr.throwException();
         }
-        
+
         limit( oldLimit );
         position( end );
         return out.flip().toString();
@@ -981,7 +988,7 @@ public abstract class ByteBuffer implements Comparable
     /**
      * Reads a <code>NUL</code>-terminated string from this buffer using the
      * specified <code>decoder</code> and returns it.
-     * 
+     *
      * @param fieldSize the maximum number of bytes to read
      */
     public String getString( int fieldSize, CharsetDecoder decoder ) throws CharacterCodingException
@@ -1005,7 +1012,6 @@ public abstract class ByteBuffer implements Comparable
             throw new IllegalArgumentException( "fieldSize is not even." );
         }
 
-        int i;
         int oldPos = position();
         int oldLimit = limit();
         int end = position() + fieldSize;
@@ -1014,6 +1020,8 @@ public abstract class ByteBuffer implements Comparable
         {
             throw new BufferUnderflowException();
         }
+
+        int i;
 
         if( !utf16 )
         {
@@ -1076,12 +1084,12 @@ public abstract class ByteBuffer implements Comparable
             {
                 cr = decoder.flush( out );
             }
-            
+
             if ( cr.isUnderflow() )
             {
                 break;
             }
-            
+
             if ( cr.isOverflow() )
             {
                 CharBuffer o = CharBuffer.allocate( out.capacity() + expectedLength );
@@ -1093,17 +1101,17 @@ public abstract class ByteBuffer implements Comparable
 
             cr.throwException();
         }
-        
+
         limit( oldLimit );
         position( end );
         return out.flip().toString();
     }
-    
+
     /**
      * Writes the content of <code>in</code> into this buffer using the
      * specified <code>encoder</code>.  This method doesn't terminate
      * string with <tt>NUL</tt>.  You have to do it by yourself.
-     * 
+     *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
     public ByteBuffer putString(
@@ -1113,12 +1121,12 @@ public abstract class ByteBuffer implements Comparable
         {
             return this;
         }
-        
-        CharBuffer in = CharBuffer.wrap( val ); 
+
+        CharBuffer in = CharBuffer.wrap( val );
         encoder.reset();
-        
+
         int expandedState = 0;
-        
+
         for (;;) {
             CoderResult cr;
             if( in.hasRemaining() )
@@ -1129,7 +1137,7 @@ public abstract class ByteBuffer implements Comparable
             {
                 cr = encoder.flush( buf() );
             }
-            
+
             if( cr.isUnderflow() )
             {
                 break;
@@ -1166,7 +1174,7 @@ public abstract class ByteBuffer implements Comparable
     }
 
     /**
-     * Writes the content of <code>in</code> into this buffer as a 
+     * Writes the content of <code>in</code> into this buffer as a
      * <code>NUL</code>-terminated string using the specified
      * <code>encoder</code>.
      * <p>
@@ -1176,7 +1184,7 @@ public abstract class ByteBuffer implements Comparable
      * <p>
      * Please note that this method doesn't terminate with <code>NUL</code>
      * if the input string is longer than <tt>fieldSize</tt>.
-     * 
+     *
      * @param fieldSize the maximum number of bytes to write
      */
     public ByteBuffer putString(
@@ -1186,9 +1194,9 @@ public abstract class ByteBuffer implements Comparable
 
         if( fieldSize == 0 )
             return this;
-        
+
         autoExpand( fieldSize );
-        
+
         boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
 
         if( utf16 && ( ( fieldSize & 1 ) != 0 ) )
@@ -1218,8 +1226,8 @@ public abstract class ByteBuffer implements Comparable
             position( end );
             return this;
         }
-        
-        CharBuffer in = CharBuffer.wrap( val ); 
+
+        CharBuffer in = CharBuffer.wrap( val );
         limit( end );
         encoder.reset();
 
@@ -1233,7 +1241,7 @@ public abstract class ByteBuffer implements Comparable
             {
                 cr = encoder.flush( buf() );
             }
-            
+
             if( cr.isUnderflow() || cr.isOverflow() )
             {
                 break;
@@ -1269,11 +1277,11 @@ public abstract class ByteBuffer implements Comparable
     {
         return getPrefixedString( 2, decoder );
     }
-    
+
     /**
      * Reads a string which has a length field before the actual
      * encoded string, using the specified <code>decoder</code> and returns it.
-     * 
+     *
      * @param prefixLength the length of the length field (1, 2, or 4)
      */
     public String getPrefixedString( int prefixLength, CharsetDecoder decoder ) throws CharacterCodingException
@@ -1284,7 +1292,7 @@ public abstract class ByteBuffer implements Comparable
         }
 
         int fieldSize = 0;
-        
+
         switch( prefixLength )
         {
         case 1:
@@ -1297,7 +1305,7 @@ public abstract class ByteBuffer implements Comparable
             fieldSize = getInt();
             break;
         }
-        
+
         if( fieldSize == 0 )
         {
             return "";
@@ -1334,12 +1342,12 @@ public abstract class ByteBuffer implements Comparable
             {
                 cr = decoder.flush( out );
             }
-            
+
             if ( cr.isUnderflow() )
             {
                 break;
             }
-            
+
             if ( cr.isOverflow() )
             {
                 CharBuffer o = CharBuffer.allocate( out.capacity() + expectedLength );
@@ -1351,65 +1359,65 @@ public abstract class ByteBuffer implements Comparable
 
             cr.throwException();
         }
-        
+
         limit( oldLimit );
         position( end );
         return out.flip().toString();
     }
 
     /**
-     * Writes the content of <code>in</code> into this buffer as a 
+     * Writes the content of <code>in</code> into this buffer as a
      * string which has a 16-bit length field before the actual
      * encoded string, using the specified <code>encoder</code>.
      * This method is a shortcut for <tt>putPrefixedString(in, 2, 0, encoder)</tt>.
-     * 
+     *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
     public ByteBuffer putPrefixedString( CharSequence in, CharsetEncoder encoder ) throws CharacterCodingException
     {
         return putPrefixedString( in, 2, 0, encoder );
     }
-    
+
     /**
-     * Writes the content of <code>in</code> into this buffer as a 
+     * Writes the content of <code>in</code> into this buffer as a
      * string which has a 16-bit length field before the actual
      * encoded string, using the specified <code>encoder</code>.
      * This method is a shortcut for <tt>putPrefixedString(in, prefixLength, 0, encoder)</tt>.
-     * 
+     *
      * @param prefixLength the length of the length field (1, 2, or 4)
-     * 
+     *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
     public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, CharsetEncoder encoder ) throws CharacterCodingException
     {
         return putPrefixedString( in, prefixLength, 0, encoder );
     }
-    
+
     /**
-     * Writes the content of <code>in</code> into this buffer as a 
+     * Writes the content of <code>in</code> into this buffer as a
      * string which has a 16-bit length field before the actual
      * encoded string, using the specified <code>encoder</code>.
      * This method is a shortcut for <tt>putPrefixedString(in, prefixLength, padding, ( byte ) 0, encoder)</tt>.
-     * 
+     *
      * @param prefixLength the length of the length field (1, 2, or 4)
      * @param padding the number of padded <tt>NUL</tt>s (1 (or 0), 2, or 4)
-     *  
+     *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
     public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, int padding, CharsetEncoder encoder ) throws CharacterCodingException
     {
         return putPrefixedString( in, prefixLength, padding, ( byte ) 0, encoder );
     }
-    
+
     /**
-     * Writes the content of <code>in</code> into this buffer as a 
+     * Writes the content of <code>in</code> into this buffer as a
      * string which has a 16-bit length field before the actual
      * encoded string, using the specified <code>encoder</code>.
-     * 
+     *
      * @param prefixLength the length of the length field (1, 2, or 4)
      * @param padding the number of padded bytes (1 (or 0), 2, or 4)
      * @param padValue the value of padded bytes
-     *  
+     *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
     public ByteBuffer putPrefixedString( CharSequence val, int prefixLength, int padding, byte padValue, CharsetEncoder encoder ) throws CharacterCodingException
@@ -1429,7 +1437,7 @@ public abstract class ByteBuffer implements Comparable
         default:
             throw new IllegalArgumentException( "prefixLength: " + prefixLength );
         }
-        
+
         if( val.length() > maxLength )
         {
             throw new IllegalArgumentException( "The specified string is too long." );
@@ -1450,7 +1458,7 @@ public abstract class ByteBuffer implements Comparable
             }
             return this;
         }
-        
+
         int padMask;
         switch( padding )
         {
@@ -1468,7 +1476,7 @@ public abstract class ByteBuffer implements Comparable
             throw new IllegalArgumentException( "padding: " + padding );
         }
 
-        CharBuffer in = CharBuffer.wrap( val ); 
+        CharBuffer in = CharBuffer.wrap( val );
         int expectedLength = (int) (in.remaining() * encoder.averageBytesPerChar()) + 1;
 
         skip( prefixLength ); // make a room for the length field
@@ -1485,12 +1493,12 @@ public abstract class ByteBuffer implements Comparable
             {
                 cr = encoder.flush( buf() );
             }
-            
+
             if( position() - oldPos > maxLength )
             {
                 throw new IllegalArgumentException( "The specified string is too long." );
             }
-            
+
             if( cr.isUnderflow() )
             {
                 break;
@@ -1502,7 +1510,7 @@ public abstract class ByteBuffer implements Comparable
             }
             cr.throwException();
         }
-        
+
         // Write the length field
         fill( padValue, padding - ( ( position() - oldPos ) & padMask ) );
         int length = position() - oldPos;
@@ -1520,7 +1528,7 @@ public abstract class ByteBuffer implements Comparable
         }
         return this;
     }
-    
+
     /**
      * Reads a Java object from the buffer using the context {@link ClassLoader}
      * of the current thread.
@@ -1529,7 +1537,7 @@ public abstract class ByteBuffer implements Comparable
     {
         return getObject( Thread.currentThread().getContextClassLoader() );
     }
-    
+
     /**
      * Reads a Java object from the buffer using the specified <tt>classLoader</tt>.
      */
@@ -1556,8 +1564,7 @@ public abstract class ByteBuffer implements Comparable
                 {
                     String className = readUTF();
                     Class  clazz = Class.forName( className, true, classLoader );
-                    ObjectStreamClass descriptor = ObjectStreamClass.lookup(clazz);
-                    return descriptor;
+                    return ObjectStreamClass.lookup(clazz);
                 }
             };
             return in.readObject();
@@ -1571,7 +1578,7 @@ public abstract class ByteBuffer implements Comparable
             limit( oldLimit );
         }
     }
-    
+
     /**
      * Writes the specified Java object to the buffer.
      */
@@ -1595,7 +1602,7 @@ public abstract class ByteBuffer implements Comparable
         {
             throw new BufferDataException( e );
         }
-        
+
         // Fill the length field
         int newPos = position();
         position( oldPos );
@@ -1603,7 +1610,7 @@ public abstract class ByteBuffer implements Comparable
         position( newPos );
         return this;
     }
-    
+
     /**
      * Returns <tt>true</tt> if this buffer contains a data which has a data
      * length as a prefix and the buffer has remaining data as enough as
@@ -1612,10 +1619,10 @@ public abstract class ByteBuffer implements Comparable
      * Please not that using this method can allow DoS (Denial of Service)
      * attack in case the remote peer sends too big data length value.
      * It is recommended to use {@link #prefixedDataAvailable(int, int)}
-     * instead. 
-     * 
+     * instead.
+     *
      * @param prefixLength the length of the prefix field (1, 2, or 4)
-     * 
+     *
      * @throws IllegalArgumentException if prefixLength is wrong
      * @throws BufferDataException if data length is negative
      */
@@ -1623,15 +1630,15 @@ public abstract class ByteBuffer implements Comparable
     {
         return prefixedDataAvailable( prefixLength, Integer.MAX_VALUE );
     }
-    
+
     /**
      * Returns <tt>true</tt> if this buffer contains a data which has a data
      * length as a prefix and the buffer has remaining data as enough as
      * specified in the data length field.
-     * 
+     *
      * @param prefixLength the length of the prefix field (1, 2, or 4)
      * @param maxDataLength the allowed maximum of the read data length
-     * 
+     *
      * @throws IllegalArgumentException if prefixLength is wrong
      * @throws BufferDataException if data length is negative or greater then <tt>maxDataLength</tt>
      */
@@ -1657,12 +1664,12 @@ public abstract class ByteBuffer implements Comparable
         default:
             throw new IllegalArgumentException( "prefixLength: " + prefixLength );
         }
-        
+
         if( dataLength < 0 || dataLength > maxDataLength )
         {
             throw new BufferDataException( "dataLength: " + dataLength );
         }
-        
+
         return remaining() - prefixLength >= dataLength;
     }
 
@@ -1821,7 +1828,7 @@ public abstract class ByteBuffer implements Comparable
         }
         return this;
     }
-    
+
     /**
      * This method forwards the call to {@link #expand(int)} only when
      * <tt>autoExpand</tt> property is <tt>true</tt>.
@@ -1834,7 +1841,7 @@ public abstract class ByteBuffer implements Comparable
         }
         return this;
     }
-    
+
     private static void checkFieldSize( int fieldSize )
     {
         if( fieldSize < 0 )
