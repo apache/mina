@@ -18,15 +18,14 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoAcceptorConfig;
-import org.apache.mina.transport.socket.nio.support.SocketSessionConfigImpl;
+
+import java.io.IOException;
+import java.net.ServerSocket;
 
 /**
  * An {@link IoAcceptorConfig} for {@link SocketAcceptor}.
@@ -39,7 +38,7 @@ public class SocketAcceptorConfig extends BaseIoAcceptorConfig
     private IoSessionConfig sessionConfig = new SocketSessionConfigImpl();
     private int backlog = 50;
     private boolean reuseAddress;
-    
+
     /**
      * Creates a new instance.
      * 
@@ -85,7 +84,7 @@ public class SocketAcceptorConfig extends BaseIoAcceptorConfig
     {
         return reuseAddress;
     }
-    
+
     /**
      * @see ServerSocket#setReuseAddress(boolean)
      */
@@ -93,12 +92,12 @@ public class SocketAcceptorConfig extends BaseIoAcceptorConfig
     {
         this.reuseAddress = reuseAddress;
     }
-    
+
     public int getBacklog()
     {
         return backlog;
     }
-    
+
     public void setBacklog( int backlog )
     {
         this.backlog = backlog;

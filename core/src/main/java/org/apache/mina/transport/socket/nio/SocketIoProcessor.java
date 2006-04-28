@@ -16,7 +16,14 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio.support;
+package org.apache.mina.transport.socket.nio;
+
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.WriteTimeoutException;
+import org.apache.mina.util.Queue;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -25,50 +32,20 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.WriteTimeoutException;
-import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.util.Queue;
-
 /**
- * Performs all I/O operations for sockets which is connected or bound.
- * This class is used by MINA internally.
- * 
+ * Performs all I/O operations for sockets which is connected or bound. This class is used by MINA internally.
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 class SocketIoProcessor
 {
-    private static final String PROCESSORS_PROPERTY = "mina.socket.processors";
-    private static final String THREAD_PREFIX = "SocketIoProcessor-";
-    private static final int DEFAULT_PROCESSORS = 1;
-    private static final int PROCESSOR_COUNT;
-    private static final SocketIoProcessor[] PROCESSORS;
-    
-    private static int nextId;
-    
-    static
-    {
-        PROCESSOR_COUNT = configureProcessorCount(); 
-        PROCESSORS = createProcessors();
-    }
-      
-    /**
-     * Returns the {@link SocketIoProcessor} to be used for a newly
-     * created session
-     * 
-     * @return  The processor to be employed
-     */
-    static synchronized SocketIoProcessor getInstance()
-    {
-        SocketIoProcessor processor = PROCESSORS[ nextId ++ ];
-        nextId %= PROCESSOR_COUNT;
-        return processor;
-    }
-      
+    private final Object lock = new Object();
+
     private final String threadName;
+    /**
+     * @noinspection FieldAccessedSynchronizedAndUnsynchronized
+     */
     private Selector selector;
 
     private final Queue newSessions = new Queue();
@@ -79,21 +56,19 @@ class SocketIoProcessor
     private Worker worker;
     private long lastIdleCheckTime = System.currentTimeMillis();
 
-    private SocketIoProcessor( String threadName )
+    SocketIoProcessor( String threadName )
     {
         this.threadName = threadName;
     }
 
     void addNew( SocketSessionImpl session ) throws IOException
     {
-        synchronized( this )
+        synchronized( newSessions )
         {
-            synchronized( newSessions )
-            {
-                newSessions.push( session );
-            }
-            startupWorker();
+            newSessions.push( session );
         }
+
+        startupWorker();
 
         selector.wakeup();
     }
@@ -105,13 +80,16 @@ class SocketIoProcessor
         selector.wakeup();
     }
 
-    private synchronized void startupWorker() throws IOException
+    private void startupWorker() throws IOException
     {
-        if( worker == null )
+        synchronized( lock )
         {
-            selector = Selector.open();
-            worker = new Worker();
-            worker.start();
+            if( worker == null )
+            {
+                selector = Selector.open();
+                worker = new Worker();
+                worker.start();
+            }
         }
     }
 
@@ -164,10 +142,10 @@ class SocketIoProcessor
         if( newSessions.isEmpty() )
             return;
 
-        SocketSessionImpl session;
-
-        for( ;; )
+        for( ; ; )
         {
+            SocketSessionImpl session;
+
             synchronized( newSessions )
             {
                 session = ( SocketSessionImpl ) newSessions.pop();
@@ -206,7 +184,7 @@ class SocketIoProcessor
         if( removingSessions.isEmpty() )
             return;
 
-        for( ;; )
+        for( ; ; )
         {
             SocketSessionImpl session;
 
@@ -277,15 +255,15 @@ class SocketIoProcessor
 
     private void read( SocketSessionImpl session )
     {
-        ByteBuffer buf = ByteBuffer.allocate( session.getReadBufferSize() ); 
+        ByteBuffer buf = ByteBuffer.allocate( session.getReadBufferSize() );
         SocketChannel ch = session.getChannel();
 
         try
         {
+            buf.clear();
+
             int readBytes = 0;
             int ret;
-
-            buf.clear();
 
             try
             {
@@ -347,28 +325,28 @@ class SocketIoProcessor
     private void notifyIdleness( SocketSessionImpl session, long currentTime )
     {
         notifyIdleness0(
-                session, currentTime,
-                session.getIdleTimeInMillis( IdleStatus.BOTH_IDLE ),
-                IdleStatus.BOTH_IDLE,
-                Math.max( session.getLastIoTime(), session.getLastIdleTime( IdleStatus.BOTH_IDLE ) ) );
+            session, currentTime,
+            session.getIdleTimeInMillis( IdleStatus.BOTH_IDLE ),
+            IdleStatus.BOTH_IDLE,
+            Math.max( session.getLastIoTime(), session.getLastIdleTime( IdleStatus.BOTH_IDLE ) ) );
         notifyIdleness0(
-                session, currentTime,
-                session.getIdleTimeInMillis( IdleStatus.READER_IDLE ),
-                IdleStatus.READER_IDLE,
-                Math.max( session.getLastReadTime(), session.getLastIdleTime( IdleStatus.READER_IDLE ) ) );
+            session, currentTime,
+            session.getIdleTimeInMillis( IdleStatus.READER_IDLE ),
+            IdleStatus.READER_IDLE,
+            Math.max( session.getLastReadTime(), session.getLastIdleTime( IdleStatus.READER_IDLE ) ) );
         notifyIdleness0(
-                session, currentTime,
-                session.getIdleTimeInMillis( IdleStatus.WRITER_IDLE ),
-                IdleStatus.WRITER_IDLE,
-                Math.max( session.getLastWriteTime(), session.getLastIdleTime( IdleStatus.WRITER_IDLE ) ) );
+            session, currentTime,
+            session.getIdleTimeInMillis( IdleStatus.WRITER_IDLE ),
+            IdleStatus.WRITER_IDLE,
+            Math.max( session.getLastWriteTime(), session.getLastIdleTime( IdleStatus.WRITER_IDLE ) ) );
 
         notifyWriteTimeout( session, currentTime, session
-                .getWriteTimeoutInMillis(), session.getLastWriteTime() );
+            .getWriteTimeoutInMillis(), session.getLastWriteTime() );
     }
 
     private void notifyIdleness0( SocketSessionImpl session, long currentTime,
-                                    long idleTime, IdleStatus status,
-                                    long lastIoTime )
+                                  long idleTime, IdleStatus status,
+                                  long lastIoTime )
     {
         if( idleTime > 0 && lastIoTime != 0
             && ( currentTime - lastIoTime ) >= idleTime )
@@ -379,8 +357,8 @@ class SocketIoProcessor
     }
 
     private void notifyWriteTimeout( SocketSessionImpl session,
-                                           long currentTime,
-                                           long writeTimeout, long lastIoTime )
+                                     long currentTime,
+                                     long writeTimeout, long lastIoTime )
     {
         SelectionKey key = session.getSelectionKey();
         if( writeTimeout > 0
@@ -397,7 +375,7 @@ class SocketIoProcessor
         if( flushingSessions.size() == 0 )
             return;
 
-        for( ;; )
+        for( ; ; )
         {
             SocketSessionImpl session;
 
@@ -414,7 +392,7 @@ class SocketIoProcessor
                 releaseWriteBuffers( session );
                 continue;
             }
-            
+
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
             // (In case that Session.write() is called before addSession() is processed)
@@ -440,12 +418,12 @@ class SocketIoProcessor
             }
         }
     }
-    
+
     private void releaseWriteBuffers( SocketSessionImpl session )
     {
         Queue writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
-        
+
         while( ( req = ( WriteRequest ) writeRequestQueue.pop() ) != null )
         {
             try
@@ -472,9 +450,10 @@ class SocketIoProcessor
         SocketChannel ch = session.getChannel();
         Queue writeRequestQueue = session.getWriteRequestQueue();
 
-        WriteRequest req;
-        for( ;; )
+        for( ; ; )
         {
+            WriteRequest req;
+
             synchronized( writeRequestQueue )
             {
                 req = ( WriteRequest ) writeRequestQueue.first();
@@ -490,9 +469,9 @@ class SocketIoProcessor
                 {
                     writeRequestQueue.pop();
                 }
-                
+
                 session.increaseWrittenWriteRequests();
-                
+
                 buf.reset();
                 ( ( SocketFilterChain ) session.getFilterChain() ).messageSent( session, req );
                 continue;
@@ -513,12 +492,12 @@ class SocketIoProcessor
         }
     }
 
-    private void doUpdateTrafficMask() 
+    private void doUpdateTrafficMask()
     {
         if( trafficControllingSessions.isEmpty() )
             return;
 
-        for( ;; )
+        for( ; ; )
         {
             SocketSessionImpl session;
 
@@ -562,65 +541,25 @@ class SocketIoProcessor
             key.interestOps( ops & mask );
         }
     }
-    
-    /**
-     * Configures the number of processors employed.
-     * We first check for a system property "mina.IoProcessors". If this
-     * property is present and can be interpreted as an integer value greater 
-     * or equal to 1, this value is used as the number of processors.
-     * Otherwise a default of 1 processor is employed.
-     * 
-     * @return  The nubmer of processors to employ
-     */
-    private static int configureProcessorCount() 
-    {
-        int processors = DEFAULT_PROCESSORS;
-        String processorProperty = System.getProperty( PROCESSORS_PROPERTY );
-        if ( processorProperty != null ) 
-        {
-            try 
-            {
-                processors = Integer.parseInt( processorProperty );
-            } 
-            catch ( NumberFormatException e )
-            {
-                ExceptionMonitor.getInstance().exceptionCaught( e );
-            }
-            processors = Math.max( processors, 1 );
-            
-            System.setProperty( PROCESSORS_PROPERTY, String.valueOf( processors ) );
-        }
 
-        return processors;
-    }
-    
-    private static SocketIoProcessor[] createProcessors()
-    {
-        SocketIoProcessor[] processors = new SocketIoProcessor[ PROCESSOR_COUNT ];
-        for ( int i = 0; i < PROCESSOR_COUNT; i ++ )
-        {
-            processors[i] = new SocketIoProcessor( THREAD_PREFIX + i );
-        }
-        return processors;
-    }
-    
+
     private class Worker extends Thread
     {
-        public Worker()
+        Worker()
         {
             super( SocketIoProcessor.this.threadName );
         }
 
         public void run()
         {
-            for( ;; )
+            for( ; ; )
             {
                 try
                 {
                     int nKeys = selector.select( 1000 );
                     doAddNew();
                     doUpdateTrafficMask();
-                    
+
                     if( nKeys > 0 )
                     {
                         process( selector.selectedKeys() );
@@ -632,12 +571,12 @@ class SocketIoProcessor
 
                     if( selector.keys().isEmpty() )
                     {
-                        synchronized( SocketIoProcessor.this )
+                        synchronized( lock )
                         {
-                            if( selector.keys().isEmpty() &&
-                                newSessions.isEmpty() )
+                            if( selector.keys().isEmpty() && newSessions.isEmpty() )
                             {
                                 worker = null;
+
                                 try
                                 {
                                     selector.close();
@@ -650,6 +589,7 @@ class SocketIoProcessor
                                 {
                                     selector = null;
                                 }
+
                                 break;
                             }
                         }
@@ -665,10 +605,11 @@ class SocketIoProcessor
                     }
                     catch( InterruptedException e1 )
                     {
+                        ExceptionMonitor.getInstance().exceptionCaught( e1 );
                     }
                 }
             }
         }
     }
-    
+
 }

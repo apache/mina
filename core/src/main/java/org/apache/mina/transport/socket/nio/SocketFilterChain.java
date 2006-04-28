@@ -16,7 +16,7 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.transport.socket.nio.support;
+package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
 
@@ -34,7 +34,7 @@ import org.apache.mina.util.Queue;
  */
 class SocketFilterChain extends AbstractIoFilterChain {
 
-    public SocketFilterChain( IoSession parent )
+    SocketFilterChain( IoSession parent )
     {
         super( parent );
     }
