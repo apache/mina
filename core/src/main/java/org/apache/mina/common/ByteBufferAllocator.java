@@ -34,10 +34,15 @@ public interface ByteBufferAllocator
      * @param direct <tt>true</tt> to get a direct buffer,
      *               <tt>false</tt> to get a heap buffer.
      */
-    public ByteBuffer allocate( int capacity, boolean direct );
+    ByteBuffer allocate( int capacity, boolean direct );
 
     /**
      * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
      */
-    public ByteBuffer wrap( java.nio.ByteBuffer nioBuffer );
+    ByteBuffer wrap( java.nio.ByteBuffer nioBuffer );
+
+    /**
+     * Dispose of this allocator.
+     */
+    void dispose();
 }

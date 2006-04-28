@@ -60,6 +60,10 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         return new SimpleByteBuffer( nioBuffer );
     }
 
+    public void dispose()
+    {
+    }
+
     private static class SimpleByteBuffer extends ByteBuffer
     {
         private java.nio.ByteBuffer buf;
