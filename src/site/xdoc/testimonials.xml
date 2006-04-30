@@ -8,6 +8,23 @@
   <body>
     <section name="Testimonials">
       <p>
+        Maarten Bosteels says:
+        <blockquote>
+          <p>
+            <a href="http://www.eurid.eu/">EURid</a> used MINA during the
+            landrush for .eu domain names on the 7th of april 2006.
+            More than 700.000 domain names were registered during the first
+            4 hours. After one hour MINA had handled more than 0.5 million
+            SSL connections.
+          </p>
+          <p>
+            We found the speed and stability of MINA to be excellent.
+            And although we are still using MINA 0.8.1, we found the API very
+            elegant and easy.
+          </p>
+        </blockquote>
+      </p>
+      <p>
         Alex Burmester says:
         <blockquote>
           <p>
@@ -30,7 +47,7 @@
         </blockquote>
       </p>
       
-      <p>Jean-François Daune says:
+      <p>Jean-Fran&#231;ois Daune says:
         <blockquote>
           <p>
             We use MINA to communicate with
