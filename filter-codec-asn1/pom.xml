@@ -4,24 +4,17 @@
   <parent>
     <groupId>org.apache.directory.mina</groupId>
     <artifactId>build</artifactId>
-    <version>0.9.4-SNAPSHOT</version>
+    <version>0.9.4</version>
   </parent>
   <artifactId>mina-filter-codec-asn1</artifactId>
   <name>Apache MINA ASN.1 Codec Filter</name>
   <packaging>jar</packaging>
 
   <dependencies>
-    <!--
-      The stable branch for the ASN.1 code is 0.9.5.1. mina 
-      should stick to using this for now so long as apacheds
-      depends on MINA.  Otherwise conflicts will arise in 
-      apacheds.  The next release of MINA should bump this
-      version up to 0.9.5.1 and not depend on the snapshot.
-    -->
     <dependency>
       <groupId>org.apache.directory.shared</groupId>
       <artifactId>shared-asn1</artifactId>
-      <version>0.9.5.1-SNAPSHOT</version>
+      <version>0.9.5.1</version>
     </dependency>
 
     <dependency>
