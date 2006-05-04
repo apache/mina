@@ -16,12 +16,8 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoSession;
 
 /**
  * An {@link IoFilter}s wrapper that keeps track of the number of usages of this filter and will call init/destroy
