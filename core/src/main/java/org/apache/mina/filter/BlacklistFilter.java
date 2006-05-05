@@ -57,11 +57,7 @@ public class BlacklistFilter extends IoFilterAdapter
         for( int i = 0; i < addresses.length; i++ )
         {
             InetAddress addr = addresses[ i ];
-            if( addr == null )
-            {
-                throw new NullPointerException( "addresses[" + i + ']' );
-            }
-            blacklist.add( addr );
+            block (addr, "addresses[" + i + ']' );
         }
     }
     
@@ -97,11 +93,19 @@ public class BlacklistFilter extends IoFilterAdapter
     /**
      * Blocks the specified endpoint.
      */
-    public synchronized void block( InetAddress address )
+    public synchronized void block( InetAddress address , String error_string )
     {
         if( address == null )
-            throw new NullPointerException( "address" );
+            throw new NullPointerException( error_string );
         blacklist.add( address );
+    }
+
+    /**
+     * Blocks the specified endpoint.
+     */
+    public synchronized void block( InetAddress address )
+    {
+        block( address, "address" );
     }
 
     /**
