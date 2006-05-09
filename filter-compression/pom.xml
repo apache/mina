@@ -33,11 +33,10 @@
     </dependency>
 
     <dependency>
-      <groupId>jcraft</groupId>
+      <groupId>com.jcraft</groupId>
       <artifactId>jzlib</artifactId>
       <version>1.0.7</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/jzlib-1.0.7.jar</systemPath>
+      <scope>compile</scope>
     </dependency>
 
   </dependencies>
