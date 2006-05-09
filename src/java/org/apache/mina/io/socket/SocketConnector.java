@@ -277,7 +277,18 @@ public class SocketConnector extends BaseSessionManager implements IoConnector
                     entry.notify();
                 }
 
-                key.cancel();
+                try
+                {
+                    key.channel().close();
+                }
+                catch( IOException e )
+                {
+                    exceptionMonitor.exceptionCaught( this, e );
+                }
+                finally
+                {
+                    key.cancel();
+                }
             }
         }
     }
