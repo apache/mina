@@ -328,7 +328,18 @@ public class SocketConnector extends BaseIoConnector
             if( currentTime >= entry.deadline )
             {
                 entry.setException( new ConnectException() );
-                key.cancel();
+                try
+                {
+                    key.channel().close();
+                }
+                catch( IOException e )
+                {
+                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                }
+                finally
+                {
+                    key.cancel();
+                }
             }
         }
     }
