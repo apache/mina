@@ -52,11 +52,11 @@ import java.util.Set;
  * all workers are daemon threads which means that any workers still alive
  * when the JVM terminates will die automatically.
  * </p>
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ThreadPoolFilter extends IoFilterAdapter
+public class ThreadPoolFilter extends IoFilterAdapter implements ThreadPoolFilterMBean
 {
     /**
      * Default maximum size of thread pool (16).
@@ -75,7 +75,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
      */
     private static final Queue threadIdReuseQueue = new Queue();
     private static int threadId = 0;
-    
+
     private static int acquireThreadId()
     {
         synchronized( threadIdReuseQueue )
@@ -91,7 +91,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
             }
         }
     }
-    
+
     private static void releaseThreadId( int id )
     {
         synchronized( threadIdReuseQueue )
@@ -124,7 +124,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
     {
         this( "IoThreadPool" );
     }
-    
+
     /**
      * Creates a new instance of this filter with the specified thread name prefix
      * and other default settings.
@@ -164,7 +164,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
             throw new IllegalArgumentException( "threadNamePrefix is empty." );
         }
         this.threadNamePrefix = threadNamePrefix;
-        
+
         synchronized( poolSizeLock )
         {
             for( Iterator i = allWorkers.iterator(); i.hasNext(); )
@@ -173,7 +173,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
             }
         }
     }
-    
+
     public int getPoolSize()
     {
         synchronized( poolSizeLock )
@@ -204,7 +204,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
         this.keepAliveTime = keepAliveTime;
     }
 
-    public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) 
+    public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter )
         throws Exception
     {
         if( leader == null )
@@ -215,7 +215,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
 
     /**
      * Starts handling new events. This will be called automatically if not
-     * already called the first time this filter is added to a filter chain. 
+     * already called the first time this filter is added to a filter chain.
      */
     public void start()
     {
@@ -239,13 +239,13 @@ public class ThreadPoolFilter extends IoFilterAdapter
             {
                 allWorkers = new ArrayList( this.allWorkers );
             }
-            
+
             // You may not interrupt the current thread.
             if( allWorkers.remove( Thread.currentThread() ) )
             {
                 expectedPoolSize = 1;
             }
-            
+
             for( Iterator i = allWorkers.iterator(); i.hasNext(); )
             {
                 Worker worker = ( Worker ) i.next();
@@ -254,7 +254,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
                     worker.interrupt();
                     try
                     {
-                        // This timeout will help us from 
+                        // This timeout will help us from
                         // infinite lock-up and interrupt workers again.
                         worker.join( 100 );
                     }
@@ -264,7 +264,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
                 }
             }
         }
-        
+
         this.allSessionBuffers.clear();
         this.unfetchedSessionBuffers.clear();
         this.buffers.clear();
@@ -314,12 +314,12 @@ public class ThreadPoolFilter extends IoFilterAdapter
             }
         }
     }
-    
+
     /**
      * Implement this method to fetch (or pop) a {@link SessionBuffer} from
      * the given <tt>unfetchedSessionBuffers</tt>.  The default implementation
      * simply pops the buffer from it.  You could prioritize the fetch order.
-     * 
+     *
      * @return A non-null {@link SessionBuffer}
      */
     protected SessionBuffer fetchSessionBuffer( Queue unfetchedSessionBuffers )
@@ -363,12 +363,12 @@ public class ThreadPoolFilter extends IoFilterAdapter
         {
             this.session = session;
         }
-        
+
         public IoSession getSession()
         {
             return session;
         }
-        
+
         public Queue getEventQueue()
         {
             return eventQueue;
@@ -389,7 +389,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
             increasePoolSize( this );
             setDaemon( true );
         }
-        
+
         public void updateName()
         {
             this.setName( threadNamePrefix + '-' + id );
@@ -408,7 +408,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
                 leader = this;
                 promotionLock.notify();
             }
-            
+
             return true;
         }
 
@@ -518,7 +518,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
 
             long startTime = System.currentTimeMillis();
             long currentTime = System.currentTimeMillis();
-            
+
             synchronized( promotionLock )
             {
                 while( this != leader && !shuttingDown )
@@ -533,7 +533,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
                     {
                         keepAliveTime = Integer.MAX_VALUE;
                     }
-                    
+
                     // Break the loop if there's no remaining keep-alive time.
                     if( keepAliveTime <= 0 )
                     {
@@ -623,24 +623,24 @@ public class ThreadPoolFilter extends IoFilterAdapter
         public static final EventType EXCEPTION = new EventType( "EXCEPTION" );
 
         private final String value;
-        
+
         private EventType( String value )
         {
             this.value = value;
         }
-        
+
         public String toString()
         {
             return value;
         }
     }
-    
+
     protected static class Event
     {
         private final EventType type;
         private final NextFilter nextFilter;
         private final Object data;
-        
+
         public Event( EventType type, NextFilter nextFilter, Object data )
         {
             this.type = type;
@@ -652,25 +652,25 @@ public class ThreadPoolFilter extends IoFilterAdapter
         {
             return data;
         }
-        
+
 
         public NextFilter getNextFilter()
         {
             return nextFilter;
         }
-        
+
 
         public EventType getType()
         {
             return type;
         }
     }
-    
+
     public void sessionCreated( NextFilter nextFilter, IoSession session )
     {
         nextFilter.sessionCreated( session );
     }
-    
+
     public void sessionOpened( NextFilter nextFilter,
                               IoSession session )
     {
