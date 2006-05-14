@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.directory.mina</groupId>
+    <artifactId>build</artifactId>
+    <version>0.9.4-SNAPSHOT</version>
+  </parent>
+  <artifactId>mina-java5</artifactId>
+  <name>Apache MINA Java5 Extensions</name>
+  <packaging>jar</packaging>  
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.apache.directory.mina</groupId>
+      <artifactId>mina-core</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.4</source>
+          <target>1.4</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
