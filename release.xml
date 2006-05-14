@@ -59,7 +59,14 @@
       <includes>
         <include>*.jar</include>
       </includes>
-    </fileSet>
+    </fileSet>     
+	<fileSet>
+      <directory>java5/target</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileSet> 
     <fileSet>
       <directory>integration-spring/target</directory>
       <outputDirectory></outputDirectory>

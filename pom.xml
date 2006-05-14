@@ -162,6 +162,7 @@
       </activation>
       <modules>
         <module>core</module>
+        <module>java5</module>
         <module>filter-ssl</module>
         <module>filter-codec-asn1</module>
         <module>filter-codec-netty</module>
@@ -198,6 +199,7 @@
 
 Build with 1.4 jvm will not include modules:
  
+ o mina-java5
  o mina-filter-ssl
  o mina-integration-spring
  o mina-examples
