@@ -91,7 +91,17 @@
           use.  Last, but not least, MINA have a really responsive support.
         </blockquote>
       </p>
-      
+
+      <p>Frederic Soulier says:
+        <blockquote>
+          In 3 days, starting from scratch (knowing nothing about MINA) and
+          with help from this list, I've re-implemented something that took us
+          2+ months to develop! I've thrown 4000 concurrent connections at it
+          without a problem. The only problem I faced was to increase the
+          limit for open files on my linux box (default was 1024).
+        </blockquote>
+      </p>
+
       <p>Julien Vermillard says:
         <blockquote>
           I'm using MINA for supervisory control and data acquisition (SCADA)
