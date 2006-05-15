@@ -18,6 +18,7 @@
  */
 package org.apache.mina.common.support;
 
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,8 +26,8 @@ import java.util.Set;
 
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
@@ -124,6 +125,11 @@ public abstract class BaseIoSession implements IoSession
     
     public WriteFuture write( Object message )
     {
+        return write( message, null );
+    }
+    
+    public WriteFuture write( Object message, SocketAddress remoteAddress )
+    {
         synchronized( this )
         {
             if( isClosing() || !isConnected() )
@@ -133,7 +139,7 @@ public abstract class BaseIoSession implements IoSession
         }
 
         WriteFuture future = new WriteFuture();
-        write0( new WriteRequest( message, future ) );
+        write0( new WriteRequest( message, future, remoteAddress ) );
         
         return future;
     }
