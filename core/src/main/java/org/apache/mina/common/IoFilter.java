@@ -18,6 +18,8 @@
  */
 package org.apache.mina.common;
 
+import java.net.SocketAddress;
+
 /**
  * A filter which intercepts {@link IoHandler} events like Servlet
  * filters.  Filters can be used for these purposes:
@@ -247,6 +249,7 @@ public interface IoFilter
         
         private final Object message;
         private final WriteFuture future;
+        private final SocketAddress destination;
         
         /**
          * Creates a new instance without {@link WriteFuture}.  You'll get
@@ -255,13 +258,26 @@ public interface IoFilter
          */
         public WriteRequest( Object message )
         {
-            this( message, null );
+            this( message, null, null );
         }
 
         /**
          * Creates a new instance with {@link WriteFuture}.
          */
         public WriteRequest( Object message, WriteFuture future )
+        {
+            this( message, future, null );
+        }
+        
+        /**
+         * Creates a new instance.
+         * 
+         * @param message a message to write
+         * @param future a future that needs to be notified when an operation is finished
+         * @param destination the destination of the message.  This property will be
+         *                    ignored unless the transport supports it.
+         */
+        public WriteRequest( Object message, WriteFuture future, SocketAddress destination )
         {
             if( message == null )
             {
@@ -275,6 +291,7 @@ public interface IoFilter
             
             this.message = message;
             this.future = future;
+            this.destination = destination;
         }
 
         /**
@@ -291,6 +308,16 @@ public interface IoFilter
         public Object getMessage()
         {
             return message;
+        }
+        
+        /**
+         * Returne the destination of this write request.
+         * 
+         * @return <tt>null</tt> for the default destination
+         */
+        public SocketAddress getDestination() 
+        {
+            return destination;
         }
         
         public String toString()

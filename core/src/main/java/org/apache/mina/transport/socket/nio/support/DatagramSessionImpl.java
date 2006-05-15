@@ -23,6 +23,7 @@ import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
+import org.apache.mina.common.BroadcastIoSession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -30,6 +31,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
+import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
@@ -42,7 +44,7 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-class DatagramSessionImpl extends BaseIoSession
+class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 {
     private final IoService wrapperManager;
     private final DatagramSessionConfig config = new SessionConfigImpl();
@@ -141,6 +143,16 @@ class DatagramSessionImpl extends BaseIoSession
     Queue getWriteRequestQueue()
     {
         return writeRequestQueue;
+    }
+    
+    public WriteFuture write( Object message, SocketAddress destination )
+    {
+        if( !this.config.isBroadcast() )
+        {
+            throw new IllegalStateException( "Non-broadcast session" );
+        }
+        
+        return super.write( message, destination );
     }
 
     protected void write0( WriteRequest writeRequest )

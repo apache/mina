@@ -483,8 +483,13 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 continue;
             }
 
-            int writtenBytes = ch
-                    .send( buf.buf(), session.getRemoteAddress() );
+            SocketAddress destination = req.getDestination();
+            if( destination == null )
+            {
+                destination = session.getRemoteAddress();
+            }
+            
+            int writtenBytes = ch.send( buf.buf(), destination );
 
             if( writtenBytes == 0 )
             {
