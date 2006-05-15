@@ -22,8 +22,6 @@ import org.apache.mina.util.BlockingQueue;
 import org.apache.mina.util.IdentityHashSet;
 import org.apache.mina.util.Queue;
 import org.apache.mina.util.Stack;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoFilter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -182,16 +180,6 @@ public class LeaderFollowersThreadPool implements ThreadPool
     public void setKeepAliveTime( int keepAliveTime )
     {
         this.keepAliveTime = keepAliveTime;
-    }
-
-    //TODO this should be in the filter, inits on pre-add if we have not been init'ed
-    public void onPreAdd( IoFilterChain parent, String name, IoFilter.NextFilter nextFilter )
-        throws Exception
-    {
-        if( leader == null )
-        {
-            init();
-        }
     }
 
     public void init()
