@@ -42,7 +42,7 @@ public class IoSessionOutputStream extends OutputStream
 
     public void close()
     {
-        session.close().join();
+        session.close();
     }
 
     public void flush()
@@ -51,23 +51,32 @@ public class IoSessionOutputStream extends OutputStream
 
     public void write( byte[] b, int off, int len )
     {
-        ByteBuffer buf = ByteBuffer.wrap( b, off, len );
-        buf.acquire(); // prevent from being pooled.
-        session.write( buf );
+        if( session.isConnected() )
+        {
+            ByteBuffer buf = ByteBuffer.wrap( b, off, len );
+            buf.acquire(); // prevent from being pooled.
+            session.write( buf );
+        }
     }
 
     public void write( byte[] b )
     {
-        ByteBuffer buf = ByteBuffer.wrap( b );
-        buf.acquire(); // prevent from being pooled.
-        session.write( buf );
+        if( session.isConnected() )
+        {
+            ByteBuffer buf = ByteBuffer.wrap( b );
+            buf.acquire(); // prevent from being pooled.
+            session.write( buf );
+        }
     }
 
     public void write( int b )
     {
-        ByteBuffer buf = ByteBuffer.allocate( 1 );
-        buf.put( ( byte ) b );
-        buf.flip();
-        session.write( buf );
+        if( session.isConnected() )
+        {
+            ByteBuffer buf = ByteBuffer.allocate( 1 );
+            buf.put( ( byte ) b );
+            buf.flip();
+            session.write( buf );
+        }
     }
 }

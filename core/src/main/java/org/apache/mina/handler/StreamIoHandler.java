@@ -117,17 +117,6 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
     }
     
     /**
-     * Closes input stream.
-     */
-    public void sessionClosed( IoSession session )
-    {
-        IoSessionInputStream in = ( IoSessionInputStream ) session.getAttribute( KEY_IN );
-        IoSessionOutputStream out = ( IoSessionOutputStream ) session.getAttribute( KEY_OUT );
-        in.close();
-        out.close();
-    }
-
-    /**
      * Forwards read data to input stream.
      */
     public void messageReceived( IoSession session, Object buf )
