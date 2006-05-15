@@ -38,7 +38,7 @@ import java.util.Set;
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */
-public class LeaderFollowerThreadPool implements ThreadPool
+public class LeaderFollowersThreadPool implements ThreadPool
 {
     /**
      * Default maximum size of thread pool (16).
@@ -52,7 +52,7 @@ public class LeaderFollowerThreadPool implements ThreadPool
 
     /**
      * A queue which contains {@link Integer}s which represents reusable
-     * thread IDs.  {@link LeaderFollowerThreadPool.Worker} first checks this queue and then
+     * thread IDs.  {@link LeaderFollowersThreadPool.Worker} first checks this queue and then
      * uses {@link #threadId} when no reusable thread ID is available.
      */
     private static final Queue threadIdReuseQueue = new Queue();
@@ -100,7 +100,7 @@ public class LeaderFollowerThreadPool implements ThreadPool
     /**
      * Creates a new instance of this filter with default thread pool settings.
      */
-    public LeaderFollowerThreadPool()
+    public LeaderFollowersThreadPool()
     {
         this( "LeaderFollowerThreadPool" );
     }
@@ -110,7 +110,7 @@ public class LeaderFollowerThreadPool implements ThreadPool
      * and other default settings.
      * @param threadNamePrefix the prefix of the thread names this pool will create.
      */
-    public LeaderFollowerThreadPool( String threadNamePrefix )
+    public LeaderFollowersThreadPool( String threadNamePrefix )
     {
         this( threadNamePrefix, DEFAULT_MAXIMUM_POOL_SIZE );
     }
@@ -121,7 +121,7 @@ public class LeaderFollowerThreadPool implements ThreadPool
      * @param threadNamePrefix the prefix of the thread names this pool will create.
      * @param maximumPoolSize Maximum size of thread pool
      */
-    public LeaderFollowerThreadPool( String threadNamePrefix, int maximumPoolSize )
+    public LeaderFollowersThreadPool( String threadNamePrefix, int maximumPoolSize )
     {
         setThreadNamePrefix( threadNamePrefix );
         setMaximumPoolSize( maximumPoolSize );
@@ -345,7 +345,7 @@ public class LeaderFollowerThreadPool implements ThreadPool
 
         private Runnable fetchRunnable()
         {
-            BlockingQueue unfetchedRunnables = LeaderFollowerThreadPool.this.unfetchedRunnables;
+            BlockingQueue unfetchedRunnables = LeaderFollowersThreadPool.this.unfetchedRunnables;
 
             synchronized( unfetchedRunnables )
             {
@@ -360,7 +360,7 @@ public class LeaderFollowerThreadPool implements ThreadPool
                         continue;
                     }
 
-                    return LeaderFollowerThreadPool.this.fetchRunnable( unfetchedRunnables );
+                    return LeaderFollowersThreadPool.this.fetchRunnable( unfetchedRunnables );
                 }
             }
 
@@ -371,7 +371,7 @@ public class LeaderFollowerThreadPool implements ThreadPool
         private void follow()
         {
             final Object promotionLock = this.promotionLock;
-            final Stack followers = LeaderFollowerThreadPool.this.followers;
+            final Stack followers = LeaderFollowersThreadPool.this.followers;
             synchronized( promotionLock )
             {
                 if( this != leader )
@@ -446,13 +446,13 @@ public class LeaderFollowerThreadPool implements ThreadPool
 
         private void giveUpLead()
         {
-            final Stack followers = LeaderFollowerThreadPool.this.followers;
-            LeaderFollowerThreadPool.Worker worker;
+            final Stack followers = LeaderFollowersThreadPool.this.followers;
+            LeaderFollowersThreadPool.Worker worker;
             do
             {
                 synchronized( followers )
                 {
-                    worker = ( LeaderFollowerThreadPool.Worker ) followers.pop();
+                    worker = ( LeaderFollowersThreadPool.Worker ) followers.pop();
                 }
 
                 if( worker == null )
@@ -462,7 +462,7 @@ public class LeaderFollowerThreadPool implements ThreadPool
                     if( !shuttingDown
                         && getPoolSize() < getMaximumPoolSize() )
                     {
-                        worker = new LeaderFollowerThreadPool.Worker();
+                        worker = new LeaderFollowersThreadPool.Worker();
                         worker.lead();
                         worker.start();
                     }
