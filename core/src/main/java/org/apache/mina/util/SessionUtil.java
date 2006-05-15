@@ -24,7 +24,7 @@ import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 
 /**
- * Exception utility.
+ * A session utility
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
