@@ -54,6 +54,9 @@
       <unsubscribe>mina-dev-unsubscribe@directory.apache.org</unsubscribe>
       <post>mina-dev@directory.apache.org</post>
       <archive>http://mail-archives.apache.org/mod_mbox/directory-mina-dev/</archive>
+      <otherArchives>
+        <archive>http://dir.gmane.org/gmane.comp.apache.directory.mina.devel</archive>
+      </otherArchives>
     </mailingList>
   </mailingLists>
 
