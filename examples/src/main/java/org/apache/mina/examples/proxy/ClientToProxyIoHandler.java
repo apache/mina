@@ -18,13 +18,13 @@
  */
 package org.apache.mina.examples.proxy;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TrafficMask;
 
 /**
@@ -62,7 +62,7 @@ public class ClientToProxyIoHandler extends AbstractProxyIoHandler
                     session.setAttachment( future.getSession() );
                     future.getSession().setTrafficMask( TrafficMask.ALL );
                 }
-                catch( IOException e )
+                catch( RuntimeIOException e )
                 {
                     // Connect failed
                     session.close();

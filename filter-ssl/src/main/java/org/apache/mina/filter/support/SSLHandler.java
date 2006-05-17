@@ -31,6 +31,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.util.Queue;
 import org.apache.mina.util.SessionLog;
@@ -539,7 +540,7 @@ public class SSLHandler
         if( !getOutNetBuffer().hasRemaining() )
         {
             // no; bail out
-            return WriteFuture.newNotWrittenFuture();
+            return DefaultWriteFuture.newNotWrittenFuture( session );
         }
         
         WriteFuture writeFuture = null;
@@ -563,7 +564,7 @@ public class SSLHandler
             }
             //debug("outNetBuffer (after copy): {0}", sslHandler.getOutNetBuffer());
             
-            writeFuture = new WriteFuture();
+            writeFuture = new DefaultWriteFuture( session );
             parent.filterWrite( nextFilter, session, new WriteRequest( writeBuffer, writeFuture ) );
 
             // loop while more writes required to complete handshake
@@ -587,7 +588,7 @@ public class SSLHandler
                         SessionLog.debug( session, " write outNetBuffer2: " + getOutNetBuffer() );
                     }
                     org.apache.mina.common.ByteBuffer writeBuffer2 = copy( getOutNetBuffer() );
-                    writeFuture = new WriteFuture();
+                    writeFuture = new DefaultWriteFuture( session );
                     parent.filterWrite( nextFilter, session, new WriteRequest( writeBuffer2, writeFuture ) );
                 }
             }
@@ -603,7 +604,7 @@ public class SSLHandler
         }
         else
         {
-            return WriteFuture.newNotWrittenFuture();
+            return DefaultWriteFuture.newNotWrittenFuture( session );
         }
     }
     
