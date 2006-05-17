@@ -34,6 +34,18 @@ public interface IoFuture
     public interface Callback
     {
         /**
+         * A {@link Callback} that closes the {@link IoSession} which is
+         * associated with the specified {@link IoFuture}.
+         */
+        static Callback CLOSE = new Callback()
+        {
+            public void operationComplete( IoFuture future )
+            {
+                future.getSession().close();
+            }
+        };
+        
+        /**
          * Invoked when the operation associated with the {@link IoFuture}
          * has been completed.
          * 
