@@ -150,7 +150,7 @@
     <repository>
       <id>apache.snapshots</id>
       <name>Apache Snapshot Repository</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+      <url>http://minotaur.apache.org/maven-snapshot-repository</url>
     </repository>
   </repositories>
 
