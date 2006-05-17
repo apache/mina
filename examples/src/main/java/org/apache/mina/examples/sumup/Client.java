@@ -18,13 +18,13 @@
  */
 package org.apache.mina.examples.sumup;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 /**
@@ -73,7 +73,7 @@ public class Client
                 session = future.getSession();
                 break;
             }
-            catch( IOException e )
+            catch( RuntimeIOException e )
             {
                 System.err.println( "Failed to connect." );
                 e.printStackTrace();

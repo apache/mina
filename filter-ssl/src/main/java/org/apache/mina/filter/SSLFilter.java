@@ -32,6 +32,7 @@ import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.support.SSLHandler;
 import org.apache.mina.util.SessionLog;
 
@@ -565,7 +566,7 @@ public class SSLFilter extends IoFilterAdapter
         // if already shut down
         if( !handler.closeOutbound() )
         {
-            return WriteFuture.newNotWrittenFuture();
+            return DefaultWriteFuture.newNotWrittenFuture( session );
         }
         
         // there might be data to write out here?

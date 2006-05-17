@@ -18,7 +18,6 @@
  */
 package org.apache.mina.examples.echoserver;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import junit.framework.Assert;
@@ -28,6 +27,7 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.SSLFilter;
@@ -123,7 +123,7 @@ public class ConnectorTest extends AbstractTest
                     session = future.getSession();
                     break;
                 }
-                catch( IOException e )
+                catch( RuntimeIOException e )
                 {
                     // Try again until we succeed to bind.
                 }
