@@ -16,17 +16,23 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.common;
+package org.apache.mina.common.support;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportType;
 
 /**
- * Tests {@link IoFuture}s.
+ * Tests {@link IoFuture} implementations.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$ 
@@ -36,7 +42,7 @@ public class FutureTest extends TestCase
     
     public void testCloseFuture() throws Exception
     {
-        CloseFuture future = new CloseFuture();
+        DefaultCloseFuture future = new DefaultCloseFuture( null );
         assertFalse( future.isReady() );
         assertFalse( future.isClosed() );
         
@@ -53,7 +59,7 @@ public class FutureTest extends TestCase
     
     public void testConnectFuture() throws Exception
     {
-        ConnectFuture future = new ConnectFuture();
+        DefaultConnectFuture future = new DefaultConnectFuture();
         assertFalse( future.isReady() );
         assertFalse( future.isConnected() );
         assertNull( future.getSession() );
@@ -131,7 +137,7 @@ public class FutureTest extends TestCase
         assertTrue( future.isConnected() );
         assertEquals( session, future.getSession() );
         
-        future = new ConnectFuture();
+        future = new DefaultConnectFuture();
         thread = new TestThread( future );
         thread.start();
         future.setException( new IOException() );
@@ -146,14 +152,14 @@ public class FutureTest extends TestCase
             future.getSession();
             fail( "IOException should be thrown." );
         }
-        catch( IOException e )
+        catch( Exception e )
         {
         }
     }
     
     public void testWriteFuture() throws Exception
     {
-        WriteFuture future = new WriteFuture();
+        DefaultWriteFuture future = new DefaultWriteFuture( null );
         assertFalse( future.isReady() );
         assertFalse( future.isWritten() );
         
@@ -167,7 +173,7 @@ public class FutureTest extends TestCase
         assertTrue( future.isReady() );
         assertTrue( future.isWritten() );
 
-        future = new WriteFuture();
+        future = new DefaultWriteFuture( null );
         thread = new TestThread( future );
         thread.start();
         

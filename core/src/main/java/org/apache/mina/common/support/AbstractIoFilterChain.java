@@ -18,22 +18,22 @@
  */
 package org.apache.mina.common.support;
 
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoFilterLifeCycleException;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.util.ByteBufferUtil;
-import org.apache.mina.util.SessionLog;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFilter;
+import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoFilterLifeCycleException;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoFilter.NextFilter;
+import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.util.ByteBufferUtil;
+import org.apache.mina.util.SessionLog;
 
 /**
  * An abstract implementation of {@link IoFilterChain} that provides
@@ -528,6 +528,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         {
             exceptionCaught( session, t );
         }
+        
         Entry head = this.head;
         callNextMessageSent( head, session, request.getMessage() );
     }

@@ -18,8 +18,6 @@
  */
 package org.apache.mina.common;
 
-import java.io.IOException;
-
 /**
  * An {@link IoFuture} for asynchronous connect requests.
  *
@@ -35,72 +33,32 @@ import java.io.IOException;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ConnectFuture extends IoFuture
+public interface ConnectFuture extends IoFuture
 {
-    /**
-     * Returns a new {@link ConnectFuture} which is already marked as 'failed to connect'.
-     */
-    public static ConnectFuture newFailedFuture( IOException exception )
-    {
-        ConnectFuture failedFuture = new ConnectFuture();
-        failedFuture.setException( exception );
-        return failedFuture;
-    }
-    
-    public ConnectFuture()
-    {
-    }
-    
-    /**
-     * Creates a new instance which uses the specified object as a lock.
-     */
-    public ConnectFuture( Object lock )
-    {
-        super( lock );
-    }
-
     /**
      * Returns {@link IoSession} which is the result of connect operation.
      * 
      * @return <tt>null</tt> if the connect operation is not finished yet
-     * @throws IOException if connection attempt failed by an exception
+     * @throws RuntimeIOException if connection attempt failed by an exception
      */
-    public IoSession getSession() throws IOException
-    {
-        Object v = getValue();
-        if( v instanceof Throwable )
-        {
-            throw ( IOException ) new IOException( "Failed to get the session." ).initCause( ( Throwable ) v );
-        }
-        else
-        {
-            return ( IoSession ) v;
-        }
-    }
+    IoSession getSession() throws RuntimeIOException;
 
     /**
      * Returns <tt>true</tt> if the connect operation is finished successfully.
      */
-    public boolean isConnected()
-    {
-        return getValue() instanceof IoSession;
-    }
+    boolean isConnected();
     
     /**
-     * This method is invoked by MINA internally.  Please do not call this method
-     * directly.
+     * Sets the newly connected session and notifies all threads waiting for
+     * this future.  This method is invoked by MINA internally.  Please do not
+     * call this method directly.
      */
-    public void setSession( IoSession session )
-    {
-        setValue( session );
-    }
+    void setSession( IoSession session );
     
     /**
-     * This method is invoked by MINA internally.  Please do not call this method
-     * directly.
+     * Sets the exception caught due to connection failure and notifies all
+     * threads waiting for this future.  This method is invoked by MINA
+     * internally.  Please do not call this method directly.
      */
-    public void setException( Throwable exception )
-    {
-        setValue( exception );
-    }
+    void setException( Throwable exception );
 }
