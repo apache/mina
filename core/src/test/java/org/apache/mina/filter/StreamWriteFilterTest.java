@@ -37,6 +37,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
@@ -78,7 +79,7 @@ public class StreamWriteFilterTest extends TestCase {
         StreamWriteFilter filter = new StreamWriteFilter();
         
         InputStream stream = new ByteArrayInputStream( new byte[ 0 ] );
-        WriteRequest writeRequest = new WriteRequest( stream );
+        WriteRequest writeRequest = new WriteRequest( stream, new DummyWriteFuture() );
         
         /*
          * Record expectations
@@ -111,7 +112,7 @@ public class StreamWriteFilterTest extends TestCase {
         StreamWriteFilter filter = new StreamWriteFilter();
         
         Object message = new Object();
-        WriteRequest writeRequest = new WriteRequest( message );
+        WriteRequest writeRequest = new WriteRequest( message, new DummyWriteFuture() );
         
         /*
          * Record expectations
@@ -135,8 +136,6 @@ public class StreamWriteFilterTest extends TestCase {
          */
         mockNextFilter.verify();
         mockSession.verify();
-        
-        assertTrue( writeRequest.getFuture().isWritten() );
     }
     
     /**
@@ -149,7 +148,7 @@ public class StreamWriteFilterTest extends TestCase {
         byte[] data = new byte[] { 1, 2, 3, 4 };
         
         InputStream stream = new ByteArrayInputStream( data );
-        WriteRequest writeRequest = new WriteRequest( stream );
+        WriteRequest writeRequest = new WriteRequest( stream, new DummyWriteFuture() );
         
         /*
          * Record expectations
@@ -203,7 +202,7 @@ public class StreamWriteFilterTest extends TestCase {
         byte[] chunk3 = new byte[] { 9, 10 };
         
         InputStream stream = new ByteArrayInputStream( data );
-        WriteRequest writeRequest = new WriteRequest( stream );
+        WriteRequest writeRequest = new WriteRequest( stream, new DummyWriteFuture() );
         
         /*
          * Record expectations
@@ -275,7 +274,7 @@ public class StreamWriteFilterTest extends TestCase {
         mockNextFilter.replay();
         mockSession.replay();
 
-        WriteRequest wr = new WriteRequest( new Object() );
+        WriteRequest wr = new WriteRequest( new Object(), new DummyWriteFuture() );
         filter.filterWrite( nextFilter, session, wr );
         assertEquals( 1, queue.size() );
         assertSame( wr, queue.pop() );
@@ -292,9 +291,9 @@ public class StreamWriteFilterTest extends TestCase {
         StreamWriteFilter filter = new StreamWriteFilter();
 
         WriteRequest wrs[] = new WriteRequest[] { 
-                new WriteRequest( new Object() ),
-                new WriteRequest( new Object() ),
-                new WriteRequest( new Object() )
+                new WriteRequest( new Object(), new DummyWriteFuture() ),
+                new WriteRequest( new Object(), new DummyWriteFuture() ),
+                new WriteRequest( new Object(), new DummyWriteFuture() )
         };
         Queue queue = new Queue();
         queue.push( wrs[ 0 ] );
@@ -312,7 +311,7 @@ public class StreamWriteFilterTest extends TestCase {
         session.removeAttribute( StreamWriteFilter.CURRENT_STREAM );
         mockSession.setReturnValue( stream );
         session.removeAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE );
-        mockSession.setReturnValue( new WriteFuture() );
+        mockSession.setReturnValue( new DefaultWriteFuture( session ) );
         session.removeAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
         mockSession.setReturnValue( queue );
         
@@ -579,6 +578,55 @@ public class StreamWriteFilterTest extends TestCase {
                     && w1.getFuture().isWritten() == w2.getFuture().isWritten();
             }
             return super.argumentMatches( expected, actual );
+        }
+    }
+    
+    private static class DummyWriteFuture implements WriteFuture
+    {
+        private boolean written;
+        
+        public boolean isWritten()
+        {
+            return written;
+        }
+
+        public void setWritten( boolean written )
+        {
+            this.written = written;
+        }
+        
+        public IoSession getSession()
+        {
+            return null;
+        }
+
+        public Object getLock()
+        {
+            return this;
+        }
+
+        public void join()
+        {
+        }
+
+        public boolean join( long timeoutInMillis )
+        {
+            return true;
+        }
+
+        public boolean isReady()
+        {
+            return true;
+        }
+
+        public Callback getCallback()
+        {
+            return null;
+        }
+
+        public void setCallback( Callback callback )
+        {
+            throw new IllegalStateException( "You can't set a callback for a dummy future." );
         }
     }
 }

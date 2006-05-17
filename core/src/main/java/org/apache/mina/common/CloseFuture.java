@@ -34,44 +34,17 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class CloseFuture extends IoFuture
+public interface CloseFuture extends IoFuture
 {
-    /**
-     * Creates a new instance.
-     */
-    public CloseFuture()
-    {
-    }
-    
-    /**
-     * Creates a new instance which uses the specified object as a lock.
-     */
-    public CloseFuture( Object lock )
-    {
-        super( lock );
-    }
-    
     /**
      * Returns <tt>true</tt> if the close request is finished and the session is closed.
      */
-    public boolean isClosed()
-    {
-        if( isReady() )
-        {
-            return ( ( Boolean ) getValue() ).booleanValue();
-        }
-        else
-        {
-            return false;
-        }
-    }
+    boolean isClosed();
     
     /**
-     * This method is invoked by MINA internally.  Please do not call this method
-     * directly.
+     * Marks this future as closed and notifies all threads waiting for this
+     * future.  This method is invoked by MINA internally.  Please do not call
+     * this method directly.
      */
-    public void setClosed()
-    {
-        setValue( Boolean.TRUE );
-    }
+    void setClosed();
 }

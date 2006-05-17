@@ -18,15 +18,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoConnectorConfig;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.support.BaseIoConnector;
-import org.apache.mina.util.Queue;
-
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
@@ -38,6 +29,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoConnectorConfig;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.support.BaseIoConnector;
+import org.apache.mina.common.support.DefaultConnectFuture;
+import org.apache.mina.util.Queue;
 
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
@@ -165,7 +166,7 @@ public class SocketConnector extends BaseIoConnector
             {
                 SocketSessionImpl session = newSession( ch, handler, config );
                 success = true;
-                ConnectFuture future = new ConnectFuture();
+                DefaultConnectFuture future = new DefaultConnectFuture();
                 future.setSession( session );
                 return future;
             }
@@ -174,7 +175,7 @@ public class SocketConnector extends BaseIoConnector
         }
         catch( IOException e )
         {
-            return ConnectFuture.newFailedFuture( e );
+            return DefaultConnectFuture.newFailedFuture( e );
         }
         finally
         {
@@ -209,7 +210,7 @@ public class SocketConnector extends BaseIoConnector
                     ExceptionMonitor.getInstance().exceptionCaught( e2 );
                 }
 
-                return ConnectFuture.newFailedFuture( e );
+                return DefaultConnectFuture.newFailedFuture( e );
             }
         }
 
@@ -450,7 +451,7 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
-    private class ConnectionRequest extends ConnectFuture
+    private class ConnectionRequest extends DefaultConnectFuture
     {
         private final SocketChannel channel;
         private final long deadline;

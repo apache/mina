@@ -34,8 +34,8 @@ import org.apache.mina.util.Queue;
  * from the stream into {@link ByteBuffer} objects and write those buffers
  * to the next filter. When end of stream has been reached this filter will
  * call {@link NextFilter#messageSent(IoSession, Object)} using the original
- * {@link InputStream} written to the session and call 
- * {@link org.apache.mina.common.WriteFuture#setWritten(boolean)} on the 
+ * {@link InputStream} written to the session and notifies 
+ * {@link org.apache.mina.common.WriteFuture} on the 
  * original {@link org.apache.mina.common.IoFilter.WriteRequest}.
  * <p>
  * This filter will ignore written messages which aren't {@link InputStream}

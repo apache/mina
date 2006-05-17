@@ -46,7 +46,7 @@ public abstract class BaseIoSession implements IoSession
     /** 
      * A future that will be set 'closed' when the connection is closed.
      */
-    private final CloseFuture closeFuture = new CloseFuture( this );
+    private final CloseFuture closeFuture = new DefaultCloseFuture( this );
     private boolean closing;
 
     // Configuration variables
@@ -134,11 +134,11 @@ public abstract class BaseIoSession implements IoSession
         {
             if( isClosing() || !isConnected() )
             {
-                return WriteFuture.newNotWrittenFuture();
+                return DefaultWriteFuture.newNotWrittenFuture( this );
             }
         }
 
-        WriteFuture future = new WriteFuture();
+        WriteFuture future = new DefaultWriteFuture( this );
         write0( new WriteRequest( message, future, remoteAddress ) );
         
         return future;

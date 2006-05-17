@@ -245,7 +245,51 @@ public interface IoFilter
      */
     public static class WriteRequest
     {
-        private static final WriteFuture UNUSED_FUTURE = new WriteFuture();
+        private static final WriteFuture UNUSED_FUTURE = new WriteFuture()
+        {
+            public boolean isWritten()
+            {
+                return false;
+            }
+
+            public void setWritten( boolean written )
+            {
+            }
+            
+            public IoSession getSession()
+            {
+                return null;
+            }
+
+            public Object getLock()
+            {
+                return this;
+            }
+
+            public void join()
+            {
+            }
+
+            public boolean join( long timeoutInMillis )
+            {
+                return true;
+            }
+
+            public boolean isReady()
+            {
+                return true;
+            }
+
+            public Callback getCallback()
+            {
+                return null;
+            }
+
+            public void setCallback( Callback callback )
+            {
+                throw new IllegalStateException( "You can't set a callback for a dummy future." );
+            }
+        };
         
         private final Object message;
         private final WriteFuture future;

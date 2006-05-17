@@ -25,6 +25,7 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.codec.support.SimpleProtocolDecoderOutput;
 import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
 import org.apache.mina.util.Queue;
@@ -382,7 +383,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             }
             else
             {
-                future = new WriteFuture();
+                future = new DefaultWriteFuture( session );
                 nextFilter.filterWrite( session, new WriteRequest( buf, future ) );
             }
             return future;

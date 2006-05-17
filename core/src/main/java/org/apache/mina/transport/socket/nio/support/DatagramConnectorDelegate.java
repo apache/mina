@@ -35,6 +35,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoConnector;
+import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.socket.nio.DatagramConnectorConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
@@ -130,7 +131,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
         catch( IOException e )
         {
-            return ConnectFuture.newFailedFuture( e );
+            return DefaultConnectFuture.newFailedFuture( e );
         }
         finally
         {
@@ -167,7 +168,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                     ExceptionMonitor.getInstance().exceptionCaught( e2 );
                 }
 
-                return ConnectFuture.newFailedFuture( e );
+                return DefaultConnectFuture.newFailedFuture( e );
             }
             
             synchronized( registerQueue )
@@ -612,6 +613,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 {
                     ExceptionMonitor.getInstance().exceptionCaught( e );
                 }
+                
                 session.getCloseFuture().setClosed();
                 key.cancel();
                 selector.wakeup(); // wake up again to trigger thread death
@@ -619,7 +621,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
     }
 
-    private static class RegistrationRequest extends ConnectFuture
+    private static class RegistrationRequest extends DefaultConnectFuture
     {
         private final DatagramChannel channel;
         private final IoHandler handler;

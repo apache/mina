@@ -41,64 +41,17 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class WriteFuture extends IoFuture
+public interface WriteFuture extends IoFuture
 {
-    /**
-     * Returns a new {@link WriteFuture} which is already marked as 'written'.
-     */
-    public static WriteFuture newWrittenFuture()
-    {
-        WriteFuture unwrittenFuture = new WriteFuture();
-        unwrittenFuture.setWritten( true );
-        return unwrittenFuture;
-    }
-
-    /**
-     * Returns a new {@link WriteFuture} which is already marked as 'not written'.
-     */
-    public static WriteFuture newNotWrittenFuture()
-    {
-        WriteFuture unwrittenFuture = new WriteFuture();
-        unwrittenFuture.setWritten( false );
-        return unwrittenFuture;
-    }
-    
-    /**
-     * Creates a new instance.
-     */
-    public WriteFuture()
-    {
-    }
-    
-    /**
-     * Creates a new instance which uses the specified object as a lock.
-     */
-    public WriteFuture( Object lock )
-    {
-        super( lock );
-    }
-    
     /**
      * Returns <tt>true</tt> if the write operation is finished successfully.
      */
-    public boolean isWritten()
-    {
-        if( isReady() )
-        {
-            return ( ( Boolean ) getValue() ).booleanValue();
-        }
-        else
-        {
-            return false;
-        }
-    }
+    boolean isWritten();
 
     /**
-     * This method is invoked by MINA internally.  Please do not call this method
-     * directly.
+     * Sets whether the message is written or not, and notifies all threads
+     * waiting for this future.  This method is invoked by MINA internally.
+     * Please do not call this method directly.
      */
-    public void setWritten( boolean written )
-    {
-        setValue( written? Boolean.TRUE : Boolean.FALSE );
-    }
+    void setWritten( boolean written );
 }

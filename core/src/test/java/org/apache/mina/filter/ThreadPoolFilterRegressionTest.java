@@ -18,6 +18,7 @@ import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.common.support.DefaultWriteFuture;
 
 public class ThreadPoolFilterRegressionTest extends TestCase
 {
@@ -118,7 +119,7 @@ public class ThreadPoolFilterRegressionTest extends TestCase
             WriteFuture future = null;
             for( int j = end; j >= 0; j-- )
             {
-                future = new WriteFuture();
+                future = new DefaultWriteFuture( sessions[ j ] );
                 filter.messageReceived( nextFilter, sessions[ j ], future );
             }
             
@@ -351,7 +352,7 @@ public class ThreadPoolFilterRegressionTest extends TestCase
 
         public void messageReceived( IoSession session, Object message )
         {
-            ( ( WriteFuture ) message ).setWritten( true );
+            ( ( DefaultWriteFuture ) message ).setWritten( true );
         }
 
         public void messageSent( IoSession session, Object message )
