@@ -1,4 +1,4 @@
-package org.apache.mina.filter;
+package org.apache.mina.filter.thread;
 
 public interface ThreadPoolFilterMBean
 {

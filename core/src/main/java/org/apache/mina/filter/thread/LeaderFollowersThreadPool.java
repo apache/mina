@@ -16,7 +16,7 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.thread;
 
 import org.apache.mina.util.BlockingQueue;
 import org.apache.mina.util.IdentityHashSet;
@@ -38,16 +38,6 @@ import java.util.Set;
  */
 public class LeaderFollowersThreadPool implements ThreadPool
 {
-    /**
-     * Default maximum size of thread pool (16).
-     */
-    public static final int DEFAULT_MAXIMUM_POOL_SIZE = 16;
-
-    /**
-     * Default keep-alive time of thread pool (1 min).
-     */
-    public static final int DEFAULT_KEEP_ALIVE_TIME = 60 * 1000;
-
     /**
      * A queue which contains {@link Integer}s which represents reusable
      * thread IDs.  {@link LeaderFollowersThreadPool.Worker} first checks this queue and then
@@ -180,6 +170,11 @@ public class LeaderFollowersThreadPool implements ThreadPool
     public void setKeepAliveTime( int keepAliveTime )
     {
         this.keepAliveTime = keepAliveTime;
+    }
+    
+    public boolean isStarted()
+    {
+        return leader != null;
     }
 
     public void init()
