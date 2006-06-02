@@ -41,8 +41,8 @@ import java.net.SocketAddress;
  * <p>
  * When you add an {@link IoFilter} to an {@link IoFilterChain}:
  * <ol>
- *   <li>{@link #init()} is invoked by {@link IoFilterChain} if the filter is
- *       added at the first time.</li>
+ *   <li>{@link #init()} is invoked by {@link ReferenceCountingIoFilter} if
+ *       the filter is added at the first time.</li>
  *   <li>{@link #onPreAdd(IoFilterChain, String, NextFilter)} is invoked to notify
  *       that the filter will be added to the chain.</li>
  *   <li>The filter is added to the chain, and all events and I/O requests
@@ -50,8 +50,9 @@ import java.net.SocketAddress;
  *   <li>{@link #onPostAdd(IoFilterChain, String, NextFilter)} is invoked to notify
  *       that the filter is added to the chain.</li>
  *   <li>The filter is removed from the chain if {@link #onPostAdd(IoFilterChain, String, org.apache.mina.common.IoFilter.NextFilter)}
- *       threw an exception.  {@link #destroy()} is also invoked if the filter
- *       is the last filter which was added to {@link IoFilterChain}s.</li>
+ *       threw an exception.  {@link #destroy()} is also invoked by
+ *       {@link ReferenceCountingIoFilter} if the filter is the last filter which
+ *       was added to {@link IoFilterChain}s.</li>
  * </ol>
  * <p>
  * When you remove an {@link IoFilter} from an {@link IoFilterChain}:
@@ -62,7 +63,8 @@ import java.net.SocketAddress;
  *       don't pass through the filter from now.</li>
  *   <li>{@link #onPostRemove(IoFilterChain, String, NextFilter)} is invoked to
  *       notify that the filter is removed from the chain.</li>
- *   <li>{@link #destroy()} is invoked if the removed filter was the last one.</li>
+ *   <li>{@link #destroy()} is invoked by {@link ReferenceCountingIoFilter} if
+ *       the removed filter was the last one.</li>
  * </ol>      
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
@@ -73,14 +75,18 @@ import java.net.SocketAddress;
 public interface IoFilter
 {
     /**
-     * Invoked when this filter is added to a {@link IoFilterChain}
-     * at the first time, so you can initialize shared resources.
+     * Invoked by {@link ReferenceCountingIoFilter} when this filter
+     * is added to a {@link IoFilterChain} at the first time, so you can
+     * initialize shared resources.  Please note that this method is never
+     * called if you don't wrap a filter with {@link ReferenceCountingIoFilter}.
      */
     void init() throws Exception;
 
     /**
-     * Invoked when this filter is not used by any {@link IoFilterChain}
-     * anymore, so you can destroy shared resources.
+     * Invoked by {@link ReferenceCountingIoFilter} when this filter
+     * is not used by any {@link IoFilterChain} anymore, so you can destroy
+     * shared resources.  Please note that this method is never called if
+     * you don't wrap a filter with {@link ReferenceCountingIoFilter}.
      */
     void destroy() throws Exception;
     

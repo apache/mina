@@ -26,12 +26,12 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ReferenceCountingIoFilterWrapper implements IoFilter
+public class ReferenceCountingIoFilter implements IoFilter
 {
     private final IoFilter filter;
     private int count = 0;
 
-    public ReferenceCountingIoFilterWrapper( IoFilter filter )
+    public ReferenceCountingIoFilter( IoFilter filter )
     {
         this.filter = filter;
     }
