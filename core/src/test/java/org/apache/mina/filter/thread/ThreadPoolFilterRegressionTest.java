@@ -1,4 +1,4 @@
-package org.apache.mina.filter;
+package org.apache.mina.filter.thread;
 
 import java.net.SocketAddress;
 
@@ -41,13 +41,13 @@ public class ThreadPoolFilterRegressionTest extends TestCase
     public void setUp() throws Exception
     {
         filter = new ThreadPoolFilter();
-        filter.start();
+        filter.init();
     }
     
     public void tearDown() throws Exception
     {
-        filter.stop();
-        Assert.assertEquals( 0, filter.getPoolSize() );
+        filter.destroy();
+        Assert.assertEquals( 0, filter.getThreadPool().getPoolSize() );
         filter = null;
     }
     
@@ -69,7 +69,7 @@ public class ThreadPoolFilterRegressionTest extends TestCase
         };
         final int end = sessions.length - 1;
         final ThreadPoolFilter filter = this.filter;
-        filter.setKeepAliveTime( 3000 );
+        filter.getThreadPool().setKeepAliveTime( 3000 );
         
         for( int i = 0; i < 1000000 ; i++ )
         {
@@ -88,7 +88,7 @@ public class ThreadPoolFilterRegressionTest extends TestCase
         
         Thread.sleep( 3500 );
         
-        Assert.assertEquals( 1, filter.getPoolSize() );
+        Assert.assertEquals( 1, filter.getThreadPool().getPoolSize() );
     }
     
     public void testShutdown() throws Exception

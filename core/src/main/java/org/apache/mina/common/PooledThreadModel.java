@@ -18,7 +18,8 @@
  */
 package org.apache.mina.common;
 
-import org.apache.mina.filter.ThreadPoolFilter;
+import org.apache.mina.filter.thread.ThreadPool;
+import org.apache.mina.filter.thread.ThreadPoolFilter;
 
 /**
  * A {@link ThreadModel} which represents a thread model with an independant
@@ -38,16 +39,16 @@ public class PooledThreadModel implements ThreadModel
     /**
      * @see ThreadPoolFilter#DEFAULT_MAXIMUM_POOL_SIZE
      */
-    public static final int DEFAULT_MAXIMUM_POOL_SIZE = ThreadPoolFilter.DEFAULT_MAXIMUM_POOL_SIZE;
+    public static final int DEFAULT_MAXIMUM_POOL_SIZE = ThreadPool.DEFAULT_MAXIMUM_POOL_SIZE;
 
     /**
      * @see ThreadPoolFilter#DEFAULT_KEEP_ALIVE_TIME
      */
-    public static final int DEFAULT_KEEP_ALIVE_TIME = ThreadPoolFilter.DEFAULT_KEEP_ALIVE_TIME;
+    public static final int DEFAULT_KEEP_ALIVE_TIME = ThreadPool.DEFAULT_KEEP_ALIVE_TIME;
     
     private static int id = 1;
     
-    private final ThreadPoolFilter pool = new ThreadPoolFilter();
+    private final ThreadPoolFilter filter = new ThreadPoolFilter();
 
     public PooledThreadModel()
     {
@@ -72,36 +73,36 @@ public class PooledThreadModel implements ThreadModel
 
     public String getThreadNamePrefix()
     {
-        return pool.getThreadNamePrefix();
+        return filter.getThreadPool().getThreadNamePrefix();
     }
 
     public void setThreadNamePrefix( String threadNamePrefix )
     {
-        pool.setThreadNamePrefix( threadNamePrefix );
+        filter.getThreadPool().setThreadNamePrefix( threadNamePrefix );
     }
     
     public int getMaximumPoolSize()
     {
-        return pool.getMaximumPoolSize();
+        return filter.getThreadPool().getMaximumPoolSize();
     }
 
     public int getKeepAliveTime()
     {
-        return pool.getKeepAliveTime();
+        return filter.getThreadPool().getKeepAliveTime();
     }
 
     public void setMaximumPoolSize( int maximumPoolSize )
     {
-        pool.setMaximumPoolSize( maximumPoolSize );
+        filter.getThreadPool().setMaximumPoolSize( maximumPoolSize );
     }
 
     public void setKeepAliveTime( int keepAliveTime )
     {
-        pool.setKeepAliveTime( keepAliveTime );
+        filter.getThreadPool().setKeepAliveTime( keepAliveTime );
     }
 
     public void buildFilterChain( IoFilterChain chain ) throws Exception
     {
-        chain.addFirst( PooledThreadModel.class.getName(), pool );
+        chain.addFirst( PooledThreadModel.class.getName(), filter );
     }
 }

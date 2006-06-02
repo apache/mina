@@ -1,33 +1,58 @@
-package org.apache.mina.filter;
+package org.apache.mina.filter.thread;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.util.ByteBufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A Thread-pooling filter.  This filter forwards {@link IoHandler} events to its thread pool.
+ * <p>
+ * Use the {@link #init()} and {@link #destroy()} methods to force this filter
+ * to start/stop processing events. Alternatively, {@link #init()} will be
+ * called automatically the first time an instance of this filter is added
+ * to a filter chain. Calling {@link #destroy()} is not required either since
+ * all workers are daemon threads which means that any workers still alive
+ * when the JVM terminates will die automatically.
  *
  * @author The Apache Directory Project (dev@directory.apache.org)
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */
-public class ThreadPoolThreadPoolFilter extends IoFilterAdapter
+public class ThreadPoolFilter extends IoFilterAdapter
 {
-	private static final Logger logger = LoggerFactory.getLogger( ThreadPoolThreadPoolFilter.class.getName() );
+	private static final Logger logger = LoggerFactory.getLogger( ThreadPoolFilter.class.getName() );
 	private final ThreadPool threadPool;
 
-	public ThreadPoolThreadPoolFilter( ThreadPool threadPool )
+    /**
+     * Creates a new instace with the default thread pool implementation
+     * (@link LeaderFollowersThreadPool}).
+     */
+    public ThreadPoolFilter()
+    {
+        this( new LeaderFollowersThreadPool() );
+    }
+    
+    /**
+     * Creates a new instance with the specified <tt>threadPool</tt>.
+     */
+	public ThreadPoolFilter( ThreadPool threadPool )
 	{
+        if( threadPool == null )
+        {
+            throw new NullPointerException( "threadPool" );
+        }
+
 		this.threadPool = threadPool;
 	}
 
-	public void init() throws Exception
+	public void init()
 	{
 		threadPool.init();
 	}
@@ -36,6 +61,23 @@ public class ThreadPoolThreadPoolFilter extends IoFilterAdapter
 	{
 		threadPool.destroy();
 	}
+    
+    public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter )
+            throws Exception
+    {
+        if( !getThreadPool().isStarted() )
+        {
+            init();
+        }
+    }
+
+    /**
+     * Returns the underlying {@link ThreadPool} instance this filter uses.
+     */
+    public ThreadPool getThreadPool()
+    {
+        return threadPool;
+    }
 
 	private void fireEvent( NextFilter nextFilter, IoSession session,
 							EventType type, Object data )
