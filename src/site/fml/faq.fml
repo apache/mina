@@ -227,7 +227,7 @@
       <answer>
         <p>
           Not yet.  Java NIO doesn't support multicast yet.  Multicast for NIO
-          will be available in Java 6, Mustang.  We are seriously considering
+          will be available in Java SE 7, Dolphin.  We are seriously considering
           to implement multicasts using pre-1.4 Java API.
         </p>
       </answer>
