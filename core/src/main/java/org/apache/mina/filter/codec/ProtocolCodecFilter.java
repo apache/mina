@@ -224,6 +224,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         
         try
         {
+            encoderOut.writeRequest = writeRequest;
             encoder.encode( session, message, encoderOut );
         }
         catch( Throwable t )
@@ -241,15 +242,15 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         }
         finally
         {
+            encoderOut.flush();
+            encoderOut.writeRequest = null;
+
             // Dispose the encoder if this session is connectionless.
             if( session.getTransportType().isConnectionless() )
             {
                 disposeEncoder( session );
             }
         }
-
-        encoderOut.writeRequest = writeRequest;
-        encoderOut.flush();
     }
     
     public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
