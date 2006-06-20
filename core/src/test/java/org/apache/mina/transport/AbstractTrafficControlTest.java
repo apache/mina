@@ -215,7 +215,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
         
     }
     
-    public static class ServerIoHandler extends IoHandlerAdapter
+    private static class ServerIoHandler extends IoHandlerAdapter
     {
         public void messageReceived( IoSession session, Object message )
                 throws Exception
