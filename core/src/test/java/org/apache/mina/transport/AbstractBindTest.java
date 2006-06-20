@@ -178,7 +178,7 @@ public abstract class AbstractBindTest extends TestCase
         bind( false );
     }
 
-    static class EchoProtocolHandler extends IoHandlerAdapter
+    private static class EchoProtocolHandler extends IoHandlerAdapter
     {
         private static final Logger log = LoggerFactory.getLogger( EchoProtocolHandler.class );
 

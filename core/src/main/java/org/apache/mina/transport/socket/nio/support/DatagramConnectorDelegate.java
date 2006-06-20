@@ -33,6 +33,7 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
@@ -550,9 +551,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             boolean success = false;
             try
             {
-                getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-                req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-                req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
+                buildFilterChain( req, session );
                 ( ( DatagramFilterChain ) session.getFilterChain() ).sessionCreated( session );
 
                 SelectionKey key = req.channel.register( selector,
@@ -583,6 +582,13 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 }
             }
         }
+    }
+
+    private void buildFilterChain( RegistrationRequest req, IoSession session ) throws Exception
+    {
+        getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
+        req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
+        req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
     }
 
     private void cancelKeys()

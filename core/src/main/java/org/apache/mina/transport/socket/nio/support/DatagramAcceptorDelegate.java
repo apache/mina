@@ -225,9 +225,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         
         try
         {
-            this.getFilterChainBuilder().buildFilterChain( s.getFilterChain() );
-            req.config.getFilterChainBuilder().buildFilterChain( s.getFilterChain() );
-            req.config.getThreadModel().buildFilterChain( s.getFilterChain() );
+            buildFilterChain( req, s );
             ( ( DatagramFilterChain ) s.getFilterChain() ).sessionCreated( s );
         }
         catch( Throwable t )
@@ -236,6 +234,13 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
         
         return s;
+    }
+
+    private void buildFilterChain( RegistrationRequest req, IoSession session ) throws Exception
+    {
+        this.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
+        req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
+        req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
     }
     
     public IoServiceConfig getDefaultConfig()
@@ -362,6 +367,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             
             try
             {
+                buildFilterChain( req, session );
                 ( ( DatagramFilterChain ) session.getFilterChain() ).sessionCreated( session );
 
                 if( key.isReadable() )
