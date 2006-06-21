@@ -22,6 +22,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.nio.BufferOverflowException;
+import java.nio.ByteOrder;
 import java.nio.ReadOnlyBufferException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -777,5 +778,24 @@ public class ByteBufferTest extends TestCase
         {
             // OK
         }
+    }
+    
+    public void testGetUnsigned() throws Exception
+    {
+        ByteBuffer buf = ByteBuffer.allocate( 16 );
+        buf.put( ( byte ) 0xA4 );
+        buf.put( ( byte ) 0xD0 );
+        buf.put( ( byte ) 0xB3 );
+        buf.put( ( byte ) 0xCD );
+        buf.flip();
+        
+        buf.order( ByteOrder.LITTLE_ENDIAN );
+        
+        buf.mark();
+        Assert.assertEquals( 0xA4, buf.getUnsigned() );
+        buf.reset();
+        Assert.assertEquals( 0xD0A4, buf.getUnsignedShort() );
+        buf.reset();
+        Assert.assertEquals( 0xCDB3D0A4L, buf.getUnsignedInt() );
     }
 }
