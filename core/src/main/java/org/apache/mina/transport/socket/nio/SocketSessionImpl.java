@@ -345,13 +345,15 @@ class SocketSessionImpl extends BaseIoSession
                 }
                 catch( SocketException e )
                 {
-                    throw new RuntimeIOException( e );
+                    // Throw an exception only when setTrafficClass is also available.
+                    if( SocketSessionConfigImpl.isSetTrafficClassAvailable() )
+                    {
+                        throw new RuntimeIOException( e );
+                    }
                 }
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         public void setTrafficClass( int tc )
