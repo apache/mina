@@ -90,7 +90,7 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
 			{
 				SET_SEND_BUFFER_SIZE_AVAILABLE = false;
 			}
-			
+
 			// Check if getTrafficClass is supported.
 			try
 			{
@@ -102,10 +102,13 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
 				GET_TRAFFIC_CLASS_AVAILABLE = false;
 				DEFAULT_TRAFFIC_CLASS = 0;
 			}
-		} catch (SocketException e) {
+		}
+        catch( SocketException e )
+        {
 			throw new ExceptionInInitializerError(e);
 		}
-		finally {
+		finally
+        {
 			if( socket != null )
 			{
 				try
