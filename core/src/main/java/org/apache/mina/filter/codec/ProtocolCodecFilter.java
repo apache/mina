@@ -28,7 +28,6 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.codec.support.SimpleProtocolDecoderOutput;
 import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
-import org.apache.mina.util.Queue;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -44,7 +43,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter
     public static final String ENCODER = ProtocolCodecFilter.class.getName() + ".encoder";
     public static final String DECODER = ProtocolCodecFilter.class.getName() + ".decoder";
     public static final String ENCODER_OUT = ProtocolCodecFilter.class.getName() + ".encoderOutput";
-    public static final String DECODER_OUT = ProtocolCodecFilter.class.getName() + ".decoderOutput";
     
     private static final Class[] EMPTY_PARAMS = new Class[0];
 
@@ -151,7 +149,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
 
         ByteBuffer in = ( ByteBuffer ) message;
         ProtocolDecoder decoder = getDecoder( session );
-        SimpleProtocolDecoderOutput decoderOut = getDecoderOut( session );
+        ProtocolDecoderOutput decoderOut = createDecoderOut( nextFilter, session );
         
         try
         {
@@ -182,11 +180,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             // Release the read buffer.
             in.release();
 
-            Queue queue = decoderOut.getMessageQueue();
-            while( !queue.isEmpty() )
-            {
-                nextFilter.messageReceived( session, queue.pop() );
-            }
+            decoderOut.flush();
         }
     }
 
@@ -293,15 +287,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         return decoder;
     }
     
-    private SimpleProtocolDecoderOutput getDecoderOut( IoSession session )
+    protected ProtocolDecoderOutput createDecoderOut( NextFilter nextFilter, IoSession session )
     {
-        SimpleProtocolDecoderOutput out = ( SimpleProtocolDecoderOutput ) session.getAttribute( DECODER_OUT );
-        if( out == null )
-        {
-            out = new SimpleProtocolDecoderOutput();
-            session.setAttribute( DECODER_OUT, out );
-        }
-        return out;
+        return new SimpleProtocolDecoderOutput( nextFilter, session );
     }
     
     private void disposeEncoder( IoSession session )
@@ -328,7 +316,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter
 
     private void disposeDecoder( IoSession session )
     {
-        session.removeAttribute( DECODER_OUT );
         ProtocolDecoder decoder = ( ProtocolDecoder ) session.removeAttribute( DECODER );
         if( decoder == null )
         {
