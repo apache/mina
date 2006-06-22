@@ -28,12 +28,13 @@ import junit.framework.TestCase;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.filter.codec.support.SimpleProtocolDecoderOutput;
+import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.util.Queue;
 
 /**
  * Tests {@link TextLineDecoder}.
@@ -56,7 +57,7 @@ public class TextLineDecoderTest extends TestCase
         
         CharsetEncoder encoder = Charset.forName( "UTF-8" ).newEncoder();
         IoSession session = new DummySession();
-        SimpleProtocolDecoderOutput out = new SimpleProtocolDecoderOutput();
+        TestDecoderOutput out = new TestDecoderOutput();
         ByteBuffer in = ByteBuffer.allocate( 16 );
      
         // Test one decode and one output
@@ -118,7 +119,7 @@ public class TextLineDecoderTest extends TestCase
         
         CharsetEncoder encoder = Charset.forName( "UTF-8" ).newEncoder();
         IoSession session = new DummySession();
-        SimpleProtocolDecoderOutput out = new SimpleProtocolDecoderOutput();
+        TestDecoderOutput out = new TestDecoderOutput();
         ByteBuffer in = ByteBuffer.allocate( 16 );
      
         // Test one decode and one output
@@ -233,6 +234,25 @@ public class TextLineDecoderTest extends TestCase
         public int getScheduledWriteBytes()
         {
             return 0;
+        }
+    }
+    
+    private static class TestDecoderOutput implements ProtocolDecoderOutput
+    {
+        private Queue messageQueue = new Queue();
+
+        public void write( Object message )
+        {
+            messageQueue.push( message );
+        }
+        
+        public Queue getMessageQueue()
+        {
+            return messageQueue;
+        }
+
+        public void flush()
+        {
         }
     }
 }

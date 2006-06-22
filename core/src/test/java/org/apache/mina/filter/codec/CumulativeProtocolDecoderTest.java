@@ -156,6 +156,10 @@ public class CumulativeProtocolDecoderTest extends TestCase
         {
             values.clear();
         }
+
+        public void flush()
+        {
+        }
     }
     
     private static class WrongDecoder extends CumulativeProtocolDecoder
