@@ -498,6 +498,16 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
                 new UnexpandableByteBuffer( buf.buf().asReadOnlyBuffer(), buf ), false );
             return newBuf;
         }
+        
+        public byte[] array()
+        {
+            return buf.buf().array();
+        }
+        
+        public int arrayOffset()
+        {
+            return buf.buf().arrayOffset();
+        }
 
         public byte get()
         {

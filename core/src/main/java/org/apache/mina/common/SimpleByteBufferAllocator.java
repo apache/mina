@@ -523,5 +523,15 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         public ByteBuffer asReadOnlyBuffer() {
             return new SimpleByteBuffer( this.buf.asReadOnlyBuffer() );
         }
+
+        public byte[] array()
+        {
+            return buf.array();
+        }
+        
+        public int arrayOffset()
+        {
+            return buf.arrayOffset();
+        }
     }
 }

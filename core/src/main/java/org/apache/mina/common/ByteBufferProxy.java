@@ -622,4 +622,14 @@ public class ByteBufferProxy extends ByteBuffer
     {
         return buf.asReadOnlyBuffer();
     }
+
+    public byte[] array()
+    {
+        return buf.array();
+    }
+
+    public int arrayOffset()
+    {
+        return buf.arrayOffset();
+    }
 }

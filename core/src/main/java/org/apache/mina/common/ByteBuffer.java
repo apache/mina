@@ -436,6 +436,16 @@ public abstract class ByteBuffer implements Comparable
     public abstract ByteBuffer asReadOnlyBuffer();
 
     /**
+     * @see java.nio.ByteBuffer#array()
+     */
+    public abstract byte[] array();
+    
+    /**
+     * @see java.nio.ByteBuffer#arrayOffset()
+     */
+    public abstract int arrayOffset();
+    
+    /**
      * @see java.nio.ByteBuffer#get()
      */
     public abstract byte get();
