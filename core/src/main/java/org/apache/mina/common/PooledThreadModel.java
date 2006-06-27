@@ -37,12 +37,12 @@ import org.apache.mina.filter.thread.ThreadPoolFilter;
 public class PooledThreadModel implements ThreadModel
 {
     /**
-     * @see ThreadPoolFilter#DEFAULT_MAXIMUM_POOL_SIZE
+     * @see ThreadPool#DEFAULT_MAXIMUM_POOL_SIZE
      */
     public static final int DEFAULT_MAXIMUM_POOL_SIZE = ThreadPool.DEFAULT_MAXIMUM_POOL_SIZE;
 
     /**
-     * @see ThreadPoolFilter#DEFAULT_KEEP_ALIVE_TIME
+     * @see ThreadPool#DEFAULT_KEEP_ALIVE_TIME
      */
     public static final int DEFAULT_KEEP_ALIVE_TIME = ThreadPool.DEFAULT_KEEP_ALIVE_TIME;
     
