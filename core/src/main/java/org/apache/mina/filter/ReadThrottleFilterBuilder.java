@@ -39,7 +39,7 @@ import org.apache.mina.filter.thread.ThreadPoolFilter;
  *
  * <pre><code>
  * DefaultFilterChainBuilder builder = ...
- * ReadThrottleFilter filter = new ReadThrottleFilter();
+ * ReadThrottleFilterBuilder filter = new ReadThrottleFilterBuilder();
  * filter.attach( builder );
  * </code></pre>
  *
@@ -47,17 +47,17 @@ import org.apache.mina.filter.thread.ThreadPoolFilter;
  *
  * <pre><code>
  * IoFilterChain chain = ...
- * ReadThrottleFilter filter = new ReadThrottleFilter();
+ * ReadThrottleFilterBuilder filter = new ReadThrottleFilterBuilder();
  * filter.attach( chain );
  * </code></pre>
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 406554 $, $Date: 2006-05-15 06:46:02Z $
  */
-public class ReadThrottleFilter
+public class ReadThrottleFilterBuilder
 {
-    public static final String COUNTER = ReadThrottleFilter.class.getName() + ".counter";
-    public static final String SUSPENDED_READS = ReadThrottleFilter.class.getName() + ".suspendedReads";
+    public static final String COUNTER = ReadThrottleFilterBuilder.class.getName() + ".counter";
+    public static final String SUSPENDED_READS = ReadThrottleFilterBuilder.class.getName() + ".suspendedReads";
 
     private volatile int maximumConnectionBufferSize = 1024 * 1024; // 1mb
 
@@ -170,7 +170,7 @@ public class ReadThrottleFilter
         {
             if( message instanceof ByteBuffer )
             {
-                add( session, ( (ByteBuffer)message ).capacity() );
+                add( session, ( (ByteBuffer)message ).remaining() );
             }
 
             nextFilter.messageReceived( session, message );
