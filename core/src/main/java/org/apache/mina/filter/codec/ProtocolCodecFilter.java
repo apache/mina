@@ -42,7 +42,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter
 {
     public static final String ENCODER = ProtocolCodecFilter.class.getName() + ".encoder";
     public static final String DECODER = ProtocolCodecFilter.class.getName() + ".decoder";
-    public static final String ENCODER_OUT = ProtocolCodecFilter.class.getName() + ".encoderOutput";
     
     private static final Class[] EMPTY_PARAMS = new Class[0];
 
@@ -149,7 +148,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
 
         ByteBuffer in = ( ByteBuffer ) message;
         ProtocolDecoder decoder = getDecoder( session );
-        ProtocolDecoderOutput decoderOut = createDecoderOut( nextFilter, session );
+        ProtocolDecoderOutput decoderOut = getDecoderOut( session, nextFilter );
         
         try
         {
@@ -213,12 +212,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         }
 
         ProtocolEncoder encoder = getEncoder( session );
-        ProtocolEncoderOutputImpl encoderOut = getEncoderOut( session );
-        encoderOut.nextFilter = nextFilter;
+        ProtocolEncoderOutputImpl encoderOut = getEncoderOut( session, nextFilter, writeRequest );
         
         try
         {
-            encoderOut.writeRequest = writeRequest;
             encoder.encode( session, message, encoderOut );
         }
         catch( Throwable t )
@@ -237,7 +234,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         finally
         {
             encoderOut.flush();
-            encoderOut.writeRequest = null;
 
             // Dispose the encoder if this session is connectionless.
             if( session.getTransportType().isConnectionless() )
@@ -265,15 +261,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         return encoder;
     }
     
-    private ProtocolEncoderOutputImpl getEncoderOut( IoSession session )
+    private ProtocolEncoderOutputImpl getEncoderOut( IoSession session, NextFilter nextFilter, WriteRequest writeRequest )
     {
-        ProtocolEncoderOutputImpl out = ( ProtocolEncoderOutputImpl ) session.getAttribute( ENCODER_OUT );
-        if( out == null )
-        {
-            out = new ProtocolEncoderOutputImpl( session );
-            session.setAttribute( ENCODER_OUT, out );
-        }
-        return out;
+        return new ProtocolEncoderOutputImpl( session, nextFilter, writeRequest );
     }
     
     private ProtocolDecoder getDecoder( IoSession session ) throws Exception
@@ -287,14 +277,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         return decoder;
     }
     
-    protected ProtocolDecoderOutput createDecoderOut( NextFilter nextFilter, IoSession session )
+    private ProtocolDecoderOutput getDecoderOut( IoSession session, NextFilter nextFilter )
     {
-        return new SimpleProtocolDecoderOutput( nextFilter, session );
+        return new SimpleProtocolDecoderOutput( session, nextFilter );
     }
     
     private void disposeEncoder( IoSession session )
     {
-        session.removeAttribute( ENCODER_OUT );
         ProtocolEncoder encoder = ( ProtocolEncoder ) session.removeAttribute( ENCODER );
         if( encoder == null )
         {
@@ -349,12 +338,14 @@ public class ProtocolCodecFilter extends IoFilterAdapter
     private static class ProtocolEncoderOutputImpl extends SimpleProtocolEncoderOutput
     {
         private final IoSession session;
-        private NextFilter nextFilter;
-        private WriteRequest writeRequest;
+        private final NextFilter nextFilter;
+        private final WriteRequest writeRequest;
         
-        public ProtocolEncoderOutputImpl( IoSession session )
+        public ProtocolEncoderOutputImpl( IoSession session, NextFilter nextFilter, WriteRequest writeRequest )
         {
             this.session = session;
+            this.nextFilter = nextFilter;
+            this.writeRequest = writeRequest;
         }
 
         protected WriteFuture doFlush( ByteBuffer buf )

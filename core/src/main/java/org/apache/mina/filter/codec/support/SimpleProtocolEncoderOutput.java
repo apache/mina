@@ -27,12 +27,12 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         return bufferQueue;
     }
     
-    public synchronized void write( ByteBuffer buf )
+    public void write( ByteBuffer buf )
     {
         bufferQueue.push( buf );
     }
     
-    public synchronized void mergeAll()
+    public void mergeAll()
     {
         int sum = 0;
         final int size = bufferQueue.size();
@@ -70,7 +70,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         bufferQueue.push(newBuf);
     }
     
-    public synchronized WriteFuture flush()
+    public WriteFuture flush()
     {
         Queue bufferQueue = this.bufferQueue;
         WriteFuture future = null;
