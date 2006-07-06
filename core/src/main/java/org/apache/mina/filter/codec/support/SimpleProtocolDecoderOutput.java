@@ -21,7 +21,7 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
     private final IoSession session;
     private final Queue messageQueue = new Queue();
     
-    public SimpleProtocolDecoderOutput( NextFilter nextFilter, IoSession session )
+    public SimpleProtocolDecoderOutput( IoSession session, NextFilter nextFilter )
     {
         this.nextFilter = nextFilter;
         this.session = session;
