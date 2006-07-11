@@ -358,7 +358,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
                         session,
                         new WriteRequest(
                                 new MessageByteBuffer(
-                                        buf, writeRequest.getMessage() ), future ) );
+                                        buf, writeRequest.getMessage() ), future, writeRequest.getDestination() ) );
             }
             else
             {
