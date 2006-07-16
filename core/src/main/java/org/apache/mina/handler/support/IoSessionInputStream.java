@@ -31,16 +31,16 @@ import org.apache.mina.common.IoSession;
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
- *
  */
 public class IoSessionInputStream extends InputStream
 {
+    private final Object mutex = new Object();
     private final ByteBuffer buf;
-    private boolean closed;
-    private boolean released;
+
+    private volatile boolean closed;
+    private volatile boolean released;
     private IOException exception;
-    private int waiters;
-    
+
     public IoSessionInputStream()
     {
         buf = ByteBuffer.allocate( 16 );
@@ -48,7 +48,7 @@ public class IoSessionInputStream extends InputStream
         buf.limit( 0 );
     }
 
-    public synchronized int available()
+    public int available()
     {
         if( released )
         {
@@ -56,106 +56,108 @@ public class IoSessionInputStream extends InputStream
         }
         else
         {
-            return buf.remaining();
+            synchronized( mutex )
+            {
+                return buf.remaining();
+            }
         }
     }
 
-    public synchronized void close()
+    public void close()
     {
         if( closed )
         {
             return;
         }
 
-        closed = true;
-        releaseBuffer();
-        
-        if( waiters != 0 )
+        synchronized( mutex )
         {
-            this.notifyAll();
+            closed = true;
+            releaseBuffer();
+
+            mutex.notifyAll();
         }
     }
 
-    public void mark( int readlimit )
+    public int read() throws IOException
     {
-    }
-
-    public boolean markSupported()
-    {
-        return false;
-    }
-
-    public synchronized int read() throws IOException
-    {
-        waitForData();
-        if( released )
+        synchronized( mutex )
         {
-            return -1;
-        }
-
-        int ret = buf.get() & 0xff;
-        return ret;
-    }
-
-    public synchronized int read( byte[] b, int off, int len ) throws IOException
-    {
-        waitForData();
-        if( released )
-        {
-            return -1;
-        }
-
-        int readBytes;
-        if( len > buf.remaining() )
-        {
-            readBytes = buf.remaining();
-        }
-        else
-        {
-            readBytes = len;
-        }
-        buf.get( b, off, readBytes );
-        
-        return readBytes;
-    }
-
-    public synchronized void reset() throws IOException
-    {
-        throw new IOException( "Mark is not supported." );
-    }
-
-    private void waitForData() throws IOException
-    {
-        if( released )
-        {
-            throw new IOException( "Stream is closed." );
-        }
-
-        waiters ++;
-        while( !released && buf.remaining() == 0 && exception == null )
-        {
-            try
+            if( !waitForData() )
             {
-                this.wait();
+                return -1;
             }
-            catch( InterruptedException e )
+
+            return buf.get() & 0xff;
+        }
+    }
+
+    public int read( byte[] b, int off, int len ) throws IOException
+    {
+        synchronized( mutex )
+        {
+            if( !waitForData() )
             {
+                return -1;
+            }
+
+            int readBytes;
+
+            if( len > buf.remaining() )
+            {
+                readBytes = buf.remaining();
+            }
+            else
+            {
+                readBytes = len;
+            }
+
+            buf.get( b, off, readBytes );
+
+            return readBytes;
+        }
+    }
+
+    private boolean waitForData() throws IOException
+    {
+        if( released )
+        {
+            return false;
+        }
+
+        synchronized( mutex )
+        {
+            while( !released && buf.remaining() == 0 && exception == null )
+            {
+                try
+                {
+                    mutex.wait();
+                }
+                catch( InterruptedException e )
+                {
+                    IOException ioe = new IOException( "Interrupted while waiting for more data" );
+                    ioe.initCause( e );
+                    throw ioe;
+                }
             }
         }
-        waiters --;
-        
+
         if( exception != null )
         {
             releaseBuffer();
             throw exception;
         }
-        
+
         if( closed && buf.remaining() == 0 )
         {
             releaseBuffer();
+
+            return false;
         }
+
+        return true;
     }
-    
+
     private void releaseBuffer()
     {
         if( released )
@@ -167,37 +169,40 @@ public class IoSessionInputStream extends InputStream
         buf.release();
     }
 
-    public synchronized void write( ByteBuffer src )
+    public void write( ByteBuffer src )
     {
-        if( closed )
+        synchronized( mutex )
         {
-            return;
-        }
-        
-        if( buf.hasRemaining() )
-        {
-            this.buf.compact();
-            this.buf.put( src );
-            this.buf.flip();
-        }
-        else
-        {
-            this.buf.clear();
-            this.buf.put( src );
-            this.buf.flip();
-            this.notify();
+            if( closed )
+            {
+                return;
+            }
+
+            if( buf.hasRemaining() )
+            {
+                this.buf.compact();
+                this.buf.put( src );
+                this.buf.flip();
+            }
+            else
+            {
+                this.buf.clear();
+                this.buf.put( src );
+                this.buf.flip();
+                mutex.notifyAll();
+            }
         }
     }
-    
-    public synchronized void throwException( IOException e )
+
+    public void throwException( IOException e )
     {
-        if( exception == null )
+        synchronized( mutex )
         {
-            exception = e;
-            
-            if( waiters != 0 )
+            if( exception == null )
             {
-                this.notifyAll();
+                exception = e;
+
+                mutex.notifyAll();
             }
         }
     }
