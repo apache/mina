@@ -118,7 +118,6 @@ public class NettyDecoder implements org.apache.mina.filter.codec.ProtocolDecode
 	                {
 	                    try
 	                    {
-	                    	//System.err.println("NETTY trying to decode : "+m);
 	                        if( m.read( readBuf ) )
 	                        {
 	                            out.write( m );
