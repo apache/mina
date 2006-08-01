@@ -18,10 +18,12 @@
  */
 package org.apache.mina.handler.support;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 
 /**
  * An {@link OutputStream} that forwards all write operations to
@@ -42,41 +44,38 @@ public class IoSessionOutputStream extends OutputStream
 
     public void close()
     {
-        session.close();
+        session.close().join();
     }
 
-    public void flush()
+    private void checkClosed() throws IOException
     {
-    }
-
-    public void write( byte[] b, int off, int len )
-    {
-        if( session.isConnected() )
+        if( ! session.isConnected() )
         {
-            ByteBuffer buf = ByteBuffer.wrap( b, off, len );
-            buf.acquire(); // prevent from being pooled.
-            session.write( buf );
+            throw new IOException( "The session has been closed." );
         }
     }
-
-    public void write( byte[] b )
+    
+    private void write( ByteBuffer buf ) throws IOException
     {
-        if( session.isConnected() )
+        checkClosed();
+        WriteFuture future = session.write( buf );
+        future.join();
+        if( ! future.isWritten() )
         {
-            ByteBuffer buf = ByteBuffer.wrap( b );
-            buf.acquire(); // prevent from being pooled.
-            session.write( buf );
+            throw new IOException( "The bytes could not be written to the session" );
         }
     }
-
-    public void write( int b )
+    
+    public void write( byte[] b, int off, int len ) throws IOException
     {
-        if( session.isConnected() )
-        {
-            ByteBuffer buf = ByteBuffer.allocate( 1 );
-            buf.put( ( byte ) b );
-            buf.flip();
-            session.write( buf );
-        }
+        write( ByteBuffer.wrap( b, off, len ) );
+    }
+
+    public void write( int b ) throws IOException
+    {
+        ByteBuffer buf = ByteBuffer.allocate( 1 );
+        buf.put( ( byte ) b );
+        buf.flip();
+        write( buf );
     }
 }
