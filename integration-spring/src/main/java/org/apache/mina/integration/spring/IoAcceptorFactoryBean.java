@@ -57,15 +57,23 @@ import org.springframework.util.Assert;
  *         class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean"&gt;
  *     &lt;property name="filters"&gt;
  *       &lt;list&gt;
- *         &lt;bean class="org.apache.mina.filter.ThreadPoolFilter"&gt;
- *           &lt;!-- Threads will be named IoWorker-1, IoWorker-2, etc --&gt;
- *           &lt;constructor-arg value=&quot;IoWorker&quot;/&gt;
- *           &lt;property name="maximumPoolSize" value="10"/&gt;
- *         &lt;/bean&gt;
  *         &lt;bean class="org.apache.mina.filter.LoggingFilter"/&gt;
  *       &lt;/list&gt;
  *     &lt;/property&gt;
  *   &lt;/bean&gt;
+ *
+ *  &lt;!-- By default MINA uses a PooledThreadModel. This demonstrates how to 
+ *          use your own with some non default settings. The threadModel will 
+ *          be set on the SocketAcceptorConfig defined below. To configure a 
+ *          ThreadPoolFilter directly you will have to use the ThreadModel.MANUAL 
+ *          ThreadModel instead. --&gt;
+ *  &lt;property name="threadModel"&gt;
+ *   &lt;bean class="org.apache.mina.common.PooledThreadModel"&gt;
+ *     &lt;!-- Threads will be named IoWorker-1, IoWorker-2, etc --&gt;
+ *     &lt;property name="threadNamePrefix" value="IoWorker"/&gt;
+ *     &lt;property name="maximumPoolSize" value="10"/&gt;
+ *     &lt;property name="keepAliveTime" value="30000"/&gt;
+ *   &lt;/bean>
  *
  *   &lt;bean id="ioAcceptor" class="org.apache.mina.integration.spring.IoAcceptorFactoryBean"&gt;
  *     &lt;property name="target"&gt;
@@ -80,6 +88,7 @@ import org.springframework.util.Assert;
  *             &lt;bean class="org.apache.mina.transport.socket.nio.SocketAcceptorConfig"&gt;
  *               &lt;property name="filterChainBuilder" ref="filterChainBuilder"/&gt;
  *               &lt;property name="reuseAddress" value="true"/&gt;
+ *               &lt;property name="threadModel" ref="threadModel"/&gt; 
  *             &lt;/bean&gt;
  *           &lt;/property&gt;
  *         &lt;/bean&gt;
