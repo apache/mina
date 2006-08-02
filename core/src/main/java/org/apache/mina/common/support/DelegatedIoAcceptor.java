@@ -80,6 +80,11 @@ public class DelegatedIoAcceptor implements IoAcceptor
         return delegate.isBound( address );
     }
 
+    public Set getBoundAddresses()
+    {
+        return delegate.getBoundAddresses();
+    }
+
     public Set getManagedSessions( SocketAddress address )
     {
         return delegate.getManagedSessions( address );

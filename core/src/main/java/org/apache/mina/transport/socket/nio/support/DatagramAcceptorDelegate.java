@@ -26,6 +26,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -188,6 +189,14 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         synchronized( channels )
         {
             return channels.containsKey( address );
+        }
+    }
+    
+    public Set getBoundAddresses()
+    {
+        synchronized( channels )
+        {
+            return new HashSet( channels.keySet() );
         }
     }
     
