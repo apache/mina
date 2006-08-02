@@ -339,6 +339,14 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
+    public Set getBoundAddresses()
+    {
+        synchronized( channels )
+        {
+            return new HashSet( channels.keySet() );
+        }
+    }
+    
     private class Worker extends Thread
     {
         Worker()

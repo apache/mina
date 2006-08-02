@@ -20,6 +20,7 @@ package org.apache.mina.common;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.Set;
 
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
@@ -75,6 +76,15 @@ public interface IoAcceptor extends IoService
      * bound by this acceptor.
      */
     boolean isBound( SocketAddress address );
+    
+    /**
+     * Returns a set of {@link SocketAddress} objects representing the addresses 
+     * which have been bound by this acceptor.
+     * 
+     * @return the set of {@link SocketAddress} objects or an empty set if 
+     *         nothing has been bound.
+     */
+    Set getBoundAddresses();
     
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified
