@@ -262,7 +262,17 @@ public interface IoSession {
      * Returns the total number of bytes which were written to this session.
      */
     long getWrittenBytes();
-    
+        
+    /**
+     * Returns the total number of messages which were read and decoded from this session. 
+     */
+    long getReadMessages();
+
+    /**
+     * Returns the total number of messages which were written and encoded by this session.
+     */
+    long getWrittenMessages();
+
     /**
      * Returns the total number of write requests which were written to this session.
      */
