@@ -61,6 +61,9 @@ public abstract class BaseIoSession implements IoSession
     private long writtenBytes;
     private long writtenWriteRequests;
     
+    private long readMessages;
+    private long writtenMessages;
+    
     private long lastReadTime;
     private long lastWriteTime;
 
@@ -331,6 +334,16 @@ public abstract class BaseIoSession implements IoSession
         return writtenWriteRequests;
     }
     
+    public long getReadMessages()
+    {
+        return readMessages;
+    }
+        
+    public long getWrittenMessages()
+    {
+        return writtenMessages;        
+    }
+    
     public void increaseReadBytes( int increment )
     {
         readBytes += increment;
@@ -350,6 +363,16 @@ public abstract class BaseIoSession implements IoSession
     public void increaseWrittenWriteRequests()
     {
         writtenWriteRequests ++;
+    }
+    
+    public void increaseReadMessages()
+    {
+        readMessages++;
+    }
+    
+    public void increaseWrittenMessages()
+    {
+        writtenMessages++;
     }
     
     public long getCreationTime()

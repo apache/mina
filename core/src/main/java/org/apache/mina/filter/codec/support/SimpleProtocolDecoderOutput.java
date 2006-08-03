@@ -5,6 +5,7 @@ package org.apache.mina.filter.codec.support;
 
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.NextFilter;
+import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.util.Queue;
 
@@ -30,6 +31,10 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
     public void write( Object message )
     {
         messageQueue.push( message );
+        if( session instanceof BaseIoSession )
+        {
+            ( (BaseIoSession) session ).increaseReadMessages();
+        }
     }
 
     public void flush()
