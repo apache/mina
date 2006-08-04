@@ -18,6 +18,8 @@
  */
 package org.apache.mina.integration.spring;
 
+import java.util.List;
+
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilter;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
@@ -84,44 +86,46 @@ public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean
     }
 
     /**
-     * Sets a number of unnamed filters which will be added to the filter
-     * chain created by this factory bean. The filters will be assigned 
+     * Sets a number of filters which will be added to the filter
+     * chain created by this factory bean. The specified list must contain either
+     * {@link IoFilter} or {@link IoFilterMapping} objects. Filters which
+     * haven't been wrapped in {@link IoFilterMapping} objects will be assigned 
      * automatically generated names (<code>&lt;filterNamePrefix&gt;0</code>, 
      * <code>&lt;filterNamePrefix&gt;1</code>, etc).
      * 
-     * @param filters the filters.
+     * @param filters the list of {@link IoFilter} and/or 
+     *        {@link IoFilterMapping} objects.
      * @throws IllegalArgumentException if the specified value is 
-     *         <code>null</code>.
+     *         <code>null</code> or contains objects of the wrong type.
      * @see #setFilterNamePrefix(String)
      */
-    public void setFilters( IoFilter[] filters )
+    public void setFilters( List filters )
     {
         Assert.notNull( filters, "Property 'filters' may not be null" );
-        this.filterMappings = new IoFilterMapping[ filters.length ];
+        IoFilterMapping[] filterMappings = new IoFilterMapping[ filters.size() ];
 
-        for( int i = 0; i < filters.length; i++ )
+        for( int i = 0; i < filterMappings.length; i++ )
         {
-            this.filterMappings[ i ] = new IoFilterMapping();
-            this.filterMappings[ i ].setFilter( filters[ i ] );
+            Object o = filters.get( i );
+            if( o instanceof IoFilterMapping )
+            {
+                filterMappings[ i ] = ( IoFilterMapping ) o;
+            }
+            else if( o instanceof IoFilter )
+            {
+                filterMappings[ i ] = new IoFilterMapping();
+                filterMappings[ i ].setFilter( ( IoFilter ) o );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "List may only contain "
+                        + "IoFilter or IoFilterMapping objects. Found object of "
+                        + "type " + o.getClass().getName() 
+                        + " at position " + i + "." );
+            }
         }
+        
+        this.filterMappings = filterMappings;
     }
 
-    /**
-     * Sets a number of named filters which will be added to the filter
-     * chain created by this factory bean. {@link IoFilterMapping} objects
-     * set using this method which haven't had their name set will be assigned
-     * automatically generated names derived from the prefix set using
-     * {@link #setFilterNamePrefix(String)} and the position in the specified
-     * array (i.e. <code>&lt;filterNamePrefix&gt;&lt;pos&gt;</code>).
-     * 
-     * @param filterMappings the name to filter mappings.
-     * @throws IllegalArgumentException if the specified value is 
-     *         <code>null</code>.
-     * @see #setFilterNamePrefix(String)
-     */
-    public void setFilterMappings( IoFilterMapping[] filterMappings )
-    {
-        Assert.notNull( filterMappings, "Property 'filterMappings' may not be null" );
-        this.filterMappings = filterMappings;
-    }    
 }
