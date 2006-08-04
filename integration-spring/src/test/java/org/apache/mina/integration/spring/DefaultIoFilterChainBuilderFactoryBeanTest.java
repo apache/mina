@@ -18,6 +18,9 @@
  */
 package org.apache.mina.integration.spring;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
@@ -60,7 +63,7 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
         
         DefaultIoFilterChainBuilderFactoryBean factory = 
                                    new DefaultIoFilterChainBuilderFactoryBean();
-        factory.setFilters( filters );
+        factory.setFilters( Arrays.asList( filters ) );
         factory.setFilterNamePrefix( "prefix" );
         DefaultIoFilterChainBuilder builder = 
                              ( DefaultIoFilterChainBuilder) factory.createInstance();
@@ -69,18 +72,29 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
         mockChain.verify();
     }
     
-    public void testnamedAndUnnamedFilters() throws Exception
+    public void testIllegalObjectsInFilterList() throws Exception
     {
-        IoFilterMapping[] mappings = new IoFilterMapping[] {
-                new IoFilterMapping(),
-                new IoFilterMapping(),
-                new IoFilterMapping()
-        };
-        mappings[ 0 ].setFilter( filters[ 0 ] );
-        mappings[ 0 ].setName( "f0" );
-        mappings[ 1 ].setFilter( filters[ 1 ] );
-        mappings[ 2 ].setFilter( filters[ 2 ] );
-        mappings[ 2 ].setName( "f2" );
+        LinkedList mappings = new LinkedList();
+        mappings.add( new IoFilterMapping( "f0", filters[ 0 ] ) );
+        mappings.add( new Object() );
+        DefaultIoFilterChainBuilderFactoryBean factory = 
+            new DefaultIoFilterChainBuilderFactoryBean();
+        try
+        {
+            factory.setFilters( mappings );
+            fail( "Illegal object in list of filters. IllegalArgumentException expected." );
+        }
+        catch( IllegalArgumentException iae )
+        {
+        }
+    }
+    
+    public void testNamedAndUnnamedFilters() throws Exception
+    {
+        LinkedList mappings = new LinkedList();
+        mappings.add( new IoFilterMapping( "f0", filters[ 0 ] ) );
+        mappings.add( filters[ 1 ] );
+        mappings.add( new IoFilterMapping( "f2", filters[ 2 ] ) );
         
         chain.addLast( "f0", filters[ 0 ] );
         chain.addLast( "filter1", filters[ 1 ] );
@@ -90,7 +104,7 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
         
         DefaultIoFilterChainBuilderFactoryBean factory = 
                                    new DefaultIoFilterChainBuilderFactoryBean();
-        factory.setFilterMappings( mappings );
+        factory.setFilters( mappings );
         DefaultIoFilterChainBuilder builder = 
                              ( DefaultIoFilterChainBuilder) factory.createInstance();
         builder.buildFilterChain( chain );
