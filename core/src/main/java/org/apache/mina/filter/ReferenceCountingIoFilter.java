@@ -16,7 +16,12 @@
  *   limitations under the License.
  *
  */
-package org.apache.mina.common;
+package org.apache.mina.filter;
+
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFilter;
+import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoSession;
 
 
 /**
