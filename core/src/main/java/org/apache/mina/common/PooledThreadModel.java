@@ -18,6 +18,9 @@
  */
 package org.apache.mina.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.mina.filter.thread.ThreadPool;
 import org.apache.mina.filter.thread.ThreadPoolFilter;
 
@@ -46,26 +49,46 @@ public class PooledThreadModel implements ThreadModel
      */
     public static final int DEFAULT_KEEP_ALIVE_TIME = ThreadPool.DEFAULT_KEEP_ALIVE_TIME;
     
-    private static int id = 1;
+    /**
+     * Maps a service name to a PooledThreadModel instance.
+     * Without this map, we might create extremely many thread pools that leads the system to
+     * coma. */
+    private static final Map service2model = new HashMap();
+    
+    /**
+     * Returns a {@link PooledThreadModel} instance for the specified <tt>serviceName</tt>.
+     * @param serviceName the name of the service that needs thread pooling
+     */
+    public static PooledThreadModel getInstance( String serviceName )
+    {
+    	if( serviceName == null )
+    	{
+    		throw new NullPointerException( "serviceName" );
+    	}
+
+    	PooledThreadModel model;
+    	synchronized( service2model )
+    	{
+    		model = ( PooledThreadModel ) service2model.get( serviceName );
+    		if( model == null )
+    		{
+    			model = new PooledThreadModel( serviceName );
+    			service2model.put( serviceName, model );
+    		}
+    	}
+    	
+    	return model;
+    }
     
     private final ThreadPoolFilter filter = new ThreadPoolFilter();
+    private final IoFilter proxy = new ReferenceCountingIoFilter( filter );
 
-    public PooledThreadModel()
-    {
-        this( "AnonymousIoService-" + id++, DEFAULT_MAXIMUM_POOL_SIZE );
-    }
-    
-    public PooledThreadModel( int maxThreads )
-    {
-        this( "AnonymousIoService-" + id++, maxThreads );
-    }
-
-    public PooledThreadModel( String threadNamePrefix )
+    private PooledThreadModel( String threadNamePrefix )
     {
         this( threadNamePrefix, DEFAULT_MAXIMUM_POOL_SIZE );
     }
 
-    public PooledThreadModel( String threadNamePrefix, int maxThreads )
+    private PooledThreadModel( String threadNamePrefix, int maxThreads )
     {
         setMaximumPoolSize( maxThreads );
         setThreadNamePrefix( threadNamePrefix );
@@ -103,6 +126,6 @@ public class PooledThreadModel implements ThreadModel
 
     public void buildFilterChain( IoFilterChain chain ) throws Exception
     {
-        chain.addFirst( PooledThreadModel.class.getName(), filter );
+        chain.addFirst( PooledThreadModel.class.getName(), proxy );
     }
 }
