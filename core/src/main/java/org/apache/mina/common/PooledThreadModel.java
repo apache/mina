@@ -85,7 +85,6 @@ public class PooledThreadModel implements ThreadModel
     }
     
     private final ThreadPoolFilter filter = new ThreadPoolFilter();
-    private final IoFilter proxy = new ReferenceCountingIoFilter( filter );
 
     private PooledThreadModel( String threadNamePrefix )
     {
@@ -130,6 +129,6 @@ public class PooledThreadModel implements ThreadModel
 
     public void buildFilterChain( IoFilterChain chain ) throws Exception
     {
-        chain.addFirst( PooledThreadModel.class.getName(), proxy );
+        chain.addFirst( PooledThreadModel.class.getName(), filter );
     }
 }

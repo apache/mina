@@ -20,6 +20,8 @@ package org.apache.mina.common;
 
 import java.net.SocketAddress;
 
+import org.apache.mina.filter.ReferenceCountingIoFilter;
+
 /**
  * A filter which intercepts {@link IoHandler} events like Servlet
  * filters.  Filters can be used for these purposes:
