@@ -57,6 +57,10 @@ public class PooledThreadModel implements ThreadModel
     
     /**
      * Returns a {@link PooledThreadModel} instance for the specified <tt>serviceName</tt>.
+     * Please note that all returned instances will be managed globally; the same instance
+     * will be returned if you specified the same service name.  Please try to specify
+     * different names for different services.
+     * 
      * @param serviceName the name of the service that needs thread pooling
      */
     public static PooledThreadModel getInstance( String serviceName )

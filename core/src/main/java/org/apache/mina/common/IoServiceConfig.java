@@ -62,14 +62,21 @@ public interface IoServiceConfig
     
     /**
      * Returns the default {@link ThreadModel} of the {@link IoService}.
-     * The default value is <tt>new {@link PooledThreadModel}()</tt>.
+     * The default value is a {@link PooledThreadModel}() whose service name is
+     * <tt>'AnonymousIoService'</tt> and which has 16 maximum active threads.
+     * It is strongly recommended to set a new {@link PooledThreadModel} by calling
+     * {@link PooledThreadModel#getInstance(String)}.
      */
     ThreadModel getThreadModel();
     
     /**
      * Sets the default {@link ThreadModel} of the {@link IoService}.
      * If you specify <tt>null</tt>, this property will be set to the
-     * default value.  The default value is <tt>new {@link PooledThreadModel}()</tt>.
+     * default value.
+     * The default value is a {@link PooledThreadModel}() whose service name is
+     * <tt>'AnonymousIoService'</tt> and which has 16 maximum active threads.
+     * It is strongly recommended to set a new {@link PooledThreadModel} by calling
+     * {@link PooledThreadModel#getInstance(String)}.
      */
     void setThreadModel( ThreadModel threadModel );
     
