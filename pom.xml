@@ -17,7 +17,7 @@
   <distributionManagement>
     <site>
       <id>apache.websites</id>
-      <url>scp://minotaur.apache.org/www/directory.apache.org/subprojects/mina/</url>
+      <url>scp://people.apache.org/www/directory.apache.org/subprojects/mina/</url>
     </site>
   </distributionManagement>
 
@@ -153,7 +153,7 @@
     <repository>
       <id>apache.snapshots</id>
       <name>Apache Snapshot Repository</name>
-      <url>http://minotaur.apache.org/maven-snapshot-repository</url>
+      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
     </repository>
   </repositories>
 
