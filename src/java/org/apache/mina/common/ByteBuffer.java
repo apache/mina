@@ -559,6 +559,12 @@ public abstract class ByteBuffer
         private boolean autoExpand;
         private boolean pooled;
 
+        /**
+         * We don't have any access to Buffer.markValue(), so we need to track it down,
+         * which will cause small extra overhead.
+         */
+        private int mark = -1;
+
         protected DefaultByteBuffer()
         {
         }
@@ -660,6 +666,10 @@ public abstract class ByteBuffer
         {
             autoExpand( newPosition, 0 );
             buf.position( newPosition );
+            if( mark > newPosition )
+        	{
+            	mark = -1;
+        	}
             return this;
         }
 
@@ -672,12 +682,17 @@ public abstract class ByteBuffer
         {
             autoExpand( newLimit, 0 );
             buf.limit( newLimit );
+            if( mark > newLimit )
+            {
+            	mark = -1;
+            }
             return this;
         }
 
         public ByteBuffer mark()
         {
             buf.mark();
+            mark = buf.position();
             return this;
         }
 
@@ -690,18 +705,21 @@ public abstract class ByteBuffer
         public ByteBuffer clear()
         {
             buf.clear();
+            mark = -1;
             return this;
         }
 
         public ByteBuffer flip()
         {
             buf.flip();
+            mark = -1;
             return this;
         }
 
         public ByteBuffer rewind()
         {
             buf.rewind();
+            mark = -1;
             return this;
         }
 
@@ -792,6 +810,7 @@ public abstract class ByteBuffer
         public ByteBuffer compact()
         {
             buf.compact();
+            mark = -1;
             return this;
         }
 
@@ -1149,7 +1168,6 @@ public abstract class ByteBuffer
                 throw new IllegalArgumentException( "fieldSize is not even." );
             }
 
-            int i;
             int oldPos = buf.position();
             int oldLimit = buf.limit();
             int end = buf.position() + fieldSize;
@@ -1158,6 +1176,8 @@ public abstract class ByteBuffer
             {
                 throw new BufferUnderflowException();
             }
+
+            int i;
 
             if( !utf16 )
             {
@@ -1530,7 +1550,14 @@ public abstract class ByteBuffer
             int limit = oldBuf.limit();
             oldBuf.clear();
             newBuf.put( oldBuf );
-            newBuf.position( 0 );
+            
+            // Transfer marked position to the new buffer.
+            if( mark >= 0 )
+            {
+            	newBuf.position( mark );
+            	newBuf.mark();
+            }
+            
             newBuf.limit( limit );
             newBuf.position( pos );
             this.buf = newBuf;
