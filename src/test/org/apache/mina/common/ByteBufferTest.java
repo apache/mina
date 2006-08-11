@@ -147,6 +147,26 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 4, buf.capacity() );
     }
     
+    public void testAutoExpandMark() throws Exception
+    {
+    	ByteBuffer buf = ByteBuffer.allocate( 4 ).setAutoExpand( true );
+
+    	buf.put( ( byte ) 0 );
+    	buf.put( ( byte ) 0 );
+    	buf.put( ( byte ) 0 );
+
+    	// Position should be 3 when we reset this buffer.
+    	buf.mark();
+
+    	// Overflow it
+    	buf.put( ( byte ) 0 );
+    	buf.put( ( byte ) 0 );
+    	
+    	Assert.assertEquals( 5, buf.position() );
+    	buf.reset();
+    	Assert.assertEquals( 3, buf.position() );
+    }
+    
     public void testPooledProperty() throws Exception
     {
         ByteBuffer buf = ByteBuffer.allocate( 16 );
