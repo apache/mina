@@ -292,12 +292,22 @@ public abstract class ByteBuffer implements Comparable
      * @see java.nio.ByteBuffer#isDirect()
      */
     public abstract boolean isDirect();
+    
+    /**
+     * @see java.nio.ByteBuffer#isReadOnly()
+     */
+    public abstract boolean isReadOnly();
 
     /**
      * @see java.nio.ByteBuffer#capacity()
      */
     public abstract int capacity();
-
+    
+    /**
+     * Changes the capacity of this buffer.
+     */
+    public abstract ByteBuffer capacity( int newCapacity );
+    
     /**
      * Returns <tt>true</tt> if and only if <tt>autoExpand</tt> is turned on.
      */
@@ -314,8 +324,11 @@ public abstract class ByteBuffer implements Comparable
      * This method works even if you didn't set <tt>autoExpand</tt> to
      * <tt>true</tt>.
      */
-    public abstract ByteBuffer expand( int expectedRemaining );
-
+    public ByteBuffer expand( int expectedRemaining )
+    {
+        return expand( position(), expectedRemaining );
+    }
+    
     /**
      * Changes the capacity and limit of this buffer so this buffer get
      * the specified <tt>expectedRemaining</tt> room from the specified
@@ -355,7 +368,7 @@ public abstract class ByteBuffer implements Comparable
      * @see java.nio.Buffer#position(int)
      */
     public abstract ByteBuffer position( int newPosition );
-
+    
     /**
      * @see java.nio.Buffer#limit()
      */
@@ -370,17 +383,23 @@ public abstract class ByteBuffer implements Comparable
      * @see java.nio.Buffer#mark()
      */
     public abstract ByteBuffer mark();
+    
+    /**
+     * Returns the position of the current mark.  This method returns <tt>-1</tt> if no
+     * mark is set.
+     */
+    public abstract int markValue();
 
     /**
      * @see java.nio.Buffer#reset()
      */
     public abstract ByteBuffer reset();
-
+    
     /**
      * @see java.nio.Buffer#clear()
      */
     public abstract ByteBuffer clear();
-
+    
     /**
      * Clears this buffer and fills its content with <tt>NUL</tt>.
      * The position is set to zero, the limit is set to the capacity,
@@ -416,7 +435,10 @@ public abstract class ByteBuffer implements Comparable
     /**
      * @see java.nio.Buffer#remaining()
      */
-    public abstract int remaining();
+    public int remaining()
+    {
+	return limit() - position();
+    }
 
     /**
      * @see java.nio.Buffer#hasRemaining()
