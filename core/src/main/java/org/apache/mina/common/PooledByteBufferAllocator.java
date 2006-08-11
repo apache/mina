@@ -18,15 +18,10 @@
  */
 package org.apache.mina.common;
 
-import org.apache.mina.util.ExpiringStack;
-
 import java.nio.ByteOrder;
-import java.nio.CharBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
+
+import org.apache.mina.common.support.BaseByteBuffer;
+import org.apache.mina.util.ExpiringStack;
 
 /**
  * A {@link ByteBufferAllocator} which pools allocated buffers. <p> All buffers are allocated with the size of power of
@@ -316,11 +311,10 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         }
     }
 
-    private class PooledByteBuffer extends ByteBuffer
+    private class PooledByteBuffer extends BaseByteBuffer
     {
         private UnexpandableByteBuffer buf;
         private int refCount = 1;
-        private boolean autoExpand;
 
         protected PooledByteBuffer()
         {
@@ -334,7 +328,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
                 buf.buf().clear();
             }
             buf.buf().order( ByteOrder.BIG_ENDIAN );
-            autoExpand = false;
+            setAutoExpand( false );
             refCount = 1;
         }
 
@@ -380,27 +374,6 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
             return buf.buf();
         }
 
-        public boolean isDirect()
-        {
-            return buf.buf().isDirect();
-        }
-
-        public boolean isReadOnly()
-        {
-            return buf.buf().isReadOnly();
-        }
-
-        public boolean isAutoExpand()
-        {
-            return autoExpand;
-        }
-
-        public ByteBuffer setAutoExpand( boolean autoExpand )
-        {
-            this.autoExpand = autoExpand;
-            return this;
-        }
-
         public boolean isPooled()
         {
             return buf.isPooled();
@@ -411,75 +384,11 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
             buf.setPooled( pooled );
         }
 
-        public int capacity()
-        {
-            return buf.buf().capacity();
-        }
-
-        public int position()
-        {
-            return buf.buf().position();
-        }
-
-        public ByteBuffer position( int newPosition )
-        {
-            autoExpand( newPosition, 0 );
-            buf.buf().position( newPosition );
-            return this;
-        }
-
-        public int limit()
-        {
-            return buf.buf().limit();
-        }
-
-        public ByteBuffer limit( int newLimit )
-        {
-            autoExpand( newLimit, 0 );
-            buf.buf().limit( newLimit );
-            return this;
-        }
-
-        public ByteBuffer mark()
-        {
-            buf.buf().mark();
-            return this;
-        }
-
-        public ByteBuffer reset()
-        {
-            buf.buf().reset();
-            return this;
-        }
-
-        public ByteBuffer clear()
-        {
-            buf.buf().clear();
-            return this;
-        }
-
-        public ByteBuffer flip()
-        {
-            buf.buf().flip();
-            return this;
-        }
-
-        public ByteBuffer rewind()
-        {
-            buf.buf().rewind();
-            return this;
-        }
-
-        public int remaining()
-        {
-            return buf.buf().remaining();
-        }
-
         public ByteBuffer duplicate()
         {
             PooledByteBuffer newBuf = allocateContainer();
             newBuf.init(
-                new UnexpandableByteBuffer( buf.buf().duplicate(), buf ), false );
+                new UnexpandableByteBuffer( buf().duplicate(), buf ), false );
             return newBuf;
         }
 
@@ -487,7 +396,7 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         {
             PooledByteBuffer newBuf = allocateContainer();
             newBuf.init(
-                new UnexpandableByteBuffer( buf.buf().slice(), buf ), false );
+                new UnexpandableByteBuffer( buf().slice(), buf ), false );
             return newBuf;
         }
 
@@ -495,298 +404,22 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
         {
             PooledByteBuffer newBuf = allocateContainer();
             newBuf.init(
-                new UnexpandableByteBuffer( buf.buf().asReadOnlyBuffer(), buf ), false );
+                new UnexpandableByteBuffer( buf().asReadOnlyBuffer(), buf ), false );
             return newBuf;
         }
         
         public byte[] array()
         {
-            return buf.buf().array();
+            return buf().array();
         }
         
         public int arrayOffset()
         {
-            return buf.buf().arrayOffset();
+            return buf().arrayOffset();
         }
 
-        public byte get()
+        protected void capacity0( int requestedCapacity )
         {
-            return buf.buf().get();
-        }
-
-        public ByteBuffer put( byte b )
-        {
-            autoExpand( 1 );
-            buf.buf().put( b );
-            return this;
-        }
-
-        public byte get( int index )
-        {
-            return buf.buf().get( index );
-        }
-
-        public ByteBuffer put( int index, byte b )
-        {
-            autoExpand( index, 1 );
-            buf.buf().put( index, b );
-            return this;
-        }
-
-        public ByteBuffer get( byte[] dst, int offset, int length )
-        {
-            buf.buf().get( dst, offset, length );
-            return this;
-        }
-
-        public ByteBuffer put( java.nio.ByteBuffer src )
-        {
-            autoExpand( src.remaining() );
-            buf.buf().put( src );
-            return this;
-        }
-
-        public ByteBuffer put( byte[] src, int offset, int length )
-        {
-            autoExpand( length );
-            buf.buf().put( src, offset, length );
-            return this;
-        }
-
-        public ByteBuffer compact()
-        {
-            buf.buf().compact();
-            return this;
-        }
-
-        public int compareTo( ByteBuffer that )
-        {
-            return this.buf.buf().compareTo( that.buf() );
-        }
-
-        public ByteOrder order()
-        {
-            return buf.buf().order();
-        }
-
-        public ByteBuffer order( ByteOrder bo )
-        {
-            buf.buf().order( bo );
-            return this;
-        }
-
-        public char getChar()
-        {
-            return buf.buf().getChar();
-        }
-
-        public ByteBuffer putChar( char value )
-        {
-            autoExpand( 2 );
-            buf.buf().putChar( value );
-            return this;
-        }
-
-        public char getChar( int index )
-        {
-            return buf.buf().getChar( index );
-        }
-
-        public ByteBuffer putChar( int index, char value )
-        {
-            autoExpand( index, 2 );
-            buf.buf().putChar( index, value );
-            return this;
-        }
-
-        public CharBuffer asCharBuffer()
-        {
-            return buf.buf().asCharBuffer();
-        }
-
-        public short getShort()
-        {
-            return buf.buf().getShort();
-        }
-
-        public ByteBuffer putShort( short value )
-        {
-            autoExpand( 2 );
-            buf.buf().putShort( value );
-            return this;
-        }
-
-        public short getShort( int index )
-        {
-            return buf.buf().getShort( index );
-        }
-
-        public ByteBuffer putShort( int index, short value )
-        {
-            autoExpand( index, 2 );
-            buf.buf().putShort( index, value );
-            return this;
-        }
-
-        public ShortBuffer asShortBuffer()
-        {
-            return buf.buf().asShortBuffer();
-        }
-
-        public int getInt()
-        {
-            return buf.buf().getInt();
-        }
-
-        public ByteBuffer putInt( int value )
-        {
-            autoExpand( 4 );
-            buf.buf().putInt( value );
-            return this;
-        }
-
-        public int getInt( int index )
-        {
-            return buf.buf().getInt( index );
-        }
-
-        public ByteBuffer putInt( int index, int value )
-        {
-            autoExpand( index, 4 );
-            buf.buf().putInt( index, value );
-            return this;
-        }
-
-        public IntBuffer asIntBuffer()
-        {
-            return buf.buf().asIntBuffer();
-        }
-
-        public long getLong()
-        {
-            return buf.buf().getLong();
-        }
-
-        public ByteBuffer putLong( long value )
-        {
-            autoExpand( 8 );
-            buf.buf().putLong( value );
-            return this;
-        }
-
-        public long getLong( int index )
-        {
-            return buf.buf().getLong( index );
-        }
-
-        public ByteBuffer putLong( int index, long value )
-        {
-            autoExpand( index, 8 );
-            buf.buf().putLong( index, value );
-            return this;
-        }
-
-        public LongBuffer asLongBuffer()
-        {
-            return buf.buf().asLongBuffer();
-        }
-
-        public float getFloat()
-        {
-            return buf.buf().getFloat();
-        }
-
-        public ByteBuffer putFloat( float value )
-        {
-            autoExpand( 4 );
-            buf.buf().putFloat( value );
-            return this;
-        }
-
-        public float getFloat( int index )
-        {
-            return buf.buf().getFloat( index );
-        }
-
-        public ByteBuffer putFloat( int index, float value )
-        {
-            autoExpand( index, 4 );
-            buf.buf().putFloat( index, value );
-            return this;
-        }
-
-        public FloatBuffer asFloatBuffer()
-        {
-            return buf.buf().asFloatBuffer();
-        }
-
-        public double getDouble()
-        {
-            return buf.buf().getDouble();
-        }
-
-        public ByteBuffer putDouble( double value )
-        {
-            autoExpand( 8 );
-            buf.buf().putDouble( value );
-            return this;
-        }
-
-        public double getDouble( int index )
-        {
-            return buf.buf().getDouble( index );
-        }
-
-        public ByteBuffer putDouble( int index, double value )
-        {
-            autoExpand( index, 8 );
-            buf.buf().putDouble( index, value );
-            return this;
-        }
-
-        public DoubleBuffer asDoubleBuffer()
-        {
-            return buf.buf().asDoubleBuffer();
-        }
-
-        public ByteBuffer expand( int expectedRemaining )
-        {
-            if( autoExpand )
-            {
-                int pos = buf.buf().position();
-                int limit = buf.buf().limit();
-                int end = pos + expectedRemaining;
-                if( end > limit )
-                {
-                    ensureCapacity( end );
-                    buf.buf().limit( end );
-                }
-            }
-            return this;
-        }
-
-        public ByteBuffer expand( int pos, int expectedRemaining )
-        {
-            if( autoExpand )
-            {
-                int limit = buf.buf().limit();
-                int end = pos + expectedRemaining;
-                if( end > limit )
-                {
-                    ensureCapacity( end );
-                    buf.buf().limit( end );
-                }
-            }
-            return this;
-        }
-
-        private void ensureCapacity( int requestedCapacity )
-        {
-            if( requestedCapacity <= buf.buf().capacity() )
-            {
-                return;
-            }
-
             if( buf.isDerived() )
             {
                 throw new IllegalStateException( "Derived buffers cannot be expanded." );
@@ -819,15 +452,8 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
             }
 
             newBuf.buf().clear();
-            newBuf.buf().order( oldBuf.buf().order() );
-
-            int pos = oldBuf.buf().position();
-            int limit = oldBuf.buf().limit();
             oldBuf.buf().clear();
             newBuf.buf().put( oldBuf.buf() );
-            newBuf.buf().position( 0 );
-            newBuf.buf().limit( limit );
-            newBuf.buf().position( pos );
             this.buf = newBuf;
             oldBuf.release();
         }

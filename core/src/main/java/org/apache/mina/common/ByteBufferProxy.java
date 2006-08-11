@@ -632,4 +632,20 @@ public class ByteBufferProxy extends ByteBuffer
     {
         return buf.arrayOffset();
     }
+
+    public ByteBuffer capacity( int newCapacity )
+    {
+	buf.capacity( newCapacity );
+	return this;
+    }
+
+    public boolean isReadOnly()
+    {
+	return buf.isReadOnly();
+    }
+
+    public int markValue()
+    {
+	return buf.markValue();
+    }
 }
