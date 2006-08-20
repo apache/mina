@@ -42,14 +42,9 @@
       <question>Which version of MINA should I use?</question>
       <answer>
         <p>
-          MINA uses Linux-like version numbers.  There are currently two
-          streams in MINA; 0.7 and 0.9:
-          <ul>
-            <li>0.7 is the first public release of MINA.</li>
-            <li>0.8 is the official stable release of 0.7.</li>
-            <li>0.9 has richer features and cleaner API than 0.8.</li>
-            <li>1.0 is the official stable release of 0.9</li>
-          </ul>
+          MINA uses Linux-like version numbers. This means that even numbers, such as 0.8, will guarantee
+          API stability between releases in the series. With 0.9, you may have to modify your code when moving
+          from 0.9.x to 0.9.y. In practice, the 0.9 series is stablizing and changes shouldn't be too drastic.
         </p>
         <p>
           Here are the general rules for choosing an appropriate release:
