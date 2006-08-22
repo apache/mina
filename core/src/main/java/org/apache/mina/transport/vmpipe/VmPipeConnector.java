@@ -85,7 +85,7 @@ public class VmPipeConnector extends BaseIoConnector
                 new VmPipeSessionImpl(
                         this,
                         new Object(), // lock
-                        AnonymousSocketAddress.INSTANCE,
+                        new AnonymousSocketAddress(),
                         handler,
                         config.getFilterChainBuilder(),
                         config.getThreadModel(),
