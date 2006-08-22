@@ -68,7 +68,7 @@ public class VmPipeConnector extends BaseSessionManager implements ProtocolConne
             throw new IOException( "Endpoint unavailable: " + address );
 
         VmPipeSession session = new VmPipeSession( new Object(), // lock
-                                                   AnonymousVmPipeAddress.INSTANCE,
+                                                   new AnonymousVmPipeAddress(),
                                                    filterChain,
                                                    protocolProvider.getHandler(),
                                                    entry );

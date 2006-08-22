@@ -15,27 +15,21 @@ class AnonymousVmPipeAddress extends SocketAddress implements Comparable
 {
     private static final long serialVersionUID = 3258135768999475512L;
 
-	static final AnonymousVmPipeAddress INSTANCE = new AnonymousVmPipeAddress();
-
     /**
      * Creates a new instance with the specifid port number.
      */
-    private AnonymousVmPipeAddress()
+    public AnonymousVmPipeAddress()
     {
     }
 
     public int hashCode()
     {
-        return 1432482932;
+        return System.identityHashCode( this );
     }
 
     public boolean equals( Object o )
     {
-        if( o == null )
-            return false;
-        if( this == o )
-            return true;
-        return o instanceof AnonymousVmPipeAddress;
+	return this == o;
     }
 
     public int compareTo( Object o )
@@ -45,6 +39,6 @@ class AnonymousVmPipeAddress extends SocketAddress implements Comparable
 
     public String toString()
     {
-        return "vm:anonymous";
+        return "vm:anonymous(" + hashCode() + ')';
     }
 }
