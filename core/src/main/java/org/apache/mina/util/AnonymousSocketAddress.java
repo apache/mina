@@ -30,27 +30,21 @@ public class AnonymousSocketAddress extends SocketAddress implements Comparable
 {
     private static final long serialVersionUID = 3978421416766944048L;
 
-    public static final AnonymousSocketAddress INSTANCE = new AnonymousSocketAddress();
-
     /**
      * Creates a new instance with the specifid port number.
      */
-    private AnonymousSocketAddress()
+    public AnonymousSocketAddress()
     {
     }
 
     public int hashCode()
     {
-        return 1432482932;
+        return System.identityHashCode( this );
     }
 
     public boolean equals( Object o )
     {
-        if( o == null )
-            return false;
-        if( this == o )
-            return true;
-        return o instanceof AnonymousSocketAddress;
+	return this == o;
     }
 
     public int compareTo( Object o )
@@ -60,6 +54,6 @@ public class AnonymousSocketAddress extends SocketAddress implements Comparable
 
     public String toString()
     {
-        return "anonymous";
+        return "anonymous(" + hashCode() + ')';
     }
 }
