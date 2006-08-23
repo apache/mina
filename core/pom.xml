@@ -30,34 +30,5 @@
 
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.4</source>
-          <target>1.4</target>
-          <debug>true</debug>
-          <optimize>true</optimize>
-          <showDeprecations>true</showDeprecations>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/Abstract*</exclude>
-
-            <!-- Timing issues with these tests due to VM bug for releasing file descriptors -->
-            <exclude>**/DatagramBindTest.java</exclude>
-            <exclude>**/VmPipeTrafficControlTest.java</exclude>
-
-            <exclude>**/*RegressionTest*</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
 
