@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.directory</groupId>
+    <artifactId>build</artifactId>
+    <version>1.0.5-SNAPSHOT</version>
+  </parent>
+  <groupId>org.apache.directory.mina</groupId>
+  <version>0.8.3-SNAPSHOT</version>
+  <artifactId>mina</artifactId>
+  <name>Apache MINA</name>
+  <packaging>jar</packaging>
+
+  <url>http://directory.apache.org/subprojects/mina/branches/0.8/</url>
+
+  <distributionManagement>
+    <site>
+      <id>apache.websites</id>
+      <url>scp://people.apache.org/www/directory.apache.org/subprojects/mina/branches/0.8/</url>
+    </site>
+  </distributionManagement>
+
+  <issueManagement>
+    <system>jira</system>
+    <url>http://issues.apache.org/jira/browse/DIRMINA</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/directory/branches/mina/0.8</connection>
+    <url>http://svn.apache.org/viewvc/directory/branches/mina/0.8/</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/directory/branches/mina/0.8</developerConnection>
+  </scm>
+
+  <ciManagement>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <address>mina-dev@directory.apache.org</address>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+
+  <description>
+    MINA (Multipurpose Infrastructure for Network Applications) is a
+    network application framework which helps users develop high
+    performance and highly scalable network applications easily.
+  </description>
+
+  <mailingLists>
+    <mailingList>
+      <name>Apache MINA Developement</name>
+      <subscribe>mina-dev-subscribe@directory.apache.org</subscribe>
+      <unsubscribe>mina-dev-unsubscribe@directory.apache.org</unsubscribe>
+      <post>mina-dev@directory.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/directory-mina-dev/</archive>
+      <otherArchives>
+        <archive>http://dir.gmane.org/gmane.comp.apache.directory.mina.devel</archive>
+      </otherArchives>
+    </mailingList>
+  </mailingLists>
+
+  <developers>
+    <developer>
+      <id>trustin</id>
+      <name>Trustin Lee</name>
+      <email>trustin@gmail.com</email>
+      <url>http://gleamynode.net/</url>
+      <organization>Chutnoon, Inc.</organization>
+      <organizationUrl>http://www.1nooncorp.com/</organizationUrl>
+      <roles>
+        <role>Project Lead</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>+9</timezone>
+    </developer>
+    <developer>
+      <id>niklas</id>
+      <name>Niklas Therning</name>
+      <email>niklas@trillian.se</email>
+      <url>http://therning.org/niklas/</url>
+      <organization>Trillian AB</organization>
+      <organizationUrl>http://www.trillian.se/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>akarasulu</id>
+      <name>Alex Karasulu</name>
+      <email>akarasulu@apache.org</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+    <developer>
+      <id>proyal</id>
+      <name>Peter Royal</name>
+      <email>proyal@apache.org</email>
+      <url>http://fotap.org/~osi</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Jan Andersson</name>
+      <email>janne@minq.se</email>
+    </contributor>
+    <contributor>
+      <name>Julien Vermillard</name>
+      <email>jvermillard@archean.fr</email>
+    </contributor>
+    <contributor>
+      <name>Vinod Panicker</name>
+      <email>vinod.p@gmail.com</email>
+    </contributor>
+  </contributors>
+
+  <licenses>
+    <license>
+      <name>Apache 2.0 License</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+      <version>1.3.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <!-- For releases -->
+    <!--
+    <repository>
+      <id>playboy.mirror</id>
+      <name>Apache Repository @ Playboy</name>
+      <url>http://mirrors.playboy.com/apache/maven-repository/</url>
+    </repository>
+    -->
+
+    <!-- For snapshots (no release jars or non-apache jars) -->
+    <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+    </repository>
+  </repositories>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.4</source>
+          <target>1.4</target>
+          <debug>true</debug>
+          <optimize>true</optimize>
+          <showDeprecations>true</showDeprecations>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/Abstract*</exclude>
+
+            <!-- Timing issues with these tests due to VM bug for releasing file descriptors -->
+            <exclude>**/DatagramBindTest.java</exclude>
+            <exclude>**/VmPipeTrafficControlTest.java</exclude>
+
+            <exclude>**/*RegressionTest*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <inherited>false</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>site</phase>
+            <configuration>
+              <tasks>
+                <javadoc destdir="target/site/apidocs" author="true" use="true" windowtitle="Apache MINA API Documentation" encoding="UTF-8" docencoding="UTF-8" locale="en_US">
+                  <package name="org.apache.mina.*"/>
+                  <excludepackage name="**.examples.**"/>
+                  <excludepackage name="**.support"/>
+
+                  <sourcepath>
+                    <dirset dir=".">
+                      <include name="**/src/main/java" />
+                    </dirset>
+                  </sourcepath>
+
+                  <classpath refid="maven.dependency.classpath" />
+
+                  <link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
+                  <link href="http://static.springframework.org/spring/docs/1.2.x/api/" />
+                  <link href="http://www.slf4j.org/api/" />
+                  <link href="http://gleamynode.net/dev/tl-netty2/docs/apidocs/" />
+                </javadoc>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.0.1</version>
+        <configuration>
+          <descriptor>release.xml</descriptor>
+          <finalName>mina-${pom.version}</finalName>
+          <includeSite>true</includeSite>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.1</version>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- <reporting>
+    <plugins> -->
+      <!-- This has been disabled to due license expiration issue. -->
+      <!-- <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+      </plugin> -->
+      <!-- <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin> -->
+      <!-- This is no longer needed while it cannot do 
+           fully connected multi module apidocs. -->
+      <!-- <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin> -->
+      <!-- <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>taglist-maven-plugin</artifactId>
+      </plugin> -->
+      <!-- This has been disabled due to incorrect functioning. -->
+      <!-- <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+      </plugin> -->
+      <!-- <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>surefire-report-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting> -->
+
+</project>
