@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id>all</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>tar.bz2</format>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <!-- Source Code -->
+    <fileSet>
+      <includes>
+        <include>**/README*</include>
+        <include>**/LICENSE*</include>
+        <include>**/NOTICE*</include>
+        <include>**/*.txt</include>
+        <include>**/*.xml</include>
+        <include>**/src/**</include>
+        <include>**/lib/**</include> <!-- 3rd party libs -->
+      </includes>
+      <excludes>
+        <exclude>**/target/**</exclude>
+        <exclude>**/.*/**</exclude>
+      </excludes>
+    </fileSet>
+
+    <!-- JARs -->
+    <fileSet>
+      <directory>target</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>
+
