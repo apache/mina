@@ -33,7 +33,7 @@ import java.util.Set;
  * <a href="http://deuce.doc.wustl.edu/doc/pspdfs/lf.pdf">Leader/Followers
  * thread pool</a> by Douglas C. Schmidt et al.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */
 public class LeaderFollowersThreadPool implements ThreadPool

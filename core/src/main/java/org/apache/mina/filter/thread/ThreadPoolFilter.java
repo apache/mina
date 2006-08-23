@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * all workers are daemon threads which means that any workers still alive
  * when the JVM terminates will die automatically.
  *
- * @author The Apache Directory Project (dev@directory.apache.org)
+ * <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */
 public class ThreadPoolFilter extends IoFilterAdapter
