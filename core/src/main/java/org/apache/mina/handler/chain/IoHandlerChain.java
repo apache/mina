@@ -29,7 +29,7 @@ import org.apache.mina.common.IoSession;
 /**
  * A chain of {@link IoHandlerCommand}s.
  * 
- * @author The Apache Directory Project
+ * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
 public class IoHandlerChain implements IoHandlerCommand
