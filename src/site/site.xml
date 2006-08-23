@@ -37,8 +37,8 @@
  
     <menu name="MINA References">
       <item name="JavaDocs" href="/apidocs/index.html"/>
-      <item name="Examples" href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/"/>
-      <item name="Source code" href="http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/"/>
+      <item name="Examples" href="http://svn.apache.org/viewvc/directory/trunks/mina/examples/src/main/java/org/apache/mina/examples/"/>
+      <item name="Source code" href="http://svn.apache.org/viewvc/directory/trunks/mina/"/>
     </menu>
 
     <menu name="Older Releases">

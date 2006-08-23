@@ -28,7 +28,7 @@
 
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/directory/trunks/mina</connection>
-    <url>http://svn.apache.org/viewcvs.cgi/directory/trunks/mina/?root=Apache-SVN</url>
+    <url>http://svn.apache.org/viewvc/directory/trunks/mina/</url>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/directory/trunks/mina</developerConnection>
   </scm>
 
