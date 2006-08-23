@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.Security;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -40,8 +41,17 @@ public class BogusSSLContextFactory
      */
     private static final String PROTOCOL = "TLS";
     
-    private static final String KEY_MANAGER_FACTORY_ALGORITHM =
-        System.getProperty( "ssl.KeyManagerFactory.algorithm", "SunX509" );
+    private static final String KEY_MANAGER_FACTORY_ALGORITHM;
+
+    static {
+	String algorithm = Security.getProperty( "ssl.KeyManagerFactory.algorithm" );
+	if( algorithm == null )
+	{
+	    algorithm = "SunX509";
+	}
+	
+	KEY_MANAGER_FACTORY_ALGORITHM = algorithm;
+    }
 
     /**
      * Bougus Server certificate keystore file name.
