@@ -113,12 +113,7 @@ public class TextLineDecoder implements ProtocolDecoder
                         ProtocolDecoderOutput out )
             throws Exception
     {
-        Context ctx = ( Context ) session.getAttribute( CONTEXT );
-        if( ctx == null )
-        {
-            ctx = new Context();
-            session.setAttribute( CONTEXT, ctx );
-        }
+        Context ctx = getContext(session);
         
         if( LineDelimiter.AUTO.equals( delimiter ) )
         {
@@ -140,6 +135,21 @@ public class TextLineDecoder implements ProtocolDecoder
                             ctx.getDecoder(),
                             out ) );
         }
+    }
+
+    private Context getContext(IoSession session) {
+	Context ctx;
+	ctx = ( Context ) session.getAttribute( CONTEXT );
+        if( ctx == null )
+        {
+            ctx = new Context();
+            session.setAttribute( CONTEXT, ctx );
+        }
+	return ctx;
+    }
+
+    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
+    {
     }
 
     public void dispose( IoSession session ) throws Exception

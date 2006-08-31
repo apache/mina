@@ -50,6 +50,17 @@ public interface ProtocolDecoder
                  ProtocolDecoderOutput out ) throws Exception;
     
     /**
+     * Invoked when the specified <tt>session</tt> is closed.  This method is useful
+     * when you deal with the protocol which doesn't specify the length of a message
+     * such as HTTP response without <tt>content-length</tt> header. Implement this
+     * method to process the remaining data that {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
+     * method didn't process completely.
+     * 
+     * @throws Exception if the read data violated protocol specification
+     */
+    void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception;
+    
+    /**
      * Releases all resources related with this decoder.
      * 
      * @throws Exception if failed to dispose all resources

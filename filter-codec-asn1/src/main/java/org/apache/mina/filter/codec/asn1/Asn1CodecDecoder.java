@@ -24,7 +24,7 @@ import org.apache.directory.shared.asn1.codec.stateful.DecoderCallback;
 import org.apache.directory.shared.asn1.codec.stateful.StatefulDecoder;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
@@ -33,7 +33,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$, 
  */
-public class Asn1CodecDecoder implements ProtocolDecoder
+public class Asn1CodecDecoder extends ProtocolDecoderAdapter
 {
 
     private final StatefulDecoder decoder;
@@ -51,10 +51,6 @@ public class Asn1CodecDecoder implements ProtocolDecoder
     {
         callback.decOut = out;
         decoder.decode( in.buf() );
-    }
-
-    public void dispose( IoSession session ) throws Exception
-    {
     }
 
     private class DecoderCallbackImpl implements DecoderCallback

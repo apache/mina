@@ -63,6 +63,14 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder
         }
     }
 
+    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
+    {
+	synchronized( decoder )
+	{
+	    decoder.finishDecode( session, out );
+	}
+    }
+
     public void dispose( IoSession session ) throws Exception
     {
         synchronized( decoder )

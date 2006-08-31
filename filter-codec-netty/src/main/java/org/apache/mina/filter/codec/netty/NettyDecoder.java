@@ -25,16 +25,19 @@ import net.gleamynode.netty2.MessageRecognizer;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
 import org.apache.mina.filter.codec.ProtocolDecoderException;
+import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * A MINA <tt>ProtocolDecoder</tt> that decodes byte buffers into
+ * A MINA {@link ProtocolDecoder} that decodes byte buffers into
  * Netty2 {@link Message}s using specified {@link MessageRecognizer}s. 
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-public class NettyDecoder implements org.apache.mina.filter.codec.ProtocolDecoder
+public class NettyDecoder extends ProtocolDecoderAdapter
 {
     private final MessageRecognizer recognizer;
 
@@ -71,89 +74,86 @@ public class NettyDecoder implements org.apache.mina.filter.codec.ProtocolDecode
         readBuf = newBuf;
     }
 
-	public void decode(IoSession session, ByteBuffer in, org.apache.mina.filter.codec.ProtocolDecoderOutput out) throws Exception {
-	       put( in );
+    public void decode( IoSession session, ByteBuffer in, ProtocolDecoderOutput out ) throws Exception
+    {
+        put( in );
 
-	        Message m = readingMessage;
-	        try
-	        {
-	            for( ;; )
-	            {
-	                readBuf.flip();
-	                if( m == null )
-	                {
-	                    int limit = readBuf.limit();
-	                    boolean failed = true;
-	                    try
-	                    {
-	                        m = recognizer.recognize( readBuf );
-	                        failed = false;
-	                    }
-	                    finally
-	                    {
-	                        if( failed )
-	                        {
-	                            // clear the read buffer if failed to recognize
-	                            readBuf.clear();
-	                            break;
-	                        }
-	                        else
-	                        {
-	                            if( m == null )
-	                            {
-	                                readBuf.limit( readBuf.capacity() );
-	                                readBuf.position( limit );
-	                                break; // finish decoding
-	                            }
-	                            else
-	                            {
-	                                // reset buffer for read
-	                                readBuf.limit( limit );
-	                                readBuf.position( 0 );
-	                            }
-	                        }
-	                    }
-	                }
+        Message m = readingMessage;
+        try
+        {
+            for( ;; )
+            {
+                readBuf.flip();
+                if( m == null )
+                {
+                    int limit = readBuf.limit();
+                    boolean failed = true;
+                    try
+                    {
+                        m = recognizer.recognize( readBuf );
+                        failed = false;
+                    }
+                    finally
+                    {
+                        if( failed )
+                        {
+                            // clear the read buffer if failed to recognize
+                            readBuf.clear();
+                            break;
+                        }
+                        else
+                        {
+                            if( m == null )
+                            {
+                        	readBuf.limit( readBuf.capacity() );
+                        	readBuf.position( limit );
+                        	break; // finish decoding
+                            }
+                            else
+                            {
+                        	// reset buffer for read
+                        	readBuf.limit( limit );
+                        	readBuf.position( 0 );
+                            }
+                        }
+                    }
+                }
 
-	                if( m != null )
-	                {
-	                    try
-	                    {
-	                        if( m.read( readBuf ) )
-	                        {
-	                            out.write( m );
-	                            m = null;
-	                        } else {
-	                        	break;
-	                        }
-	                    }
-	                    finally
-	                    {
-	                        if( readBuf.hasRemaining() )
-	                        {
-	                            readBuf.compact();
-	                        }
-	                        else
-	                        {
-	                            readBuf.clear();
-				    break;
-	                        }
-	                    }
-	                }
-	            }
-	        }
-	        catch( MessageParseException e )
-	        {
-	            m = null; // discard reading message
-	            throw new ProtocolDecoderException( "Failed to decode.", e );
-	        }
-	        finally
-	        {
-	            readingMessage = m;
-	        }		
-	}
-
-	public void dispose(IoSession session) throws Exception {
-
-	}
+                if( m != null )
+                {
+                    try
+                    {
+                	if( m.read( readBuf ) )
+                	{
+                	    out.write( m );
+                	    m = null;
+                	} else {
+                	    break;
+                	}
+                    }
+                    finally
+                    {
+                	if( readBuf.hasRemaining() )
+                	{
+                	    readBuf.compact();
+                	}
+                	else
+                	{
+                	    readBuf.clear();
+                	    break;
+                	}
+                    }
+                }
+            }
+        }
+        catch( MessageParseException e )
+        {
+            m = null; // discard reading message
+            throw new ProtocolDecoderException( "Failed to decode.", e );
+        }
+        finally
+        {
+            readingMessage = m;
+        }		
+    }
 }
