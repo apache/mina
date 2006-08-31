@@ -30,8 +30,17 @@ import org.apache.mina.common.IoSession;
  */
 public abstract class ProtocolDecoderAdapter implements ProtocolDecoder
 {
+    
     /**
-     * Override this method dispose all resources related with this decoder.
+     * Override this method to deal with the closed connection.
+     * The default implementation does nothing.
+     */
+    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
+    {
+    }
+
+    /**
+     * Override this method to dispose all resources related with this decoder.
      * The default implementation does nothing.
      */
     public void dispose( IoSession session ) throws Exception
