@@ -17,34 +17,25 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.codec;
+package org.apache.mina.filter.codec.demux;
 
 import org.apache.mina.common.IoSession;
+import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * An abstract {@link ProtocolDecoder} implementation for those who don't need
- * {@link ProtocolDecoder#finishDecode(IoSession, ProtocolDecoderOutput)} nor
- * {@link ProtocolDecoder#dispose(IoSession)} method.
+ * An abstract {@link MessageDecoder} implementation for those who don't need to
+ * implement {@link MessageDecoder#finishDecode(IoSession, ProtocolDecoderOutput)}
+ * method.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev$, $Date$
  */
-public abstract class ProtocolDecoderAdapter implements ProtocolDecoder
+public abstract class MessageDecoderAdapter implements MessageDecoder
 {
-    
     /**
      * Override this method to deal with the closed connection.
      * The default implementation does nothing.
      */
     public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
-    {
-    }
-
-    /**
-     * Override this method to dispose all resources related with this decoder.
-     * The default implementation does nothing.
-     */
-    public void dispose( IoSession session ) throws Exception
     {
     }
 }

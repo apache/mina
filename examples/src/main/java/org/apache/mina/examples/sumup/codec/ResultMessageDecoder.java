@@ -23,6 +23,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.examples.sumup.message.AbstractMessage;
 import org.apache.mina.examples.sumup.message.ResultMessage;
+import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.demux.MessageDecoder;
 
 /**
@@ -76,7 +77,7 @@ public class ResultMessageDecoder extends AbstractMessageDecoder
         }
     }
 
-    public void dispose() throws Exception
+    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
     {
     }
 }

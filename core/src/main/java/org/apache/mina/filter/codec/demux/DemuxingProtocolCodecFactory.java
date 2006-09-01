@@ -333,7 +333,17 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             }
         }
 
-        public void dispose( IoSession session ) throws Exception
+        public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
+        {
+            if( currentDecoder == null )
+            {
+        	return;
+            }
+            
+            currentDecoder.finishDecode( session, out ); 
+	}
+
+	public void dispose( IoSession session ) throws Exception
         {
             super.dispose( session );
             

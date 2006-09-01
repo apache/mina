@@ -78,5 +78,17 @@ public interface MessageDecoder {
      * @throws Exception if the read data violated protocol specification 
      */
     MessageDecoderResult decode( IoSession session, ByteBuffer in,
-                         ProtocolDecoderOutput out ) throws Exception;
+                                 ProtocolDecoderOutput out ) throws Exception;
+    
+    /**
+     * Invoked when the specified <tt>session</tt> is closed while this decoder was
+     * parsing the data.  This method is useful when you deal with the protocol which doesn't
+     * specify the length of a message such as HTTP response without <tt>content-length</tt>
+     * header. Implement this method to process the remaining data that
+     * {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)} method didn't process
+     * completely.
+     * 
+     * @throws Exception if the read data violated protocol specification
+     */
+    void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception;
 }
