@@ -60,7 +60,8 @@ import org.apache.mina.util.IdentityHashSet;
  * @see MessageEncoder
  * @see MessageDecoder
  */
-public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
+public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
+{
     private MessageDecoderFactory[] decoderFactories = new MessageDecoderFactory[0];
     private MessageEncoderFactory[] encoderFactories = new MessageEncoderFactory[0];
     
@@ -142,11 +143,13 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         this.decoderFactories = newDecoderFactories;
     }
     
-    public ProtocolEncoder getEncoder() throws Exception {
+    public ProtocolEncoder getEncoder() throws Exception
+    {
         return new ProtocolEncoderImpl();
     }
 
-    public ProtocolDecoder getDecoder() throws Exception {
+    public ProtocolDecoder getDecoder() throws Exception
+    {
         return new ProtocolDecoderImpl();
     }
     
@@ -337,13 +340,13 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         {
             if( currentDecoder == null )
             {
-        	return;
+                return;
             }
             
             currentDecoder.finishDecode( session, out ); 
-	}
+        }
 
-	public void dispose( IoSession session ) throws Exception
+        public void dispose( IoSession session ) throws Exception
         {
             super.dispose( session );
             

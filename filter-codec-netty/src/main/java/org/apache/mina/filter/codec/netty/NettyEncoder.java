@@ -23,6 +23,7 @@ import net.gleamynode.netty2.Message;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderException;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
@@ -33,7 +34,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-public class NettyEncoder implements org.apache.mina.filter.codec.ProtocolEncoder
+public class NettyEncoder implements ProtocolEncoder
 {
     /**
      * Creates a new instance.
@@ -42,39 +43,41 @@ public class NettyEncoder implements org.apache.mina.filter.codec.ProtocolEncode
     {
     }
 
-	public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
-	       if( ! ( message instanceof Message ) )
-	        {
-	            throw new ProtocolEncoderException("This encoder can decode only Netty Messages." );
-	        }
+    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception
+    {
+        if( !( message instanceof Message ) )
+        {
+            throw new ProtocolEncoderException(
+                    "This encoder can decode only Netty Messages." );
+        }
 
-	        for( ;; )
-	        {
-	            ByteBuffer buf = ByteBuffer.allocate( 8192 );
-	            Message m = ( Message ) message;
-	            try
-	            {
-	                if( m.write( buf.buf() ) )
-	                {
-	                    break;
-	                }
-	            }
-	            finally
-	            {
-	                buf.flip();
-	                if( buf.hasRemaining() )
-	                {
-	                    out.write( buf );
-	                }
-	                else
-	                {
-	                    buf.release();
-	                }
-	            }
-	        }		
-	}
+        for( ;; )
+        {
+            ByteBuffer buf = ByteBuffer.allocate( 8192 );
+            Message m = ( Message ) message;
+            try
+            {
+                if( m.write( buf.buf() ) )
+                {
+                    break;
+                }
+            }
+            finally
+            {
+                buf.flip();
+                if( buf.hasRemaining() )
+                {
+                    out.write( buf );
+                }
+                else
+                {
+                    buf.release();
+                }
+            }
+        }                
+    }
 
-	public void dispose(IoSession session) throws Exception {
-		
-	}
+    public void dispose( IoSession session ) throws Exception
+    {
+    }
 }

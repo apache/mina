@@ -228,18 +228,18 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
         public void setReceiveBufferSize( int receiveBufferSize )
         {
-        	if( DatagramSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
-        	{
-	            try
-	            {
-	                ch.socket().setReceiveBufferSize( receiveBufferSize );
-	                DatagramSessionImpl.this.readBufferSize = receiveBufferSize;
-	            }
-	            catch( SocketException e )
-	            {
-	                throw new RuntimeIOException( e );
-	            }
-        	}
+            if( DatagramSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
+            {
+                try
+                {
+                    ch.socket().setReceiveBufferSize( receiveBufferSize );
+                    DatagramSessionImpl.this.readBufferSize = receiveBufferSize;
+                }
+                catch( SocketException e )
+                {
+                    throw new RuntimeIOException( e );
+                }
+            }
         }
 
         public boolean isBroadcast()
@@ -280,17 +280,17 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
         public void setSendBufferSize( int sendBufferSize )
         {
-        	if( DatagramSessionConfigImpl.isSetSendBufferSizeAvailable() )
-        	{
-	            try
-	            {
-	                ch.socket().setSendBufferSize( sendBufferSize );
-	            }
-	            catch( SocketException e )
-	            {
-	                throw new RuntimeIOException( e );
-	            }
-        	}
+            if( DatagramSessionConfigImpl.isSetSendBufferSizeAvailable() )
+            {
+                try
+                {
+                    ch.socket().setSendBufferSize( sendBufferSize );
+                }
+                catch( SocketException e )
+                {
+                    throw new RuntimeIOException( e );
+                }
+            }
         }
 
         public boolean isReuseAddress()
@@ -319,36 +319,36 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
         public int getTrafficClass()
         {
-        	if( DatagramSessionConfigImpl.isGetTrafficClassAvailable() )
-        	{
-	            try
-	            {
-	                return ch.socket().getTrafficClass();
-	            }
-	            catch( SocketException e )
-	            {
-	                throw new RuntimeIOException( e );
-	            }
-        	}
-        	else
-        	{
-        		return 0;
-        	}
+            if( DatagramSessionConfigImpl.isGetTrafficClassAvailable() )
+            {
+                try
+                {
+                    return ch.socket().getTrafficClass();
+                }
+                catch( SocketException e )
+                {
+                    throw new RuntimeIOException( e );
+                }
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public void setTrafficClass( int trafficClass )
         {
-        	if( DatagramSessionConfigImpl.isSetTrafficClassAvailable() )
-        	{
-	            try
-	            {
-	                ch.socket().setTrafficClass( trafficClass );
-	            }
-	            catch( SocketException e )
-	            {
-	                throw new RuntimeIOException( e );
-	            }
-        	}
+            if( DatagramSessionConfigImpl.isSetTrafficClassAvailable() )
+            {
+                try
+                {
+                    ch.socket().setTrafficClass( trafficClass );
+                }
+                catch( SocketException e )
+                {
+                    throw new RuntimeIOException( e );
+                }
+            }
         }
     }
 }

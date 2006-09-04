@@ -57,40 +57,40 @@ public abstract class BaseByteBuffer extends ByteBuffer
 
     public boolean isDirect()
     {
-	return buf().isDirect();
+        return buf().isDirect();
     }
     
     public boolean isReadOnly()
     {
-	return buf().isReadOnly();
+        return buf().isReadOnly();
     }
 
     public int capacity()
     {
-	return buf().capacity();
+        return buf().capacity();
     }
     
     public ByteBuffer capacity( int newCapacity )
     {
-	if( newCapacity > capacity() )
-	{
-	    // Allocate a new buffer and transfer all settings to it.
-	    int pos = position();
-	    int limit = limit();
-	    ByteOrder bo = order();
+        if( newCapacity > capacity() )
+        {
+            // Allocate a new buffer and transfer all settings to it.
+            int pos = position();
+            int limit = limit();
+            ByteOrder bo = order();
 
-	    capacity0( newCapacity );
-	    buf().limit( limit );
-	    if( mark >= 0 )
-	    {
-		buf().position( mark );
-		buf().mark();
-	    }
-	    buf().position( pos );
-	    buf().order( bo );
-	}
-	
-	return this;
+            capacity0( newCapacity );
+            buf().limit( limit );
+            if( mark >= 0 )
+            {
+                buf().position( mark );
+                buf().mark();
+            }
+            buf().position( pos );
+            buf().order( bo );
+        }
+        
+        return this;
     }
     
     /**
@@ -101,41 +101,41 @@ public abstract class BaseByteBuffer extends ByteBuffer
 
     public boolean isAutoExpand()
     {
-	return autoExpand;
+        return autoExpand;
     }
 
     public ByteBuffer setAutoExpand( boolean autoExpand )
     {
-	this.autoExpand = autoExpand;
-	return this;
+        this.autoExpand = autoExpand;
+        return this;
     }
 
     public ByteBuffer expand( int pos, int expectedRemaining )
     {
-	int end = pos + expectedRemaining;
-	if( end > capacity() )
-	{
-	    // The buffer needs expansion.
-	    capacity( end );
-	}
-	
-	if( end > limit() )
-	{
-	    // We call limit() directly to prevent StackOverflowError
-	    buf().limit( end );
-	}
-	return this;
+        int end = pos + expectedRemaining;
+        if( end > capacity() )
+        {
+            // The buffer needs expansion.
+            capacity( end );
+        }
+        
+        if( end > limit() )
+        {
+            // We call limit() directly to prevent StackOverflowError
+            buf().limit( end );
+        }
+        return this;
     }
 
     public int position()
     {
-	return buf().position();
+        return buf().position();
     }
 
     public ByteBuffer position( int newPosition )
     {
         autoExpand( newPosition, 0 );
-	buf().position( newPosition );
+        buf().position( newPosition );
         if( mark > newPosition )
         {
             mark = -1;
@@ -145,13 +145,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
     
     public int limit()
     {
-	return buf().limit();
+        return buf().limit();
     }
 
     public ByteBuffer limit( int newLimit )
     {
         autoExpand( newLimit, 0 );
-	buf().limit( newLimit );
+        buf().limit( newLimit );
         if( mark > newLimit )
         {
             mark = -1;
@@ -161,276 +161,276 @@ public abstract class BaseByteBuffer extends ByteBuffer
     
     public ByteBuffer mark()
     {
-	buf().mark();
+        buf().mark();
         mark = position();
         return this;
     }
     
     public int markValue()
     {
-	return mark;
+        return mark;
     }
 
     public ByteBuffer reset()
     {
-	buf().reset();
-	return this;
+        buf().reset();
+        return this;
     }
     
     public ByteBuffer clear()
     {
-	buf().clear();
-	mark = -1;
-	return this;
+        buf().clear();
+        mark = -1;
+        return this;
     }
     
     public ByteBuffer flip()
     {
-	buf().flip();
-	mark = -1;
-	return this;
+        buf().flip();
+        mark = -1;
+        return this;
     }
     
     public ByteBuffer rewind()
     {
-	buf().rewind();
-	mark = -1;
-	return this;
+        buf().rewind();
+        mark = -1;
+        return this;
     }
     
     public byte get()
     {
-	return buf().get();
+        return buf().get();
     }
 
     public ByteBuffer put( byte b )
     {
         autoExpand( 1 );
-	buf().put( b );
-	return this;
+        buf().put( b );
+        return this;
     }
 
     public byte get( int index )
     {
-	return buf().get( index );
+        return buf().get( index );
     }
 
     public ByteBuffer put( int index, byte b )
     {
         autoExpand( index, 1 );
-	buf().put( index, b );
-	return this;
+        buf().put( index, b );
+        return this;
     }
 
     public ByteBuffer get( byte[] dst, int offset, int length )
     {
-	buf().get( dst, offset, length );
-	return this;
+        buf().get( dst, offset, length );
+        return this;
     }
 
     public ByteBuffer put( java.nio.ByteBuffer src )
     {
         autoExpand( src.remaining() );
-	buf().put( src );
-	return this;
+        buf().put( src );
+        return this;
     }
 
     public ByteBuffer put( byte[] src, int offset, int length )
     {
         autoExpand( length );
-	buf().put( src, offset, length );
-	return this;
+        buf().put( src, offset, length );
+        return this;
     }
 
     public ByteBuffer compact()
     {
-	buf().compact();
-	mark = -1;
-	return this;
+        buf().compact();
+        mark = -1;
+        return this;
     }
 
     public ByteOrder order()
     {
-	return buf().order();
+        return buf().order();
     }
 
     public ByteBuffer order( ByteOrder bo )
     {
-	buf().order( bo );
-	return this;
+        buf().order( bo );
+        return this;
     }
 
     public char getChar()
     {
-	return buf().getChar();
+        return buf().getChar();
     }
 
     public ByteBuffer putChar( char value )
     {
         autoExpand( 2 );
-	buf().putChar( value );
-	return this;
+        buf().putChar( value );
+        return this;
     }
 
     public char getChar( int index )
     {
-	return buf().getChar( index );
+        return buf().getChar( index );
     }
 
     public ByteBuffer putChar( int index, char value )
     {
         autoExpand( index, 2 );
-	buf().putChar( index, value );
-	return this;
+        buf().putChar( index, value );
+        return this;
     }
 
     public CharBuffer asCharBuffer()
     {
-	return buf().asCharBuffer();
+        return buf().asCharBuffer();
     }
 
     public short getShort()
     {
-	return buf().getShort();
+        return buf().getShort();
     }
 
     public ByteBuffer putShort( short value )
     {
         autoExpand( 2 );
-	buf().putShort( value );
-	return this;
+        buf().putShort( value );
+        return this;
     }
 
     public short getShort( int index )
     {
-	return buf().getShort( index );
+        return buf().getShort( index );
     }
 
     public ByteBuffer putShort( int index, short value )
     {
         autoExpand( index, 2 );
-	buf().putShort( index, value );
-	return this;
+        buf().putShort( index, value );
+        return this;
     }
 
     public ShortBuffer asShortBuffer()
     {
-	return buf().asShortBuffer();
+        return buf().asShortBuffer();
     }
 
     public int getInt()
     {
-	return buf().getInt();
+        return buf().getInt();
     }
 
     public ByteBuffer putInt( int value )
     {
         autoExpand( 4 );
-	buf().putInt( value );
-	return this;
+        buf().putInt( value );
+        return this;
     }
 
     public int getInt( int index )
     {
-	return buf().getInt( index );
+        return buf().getInt( index );
     }
 
     public ByteBuffer putInt( int index, int value )
     {
         autoExpand( index, 4 );
-	buf().putInt( index, value );
-	return this;
+        buf().putInt( index, value );
+        return this;
     }
 
     public IntBuffer asIntBuffer()
     {
-	return buf().asIntBuffer();
+        return buf().asIntBuffer();
     }
 
     public long getLong()
     {
-	return buf().getLong();
+        return buf().getLong();
     }
 
     public ByteBuffer putLong( long value )
     {
         autoExpand( 8 );
-	buf().putLong( value );
-	return this;
+        buf().putLong( value );
+        return this;
     }
 
     public long getLong( int index )
     {
-	return buf().getLong( index );
+        return buf().getLong( index );
     }
 
     public ByteBuffer putLong( int index, long value )
     {
         autoExpand( index, 8 );
-	buf().putLong( index, value );
-	return this;
+        buf().putLong( index, value );
+        return this;
     }
 
     public LongBuffer asLongBuffer()
     {
-	return buf().asLongBuffer();
+        return buf().asLongBuffer();
     }
 
     public float getFloat()
     {
-	return buf().getFloat();
+        return buf().getFloat();
     }
 
     public ByteBuffer putFloat( float value )
     {
         autoExpand( 4 );
-	buf().putFloat( value );
-	return this;
+        buf().putFloat( value );
+        return this;
     }
 
     public float getFloat( int index )
     {
-	return buf().getFloat( index );
+        return buf().getFloat( index );
     }
 
     public ByteBuffer putFloat( int index, float value )
     {
         autoExpand( index, 4 );
-	buf().putFloat( index, value );
-	return this;
+        buf().putFloat( index, value );
+        return this;
     }
 
     public FloatBuffer asFloatBuffer()
     {
-	return buf().asFloatBuffer();
+        return buf().asFloatBuffer();
     }
 
     public double getDouble()
     {
-	return buf().getDouble();
+        return buf().getDouble();
     }
 
     public ByteBuffer putDouble( double value )
     {
         autoExpand( 8 );
-	buf().putDouble( value );
-	return this;
+        buf().putDouble( value );
+        return this;
     }
 
     public double getDouble( int index )
     {
-	return buf().getDouble( index );
+        return buf().getDouble( index );
     }
 
     public ByteBuffer putDouble( int index, double value )
     {
         autoExpand( index, 8 );
-	buf().putDouble( index, value );
-	return this;
+        buf().putDouble( index, value );
+        return this;
     }
 
     public DoubleBuffer asDoubleBuffer()
     {
-	return buf().asDoubleBuffer();
+        return buf().asDoubleBuffer();
     }
 }

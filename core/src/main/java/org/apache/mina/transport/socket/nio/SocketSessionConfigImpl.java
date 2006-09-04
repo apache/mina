@@ -35,12 +35,12 @@ import java.net.SocketException;
  */
 public class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
 {
-	private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
-	private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
-	private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
-	private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
+    private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
+    private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
+    private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
+    private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
 
-	private static boolean DEFAULT_REUSE_ADDRESS;
+    private static boolean DEFAULT_REUSE_ADDRESS;
     private static int DEFAULT_RECEIVE_BUFFER_SIZE;
     private static int DEFAULT_SEND_BUFFER_SIZE;
     private static int DEFAULT_TRAFFIC_CLASS;
@@ -51,95 +51,95 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
     
     static
     {
-    	initialize();
+        initialize();
     }
     
     private static void initialize()
     {
-    	Socket socket = null;
-    	
-		socket = new Socket();
+        Socket socket = null;
+        
+        socket = new Socket();
 
-		try
-		{
-			DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
-			DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
-			DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
-			DEFAULT_KEEP_ALIVE = socket.getKeepAlive();
-			DEFAULT_OOB_INLINE = socket.getOOBInline();
-			DEFAULT_SO_LINGER = socket.getSoLinger();
-			DEFAULT_TCP_NO_DELAY = socket.getTcpNoDelay();
-			
-			// Check if setReceiveBufferSize is supported.
-			try
-			{
-				socket.setReceiveBufferSize(DEFAULT_RECEIVE_BUFFER_SIZE);
-				SET_RECEIVE_BUFFER_SIZE_AVAILABLE = true;
-			}
-			catch( SocketException e )
-			{
-				SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
-			}
-			
-			// Check if setSendBufferSize is supported.
-			try
-			{
-				socket.setSendBufferSize(DEFAULT_SEND_BUFFER_SIZE);
-				SET_SEND_BUFFER_SIZE_AVAILABLE = true;
-			}
-			catch( SocketException e )
-			{
-				SET_SEND_BUFFER_SIZE_AVAILABLE = false;
-			}
+        try
+        {
+            DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
+            DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
+            DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
+            DEFAULT_KEEP_ALIVE = socket.getKeepAlive();
+            DEFAULT_OOB_INLINE = socket.getOOBInline();
+            DEFAULT_SO_LINGER = socket.getSoLinger();
+            DEFAULT_TCP_NO_DELAY = socket.getTcpNoDelay();
+            
+            // Check if setReceiveBufferSize is supported.
+            try
+            {
+                socket.setReceiveBufferSize(DEFAULT_RECEIVE_BUFFER_SIZE);
+                SET_RECEIVE_BUFFER_SIZE_AVAILABLE = true;
+            }
+            catch( SocketException e )
+            {
+                SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
+            }
+            
+            // Check if setSendBufferSize is supported.
+            try
+            {
+                socket.setSendBufferSize(DEFAULT_SEND_BUFFER_SIZE);
+                SET_SEND_BUFFER_SIZE_AVAILABLE = true;
+            }
+            catch( SocketException e )
+            {
+                SET_SEND_BUFFER_SIZE_AVAILABLE = false;
+            }
 
-			// Check if getTrafficClass is supported.
-			try
-			{
-				DEFAULT_TRAFFIC_CLASS = socket.getTrafficClass();
-				GET_TRAFFIC_CLASS_AVAILABLE = true;
-			}
-			catch( SocketException e )
-			{
-				GET_TRAFFIC_CLASS_AVAILABLE = false;
-				DEFAULT_TRAFFIC_CLASS = 0;
-			}
-		}
+            // Check if getTrafficClass is supported.
+            try
+            {
+                DEFAULT_TRAFFIC_CLASS = socket.getTrafficClass();
+                GET_TRAFFIC_CLASS_AVAILABLE = true;
+            }
+            catch( SocketException e )
+            {
+                GET_TRAFFIC_CLASS_AVAILABLE = false;
+                DEFAULT_TRAFFIC_CLASS = 0;
+            }
+        }
         catch( SocketException e )
         {
-			throw new ExceptionInInitializerError(e);
-		}
-		finally
+            throw new ExceptionInInitializerError(e);
+        }
+        finally
         {
-			if( socket != null )
-			{
-				try
-				{
-					socket.close();
-				}
-				catch( IOException e )
-				{
-					ExceptionMonitor.getInstance().exceptionCaught(e);
-				}
-			}
-		}
+            if( socket != null )
+            {
+                try
+                {
+                    socket.close();
+                }
+                catch( IOException e )
+                {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
+            }
+        }
     }
     
     public static boolean isSetReceiveBufferSizeAvailable() {
-    	return SET_RECEIVE_BUFFER_SIZE_AVAILABLE;
+        return SET_RECEIVE_BUFFER_SIZE_AVAILABLE;
     }
-	
+    
     public static boolean isSetSendBufferSizeAvailable() {
-    	return SET_SEND_BUFFER_SIZE_AVAILABLE;
+        return SET_SEND_BUFFER_SIZE_AVAILABLE;
     }
-	
+    
     public static boolean isGetTrafficClassAvailable() {
-    	return GET_TRAFFIC_CLASS_AVAILABLE;
+        return GET_TRAFFIC_CLASS_AVAILABLE;
     }
-	
+    
     public static boolean isSetTrafficClassAvailable() {
-    	return SET_TRAFFIC_CLASS_AVAILABLE;
+        return SET_TRAFFIC_CLASS_AVAILABLE;
     }
-	
+    
     private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
     private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;

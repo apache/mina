@@ -45,7 +45,7 @@ public class AnonymousSocketAddress extends SocketAddress implements Comparable
 
     public boolean equals( Object o )
     {
-	return this == o;
+        return this == o;
     }
 
     public int compareTo( Object o )

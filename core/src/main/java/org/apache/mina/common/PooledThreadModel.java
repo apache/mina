@@ -66,23 +66,23 @@ public class PooledThreadModel implements ThreadModel
      */
     public static PooledThreadModel getInstance( String serviceName )
     {
-    	if( serviceName == null )
-    	{
-    		throw new NullPointerException( "serviceName" );
-    	}
+        if( serviceName == null )
+        {
+            throw new NullPointerException( "serviceName" );
+        }
 
-    	PooledThreadModel model;
-    	synchronized( service2model )
-    	{
-    		model = ( PooledThreadModel ) service2model.get( serviceName );
-    		if( model == null )
-    		{
-    			model = new PooledThreadModel( serviceName );
-    			service2model.put( serviceName, model );
-    		}
-    	}
-    	
-    	return model;
+        PooledThreadModel model;
+        synchronized( service2model )
+        {
+            model = ( PooledThreadModel ) service2model.get( serviceName );
+            if( model == null )
+            {
+                model = new PooledThreadModel( serviceName );
+                service2model.put( serviceName, model );
+            }
+        }
+        
+        return model;
     }
     
     private final ThreadPoolFilter filter = new ThreadPoolFilter();

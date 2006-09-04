@@ -249,8 +249,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter
     
     public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
     {
-	// Call finishDecode() first when a connection is closed.
-	ProtocolDecoder decoder = getDecoder( session );
+        // Call finishDecode() first when a connection is closed.
+        ProtocolDecoder decoder = getDecoder( session );
         ProtocolDecoderOutput decoderOut = getDecoderOut( session, nextFilter );
         try
         {

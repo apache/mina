@@ -637,17 +637,17 @@ public class ByteBufferProxy extends ByteBuffer
 
     public ByteBuffer capacity( int newCapacity )
     {
-	buf.capacity( newCapacity );
-	return this;
+        buf.capacity( newCapacity );
+        return this;
     }
 
     public boolean isReadOnly()
     {
-	return buf.isReadOnly();
+        return buf.isReadOnly();
     }
 
     public int markValue()
     {
-	return buf.markValue();
+        return buf.markValue();
     }
 }
