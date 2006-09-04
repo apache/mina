@@ -438,7 +438,7 @@ public abstract class ByteBuffer implements Comparable
      */
     public int remaining()
     {
-	return limit() - position();
+        return limit() - position();
     }
 
     /**

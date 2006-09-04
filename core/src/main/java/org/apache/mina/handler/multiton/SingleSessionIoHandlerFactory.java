@@ -31,11 +31,11 @@ import org.apache.mina.common.IoSession;
  * @version $Rev$, $Date$
  */
 public interface SingleSessionIoHandlerFactory {
-	
-	/**
-	 * Returns a {@link SingleSessionIoHandler} for the given session.
-	 * 
-	 * @param session the session for which a handler is requested
-	 */
-	SingleSessionIoHandler getHandler(IoSession session);
+    
+    /**
+     * Returns a {@link SingleSessionIoHandler} for the given session.
+     * 
+     * @param session the session for which a handler is requested
+     */
+    SingleSessionIoHandler getHandler(IoSession session);
 }

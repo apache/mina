@@ -22,6 +22,8 @@ package org.apache.mina.filter.codec.netty;
 import net.gleamynode.netty2.Message;
 import net.gleamynode.netty2.MessageRecognizer;
 
+import org.apache.mina.filter.codec.ProtocolCodecFactory;
+
 /**
  * A MINA <tt>ProtocolCodecFactory</tt> that provides encoder and decoder
  * for Netty2 {@link Message}s and {@link MessageRecognizer}s.
@@ -33,22 +35,25 @@ import net.gleamynode.netty2.MessageRecognizer;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-public class NettyCodecFactory implements org.apache.mina.filter.codec.ProtocolCodecFactory {
-
+public class NettyCodecFactory implements ProtocolCodecFactory
+{
     private static final NettyEncoder ENCODER = new NettyEncoder();
 
     private final MessageRecognizer recognizer;
     
-    public NettyCodecFactory(MessageRecognizer recognizer) {
+    public NettyCodecFactory(MessageRecognizer recognizer)
+    {
         this.recognizer = recognizer;
     }
 
 
-	public org.apache.mina.filter.codec.ProtocolEncoder getEncoder() {
-		return ENCODER;
-	}
+    public org.apache.mina.filter.codec.ProtocolEncoder getEncoder()
+    {
+        return ENCODER;
+    }
 
-	public org.apache.mina.filter.codec.ProtocolDecoder getDecoder() {
-		return new NettyDecoder(recognizer);
-	}
+    public org.apache.mina.filter.codec.ProtocolDecoder getDecoder()
+    {
+        return new NettyDecoder(recognizer);
+    }
 }

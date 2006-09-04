@@ -105,15 +105,15 @@ public class NettyDecoder extends ProtocolDecoderAdapter
                         {
                             if( m == null )
                             {
-                        	readBuf.limit( readBuf.capacity() );
-                        	readBuf.position( limit );
-                        	break; // finish decoding
+                                readBuf.limit( readBuf.capacity() );
+                                readBuf.position( limit );
+                                break; // finish decoding
                             }
                             else
                             {
-                        	// reset buffer for read
-                        	readBuf.limit( limit );
-                        	readBuf.position( 0 );
+                                // reset buffer for read
+                                readBuf.limit( limit );
+                                readBuf.position( 0 );
                             }
                         }
                     }
@@ -123,25 +123,25 @@ public class NettyDecoder extends ProtocolDecoderAdapter
                 {
                     try
                     {
-                	if( m.read( readBuf ) )
-                	{
-                	    out.write( m );
-                	    m = null;
-                	} else {
-                	    break;
-                	}
+                        if( m.read( readBuf ) )
+                        {
+                            out.write( m );
+                            m = null;
+                        } else {
+                            break;
+                        }
                     }
                     finally
                     {
-                	if( readBuf.hasRemaining() )
-                	{
-                	    readBuf.compact();
-                	}
-                	else
-                	{
-                	    readBuf.clear();
-                	    break;
-                	}
+                        if( readBuf.hasRemaining() )
+                        {
+                            readBuf.compact();
+                        }
+                        else
+                        {
+                            readBuf.clear();
+                            break;
+                        }
                     }
                 }
             }
@@ -154,6 +154,6 @@ public class NettyDecoder extends ProtocolDecoderAdapter
         finally
         {
             readingMessage = m;
-        }		
+        }                
     }
 }

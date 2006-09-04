@@ -45,13 +45,13 @@ public class BogusSSLContextFactory
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
 
     static {
-	String algorithm = Security.getProperty( "ssl.KeyManagerFactory.algorithm" );
-	if( algorithm == null )
-	{
-	    algorithm = "SunX509";
-	}
-	
-	KEY_MANAGER_FACTORY_ALGORITHM = algorithm;
+        String algorithm = Security.getProperty( "ssl.KeyManagerFactory.algorithm" );
+        if( algorithm == null )
+        {
+            algorithm = "SunX509";
+        }
+        
+        KEY_MANAGER_FACTORY_ALGORITHM = algorithm;
     }
 
     /**
