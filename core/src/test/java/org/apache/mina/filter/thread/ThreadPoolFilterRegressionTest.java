@@ -73,7 +73,7 @@ public class ThreadPoolFilterRegressionTest extends TestCase
     public void testEventOrder() throws Throwable
     {
         final EventOrderChecker nextFilter = new EventOrderChecker();
-        final IoSession[] sessions = new IoSession[]
+        final EventOrderCounter[] sessions = new EventOrderCounter[]
         {
             new EventOrderCounter(),
             new EventOrderCounter(),
@@ -86,11 +86,12 @@ public class ThreadPoolFilterRegressionTest extends TestCase
             new EventOrderCounter(),
             new EventOrderCounter(),
         };
+        final int loop = 1000000;
         final int end = sessions.length - 1;
         final ThreadPoolFilter filter = this.filter;
         filter.getThreadPool().setKeepAliveTime( 3000 );
         
-        for( int i = 0; i < 1000000 ; i++ )
+        for( int i = 0; i < loop ; i++ )
         {
             Integer objI = new Integer( i );
 
@@ -108,6 +109,10 @@ public class ThreadPoolFilterRegressionTest extends TestCase
         Thread.sleep( 3500 );
         
         Assert.assertEquals( 1, filter.getThreadPool().getPoolSize() );
+        for( int i = end; i >= 0; i-- )
+        {
+            Assert.assertEquals( loop - 1, sessions[ i ].lastCount.intValue() );
+        }
     }
     
     public void testShutdown() throws Exception
