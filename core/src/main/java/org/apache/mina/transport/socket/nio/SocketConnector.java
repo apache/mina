@@ -26,8 +26,6 @@ import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -59,7 +57,6 @@ public class SocketConnector extends BaseIoConnector
     private final String threadName = "SocketConnector-" + id;
     private final IoServiceConfig defaultConfig = new SocketConnectorConfig();
     private final Queue connectQueue = new Queue();
-    private final Set managedSessions = Collections.synchronizedSet( new HashSet() );
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
 
@@ -351,8 +348,8 @@ public class SocketConnector extends BaseIoConnector
     {
         SocketSessionImpl session = new SocketSessionImpl( this,
                                                            nextProcessor(),
-                                                           managedSessions,
-                                                           config.getSessionConfig(),
+                                                           getListeners(),
+                                                           config,
                                                            ch,
                                                            handler,
                                                            ch.socket().getRemoteSocketAddress() );
@@ -367,7 +364,6 @@ public class SocketConnector extends BaseIoConnector
         {
             throw ( IOException ) new IOException( "Failed to create a session." ).initCause( e );
         }
-        session.getManagedSessions().add( session );
         session.getIoProcessor().addNew( session );
         return session;
     }

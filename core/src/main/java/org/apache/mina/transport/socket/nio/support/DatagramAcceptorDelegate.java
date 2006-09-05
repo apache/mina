@@ -228,7 +228,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         RegistrationRequest req = ( RegistrationRequest ) key.attachment();
         DatagramSessionImpl s = new DatagramSessionImpl(
                 wrapper, this,
-                req.config.getSessionConfig(), ch, req.handler,
+                req.config, ch, req.handler,
                 req.address );
         s.setRemoteAddress( remoteAddress );
         s.setSelectionKey( key );
@@ -370,7 +370,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             RegistrationRequest req = ( RegistrationRequest ) key.attachment();
             DatagramSessionImpl session = new DatagramSessionImpl(
                     wrapper, this,
-                    req.config.getSessionConfig(),
+                    req.config,
                     ch, req.handler,
                     req.address );
             session.setSelectionKey( key );
@@ -578,6 +578,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 {
                     channels.put( req.address, ch );
                 }
+                
+                getListeners().fireServiceActivated(
+                        this, req.address, req.handler, req.config);
             }
             catch( Throwable t )
             {
@@ -642,6 +645,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 else
                 {
                     SelectionKey key = ch.keyFor( selector );
+                    request.registrationRequest = ( RegistrationRequest ) key.attachment();
                     key.cancel();
                     selector.wakeup(); // wake up again to trigger thread death
                     ch.disconnect();
@@ -658,6 +662,14 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 {
                     request.done = true;
                     request.notify();
+                }
+
+                if( request.exception == null )
+                {
+                    getListeners().fireServiceDeactivated(
+                            this, request.address,
+                            request.registrationRequest.handler,
+                            request.registrationRequest.config );
                 }
             }
         }
@@ -691,6 +703,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     {
         private final SocketAddress address;
         private boolean done;
+        private RegistrationRequest registrationRequest;
         private RuntimeException exception;
         
         private CancellationRequest( SocketAddress address )

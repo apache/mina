@@ -25,12 +25,11 @@ import java.util.Set;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.ThreadModel;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
@@ -48,6 +47,7 @@ public class VmPipeSessionImpl extends BaseIoSession
     private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
     
     private final IoService manager;
+    private final IoServiceConfig serviceConfig;
     private final SocketAddress localAddress;
     private final SocketAddress remoteAddress;
     private final SocketAddress serviceAddress;
@@ -61,11 +61,11 @@ public class VmPipeSessionImpl extends BaseIoSession
     /**
      * Constructor for client-side session.
      */
-    public VmPipeSessionImpl( IoService manager, Object lock, SocketAddress localAddress,
-                   IoHandler handler, IoFilterChainBuilder filterChainBuilder, ThreadModel threadModel,
-                   VmPipe remoteEntry ) throws IOException
+    public VmPipeSessionImpl( IoService manager, IoServiceConfig serviceConfig, Object lock, SocketAddress localAddress,
+                   IoHandler handler, VmPipe remoteEntry ) throws IOException
     {
         this.manager = manager;
+        this.serviceConfig = serviceConfig;
         this.lock = lock;
         this.localAddress = localAddress;
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
@@ -97,8 +97,8 @@ public class VmPipeSessionImpl extends BaseIoSession
         try
         {
             manager.getFilterChainBuilder().buildFilterChain( filterChain );
-            filterChainBuilder.buildFilterChain( filterChain );
-            threadModel.buildFilterChain( filterChain );
+            serviceConfig.getFilterChainBuilder().buildFilterChain( filterChain );
+            serviceConfig.getThreadModel().buildFilterChain( filterChain );
             handler.sessionCreated( this );
         }
         catch( Throwable t )
@@ -122,6 +122,7 @@ public class VmPipeSessionImpl extends BaseIoSession
     private VmPipeSessionImpl( IoService manager, VmPipeSessionImpl remoteSession, VmPipe entry )
     {
         this.manager = manager;
+        this.serviceConfig = entry.getConfig();
         this.lock = remoteSession.lock;
         this.localAddress = this.serviceAddress = remoteSession.remoteAddress;
         this.remoteAddress = remoteSession.localAddress;
@@ -140,6 +141,11 @@ public class VmPipeSessionImpl extends BaseIoSession
     public IoService getService()
     {
         return manager;
+    }
+    
+    public IoServiceConfig getServiceConfig()
+    {
+        return serviceConfig;
     }
     
     public IoSessionConfig getConfig()

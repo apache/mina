@@ -40,7 +40,11 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
     
+    /**
+     * The default thread model.
+     */
     private final ThreadModel defaultThreadModel = PooledThreadModel.getInstance("AnonymousIoService");
+    
     /**
      * Current thread model.
      */

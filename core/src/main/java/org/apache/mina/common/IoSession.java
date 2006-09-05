@@ -54,6 +54,11 @@ public interface IoSession {
      * Returns the {@link IoService} which provides I/O service to this session.
      */
     IoService getService();
+    
+    /**
+     * Returns the {@link IoServiceConfig} of this session.
+     */
+    IoServiceConfig getServiceConfig();
 
     /**
      * Returns the {@link IoHandler} which handles this session.

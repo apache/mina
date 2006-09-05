@@ -27,11 +27,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,14 +35,9 @@ import java.util.Set;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoAcceptorConfig;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.util.IdentityHashSet;
 import org.apache.mina.util.Queue;
 
 /**
@@ -67,7 +58,6 @@ public class SocketAcceptor extends BaseIoAcceptor
     private final String threadName = "SocketAcceptor-" + id;
     private final IoServiceConfig defaultConfig = new SocketAcceptorConfig();
     private final Map channels = new HashMap();
-    private final Hashtable sessions = new Hashtable();
 
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
@@ -191,24 +181,6 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-    public Set getManagedSessions( SocketAddress address )
-    {
-        if( address == null )
-        {
-            throw new NullPointerException( "address" );
-        }
-
-        Set managedSessions = ( Set ) sessions.get( address );
-
-        if( managedSessions == null )
-        {
-            throw new IllegalArgumentException( "Address not bound: " + address );
-        }
-
-        return Collections.unmodifiableSet(
-            new IdentityHashSet( Arrays.asList( managedSessions.toArray() ) ) );
-    }
-
     public void unbind( SocketAddress address )
     {
         if( address == null )
@@ -216,7 +188,6 @@ public class SocketAcceptor extends BaseIoAcceptor
             throw new NullPointerException( "address" );
         }
 
-        final Set managedSessions = ( Set ) sessions.get( address );
         CancellationRequest request = new CancellationRequest( address );
 
         try
@@ -260,63 +231,6 @@ public class SocketAcceptor extends BaseIoAcceptor
 
             throw request.exception;
         }
-
-        // Disconnect all clients
-        IoServiceConfig cfg = request.registrationRequest.config;
-        boolean disconnectOnUnbind;
-        if( cfg instanceof IoAcceptorConfig )
-        {
-            disconnectOnUnbind = ( ( IoAcceptorConfig ) cfg ).isDisconnectOnUnbind();
-        }
-        else
-        {
-            disconnectOnUnbind = ( ( IoAcceptorConfig ) getDefaultConfig() ).isDisconnectOnUnbind();
-        }
-
-        if( disconnectOnUnbind && managedSessions != null )
-        {
-            IoSession[] tempSessions =
-                ( IoSession[] ) managedSessions.toArray( new IoSession[ managedSessions.size() ] );
-
-            final Object lock = new Object();
-
-            for( int i = 0; i < tempSessions.length; i++ )
-            {
-                if( !managedSessions.contains( tempSessions[i] ) )
-                {
-                    // The session has already been closed and have been 
-                    // removed from managedSessions by the SocketIoProcessor.
-                    continue;
-                }
-                tempSessions[i].close().addListener( new IoFutureListener()
-                {
-                    public void operationComplete( IoFuture future )
-                    {
-                        synchronized( lock )
-                        {
-                            //noinspection NakedNotify
-                            lock.notifyAll();
-                        }
-                    }
-                } );
-            }
-
-            try
-            {
-                synchronized( lock )
-                {
-                    while( !managedSessions.isEmpty() )
-                    {
-                        lock.wait( 1000 );
-                    }
-                }
-            }
-            catch( InterruptedException ie )
-            {
-                // Ignored
-            }
-
-        }
     }
 
     public void unbindAll()
@@ -333,22 +247,6 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-    public boolean isBound( SocketAddress address )
-    {
-        synchronized( channels )
-        {
-            return channels.containsKey( address );
-        }
-    }
-
-    public Set getBoundAddresses()
-    {
-        synchronized( channels )
-        {
-            return new HashSet( channels.keySet() );
-        }
-    }
-    
     private class Worker extends Thread
     {
         Worker()
@@ -444,8 +342,8 @@ public class SocketAcceptor extends BaseIoAcceptor
                     RegistrationRequest req = ( RegistrationRequest ) key.attachment();
                     session = new SocketSessionImpl( SocketAcceptor.this,
                                                      nextProcessor(),
-                                                     ( Set ) sessions.get( req.address ),
-                                                     req.config.getSessionConfig(),
+                                                     getListeners(),
+                                                     req.config,
                                                      ch,
                                                      req.handler,
                                                      req.address );
@@ -453,7 +351,6 @@ public class SocketAcceptor extends BaseIoAcceptor
                     req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
                     ( ( SocketFilterChain ) session.getFilterChain() ).sessionCreated( session );
-                    session.getManagedSessions().add( session );
                     session.getIoProcessor().addNew( session );
                     success = true;
                 }
@@ -465,10 +362,6 @@ public class SocketAcceptor extends BaseIoAcceptor
                 {
                     if( !success )
                     {
-                        if( session != null )
-                        {
-                            session.getManagedSessions().remove( session );
-                        }
                         ch.close();
                     }
                 }
@@ -537,7 +430,9 @@ public class SocketAcceptor extends BaseIoAcceptor
                 {
                     channels.put( req.address, ssc );
                 }
-                sessions.put( req.address, Collections.synchronizedSet( new HashSet() ) );
+                
+                getListeners().fireServiceActivated(
+                        this, req.address, req.handler, req.config );
             }
             catch( IOException e )
             {
@@ -589,7 +484,6 @@ public class SocketAcceptor extends BaseIoAcceptor
                 break;
             }
 
-            sessions.remove( request.address );
             ServerSocketChannel ssc;
             synchronized( channels )
             {
@@ -624,6 +518,14 @@ public class SocketAcceptor extends BaseIoAcceptor
                 {
                     request.done = true;
                     request.notifyAll();
+                }
+                
+                if( request.exception == null )
+                {
+                    getListeners().fireServiceDeactivated(
+                            this, request.address,
+                            request.registrationRequest.handler,
+                            request.registrationRequest.config );
                 }
             }
         }

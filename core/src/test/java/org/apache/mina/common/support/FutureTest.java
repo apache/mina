@@ -28,6 +28,7 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
@@ -127,6 +128,11 @@ public class FutureTest extends TestCase
             public int getScheduledWriteBytes()
             {
                 return 0;
+            }
+
+            public IoServiceConfig getServiceConfig()
+            {
+                return null;
             }
         };
         

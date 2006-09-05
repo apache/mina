@@ -28,6 +28,7 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 
 /**
@@ -76,19 +77,19 @@ public class DelegatedIoAcceptor implements IoAcceptor
         delegate.unbindAll();
     }
     
-    public boolean isBound( SocketAddress address )
+    public boolean isManaged( SocketAddress address )
     {
-        return delegate.isBound( address );
+        return delegate.isManaged( address );
     }
 
-    public Set getBoundAddresses()
+    public Set getManagedServiceAddresses()
     {
-        return delegate.getBoundAddresses();
+        return delegate.getManagedServiceAddresses();
     }
 
-    public Set getManagedSessions( SocketAddress address )
+    public Set getManagedSessions( SocketAddress serviceAddress )
     {
-        return delegate.getManagedSessions( address );
+        return delegate.getManagedSessions( serviceAddress );
     }
 
     public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
@@ -114,5 +115,15 @@ public class DelegatedIoAcceptor implements IoAcceptor
     public DefaultIoFilterChainBuilder getFilterChain()
     {
         return delegate.getFilterChain();
+    }
+
+    public void addListener( IoServiceListener listener )
+    {
+        delegate.addListener( listener );
+    }
+
+    public void removeListener( IoServiceListener listener )
+    {
+        delegate.removeListener( listener );
     }
 }

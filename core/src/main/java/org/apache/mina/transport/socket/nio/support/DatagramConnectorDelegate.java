@@ -545,7 +545,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             DatagramSessionImpl session = new DatagramSessionImpl(
                     wrapper, this,
-                    req.config.getSessionConfig(),
+                    req.config,
                     req.channel, req.handler,
                     req.channel.socket().getRemoteSocketAddress() );
 
