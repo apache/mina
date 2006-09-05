@@ -253,17 +253,14 @@ public class LeaderFollowersThreadPool implements ThreadPool
      *
      * @return A non-null {@link Runnable}
      */
-    protected Runnable fetchRunnable( Queue unfetchedSessionBuffers )
+    protected Runnable fetchRunnable( Queue unfetchedRunnables )
     {
-        return ( Runnable ) unfetchedSessionBuffers.pop();
+        return ( Runnable ) unfetchedRunnables.pop();
     }
 
     public void submit( Runnable runnable )
     {
-        synchronized( unfetchedRunnables )
-        {
-            unfetchedRunnables.add( runnable );
-        }
+        unfetchedRunnables.add( runnable );
     }
 
     private class Worker extends Thread
