@@ -33,6 +33,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
@@ -620,14 +621,12 @@ public class StreamWriteFilterTest extends TestCase {
             return true;
         }
 
-        public Callback getCallback()
+        public void addListener( IoFutureListener listener )
         {
-            return null;
         }
 
-        public void setCallback( Callback callback )
+        public void removeListener( IoFutureListener listener )
         {
-            throw new IllegalStateException( "You can't set a callback for a dummy future." );
         }
     }
 }

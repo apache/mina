@@ -19,51 +19,35 @@
  */
 package org.apache.mina.common;
 
+import java.util.EventListener;
 
 /**
- * Represents the result of an ashynchronous I/O operation.
+ * Something interested in being notified when the result
+ * of an {@link IoFuture} becomes available.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoFuture
+public interface IoFutureListener extends EventListener
 {
     /**
-     * Returns the {@link IoSession} which is associated with this future.
+     * An {@link IoFutureListener} that closes the {@link IoSession} which is
+     * associated with the specified {@link IoFuture}.
      */
-    IoSession getSession();
+    static IoFutureListener CLOSE = new IoFutureListener()
+    {
+        public void operationComplete( IoFuture future )
+        {
+            future.getSession().close();
+        }
+    };
     
     /**
-     * Returns the lock object this future acquires.
-     */
-    Object getLock();
-    
-    /**
-     * Wait for the asynchronous operation to end.
-     */
-    void join();
-
-    /**
-     * Wait for the asynchronous operation to end with the specified timeout.
+     * Invoked when the operation associated with the {@link IoFuture}
+     * has been completed.
      * 
-     * @return <tt>true</tt> if the operation is finished.
+     * @param future  The source {@link IoFuture} which called this
+     *                callback.
      */
-    boolean join( long timeoutInMillis );
-
-    /**
-     * Returns if the asynchronous operation is finished.
-     */
-    boolean isReady();
-
-    /**
-     * Adds an event <tt>listener</tt> which is notified when
-     * the state of this future changes.
-     */
-    void addListener( IoFutureListener listener );
-    
-    /**
-     * Removes an existing event <tt>listener</tt> which is notified when
-     * the state of this future changes.
-     */
-    void removeListener( IoFutureListener listener );
+    void operationComplete( IoFuture future );
 }

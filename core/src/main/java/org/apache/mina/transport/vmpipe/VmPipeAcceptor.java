@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
@@ -155,7 +156,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
                     // removed from managedSessions by the VmPipeFilterChain.
                     continue;
                 }
-                tempSessions[ i ].close().setCallback( new IoFuture.Callback()
+                tempSessions[ i ].close().addListener( new IoFutureListener()
                 {
                     public void operationComplete( IoFuture future )
                     {

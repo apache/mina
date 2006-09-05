@@ -24,6 +24,7 @@ import java.net.InetSocketAddress;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TrafficMask;
@@ -51,8 +52,8 @@ public class ClientToProxyIoHandler extends AbstractProxyIoHandler
 
     public void sessionOpened( final IoSession session ) throws Exception 
     {
-        connector.connect( address, connectorHandler ).setCallback( 
-                new IoFuture.Callback()
+        connector.connect( address, connectorHandler ).addListener( 
+                new IoFutureListener()
         {
             public void operationComplete( IoFuture f )
             {

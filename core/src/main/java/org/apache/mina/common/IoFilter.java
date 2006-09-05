@@ -289,14 +289,14 @@ public interface IoFilter
                 return true;
             }
 
-            public Callback getCallback()
+            public void addListener( IoFutureListener listener )
             {
-                return null;
+                throw new IllegalStateException( "You can't add a listener to a dummy future." );
             }
 
-            public void setCallback( Callback callback )
+            public void removeListener( IoFutureListener listener )
             {
-                throw new IllegalStateException( "You can't set a callback for a dummy future." );
+                throw new IllegalStateException( "You can't add a listener to a dummy future." );
             }
         };
         

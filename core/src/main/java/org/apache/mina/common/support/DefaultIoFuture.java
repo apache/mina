@@ -19,7 +19,12 @@
  */
 package org.apache.mina.common.support;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
 
 /**
@@ -32,8 +37,8 @@ public class DefaultIoFuture implements IoFuture
 {
     private final IoSession session;
     private final Object lock;
+    private final List listeners = new ArrayList();
     private Object result;
-    private Callback callback;
     private boolean ready;
 
     /**
@@ -153,10 +158,7 @@ public class DefaultIoFuture implements IoFuture
             ready = true;
             lock.notifyAll();
     
-            if( callback != null )
-            {
-                invokeCallback();
-            }
+            notifyListeners();
         }
     }
 
@@ -171,33 +173,43 @@ public class DefaultIoFuture implements IoFuture
         }
     }
     
-    public Callback getCallback()
+    public void addListener( IoFutureListener listener )
     {
-        synchronized( lock )
+        if( listener == null )
         {
-            return callback;
-        }
-    }
-    
-    public void setCallback( Callback callback ) 
-    {
-        if( callback == null )
-        {
-            throw new NullPointerException( "callback" );
+            throw new NullPointerException( "listener" );
         }
 
         synchronized( lock )
         {
-            this.callback = callback;
+            listeners.add( listener );
             if( ready )
             {
-                invokeCallback();
+                listener.operationComplete( this );
             }
         }
     }
-
-    private void invokeCallback()
+    
+    public void removeListener( IoFutureListener listener )
     {
-        callback.operationComplete( this );
+        if( listener == null )
+        {
+            throw new NullPointerException( "listener" );
+        }
+
+        synchronized( lock )
+        {
+            listeners.remove( listener );
+        }
+    }
+
+    private void notifyListeners()
+    {
+        synchronized( lock )
+        {
+            for( Iterator i = listeners.iterator(); i.hasNext(); ) {
+                ( ( IoFutureListener ) i.next() ).operationComplete( this );
+            }
+        }
     }
 }

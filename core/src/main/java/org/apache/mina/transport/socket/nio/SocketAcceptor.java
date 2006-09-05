@@ -19,17 +19,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoAcceptorConfig;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.util.IdentityHashSet;
-import org.apache.mina.util.Queue;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -47,6 +36,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoAcceptorConfig;
+import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.support.BaseIoAcceptor;
+import org.apache.mina.util.IdentityHashSet;
+import org.apache.mina.util.Queue;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).
@@ -287,7 +288,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                     // removed from managedSessions by the SocketIoProcessor.
                     continue;
                 }
-                tempSessions[i].close().setCallback( new IoFuture.Callback()
+                tempSessions[i].close().addListener( new IoFutureListener()
                 {
                     public void operationComplete( IoFuture future )
                     {

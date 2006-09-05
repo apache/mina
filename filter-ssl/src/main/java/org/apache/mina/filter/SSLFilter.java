@@ -30,6 +30,7 @@ import org.apache.mina.common.ByteBufferProxy;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
@@ -549,7 +550,7 @@ public class SSLFilter extends IoFilterAdapter
                 }
                 else
                 {
-                    future.setCallback( new IoFuture.Callback()
+                    future.addListener( new IoFutureListener()
                     {
                         public void operationComplete( IoFuture future )
                         {
