@@ -85,11 +85,10 @@ public class VmPipeConnector extends BaseIoConnector
             VmPipeSessionImpl session =
                 new VmPipeSessionImpl(
                         this,
+                        config,
                         new Object(), // lock
                         new AnonymousSocketAddress(),
                         handler,
-                        config.getFilterChainBuilder(),
-                        config.getThreadModel(),
                         entry );
             future.setSession( session );
         }

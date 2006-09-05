@@ -28,6 +28,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoServiceListener;
 
 /**
  * A delegated {@link IoConnector} that wraps the other {@link IoConnector}.
@@ -77,9 +78,19 @@ public class DelegatedIoConnector implements IoConnector
         return delegate.connect( address, localAddress, handler, config );
     }
 
-    public Set getManagedSessions( SocketAddress address )
+    public boolean isManaged( SocketAddress serviceAddress )
     {
-        return delegate.getManagedSessions( address );
+        return delegate.isManaged( serviceAddress );
+    }
+    
+    public Set getManagedServiceAddresses()
+    {
+        return delegate.getManagedServiceAddresses();
+    }
+
+    public Set getManagedSessions( SocketAddress serviceAddress )
+    {
+        return delegate.getManagedSessions( serviceAddress );
     }
     
     public IoServiceConfig getDefaultConfig()
@@ -100,5 +111,15 @@ public class DelegatedIoConnector implements IoConnector
     public DefaultIoFilterChainBuilder getFilterChain()
     {
         return delegate.getFilterChain();
+    }
+
+    public void addListener( IoServiceListener listener )
+    {
+        delegate.addListener( listener );
+    }
+
+    public void removeListener( IoServiceListener listener )
+    {
+        delegate.removeListener( listener );
     }
 }

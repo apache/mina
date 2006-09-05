@@ -28,6 +28,7 @@ import org.apache.mina.common.BroadcastIoSession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
@@ -48,6 +49,7 @@ import org.apache.mina.util.Queue;
 class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 {
     private final IoService wrapperManager;
+    private final IoServiceConfig serviceConfig;
     private final DatagramSessionConfig config = new SessionConfigImpl();
     private final DatagramService managerDelegate;
     private final DatagramFilterChain filterChain;
@@ -65,7 +67,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
      */
     DatagramSessionImpl( IoService wrapperManager,
                          DatagramService managerDelegate,
-                         IoSessionConfig config,
+                         IoServiceConfig serviceConfig,
                          DatagramChannel ch, IoHandler defaultHandler,
                          SocketAddress serviceAddress )
     {
@@ -78,11 +80,13 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
         this.serviceAddress = serviceAddress;
+        this.serviceConfig = serviceConfig;
         
         // Apply the initial session settings
-        if( config instanceof DatagramSessionConfig )
+        IoSessionConfig sessionConfig = serviceConfig.getSessionConfig();
+        if( sessionConfig instanceof DatagramSessionConfig )
         {
-            DatagramSessionConfig cfg = ( DatagramSessionConfig ) config;
+            DatagramSessionConfig cfg = ( DatagramSessionConfig ) sessionConfig;
             this.config.setBroadcast( cfg.isBroadcast() );
             this.config.setReceiveBufferSize( cfg.getReceiveBufferSize() );
             this.readBufferSize = cfg.getReceiveBufferSize();
@@ -99,6 +103,11 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     public IoService getService()
     {
         return wrapperManager;
+    }
+    
+    public IoServiceConfig getServiceConfig()
+    {
+        return serviceConfig;
     }
     
     public IoSessionConfig getConfig()

@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceListener;
 
 /**
  * Base implementation of {@link IoService}s.
@@ -39,13 +40,13 @@ public abstract class BaseIoService implements IoService
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
 
+    /**
+     * Maintains the {@link IoServiceListener}s of this service.
+     */
+    private final IoServiceListenerSupport listeners = new IoServiceListenerSupport();
+    
     protected BaseIoService()
     {
-    }
-    
-    public Set getManagedSessions( SocketAddress address )
-    {
-        throw new UnsupportedOperationException();
     }
     
     public IoFilterChainBuilder getFilterChainBuilder()
@@ -73,5 +74,35 @@ public abstract class BaseIoService implements IoService
             throw new IllegalStateException(
                     "Current filter chain builder is not a DefaultIoFilterChainBuilder." );
         }
+    }
+    
+    public void addListener( IoServiceListener listener )
+    {
+        getListeners().add( listener );
+    }
+    
+    public void removeListener( IoServiceListener listener )
+    {
+        getListeners().remove( listener );
+    }
+    
+    public Set getManagedServiceAddresses()
+    {
+        return getListeners().getManagedServiceAddresses();
+    }
+
+    public Set getManagedSessions( SocketAddress serviceAddress )
+    {
+        return getListeners().getManagedSessions( serviceAddress );
+    }
+
+    public boolean isManaged( SocketAddress serviceAddress )
+    {
+        return getListeners().isManaged( serviceAddress );
+    }
+
+    protected IoServiceListenerSupport getListeners()
+    {
+        return listeners;
     }
 }

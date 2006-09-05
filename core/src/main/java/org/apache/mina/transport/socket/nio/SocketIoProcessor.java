@@ -168,13 +168,13 @@ class SocketIoProcessor
             }
             catch( IOException e )
             {
-                session.getManagedSessions().remove( session );
                 registered = false;
                 ( ( SocketFilterChain ) session.getFilterChain() ).exceptionCaught( session, e );
             }
 
             if( registered )
             {
+                session.getServiceListeners().fireSessionCreated( session );
                 ( ( SocketFilterChain ) session.getFilterChain() ).sessionOpened( session );
             }
         }
@@ -224,7 +224,7 @@ class SocketIoProcessor
             finally
             {
                 releaseWriteBuffers( session );
-                session.getManagedSessions().remove( session );
+                session.getServiceListeners().fireSessionDestroyed( session );
 
                 ( ( SocketFilterChain ) session.getFilterChain() ).sessionClosed( session );
             }

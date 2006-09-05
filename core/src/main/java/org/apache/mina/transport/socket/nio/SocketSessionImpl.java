@@ -19,23 +19,24 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.TransportType;
-import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.common.support.BaseIoSessionConfig;
-import org.apache.mina.util.Queue;
-
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.Set;
+
+import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.common.support.BaseIoSessionConfig;
+import org.apache.mina.common.support.IoServiceListenerSupport;
+import org.apache.mina.util.Queue;
 
 /**
  * An {@link IoSession} for socket transport (TCP/IP).
@@ -46,6 +47,7 @@ import java.util.Set;
 class SocketSessionImpl extends BaseIoSession
 {
     private final IoService manager;
+    private final IoServiceConfig serviceConfig;
     private final SocketSessionConfig config = new SessionConfigImpl();
     private final SocketIoProcessor ioProcessor;
     private final SocketFilterChain filterChain;
@@ -55,7 +57,7 @@ class SocketSessionImpl extends BaseIoSession
     private final SocketAddress remoteAddress;
     private final SocketAddress localAddress;
     private final SocketAddress serviceAddress;
-    private final Set managedSessions;
+    private final IoServiceListenerSupport serviceListeners;
     private SelectionKey key;
     private int readBufferSize;
 
@@ -64,14 +66,14 @@ class SocketSessionImpl extends BaseIoSession
      */
     SocketSessionImpl( IoService manager,
                        SocketIoProcessor ioProcessor,
-                       Set managedSessions,
-                       IoSessionConfig config,
+                       IoServiceListenerSupport listeners,
+                       IoServiceConfig serviceConfig,
                        SocketChannel ch,
                        IoHandler defaultHandler,
                        SocketAddress serviceAddress )
     {
         this.manager = manager;
-        this.managedSessions = managedSessions;
+        this.serviceListeners = listeners;
         this.ioProcessor = ioProcessor;
         this.filterChain = new SocketFilterChain( this );
         this.ch = ch;
@@ -80,11 +82,13 @@ class SocketSessionImpl extends BaseIoSession
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
         this.serviceAddress = serviceAddress;
+        this.serviceConfig = serviceConfig;
 
         // Apply the initial session settings
-        if( config instanceof SocketSessionConfig )
+        IoSessionConfig sessionConfig = serviceConfig.getSessionConfig();
+        if( sessionConfig instanceof SocketSessionConfig )
         {
-            SocketSessionConfig cfg = ( SocketSessionConfig ) config;
+            SocketSessionConfig cfg = ( SocketSessionConfig ) sessionConfig;
             this.config.setKeepAlive( cfg.isKeepAlive() );
             this.config.setOobInline( cfg.isOobInline() );
             this.config.setReceiveBufferSize( cfg.getReceiveBufferSize() );
@@ -104,6 +108,11 @@ class SocketSessionImpl extends BaseIoSession
     public IoService getService()
     {
         return manager;
+    }
+    
+    public IoServiceConfig getServiceConfig()
+    {
+        return serviceConfig;
     }
 
     public IoSessionConfig getConfig()
@@ -126,9 +135,9 @@ class SocketSessionImpl extends BaseIoSession
         return ch;
     }
 
-    Set getManagedSessions()
+    IoServiceListenerSupport getServiceListeners()
     {
-        return managedSessions;
+        return serviceListeners;
     }
 
     SelectionKey getSelectionKey()
