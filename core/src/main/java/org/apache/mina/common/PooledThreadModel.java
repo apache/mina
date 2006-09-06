@@ -110,7 +110,9 @@ public class PooledThreadModel implements ThreadModel
     
     /**
      * Changes the underlying {@link ThreadPool} of this model.
-     * Only newly created {@link IoSession}s will be affected.
+     * Previous settings such as thread name prefix and the number
+     * of threads should be configured again. Only newly created
+     * {@link IoSession}s will be affected.
      */
     public void setThreadPool( ThreadPool threadPool )
     {
