@@ -227,6 +227,19 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( "A", buf.getString( 1, decoder ) );
         Assert.assertEquals( 1, buf.position() );
 
+        // Test a trailing garbage
+        buf.clear();
+        buf.put( (byte) 'A' );
+        buf.put( (byte) 'B' );
+        buf.put( (byte) 0 );
+        buf.put( (byte) 'C' );
+        buf.position( 0 );
+        Assert.assertEquals( "AB", buf.getString( 4, decoder ) );
+        Assert.assertEquals( 4, buf.position() );
+        buf.position( 0 );
+        Assert.assertEquals( "AB\u0000C", buf.getString( 4, decoder, false ) );
+        Assert.assertEquals( 4, buf.position() );
+
         buf.clear();
         buf.fillAndReset( buf.limit() );
         decoder = Charset.forName( "UTF-16" ).newDecoder();
@@ -271,7 +284,7 @@ public class ByteBufferTest extends TestCase
         {
             // ignore
         }
-
+        
         // Test getting strings from an empty buffer.
         buf.clear();
         buf.limit( 0 );
