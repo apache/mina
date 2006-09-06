@@ -823,5 +823,10 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         {
             return nextFilter;
         }
+        
+        public String toString()
+        {
+            return "(" + getName() + ':' + filter + ')';
+        }
     }
 }
