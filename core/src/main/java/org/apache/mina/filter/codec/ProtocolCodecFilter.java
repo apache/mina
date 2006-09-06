@@ -219,8 +219,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         try
         {
             encoder.encode( session, message, encoderOut );
-            
-            ((BaseIoSession)session).increaseWrittenMessages();
+            if( session instanceof BaseIoSession )
+            {
+                ( ( BaseIoSession ) session ).increaseWrittenMessages();
+            }
         }
         catch( Throwable t )
         {
