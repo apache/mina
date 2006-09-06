@@ -357,5 +357,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
         {
             throw new IllegalStateException();
         }
+        
+        public String toString()
+        {
+            return "(" + getName() + ':' + filter + ')';
+        }
     }
 }

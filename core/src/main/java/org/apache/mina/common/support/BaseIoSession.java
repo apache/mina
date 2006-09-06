@@ -459,4 +459,13 @@ public abstract class BaseIoSession implements IoSession
             throw new IllegalArgumentException( "Unknown idle status: "
                                                 + status );
     }
+    
+    public String toString()
+    {
+        return "(" + getTransportType() +
+               ", R: " + getRemoteAddress() +
+               ", L: " + getLocalAddress() +
+               ", S: " + getServiceAddress() +
+               ')';
+    }
 }
