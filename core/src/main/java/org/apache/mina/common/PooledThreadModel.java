@@ -85,7 +85,7 @@ public class PooledThreadModel implements ThreadModel
         return model;
     }
     
-    private final ThreadPoolFilter filter = new ThreadPoolFilter();
+    private ThreadPoolFilter filter = new ThreadPoolFilter();
 
     private PooledThreadModel( String threadNamePrefix )
     {
@@ -94,38 +94,27 @@ public class PooledThreadModel implements ThreadModel
 
     private PooledThreadModel( String threadNamePrefix, int maxThreads )
     {
-        setMaximumPoolSize( maxThreads );
-        setThreadNamePrefix( threadNamePrefix );
+        getThreadPool().setMaximumPoolSize( maxThreads );
+        getThreadPool().setThreadNamePrefix( threadNamePrefix );
     }
 
-    public String getThreadNamePrefix()
+    /**
+     * Returns the underlying {@link ThreadPool} of this model.
+     * You can change various properties such as the number of threads
+     * by calling methods of {@link ThreadPool}.
+     */
+    public ThreadPool getThreadPool()
     {
-        return filter.getThreadPool().getThreadNamePrefix();
-    }
-
-    public void setThreadNamePrefix( String threadNamePrefix )
-    {
-        filter.getThreadPool().setThreadNamePrefix( threadNamePrefix );
+        return filter.getThreadPool();
     }
     
-    public int getMaximumPoolSize()
+    /**
+     * Changes the underlying {@link ThreadPool} of this model.
+     * Only newly created {@link IoSession}s will be affected.
+     */
+    public void setThreadPool( ThreadPool threadPool )
     {
-        return filter.getThreadPool().getMaximumPoolSize();
-    }
-
-    public int getKeepAliveTime()
-    {
-        return filter.getThreadPool().getKeepAliveTime();
-    }
-
-    public void setMaximumPoolSize( int maximumPoolSize )
-    {
-        filter.getThreadPool().setMaximumPoolSize( maximumPoolSize );
-    }
-
-    public void setKeepAliveTime( int keepAliveTime )
-    {
-        filter.getThreadPool().setKeepAliveTime( keepAliveTime );
+        filter = new ThreadPoolFilter( threadPool );
     }
 
     public void buildFilterChain( IoFilterChain chain ) throws Exception
