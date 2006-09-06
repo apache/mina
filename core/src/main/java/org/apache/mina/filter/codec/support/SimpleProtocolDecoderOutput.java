@@ -49,7 +49,7 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
         messageQueue.push( message );
         if( session instanceof BaseIoSession )
         {
-            ( (BaseIoSession) session ).increaseReadMessages();
+            ( ( BaseIoSession ) session ).increaseReadMessages();
         }
     }
 
