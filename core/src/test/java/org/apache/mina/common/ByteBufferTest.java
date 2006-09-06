@@ -236,9 +236,6 @@ public class ByteBufferTest extends TestCase
         buf.position( 0 );
         Assert.assertEquals( "AB", buf.getString( 4, decoder ) );
         Assert.assertEquals( 4, buf.position() );
-        buf.position( 0 );
-        Assert.assertEquals( "AB\u0000C", buf.getString( 4, decoder, false ) );
-        Assert.assertEquals( 4, buf.position() );
 
         buf.clear();
         buf.fillAndReset( buf.limit() );
