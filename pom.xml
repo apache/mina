@@ -171,6 +171,7 @@
         <module>filter-codec-netty</module>
         <module>filter-compression</module>
         <module>integration-spring</module>
+	<module>jmx</module>
         <module>examples</module>
       </modules>
     </profile>
@@ -206,6 +207,7 @@ Build with 1.4 jvm will not include modules:
  o mina-filter-ssl
  o mina-integration-spring
  o mina-examples
+ o mina-jmx
 
 Use JDK 1.5 to make sure these modules build.
 ====================================================================
