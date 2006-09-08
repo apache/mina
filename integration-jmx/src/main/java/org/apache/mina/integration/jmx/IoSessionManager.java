@@ -219,7 +219,7 @@ public class IoSessionManager implements IoSessionManagerMBean
 
     public float getByteReadThroughtput()
     {
-        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.STAT_ID);
+        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
         if(stats==null)
             return Float.NaN;
         else
@@ -229,7 +229,7 @@ public class IoSessionManager implements IoSessionManagerMBean
 
     public float getByteWrittenThroughtput()
     {
-        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.STAT_ID);
+        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
         if(stats==null)
             return Float.NaN;
         else
@@ -239,7 +239,7 @@ public class IoSessionManager implements IoSessionManagerMBean
 
     public float getMessageReadThroughtput()
     {
-        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.STAT_ID);
+        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
         if(stats==null)
             return Float.NaN;
         else
@@ -249,7 +249,7 @@ public class IoSessionManager implements IoSessionManagerMBean
 
     public float getMessageWrittenThroughtput()
     {
-        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.STAT_ID);
+        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
         if(stats==null)
             return Float.NaN;
         else

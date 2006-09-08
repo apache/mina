@@ -20,12 +20,14 @@
 package org.apache.mina.management;
 
 /**
+ * The collected stats for a session. It's used by {@link StatCollector} to attach
+ * throughput stats to an {@link IoSession}.
+ * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * The collected stats for a session. It's used by StatCollector for attach throughput stats to IoSession
+ * @version $Rev$, $Date$
  */
 public class IoSessionStat
 {
-
     long lastByteRead = -1;
     long lastByteWrite = -1;
     long lastMessageRead = -1;
