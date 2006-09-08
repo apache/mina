@@ -171,7 +171,7 @@
         <module>filter-codec-netty</module>
         <module>filter-compression</module>
         <module>integration-spring</module>
-	<module>jmx</module>
+	<module>integration-jmx</module>
         <module>examples</module>
       </modules>
     </profile>
