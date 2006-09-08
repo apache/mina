@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.thread;
+package org.apache.mina.filter.executor;
 
 import org.apache.mina.util.BlockingQueue;
 import org.apache.mina.util.IdentityHashSet;

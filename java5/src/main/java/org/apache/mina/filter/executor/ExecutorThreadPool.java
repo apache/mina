@@ -17,9 +17,11 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.thread;
+package org.apache.mina.filter.executor;
 
 import java.util.concurrent.Executor;
+
+import org.apache.mina.filter.executor.ThreadPool;
 
 /**
  * {@link ThreadPool} implementation that hands excecution off to an

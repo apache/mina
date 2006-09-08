@@ -22,8 +22,8 @@ package org.apache.mina.common;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.mina.filter.thread.ThreadPool;
-import org.apache.mina.filter.thread.ThreadPoolFilter;
+import org.apache.mina.filter.executor.ThreadPool;
+import org.apache.mina.filter.executor.ThreadPoolFilter;
 
 /**
  * A {@link ThreadModel} which represents a thread model with an independant
