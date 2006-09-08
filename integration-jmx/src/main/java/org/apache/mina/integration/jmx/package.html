@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+</head>
+<body>
+JMX (Java Management eXtension) integration
+
+<h2>Monitoring Your MINA Services and Sessions</h3>
+
+<h3>Monitoring an IoService</h3>
+<pre>
+acceptor = new SocketAcceptor();
+       
+try
+{
+    IoServiceManager iosm = new IoServiceManager(acceptor);
+    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();  
+    ObjectName name = new ObjectName( "com.acme.test:type=IoServiceManager,name=MyMINAServer" );
+    mbs.registerMBean( iosm, name );
+}
+catch( JMException e )
+{
+    logger.error( "JMX Exception: ", e );
+}
+</pre>
+
+<h3>Monitoring an IoSession</h3>
+
+Each session is registered to MBean server individually.
+
+<pre>
+acceptor.addListener( new IoServiceListener()
+{
+    public void serviceActivated( IoService service, SocketAddress serviceAddress, IoHandler handler, IoServiceConfig config )
+    {
+    }
+
+    public void serviceDeactivated( IoService service, SocketAddress serviceAddress, IoHandler handler, IoServiceConfig config )
+    {
+    }
+
+    public void sessionCreated( IoSession session )
+    {
+        try
+        {
+            IoSessionManager sessMgr = new IoSessionManager( session );
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();  
+            ObjectName name = new ObjectName( "com.acme.test.session:type=IoSessionManager,name=" + session.getRemoteAddress().toString().replace( ':', '/' ) );
+            mbs.registerMBean( sessMgr, name );
+        }
+        catch( JMException e )
+        {
+            logger.error( "JMX Exception: ", e );
+        }      
+    }
+
+    public void sessionDestroyed( IoSession session )
+    {
+        try
+        {
+            ObjectName name = new ObjectName( "com.acme.test.session:type=IoSessionManager,name=" + session.getRemoteAddress().toString().replace( ':', '/' ) );
+            ManagementFactory.getPlatformMBeanServer().unregisterMBean( name );
+        }
+        catch( JMException e )
+        {
+            logger.error( "JMX Exception: ", e );
+        }      
+    }
+});
+</pre>
+</body>
+</html>

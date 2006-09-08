@@ -21,6 +21,7 @@ package org.apache.mina.integration.jmx;
 
 /**
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$
  */
 public interface IoServiceManagerMBean
 {

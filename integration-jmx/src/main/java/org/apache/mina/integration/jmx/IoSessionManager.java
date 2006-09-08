@@ -35,6 +35,7 @@ import org.apache.mina.management.StatCollector;
 
 /**
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$
  */
 public class IoSessionManager implements IoSessionManagerMBean
 {
