@@ -33,42 +33,29 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.common.support.DefaultWriteFuture;
-import org.apache.mina.filter.executor.ThreadPoolFilter;
 
-public class ThreadPoolFilterRegressionTest extends TestCase
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+public class ExecutorFilterRegressionTest extends TestCase
 {
-    private static final IoFilterChain FILTER_PARENT = new AbstractIoFilterChain( new DummySession() )
-    {
-        protected void doWrite( IoSession session, WriteRequest writeRequest )
-        {
-        }
-        protected void doClose( IoSession session )
-        {
-        }
-    };
-
-    private ThreadPoolFilter filter;
+    private ExecutorFilter filter;
     
-    public ThreadPoolFilterRegressionTest()
+    public ExecutorFilterRegressionTest()
     {
     }
     
     public void setUp() throws Exception
     {
-        filter = new ThreadPoolFilter();
-        filter.init();
+        filter = new ExecutorFilter();
     }
     
     public void tearDown() throws Exception
     {
-        filter.destroy();
-        Assert.assertEquals( 0, filter.getThreadPool().getPoolSize() );
+        ( ( ThreadPoolExecutor ) filter.getExecutor() ).shutdown();
         filter = null;
     }
     
@@ -90,8 +77,8 @@ public class ThreadPoolFilterRegressionTest extends TestCase
         };
         final int loop = 1000000;
         final int end = sessions.length - 1;
-        final ThreadPoolFilter filter = this.filter;
-        filter.getThreadPool().setKeepAliveTime( 3000 );
+        final ExecutorFilter filter = this.filter;
+        ( ( ThreadPoolExecutor ) filter.getExecutor() ).setKeepAliveTime( 3, TimeUnit.SECONDS );
         
         for( int i = 0; i < loop ; i++ )
         {
@@ -108,51 +95,11 @@ public class ThreadPoolFilterRegressionTest extends TestCase
             }
         }
         
-        Thread.sleep( 3500 );
+        Thread.sleep( 1000 );
         
-        Assert.assertEquals( 1, filter.getThreadPool().getPoolSize() );
         for( int i = end; i >= 0; i-- )
         {
             Assert.assertEquals( loop - 1, sessions[ i ].lastCount.intValue() );
-        }
-    }
-    
-    public void testShutdown() throws Exception
-    {
-        final IoSession[] sessions = new IoSession[]
-        {
-            new DummySession(),
-            new DummySession(),
-            new DummySession(),
-            new DummySession(),
-            new DummySession(),
-            new DummySession(),
-            new DummySession(),
-            new DummySession(),
-            new DummySession(),
-            new DummySession(),
-        };
-        final int end = sessions.length - 1;
-        final NextFilter nextFilter = new DummyNextFilter();
-
-        for( int i = 0; i < 100000; i ++ )
-        {
-            if( i % 1000 == 0 )
-            {
-                System.out.println( "Shutdown: " + i );
-            }
-            
-            WriteFuture future = null;
-            for( int j = end; j >= 0; j-- )
-            {
-                future = new DefaultWriteFuture( sessions[ j ] );
-                filter.messageReceived( nextFilter, sessions[ j ], future );
-            }
-            
-            future.join();
-            
-            filter.onPostRemove( FILTER_PARENT, "", null );
-            filter.onPostAdd( FILTER_PARENT, "", null );
         }
     }
     
@@ -292,120 +239,8 @@ public class ThreadPoolFilterRegressionTest extends TestCase
         }
     }
     
-    private static class DummySession extends BaseIoSession
-    {
-        protected void updateTrafficMask()
-        {
-        }
-
-        public IoHandler getHandler()
-        {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain()
-        {
-            return null;
-        }
-
-        public CloseFuture close()
-        {
-            return null;
-        }
-
-        public TransportType getTransportType()
-        {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress()
-        {
-            return null;
-        }
-
-        public SocketAddress getLocalAddress()
-        {
-            return null;
-        }
-
-        public int getScheduledWriteRequests()
-        {
-            return 0;
-        }
-
-        public boolean isClosing()
-        {
-            return false;
-        }
-
-        public IoService getService()
-        {
-            return null;
-        }
-
-        public IoServiceConfig getServiceConfig()
-        {
-            return null;
-        }
-
-        public IoSessionConfig getConfig()
-        {
-            return null;
-        }
-
-        public SocketAddress getServiceAddress()
-        {
-            return null;
-        }
-
-        public int getScheduledWriteBytes()
-        {
-            return 0;
-        }
-    }
-    
-    private static class DummyNextFilter implements NextFilter
-    {
-        public void sessionCreated( IoSession session )
-        {
-        }
-
-        public void sessionOpened( IoSession session )
-        {
-        }
-
-        public void sessionClosed( IoSession session )
-        {
-        }
-
-        public void sessionIdle( IoSession session, IdleStatus status )
-        {
-        }
-
-        public void exceptionCaught( IoSession session, Throwable cause )
-        {
-        }
-
-        public void messageReceived( IoSession session, Object message )
-        {
-            ( ( DefaultWriteFuture ) message ).setWritten( true );
-        }
-
-        public void messageSent( IoSession session, Object message )
-        {
-        }
-
-        public void filterWrite( IoSession session, WriteRequest writeRequest )
-        {
-        }
-
-        public void filterClose( IoSession session )
-        {
-        }
-    }
-    
     public static void main( String[] args )
     {
-        junit.textui.TestRunner.run( ThreadPoolFilterRegressionTest.class );
+        junit.textui.TestRunner.run( ExecutorFilterRegressionTest.class );
     }
 }

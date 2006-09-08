@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.PooledThreadModel;
+import org.apache.mina.common.ExecutorThreadModel;
 import org.apache.mina.common.ThreadModel;
 
 /**
@@ -43,7 +43,7 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
     /**
      * The default thread model.
      */
-    private final ThreadModel defaultThreadModel = PooledThreadModel.getInstance("AnonymousIoService");
+    private final ThreadModel defaultThreadModel = ExecutorThreadModel.getInstance("AnonymousIoService");
     
     /**
      * Current thread model.

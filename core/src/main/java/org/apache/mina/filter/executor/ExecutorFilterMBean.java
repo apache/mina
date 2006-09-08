@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.executor;
 
-public interface ThreadPoolFilterMBean
+public interface ExecutorFilterMBean
 {
     String getThreadNamePrefix();
 
