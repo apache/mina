@@ -27,7 +27,7 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.executor.ThreadPoolFilter;
+import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
  * This filter will automatically disable reads on an <code>IoSession</code> once the data batched for that session in
@@ -111,7 +111,7 @@ public class ReadThrottleFilterBuilder
         {
             IoFilterChain.Entry entry = (IoFilterChain.Entry)i.next();
 
-            if( entry.getFilter().getClass().isAssignableFrom( ThreadPoolFilter.class ) )
+            if( entry.getFilter().getClass().isAssignableFrom( ExecutorFilter.class ) )
             {
                 return entry.getName();
             }

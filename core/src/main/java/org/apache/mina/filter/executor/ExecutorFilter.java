@@ -25,77 +25,63 @@ import java.util.List;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.ThreadModel;
 import org.apache.mina.util.ByteBufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 /**
- * A Thread-pooling filter.  This filter forwards {@link IoHandler} events to its thread pool.
+ * A filter that forward events to {@link Executor} in
+ * <a href="http://dcl.mathcs.emory.edu/util/backport-util-concurrent/">backport-util-concurrent</a>.
+ * You can apply various thread model by inserting this filter to the {@link IoFilterChain}.
+ * This filter is usually inserted by {@link ThreadModel} automatically, so you don't need
+ * to add this filter in most cases.
  * <p>
- * Use the {@link #init()} and {@link #destroy()} methods to force this filter
- * to start/stop processing events. Alternatively, {@link #init()} will be
- * called automatically the first time an instance of this filter is added
- * to a filter chain. Calling {@link #destroy()} is not required either since
- * all workers are daemon threads which means that any workers still alive
- * when the JVM terminates will die automatically.
+ * Please note that this filter doesn't manage the life cycle of the underlying
+ * {@link Executor}.  You have to destroy or stop it by yourself.
  *
  * <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */
-public class ThreadPoolFilter extends IoFilterAdapter
+public class ExecutorFilter extends IoFilterAdapter
 {
-    private static final Logger logger = LoggerFactory.getLogger( ThreadPoolFilter.class.getName() );
-    private final ThreadPool threadPool;
+    private static final Logger logger = LoggerFactory.getLogger( ExecutorFilter.class.getName() );
+    private final Executor executor;
 
     /**
      * Creates a new instace with the default thread pool implementation
-     * (@link LeaderFollowersThreadPool}).
+     * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
-    public ThreadPoolFilter()
+    public ExecutorFilter()
     {
-        this( new LeaderFollowersThreadPool() );
+        this( new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() ) );
     }
     
     /**
-     * Creates a new instance with the specified <tt>threadPool</tt>.
+     * Creates a new instance with the specified <tt>executor</tt>.
      */
-    public ThreadPoolFilter( ThreadPool threadPool )
+    public ExecutorFilter( Executor executor )
     {
-        if( threadPool == null )
+        if( executor == null )
         {
-            throw new NullPointerException( "threadPool" );
+            throw new NullPointerException( "executor" );
         }
 
-        this.threadPool = threadPool;
-    }
-
-    public void init()
-    {
-        threadPool.init();
-    }
-
-    public void destroy()
-    {
-        threadPool.destroy();
-    }
-    
-    public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter )
-            throws Exception
-    {
-        if( !getThreadPool().isStarted() )
-        {
-            init();
-        }
+        this.executor = executor;
     }
 
     /**
-     * Returns the underlying {@link ThreadPool} instance this filter uses.
+     * Returns the underlying {@link Executor} instance this filter uses.
      */
-    public ThreadPool getThreadPool()
+    public Executor getExecutor()
     {
-        return threadPool;
+        return executor;
     }
 
     private void fireEvent( NextFilter nextFilter, IoSession session,
@@ -114,7 +100,7 @@ public class ThreadPoolFilter extends IoFilterAdapter
                     logger.debug( "Launching thread for " + session.getRemoteAddress() );
                 }
 
-                threadPool.submit( new ProcessEventsRunnable( buf ) );
+                executor.execute( new ProcessEventsRunnable( buf ) );
             }
         }
     }
