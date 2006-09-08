@@ -39,6 +39,7 @@ import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.DefaultWriteFuture;
+import org.apache.mina.filter.executor.ThreadPoolFilter;
 
 public class ThreadPoolFilterRegressionTest extends TestCase
 {

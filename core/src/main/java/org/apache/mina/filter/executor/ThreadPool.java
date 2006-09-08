@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.thread;
+package org.apache.mina.filter.executor;
 
 /**
  * An interface for a pool of threads, capable of handling units of work that are <code>Runnable</code>.

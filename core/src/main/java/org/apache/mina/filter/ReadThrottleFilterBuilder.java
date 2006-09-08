@@ -27,7 +27,7 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.thread.ThreadPoolFilter;
+import org.apache.mina.filter.executor.ThreadPoolFilter;
 
 /**
  * This filter will automatically disable reads on an <code>IoSession</code> once the data batched for that session in
