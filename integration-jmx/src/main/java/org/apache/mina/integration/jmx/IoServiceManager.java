@@ -23,10 +23,7 @@ package org.apache.mina.integration.jmx;
 import java.net.SocketAddress;
 import java.util.Iterator;
 
-import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.management.IoSessionStat;
 import org.apache.mina.management.StatCollector;
@@ -34,6 +31,7 @@ import org.apache.mina.management.StatCollector;
 
 /**
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$
  */
 public class IoServiceManager implements IoServiceManagerMBean
 {
