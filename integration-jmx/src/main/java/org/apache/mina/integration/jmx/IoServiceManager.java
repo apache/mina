@@ -91,7 +91,7 @@ public class IoServiceManager implements IoServiceManagerMBean
             for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
             {
                 IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.STAT_ID ) )
+                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
                     .getByteReadThroughput();
             }
         }
@@ -109,7 +109,7 @@ public class IoServiceManager implements IoServiceManagerMBean
             for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
             {
                 IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.STAT_ID ) )
+                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
                     .getByteWrittenThroughput();
             }
         }
@@ -127,7 +127,7 @@ public class IoServiceManager implements IoServiceManagerMBean
             for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
             {
                 IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.STAT_ID ) )
+                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
                     .getMessageReadThroughput();
             }
         }
@@ -145,7 +145,7 @@ public class IoServiceManager implements IoServiceManagerMBean
             for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
             {
                 IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.STAT_ID ) )
+                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
                     .getMessageWrittenThroughput();
             }
         }
@@ -164,7 +164,7 @@ public class IoServiceManager implements IoServiceManagerMBean
             for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
             {
                 IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.STAT_ID ) )
+                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
                     .getByteReadThroughput();
                 count++;
             }
@@ -184,7 +184,7 @@ public class IoServiceManager implements IoServiceManagerMBean
             for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
             {
                 IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.STAT_ID ) )
+                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
                     .getByteWrittenThroughput();
                 count++;
             }
@@ -204,7 +204,7 @@ public class IoServiceManager implements IoServiceManagerMBean
             for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
             {
                 IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.STAT_ID ) )
+                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
                     .getMessageReadThroughput();
                 count++;
             }
@@ -224,7 +224,7 @@ public class IoServiceManager implements IoServiceManagerMBean
             for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
             {
                 IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.STAT_ID ) )
+                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
                     .getMessageWrittenThroughput();
                 count++;
             }

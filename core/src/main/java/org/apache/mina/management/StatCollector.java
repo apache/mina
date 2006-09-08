@@ -23,6 +23,7 @@ package org.apache.mina.management;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -32,48 +33,46 @@ import org.apache.mina.common.IoSession;
 
 
 /**
+ * Collects statistics of an {@linkIoService}. It's polling all the sessions of a given
+ * IoService. It's attaching a {@link IoSessionStat} object to all the sessions polled
+ * and filling the throughput values.
+ * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * An  IoService statistic collector. It's polling all the sessions of a given IoService. It's attaching a IoSessionStats object to
- * all the sessions polled and filling the throughput values.
+ * @version $Rev$, $Date$
  */
 public class StatCollector
 {
-    private IoService service;
+    /**
+     * The session attribute key for {@link IoSessionStat}.
+     */
+    public static final String KEY = StatCollector.class.getName() + ".stat";
 
-    public static String STAT_ID = "StatCollected";
-
+    private final IoService service;
     private Worker worker;
-
     private int pollingInterval = 5000;
+    private List polledSessions;
 
-    private ArrayList polledSessions;
-
-    private IoServiceListener serviceListener = new IoServiceListener()
+    private final IoServiceListener serviceListener = new IoServiceListener()
     {
-
         public void serviceActivated( IoService service, SocketAddress serviceAddress, IoHandler handler,
             IoServiceConfig config )
         {
         }
-
 
         public void serviceDeactivated( IoService service, SocketAddress serviceAddress, IoHandler handler,
             IoServiceConfig config )
         {
         }
 
-
         public void sessionCreated( IoSession session )
         {
             addSession( session );
         }
 
-
         public void sessionDestroyed( IoSession session )
         {
             removeSession( session );
         }
-
     };
 
     /**
@@ -82,7 +81,7 @@ public class StatCollector
      */
     public StatCollector( IoService service )
     {
-        this(service,5000);
+        this( service,5000 );
 
     }
 
@@ -102,6 +101,7 @@ public class StatCollector
      */
     public void start()
     {
+        // TODO Make this method thread-safe.
         if ( worker != null && worker.isAlive() )
             throw new RuntimeException( "Stat collecting already started" );
 
@@ -133,6 +133,8 @@ public class StatCollector
      */
     public void stop()
     {
+        // TODO Make this method thread-safe.
+        // TODO Make the worker stop immediately, not waiting for the next loop.
         service.removeListener( serviceListener );
 
         // stop worker
@@ -159,21 +161,20 @@ public class StatCollector
      */
     public boolean isRunning()
     {
+        // TODO Make this method thread-safe
         return worker != null && worker.stop != true;
     }
-
 
     private void addSession( IoSession session )
     {
         polledSessions.add( session );
-        session.setAttribute( STAT_ID, new IoSessionStat() );
+        session.setAttribute( KEY, new IoSessionStat() );
     }
-
 
     private void removeSession( IoSession session )
     {
         polledSessions.remove( session );
-        session.removeAttribute( STAT_ID );
+        session.removeAttribute( KEY );
     }
 
     private class Worker extends Thread
@@ -181,9 +182,9 @@ public class StatCollector
 
         boolean stop = false;
 
-
         private Worker()
         {
+            // TODO Append a thread ID or any distingushed information to the thread name.
             super( "StatCollectorWorker" );
         }
 
@@ -194,7 +195,7 @@ public class StatCollector
                 for ( Iterator iter = polledSessions.iterator(); iter.hasNext(); )
                 {
                     IoSession session = ( IoSession ) iter.next();
-                    IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( STAT_ID );
+                    IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
 
                     sessStat.lastByteRead = session.getReadBytes();
                     sessStat.lastByteWrite = session.getWrittenBytes();
@@ -214,20 +215,19 @@ public class StatCollector
                 for ( Iterator iter = polledSessions.iterator(); iter.hasNext(); )
                 {
                     IoSession session = ( IoSession ) iter.next();
-                    IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( STAT_ID );
+                    IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
 
-                    sessStat.byteReadThroughput = ( ( float ) ( session.getReadBytes() - sessStat.lastByteRead ) )
-                        / ( ( ( float ) pollingInterval ) / 1000f );
-                    sessStat.byteWrittenThroughput = ( ( float ) ( session.getWrittenBytes() - sessStat.lastByteWrite ) )
-                        / ( ( ( float ) pollingInterval ) / 1000f );
+                    sessStat.byteReadThroughput = ( session.getReadBytes() - sessStat.lastByteRead )
+                        / ( pollingInterval / 1000f );
+                    sessStat.byteWrittenThroughput = ( session.getWrittenBytes() - sessStat.lastByteWrite )
+                        / ( pollingInterval / 1000f );
 
-                    sessStat.messageReadThroughput = ( ( float ) ( session.getReadMessages() - sessStat.lastMessageRead ) )
-                        / ( ( ( float ) pollingInterval ) / 1000f );
-                    sessStat.messageWrittenThroughput = ( ( float ) ( session.getWrittenMessages() - sessStat.lastMessageWrite ) )
-                        / ( ( ( float ) pollingInterval ) / 1000f );
+                    sessStat.messageReadThroughput = ( session.getReadMessages() - sessStat.lastMessageRead )
+                        / ( pollingInterval / 1000f );
+                    sessStat.messageWrittenThroughput = ( session.getWrittenMessages() - sessStat.lastMessageWrite )
+                        / ( pollingInterval / 1000f );
 
                 }
-
             }
         }
     }
