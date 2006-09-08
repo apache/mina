@@ -21,7 +21,12 @@ package org.apache.mina.management;
 
 /**
  * The collected stats for a session. It's used by {@link StatCollector} to attach
- * throughput stats to an {@link IoSession}.
+ * throughput stats to an {@link IoSession}. You can accces a session stat using 
+ * {@link IoSession} getAttribute method :
+ * <pre>
+ * IoSession session = ...
+ * IoSessionStat stat = session.getAttribute( StatCollector.KEY );
+ * </pre>
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$

@@ -37,6 +37,16 @@ import org.apache.mina.common.IoSession;
  * IoService. It's attaching a {@link IoSessionStat} object to all the sessions polled
  * and filling the throughput values.
  * 
+ * Usage :
+ * <pre>
+ * IoService service = ...
+ * StatCollector collector = new StatCollector( service );
+ * collector.start();
+ * </pre>
+ * 
+ * By default the {@link Statcollector} is polling the sessions every 5 seconds. You can 
+ * give a different polling time using a second constructor.
+ * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -83,7 +93,7 @@ public class StatCollector
     };
 
     /**
-     * create a stat collector for the given given service with the default polling time 
+     * Create a stat collector for the given service with a default polling time of 5 seconds. 
      * @param service the IoService to inspect
      */
     public StatCollector( IoService service )
@@ -104,7 +114,8 @@ public class StatCollector
     }
 
     /**
-     * start collecting stats
+     * Start collecting stats for the {@link IoSession} of the service.
+     * New sessions or destroyed will be automaticly added or removed.
      */
     public void start()
     {
@@ -140,7 +151,8 @@ public class StatCollector
     }
 
     /**
-     * stop collecting stats
+     * Stop collecting stats. all the {@link IoSessionStat} object will be removed of the
+     * polled session attachements. 
      */
     public void stop()
     {
@@ -163,12 +175,16 @@ public class StatCollector
                 }
             }
 
+            for (Iterator iter = polledSessions.iterator(); iter.hasNext();) {
+                IoSession session = (IoSession) iter.next();
+                session.removeAttribute(KEY);
+            }
             polledSessions.clear();
         }
     }
 
     /**
-     * is the stat collector collecting
+     * is the stat collector started and polling the {@link IoSession} of the {@link IoService}
      * @return true if started
      */
     public boolean isRunning()
