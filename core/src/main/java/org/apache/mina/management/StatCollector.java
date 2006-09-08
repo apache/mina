@@ -47,6 +47,13 @@ public class StatCollector
      */
     public static final String KEY = StatCollector.class.getName() + ".stat";
 
+    
+    /**
+     * @noinspection StaticNonFinalField
+     */
+    private static volatile int nextId = 0;
+    private final int id = nextId ++;
+    
     private final IoService service;
     private Worker worker;
     private int pollingInterval = 5000;
@@ -101,31 +108,35 @@ public class StatCollector
      */
     public void start()
     {
-        // TODO Make this method thread-safe.
-        if ( worker != null && worker.isAlive() )
-            throw new RuntimeException( "Stat collecting already started" );
-
-        // add all current sessions
-
-        polledSessions = new ArrayList();
-
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        synchronized (this) 
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
+            if ( worker != null && worker.isAlive() )
+                throw new RuntimeException( "Stat collecting already started" );
+    
+            // add all current sessions
+    
+            polledSessions = new ArrayList();
+    
+            for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
             {
-                addSession( ( IoSession ) iter2.next() );
-
+                SocketAddress element = ( SocketAddress ) iter.next();
+    
+                for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
+                {
+                    addSession( ( IoSession ) iter2.next() );
+    
+                }
             }
+
+            // listen for new ones
+            service.addListener( serviceListener );
+    
+            // start polling
+            worker = new Worker();
+            worker.start();
+
         }
 
-        // listen for new ones
-        service.addListener( serviceListener );
-
-        // start polling
-        worker = new Worker();
-        worker.start();
     }
 
     /**
@@ -133,26 +144,27 @@ public class StatCollector
      */
     public void stop()
     {
-        // TODO Make this method thread-safe.
-        // TODO Make the worker stop immediately, not waiting for the next loop.
-        service.removeListener( serviceListener );
-
-        // stop worker
-        worker.stop = true;
-        try
+        synchronized (this) 
         {
-            synchronized ( worker )
+            service.removeListener( serviceListener );
+
+            // stop worker
+            worker.stop = true;
+            worker.interrupt();
+            while( worker.isAlive() )
             {
-                worker.join();
+                try
+                {
+                    worker.join();
+                }
+                catch( InterruptedException e )
+                {
+                    //ignore since this is shutdown time
+                }
             }
-        }
-        catch ( InterruptedException e )
-        {
-            // ignore
-        }
 
-        polledSessions.clear();
-
+            polledSessions.clear();
+        }
     }
 
     /**
@@ -161,8 +173,10 @@ public class StatCollector
      */
     public boolean isRunning()
     {
-        // TODO Make this method thread-safe
-        return worker != null && worker.stop != true;
+        synchronized (this) 
+        {
+            return worker != null && worker.stop != true;
+        }
     }
 
     private void addSession( IoSession session )
@@ -184,8 +198,7 @@ public class StatCollector
 
         private Worker()
         {
-            // TODO Append a thread ID or any distingushed information to the thread name.
-            super( "StatCollectorWorker" );
+            super( "StatCollectorWorker-"+id );
         }
 
         public void run()
@@ -231,5 +244,4 @@ public class StatCollector
             }
         }
     }
-
 }
