@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.thread;
+package org.apache.mina.filter.executor;
 
 import java.net.SocketAddress;
 
