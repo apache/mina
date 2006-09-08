@@ -10,11 +10,19 @@
   <name>Apache MINA JMX management</name>
   <packaging>jar</packaging>  
   <dependencies>
-     <dependency>
-          <groupId>org.apache.mina</groupId>
-          <artifactId>mina-core</artifactId>
-          <version>${pom.version}</version>
-     </dependency>
+    <dependency>
+      <groupId>org.apache.mina</groupId>
+      <artifactId>mina-core</artifactId>
+      <version>${pom.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.management</groupId>
+      <artifactId>jmxri</artifactId>
+      <version>1.2.1</version>
+      <scope>compile</scope>
+    </dependency>
 
   </dependencies>
   
