@@ -33,7 +33,7 @@ import org.apache.mina.common.IoSession;
 
 
 /**
- * Collects statistics of an {@linkIoService}. It's polling all the sessions of a given
+ * Collects statistics of an {@link IoService}. It's polling all the sessions of a given
  * IoService. It's attaching a {@link IoSessionStat} object to all the sessions polled
  * and filling the throughput values.
  * 
