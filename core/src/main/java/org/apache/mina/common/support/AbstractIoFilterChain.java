@@ -399,7 +399,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
     }
 
-    public void sessionCreated( IoSession session )
+    public void fireSessionCreated( IoSession session )
     {
         Entry head = this.head;
         callNextSessionCreated(head, session);
@@ -413,11 +413,11 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            exceptionCaught( session, e );
+            fireExceptionCaught( session, e );
         }
     }
 
-    public void sessionOpened( IoSession session )
+    public void fireSessionOpened( IoSession session )
     {
         Entry head = this.head;
         callNextSessionOpened(head, session);
@@ -432,11 +432,11 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            exceptionCaught( session, e );
+            fireExceptionCaught( session, e );
         }
     }
 
-    public void sessionClosed( IoSession session )
+    public void fireSessionClosed( IoSession session )
     {
         // Update future.
         try
@@ -445,7 +445,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable t )
         {
-            exceptionCaught( session, t );
+            fireExceptionCaught( session, t );
         }
 
         // And start the chain.
@@ -463,11 +463,11 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            exceptionCaught( session, e );
+            fireExceptionCaught( session, e );
         }
     }
 
-    public void sessionIdle( IoSession session, IdleStatus status )
+    public void fireSessionIdle( IoSession session, IdleStatus status )
     {
         Entry head = this.head;
         callNextSessionIdle(head, session, status);
@@ -483,11 +483,11 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            exceptionCaught( session, e );
+            fireExceptionCaught( session, e );
         }
     }
 
-    public void messageReceived( IoSession session, Object message )
+    public void fireMessageReceived( IoSession session, Object message )
     {
         Entry head = this.head;
         callNextMessageReceived(head, session, message );
@@ -503,23 +503,11 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            exceptionCaught( session, e );
+            fireExceptionCaught( session, e );
         }
     }
 
-    public void messageNotSent( IoSession session, WriteRequest request )
-    {
-        try
-        {
-            request.getFuture().setWritten( false );
-        }
-        catch( Throwable t )
-        {
-            exceptionCaught( session, t );
-        }
-    }
-
-    public void messageSent( IoSession session, WriteRequest request )
+    public void fireMessageSent( IoSession session, WriteRequest request )
     {
         try
         {
@@ -527,7 +515,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable t )
         {
-            exceptionCaught( session, t );
+            fireExceptionCaught( session, t );
         }
         
         Entry head = this.head;
@@ -544,11 +532,11 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            exceptionCaught( session, e );
+            fireExceptionCaught( session, e );
         }
     }
 
-    public void exceptionCaught( IoSession session, Throwable cause )
+    public void fireExceptionCaught( IoSession session, Throwable cause )
     {
         Entry head = this.head;
         callNextExceptionCaught(head, session, cause);
@@ -570,7 +558,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
     }
 
-    public void filterWrite( IoSession session, WriteRequest writeRequest )
+    public void fireFilterWrite( IoSession session, WriteRequest writeRequest )
     {
         Entry tail = this.tail;
         callPreviousFilterWrite( tail, session, writeRequest );
@@ -586,11 +574,11 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            exceptionCaught( session, e );
+            fireExceptionCaught( session, e );
         }
     }
 
-    public void filterClose( IoSession session )
+    public void fireFilterClose( IoSession session )
     {
         Entry tail = this.tail;
         callPreviousFilterClose( tail, session );
@@ -605,7 +593,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         catch( Throwable e )
         {
-            exceptionCaught( session, e );
+            fireExceptionCaught( session, e );
         }
     }
 

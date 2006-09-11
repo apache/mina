@@ -83,7 +83,7 @@ public class VmPipeSessionImpl extends BaseIoSession
             remoteEntry.getAcceptor().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
             remoteEntry.getConfig().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
             remoteEntry.getConfig().getThreadModel().buildFilterChain( remoteSession.getFilterChain() );
-            ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).sessionCreated( remoteSession );
+            remoteSession.getFilterChain().fireSessionCreated( remoteSession );
         }
         catch( Throwable t )
         {
@@ -112,8 +112,8 @@ public class VmPipeSessionImpl extends BaseIoSession
         remoteSession.managedSessions.add( remoteSession );
         this.managedSessions.add( this );
         
-        ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).sessionOpened( remoteSession );
-        filterChain.sessionOpened( this );
+        remoteSession.getFilterChain().fireSessionOpened( remoteSession );
+        filterChain.fireSessionOpened( this );
     }
 
     /**
@@ -165,12 +165,12 @@ public class VmPipeSessionImpl extends BaseIoSession
 
     protected void close0()
     {
-        filterChain.filterClose( this );
+        filterChain.fireFilterClose( this );
     }
     
     protected void write0( WriteRequest writeRequest )
     {
-        this.filterChain.filterWrite( this, writeRequest );
+        this.filterChain.fireFilterWrite( this, writeRequest );
     }
 
     public int getScheduledWriteRequests()
@@ -223,7 +223,7 @@ public class VmPipeSessionImpl extends BaseIoSession
                 }
                 else
                 {
-                    filterChain.messageReceived( this, data[ i ] );
+                    filterChain.fireMessageReceived( this, data[ i ] );
                 }
             }
         }

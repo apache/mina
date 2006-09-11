@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.support.AbstractIoFilterChain;
 
 /**
  * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them. 
@@ -127,7 +126,7 @@ public class VmPipeIdleStatusChecker
             && ( currentTime - lastIoTime ) >= idleTime )
         {
             session.increaseIdleCount( status );
-            ( ( AbstractIoFilterChain ) session.getFilterChain() ).sessionIdle( session, status );
+            session.getFilterChain().fireSessionIdle( session, status );
         }
     }
 

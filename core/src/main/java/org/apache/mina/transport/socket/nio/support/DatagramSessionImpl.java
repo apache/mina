@@ -147,7 +147,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     
     protected void close0()
     {
-        filterChain.filterClose( this );
+        filterChain.fireFilterClose( this );
     }
 
     Queue getWriteRequestQueue()
@@ -167,7 +167,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
     protected void write0( WriteRequest writeRequest )
     {
-        filterChain.filterWrite( this, writeRequest );
+        filterChain.fireFilterWrite( this, writeRequest );
     }
 
     public int getScheduledWriteRequests()

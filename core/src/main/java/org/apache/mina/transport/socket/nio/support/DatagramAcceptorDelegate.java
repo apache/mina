@@ -236,7 +236,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         try
         {
             buildFilterChain( req, s );
-            ( ( DatagramFilterChain ) s.getFilterChain() ).sessionCreated( s );
+            s.getFilterChain().fireSessionCreated( s );
         }
         catch( Throwable t )
         {
@@ -378,7 +378,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             try
             {
                 buildFilterChain( req, session );
-                ( ( DatagramFilterChain ) session.getFilterChain() ).sessionCreated( session );
+                ( ( DatagramFilterChain ) session.getFilterChain() ).fireSessionCreated( session );
 
                 if( key.isReadable() )
                 {
@@ -415,12 +415,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 newBuf.flip();
 
                 session.increaseReadBytes( newBuf.remaining() );
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageReceived( session, newBuf );
+                session.getFilterChain().fireMessageReceived( session, newBuf );
             }
         }
         catch( IOException e )
         {
-            ( ( DatagramFilterChain ) session.getFilterChain() ).exceptionCaught( session, e );
+            ( ( DatagramFilterChain ) session.getFilterChain() ).fireExceptionCaught( session, e );
         }
         finally
         {
@@ -451,7 +451,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             }
             catch( IOException e )
             {
-                ( ( DatagramFilterChain ) session.getFilterChain() ).exceptionCaught( session, e );
+                ( ( DatagramFilterChain ) session.getFilterChain() ).fireExceptionCaught( session, e );
             }
         }
     }
@@ -484,7 +484,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
                 session.increaseWrittenWriteRequests();
                 buf.reset();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, req );
+                ( ( DatagramFilterChain ) session.getFilterChain() ).fireMessageSent( session, req );
                 continue;
             }
 
@@ -526,7 +526,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 session.increaseWrittenBytes( writtenBytes );
                 session.increaseWrittenWriteRequests();
                 buf.reset();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, req );
+                ( ( DatagramFilterChain ) session.getFilterChain() ).fireMessageSent( session, req );
             }
         }
     }
