@@ -358,7 +358,7 @@ public class SocketConnector extends BaseIoConnector
             getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
             config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
             config.getThreadModel().buildFilterChain( session.getFilterChain() );
-            ( ( SocketFilterChain ) session.getFilterChain() ).sessionCreated( session );
+            session.getFilterChain().fireSessionCreated( session );
         }
         catch( Throwable e )
         {

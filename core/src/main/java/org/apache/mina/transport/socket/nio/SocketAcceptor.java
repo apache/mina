@@ -350,7 +350,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                     getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
-                    ( ( SocketFilterChain ) session.getFilterChain() ).sessionCreated( session );
+                    session.getFilterChain().fireSessionCreated( session );
                     session.getIoProcessor().addNew( session );
                     success = true;
                 }

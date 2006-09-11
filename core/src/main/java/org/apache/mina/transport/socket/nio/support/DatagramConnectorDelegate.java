@@ -417,12 +417,12 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 newBuf.flip();
 
                 session.increaseReadBytes( readBytes );
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageReceived( session, newBuf );
+                session.getFilterChain().fireMessageReceived( session, newBuf );
             }
         }
         catch( IOException e )
         {
-            ( ( DatagramFilterChain ) session.getFilterChain() ).exceptionCaught( session, e );
+            session.getFilterChain().fireExceptionCaught( session, e );
         }
         finally
         {
@@ -453,7 +453,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             }
             catch( IOException e )
             {
-                ( ( DatagramFilterChain ) session.getFilterChain() ).exceptionCaught( session, e );
+                session.getFilterChain().fireExceptionCaught( session, e );
             }
         }
     }
@@ -486,7 +486,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
                 session.increaseWrittenWriteRequests();
                 buf.reset();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, req );
+                session.getFilterChain().fireMessageSent( session, req );
                 continue;
             }
 
@@ -522,7 +522,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 session.increaseWrittenBytes( writtenBytes );
                 session.increaseWrittenWriteRequests();
                 buf.reset();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).messageSent( session, req );
+                session.getFilterChain().fireMessageSent( session, req );
             }
         }
     }
@@ -553,7 +553,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             try
             {
                 buildFilterChain( req, session );
-                ( ( DatagramFilterChain ) session.getFilterChain() ).sessionCreated( session );
+                session.getFilterChain().fireSessionCreated( session );
 
                 SelectionKey key = req.channel.register( selector,
                         SelectionKey.OP_READ, session );

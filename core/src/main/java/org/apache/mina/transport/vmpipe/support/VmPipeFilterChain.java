@@ -35,7 +35,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
         super( session );
     }
 
-    public void messageReceived( IoSession session, Object message )
+    public void fireMessageReceived( IoSession session, Object message )
     {
         VmPipeSessionImpl s = ( VmPipeSessionImpl ) session;
         synchronized( s.lock )
@@ -57,7 +57,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                 
                 s.increaseReadBytes( byteCount );
                 
-                super.messageReceived( s, message );
+                super.fireMessageReceived( s, message );
             }
         }
     }
@@ -99,14 +99,14 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                     s.increaseWrittenBytes( byteCount );
                     s.increaseWrittenWriteRequests();
     
-                    ( ( VmPipeFilterChain ) s.getFilterChain() ).messageSent( s, writeRequest );
-                    ( ( VmPipeFilterChain ) s.remoteSession.getFilterChain() )
-                                .messageReceived( s.remoteSession, messageCopy );
+                    s.getFilterChain().fireMessageSent( s, writeRequest );
+                    s.remoteSession.getFilterChain()
+                                .fireMessageReceived( s.remoteSession, messageCopy );
                 }
             }
             else 
             {
-                ( ( VmPipeFilterChain ) s.getFilterChain() ).messageNotSent( s, writeRequest );
+                writeRequest.getFuture().setWritten( false );
             }
         }
     }
@@ -119,7 +119,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
             if( !session.getCloseFuture().isClosed() )
             {
                 s.getManagedSessions().remove( s );
-                ( ( VmPipeFilterChain ) s.getFilterChain() ).sessionClosed( session );
+                s.getFilterChain().fireSessionClosed( session );
                 s.remoteSession.close();
             }
         }

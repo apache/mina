@@ -157,7 +157,7 @@ class SocketSessionImpl extends BaseIoSession
 
     protected void close0()
     {
-        filterChain.filterClose( this );
+        filterChain.fireFilterClose( this );
     }
 
     Queue getWriteRequestQueue()
@@ -183,7 +183,7 @@ class SocketSessionImpl extends BaseIoSession
 
     protected void write0( WriteRequest writeRequest )
     {
-        filterChain.filterWrite( this, writeRequest );
+        filterChain.fireFilterWrite( this, writeRequest );
     }
 
     public TransportType getTransportType()

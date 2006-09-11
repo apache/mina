@@ -179,13 +179,13 @@ public class IoFilterChainTest extends TestCase
     
     private void run( String expectedResult )
     {
-        chain.sessionCreated( session );
-        chain.sessionOpened( session );
-        chain.messageReceived( session, new Object() );
-        chain.filterWrite( session, new WriteRequest( new Object() ) );
-        chain.sessionIdle( session, IdleStatus.READER_IDLE );
-        chain.exceptionCaught( session, new Exception() );
-        chain.sessionClosed( session );
+        chain.fireSessionCreated( session );
+        chain.fireSessionOpened( session );
+        chain.fireMessageReceived( session, new Object() );
+        chain.fireFilterWrite( session, new WriteRequest( new Object() ) );
+        chain.fireSessionIdle( session, IdleStatus.READER_IDLE );
+        chain.fireExceptionCaught( session, new Exception() );
+        chain.fireSessionClosed( session );
         
         result = formatResult( result );
         expectedResult = formatResult( expectedResult );
@@ -459,7 +459,7 @@ public class IoFilterChainTest extends TestCase
 
         protected void doWrite( IoSession session, WriteRequest writeRequest )
         {
-            messageSent( session, writeRequest );
+            fireMessageSent( session, writeRequest );
         }
 
         protected void doClose( IoSession session )
