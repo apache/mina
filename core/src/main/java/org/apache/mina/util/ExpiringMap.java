@@ -35,9 +35,9 @@ import java.util.Set;
  */
 public class ExpiringMap implements Map
 {
-    public static final long DEFAULT_EXPIRATION_TIME = 5000;
+    public static final long DEFAULT_EXPIRATION_TIME = 60000;
 
-    public static final long DEFAULT_EXPIRER_DELAY = 5000;
+    public static final long DEFAULT_EXPIRER_DELAY = 1000;
 
     private static volatile int expirerCount = 1;
 
