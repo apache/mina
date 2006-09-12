@@ -67,6 +67,7 @@ class DatagramFilterChain extends AbstractIoFilterChain {
         }
         else
         {
+            ( ( DatagramAcceptorDelegate ) manager ).getListeners().fireSessionDestroyed( session );
             session.getCloseFuture().setClosed();
         }
     }

@@ -86,6 +86,7 @@ public class VmPipeConnector extends BaseIoConnector
                 new VmPipeSessionImpl(
                         this,
                         config,
+                        getListeners(),
                         new Object(), // lock
                         new AnonymousSocketAddress(),
                         handler,

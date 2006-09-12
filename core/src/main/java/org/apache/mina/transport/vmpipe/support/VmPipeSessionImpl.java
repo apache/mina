@@ -21,7 +21,6 @@ package org.apache.mina.transport.vmpipe.support;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Set;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChain;
@@ -34,6 +33,7 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
+import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.Queue;
 
 /**
@@ -46,14 +46,14 @@ public class VmPipeSessionImpl extends BaseIoSession
 {
     private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
     
-    private final IoService manager;
+    private final IoService service;
     private final IoServiceConfig serviceConfig;
+    private final IoServiceListenerSupport serviceListeners;
     private final SocketAddress localAddress;
     private final SocketAddress remoteAddress;
     private final SocketAddress serviceAddress;
     private final IoHandler handler;
     private final VmPipeFilterChain filterChain;
-    private final Set managedSessions;
     final VmPipeSessionImpl remoteSession;
     final Object lock;
     final Queue pendingDataQueue;
@@ -61,11 +61,14 @@ public class VmPipeSessionImpl extends BaseIoSession
     /**
      * Constructor for client-side session.
      */
-    public VmPipeSessionImpl( IoService manager, IoServiceConfig serviceConfig, Object lock, SocketAddress localAddress,
-                   IoHandler handler, VmPipe remoteEntry ) throws IOException
+    public VmPipeSessionImpl(
+            IoService service, IoServiceConfig serviceConfig,
+            IoServiceListenerSupport serviceListeners, Object lock, SocketAddress localAddress,
+            IoHandler handler, VmPipe remoteEntry ) throws IOException
     {
-        this.manager = manager;
+        this.service = service;
         this.serviceConfig = serviceConfig;
+        this.serviceListeners = serviceListeners;
         this.lock = lock;
         this.localAddress = localAddress;
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
@@ -73,56 +76,32 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.filterChain = new VmPipeFilterChain( this );
         this.pendingDataQueue = new Queue();
 
-        this.managedSessions = remoteEntry.getManagedClientSessions();
+        remoteSession = new VmPipeSessionImpl( service, this, remoteEntry );
         
-        remoteSession = new VmPipeSessionImpl( manager, this, remoteEntry );
-        
-        // initialize remote session
+        // initialize connector session
         try
         {
-            remoteEntry.getAcceptor().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
-            remoteEntry.getConfig().getFilterChainBuilder().buildFilterChain( remoteSession.getFilterChain() );
-            remoteEntry.getConfig().getThreadModel().buildFilterChain( remoteSession.getFilterChain() );
-            remoteSession.getFilterChain().fireSessionCreated( remoteSession );
-        }
-        catch( Throwable t )
-        {
-            ExceptionMonitor.getInstance().exceptionCaught( t );
-            IOException e = new IOException( "Failed to initialize remote session." );
-            e.initCause( t );
-            throw e;
-        }
-        
-        // initialize client session
-        try
-        {
-            manager.getFilterChainBuilder().buildFilterChain( filterChain );
+            service.getFilterChainBuilder().buildFilterChain( filterChain );
             serviceConfig.getFilterChainBuilder().buildFilterChain( filterChain );
             serviceConfig.getThreadModel().buildFilterChain( filterChain );
-            handler.sessionCreated( this );
+            serviceListeners.fireSessionCreated( this );
         }
         catch( Throwable t )
         {
-            throw ( IOException ) new IOException( "Failed to create a session." ).initCause( t );
+            throw ( IOException ) new IOException( "Failed to create a connector session." ).initCause( t );
         }
 
-        VmPipeIdleStatusChecker.getInstance().addSession( remoteSession );
         VmPipeIdleStatusChecker.getInstance().addSession( this );
-        
-        remoteSession.managedSessions.add( remoteSession );
-        this.managedSessions.add( this );
-        
-        remoteSession.getFilterChain().fireSessionOpened( remoteSession );
-        filterChain.fireSessionOpened( this );
     }
 
     /**
      * Constructor for server-side session.
      */
-    private VmPipeSessionImpl( IoService manager, VmPipeSessionImpl remoteSession, VmPipe entry )
+    private VmPipeSessionImpl( IoService service, VmPipeSessionImpl remoteSession, VmPipe entry ) throws IOException
     {
-        this.manager = manager;
+        this.service = service;
         this.serviceConfig = entry.getConfig();
+        this.serviceListeners = entry.getListeners();
         this.lock = remoteSession.lock;
         this.localAddress = this.serviceAddress = remoteSession.remoteAddress;
         this.remoteAddress = remoteSession.localAddress;
@@ -130,17 +109,34 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.filterChain = new VmPipeFilterChain( this );
         this.remoteSession = remoteSession;
         this.pendingDataQueue = new Queue();
-        this.managedSessions = entry.getManagedServerSessions();
+
+        // initialize acceptor session
+        try
+        {
+            entry.getAcceptor().getFilterChainBuilder().buildFilterChain( this.getFilterChain() );
+            entry.getConfig().getFilterChainBuilder().buildFilterChain( this.getFilterChain() );
+            entry.getConfig().getThreadModel().buildFilterChain( this.getFilterChain() );
+            serviceListeners.fireSessionCreated( this );
+        }
+        catch( Throwable t )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( t );
+            IOException e = new IOException( "Failed to initialize acceptor session." );
+            e.initCause( t );
+            throw e;
+        }
+        
+        VmPipeIdleStatusChecker.getInstance().addSession( this );
     }
     
-    Set getManagedSessions()
-    {
-        return managedSessions;
-    }
-
     public IoService getService()
     {
-        return manager;
+        return service;
+    }
+    
+    IoServiceListenerSupport getServiceListeners()
+    {
+        return serviceListeners;
     }
     
     public IoServiceConfig getServiceConfig()

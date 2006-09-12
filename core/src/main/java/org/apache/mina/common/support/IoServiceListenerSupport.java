@@ -111,14 +111,17 @@ public class IoServiceListenerSupport
         Set sessions;
         synchronized( managedSessions )
         {
-            sessions = ( Set )managedSessions.get( serviceAddress );
+            sessions = ( Set ) managedSessions.get( serviceAddress );
             if( sessions == null )
             {
                 sessions = new IdentityHashSet();
             }
         }
         
-        return Collections.unmodifiableSet( sessions );
+        synchronized( sessions )
+        {
+            return Collections.unmodifiableSet( sessions );
+        }
     }
 
     /**
@@ -188,6 +191,7 @@ public class IoServiceListenerSupport
     {
         SocketAddress serviceAddress = session.getServiceAddress();
         
+        // Get the session set.
         boolean firstSession = false;
         Set sessions;
         synchronized( managedSessions )
@@ -201,13 +205,7 @@ public class IoServiceListenerSupport
             }
         }
         
-        if( session.getService() instanceof IoConnector && firstSession )
-        {
-            fireServiceActivated(
-                    session.getService(), session.getServiceAddress(),
-                    session.getHandler(), session.getServiceConfig() );
-        }
-
+        // If already registered, ignore.
         synchronized( sessions )
         {
             if ( !sessions.add( session ) )
@@ -215,7 +213,20 @@ public class IoServiceListenerSupport
                 return;
             }
         }
+        
+        // If the first connector session, fire a virtual service activation event.
+        if( session.getService() instanceof IoConnector && firstSession )
+        {
+            fireServiceActivated(
+                    session.getService(), session.getServiceAddress(),
+                    session.getHandler(), session.getServiceConfig() );
+        }
 
+        // Fire session events.
+        session.getFilterChain().fireSessionCreated( session );
+        session.getFilterChain().fireSessionOpened( session);
+        
+        // Fire listener events.
         synchronized( listeners )
         {
             for( Iterator i = listeners.iterator(); i.hasNext(); )
@@ -232,17 +243,20 @@ public class IoServiceListenerSupport
     {
         SocketAddress serviceAddress = session.getServiceAddress();
         
+        // Get the session set.
         Set sessions;
         synchronized( managedSessions )
         {
             sessions = ( Set ) managedSessions.get( serviceAddress );
         }
         
+        // Ignore if unknown.
         if( sessions == null )
         {
             return;
         }
         
+        // Try to remove the remaining empty seession set after removal.
         boolean lastSession = false;
         synchronized( sessions )
         {
@@ -257,7 +271,10 @@ public class IoServiceListenerSupport
             }
         }
         
-
+        // Fire session events.
+        session.getFilterChain().fireSessionClosed( session );
+        
+        // Fire listener events.
         try
         {
             synchronized( listeners )
@@ -270,6 +287,7 @@ public class IoServiceListenerSupport
         }
         finally
         {
+            // Fire a virtual service deactivation event for the last session of the connector.
             if( session.getService() instanceof IoConnector && lastSession )
             {
                 fireServiceDeactivated(
@@ -303,22 +321,26 @@ public class IoServiceListenerSupport
         }
 
         final Object lock = new Object();
+        Set sessionsCopy;
+        
+        // Create a copy to avoid ConcurrentModificationException
         synchronized( sessions )
         {
-            for( Iterator i = sessions.iterator(); i.hasNext(); )
+            sessionsCopy = new IdentityHashSet( sessions );
+        }
+        
+        for( Iterator i = sessionsCopy.iterator(); i.hasNext(); )
+        {
+            ( ( IoSession ) i.next() ).close().addListener( new IoFutureListener()
             {
-                ( ( IoSession ) i.next() ).close().addListener( new IoFutureListener()
+                public void operationComplete( IoFuture future )
                 {
-                    public void operationComplete( IoFuture future )
+                    synchronized( lock )
                     {
-                        synchronized( lock )
-                        {
-                            //noinspection NakedNotify
-                            lock.notifyAll();
-                        }
+                        lock.notifyAll();
                     }
-                } );
-            }
+                }
+            } );
         }
 
         try
@@ -327,7 +349,7 @@ public class IoServiceListenerSupport
             {
                 while( !managedSessions.isEmpty() )
                 {
-                    lock.wait( 1000 );
+                    lock.wait( 500 );
                 }
             }
         }
