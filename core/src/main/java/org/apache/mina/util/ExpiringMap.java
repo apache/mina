@@ -32,6 +32,7 @@ import java.util.Set;
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * TODO Change time unit to 'seconds'.
+ * TODO Make thread-safe.
  */
 public class ExpiringMap implements Map
 {
