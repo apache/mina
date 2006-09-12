@@ -32,6 +32,7 @@ import org.apache.mina.util.ExpiringMap;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * 
  * TODO Change time unit to 'seconds'.
+ * TODO Make thread-safe.
  */
 public class ExpiringSessionRecycler implements IoSessionRecycler, ExpirationListener
 {
