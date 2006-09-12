@@ -125,7 +125,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
     public void unbind( SocketAddress address )
     {
-        // TODO: DIRMINA-93
         if( address == null )
             throw new NullPointerException( "address" );
 
