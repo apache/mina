@@ -33,6 +33,7 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -70,7 +71,11 @@ public class DatagramConfigTest extends TestCase
         {
             ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ), new IoHandlerAdapter() );
             future.join();
-            future.getSession().write( ByteBuffer.allocate( 16 ).putInt( 0 ).flip() ).join();
+            
+            WriteFuture writeFuture = future.getSession().write( ByteBuffer.allocate( 16 ).putInt( 0 ).flip() );
+            writeFuture.join();
+            Assert.assertTrue( writeFuture.isWritten() );
+            
             future.getSession().close();
     
             for( int i = 0; i < 30; i ++ )

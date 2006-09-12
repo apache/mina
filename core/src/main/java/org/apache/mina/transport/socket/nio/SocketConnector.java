@@ -33,8 +33,10 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoConnectorConfig;
+import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.util.Queue;
@@ -162,10 +164,9 @@ public class SocketConnector extends BaseIoConnector
 
             if( ch.connect( address ) )
             {
-                SocketSessionImpl session = newSession( ch, handler, config );
-                success = true;
                 DefaultConnectFuture future = new DefaultConnectFuture();
-                future.setSession( session );
+                newSession( ch, handler, config, future );
+                success = true;
                 return future;
             }
 
@@ -282,8 +283,7 @@ public class SocketConnector extends BaseIoConnector
             try
             {
                 ch.finishConnect();
-                SocketSessionImpl session = newSession( ch, entry.handler, entry.config );
-                entry.setSession( session );
+                newSession( ch, entry.handler, entry.config, entry );
                 success = true;
             }
             catch( Throwable e )
@@ -343,7 +343,7 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
-    private SocketSessionImpl newSession( SocketChannel ch, IoHandler handler, IoServiceConfig config )
+    private void newSession( SocketChannel ch, IoHandler handler, IoServiceConfig config, final ConnectFuture connectFuture )
         throws IOException
     {
         SocketSessionImpl session = new SocketSessionImpl( this,
@@ -358,14 +358,28 @@ public class SocketConnector extends BaseIoConnector
             getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
             config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
             config.getThreadModel().buildFilterChain( session.getFilterChain() );
-            session.getFilterChain().fireSessionCreated( session );
+            session.getFilterChain().addFirst("__CONNECT_FUTURE_NOTIFIER__", new IoFilterAdapter()
+            {
+
+                public void sessionCreated( NextFilter nextFilter, IoSession session ) throws Exception
+                {
+                    session.getFilterChain().remove( "__CONNECT_FUTURE_NOTIFIER__" );
+                    try
+                    {
+                        nextFilter.sessionCreated( session );
+                    }
+                    finally
+                    {
+                        connectFuture.setSession( session );
+                    }
+                }
+            });
         }
         catch( Throwable e )
         {
             throw ( IOException ) new IOException( "Failed to create a session." ).initCause( e );
         }
         session.getIoProcessor().addNew( session );
-        return session;
     }
 
     private SocketIoProcessor nextProcessor()

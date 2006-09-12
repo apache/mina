@@ -27,7 +27,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +38,10 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
+import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.socket.nio.DatagramAcceptorConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
@@ -64,7 +65,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private final Queue cancelQueue = new Queue();
     private final Queue flushingSessions = new Queue();
     private Worker worker;
-
+    
     /**
      * Creates a new instance.
      */
@@ -185,22 +186,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
     
-    public boolean isBound( SocketAddress address )
-    {
-        synchronized( channels )
-        {
-            return channels.containsKey( address );
-        }
-    }
-    
-    public Set getBoundAddresses()
-    {
-        synchronized( channels )
-        {
-            return new HashSet( channels.keySet() );
-        }
-    }
-    
     public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
     {
         if( remoteAddress == null )
@@ -226,24 +211,44 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
 
         RegistrationRequest req = ( RegistrationRequest ) key.attachment();
-        DatagramSessionImpl s = new DatagramSessionImpl(
-                wrapper, this,
-                req.config, ch, req.handler,
-                req.address );
-        s.setRemoteAddress( remoteAddress );
-        s.setSelectionKey( key );
+        IoSession session;
+        IoSessionRecycler sessionRecycler = req.config.getSessionRecycler();
+        synchronized ( sessionRecycler )
+        {
+            session = sessionRecycler.recycle( localAddress, remoteAddress);
+            if( session != null )
+            {
+                return session;
+            }
+
+            // If a new session needs to be created.
+            DatagramSessionImpl datagramSession = new DatagramSessionImpl(
+                    wrapper, this,
+                    req.config, ch, req.handler,
+                    req.address );
+            datagramSession.setRemoteAddress( remoteAddress );
+            datagramSession.setSelectionKey( key );
+            
+            req.config.getSessionRecycler().put( datagramSession );
+            session = datagramSession;
+        }
         
         try
         {
-            buildFilterChain( req, s );
-            s.getFilterChain().fireSessionCreated( s );
+            buildFilterChain( req, session );
+            getListeners().fireSessionCreated( session );
         }
         catch( Throwable t )
         {
             ExceptionMonitor.getInstance().exceptionCaught( t );
         }
         
-        return s;
+        return session;
+    }
+    
+    public IoServiceListenerSupport getListeners()
+    {
+        return super.getListeners();
     }
 
     private void buildFilterChain( RegistrationRequest req, IoSession session ) throws Exception
@@ -368,26 +373,20 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             DatagramChannel ch = ( DatagramChannel ) key.channel();
 
             RegistrationRequest req = ( RegistrationRequest ) key.attachment();
-            DatagramSessionImpl session = new DatagramSessionImpl(
-                    wrapper, this,
-                    req.config,
-                    ch, req.handler,
-                    req.address );
-            session.setSelectionKey( key );
-            
             try
             {
-                buildFilterChain( req, session );
-                ( ( DatagramFilterChain ) session.getFilterChain() ).fireSessionCreated( session );
-
                 if( key.isReadable() )
                 {
-                    readSession( session );
+                    readSession( ch, req );
                 }
 
                 if( key.isWritable() )
                 {
-                    scheduleFlush( session );
+                    for( Iterator i = getManagedSessions( req.address ).iterator();
+                         i.hasNext(); )
+                    {
+                        scheduleFlush( ( DatagramSessionImpl ) i.next() );
+                    }
                 }
             }
             catch( Throwable t )
@@ -397,18 +396,20 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
 
-    private void readSession( DatagramSessionImpl session )
+    private void readSession( DatagramChannel channel, RegistrationRequest req ) throws Exception
     {
-
-        ByteBuffer readBuf = ByteBuffer.allocate( session.getReadBufferSize() );
+        ByteBuffer readBuf = ByteBuffer.allocate(
+                ( ( DatagramSessionConfig ) req.config.getSessionConfig() ).getReceiveBufferSize() );
         try
         {
-            SocketAddress remoteAddress = session.getChannel().receive(
-                    readBuf.buf() );
+            SocketAddress remoteAddress = channel.receive(
+                readBuf.buf() );
             if( remoteAddress != null )
             {
+                DatagramSessionImpl session =
+                    ( DatagramSessionImpl ) newSession( remoteAddress, req.address );
+
                 readBuf.flip();
-                session.setRemoteAddress( remoteAddress );
 
                 ByteBuffer newBuf = ByteBuffer.allocate( readBuf.limit() );
                 newBuf.put( readBuf );
@@ -417,10 +418,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 session.increaseReadBytes( newBuf.remaining() );
                 session.getFilterChain().fireMessageReceived( session, newBuf );
             }
-        }
-        catch( IOException e )
-        {
-            ( ( DatagramFilterChain ) session.getFilterChain() ).fireExceptionCaught( session, e );
         }
         finally
         {
@@ -451,7 +448,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             }
             catch( IOException e )
             {
-                ( ( DatagramFilterChain ) session.getFilterChain() ).fireExceptionCaught( session, e );
+                session.getFilterChain().fireExceptionCaught( session, e );
             }
         }
     }
@@ -526,7 +523,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 session.increaseWrittenBytes( writtenBytes );
                 session.increaseWrittenWriteRequests();
                 buf.reset();
-                ( ( DatagramFilterChain ) session.getFilterChain() ).fireMessageSent( session, req );
+                session.getFilterChain().fireMessageSent( session, req );
             }
         }
     }

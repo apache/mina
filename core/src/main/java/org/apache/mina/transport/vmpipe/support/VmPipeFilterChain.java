@@ -118,8 +118,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
         {
             if( !session.getCloseFuture().isClosed() )
             {
-                s.getManagedSessions().remove( s );
-                s.getFilterChain().fireSessionClosed( session );
+                s.getServiceListeners().fireSessionDestroyed( s );
                 s.remoteSession.close();
             }
         }

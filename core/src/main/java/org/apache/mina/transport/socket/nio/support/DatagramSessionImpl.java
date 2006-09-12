@@ -36,7 +36,6 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
 
@@ -81,7 +80,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         this.localAddress = ch.socket().getLocalSocketAddress();
         this.serviceAddress = serviceAddress;
         this.serviceConfig = serviceConfig;
-        
+
         // Apply the initial session settings
         IoSessionConfig sessionConfig = serviceConfig.getSessionConfig();
         if( sessionConfig instanceof DatagramSessionConfig )
@@ -99,22 +98,22 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
     }
-    
+
     public IoService getService()
     {
         return wrapperManager;
     }
-    
+
     public IoServiceConfig getServiceConfig()
     {
         return serviceConfig;
     }
-    
+
     public IoSessionConfig getConfig()
     {
         return config;
     }
-    
+
     DatagramService getManagerDelegate()
     {
         return managerDelegate;
@@ -147,6 +146,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     
     protected void close0()
     {
+        getServiceConfig().getSessionRecycler().remove( this );
         filterChain.fireFilterClose( this );
     }
 
@@ -177,7 +177,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             return writeRequestQueue.size();
         }
     }
-    
+
     public int getScheduledWriteBytes()
     {
         synchronized( writeRequestQueue )
@@ -185,7 +185,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             return writeRequestQueue.byteSize();
         }
     }
-    
+
     public TransportType getTransportType()
     {
         return TransportType.DATAGRAM;
@@ -205,7 +205,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     {
         return localAddress;
     }
-    
+
     public SocketAddress getServiceAddress()
     {
         return serviceAddress;
@@ -215,13 +215,13 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     {
         managerDelegate.updateTrafficMask( this );
     }
-    
+
     int getReadBufferSize()
     {
         return readBufferSize;
     }
-    
-    private class SessionConfigImpl extends BaseIoSessionConfig implements DatagramSessionConfig
+
+    private class SessionConfigImpl extends DatagramSessionConfigImpl implements DatagramSessionConfig
     {
         public int getReceiveBufferSize()
         {

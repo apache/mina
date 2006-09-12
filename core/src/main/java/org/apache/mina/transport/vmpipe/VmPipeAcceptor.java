@@ -22,27 +22,18 @@ package org.apache.mina.transport.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.mina.common.IoAcceptorConfig;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.BaseIoAcceptorConfig;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
-import org.apache.mina.util.IdentityHashSet;
 
 /**
  * Binds the specified {@link IoHandler} to the specified
@@ -89,30 +80,10 @@ public class VmPipeAcceptor extends BaseIoAcceptor
             boundHandlers.put( address, 
                                new VmPipe( this,
                                           ( VmPipeAddress ) address,
-                                          handler, config ) );
+                                          handler, config, getListeners() ) );
         }
     }
     
-    public Set getManagedSessions( SocketAddress address )
-    {
-        if( address == null )
-            throw new NullPointerException( "address" );
-        
-        VmPipe pipe = null;
-        synchronized( boundHandlers )
-        {
-            pipe = ( VmPipe ) boundHandlers.get( address );
-            if( pipe == null )
-            {
-                throw new IllegalArgumentException( "Address not bound: " + address );
-            }
-        }
-        
-        Set managedSessions = pipe.getManagedServerSessions();
-        return Collections.unmodifiableSet(
-                new IdentityHashSet( Arrays.asList( managedSessions.toArray() ) ) );
-    }
-
     public void unbind( SocketAddress address )
     {
         if( address == null )
@@ -129,60 +100,9 @@ public class VmPipeAcceptor extends BaseIoAcceptor
             pipe = ( VmPipe ) boundHandlers.remove( address );
         }
         
-        Set managedSessions = pipe.getManagedServerSessions();
-        
-        IoServiceConfig cfg = pipe.getConfig();
-        boolean disconnectOnUnbind;
-        if( cfg instanceof IoAcceptorConfig )
-        {
-            disconnectOnUnbind = ( ( IoAcceptorConfig ) cfg ).isDisconnectOnUnbind();
-        }
-        else
-        {
-            disconnectOnUnbind = ( ( IoAcceptorConfig ) getDefaultConfig() ).isDisconnectOnUnbind();
-        }
-        if( disconnectOnUnbind && managedSessions != null )
-        {
-            IoSession[] tempSessions = ( IoSession[] ) 
-                                  managedSessions.toArray( new IoSession[ 0 ] );
-            
-            final Object lock = new Object();
-            
-            for( int i = 0; i < tempSessions.length; i++ )
-            {
-                if( !managedSessions.contains( tempSessions[ i ] ) )
-                {
-                    // The session has already been closed and have been 
-                    // removed from managedSessions by the VmPipeFilterChain.
-                    continue;
-                }
-                tempSessions[ i ].close().addListener( new IoFutureListener()
-                {
-                    public void operationComplete( IoFuture future )
-                    {
-                        synchronized( lock )
-                        {
-                            lock.notify();
-                        }
-                    }
-                } );
-            }
-
-            try
-            {
-                synchronized( lock )
-                {
-                    while( !managedSessions.isEmpty() )
-                    {
-                        lock.wait( 1000 );
-                    }
-                }
-            }
-            catch( InterruptedException ie )
-            {
-                // Ignored
-            }
-        }                
+        getListeners().fireServiceDeactivated(
+                this, pipe.getAddress(),
+                pipe.getHandler(), pipe.getConfig() );
     }
     
     public void unbindAll()
@@ -194,22 +114,6 @@ public class VmPipeAcceptor extends BaseIoAcceptor
             {
                 unbind( ( SocketAddress ) i.next() );
             }
-        }
-    }
-    
-    public boolean isBound( SocketAddress address )
-    {
-        synchronized( boundHandlers )
-        {
-            return boundHandlers.containsKey( address );
-        }
-    }
-    
-    public Set getBoundAddresses()
-    {
-        synchronized( boundHandlers )
-        {
-            return new HashSet( boundHandlers.keySet() );
         }
     }
     

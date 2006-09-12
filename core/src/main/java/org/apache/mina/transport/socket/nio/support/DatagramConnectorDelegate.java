@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandler;
@@ -390,6 +391,13 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             DatagramSessionImpl session = ( DatagramSessionImpl ) key.attachment();
 
+            DatagramSessionImpl replaceSession = getRecycledSession(session);
+
+            if(replaceSession != null)
+            {
+                session = replaceSession;
+            }
+
             if( key.isReadable() && session.getTrafficMask().isReadable() )
             {
                 readSession( session );
@@ -400,6 +408,30 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 scheduleFlush( session );
             }
         }
+    }
+    
+    private DatagramSessionImpl getRecycledSession( IoSession session )
+    {
+        IoSessionRecycler sessionRecycler = session.getServiceConfig().getSessionRecycler();
+        DatagramSessionImpl replaceSession = null;
+
+        if ( sessionRecycler != null )
+        {
+            synchronized ( sessionRecycler )
+            {
+                replaceSession = ( DatagramSessionImpl ) sessionRecycler.recycle( session.getLocalAddress(), session
+                        .getRemoteAddress() );
+
+                if ( replaceSession != null )
+                {
+                    return replaceSession;
+                }
+
+                sessionRecycler.put( session );
+            }
+        }
+
+        return null;
     }
 
     private void readSession( DatagramSessionImpl session )
@@ -552,8 +584,17 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             boolean success = false;
             try
             {
-                buildFilterChain( req, session );
-                session.getFilterChain().fireSessionCreated( session );
+                DatagramSessionImpl replaceSession = getRecycledSession( session );
+
+                if ( replaceSession != null )
+                {
+                    session = replaceSession;
+                }
+                else
+                {
+                    buildFilterChain( req, session );
+                    getListeners().fireSessionCreated( session );
+                }
 
                 SelectionKey key = req.channel.register( selector,
                         SelectionKey.OP_READ, session );
@@ -621,6 +662,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                     ExceptionMonitor.getInstance().exceptionCaught( e );
                 }
                 
+                getListeners().fireSessionDestroyed( session );
                 session.getCloseFuture().setClosed();
                 key.cancel();
                 selector.wakeup(); // wake up again to trigger thread death

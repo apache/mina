@@ -19,12 +19,9 @@
  */
 package org.apache.mina.transport.vmpipe.support;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.vmpipe.VmPipeAcceptor;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
 
@@ -38,18 +35,19 @@ public class VmPipe
     private final VmPipeAddress address;
     private final IoHandler handler;
     private final IoServiceConfig config;
-    private final Set managedClientSessions = Collections.synchronizedSet( new HashSet() );
-    private final Set managedServerSessions = Collections.synchronizedSet( new HashSet() );
+    private final IoServiceListenerSupport listeners;
     
     public VmPipe( VmPipeAcceptor acceptor,
                    VmPipeAddress address,
                    IoHandler handler,
-                   IoServiceConfig config )
+                   IoServiceConfig config,
+                   IoServiceListenerSupport listeners)
     {
         this.acceptor = acceptor;
         this.address = address;
         this.handler = handler;
         this.config = config;
+        this.listeners = listeners;
     }
 
     public VmPipeAcceptor getAcceptor()
@@ -71,14 +69,9 @@ public class VmPipe
     {
         return config;
     }
-
-    public Set getManagedClientSessions()
-    {
-        return managedClientSessions;
-    }
     
-    public Set getManagedServerSessions()
+    public IoServiceListenerSupport getListeners()
     {
-        return managedServerSessions;
+        return listeners;
     }
 }

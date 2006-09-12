@@ -175,7 +175,6 @@ class SocketIoProcessor
             if( registered )
             {
                 session.getServiceListeners().fireSessionCreated( session );
-                session.getFilterChain().fireSessionOpened( session );
             }
         }
     }
@@ -225,8 +224,6 @@ class SocketIoProcessor
             {
                 releaseWriteBuffers( session );
                 session.getServiceListeners().fireSessionDestroyed( session );
-
-                session.getFilterChain().fireSessionClosed( session );
             }
         }
     }
