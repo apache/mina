@@ -81,7 +81,7 @@ import org.apache.mina.common.IoSession;
  *             previous = current;
  *         }
  *         
- *         // Could not find CRLF in the buffer. Reset to the initial 
+ *         // Could not find CRLF in the buffer. Reset the initial 
  *         // position to the one we recorded above.
  *         in.position(start);
  *        
