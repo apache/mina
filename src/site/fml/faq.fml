@@ -153,7 +153,7 @@
       <answer>
         <p>
           Yes.  Please take a look at <a target="classFrame" href="xref-examples/org/apache/mina/examples/sumup/package-summary.html">SumUp</a> example.
-          There is also <a href="http://directory.apache.org/subprojects/asn1/">Apache ASN.1</a> project which provides ASN.1 codec for MINA.
+          There is no full ASN.1 support yet, but we will implement it someday and you can contribute to make it available sooner.
         </p>
       </answer>
     </faq>
