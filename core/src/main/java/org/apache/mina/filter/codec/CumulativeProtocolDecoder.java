@@ -30,25 +30,62 @@ import org.apache.mina.common.IoSession;
  * decoders should cumulate received buffers to make a message complete or
  * to postpone decoding until more buffers arrive.
  * <p>
- * Here is an example decoder that decodes a list of integers:
+ * Here is an example decoder that decodes CRLF terminated lines into 
+ * <code>Command</code> objects:
  * <pre>
- * public class IntegerDecoder extends CumulativeProtocolDecoder {
+ * public class CRLFTerminatedCommandLineDecoder 
+ *         extends CumulativeProtocolDecoder {
  * 
- *     public IntegerDecoder() {
- *         super(4);
+ *     private Command parseCommand(ByteBuffer in) {
+ *         // Convert the bytes in the specified buffer to a 
+ *         // Command object.
+ *         ...
  *     }
  * 
  *     protected boolean doDecode(IoSession session, ByteBuffer in,
- *                                ProtocolDecoderOutput out) throws ProtocolViolationException {
- *         if (in.remaining() < 4) {
- *             return false; // Cumulate remainder to decode later.
+ *                                ProtocolDecoderOutput out) 
+ *             throws Exception {
+ * 
+ *         // Remember the initial position.
+ *         int start = in.position();
+ *        
+ *         // Now find the first CRLF in the buffer.
+ *         byte previous = 0;
+ *         while (in.hasRemaining()) {
+ *             byte current = in.get();
+ *            
+ *             if (previous == '\r' && current == '\n') {
+ *                 // Remember the current position and limit.
+ *                 int position = in.position();
+ *                 int limit = in.limit();
+ *                 try {
+ *                     in.position(start);
+ *                     in.limit(position);
+ *                     // The bytes between in.position() and in.limit()
+ *                     // now contain a full CRLF terminated line.
+ *                     out.write(parseCommand(in.slice()));
+ *                 } finally {
+ *                     // Set the position to point right after the
+ *                     // detected line and set the limit to the old
+ *                     // one.
+ *                     in.position(position);
+ *                     in.limit(limit);
+ *                 }
+ *                 // Decoded one line; CumulativeProtocolDecoder will  
+ *                 // call me again until I return false. So just 
+ *                 // return true until there are no more lines in the 
+ *                 // buffer.
+ *                 return true;
+ *             }
+ *            
+ *             previous = current;
  *         }
  *         
- *         out.write(new Integer(in.getInt()));
- * 
- *         // Decoded one integer; CumulativeProtocolDecoder will call me again,
- *         // so I can decode as many integers as possible.
- *         return true;
+ *         // Could not find CRLF in the buffer. Reset to the initial 
+ *         // position to the one we recorded above.
+ *         in.position(start);
+ *        
+ *         return false;
  *     }
  * }
  * </pre>
