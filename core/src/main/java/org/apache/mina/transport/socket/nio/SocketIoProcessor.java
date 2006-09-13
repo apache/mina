@@ -214,6 +214,10 @@ class SocketIoProcessor
             try
             {
                 key.cancel();
+                
+                // Disable SO_LINGER which causes the I/O processor to block
+                // too long.
+                ch.socket().setSoLinger( false, 0 );
                 ch.close();
             }
             catch( IOException e )
