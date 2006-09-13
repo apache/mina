@@ -77,6 +77,13 @@ public abstract class AbstractTrafficControlTest extends TestCase
         future.join();
         IoSession session = future.getSession();
         
+        // We wait for the sessionCreated() event is fired becayse we cannot guarentee that
+        // it is invoked already.
+        while( session.getAttribute( "lock" ) == null )
+        {
+            Thread.yield();
+        }
+        
         Object lock = session.getAttribute( "lock" );
         synchronized( lock )
         {
