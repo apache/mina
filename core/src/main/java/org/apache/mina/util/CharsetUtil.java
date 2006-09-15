@@ -23,9 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * Utilities for dealing with Charsets.
@@ -35,9 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CharsetUtil
 {
-    public static final Logger log = LoggerFactory.getLogger( CharsetUtil.class );
-    
-    public static final String getDefaultCharsetName()
+    public static String getDefaultCharsetName()
     {
         // Use reflection here to be able to compile mina with jdk 1.4.
         try
@@ -48,6 +43,7 @@ public class CharsetUtil
         }
         catch ( Exception e )
         {
+            //ignore, not on java 5
         }
 
         // Try to use OutputStreamWriter instead.
