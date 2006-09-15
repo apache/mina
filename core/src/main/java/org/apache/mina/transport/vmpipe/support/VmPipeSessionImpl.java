@@ -76,7 +76,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.filterChain = new VmPipeFilterChain( this );
         this.pendingDataQueue = new Queue();
 
-        remoteSession = new VmPipeSessionImpl( service, this, remoteEntry );
+        remoteSession = new VmPipeSessionImpl( this, remoteEntry );
         
         // initialize connector session
         try
@@ -97,9 +97,9 @@ public class VmPipeSessionImpl extends BaseIoSession
     /**
      * Constructor for server-side session.
      */
-    private VmPipeSessionImpl( IoService service, VmPipeSessionImpl remoteSession, VmPipe entry ) throws IOException
+    private VmPipeSessionImpl( VmPipeSessionImpl remoteSession, VmPipe entry ) throws IOException
     {
-        this.service = service;
+        this.service = entry.getAcceptor();
         this.serviceConfig = entry.getConfig();
         this.serviceListeners = entry.getListeners();
         this.lock = remoteSession.lock;
@@ -203,7 +203,7 @@ public class VmPipeSessionImpl extends BaseIoSession
     {
         if( getTrafficMask().isReadable() || getTrafficMask().isWritable())
         {
-            Object[] data = null;
+            Object[] data;
             synchronized( pendingDataQueue )
             {
                 data = pendingDataQueue.toArray();
