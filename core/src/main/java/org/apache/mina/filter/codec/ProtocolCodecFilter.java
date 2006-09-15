@@ -46,6 +46,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
     public static final String DECODER = ProtocolCodecFilter.class.getName() + ".decoder";
     
     private static final Class[] EMPTY_PARAMS = new Class[0];
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap( new byte[0] );
 
     private final ProtocolCodecFactory factory;
     
@@ -187,21 +188,18 @@ public class ProtocolCodecFilter extends IoFilterAdapter
 
     public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
     {
-        if( ! ( message instanceof MessageByteBuffer ) )
+        if( message instanceof HiddenByteBuffer )
+        {
+            return;
+        }
+
+        if( !( message instanceof MessageByteBuffer ) )
         {
             nextFilter.messageSent( session, message );
             return;
         }
 
-        MessageByteBuffer buf = ( MessageByteBuffer ) message;
-        try
-        {
-            buf.release();
-        }
-        finally
-        {
-            nextFilter.messageSent( session, buf.message );
-        }
+        nextFilter.messageSent( session, ( ( MessageByteBuffer ) message ).message );
     }
     
     public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
@@ -219,6 +217,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         try
         {
             encoder.encode( session, message, encoderOut );
+            encoderOut.flush();
+            nextFilter.filterWrite(
+                    session,
+                    new WriteRequest(
+                            new MessageByteBuffer( writeRequest.getMessage() ),
+                            writeRequest.getFuture(), writeRequest.getDestination() ) );
+
             if( session instanceof BaseIoSession )
             {
                 ( ( BaseIoSession ) session ).increaseWrittenMessages();
@@ -239,8 +244,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         }
         finally
         {
-            encoderOut.flush();
-
             // Dispose the encoder if this session is connectionless.
             if( session.getTransportType().isConnectionless() )
             {
@@ -357,13 +360,21 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         }
     }
 
+    private static class HiddenByteBuffer extends ByteBufferProxy
+    {
+        private HiddenByteBuffer( ByteBuffer buf )
+        {
+            super( buf );
+        }
+    }
+    
     private static class MessageByteBuffer extends ByteBufferProxy
     {
         private final Object message;
         
-        private MessageByteBuffer( ByteBuffer buf, Object message )
+        private MessageByteBuffer( Object message )
         {
-            super( buf );
+            super( EMPTY_BUFFER );
             this.message = message;
         }
     }
@@ -383,21 +394,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter
 
         protected WriteFuture doFlush( ByteBuffer buf )
         {
-            WriteFuture future;
-            if( writeRequest != null )
-            {
-                future = writeRequest.getFuture();
-                nextFilter.filterWrite(
-                        session,
-                        new WriteRequest(
-                                new MessageByteBuffer(
-                                        buf, writeRequest.getMessage() ), future, writeRequest.getDestination() ) );
-            }
-            else
-            {
-                future = new DefaultWriteFuture( session );
-                nextFilter.filterWrite( session, new WriteRequest( buf, future ) );
-            }
+            WriteFuture future = new DefaultWriteFuture( session );
+            nextFilter.filterWrite(
+                    session,
+                    new WriteRequest(
+                            new HiddenByteBuffer( buf ),
+                            future, writeRequest.getDestination() ) );
             return future;
         }
     }
