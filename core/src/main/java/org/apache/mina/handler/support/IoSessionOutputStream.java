@@ -37,12 +37,13 @@ import org.apache.mina.common.WriteFuture;
 public class IoSessionOutputStream extends OutputStream
 {
     private final IoSession session;
+    private WriteFuture lastWriteFuture;
     
     public IoSessionOutputStream( IoSession session )
     {
         this.session = session;
     }
-
+    
     public void close()
     {
         session.close().join();
@@ -56,15 +57,11 @@ public class IoSessionOutputStream extends OutputStream
         }
     }
     
-    private void write( ByteBuffer buf ) throws IOException
+    private synchronized void write( ByteBuffer buf ) throws IOException
     {
         checkClosed();
         WriteFuture future = session.write( buf );
-        future.join();
-        if( ! future.isWritten() )
-        {
-            throw new IOException( "The bytes could not be written to the session" );
-        }
+        lastWriteFuture = future;
     }
     
     public void write( byte[] b, int off, int len ) throws IOException
@@ -78,5 +75,19 @@ public class IoSessionOutputStream extends OutputStream
         buf.put( ( byte ) b );
         buf.flip();
         write( buf );
+    }
+    
+    public synchronized void flush() throws IOException
+    {
+        if( lastWriteFuture == null )
+        {
+            return;
+        }
+        
+        lastWriteFuture.join();
+        if( !lastWriteFuture.isWritten() )
+        {
+            throw new IOException( "The bytes could not be written to the session" );
+        }
     }
 }
