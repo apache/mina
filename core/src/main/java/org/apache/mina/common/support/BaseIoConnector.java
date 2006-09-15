@@ -35,11 +35,6 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
 {
     protected BaseIoConnector()
     {
-        super( true );
-    }
-
-    protected BaseIoConnector( boolean deactivateWhenIdle) {
-        super( deactivateWhenIdle );
     }
 
     public ConnectFuture connect( SocketAddress address, IoHandler handler )

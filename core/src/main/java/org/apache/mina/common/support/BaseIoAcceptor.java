@@ -36,7 +36,6 @@ public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor
 {
     protected BaseIoAcceptor()
     {
-        super( false );
     }
     
     public void bind( SocketAddress address, IoHandler handler ) throws IOException

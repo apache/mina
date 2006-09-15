@@ -45,9 +45,9 @@ public abstract class BaseIoService implements IoService
      */
     private final IoServiceListenerSupport listeners;
     
-    protected BaseIoService( boolean deactivateWhenIdle )
+    protected BaseIoService()
     {
-        this.listeners = new IoServiceListenerSupport( deactivateWhenIdle );
+        this.listeners = new IoServiceListenerSupport();
     }
     
     public IoFilterChainBuilder getFilterChainBuilder()

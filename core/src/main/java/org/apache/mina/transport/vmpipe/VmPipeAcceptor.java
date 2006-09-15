@@ -82,6 +82,8 @@ public class VmPipeAcceptor extends BaseIoAcceptor
                                           ( VmPipeAddress ) address,
                                           handler, config, getListeners() ) );
         }
+        
+        getListeners().fireServiceActivated( this, address, handler, config );
     }
     
     public void unbind( SocketAddress address )
