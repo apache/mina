@@ -64,11 +64,14 @@ public class IoServiceListenerSupport
      */
     private final Map managedSessions = new HashMap();
     
+    private final boolean deactivateWhenIdle;
+    
     /**
      * Creates a new instance.
      */
-    public IoServiceListenerSupport()
+    public IoServiceListenerSupport( boolean deactivateWhenIdle )
     {
+        this.deactivateWhenIdle = deactivateWhenIdle;
     }
     
     /**
@@ -288,7 +291,8 @@ public class IoServiceListenerSupport
         finally
         {
             // Fire a virtual service deactivation event for the last session of the connector.
-            if( session.getService() instanceof IoConnector && lastSession )
+            //TODO double-check that this is *STILL* the last service. May not be the case
+            if( deactivateWhenIdle && lastSession )
             {
                 fireServiceDeactivated(
                         session.getService(), session.getServiceAddress(),

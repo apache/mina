@@ -52,7 +52,14 @@ public class VmPipeConnector extends BaseIoConnector
         }
     };
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config ) 
+    public VmPipeConnector() {
+    }
+
+    public VmPipeConnector(boolean deactivateWhenIdle) {
+        super( deactivateWhenIdle );
+    }
+
+    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
     {
         return connect( address, null, handler, config );
     }
