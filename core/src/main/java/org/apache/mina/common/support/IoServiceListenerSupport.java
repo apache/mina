@@ -64,14 +64,11 @@ public class IoServiceListenerSupport
      */
     private final Map managedSessions = new HashMap();
     
-    private final boolean deactivateWhenIdle;
-    
     /**
      * Creates a new instance.
      */
-    public IoServiceListenerSupport( boolean deactivateWhenIdle )
+    public IoServiceListenerSupport()
     {
-        this.deactivateWhenIdle = deactivateWhenIdle;
     }
     
     /**
@@ -123,7 +120,7 @@ public class IoServiceListenerSupport
         
         synchronized( sessions )
         {
-            return Collections.unmodifiableSet( sessions );
+            return new IdentityHashSet( sessions );
         }
     }
 
@@ -248,29 +245,25 @@ public class IoServiceListenerSupport
         
         // Get the session set.
         Set sessions;
+        boolean lastSession = false;
         synchronized( managedSessions )
         {
             sessions = ( Set ) managedSessions.get( serviceAddress );
-        }
-        
-        // Ignore if unknown.
-        if( sessions == null )
-        {
-            return;
-        }
-        
-        // Try to remove the remaining empty seession set after removal.
-        boolean lastSession = false;
-        synchronized( sessions )
-        {
-            sessions.remove( session );
-            if( sessions.isEmpty() )
+            // Ignore if unknown.
+            if( sessions == null )
             {
-                synchronized( managedSessions )
+                return;
+            }
+            
+            // Try to remove the remaining empty seession set after removal.
+            synchronized( sessions )
+            {
+                sessions.remove( session );
+                if( sessions.isEmpty() )
                 {
                     managedSessions.remove( serviceAddress );
+                    lastSession = true;
                 }
-                lastSession = true;
             }
         }
         
@@ -291,8 +284,8 @@ public class IoServiceListenerSupport
         finally
         {
             // Fire a virtual service deactivation event for the last session of the connector.
-            //TODO double-check that this is *STILL* the last service. May not be the case
-            if( deactivateWhenIdle && lastSession )
+            //TODO double-check that this is *STILL* the last session. May not be the case
+            if( session.getService() instanceof IoConnector && lastSession )
             {
                 fireServiceDeactivated(
                         session.getService(), session.getServiceAddress(),

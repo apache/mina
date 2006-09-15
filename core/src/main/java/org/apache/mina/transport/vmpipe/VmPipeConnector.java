@@ -52,11 +52,11 @@ public class VmPipeConnector extends BaseIoConnector
         }
     };
 
-    public VmPipeConnector() {
-    }
-
-    public VmPipeConnector(boolean deactivateWhenIdle) {
-        super( deactivateWhenIdle );
+    /**
+     * Creates a new instance.
+     */
+    public VmPipeConnector()
+    {
     }
 
     public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )

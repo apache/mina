@@ -49,7 +49,7 @@ public class IoServiceListenerSupportTest extends TestCase
 
     public void testServiceLifecycle() throws Exception
     {
-        IoServiceListenerSupport support = new IoServiceListenerSupport( false );
+        IoServiceListenerSupport support = new IoServiceListenerSupport();
     
         MockControl listenerControl = MockControl.createStrictControl( IoServiceListener.class );
         IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
@@ -87,7 +87,7 @@ public class IoServiceListenerSupportTest extends TestCase
     
     public void testSessionLifecycle() throws Exception
     {
-        IoServiceListenerSupport support = new IoServiceListenerSupport( false );
+        IoServiceListenerSupport support = new IoServiceListenerSupport();
     
         TestSession session = new TestSession( ADDRESS );
         
@@ -138,7 +138,7 @@ public class IoServiceListenerSupportTest extends TestCase
     
     public void testDisconnectOnUnbind() throws Exception
     {
-        final IoServiceListenerSupport support = new IoServiceListenerSupport( false );
+        final IoServiceListenerSupport support = new IoServiceListenerSupport();
     
         MockControl acceptorControl = MockControl.createStrictControl( IoAcceptor.class );
         IoAcceptor acceptor = ( IoAcceptor ) acceptorControl.getMock();
@@ -213,7 +213,7 @@ public class IoServiceListenerSupportTest extends TestCase
     
     public void testConnectorActivation() throws Exception
     {
-        IoServiceListenerSupport support = new IoServiceListenerSupport( true );
+        IoServiceListenerSupport support = new IoServiceListenerSupport();
     
         MockControl connectorControl = MockControl.createStrictControl( IoConnector.class );
         IoConnector connector = ( IoConnector ) connectorControl.getMock();

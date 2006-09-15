@@ -73,7 +73,7 @@ public class SocketConnector extends BaseIoConnector
      */
     public SocketConnector()
     {
-        this( 1, true );
+        this( 1 );
     }
     
     /**
@@ -81,10 +81,8 @@ public class SocketConnector extends BaseIoConnector
      *
      * @param processorCount Number of processing threads
      */
-    public SocketConnector( int processorCount, boolean deactivateWhenIdle )
+    public SocketConnector( int processorCount )
     {
-        super( deactivateWhenIdle );
-        
         if( processorCount < 1 )
         {
             throw new IllegalArgumentException( "Must have at least one processor" );
