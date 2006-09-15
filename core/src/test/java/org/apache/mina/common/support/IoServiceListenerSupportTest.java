@@ -47,15 +47,10 @@ public class IoServiceListenerSupportTest extends TestCase
 {
     private static final SocketAddress ADDRESS = new InetSocketAddress( 8080 );
 
-    private IoServiceListenerSupport support;
-    
-    public void setUp() throws Exception
-    {
-        support = new IoServiceListenerSupport();
-    }
-    
     public void testServiceLifecycle() throws Exception
     {
+        IoServiceListenerSupport support = new IoServiceListenerSupport( false );
+    
         MockControl listenerControl = MockControl.createStrictControl( IoServiceListener.class );
         IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
         
@@ -92,6 +87,8 @@ public class IoServiceListenerSupportTest extends TestCase
     
     public void testSessionLifecycle() throws Exception
     {
+        IoServiceListenerSupport support = new IoServiceListenerSupport( false );
+    
         TestSession session = new TestSession( ADDRESS );
         
         MockControl chainControl = MockControl.createStrictControl( IoFilterChain.class );
@@ -141,6 +138,8 @@ public class IoServiceListenerSupportTest extends TestCase
     
     public void testDisconnectOnUnbind() throws Exception
     {
+        final IoServiceListenerSupport support = new IoServiceListenerSupport( false );
+    
         MockControl acceptorControl = MockControl.createStrictControl( IoAcceptor.class );
         IoAcceptor acceptor = ( IoAcceptor ) acceptorControl.getMock();
 
@@ -214,6 +213,8 @@ public class IoServiceListenerSupportTest extends TestCase
     
     public void testConnectorActivation() throws Exception
     {
+        IoServiceListenerSupport support = new IoServiceListenerSupport( true );
+    
         MockControl connectorControl = MockControl.createStrictControl( IoConnector.class );
         IoConnector connector = ( IoConnector ) connectorControl.getMock();
 
@@ -266,12 +267,12 @@ public class IoServiceListenerSupportTest extends TestCase
         private final SocketAddress serviceAddress;
         private IoFilterChain filterChain;
         
-        public TestSession( SocketAddress serviceAddress )
+        TestSession( SocketAddress serviceAddress )
         {
             this( null, serviceAddress );
         }
         
-        public TestSession( IoService service, SocketAddress serviceAddress )
+        TestSession( IoService service, SocketAddress serviceAddress )
         {
             this.service = service;
             this.serviceAddress = serviceAddress;
