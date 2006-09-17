@@ -44,7 +44,7 @@ import org.apache.mina.common.IoSession;
  * collector.start();
  * </pre>
  * 
- * By default the {@link Statcollector} is polling the sessions every 5 seconds. You can 
+ * By default the {@link StatCollector} is polling the sessions every 5 seconds. You can 
  * give a different polling time using a second constructor.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
