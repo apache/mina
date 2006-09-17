@@ -38,6 +38,9 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.util.Queue;
+import org.apache.mina.util.NewThreadExecutor;
+import org.apache.mina.util.NamePreservingRunnable;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
@@ -59,6 +62,7 @@ public class SocketConnector extends BaseIoConnector
     private final Queue connectQueue = new Queue();
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
+    private final Executor executor;
 
     /**
      * @noinspection FieldAccessedSynchronizedAndUnsynchronized
@@ -69,31 +73,33 @@ public class SocketConnector extends BaseIoConnector
     private long workerTimeout = 1000L * 60;
 
     /**
-     * Create a connector with a single processing thread
+     * Create a connector with a single processing thread using a NewThreadExecutor 
      */
     public SocketConnector()
     {
-        this( 1 );
+        this( 1, new NewThreadExecutor() );
     }
-    
+
     /**
      * Create a connector with the desired number of processing threads
      *
      * @param processorCount Number of processing threads
+     * @param executor Executor to use for launching threads
      */
-    public SocketConnector( int processorCount )
+    public SocketConnector( int processorCount, Executor executor )
     {
         if( processorCount < 1 )
         {
             throw new IllegalArgumentException( "Must have at least one processor" );
         }
 
+        this.executor = executor;
         this.processorCount = processorCount;
         ioProcessors = new SocketIoProcessor[processorCount];
 
         for( int i = 0; i < processorCount; i++ )
         {
-            ioProcessors[i] = new SocketIoProcessor( "SocketConnectorIoProcessor-" + id + "." + i );
+            ioProcessors[i] = new SocketIoProcessor( "SocketConnectorIoProcessor-" + id + "." + i, executor );
         }
     }
 
@@ -231,7 +237,7 @@ public class SocketConnector extends BaseIoConnector
         {
             selector = Selector.open();
             worker = new Worker();
-            worker.start();
+            executor.execute( new NamePreservingRunnable( worker ) );
         }
     }
 
@@ -370,17 +376,14 @@ public class SocketConnector extends BaseIoConnector
         return ioProcessors[processorDistributor++ % processorCount];
     }
 
-    private class Worker extends Thread
+    private class Worker implements Runnable
     {
         private long lastActive = System.currentTimeMillis();
 
-        Worker()
-        {
-            super( SocketConnector.this.threadName );
-        }
-
         public void run()
         {
+            Thread.currentThread().setName( SocketConnector.this.threadName );
+
             for( ; ; )
             {
                 try
