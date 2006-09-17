@@ -28,19 +28,21 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.Set;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.socket.nio.DatagramConnectorConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
+import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
 
 /**
@@ -54,6 +56,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private static volatile int nextId = 0;
 
     private final IoConnector wrapper;
+    private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
     private final DatagramConnectorConfig defaultConfig = new DatagramConnectorConfig();
@@ -66,9 +69,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     /**
      * Creates a new instance.
      */
-    public DatagramConnectorDelegate( IoConnector wrapper )
+    public DatagramConnectorDelegate( IoConnector wrapper, Executor executor )
     {
         this.wrapper = wrapper;
+        this.executor = executor;
     }
 
     public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
@@ -195,7 +199,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         {
             selector = Selector.open();
             worker = new Worker();
-            worker.start();
+            executor.execute( new NamePreservingRunnable( worker ) );
         }
     }
 
@@ -313,15 +317,12 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
     }
     
-    private class Worker extends Thread
+    private class Worker implements Runnable
     {
-        public Worker()
-        {
-            super( "DatagramConnector-" + id );
-        }
-
         public void run()
         {
+            Thread.currentThread().setName( "DatagramConnector-" + id );
+
             for( ;; )
             {
                 try
@@ -597,8 +598,8 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 }
 
                 SelectionKey key = req.channel.register( selector,
-                        SelectionKey.OP_READ, session );
-    
+                                                         SelectionKey.OP_READ, session );
+
                 session.setSelectionKey( key );
 
                 req.setSession( session );
@@ -608,7 +609,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             {
                 req.setException( t );
             }
-            finally 
+            finally
             {
                 if( !success )
                 {

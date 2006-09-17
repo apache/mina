@@ -35,16 +35,18 @@ import java.util.Set;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.socket.nio.DatagramAcceptorConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
+import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
@@ -57,6 +59,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private static volatile int nextId = 0;
 
     private final IoAcceptor wrapper;
+    private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
     private final DatagramAcceptorConfig defaultConfig = new DatagramAcceptorConfig();
@@ -69,9 +72,10 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     /**
      * Creates a new instance.
      */
-    public DatagramAcceptorDelegate( IoAcceptor wrapper )
+    public DatagramAcceptorDelegate( IoAcceptor wrapper, Executor executor )
     {
         this.wrapper = wrapper;
+        this.executor = executor;
     }
 
     public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config )
@@ -268,7 +272,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         {
             selector = Selector.open();
             worker = new Worker();
-            worker.start();
+            executor.execute( new NamePreservingRunnable( worker ) );
         }
     }
 
@@ -294,15 +298,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
 
-    private class Worker extends Thread
+    private class Worker implements Runnable
     {
-        public Worker()
-        {
-            super( "DatagramAcceptor-" + id );
-        }
-
         public void run()
         {
+            Thread.currentThread().setName( "DatagramAcceptor-" + id );
+
             for( ;; )
             {
                 try

@@ -22,6 +22,8 @@ package org.apache.mina.transport.socket.nio;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.support.DelegatedIoAcceptor;
 import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
+import org.apache.mina.util.NewThreadExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
@@ -32,10 +34,20 @@ import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
 public class DatagramAcceptor extends DelegatedIoAcceptor
 {
     /**
-     * Creates a new instance.
+     * Creates a new instance using a NewThreadExecutor
      */
     public DatagramAcceptor()
     {
-        init( new DatagramAcceptorDelegate( this ) );
+        init( new DatagramAcceptorDelegate( this, new NewThreadExecutor( ) ) );
+    }
+
+    /**
+     * Creates a new instance.
+     * 
+     * @param executor Executor to use for launching threads
+     */
+    public DatagramAcceptor( Executor executor )
+    {
+        init( new DatagramAcceptorDelegate( this, executor ) );
     }
 }

@@ -19,19 +19,21 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.common.WriteTimeoutException;
-import org.apache.mina.util.Queue;
-
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.WriteTimeoutException;
+import org.apache.mina.util.NamePreservingRunnable;
+import org.apache.mina.util.Queue;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * Performs all I/O operations for sockets which is connected or bound. This class is used by MINA internally.
@@ -44,6 +46,7 @@ class SocketIoProcessor
     private final Object lock = new Object();
 
     private final String threadName;
+    private final Executor executor;
     /**
      * @noinspection FieldAccessedSynchronizedAndUnsynchronized
      */
@@ -57,9 +60,10 @@ class SocketIoProcessor
     private Worker worker;
     private long lastIdleCheckTime = System.currentTimeMillis();
 
-    SocketIoProcessor( String threadName )
+    SocketIoProcessor( String threadName, Executor executor )
     {
         this.threadName = threadName;
+        this.executor = executor;
     }
 
     void addNew( SocketSessionImpl session ) throws IOException
@@ -89,7 +93,7 @@ class SocketIoProcessor
             {
                 selector = Selector.open();
                 worker = new Worker();
-                worker.start();
+                executor.execute( new NamePreservingRunnable( worker ) );
             }
         }
     }
@@ -541,15 +545,12 @@ class SocketIoProcessor
     }
 
 
-    private class Worker extends Thread
+    private class Worker implements Runnable
     {
-        Worker()
-        {
-            super( SocketIoProcessor.this.threadName );
-        }
-
         public void run()
         {
+            Thread.currentThread().setName( SocketIoProcessor.this.threadName );
+
             for( ; ; )
             {
                 try

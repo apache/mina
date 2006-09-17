@@ -39,6 +39,9 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.util.Queue;
+import org.apache.mina.util.NewThreadExecutor;
+import org.apache.mina.util.NamePreservingRunnable;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).
@@ -53,6 +56,7 @@ public class SocketAcceptor extends BaseIoAcceptor
      */
     private static volatile int nextId = 0;
 
+    private final Executor executor;
     private final Object lock = new Object();
     private final int id = nextId ++;
     private final String threadName = "SocketAcceptor-" + id;
@@ -73,31 +77,33 @@ public class SocketAcceptor extends BaseIoAcceptor
     private int processorDistributor = 0;
 
     /**
-     * Create an acceptor with a single processing thread
+     * Create an acceptor with a single processing thread using a NewThreadExecutor
      */
     public SocketAcceptor()
     {
-        this( 1 );
+        this( 1, new NewThreadExecutor() );
     }
 
     /**
      * Create an acceptor with the desired number of processing threads
      *
      * @param processorCount Number of processing threads
+     * @param executor Executor to use for launching threads
      */
-    public SocketAcceptor( int processorCount )
+    public SocketAcceptor( int processorCount, Executor executor )
     {
         if( processorCount < 1 )
         {
             throw new IllegalArgumentException( "Must have at least one processor" );
         }
 
+        this.executor = executor;
         this.processorCount = processorCount;
         ioProcessors = new SocketIoProcessor[processorCount];
 
         for( int i = 0; i < processorCount; i++ )
         {
-            ioProcessors[i] = new SocketIoProcessor( "SocketAcceptorIoProcessor-" + id + "." + i );
+            ioProcessors[i] = new SocketIoProcessor( "SocketAcceptorIoProcessor-" + id + "." + i, executor );
         }
     }
 
@@ -176,7 +182,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                 selector = Selector.open();
                 worker = new Worker();
 
-                worker.start();
+                executor.execute( new NamePreservingRunnable( worker ) );
             }
         }
     }
@@ -247,15 +253,12 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-    private class Worker extends Thread
+    private class Worker implements Runnable
     {
-        Worker()
-        {
-            super( SocketAcceptor.this.threadName );
-        }
-
         public void run()
         {
+            Thread.currentThread().setName(SocketAcceptor.this.threadName );
+
             for( ; ; )
             {
                 try
@@ -336,17 +339,16 @@ public class SocketAcceptor extends BaseIoAcceptor
                 }
 
                 boolean success = false;
-                SocketSessionImpl session = null;
                 try
                 {
                     RegistrationRequest req = ( RegistrationRequest ) key.attachment();
-                    session = new SocketSessionImpl( SocketAcceptor.this,
-                                                     nextProcessor(),
-                                                     getListeners(),
-                                                     req.config,
-                                                     ch,
-                                                     req.handler,
-                                                     req.address );
+                    SocketSessionImpl session = new SocketSessionImpl( SocketAcceptor.this,
+                                                                       nextProcessor(),
+                                                                       getListeners(),
+                                                                       req.config,
+                                                                       ch,
+                                                                       req.handler,
+                                                                       req.address );
                     getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
@@ -429,7 +431,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                 {
                     channels.put( req.address, ssc );
                 }
-                
+
                 getListeners().fireServiceActivated(
                         this, req.address, req.handler, req.config );
             }
@@ -518,7 +520,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                     request.done = true;
                     request.notifyAll();
                 }
-                
+
                 if( request.exception == null )
                 {
                     getListeners().fireServiceDeactivated(
