@@ -377,6 +377,16 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             super( EMPTY_BUFFER );
             this.message = message;
         }
+
+        public void acquire()
+        {
+            // no-op since we are wraping a zero-byte buffer, this instance is to just curry the message
+        }
+
+        public void release()
+        {
+            // no-op since we are wraping a zero-byte buffer, this instance is to just curry the message
+        }
     }
     
     private static class ProtocolEncoderOutputImpl extends SimpleProtocolEncoderOutput
