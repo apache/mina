@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+<!-- 
+        Classic Spring approach : define each bean, then do the call to bind in code
+
+        <bean id="acceptor" class="org.apache.mina.transport.socket.nio.SocketAcceptor" />
+        <bean id="address" class="java.net.InetSocketAddress">
+            <constructor-arg>
+                <value>1234</value>
+            </constructor-arg>
+        </bean>
+         <bean id="chatHandler" class="server.ChatProtocolHandler" />
+--> 
+
+   <!-- MINA IoAcceptorFactoryBean approach -->
+   <!-- This makes it possible to specify java.net.SocketAddress values 
+        (e.g. :1234 below) as Strings.
+        They will be converted into java.net.InetSocketAddress objects by Spring.  -->
+   <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+     <property name="customEditors">
+       <map>
+         <entry key="java.net.SocketAddress">
+           <bean class="org.apache.mina.integration.spring.InetSocketAddressEditor"/>
+         </entry>
+       </map>
+     </property>
+   </bean>
+ 
+   <!-- The IoHandler implementation -->
+   <bean id="chatHandler" class="org.apache.mina.example.chat.ChatProtocolHandler" />
+     
+   <bean id="filterChainBuilder" 
+         class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean">
+     <property name="filters">
+       <list>
+
+         <!-- Thread pool where threads will be named IoWorker-1, IoWorker-2, etc -->
+		 <!--
+         <bean class="org.apache.mina.filter.ThreadPoolFilter">
+           <constructor-arg value="IoWorker"/>
+           <property name="maximumPoolSize" value="10"/>
+         </bean>
+         -->
+         <bean class="org.apache.mina.filter.codec.ProtocolCodecFilter" >
+          <constructor-arg>
+           	<bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
+           </constructor-arg>
+         </bean>
+         <bean class="org.apache.mina.filter.LoggingFilter"/>
+       </list>
+     </property>
+   </bean>
+
+   <bean id="ioAcceptor" class="org.apache.mina.integration.spring.IoAcceptorFactoryBean">
+     <property name="target">
+       <bean class="org.apache.mina.transport.socket.nio.SocketAcceptor"/>
+     </property>
+     <property name="bindings">
+       <list>
+         <bean class="org.apache.mina.integration.spring.Binding">
+           <property name="address" value=":1234"/>
+           <property name="handler" ref="chatHandler"/>
+           <property name="serviceConfig">
+             <bean class="org.apache.mina.transport.socket.nio.SocketAcceptorConfig">
+               <property name="filterChainBuilder" ref="filterChainBuilder"/>
+               <property name="reuseAddress" value="true"/>
+             </bean>
+           </property>
+         </bean>
+       </list>
+     </property>
+   </bean>
+        
+</beans>
