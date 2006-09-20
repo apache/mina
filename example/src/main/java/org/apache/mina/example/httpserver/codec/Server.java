@@ -22,6 +22,8 @@ package org.apache.mina.example.httpserver.codec;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.filter.LoggingFilter;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 
@@ -53,11 +55,18 @@ public class Server
 
         try
         {
-            // Create ServiceRegistry.
+            // Create an acceptor
             IoAcceptor acceptor = new SocketAcceptor();
-            ( ( SocketAcceptorConfig ) acceptor.getDefaultConfig() )
-                    .setReuseAddress( true );
-            acceptor.bind( new InetSocketAddress( port ), new ServerHandler() );
+            
+            // Create a service configuration
+            SocketAcceptorConfig cfg = new SocketAcceptorConfig();
+            cfg.setReuseAddress( true );
+            cfg.getFilterChain().addLast(
+                    "protocolFilter",
+                    new ProtocolCodecFilter( new HttpServerProtocolCodecFactory() ) );
+            cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
+
+            acceptor.bind( new InetSocketAddress( port ), new ServerHandler(), cfg );
 
             System.out.println( "Server now listening on port " + port );
         }

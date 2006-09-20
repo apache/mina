@@ -21,9 +21,9 @@ package org.apache.mina.example.httpserver.codec;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.util.SessionLog;
 
 /**
  * An {@link IoHandler} for HTTP.
@@ -31,48 +31,18 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ServerHandler implements IoHandler
+public class ServerHandler extends IoHandlerAdapter
 {
-    public ServerHandler()
-    {
-    }
-
-    public void sessionCreated( IoSession session ) throws Exception
-    {
-        ProtocolCodecFactory codec = new HttpServerProtocolCodecFactory();
-
-        session.getFilterChain().addFirst( "protocolFilter",
-                new ProtocolCodecFilter( codec ) );
-        //    session.getFilterChain().addLast("logger", new LoggingFilter());
-    }
-
     public void sessionOpened( IoSession session )
     {
-        System.out.println( "SERVER SESSIOn OPENED - "
-                + session.getRemoteAddress() );
         // set idle time to 60 seconds
         session.setIdleTime( IdleStatus.BOTH_IDLE, 60 );
     }
 
-    public void sessionClosed( IoSession session )
-    {
-        System.out.println( "SERVER SESSIOn CLOSED" );
-    }
-
     public void messageReceived( IoSession session, Object message )
     {
-        HttpResponseMessage response = null;
-
-        HttpRequestMessage msg = ( HttpRequestMessage ) message;
-
-        System.out
-                .println( "***************************  REQUEST  ***************************" );
-        System.out.println( msg );
-        System.out
-                .println( "*****************************************************************" );
-
         // Check that we can service the request context
-        response = new HttpResponseMessage();
+        HttpResponseMessage response = new HttpResponseMessage();
         response.setContentType( "text/plain" );
         response.setResponseCode( HttpResponseMessage.HTTP_STATUS_SUCCESS );
         response.appendBody( "CONNECTED" );
@@ -97,23 +67,14 @@ public class ServerHandler implements IoHandler
             session.write( response ).join();
     }
 
-    public void messageSent( IoSession session, Object message )
-    {
-        System.out.println( "  MESSAGE SENT - WRITTEN BYTES="
-                + session.getWrittenBytes() );
-    }
-
     public void sessionIdle( IoSession session, IdleStatus status )
     {
-        System.out.println( "Disconnecting the idle." );
-        // disconnect an idle client
+        SessionLog.info( session, "Disconnecting the idle." );
         session.close();
     }
 
     public void exceptionCaught( IoSession session, Throwable cause )
     {
-        cause.printStackTrace();
-        // close the connection on exceptional situation
         session.close();
     }
 }
