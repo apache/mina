@@ -51,9 +51,7 @@ public class HttpResponseMessage
 
     public HttpResponseMessage()
     {
-        String[] ver = Server.VERSION_STRING.split( " " );
-        headers.put( "Server", "HttpServer - Revision: " + ver[ 1 ] + " "
-                + ver[ 7 ] + " " + ver[ 8 ] + " " + ver[ 9 ] + " " + ver[ 10 ] );
+        headers.put( "Server", "HttpServer (" + Server.VERSION_STRING + ')' );
         headers.put( "Cache-Control", "private" );
         headers.put( "Content-Type", "text/html; charset=iso-8859-1" );
         headers.put( "Connection", "keep-alive" );
