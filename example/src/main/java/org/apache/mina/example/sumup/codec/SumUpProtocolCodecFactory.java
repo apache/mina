@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.sumup.codec;
+package org.apache.mina.example.sumup.codec;
 
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;

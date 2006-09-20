@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.sumup.message;
+package org.apache.mina.example.sumup.message;
 
 /**
  * <code>ADD</code> message in SumUp protocol.

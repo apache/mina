@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.echoserver.ssl;
+package org.apache.mina.example.echoserver.ssl;
 
 import java.io.IOException;
 import java.io.InputStream;

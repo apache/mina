@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.sumup;
+package org.apache.mina.example.sumup;
 
 import java.net.InetSocketAddress;
 

@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.sumup.codec;
+package org.apache.mina.example.sumup.codec;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,8 +25,8 @@ import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.examples.sumup.message.AbstractMessage;
-import org.apache.mina.examples.sumup.message.AddMessage;
+import org.apache.mina.example.sumup.message.AbstractMessage;
+import org.apache.mina.example.sumup.message.AddMessage;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 /**

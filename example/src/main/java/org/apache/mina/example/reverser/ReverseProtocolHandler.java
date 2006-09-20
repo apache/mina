@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.reverser;
+package org.apache.mina.example.reverser;
 
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoHandler;
