@@ -19,13 +19,9 @@
  */
 package org.apache.mina.example.reverser;
 
-import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.LoggingFilter;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 
 /**
  * {@link IoHandler} implementation of reverser server protocol.
@@ -35,16 +31,6 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
  */
 public class ReverseProtocolHandler extends IoHandlerAdapter
 {
-    private static IoFilter LOGGING_FILTER = new LoggingFilter();
-    private static IoFilter CODEC_FILTER =
-        new ProtocolCodecFilter( new TextLineCodecFactory() );
-
-    public void sessionCreated( IoSession session ) throws Exception
-    {
-        session.getFilterChain().addLast( "logger", LOGGING_FILTER );
-        session.getFilterChain().addLast( "codec", CODEC_FILTER );
-    }
-
     public void exceptionCaught( IoSession session, Throwable cause )
     {
         cause.printStackTrace();
