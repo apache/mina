@@ -21,14 +21,10 @@ package org.apache.mina.example.sumup;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
 import org.apache.mina.example.sumup.message.AddMessage;
 import org.apache.mina.example.sumup.message.ResultMessage;
-import org.apache.mina.filter.LoggingFilter;
-import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -37,33 +33,8 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ServerSessionHandler implements IoHandler
+public class ServerSessionHandler extends IoHandlerAdapter
 {
-    private final boolean useCustomCodec;
-
-    public ServerSessionHandler( boolean useCustomCodec )
-    {
-        this.useCustomCodec = useCustomCodec;
-    }
-
-    public void sessionCreated( IoSession session ) throws Exception
-    {
-        ProtocolCodecFactory codec;
-        if( useCustomCodec )
-        {
-            codec = new SumUpProtocolCodecFactory( true );
-        }
-        else
-        {
-            codec = new ObjectSerializationCodecFactory();
-        }
-
-        session.getFilterChain().addFirst(
-                "protocolFilter", new ProtocolCodecFilter( codec ) );
-        session.getFilterChain().addLast(
-                "logger", new LoggingFilter() );
-    }
-
     public void sessionOpened( IoSession session )
     {
         // set idle time to 60 seconds
@@ -71,10 +42,6 @@ public class ServerSessionHandler implements IoHandler
 
         // initial sum is zero
         session.setAttachment( new Integer( 0 ) );
-    }
-
-    public void sessionClosed( IoSession session )
-    {
     }
 
     public void messageReceived( IoSession session, Object message )
@@ -108,10 +75,6 @@ public class ServerSessionHandler implements IoHandler
             rm.setValue( sum );
             session.write( rm );
         }
-    }
-
-    public void messageSent( IoSession session, Object message )
-    {
     }
 
     public void sessionIdle( IoSession session, IdleStatus status )

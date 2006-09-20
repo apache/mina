@@ -23,10 +23,14 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
+import org.apache.mina.filter.LoggingFilter;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
 
 /**
  * (<strong>Entry Point</strong>) Starts SumUp client.
@@ -57,9 +61,24 @@ public class Client
             values[ i ] = Integer.parseInt( args[ i ] );
         }
 
-        // Set connect timeout.
         IoConnector connector = new SocketConnector();
-        ( ( IoConnectorConfig ) connector.getDefaultConfig() ).setConnectTimeout( CONNECT_TIMEOUT );
+        
+        // Configure the service.
+        SocketConnectorConfig cfg = new SocketConnectorConfig();
+        cfg.setConnectTimeout( CONNECT_TIMEOUT );
+        if( USE_CUSTOM_CODEC )
+        {
+            cfg.getFilterChain().addLast(
+                    "codec",
+                    new ProtocolCodecFilter( new SumUpProtocolCodecFactory( false ) ) );
+        }
+        else
+        {
+            cfg.getFilterChain().addLast(
+                    "codec",
+                    new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
+        }
+        cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
         
         IoSession session;
         for( ;; )
@@ -68,7 +87,7 @@ public class Client
             {
                 ConnectFuture future = connector.connect(
                         new InetSocketAddress( HOSTNAME, PORT ),
-                        new ClientSessionHandler( USE_CUSTOM_CODEC, values ) );
+                        new ClientSessionHandler( values ), cfg );
                 
                 future.join();
                 session = future.getSession();
