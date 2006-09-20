@@ -17,12 +17,24 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.mina</groupId>
+      <artifactId>mina-integration-spring</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>nlog4j</artifactId>
       <version>1.2.25</version>
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>1.2.8</version>
+    </dependency>
+        
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
