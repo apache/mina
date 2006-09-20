@@ -70,7 +70,7 @@ public class SocketConnector extends BaseIoConnector
     private Selector selector;
     private Worker worker;
     private int processorDistributor = 0;
-    private long workerTimeout = 1000L * 60;
+    private int workerTimeout = 60;  // 1 min.
 
     /**
      * Create a connector with a single processing thread using a NewThreadExecutor 
@@ -104,25 +104,25 @@ public class SocketConnector extends BaseIoConnector
     }
 
     /**
-     * How many milliseconds to keep the connection thread alive between connection requests
+     * How many seconds to keep the connection thread alive between connection requests
      *
-     * @return Number of milliseconds to keep connection thread alive
+     * @return Number of seconds to keep connection thread alive
      */
-    public long getWorkerTimeout()
+    public int getWorkerTimeout()
     {
         return workerTimeout;
     }
 
     /**
-     * Set how many milliseconds the connection worker thread should remain alive once idle before terminating itself.
+     * Set how many seconds the connection worker thread should remain alive once idle before terminating itself.
      *
-     * @param workerTimeout Number of milliseconds to keep thread alive. Must be >=0
+     * @param workerTimeout Number of seconds to keep thread alive. Must be >=0
      */
-    public void setWorkerTimeout( long workerTimeout )
+    public void setWorkerTimeout( int workerTimeout )
     {
         if( workerTimeout < 0 )
         {
-            throw new IllegalArgumentException( "Must be > 0" );
+            throw new IllegalArgumentException( "Must be >= 0" );
         }
         this.workerTimeout = workerTimeout;
     }
@@ -401,7 +401,7 @@ public class SocketConnector extends BaseIoConnector
 
                     if( selector.keys().isEmpty() )
                     {
-                        if( System.currentTimeMillis() - lastActive > workerTimeout )
+                        if( System.currentTimeMillis() - lastActive > workerTimeout * 1000L )
                         {
                             synchronized( lock )
                             {
