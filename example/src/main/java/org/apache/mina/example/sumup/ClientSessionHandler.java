@@ -22,13 +22,8 @@ package org.apache.mina.example.sumup;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
 import org.apache.mina.example.sumup.message.AddMessage;
 import org.apache.mina.example.sumup.message.ResultMessage;
-import org.apache.mina.filter.LoggingFilter;
-import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -39,37 +34,17 @@ import org.apache.mina.util.SessionLog;
  */
 public class ClientSessionHandler extends IoHandlerAdapter
 {
-    private final boolean useCustomCodec;
     private final int[] values;
     private boolean finished;
 
-    public ClientSessionHandler( boolean useCustomCodec, int[] values )
+    public ClientSessionHandler( int[] values )
     {
-        this.useCustomCodec = useCustomCodec;
         this.values = values;
     }
 
     public boolean isFinished()
     {
         return finished;
-    }
-
-    public void sessionCreated( IoSession session ) throws Exception
-    {
-        ProtocolCodecFactory codec;
-        if( useCustomCodec )
-        {
-            codec = new SumUpProtocolCodecFactory( false );
-        }
-        else
-        {
-            codec = new ObjectSerializationCodecFactory();
-        }
-
-        session.getFilterChain().addLast(
-                "protocolFilter", new ProtocolCodecFilter( codec ) );
-        session.getFilterChain().addLast(
-                "logger", new LoggingFilter() );
     }
 
     public void sessionOpened( IoSession session )

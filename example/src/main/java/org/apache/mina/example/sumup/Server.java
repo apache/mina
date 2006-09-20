@@ -22,7 +22,12 @@ package org.apache.mina.example.sumup;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
+import org.apache.mina.filter.LoggingFilter;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 
 /**
  * (<strong>Entry Point</strong>) Starts SumUp server.
@@ -38,12 +43,28 @@ public class Server
 
     public static void main( String[] args ) throws Throwable
     {
-        // Create ServiceRegistry.
         IoAcceptor acceptor = new SocketAcceptor();
+        
+        // Prepare the service configuration.
+        SocketAcceptorConfig cfg = new SocketAcceptorConfig();
+        cfg.setReuseAddress( true );
+        if( USE_CUSTOM_CODEC )
+        {
+            cfg.getFilterChain().addLast(
+                    "codec",
+                    new ProtocolCodecFilter( new SumUpProtocolCodecFactory( true ) ) );
+        }
+        else
+        {
+            cfg.getFilterChain().addLast(
+                    "codec",
+                    new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
+        }
+        cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
 
         acceptor.bind(
                 new InetSocketAddress( SERVER_PORT ),
-                new ServerSessionHandler( USE_CUSTOM_CODEC ) );
+                new ServerSessionHandler( ), cfg );
 
         System.out.println( "Listening on port " + SERVER_PORT );
     }
