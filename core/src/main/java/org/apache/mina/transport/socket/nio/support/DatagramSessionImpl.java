@@ -36,6 +36,7 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
 
@@ -146,7 +147,11 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     
     protected void close0()
     {
-        getServiceConfig().getSessionRecycler().remove( this );
+        IoServiceConfig config = getServiceConfig();
+        if( config instanceof DatagramServiceConfig )
+        {
+            ( ( DatagramServiceConfig ) config ).getSessionRecycler().remove( this );
+        }
         filterChain.fireFilterClose( this );
     }
 

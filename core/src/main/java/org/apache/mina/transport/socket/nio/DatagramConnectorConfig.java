@@ -19,8 +19,10 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoConnectorConfig;
 import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
@@ -31,9 +33,16 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnectorConfig extends BaseIoConnectorConfig
+public class DatagramConnectorConfig extends BaseIoConnectorConfig implements DatagramServiceConfig
 {
-    private final DatagramSessionConfig sessionConfig = new DatagramSessionConfigImpl();
+    private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
+    
+    /**
+     * Current session recycler
+     */
+    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
+
+    private DatagramSessionConfig sessionConfig = new DatagramSessionConfigImpl();
 
     /**
      * Creates a new instance.
@@ -49,5 +58,27 @@ public class DatagramConnectorConfig extends BaseIoConnectorConfig
     public IoSessionConfig getSessionConfig()
     {
         return sessionConfig;
+    }
+
+    public IoSessionRecycler getSessionRecycler()
+    {
+        return sessionRecycler;
+    }
+
+    // FIXME There can be a problem if a user changes the recycler after the service is activated.
+    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
+    {
+        if( sessionRecycler == null )
+        {
+            sessionRecycler = DEFAULT_RECYCLER;
+        }
+        this.sessionRecycler = sessionRecycler;
+    }
+
+    public Object clone()
+    {
+        DatagramConnectorConfig ret = ( DatagramConnectorConfig ) super.clone();
+        ret.sessionConfig = ( DatagramSessionConfig ) this.sessionConfig.clone();
+        return ret;
     }
 }

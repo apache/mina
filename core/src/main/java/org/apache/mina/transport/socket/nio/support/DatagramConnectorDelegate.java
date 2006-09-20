@@ -28,22 +28,24 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.socket.nio.DatagramConnectorConfig;
+import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
@@ -413,7 +415,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     
     private DatagramSessionImpl getRecycledSession( IoSession session )
     {
-        IoSessionRecycler sessionRecycler = session.getServiceConfig().getSessionRecycler();
+        IoSessionRecycler sessionRecycler = getSessionRecycler( session );
         DatagramSessionImpl replaceSession = null;
 
         if ( sessionRecycler != null )
@@ -433,6 +435,21 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
 
         return null;
+    }
+    
+    private IoSessionRecycler getSessionRecycler( IoSession session )
+    {
+        IoServiceConfig config = session.getServiceConfig();
+        IoSessionRecycler sessionRecycler;
+        if( config instanceof DatagramServiceConfig )
+        {
+            sessionRecycler = ( ( DatagramServiceConfig ) config ).getSessionRecycler();
+        }
+        else
+        {
+            sessionRecycler = defaultConfig.getSessionRecycler();
+        }
+        return sessionRecycler;
     }
 
     private void readSession( DatagramSessionImpl session )

@@ -35,17 +35,19 @@ import java.util.Set;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.socket.nio.DatagramAcceptorConfig;
+import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -215,7 +217,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
         RegistrationRequest req = ( RegistrationRequest ) key.attachment();
         IoSession session;
-        IoSessionRecycler sessionRecycler = req.config.getSessionRecycler();
+        IoSessionRecycler sessionRecycler = getSessionRecycler( req );
         synchronized ( sessionRecycler )
         {
             session = sessionRecycler.recycle( localAddress, remoteAddress);
@@ -232,7 +234,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             datagramSession.setRemoteAddress( remoteAddress );
             datagramSession.setSelectionKey( key );
             
-            req.config.getSessionRecycler().put( datagramSession );
+            getSessionRecycler( req ).put( datagramSession );
             session = datagramSession;
         }
         
@@ -247,6 +249,20 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
         
         return session;
+    }
+
+    private IoSessionRecycler getSessionRecycler( RegistrationRequest req )
+    {
+        IoSessionRecycler sessionRecycler;
+        if( req.config instanceof DatagramServiceConfig )
+        {
+            sessionRecycler = ( ( DatagramServiceConfig ) req.config ).getSessionRecycler();
+        }
+        else
+        {
+            sessionRecycler = defaultConfig.getSessionRecycler();
+        }
+        return sessionRecycler;
     }
     
     public IoServiceListenerSupport getListeners()
