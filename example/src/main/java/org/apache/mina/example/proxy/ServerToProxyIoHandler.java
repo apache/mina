@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.proxy;
+package org.apache.mina.example.proxy;
 
 /**
  * Handles the server to proxy part of the proxied connection.

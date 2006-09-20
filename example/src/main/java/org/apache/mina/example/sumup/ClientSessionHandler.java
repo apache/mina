@@ -17,14 +17,14 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.sumup;
+package org.apache.mina.example.sumup;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.examples.sumup.codec.SumUpProtocolCodecFactory;
-import org.apache.mina.examples.sumup.message.AddMessage;
-import org.apache.mina.examples.sumup.message.ResultMessage;
+import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
+import org.apache.mina.example.sumup.message.AddMessage;
+import org.apache.mina.example.sumup.message.ResultMessage;
 import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;

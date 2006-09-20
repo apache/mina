@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.tennis;
+package org.apache.mina.example.tennis;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoAcceptor;

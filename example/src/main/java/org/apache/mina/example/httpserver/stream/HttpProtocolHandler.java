@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.httpserver;
+package org.apache.mina.example.httpserver.stream;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

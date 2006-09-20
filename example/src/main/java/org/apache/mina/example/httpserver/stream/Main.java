@@ -17,14 +17,14 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.httpserver;
+package org.apache.mina.example.httpserver.stream;
 
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoAcceptorConfig;
-import org.apache.mina.examples.echoserver.ssl.BogusSSLContextFactory;
+import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;

@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.proxy;
+package org.apache.mina.example.proxy;
 
 import java.net.InetSocketAddress;
 

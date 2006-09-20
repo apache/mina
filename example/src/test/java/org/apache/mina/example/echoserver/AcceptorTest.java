@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.echoserver;
+package org.apache.mina.example.echoserver;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -31,8 +31,8 @@ import javax.net.SocketFactory;
 
 import org.apache.commons.net.EchoTCPClient;
 import org.apache.commons.net.EchoUDPClient;
-import org.apache.mina.examples.echoserver.ssl.SSLServerSocketFactory;
-import org.apache.mina.examples.echoserver.ssl.SSLSocketFactory;
+import org.apache.mina.example.echoserver.ssl.SSLServerSocketFactory;
+import org.apache.mina.example.echoserver.ssl.SSLSocketFactory;
 
 /**
  * Tests echo server example.

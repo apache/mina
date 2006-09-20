@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.netcat;
+package org.apache.mina.example.netcat;
 
 import java.net.InetSocketAddress;
 

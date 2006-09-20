@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.echoserver.ssl;
+package org.apache.mina.example.echoserver.ssl;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;

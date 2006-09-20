@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.proxy;
+package org.apache.mina.example.proxy;
 
 import java.net.InetSocketAddress;
 
@@ -35,7 +35,7 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
  * strings before being logged.
  * <p>
  * Start a proxy like this:<br/>
- * <code>org.apache.mina.examples.proxy.Main 12345 www.google.com 80</code><br/>
+ * <code>org.apache.mina.example.proxy.Main 12345 www.google.com 80</code><br/>
  * and open <a href="http://localhost:12345">http://localhost:12345</a> in a
  * browser window.
  * </p>

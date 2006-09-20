@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.examples.tennis;
+package org.apache.mina.example.tennis;
 
 /**
  * A tennis ball which has TTL value and state whose value is one of 'PING' and
