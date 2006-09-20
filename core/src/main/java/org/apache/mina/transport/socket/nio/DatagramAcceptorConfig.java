@@ -20,8 +20,10 @@
 package org.apache.mina.transport.socket.nio;
 
 
+import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoAcceptorConfig;
 import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
@@ -32,8 +34,15 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements IoAcceptorConfig
+public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements DatagramServiceConfig
 {
+    private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
+    
+    /**
+     * Current session recycler
+     */
+    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
+
     private DatagramSessionConfig sessionConfig = new DatagramSessionConfigImpl();
 
     /**
@@ -51,6 +60,21 @@ public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements IoAc
         return sessionConfig;
     }
     
+    public IoSessionRecycler getSessionRecycler()
+    {
+        return sessionRecycler;
+    }
+
+    // FIXME There can be a problem if a user changes the recycler after the service is activated.
+    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
+    {
+        if( sessionRecycler == null )
+        {
+            sessionRecycler = DEFAULT_RECYCLER;
+        }
+        this.sessionRecycler = sessionRecycler;
+    }
+
     public Object clone()
     {
         DatagramAcceptorConfig ret = ( DatagramAcceptorConfig ) super.clone();

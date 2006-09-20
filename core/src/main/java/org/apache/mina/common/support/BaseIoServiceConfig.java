@@ -22,11 +22,9 @@ package org.apache.mina.common.support;
 import java.lang.reflect.Method;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
-import org.apache.mina.common.ExpiringSessionRecycler;
+import org.apache.mina.common.ExecutorThreadModel;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.ExecutorThreadModel;
-import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.ThreadModel;
 
 /**
@@ -37,8 +35,6 @@ import org.apache.mina.common.ThreadModel;
  */
 public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
 {
-    private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
-    
     /**
      * Current filter chain builder.
      */
@@ -54,11 +50,6 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
      */
     private ThreadModel threadModel = defaultThreadModel;
     
-    /**
-     * Current session recycler
-     */
-    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
-
     public BaseIoServiceConfig()
     {
         super();
@@ -107,21 +98,6 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
         this.threadModel = threadModel;
     }
     
-    // FIXME There can be a problem if a user changes the recycler after the service is activated.
-    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
-    {
-        if( sessionRecycler == null )
-        {
-            sessionRecycler = DEFAULT_RECYCLER;
-        }
-        this.sessionRecycler = sessionRecycler;
-    }
-    
-    public IoSessionRecycler getSessionRecycler()
-    {
-        return sessionRecycler;
-    }
-
     public Object clone()
     {
         BaseIoServiceConfig ret;

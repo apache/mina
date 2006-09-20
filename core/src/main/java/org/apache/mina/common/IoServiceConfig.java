@@ -82,19 +82,6 @@ public interface IoServiceConfig
     void setThreadModel( ThreadModel threadModel );
     
     /**
-     * Sets the {@link IoSessionRecycler} for this service. Please note that this
-     * recycler will only be applied to connectionless transports.
-     * 
-     * @param sessionRecycler <tt>null</tt> to use the default recycler
-     */
-    void setSessionRecycler( IoSessionRecycler sessionRecycler );
-
-    /**
-     * Returns the {@link IoSessionRecycler} for this service.
-     */
-    IoSessionRecycler getSessionRecycler();
-    
-    /**
      * Returns a deep clone of this configuration.
      */
     Object clone();
