@@ -31,6 +31,23 @@ import java.net.SocketAddress;
 public interface IoSessionRecycler
 {
     /**
+     * A dummy recycler that doesn't recycle any sessions.  Using this recycler will
+     * make all session lifecycle events to be fired for every I/O for all connectionless
+     * sessions.
+     */
+    static IoSessionRecycler NOOP = new IoSessionRecycler()
+    {
+        public void put( IoSession session ) {}
+        public IoSession recycle( SocketAddress localAddress, SocketAddress remoteAddress )
+        {
+            return null;
+        }
+        public void remove( IoSession session )
+        {
+        }
+    };
+
+    /**
      * Called when the underlying transport creates or writes a new {@link IoSession}.
      * 
      * @param session

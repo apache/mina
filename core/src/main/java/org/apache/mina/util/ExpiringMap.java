@@ -20,177 +20,94 @@
 package org.apache.mina.util;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.ReadWriteLock;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A map with expiration.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * TODO Change time unit to 'seconds'.
- * TODO Make thread-safe.
  */
 public class ExpiringMap implements Map
 {
-    public static final long DEFAULT_EXPIRATION_TIME = 60000;
+    public static final int DEFAULT_TIME_TO_LIVE = 60;
 
-    public static final long DEFAULT_EXPIRER_DELAY = 1000;
+    public static final int DEFAULT_EXPIRATION_INTERVAL = 1;
 
     private static volatile int expirerCount = 1;
 
-    private long expirationTimeMillis;
+    private final ConcurrentHashMap delegate;
 
-    private long expirerDelay;
+    private final CopyOnWriteArrayList expirationListeners;
 
-    private HashMap delegate;
-
-    private HashMap expirationInfos;
-
-    private List expirationListeners;
-
-    private Expirer expirer;
+    private final Expirer expirer;
 
     public ExpiringMap()
     {
-        this( new HashMap(), new HashMap(), new LinkedList(), DEFAULT_EXPIRATION_TIME, DEFAULT_EXPIRER_DELAY );
+        this( DEFAULT_TIME_TO_LIVE, DEFAULT_EXPIRATION_INTERVAL );
     }
 
-    public ExpiringMap( long expirationTimeMillis )
+    public ExpiringMap( int timeToLive )
     {
-        this( new HashMap(), new HashMap(), new LinkedList(), expirationTimeMillis, DEFAULT_EXPIRER_DELAY );
+        this( timeToLive, DEFAULT_EXPIRATION_INTERVAL );
     }
 
-    public ExpiringMap( long expirationTimeMillis, long expirerDelay )
+    public ExpiringMap( int timeToLive, int expirationInterval )
     {
-        this( new HashMap(), new HashMap(), new LinkedList(), expirationTimeMillis, expirerDelay );
+        this( new ConcurrentHashMap(), new CopyOnWriteArrayList(), timeToLive, expirationInterval );
     }
 
-    private ExpiringMap( HashMap delegate, HashMap accessTimes, List expirationListeners, long expirationTimeMillis,
-            long expirerDelay )
+    private ExpiringMap(
+            ConcurrentHashMap delegate, CopyOnWriteArrayList expirationListeners,
+            int timeToLive, int expirationInterval )
     {
         this.delegate = delegate;
-        this.expirationInfos = accessTimes;
-        this.expirationTimeMillis = expirationTimeMillis;
         this.expirationListeners = expirationListeners;
-        this.expirerDelay = expirerDelay;
 
         this.expirer = new Expirer();
-        this.expirer.start();
+        expirer.setTimeToLive( timeToLive );
+        expirer.setExpirationInterval( expirationInterval );
     }
 
-    /**
-     * @see java.util.Map#clear()
-     */
-    public void clear()
+    public Object put( Object key, Object value )
     {
-        expirationInfos.clear();
-        delegate.clear();
+        return delegate.put( key, new ExpiringObject( key, value, System.currentTimeMillis() ) );
     }
 
-    /**
-     * @see java.util.Map#containsKey(java.lang.Object)
-     */
+    public Object get( Object key )
+    {
+        Object object = delegate.get( key );
+
+        if( object != null )
+        {
+            ExpiringObject expObject = ( ExpiringObject ) object;
+            expObject.setLastAccessTime( System.currentTimeMillis() );
+
+            return expObject.getValue();
+        }
+
+        return object;
+    }
+
+    public Object remove( Object key )
+    {
+        return delegate.remove( key );
+    }
+
     public boolean containsKey( Object key )
     {
         return delegate.containsKey( key );
     }
 
-    /**
-     * @see java.util.Map#containsValue(java.lang.Object)
-     */
     public boolean containsValue( Object value )
     {
         return delegate.containsValue( value );
-    }
-
-    /**
-     * @see java.util.Map#entrySet()
-     */
-    public Set entrySet()
-    {
-        return delegate.entrySet();
-    }
-
-    /**
-     * @see java.util.Map#equals(java.util.Map)
-     */
-    public boolean equals( Object o )
-    {
-        return delegate.equals( o );
-    }
-
-    /**
-     * @see java.util.Map#get(java.lang.Object)
-     */
-    public Object get( Object key )
-    {
-        Object object = delegate.get( key );
-
-        if ( object != null )
-        {
-            updateAccessTime( object );
-        }
-
-        return object;
-    }
-
-    public int hashCode()
-    {
-        return delegate.hashCode();
-    }
-
-    public boolean isEmpty()
-    {
-        return delegate.isEmpty();
-    }
-
-    public Set keySet()
-    {
-        return delegate.keySet();
-    }
-
-    public Object put( Object key, Object value )
-    {
-        if ( value != null )
-        {
-            addAccessTime( key, value );
-        }
-
-        return delegate.put( key, value );
-    }
-
-    public void putAll( Map map )
-    {
-        Iterator mapKeyIterator = map.keySet().iterator();
-
-        while ( mapKeyIterator.hasNext() )
-        {
-            Object key = mapKeyIterator.next();
-            Object value = map.get( key );
-
-            if ( value != null )
-            {
-                addAccessTime( key, value );
-            }
-        }
-
-        delegate.putAll( map );
-    }
-
-    public Object remove( Object key )
-    {
-        Object object = delegate.remove( key );
-
-        if ( object != null )
-        {
-            expirationInfos.remove( object );
-        }
-
-        return object;
     }
 
     public int size()
@@ -198,123 +115,195 @@ public class ExpiringMap implements Map
         return delegate.size();
     }
 
+    public boolean isEmpty()
+    {
+        return delegate.isEmpty();
+    }
+
+    public void clear()
+    {
+        delegate.clear();
+    }
+
+    public int hashCode()
+    {
+        return delegate.hashCode();
+    }
+
+    public Set keySet()
+    {
+        return delegate.keySet();
+    }
+
+    public boolean equals( Object obj )
+    {
+        return delegate.equals( obj );
+    }
+
+    public void putAll( Map inMap )
+    {
+        synchronized( inMap )
+        {
+            Iterator inMapKeysIt = inMap.keySet().iterator();
+
+            while( inMapKeysIt.hasNext() )
+            {
+                Object key = inMapKeysIt.next();
+                Object value = inMap.get( key );
+
+                if( value instanceof ExpiringObject )
+                {
+                    delegate.put( key, value );
+                }
+            }
+        }
+    }
+
     public Collection values()
     {
         return delegate.values();
     }
 
-    private void addAccessTime( Object key, Object value )
+    public Set entrySet()
     {
-        ExpirationInfo info = new ExpirationInfo();
-        info.key = key;
-        info.accesstime = System.currentTimeMillis();
-
-        expirationInfos.put( value, info );
-    }
-
-    public void updateAccessTime( Object object )
-    {
-        Object infoObject = expirationInfos.get( object );
-
-        if ( infoObject != null )
-        {
-            ExpirationInfo info = ( ExpirationInfo ) infoObject;
-            info.accesstime = System.currentTimeMillis();
-        }
-    }
-
-    private ExpirationInfo getExpirationInfo( Object object )
-    {
-        Object infoObject = expirationInfos.get( object );
-
-        if ( infoObject != null )
-        {
-            ExpirationInfo info = ( ExpirationInfo ) infoObject;
-
-            return info;
-        }
-
-        return null;
+        return delegate.entrySet();
     }
 
     public void addExpirationListener( ExpirationListener listener )
     {
-        synchronized ( expirationListeners )
-        {
-            expirationListeners.add( listener );
-        }
+        expirationListeners.add( listener );
     }
 
     public void removeExpirationListener( ExpirationListener listener )
     {
-        synchronized ( expirationListeners )
-        {
-            expirationListeners.remove( listener );
-        }
+        expirationListeners.remove( listener );
+    }
+    
+    public Expirer getExpirer()
+    {
+        return expirer;
     }
 
-    public Object[] findMappedObjects()
+    public int getExpirationInterval()
     {
-        Object results[] = null;
-        synchronized ( delegate )
-        {
-            results = new Object[delegate.size()];
-            results = delegate.values().toArray( results );
-        }
-        return ( results );
+        return expirer.getExpirationInterval();
     }
 
-    public void startExpirer()
+    public int getTimeToLive()
     {
-        synchronized ( expirer )
+        return expirer.getTimeToLive();
+    }
+
+    public void setExpirationInterval( int expirationInterval )
+    {
+        expirer.setExpirationInterval( expirationInterval );
+    }
+
+    public void setTimeToLive( int timeToLive )
+    {
+        expirer.setTimeToLive( timeToLive );
+    }
+
+    private class ExpiringObject
+    {
+        private Object key;
+
+        private Object value;
+
+        private long lastAccessTime;
+
+        private ReadWriteLock lastAccessTimeLock = new ReentrantReadWriteLock();
+
+        public ExpiringObject( Object key, Object value, long lastAccessTime )
         {
-            if ( !expirer.isRunning() )
+            if( value == null )
             {
-                expirer.setRunning( true );
-                expirer.interrupt();
+                throw new IllegalArgumentException( "An expiring object cannot be null." );
+            }
+
+            this.key = key;
+            this.value = value;
+            this.lastAccessTime = lastAccessTime;
+        }
+
+        public long getLastAccessTime()
+        {
+            lastAccessTimeLock.readLock().lock();
+
+            try
+            {
+                return lastAccessTime;
+            }
+            finally
+            {
+                lastAccessTimeLock.readLock().unlock();
             }
         }
-    }
 
-    public void stopExpirer()
-    {
-        synchronized ( expirer )
+        public void setLastAccessTime( long lastAccessTime )
         {
-            if ( expirer.isRunning() )
+            lastAccessTimeLock.writeLock().lock();
+
+            try
             {
-                expirer.setRunning( false );
-                expirer.interrupt();
+                this.lastAccessTime = lastAccessTime;
             }
+            finally
+            {
+                lastAccessTimeLock.writeLock().unlock();
+            }
+        }
+
+        public Object getKey()
+        {
+            return key;
+        }
+
+        public Object getValue()
+        {
+            return value;
+        }
+
+        public boolean equals( Object obj )
+        {
+            return value.equals( obj );
+        }
+
+        public int hashCode()
+        {
+            return value.hashCode();
         }
     }
 
-    private class ExpirationInfo
+    public class Expirer implements Runnable
     {
-        public Object key;
+        private ReadWriteLock stateLock = new ReentrantReadWriteLock();
 
-        public long accesstime;
-    }
+        private long timeToLiveMillis;
 
-    private class Expirer extends Thread
-    {
-        private boolean running = true;
+        private long expirationIntervalMillis;
+
+        private boolean running = false;
+
+        private final Thread expirerThread;
 
         public Expirer()
         {
-            super( "MapExpirer-" + expirerCount++ );
+            expirerThread = new Thread( this, "ExpiringMapExpirer-" + ( expirerCount++ ) );
+            expirerThread.setDaemon( true );
         }
 
         public void run()
         {
-            while ( running )
+            while( running )
             {
                 processExpires();
 
                 try
                 {
-                    Thread.sleep( expirerDelay );
+                    Thread.sleep( expirationIntervalMillis );
                 }
-                catch ( InterruptedException e )
+                catch( InterruptedException e )
                 {
                 }
             }
@@ -323,49 +312,162 @@ public class ExpiringMap implements Map
         private void processExpires()
         {
             long timeNow = System.currentTimeMillis();
-            Object mappedObjects[] = findMappedObjects();
 
-            for ( int i = 0; i < mappedObjects.length; i++ )
+            Iterator expiringObjectsIterator = delegate.values().iterator();
+
+            while( expiringObjectsIterator.hasNext() )
             {
-                Object mappedObject = mappedObjects[i];
+                ExpiringObject expObject = ( ExpiringObject ) expiringObjectsIterator.next();
 
-                ExpirationInfo info = getExpirationInfo( mappedObject );
+                if( timeToLiveMillis <= 0 )
+                    continue;
 
-                if ( info != null )
+                long timeIdle = timeNow - expObject.getLastAccessTime();
+
+                if( timeIdle >= timeToLiveMillis )
                 {
-                    if ( expirationTimeMillis < 0 )
-                        continue;
-                    long timeIdle = timeNow - info.accesstime;
+                    delegate.remove( expObject.getKey() );
 
-                    if ( timeIdle >= expirationTimeMillis )
+                    Iterator listenerIterator = expirationListeners.iterator();
+
+                    while( listenerIterator.hasNext() )
                     {
-                        delegate.remove( info.key );
-                        expirationInfos.remove( info.key );
+                        ExpirationListener listener = ( ExpirationListener ) listenerIterator.next();
 
-                        synchronized ( expirationListeners )
-                        {
-                            Iterator listenerIterator = expirationListeners.iterator();
-
-                            while ( listenerIterator.hasNext() )
-                            {
-                                ExpirationListener listener = ( ExpirationListener ) listenerIterator.next();
-
-                                listener.expired( mappedObject );
-                            }
-                        }
+                        listener.expired( expObject.getValue() );
                     }
                 }
             }
         }
 
-        public void setRunning( boolean running )
+        public void startExpiring()
         {
-            this.running = running;
+            stateLock.writeLock().lock();
+
+            try
+            {
+                if( !running )
+                {
+                    running = true;
+                    expirerThread.start();
+                }
+            }
+            finally
+            {
+                stateLock.writeLock().unlock();
+            }
+        }
+
+        public void startExpiringIfNotStarted()
+        {
+            stateLock.readLock().lock();
+            if( running )
+            {
+                stateLock.readLock().unlock();
+                return;
+            }
+            
+            stateLock.writeLock().lock();
+            try
+            {
+                if( !running )
+                {
+                    running = true;
+                    expirerThread.start();
+                }
+            }
+            finally
+            {
+                stateLock.writeLock().unlock();
+            }
+        }
+
+        public void stopExpiring()
+        {
+            stateLock.writeLock().lock();
+
+            try
+            {
+                if( running )
+                {
+                    running = false;
+                    expirerThread.interrupt();
+                }
+            }
+            finally
+            {
+                stateLock.writeLock().unlock();
+            }
         }
 
         public boolean isRunning()
         {
-            return running;
+            stateLock.readLock().lock();
+
+            try
+            {
+                return running;
+            }
+            finally
+            {
+                stateLock.readLock().unlock();
+            }
+        }
+
+        public int getTimeToLive()
+        {
+            stateLock.readLock().lock();
+
+            try
+            {
+                return ( int ) timeToLiveMillis / 1000;
+            }
+            finally
+            {
+                stateLock.readLock().unlock();
+            }
+        }
+
+        public void setTimeToLive( long timeToLive )
+        {
+            stateLock.writeLock().lock();
+
+            try
+            {
+                this.timeToLiveMillis = timeToLive * 1000;
+            }
+            finally
+            {
+                stateLock.writeLock().unlock();
+            }
+        }
+
+        public int getExpirationInterval()
+        {
+            stateLock.readLock().lock();
+
+            try
+            {
+                return ( int ) expirationIntervalMillis / 1000;
+            }
+            finally
+            {
+                stateLock.readLock().unlock();
+            }
+        }
+
+        public void setExpirationInterval( long expirationInterval )
+        {
+            stateLock.writeLock().lock();
+
+            try
+            {
+                this.expirationIntervalMillis = expirationInterval * 1000;
+            }
+            finally
+            {
+                stateLock.writeLock().unlock();
+            }
         }
     }
 }

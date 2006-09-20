@@ -29,36 +29,41 @@ import org.apache.mina.util.ExpiringMap;
 /**
  * An {@link IoSessionRecycler} with sessions that time out on inactivity.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * TODO Document me.
  * 
- * TODO Change time unit to 'seconds'.
- * TODO Make thread-safe.
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$
  */
-public class ExpiringSessionRecycler implements IoSessionRecycler, ExpirationListener
+public class ExpiringSessionRecycler implements IoSessionRecycler
 {
     private ExpiringMap sessionMap;
-
+    
+    private ExpiringMap.Expirer mapExpirer;
+    
     public ExpiringSessionRecycler()
     {
-        this( ExpiringMap.DEFAULT_EXPIRATION_TIME, ExpiringMap.DEFAULT_EXPIRER_DELAY );
+        this( ExpiringMap.DEFAULT_TIME_TO_LIVE );
     }
-
-    public ExpiringSessionRecycler( long expirationTimeMillis )
+    
+    public ExpiringSessionRecycler( int timeToLive )
     {
-        this( expirationTimeMillis, ExpiringMap.DEFAULT_EXPIRER_DELAY );
+        this( timeToLive, ExpiringMap.DEFAULT_EXPIRATION_INTERVAL );
     }
-
-    public ExpiringSessionRecycler( long expirationTimeMillis, long expirerDelay )
+    
+    public ExpiringSessionRecycler( int timeToLive, int expirationInterval )
     {
-        // FIXME Use IdentityHashMap if possible.
-        sessionMap = new ExpiringMap( expirationTimeMillis, expirerDelay );
-        sessionMap.addExpirationListener( this );
+        sessionMap = new ExpiringMap( timeToLive, expirationInterval );
+        mapExpirer = sessionMap.getExpirer();
+        sessionMap.addExpirationListener( new DefaultExpirationListener() );
     }
 
     public void put( IoSession session )
     {
+        mapExpirer.startExpiringIfNotStarted();
+        
         Object key = generateKey( session );
-        if ( !sessionMap.containsKey( key ) )
+
+        if( !sessionMap.containsKey( key ) )
         {
             sessionMap.put( key, session );
         }
@@ -66,20 +71,37 @@ public class ExpiringSessionRecycler implements IoSessionRecycler, ExpirationLis
 
     public IoSession recycle( SocketAddress localAddress, SocketAddress remoteAddress )
     {
-        Object key = generateKey( localAddress, remoteAddress );
-        return ( IoSession ) sessionMap.get( key );
+        return ( IoSession ) sessionMap.get( generateKey( localAddress, remoteAddress ) );
     }
 
     public void remove( IoSession session )
     {
-        Object key = generateKey( session );
-        sessionMap.remove( key );
+        sessionMap.remove( generateKey( session ) );
     }
 
-    public void expired( Object expiredObject )
+    public void stopExpiring()
     {
-        IoSession expiredSession = ( IoSession ) expiredObject;
-        expiredSession.close();
+        mapExpirer.stopExpiring();
+    }
+
+    public int getExpirationInterval()
+    {
+        return sessionMap.getExpirationInterval();
+    }
+
+    public int getTimeToLive()
+    {
+        return sessionMap.getTimeToLive();
+    }
+
+    public void setExpirationInterval( int expirationInterval )
+    {
+        sessionMap.setExpirationInterval( expirationInterval );
+    }
+
+    public void setTimeToLive( int timeToLive )
+    {
+        sessionMap.setTimeToLive( timeToLive );
     }
 
     private Object generateKey( IoSession session )
@@ -93,5 +115,15 @@ public class ExpiringSessionRecycler implements IoSessionRecycler, ExpirationLis
         key.add( remoteAddress );
         key.add( localAddress );
         return key;
+    }
+    
+    private class DefaultExpirationListener implements ExpirationListener
+    {
+        public void expired( Object expiredObject )
+        {
+            IoSession expiredSession = ( IoSession ) expiredObject;
+            
+            expiredSession.close();
+        }
     }
 }
