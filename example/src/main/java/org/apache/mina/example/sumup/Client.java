@@ -22,7 +22,6 @@ package org.apache.mina.example.sumup;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
@@ -61,7 +60,11 @@ public class Client
             values[ i ] = Integer.parseInt( args[ i ] );
         }
 
-        IoConnector connector = new SocketConnector();
+        SocketConnector connector = new SocketConnector();
+
+        // Change the worker timeout to 1 second to make the I/O thread quit soon
+        // when there's no connection to manage.
+        connector.setWorkerTimeout( 1 );
         
         // Configure the service.
         SocketConnectorConfig cfg = new SocketConnectorConfig();
