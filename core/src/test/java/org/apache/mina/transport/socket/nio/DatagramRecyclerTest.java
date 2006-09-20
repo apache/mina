@@ -53,7 +53,7 @@ public class DatagramRecyclerTest extends TestCase
     {
         int port = AvailablePortFinder.getNextAvailable( 1024 );
         DatagramAcceptorConfig config = new DatagramAcceptorConfig();
-        ExpiringSessionRecycler recycler = new ExpiringSessionRecycler( 1000, 500 );
+        ExpiringSessionRecycler recycler = new ExpiringSessionRecycler( 1, 1 );
         config.setSessionRecycler( recycler );
         
         MockHandler acceptorHandler = new MockHandler();
@@ -66,7 +66,6 @@ public class DatagramRecyclerTest extends TestCase
             ConnectFuture future = connector.connect(
                     new InetSocketAddress( "localhost", port ), connectorHandler, config );
             future.join();
-            Assert.assertTrue( future.isConnected() );
             
             // Write whatever to trigger the acceptor.
             future.getSession().write( ByteBuffer.allocate(1) ).join();
@@ -77,7 +76,7 @@ public class DatagramRecyclerTest extends TestCase
             acceptorHandler.session.getCloseFuture().join( 3000 );
             Assert.assertTrue( acceptorHandler.session.getCloseFuture().isClosed() );
             
-            Thread.sleep( 500 );
+            Thread.sleep( 1000 );
 
             Assert.assertEquals( "CROPSECL", connectorHandler.result );
             Assert.assertEquals( "CROPRECL", acceptorHandler.result );
