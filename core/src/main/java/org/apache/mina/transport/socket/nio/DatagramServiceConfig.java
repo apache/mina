@@ -19,9 +19,16 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSessionRecycler;
 
-public interface DatagramServiceConfig
+/**
+ * An {@link IoServiceConfig} for {@link DatagramAcceptor} and {@link DatagramConnector}.
+ *
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @version $Rev$, $Date$
+ */
+public interface DatagramServiceConfig extends IoServiceConfig
 {
     /**
      * Returns the {@link IoSessionRecycler} for this service.
