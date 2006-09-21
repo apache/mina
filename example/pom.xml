@@ -34,7 +34,13 @@
       <artifactId>spring-context</artifactId>
       <version>1.2.8</version>
     </dependency>
-        
+    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-support</artifactId>
+      <version>1.2.8</version>
+    </dependency>
+    
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>

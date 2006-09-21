@@ -2,75 +2,99 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-<!-- 
-        Classic Spring approach : define each bean, then do the call to bind in code
+  <!-- This makes it possible to specify java.net.SocketAddress values 
+    (e.g. :1234 below) as Strings.
+    They will be converted into java.net.InetSocketAddress objects by Spring.  -->
+  <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+    <property name="customEditors">
+      <map>
+        <entry key="java.net.SocketAddress">
+          <bean class="org.apache.mina.integration.spring.InetSocketAddressEditor" />
+        </entry>
+      </map>
+    </property>
+  </bean>
 
-        <bean id="acceptor" class="org.apache.mina.transport.socket.nio.SocketAcceptor" />
-        <bean id="address" class="java.net.InetSocketAddress">
-            <constructor-arg>
-                <value>1234</value>
-            </constructor-arg>
-        </bean>
-         <bean id="chatHandler" class="server.ChatProtocolHandler" />
---> 
+  <!-- The IoHandler implementation -->
+  <bean id="chatHandler" class="org.apache.mina.example.chat.ChatProtocolHandler" />
 
-   <!-- MINA IoAcceptorFactoryBean approach -->
-   <!-- This makes it possible to specify java.net.SocketAddress values 
-        (e.g. :1234 below) as Strings.
-        They will be converted into java.net.InetSocketAddress objects by Spring.  -->
-   <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-     <property name="customEditors">
-       <map>
-         <entry key="java.net.SocketAddress">
-           <bean class="org.apache.mina.integration.spring.InetSocketAddressEditor"/>
-         </entry>
-       </map>
-     </property>
-   </bean>
- 
-   <!-- The IoHandler implementation -->
-   <bean id="chatHandler" class="org.apache.mina.example.chat.ChatProtocolHandler" />
-     
-   <bean id="filterChainBuilder" 
-         class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean">
-     <property name="filters">
-       <list>
-
-         <!-- Thread pool where threads will be named IoWorker-1, IoWorker-2, etc -->
-		 <!--
-         <bean class="org.apache.mina.filter.ThreadPoolFilter">
-           <constructor-arg value="IoWorker"/>
-           <property name="maximumPoolSize" value="10"/>
-         </bean>
-         -->
-         <bean class="org.apache.mina.filter.codec.ProtocolCodecFilter" >
+  <!-- The SSL configuration -->
+  <bean id="keyStore" class="org.apache.mina.integration.spring.ssl.KeyStoreFactoryBean">
+    <property name="resource" value="classpath:org/apache/mina/example/echoserver/ssl/bogus.cert"/>
+    <property name="password" value="boguspw"/>
+  </bean>
+  
+  <bean id="bogusTrustManagerFactory" class="org.apache.mina.integration.spring.ssl.BogusTrustManagerFactory"/>
+  
+  <!-- SSLContext to be used when acting as a server (client <-> proxy) -->
+  <bean id="sslContext"  class="org.apache.mina.integration.spring.ssl.SSLContextFactoryBean">
+    <property name="protocol" value="TLS"/>
+    <property name="keyManagerFactoryAlgorithm" value="SunX509"/>
+    <property name="keyManagerFactoryKeyStore"><ref local="keyStore"/></property>
+    <property name="keyManagerFactoryKeyStorePassword" value="boguspw"/>
+    <property name="trustManagerFactory"><ref local="bogusTrustManagerFactory"/></property>
+  </bean>
+  
+  <!-- The filter chain. Adds an SSLFilter, a TextLineCodec and a LoggingFilter -->
+  <bean id="filterChainBuilder" class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean">
+    <property name="filters">
+      <list>
+        <bean class="org.apache.mina.filter.SSLFilter">
+          <constructor-arg ref="sslContext"/>
+        </bean>      
+        <bean class="org.apache.mina.filter.codec.ProtocolCodecFilter">
           <constructor-arg>
-           	<bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
-           </constructor-arg>
-         </bean>
-         <bean class="org.apache.mina.filter.LoggingFilter"/>
-       </list>
-     </property>
-   </bean>
+            <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
+          </constructor-arg>
+        </bean>
+        <bean class="org.apache.mina.filter.LoggingFilter" />
+      </list>
+    </property>
+  </bean>
 
-   <bean id="ioAcceptor" class="org.apache.mina.integration.spring.IoAcceptorFactoryBean">
-     <property name="target">
-       <bean class="org.apache.mina.transport.socket.nio.SocketAcceptor"/>
-     </property>
-     <property name="bindings">
-       <list>
-         <bean class="org.apache.mina.integration.spring.Binding">
-           <property name="address" value=":1234"/>
-           <property name="handler" ref="chatHandler"/>
-           <property name="serviceConfig">
-             <bean class="org.apache.mina.transport.socket.nio.SocketAcceptorConfig">
-               <property name="filterChainBuilder" ref="filterChainBuilder"/>
-               <property name="reuseAddress" value="true"/>
-             </bean>
-           </property>
-         </bean>
-       </list>
-     </property>
-   </bean>
-        
+  <!-- The IoAcceptor which binds to port 1234 -->
+  <bean id="ioAcceptor" class="org.apache.mina.integration.spring.IoAcceptorFactoryBean">
+    <property name="target">
+      <bean class="org.apache.mina.transport.socket.nio.SocketAcceptor" />
+    </property>
+    <property name="bindings">
+      <list>
+        <bean class="org.apache.mina.integration.spring.Binding">
+          <property name="address" value=":1234" />
+          <property name="handler" ref="chatHandler" />
+          <property name="serviceConfig">
+            <bean class="org.apache.mina.transport.socket.nio.SocketAcceptorConfig">
+              <property name="filterChainBuilder" ref="filterChainBuilder" />
+              <property name="reuseAddress" value="true" />
+            </bean>
+          </property>
+        </bean>
+      </list>
+    </property>
+  </bean>
+
+  <!-- JMX stuff. Creates an MBeanServer. -->
+  <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+    <property name="locateExistingServerIfPossible" value="true"/>
+  </bean>
+
+  <!-- JMX stuff. Creates an MBeanServer. -->
+  <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
+    <property name="beans">
+      <map>
+        <entry key="chatServer:name=ioHandler">
+          <ref local="chatHandler"/>
+        </entry>
+      </map>
+    </property>
+    <property name="assembler">
+      <bean class="org.springframework.jmx.export.assembler.MethodNameBasedMBeanInfoAssembler">
+        <property name="managedMethods" value="isChatUser,getNumberOfUsers,kick"/>
+      </bean>
+    </property>
+    <property name="server">
+      <ref local="mbeanServer"/>
+    </property>
+  </bean>
+
 </beans>
