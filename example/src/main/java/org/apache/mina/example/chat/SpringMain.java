@@ -38,9 +38,11 @@ public class SpringMain
             new ClassPathXmlApplicationContext( getJmxApplicationContexts() );
             System.out.println( "JMX enabled." );
         }
-        else {
+        else
+        {
             new ClassPathXmlApplicationContext( getApplicationContext() );
-            System.out.println( "JMX disabled. Please set the 'com.sun.management.jmxremote' system property to enable JMX." );
+            System.out.println( "JMX disabled. Please set the "
+                    + "'com.sun.management.jmxremote' system property to enable JMX." );
         }
         System.out.println( "Listening ..." );
     }
@@ -52,9 +54,7 @@ public class SpringMain
 
     public static String[] getJmxApplicationContexts()
     {
-        return new String[] {
-                "org/apache/mina/example/chat/serverContext.xml",
-                "org/apache/mina/example/chat/jmxContext.xml"
-        };
+        return new String[] { "org/apache/mina/example/chat/serverContext.xml",
+                "org/apache/mina/example/chat/jmxContext.xml" };
     }
 }
