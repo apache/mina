@@ -24,7 +24,9 @@ import java.net.InetSocketAddress;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoAcceptorConfig;
+import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.LoggingFilter;
+import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
@@ -41,11 +43,20 @@ public class Main
     /** Choose your favorite port number. */
     private static final int PORT = 1234;
     
+    /** Set this to true if you want to make the server SSL */
+    private static final boolean USE_SSL = false;
+    
     public static void main( String[] args ) throws Exception
     {
         IoAcceptor acceptor = new SocketAcceptor();
         IoAcceptorConfig config = new SocketAcceptorConfig();
         DefaultIoFilterChainBuilder chain = config.getFilterChain();
+        
+        // Add SSL filter if SSL is enabled.
+        if( USE_SSL )
+        {
+            addSSLSupport( chain  );
+        }
         
         chain.addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory() ) );
         
@@ -59,6 +70,16 @@ public class Main
 
         System.out.println( "Listening on port " + PORT );
     }
+    
+    private static void addSSLSupport( DefaultIoFilterChainBuilder chain )
+            throws Exception
+    {
+        SSLFilter sslFilter = new SSLFilter( BogusSSLContextFactory
+                .getInstance( true ) );
+        chain.addLast( "sslFilter", sslFilter );
+        System.out.println( "SSL ON" );
+    }
+
     
     private static void addLogger( DefaultIoFilterChainBuilder chain ) throws Exception
     {

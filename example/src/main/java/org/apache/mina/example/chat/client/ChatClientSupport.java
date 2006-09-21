@@ -19,13 +19,17 @@
  */
 package org.apache.mina.example.chat.client;
 
-import java.io.IOException;
 import java.net.SocketAddress;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
+import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
 
 /**
  * A simple chat client for a given user.
@@ -49,17 +53,39 @@ public class ChatClientSupport
         this.handler = handler;
     }
 
-    public void connect( SocketConnector connector, SocketAddress address )
-            throws IOException
+    public boolean connect( SocketConnector connector, SocketAddress address, boolean useSsl )
     {
         if( session != null && session.isConnected() )
         {
             throw new IllegalStateException( "Already connected. Disconnect first." );
         }
         
-        ConnectFuture future1 = connector.connect( address, handler );
-        future1.join();
-        session = future1.getSession();
+        try
+        {
+            
+            SocketConnectorConfig config = new SocketConnectorConfig();
+            if( useSsl )
+            {
+                SSLContext sslContext = BogusSSLContextFactory.getInstance( false );
+                SSLFilter sslFilter = new SSLFilter( sslContext );
+                sslFilter.setUseClientMode( true );
+                config.getFilterChain().addLast( "sslFilter", sslFilter );
+            }
+     
+            ConnectFuture future1 = connector.connect( address, handler, config );
+            future1.join();
+            if( ! future1.isConnected() )
+            {
+                return false;
+            }
+            session = future1.getSession();
+            
+            return true;
+        }
+        catch ( Exception e)
+        {
+            return false;
+        }
     }
 
     public void login()

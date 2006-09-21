@@ -146,33 +146,27 @@ public class SwingChatClient extends JFrame implements Callback
         public void actionPerformed( ActionEvent e )
         {
 
-            String value = JOptionPane.showInputDialog( SwingChatClient.this,
-                    "Specify server address (default: localhost:1234)" ); // "localhost";
-            if( value == null || value.length() == 0 )
+            ConnectDialog dialog = new ConnectDialog( SwingChatClient.this );
+            dialog.pack();
+            dialog.setVisible( true );
+            
+            if( dialog.isCancelled() )
             {
-                value = "localhost:1234";
+                return;
             }
-            SocketAddress address = parseSocketAddress( value );
-            String name = JOptionPane.showInputDialog( SwingChatClient.this,
-                            "Specify name for chat session with no spaces (default: userN)" );
-            if( name == null || name.length() == 0 )
-            {
-                name = "user" + Math.round( Math.random() * 10 );
-            }
-            name = name.trim();
+            
+            SocketAddress address = parseSocketAddress( dialog.getServerAddress() );
+            String name = dialog.getUsername();
+            
             handler = new SwingChatClientHandler( SwingChatClient.this );
             client = new ChatClientSupport( name, handler );
             nameField.setText( name );
-            serverField.setText( value );
-            try
-            {
-                client.connect( connector, address );
-                area.setText( "" );
-            }
-            catch( Exception ex )
+            serverField.setText( dialog.getServerAddress() );
+            
+            if( ! client.connect( connector, address, dialog.isUseSsl() ) )
             {
                 JOptionPane.showMessageDialog( SwingChatClient.this,
-                        "Could not connect to " + value + ". " );
+                        "Could not connect to " + dialog.getServerAddress() + ". " );
             }
         }
     }
@@ -224,6 +218,7 @@ public class SwingChatClient extends JFrame implements Callback
 
     private void setLoggedIn()
     {
+        area.setText( "" );
         inputText.setEnabled( true );
         quitButton.setEnabled( true );
         loginButton.setEnabled( false );
@@ -275,6 +270,7 @@ public class SwingChatClient extends JFrame implements Callback
 
     public void disconnected()
     {
+        append( "Connection closed.\n" );
         setLoggedOut();
     }
 

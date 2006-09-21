@@ -148,4 +148,26 @@ public class ChatProtocolHandler extends IoHandlerAdapter
     {
         return users.contains( name );
     }
+    
+    public int getNumberOfUsers()
+    {
+        return users.size();
+    }
+    
+    public void kick( String name )
+    {
+        synchronized( sessions )
+        {
+            Iterator iter = sessions.iterator();
+            while( iter.hasNext() )
+            {
+                IoSession s = ( IoSession ) iter.next();
+                if( name.equals( s.getAttribute( "user" ) ) )
+                {
+                    s.close();
+                    break;
+                }
+            }
+        }
+    }    
 }
