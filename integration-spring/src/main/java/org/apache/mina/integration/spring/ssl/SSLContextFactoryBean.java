@@ -27,6 +27,8 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.ManagerFactoryParameters;
+
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.util.Assert;
@@ -73,6 +75,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
     private String trustManagerFactoryAlgorithm = null;
     private String trustManagerFactoryProvider = null;
     private boolean trustManagerFactoryAlgorithmUseDefault = false;
+    private ManagerFactoryParameters trustManagerFactoryParameters = null;
     
     protected Object createInstance() throws Exception
     {
@@ -131,7 +134,14 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
         TrustManager[] trustManagers = null; 
         if( tmf != null )
         {
-            tmf.init( trustManagerFactoryKeyStore );
+            if( trustManagerFactoryParameters != null )
+            {
+                tmf.init( trustManagerFactoryParameters );
+            }
+            else
+            {
+                tmf.init( trustManagerFactoryKeyStore );
+            }
             trustManagers = tmf.getTrustManagers();
         }
         
@@ -324,12 +334,28 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * Sets the {@link KeyStore} which will be used in the call to 
      * {@link TrustManagerFactory#init(java.security.KeyStore)} when
      * the {@link SSLContext} is created. 
+     * <p>
+     * This property will be ignored if {@link ManagerFactoryParameters} has been
+     * set directly using {@link #setTrustManagerFactoryParameters(ManagerFactoryParameters)}.
+     * </p>
      * 
      * @param keyStore the key store.
      */
     public void setTrustManagerFactoryKeyStore( KeyStore keyStore )
     {
         this.trustManagerFactoryKeyStore = keyStore;
+    }
+
+    /**
+     * Sets the {@link ManagerFactoryParameters} which will be used in the call to
+     * {@link TrustManagerFactory#init(javax.net.ssl.ManagerFactoryParameters)} when
+     * the {@link SSLContext} is created.
+     *  
+     * @param parameters describing provider-specific trust material.
+     */
+    public void setTrustManagerFactoryParameters( ManagerFactoryParameters parameters )
+    {
+        this.trustManagerFactoryParameters = parameters;
     }
 
     /**
