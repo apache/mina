@@ -70,7 +70,7 @@
               <td>Both</td>
             </tr>
             <tr>
-              <td><a href="http://svn.apache.org/viewvc/directory/trunks/mina/example/src/main/java/org/apache/mina/example/chat/">Proxy</a></td>
+              <td><a href="http://svn.apache.org/viewvc/directory/trunks/mina/example/src/main/java/org/apache/mina/example/proxy/">Proxy</a></td>
               <td>Using traffic mask. Resending received bytes on another session.</td>
               <td>Both</td>
             </tr>            
