@@ -30,12 +30,14 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
- * This filter will automatically disable reads on an <code>IoSession</code> once the data batched for that session in
- * the <code>ThreadPoolFilter</code> reaches a defined threshold (the default is 1mb). It accomplishes this by being in
- * the filter chain before <strong>and</strong> after the <code>ThreadPoolFilter</code>. It is possible to subvert the
- * behavior of this filter by adding filters immediately after the <code>ThreadPoolFilter</code> after adding this
- * filter. Thus, it is recommended to add this filter towards the end of your filter chain construction, if you need to
- * ensure that other filters need to be right after the <code>ThreadPoolFilter</code>.
+ * This filter will automatically disable reads on an <code>IoSession</code> once the data
+ * batched for that session in the {@link ExecutorFilter} reaches a defined threshold (the
+ * default is 1 megabytes). It accomplishes this by being in the filter chain before
+ * <strong>and</strong> after the {@link ExecutorFilter}. It is possible to subvert the
+ * behavior of this filter by adding filters immediately after the {@link ExecutorFilter}
+ * after adding this filter. Thus, it is recommended to add this filter towards the end of
+ * your filter chain construction, if you need to ensure that other filters need to be right
+ * after the {@link ExecutorFilter}
  *
  * <p>Usage:
  *
@@ -64,9 +66,9 @@ public class ReadThrottleFilterBuilder
     private volatile int maximumConnectionBufferSize = 1024 * 1024; // 1mb
 
     /**
-     * Set the maximum amount of data to buffer in the ThreadPoolFilter prior to disabling reads. Changing the value
-     * will only take effect when new data is received for a connection, including existing connections. Default value
-     * is 1mb
+     * Set the maximum amount of data to buffer in the ThreadPoolFilter prior to disabling
+     * reads. Changing the value will only take effect when new data is received for a
+     * connection, including existing connections. Default value is 1 megabytes.
      *
      * @param maximumConnectionBufferSize New buffer size. Must be > 0
      */
@@ -79,7 +81,7 @@ public class ReadThrottleFilterBuilder
      * Attach this filter to the specified filter chain. It will search for the ThreadPoolFilter, and attach itself
      * before and after that filter.
      *
-     * @param chain <code>IoFilterChain</code> to attach self to.
+     * @param chain {@link IoFilterChain} to attach self to.
      */
     public void attach( IoFilterChain chain )
     {
@@ -90,10 +92,10 @@ public class ReadThrottleFilterBuilder
     }
 
     /**
-     * Attach this filter to the specified builder. It will search for the ThreadPoolFilter, and attach itself before
-     * and after that filter.
+     * Attach this filter to the specified builder. It will search for the
+     * {@link ExecutorFilter}, and attach itself before and after that filter.
      *
-     * @param builder <code>DefaultIoFilterChainBuilder</code> to attach self to.
+     * @param builder {@link DefaultIoFilterChainBuilder} to attach self to.
      */
     public void attach( DefaultIoFilterChainBuilder builder )
     {
@@ -109,7 +111,7 @@ public class ReadThrottleFilterBuilder
 
         while( i.hasNext() )
         {
-            IoFilterChain.Entry entry = (IoFilterChain.Entry)i.next();
+            IoFilterChain.Entry entry = ( IoFilterChain.Entry ) i.next();
 
             if( entry.getFilter().getClass().isAssignableFrom( ExecutorFilter.class ) )
             {
@@ -117,7 +119,7 @@ public class ReadThrottleFilterBuilder
             }
         }
 
-        throw new IllegalStateException( "Chain does not contain a ThreadPoolFilter" );
+        throw new IllegalStateException( "Chain does not contain a ExecutorFilter" );
     }
 
     private void add( IoSession session, int size )
