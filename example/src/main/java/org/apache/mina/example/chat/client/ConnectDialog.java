@@ -24,7 +24,6 @@ import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -41,6 +40,8 @@ import javax.swing.JTextField;
  */
 public class ConnectDialog extends JDialog
 {
+    private static final long serialVersionUID = 2009384520250666216L;
+
     private String serverAddress;
     private String username;
     private boolean useSsl;
@@ -68,6 +69,8 @@ public class ConnectDialog extends JDialog
         JButton okButton = new JButton();
         okButton.setAction( new AbstractAction( "OK" )
         {
+            private static final long serialVersionUID = -2292183622613960604L;
+
             public void actionPerformed( ActionEvent e )
             {
                 serverAddress = serverAddressField.getText();
@@ -80,6 +83,8 @@ public class ConnectDialog extends JDialog
         JButton cancelButton = new JButton();
         cancelButton.setAction( new AbstractAction( "Cancel" )
         {
+            private static final long serialVersionUID = 6122393546173723305L;
+
             public void actionPerformed( ActionEvent e )
             {
                 cancelled = true;

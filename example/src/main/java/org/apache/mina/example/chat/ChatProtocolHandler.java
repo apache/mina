@@ -40,14 +40,14 @@ public class ChatProtocolHandler extends IoHandlerAdapter
     private Set sessions = Collections.synchronizedSet( new HashSet() );
     private Set users = Collections.synchronizedSet( new HashSet() );
 
-	public void exceptionCaught( IoSession session, Throwable cause )
+    public void exceptionCaught( IoSession session, Throwable cause )
     {
         SessionLog.error( session, "", cause );
         // Close connection when unexpected exception is caught.
         session.close();
     }
 
-	public void messageReceived( IoSession session, Object message )
+    public void messageReceived( IoSession session, Object message )
     {
         String theMessage = ( String ) message;
         String[] result = theMessage.split( " ", 2 );
@@ -88,7 +88,8 @@ public class ChatProtocolHandler extends IoHandlerAdapter
                 // check if the username is already used
                 if( users.contains( user ) )
                 {
-                    session.write( "LOGIN ERROR the name " + user + " is already used." );
+                    session.write( "LOGIN ERROR the name " + user
+                            + " is already used." );
                     return;
                 }
 
@@ -120,7 +121,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter
         }
     }
 
-    public void broadcast(String message)
+    public void broadcast( String message )
     {
         synchronized( sessions )
         {
@@ -134,9 +135,9 @@ public class ChatProtocolHandler extends IoHandlerAdapter
                 }
             }
         }
-	}
+    }
 
-	public void sessionClosed( IoSession session ) throws Exception
+    public void sessionClosed( IoSession session ) throws Exception
     {
         String user = ( String ) session.getAttribute( "user" );
         users.remove( user );
@@ -144,16 +145,16 @@ public class ChatProtocolHandler extends IoHandlerAdapter
         broadcast( "The user " + user + " has left the chat session." );
     }
 
-	public boolean isChatUser( String name )
+    public boolean isChatUser( String name )
     {
         return users.contains( name );
     }
-    
+
     public int getNumberOfUsers()
     {
         return users.size();
     }
-    
+
     public void kick( String name )
     {
         synchronized( sessions )
@@ -169,5 +170,5 @@ public class ChatProtocolHandler extends IoHandlerAdapter
                 }
             }
         }
-    }    
+    }
 }
