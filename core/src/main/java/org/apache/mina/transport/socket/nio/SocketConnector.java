@@ -58,7 +58,7 @@ public class SocketConnector extends BaseIoConnector
     private final Object lock = new Object();
     private final int id = nextId++;
     private final String threadName = "SocketConnector-" + id;
-    private final IoServiceConfig defaultConfig = new SocketConnectorConfig();
+    private SocketConnectorConfig defaultConfig = new SocketConnectorConfig();
     private final Queue connectQueue = new Queue();
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
@@ -231,6 +231,21 @@ public class SocketConnector extends BaseIoConnector
         return defaultConfig;
     }
 
+    /**
+     * Sets the config this connector will use by default.
+     * 
+     * @param defaultConfig the default config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setDefaultConfig( SocketConnectorConfig defaultConfig )
+    {
+        if( defaultConfig == null )
+        {
+            throw new NullPointerException( "defaultConfig" );
+        }
+        this.defaultConfig = defaultConfig;
+    }
+    
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
