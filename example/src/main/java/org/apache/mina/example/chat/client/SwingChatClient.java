@@ -51,25 +51,27 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
  */
 public class SwingChatClient extends JFrame implements Callback
 {
-	private JTextField inputText;
-	private JButton loginButton;
-	private JButton quitButton;
-	private JButton closeButton;
-	private JTextField serverField;
-	private JTextField nameField;
-	private JTextArea area;
-	private JScrollBar scroll;
+    private static final long serialVersionUID = 1538675161745436968L;
 
-	private ChatClientSupport client;
-	private SwingChatClientHandler handler;
+    private JTextField inputText;
+    private JButton loginButton;
+    private JButton quitButton;
+    private JButton closeButton;
+    private JTextField serverField;
+    private JTextField nameField;
+    private JTextArea area;
+    private JScrollBar scroll;
+    private ChatClientSupport client;
+    private SwingChatClientHandler handler;
+
     private SocketConnector connector;
 
-	public SwingChatClient()
+    public SwingChatClient()
     {
         super( "Chat Client based on Apache MINA" );
-        
+
         connector = new SocketConnector();
-        
+
         loginButton = new JButton( new LoginAction() );
         loginButton.setText( "Connect" );
         quitButton = new JButton( new LogoutAction() );
@@ -140,39 +142,45 @@ public class SwingChatClient extends JFrame implements Callback
         setLoggedOut();
         setDefaultCloseOperation( EXIT_ON_CLOSE );
     }
-	
-	public class LoginAction extends AbstractAction
+
+    public class LoginAction extends AbstractAction
     {
+        private static final long serialVersionUID = 3596719854773863244L;
+
         public void actionPerformed( ActionEvent e )
         {
 
             ConnectDialog dialog = new ConnectDialog( SwingChatClient.this );
             dialog.pack();
             dialog.setVisible( true );
-            
+
             if( dialog.isCancelled() )
             {
                 return;
             }
-            
-            SocketAddress address = parseSocketAddress( dialog.getServerAddress() );
+
+            SocketAddress address = parseSocketAddress( dialog
+                    .getServerAddress() );
             String name = dialog.getUsername();
-            
+
             handler = new SwingChatClientHandler( SwingChatClient.this );
             client = new ChatClientSupport( name, handler );
             nameField.setText( name );
             serverField.setText( dialog.getServerAddress() );
-            
-            if( ! client.connect( connector, address, dialog.isUseSsl() ) )
+
+            if( !client.connect( connector, address, dialog.isUseSsl() ) )
             {
                 JOptionPane.showMessageDialog( SwingChatClient.this,
-                        "Could not connect to " + dialog.getServerAddress() + ". " );
+                        "Could not connect to " + dialog.getServerAddress()
+                                + ". " );
             }
         }
     }
-    
-	private class LogoutAction extends AbstractAction
+
+    private class LogoutAction extends AbstractAction
     {
+        private static final long serialVersionUID = 1655297424639924560L;
+
         public void actionPerformed( ActionEvent e )
         {
             try
@@ -187,18 +195,25 @@ public class SwingChatClient extends JFrame implements Callback
             }
         }
     }
-	
-	private class BroadcastAction extends AbstractAction
+
+    private class BroadcastAction extends AbstractAction
     {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6276019615521905411L;
+
         public void actionPerformed( ActionEvent e )
         {
             client.broadcast( inputText.getText() );
             inputText.setText( "" );
         }
     }
-	
-	private class QuitAction extends AbstractAction
+
+    private class QuitAction extends AbstractAction
     {
+        private static final long serialVersionUID = -6389802816912005370L;
+
         public void actionPerformed( ActionEvent e )
         {
             if( client != null )
@@ -208,7 +223,7 @@ public class SwingChatClient extends JFrame implements Callback
             SwingChatClient.this.dispose();
         }
     }
-	
+
     private void setLoggedOut()
     {
         inputText.setEnabled( false );
@@ -229,12 +244,12 @@ public class SwingChatClient extends JFrame implements Callback
         area.append( text );
     }
 
-	private void notifyError( String message )
+    private void notifyError( String message )
     {
         JOptionPane.showMessageDialog( this, message );
     }
 
-	private SocketAddress parseSocketAddress( String s )
+    private SocketAddress parseSocketAddress( String s )
     {
         s = s.trim();
         int colonIndex = s.indexOf( ":" );
@@ -251,7 +266,7 @@ public class SwingChatClient extends JFrame implements Callback
         }
     }
 
-	private int parsePort( String s )
+    private int parsePort( String s )
     {
         try
         {
@@ -261,9 +276,9 @@ public class SwingChatClient extends JFrame implements Callback
         {
             throw new IllegalArgumentException( "Illegal port number: " + s );
         }
-    }    
-	
-	public void connected()
+    }
+
+    public void connected()
     {
         client.login();
     }
