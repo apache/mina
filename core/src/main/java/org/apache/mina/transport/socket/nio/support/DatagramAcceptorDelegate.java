@@ -64,7 +64,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
-    private final DatagramAcceptorConfig defaultConfig = new DatagramAcceptorConfig();
+    private DatagramAcceptorConfig defaultConfig = new DatagramAcceptorConfig();
     private final Map channels = new HashMap();
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
@@ -280,6 +280,21 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     public IoServiceConfig getDefaultConfig()
     {
         return defaultConfig;
+    }
+    
+    /**
+     * Sets the config this acceptor will use by default.
+     * 
+     * @param defaultConfig the default config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setDefaultConfig( DatagramAcceptorConfig defaultConfig )
+    {
+        if( defaultConfig == null )
+        {
+            throw new NullPointerException( "defaultConfig" );
+        }
+        this.defaultConfig = defaultConfig;
     }
     
     private synchronized void startupWorker() throws IOException

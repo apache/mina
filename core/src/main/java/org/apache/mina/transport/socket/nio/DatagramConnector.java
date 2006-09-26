@@ -50,4 +50,15 @@ public class DatagramConnector extends DelegatedIoConnector
     {
         init( new DatagramConnectorDelegate( this, executor ) );
     }
+    
+    /**
+     * Sets the default config this connector should use.
+     * 
+     * @param defaultConfig the default config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setDefaultConfig( DatagramConnectorConfig defaultConfig )
+    {
+        ( ( DatagramConnectorDelegate ) delegate ).setDefaultConfig( defaultConfig );
+    }
 }

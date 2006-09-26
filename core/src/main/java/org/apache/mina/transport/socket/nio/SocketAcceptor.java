@@ -60,7 +60,7 @@ public class SocketAcceptor extends BaseIoAcceptor
     private final Object lock = new Object();
     private final int id = nextId ++;
     private final String threadName = "SocketAcceptor-" + id;
-    private final IoServiceConfig defaultConfig = new SocketAcceptorConfig();
+    private SocketAcceptorConfig defaultConfig = new SocketAcceptorConfig();
     private final Map channels = new HashMap();
 
     private final Queue registerQueue = new Queue();
@@ -378,6 +378,21 @@ public class SocketAcceptor extends BaseIoAcceptor
     public IoServiceConfig getDefaultConfig()
     {
         return defaultConfig;
+    }
+
+    /**
+     * Sets the config this acceptor will use by default.
+     * 
+     * @param defaultConfig the default config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setDefaultConfig( SocketAcceptorConfig defaultConfig )
+    {
+        if( defaultConfig == null )
+        {
+            throw new NullPointerException( "defaultConfig" );
+        }
+        this.defaultConfig = defaultConfig;
     }
 
     private void registerNew()

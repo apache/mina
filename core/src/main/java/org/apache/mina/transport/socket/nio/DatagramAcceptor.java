@@ -23,6 +23,7 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.support.DelegatedIoAcceptor;
 import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -50,4 +51,15 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
     {
         init( new DatagramAcceptorDelegate( this, executor ) );
     }
+    
+    /**
+     * Sets the config this acceptor will use by default.
+     * 
+     * @param defaultConfig the default config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setDefaultConfig( DatagramAcceptorConfig defaultConfig )
+    {
+        ( ( DatagramAcceptorDelegate ) delegate ).setDefaultConfig( defaultConfig );
+    }    
 }

@@ -61,7 +61,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
-    private final DatagramConnectorConfig defaultConfig = new DatagramConnectorConfig();
+    private DatagramConnectorConfig defaultConfig = new DatagramConnectorConfig();
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
     private final Queue flushingSessions = new Queue();
@@ -194,7 +194,22 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     {
         return defaultConfig;
     }
-
+    
+    /**
+     * Sets the config this connector will use by default.
+     * 
+     * @param defaultConfig the default config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setDefaultConfig( DatagramConnectorConfig defaultConfig )
+    {
+        if( defaultConfig == null )
+        {
+            throw new NullPointerException( "defaultConfig" );
+        }
+        this.defaultConfig = defaultConfig;
+    }
+    
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
