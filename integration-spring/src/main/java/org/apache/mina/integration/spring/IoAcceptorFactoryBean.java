@@ -63,18 +63,21 @@ import org.springframework.util.Assert;
  *     &lt;/property&gt;
  *   &lt;/bean&gt;
  *
- *  &lt;!-- By default MINA uses a PooledThreadModel. This demonstrates how to 
+ *  &lt;!-- By default MINA uses an ExecutorThreadModel. This demonstrates how to 
  *          use your own with some non default settings. The threadModel will 
  *          be set on the SocketAcceptorConfig defined below. To configure a 
- *          ThreadPoolFilter directly you will have to use the ThreadModel.MANUAL 
+ *          ExecutorFilter directly you will have to use the ThreadModel.MANUAL 
  *          ThreadModel instead. --&gt;
- *  &lt;property name="threadModel"&gt;
- *   &lt;bean class="org.apache.mina.common.PooledThreadModel"&gt;
- *     &lt;!-- Threads will be named IoWorker-1, IoWorker-2, etc --&gt;
- *     &lt;property name="threadNamePrefix" value="IoWorker"/&gt;
- *     &lt;property name="maximumPoolSize" value="10"/&gt;
- *     &lt;property name="keepAliveTime" value="30000"/&gt;
- *   &lt;/bean>
+ *   &lt;bean id="threadModel" class="org.apache.mina.integration.spring.ExecutorThreadModelFactoryBean"&gt;
+ *     &lt;property name="serviceName" value="HttpService"/&gt;
+ *     &lt;property name="executor"&gt;
+ *       &lt;bean class="org.apache.mina.integration.spring.ThreadPoolExecutorFactoryBean"&gt;
+ *         &lt;property name="corePoolSize" value="2"/&gt;
+ *         &lt;property name="maxPoolSize" value="10"/&gt;
+ *         &lt;property name="keepAliveSeconds" value="30"/&gt;
+ *       &lt;/bean&gt;
+ *     &lt;/property&gt;
+ *   &lt;/bean&gt;
  *
  *   &lt;bean id="ioAcceptor" class="org.apache.mina.integration.spring.IoAcceptorFactoryBean"&gt;
  *     &lt;property name="target"&gt;
