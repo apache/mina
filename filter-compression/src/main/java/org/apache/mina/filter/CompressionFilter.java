@@ -164,7 +164,7 @@ public class CompressionFilter extends IoFilterAdapter
 
         ByteBuffer inBuffer = ( ByteBuffer ) message;
         ByteBuffer outBuffer = inflater.inflate( inBuffer );
-
+        inBuffer.release();
         nextFilter.messageReceived( session, outBuffer );
     }
 
@@ -195,9 +195,8 @@ public class CompressionFilter extends IoFilterAdapter
         }
 
         ByteBuffer inBuffer = ( ByteBuffer ) writeRequest.getMessage();
-
         ByteBuffer outBuf = deflater.deflate( inBuffer );
-
+        inBuffer.release();
         nextFilter.filterWrite( session, new WriteRequest( outBuf, writeRequest
                 .getFuture() ) );
     }
