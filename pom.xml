@@ -7,7 +7,7 @@
     <version>1.0.5</version>
   </parent>
   <groupId>org.apache.mina</groupId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
   <artifactId>build</artifactId>
   <name>Apache MINA</name>
   <packaging>pom</packaging>
