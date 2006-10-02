@@ -4,10 +4,10 @@
   <parent>
     <groupId>org.apache.directory</groupId>
     <artifactId>build</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.5</version>
   </parent>
   <groupId>org.apache.directory.mina</groupId>
-  <version>0.8.3-SNAPSHOT</version>
+  <version>0.8.3</version>
   <artifactId>mina</artifactId>
   <name>Apache MINA</name>
   <packaging>jar</packaging>
