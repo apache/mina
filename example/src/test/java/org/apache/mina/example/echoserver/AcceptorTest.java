@@ -38,7 +38,7 @@ import org.apache.mina.example.echoserver.ssl.SSLSocketFactory;
  * Tests echo server example.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
 public class AcceptorTest extends AbstractTest
 {
