@@ -220,7 +220,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         IoSessionRecycler sessionRecycler = getSessionRecycler( req );
         synchronized ( sessionRecycler )
         {
-            session = sessionRecycler.recycle( localAddress, remoteAddress);
+            session = sessionRecycler.recycle( localAddress, remoteAddress );
             if( session != null )
             {
                 return session;
