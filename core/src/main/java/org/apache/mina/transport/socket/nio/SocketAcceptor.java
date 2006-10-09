@@ -266,12 +266,13 @@ public class SocketAcceptor extends BaseIoAcceptor
                     int nKeys = selector.select();
 
                     registerNew();
-                    cancelKeys();
 
                     if( nKeys > 0 )
                     {
                         processSessions( selector.selectedKeys() );
                     }
+
+                    cancelKeys();
 
                     if( selector.keys().isEmpty() )
                     {
