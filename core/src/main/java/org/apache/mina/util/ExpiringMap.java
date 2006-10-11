@@ -361,10 +361,16 @@ public class ExpiringMap implements Map
         public void startExpiringIfNotStarted()
         {
             stateLock.readLock().lock();
-            if( running )
+            try
+            {
+                if( running )
+                {
+                    return;
+                }
+            }
+            finally
             {
                 stateLock.readLock().unlock();
-                return;
             }
             
             stateLock.writeLock().lock();
