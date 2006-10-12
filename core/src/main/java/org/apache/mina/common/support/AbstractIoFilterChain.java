@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
@@ -786,6 +787,18 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                 public void filterWrite( IoSession session, WriteRequest writeRequest )
                 {
                     Entry nextEntry = EntryImpl.this.prevEntry;
+                    if( nextEntry != head && writeRequest.getMessage() instanceof ByteBuffer )
+                    {
+                        // A special message is a buffer with zero length.
+                        // A special message will bypass all next filters.
+                        // TODO: Provide a nicer way to take care of special messages.
+                        ByteBuffer message = ( ByteBuffer ) writeRequest.getMessage();
+                        if( message.remaining() == 0 )
+                        {
+                            callPreviousFilterWrite( head.nextEntry, session, writeRequest );
+                            return;
+                        }
+                    }
                     callPreviousFilterWrite( nextEntry, session, writeRequest );
                 }
 
