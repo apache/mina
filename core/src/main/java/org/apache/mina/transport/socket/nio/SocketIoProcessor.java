@@ -469,7 +469,7 @@ class SocketIoProcessor
                     writeRequestQueue.pop();
                 }
 
-                session.increaseWrittenWriteRequests();
+                session.increaseWrittenMessages();
 
                 buf.reset();
                 session.getFilterChain().fireMessageSent( session, req );

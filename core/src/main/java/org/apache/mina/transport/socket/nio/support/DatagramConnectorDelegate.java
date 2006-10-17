@@ -550,7 +550,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                     writeRequestQueue.pop();
                 }
 
-                session.increaseWrittenWriteRequests();
+                session.increaseWrittenMessages();
                 buf.reset();
                 session.getFilterChain().fireMessageSent( session, req );
                 continue;
@@ -586,7 +586,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
-                session.increaseWrittenWriteRequests();
+                session.increaseWrittenMessages();
                 buf.reset();
                 session.getFilterChain().fireMessageSent( session, req );
             }
