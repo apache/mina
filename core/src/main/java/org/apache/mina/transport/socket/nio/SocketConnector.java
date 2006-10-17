@@ -35,6 +35,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.util.Queue;
@@ -365,13 +366,9 @@ public class SocketConnector extends BaseIoConnector
     private void newSession( SocketChannel ch, IoHandler handler, IoServiceConfig config, ConnectFuture connectFuture )
         throws IOException
     {
-        SocketSessionImpl session = new SocketSessionImpl( this,
-                                                           nextProcessor(),
-                                                           getListeners(),
-                                                           config,
-                                                           ch,
-                                                           handler,
-                                                           ch.socket().getRemoteSocketAddress() );
+        SocketSessionImpl session = new SocketSessionImpl(
+                this, nextProcessor(), getListeners(),
+                config, ch, handler, ch.socket().getRemoteSocketAddress() );
         try
         {
             getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
@@ -382,8 +379,13 @@ public class SocketConnector extends BaseIoConnector
         {
             throw ( IOException ) new IOException( "Failed to create a session." ).initCause( e );
         }
+        
+        // Set the ConnectFuture of the specified session, which will be
+        // removed and notified by AbstractIoFilterChain eventually.
+        session.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, connectFuture );
+
+        // Forward the remaining process to the SocketIoProcessor.
         session.getIoProcessor().addNew( session );
-        connectFuture.setSession( session );
     }
 
     private SocketIoProcessor nextProcessor()

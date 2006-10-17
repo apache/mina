@@ -23,14 +23,18 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.BaseIoConnectorConfig;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
+import org.apache.mina.transport.vmpipe.support.VmPipeIdleStatusChecker;
 import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
 import org.apache.mina.util.AnonymousSocketAddress;
 
@@ -87,23 +91,53 @@ public class VmPipeConnector extends BaseIoConnector
         }
 
         DefaultConnectFuture future = new DefaultConnectFuture();
+        VmPipeSessionImpl localSession =
+            new VmPipeSessionImpl(
+                    this,
+                    config,
+                    getListeners(),
+                    new Object(), // lock
+                    new AnonymousSocketAddress(),
+                    handler,
+                    entry );
+        
+        // initialize connector session
         try
         {
-            VmPipeSessionImpl session =
-                new VmPipeSessionImpl(
-                        this,
-                        config,
-                        getListeners(),
-                        new Object(), // lock
-                        new AnonymousSocketAddress(),
-                        handler,
-                        entry );
-            future.setSession( session );
+            IoFilterChain filterChain = localSession.getFilterChain();
+            this.getFilterChainBuilder().buildFilterChain( filterChain );
+            config.getFilterChainBuilder().buildFilterChain( filterChain );
+            config.getThreadModel().buildFilterChain( filterChain );
+
+            // The following sentences don't throw any exceptions.
+            localSession.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, future );
+            getListeners().fireSessionCreated( localSession );
+            VmPipeIdleStatusChecker.getInstance().addSession( localSession);
         }
-        catch( IOException e )
+        catch( Throwable t )
         {
-            future.setException( e );
+            future.setException( t );
         }
+        
+        // initialize acceptor session
+        VmPipeSessionImpl remoteSession = localSession.getRemoteSession();
+        try
+        {
+            IoFilterChain filterChain = remoteSession.getFilterChain();
+            entry.getAcceptor().getFilterChainBuilder().buildFilterChain( filterChain );
+            entry.getConfig().getFilterChainBuilder().buildFilterChain( filterChain );
+            entry.getConfig().getThreadModel().buildFilterChain( filterChain );
+            
+            // The following sentences don't throw any exceptions.
+            entry.getListeners().fireSessionCreated( remoteSession );
+            VmPipeIdleStatusChecker.getInstance().addSession( remoteSession );
+        }
+        catch( Throwable t )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( t );
+            remoteSession.close();
+        }
+
         return future;
     }
     
