@@ -280,15 +280,9 @@ public interface IoSession {
     long getWrittenMessages();
 
     /**
-     * Returns the total number of write requests which were written to this session.
+     * Returns the number of messages which are scheduled to be written to this session.
      */
-    long getWrittenWriteRequests();
-    
-    /**
-     * Returns the number of write requests which are scheduled to be written
-     * to this session.
-     */
-    int getScheduledWriteRequests();
+    int getScheduledWriteMessages();
 
     /**
      * Returns the number of bytes which are scheduled to be written to this

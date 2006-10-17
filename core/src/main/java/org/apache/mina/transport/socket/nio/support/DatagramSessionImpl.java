@@ -178,7 +178,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         filterChain.fireFilterWrite( this, writeRequest );
     }
 
-    public int getScheduledWriteRequests()
+    public int getScheduledWriteMessages()
     {
         synchronized( writeRequestQueue )
         {

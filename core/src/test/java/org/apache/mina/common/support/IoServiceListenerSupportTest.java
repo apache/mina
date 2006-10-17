@@ -317,7 +317,7 @@ public class IoServiceListenerSupportTest extends TestCase
             return 0;
         }
 
-        public int getScheduledWriteRequests()
+        public int getScheduledWriteMessages()
         {
             return 0;
         }

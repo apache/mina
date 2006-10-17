@@ -282,7 +282,7 @@ public class IoFilterChainTest extends TestCase
             };
         }
 
-        public int getScheduledWriteRequests()
+        public int getScheduledWriteMessages()
         {
             return 0;
         }
@@ -430,7 +430,7 @@ public class IoFilterChainTest extends TestCase
                     return null;
                 }
 
-                public int getScheduledWriteRequests()
+                public int getScheduledWriteMessages()
                 {
                     return 0;
                 }

@@ -165,7 +165,7 @@ class SocketSessionImpl extends BaseIoSession
         return writeRequestQueue;
     }
 
-    public int getScheduledWriteRequests()
+    public int getScheduledWriteMessages()
     {
         synchronized( writeRequestQueue )
         {
