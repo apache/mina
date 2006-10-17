@@ -97,7 +97,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                     }
                     
                     s.increaseWrittenBytes( byteCount );
-                    s.increaseWrittenWriteRequests();
+                    s.increaseWrittenMessages();
     
                     s.getFilterChain().fireMessageSent( s, writeRequest );
                     s.getRemoteSession().getFilterChain()

@@ -510,7 +510,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                     writeRequestQueue.pop();
                 }
 
-                session.increaseWrittenWriteRequests();
+                session.increaseWrittenMessages();
                 buf.reset();
                 ( ( DatagramFilterChain ) session.getFilterChain() ).fireMessageSent( session, req );
                 continue;
@@ -552,7 +552,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
-                session.increaseWrittenWriteRequests();
+                session.increaseWrittenMessages();
                 buf.reset();
                 session.getFilterChain().fireMessageSent( session, req );
             }

@@ -60,7 +60,6 @@ public abstract class BaseIoSession implements IoSession
     // Status variables
     private long readBytes;
     private long writtenBytes;
-    private long writtenWriteRequests;
     
     private long readMessages;
     private long writtenMessages;
@@ -332,7 +331,7 @@ public abstract class BaseIoSession implements IoSession
     
     public long getWrittenWriteRequests()
     {
-        return writtenWriteRequests;
+        return writtenMessages;
     }
     
     public long getReadMessages()
@@ -359,11 +358,6 @@ public abstract class BaseIoSession implements IoSession
         lastWriteTime = System.currentTimeMillis();
         idleCountForBoth = 0;
         idleCountForWrite = 0;
-    }
-    
-    public void increaseWrittenWriteRequests()
-    {
-        writtenWriteRequests ++;
     }
     
     public void increaseReadMessages()
