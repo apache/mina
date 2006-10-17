@@ -223,7 +223,7 @@ public class TextLineDecoderTest extends TestCase
             return null;
         }
 
-        public int getScheduledWriteRequests()
+        public int getScheduledWriteMessages()
         {
             return 0;
         }

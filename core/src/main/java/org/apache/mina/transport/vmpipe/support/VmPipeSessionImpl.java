@@ -139,7 +139,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.filterChain.fireFilterWrite( this, writeRequest );
     }
 
-    public int getScheduledWriteRequests()
+    public int getScheduledWriteMessages()
     {
         return 0;
     }

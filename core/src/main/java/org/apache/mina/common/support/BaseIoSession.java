@@ -329,11 +329,6 @@ public abstract class BaseIoSession implements IoSession
         return writtenBytes;
     }
     
-    public long getWrittenWriteRequests()
-    {
-        return writtenMessages;
-    }
-    
     public long getReadMessages()
     {
         return readMessages;
