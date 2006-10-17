@@ -343,13 +343,9 @@ public class SocketAcceptor extends BaseIoAcceptor
                 try
                 {
                     RegistrationRequest req = ( RegistrationRequest ) key.attachment();
-                    SocketSessionImpl session = new SocketSessionImpl( SocketAcceptor.this,
-                                                                       nextProcessor(),
-                                                                       getListeners(),
-                                                                       req.config,
-                                                                       ch,
-                                                                       req.handler,
-                                                                       req.address );
+                    SocketSessionImpl session = new SocketSessionImpl(
+                            SocketAcceptor.this, nextProcessor(), getListeners(),
+                            req.config, ch, req.handler, req.address );
                     getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getThreadModel().buildFilterChain( session.getFilterChain() );

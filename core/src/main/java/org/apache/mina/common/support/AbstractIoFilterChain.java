@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
@@ -52,10 +53,17 @@ import org.apache.mina.util.SessionLog;
  */
 public abstract class AbstractIoFilterChain implements IoFilterChain
 {
+    /**
+     * A session attribute that stores a {@link ConnectFuture} related with
+     * the {@link IoSession}.  {@link AbstractIoFilterChain} clears this
+     * attribute and notifies the future when {@link #fireSessionOpened(IoSession)}
+     * or {@link #fireExceptionCaught(IoSession, Throwable)} is invoked
+     */
+    public static final String CONNECT_FUTURE =
+        AbstractIoFilterChain.class.getName() + ".connectFuture";
+
     private final IoSession session;
-
     private final Map name2entry = new HashMap();
-
     private final EntryImpl head;
     private final EntryImpl tail;
 
@@ -67,158 +75,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
 
         this.session = session;
-        head = new EntryImpl( null, null, "head", createHeadFilter() );
-        tail = new EntryImpl( head, null, "tail", createTailFilter() );
+        head = new EntryImpl( null, null, "head", new HeadFilter() );
+        tail = new EntryImpl( head, null, "tail", new TailFilter() );
         head.nextEntry = tail;
-    }
-
-    /**
-     * Override this method to create custom head of this filter chain.
-     */
-    protected IoFilter createHeadFilter()
-    {
-        return new IoFilterAdapter()
-        {
-            public void sessionCreated( NextFilter nextFilter, IoSession session )
-            {
-                nextFilter.sessionCreated( session );
-            }
-
-            public void sessionOpened( NextFilter nextFilter, IoSession session )
-            {
-                nextFilter.sessionOpened( session );
-            }
-
-            public void sessionClosed( NextFilter nextFilter, IoSession session )
-            {
-                nextFilter.sessionClosed( session );
-            }
-
-            public void sessionIdle( NextFilter nextFilter, IoSession session,
-                                    IdleStatus status )
-            {
-                nextFilter.sessionIdle( session, status );
-            }
-
-            public void exceptionCaught( NextFilter nextFilter,
-                                        IoSession session, Throwable cause )
-            {
-                nextFilter.exceptionCaught( session, cause );
-            }
-
-            public void messageReceived( NextFilter nextFilter, IoSession session,
-                                         Object message )
-            {
-                nextFilter.messageReceived( session, message );
-            }
-
-            public void messageSent( NextFilter nextFilter, IoSession session,
-                                     Object message )
-            {
-                nextFilter.messageSent( session, message );
-            }
-
-            public void filterWrite( NextFilter nextFilter, IoSession session,
-                                     WriteRequest writeRequest ) throws Exception
-            {
-                if( session.getTransportType().getEnvelopeType().isAssignableFrom( writeRequest.getMessage().getClass() ) )
-                {
-                    doWrite( session, writeRequest );
-                }
-                else
-                {
-                    throw new IllegalStateException(
-                            "Write requests must be transformed to " +
-                            session.getTransportType().getEnvelopeType() +
-                            ": " + writeRequest );
-                }
-            }
-
-            public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
-            {
-                doClose( session );
-            }
-        };
-    }
-
-    /**
-     * Override this method to create custom head of this filter chain.
-     */
-    protected IoFilter createTailFilter()
-    {
-        return new IoFilterAdapter()
-        {
-            public void sessionCreated( NextFilter nextFilter, IoSession session ) throws Exception
-            {
-                session.getHandler().sessionCreated( session );
-            }
-            public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
-            {
-                session.getHandler().sessionOpened( session );
-            }
-
-            public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
-            {
-                try
-                {
-                    session.getHandler().sessionClosed( session );
-                }
-                finally
-                {
-                    // Remove all filters.
-                    session.getFilterChain().clear();
-                }
-            }
-
-            public void sessionIdle( NextFilter nextFilter, IoSession session,
-                                    IdleStatus status ) throws Exception
-            {
-                session.getHandler().sessionIdle( session, status );
-            }
-
-            public void exceptionCaught( NextFilter nextFilter,
-                                        IoSession session, Throwable cause ) throws Exception
-            {
-                session.getHandler().exceptionCaught( session, cause );
-            }
-
-            public void messageReceived( NextFilter nextFilter, IoSession session,
-                                         Object message ) throws Exception
-            {
-                try
-                {
-                    session.getHandler().messageReceived( session, message );
-                }
-                finally
-                {
-                    ByteBufferUtil.releaseIfPossible( message );
-                }
-            }
-
-            public void messageSent( NextFilter nextFilter, IoSession session,
-                                     Object message ) throws Exception
-            {
-                try
-                {
-                    session.getHandler().messageSent( session, message );
-                }
-                finally
-                {
-                    ByteBufferUtil.releaseIfPossible( message );
-                }
-            }
-
-            public void filterWrite( NextFilter nextFilter,
-                                     IoSession session, WriteRequest writeRequest ) throws Exception
-            {
-                nextFilter.filterWrite( session, writeRequest );
-            }
-
-            public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
-            {
-                nextFilter.filterClose( session );
-            }
-        };
     }
 
     public IoSession getSession()
@@ -539,8 +398,20 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
     public void fireExceptionCaught( IoSession session, Throwable cause )
     {
-        Entry head = this.head;
-        callNextExceptionCaught(head, session, cause);
+        // Notify the related ConnectFuture
+        // if the session is created from SocketConnector.
+        ConnectFuture future = ( ConnectFuture ) session.removeAttribute( CONNECT_FUTURE );
+        if( future == null )
+        {
+            Entry head = this.head;
+            callNextExceptionCaught( head, session, cause );
+        }
+        else
+        {
+            // Please note that this place is not the only place that
+            // calls ConnectFuture.setException().
+            future.setException( cause );
+        }
     }
 
     private void callNextExceptionCaught( Entry entry,
@@ -710,6 +581,157 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     protected abstract void doWrite( IoSession session, WriteRequest writeRequest ) throws Exception;
 
     protected abstract void doClose( IoSession session ) throws Exception;
+
+    private class HeadFilter extends IoFilterAdapter
+    {
+        public void sessionCreated( NextFilter nextFilter, IoSession session )
+        {
+            nextFilter.sessionCreated( session );
+        }
+
+        public void sessionOpened( NextFilter nextFilter, IoSession session )
+        {
+            nextFilter.sessionOpened( session );
+        }
+
+        public void sessionClosed( NextFilter nextFilter, IoSession session )
+        {
+            nextFilter.sessionClosed( session );
+        }
+
+        public void sessionIdle( NextFilter nextFilter, IoSession session,
+                                IdleStatus status )
+        {
+            nextFilter.sessionIdle( session, status );
+        }
+
+        public void exceptionCaught( NextFilter nextFilter,
+                                    IoSession session, Throwable cause )
+        {
+            nextFilter.exceptionCaught( session, cause );
+        }
+
+        public void messageReceived( NextFilter nextFilter, IoSession session,
+                                     Object message )
+        {
+            nextFilter.messageReceived( session, message );
+        }
+
+        public void messageSent( NextFilter nextFilter, IoSession session,
+                                 Object message )
+        {
+            nextFilter.messageSent( session, message );
+        }
+
+        public void filterWrite( NextFilter nextFilter, IoSession session,
+                                 WriteRequest writeRequest ) throws Exception
+        {
+            if( session.getTransportType().getEnvelopeType().isAssignableFrom( writeRequest.getMessage().getClass() ) )
+            {
+                doWrite( session, writeRequest );
+            }
+            else
+            {
+                throw new IllegalStateException(
+                        "Write requests must be transformed to " +
+                        session.getTransportType().getEnvelopeType() +
+                        ": " + writeRequest );
+            }
+        }
+
+        public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
+        {
+            doClose( session );
+        }
+    }
+
+    private static class TailFilter extends IoFilterAdapter
+    {
+        public void sessionCreated( NextFilter nextFilter, IoSession session ) throws Exception
+        {
+            session.getHandler().sessionCreated( session );
+        }
+
+        public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
+        {
+            try
+            {
+                session.getHandler().sessionOpened( session );
+            }
+            finally
+            {
+                // Notify the related ConnectFuture
+                // if the session is created from SocketConnector.
+                ConnectFuture future = ( ConnectFuture ) session.removeAttribute( CONNECT_FUTURE );
+                if( future != null )
+                {
+                    future.setSession( session );
+                }
+            }
+        }
+
+        public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
+        {
+            try
+            {
+                session.getHandler().sessionClosed( session );
+            }
+            finally
+            {
+                // Remove all filters.
+                session.getFilterChain().clear();
+            }
+        }
+
+        public void sessionIdle( NextFilter nextFilter, IoSession session,
+                                IdleStatus status ) throws Exception
+        {
+            session.getHandler().sessionIdle( session, status );
+        }
+
+        public void exceptionCaught( NextFilter nextFilter,
+                                    IoSession session, Throwable cause ) throws Exception
+        {
+            session.getHandler().exceptionCaught( session, cause );
+        }
+
+        public void messageReceived( NextFilter nextFilter, IoSession session,
+                                     Object message ) throws Exception
+        {
+            try
+            {
+                session.getHandler().messageReceived( session, message );
+            }
+            finally
+            {
+                ByteBufferUtil.releaseIfPossible( message );
+            }
+        }
+
+        public void messageSent( NextFilter nextFilter, IoSession session,
+                                 Object message ) throws Exception
+        {
+            try
+            {
+                session.getHandler().messageSent( session, message );
+            }
+            finally
+            {
+                ByteBufferUtil.releaseIfPossible( message );
+            }
+        }
+
+        public void filterWrite( NextFilter nextFilter,
+                                 IoSession session, WriteRequest writeRequest ) throws Exception
+        {
+            nextFilter.filterWrite( session, writeRequest );
+        }
+
+        public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
+        {
+            nextFilter.filterClose( session );
+        }
+    }
 
     private class EntryImpl implements Entry
     {

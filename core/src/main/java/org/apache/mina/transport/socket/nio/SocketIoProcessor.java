@@ -160,25 +160,22 @@ class SocketIoProcessor
                 break;
 
             SocketChannel ch = session.getChannel();
-            boolean registered;
-
             try
             {
                 ch.configureBlocking( false );
                 session.setSelectionKey( ch.register( selector,
                                                       SelectionKey.OP_READ,
                                                       session ) );
-                registered = true;
+
+                // AbstractIoFilterChain.CONNECT_FUTURE is cleared inside here
+                // in AbstractIoFilterChain.fireSessionOpened().
+                session.getServiceListeners().fireSessionCreated( session );
             }
             catch( IOException e )
             {
-                registered = false;
+                // Clear the AbstractIoFilterChain.CONNECT_FUTURE attribute
+                // and call ConnectFuture.setException().
                 session.getFilterChain().fireExceptionCaught( session, e );
-            }
-
-            if( registered )
-            {
-                session.getServiceListeners().fireSessionCreated( session );
             }
         }
     }
