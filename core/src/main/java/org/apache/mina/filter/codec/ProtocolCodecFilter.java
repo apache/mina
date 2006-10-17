@@ -26,7 +26,6 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.codec.support.SimpleProtocolDecoderOutput;
 import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
@@ -223,11 +222,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter
                     new WriteRequest(
                             new MessageByteBuffer( writeRequest.getMessage() ),
                             writeRequest.getFuture(), writeRequest.getDestination() ) );
-
-            if( session instanceof BaseIoSession )
-            {
-                ( ( BaseIoSession ) session ).increaseWrittenMessages();
-            }
         }
         catch( Throwable t )
         {
