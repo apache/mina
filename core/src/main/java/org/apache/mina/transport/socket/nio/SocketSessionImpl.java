@@ -149,7 +149,7 @@ class SocketSessionImpl extends BaseIoSession
     {
         this.key = key;
     }
-
+    
     public IoHandler getHandler()
     {
         return handler;

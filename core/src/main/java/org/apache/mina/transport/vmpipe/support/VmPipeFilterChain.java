@@ -100,8 +100,8 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                     s.increaseWrittenWriteRequests();
     
                     s.getFilterChain().fireMessageSent( s, writeRequest );
-                    s.remoteSession.getFilterChain()
-                                .fireMessageReceived( s.remoteSession, messageCopy );
+                    s.getRemoteSession().getFilterChain()
+                                .fireMessageReceived( s.getRemoteSession(), messageCopy );
                 }
             }
             else 
@@ -119,7 +119,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
             if( !session.getCloseFuture().isClosed() )
             {
                 s.getServiceListeners().fireSessionDestroyed( s );
-                s.remoteSession.close();
+                s.getRemoteSession().close();
             }
         }
     }

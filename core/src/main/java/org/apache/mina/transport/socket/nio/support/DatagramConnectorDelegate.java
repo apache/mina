@@ -37,6 +37,7 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.socket.nio.DatagramConnectorConfig;
@@ -613,6 +614,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                     req.config,
                     req.channel, req.handler,
                     req.channel.socket().getRemoteSocketAddress() );
+            
+            // AbstractIoFilterChain will notify the connect future.
+            session.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, req );
 
             boolean success = false;
             try
@@ -625,21 +629,20 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 }
                 else
                 {
+                    SelectionKey key = req.channel.register( selector,
+                            SelectionKey.OP_READ, session );
+
+                    session.setSelectionKey( key );
                     buildFilterChain( req, session );
+                    // The CONNECT_FUTURE attribute is cleared and notified here.
                     getListeners().fireSessionCreated( session );
                 }
-
-                SelectionKey key = req.channel.register( selector,
-                                                         SelectionKey.OP_READ, session );
-
-                session.setSelectionKey( key );
-
-                req.setSession( session );
                 success = true;
             }
             catch( Throwable t )
             {
-                req.setException( t );
+                // The CONNECT_FUTURE attribute is cleared and notified here.
+                session.getFilterChain().fireExceptionCaught( session, t );
             }
             finally
             {
