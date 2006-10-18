@@ -70,8 +70,12 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * <pre>
  * ByteBuffer buf = ByteBuffer.allocate(1024, true);
  * </pre>
- * or you can let MINA choose:
+ * or you can set your preference.
  * <pre>
+ * // Prefer heap buffers to direct buffers.
+ * ByteBuffer.setUseDirectBuffer(false);
+ * 
+ * // Try to allocate a heap buffer first, and then a direct buffer.
  * ByteBuffer buf = ByteBuffer.allocate(1024);
  * </pre>
  * </p>
@@ -156,7 +160,7 @@ public abstract class ByteBuffer implements Comparable
 {
     private static ByteBufferAllocator allocator = new PooledByteBufferAllocator();
 
-    private static boolean useDirectBuffers = true;
+    private static boolean preferDirectBuffers = false;
 
     /**
      * Returns the current allocator which manages the allocated buffers.
@@ -187,40 +191,50 @@ public abstract class ByteBuffer implements Comparable
         }
     }
 
-    public static boolean isUseDirectBuffers()
+    /**
+     * Returns <tt>true</tt> if and only if a direct buffer is allocated
+     * by default when the type of the new buffer is not specified.  The
+     * default value is <tt>false</tt>.
+     */
+    public static boolean isPreferDirectBuffers()
     {
-        return useDirectBuffers;
+        return preferDirectBuffers;
     }
 
-    public static void setUseDirectBuffers( boolean useDirectBuffers )
+    /**
+     * Sets if a direct buffer should be allocated by default when the
+     * type of the new buffer is not specified.  The default value is
+     * <tt>false</tt>.
+     */
+    public static void setPreferDirectBuffers( boolean preferDirectBuffers )
     {
-        ByteBuffer.useDirectBuffers = useDirectBuffers;
+        ByteBuffer.preferDirectBuffers = preferDirectBuffers;
     }
 
     /**
      * Returns the direct or heap buffer which is capable of the specified
-     * size.  This method tries to allocate direct buffer first, and then
-     * tries heap buffer if direct buffer memory is exhausted.  Please use
+     * size.  This method tries to allocate a buffer of the preferred type
+     * first, and then tries the other type of buffer if the buffer memory
+     * of the preferred type is exhausted.  Please use
      * {@link #allocate(int, boolean)} to allocate buffers of specific type.
      *
      * @param capacity the capacity of the buffer
+     * 
+     * @see #setPreferDirectBuffers(boolean)
      */
     public static ByteBuffer allocate( int capacity )
     {
-        if( useDirectBuffers )
+        try
         {
-            try
-            {
-                // first try to allocate direct buffer
-                return allocate( capacity, true );
-            }
-            catch( OutOfMemoryError e )
-            {
-                // fall through to heap buffer
-            }
+            // first try to allocate a buffer of the preferred type.
+            return allocate( capacity, preferDirectBuffers );
+        }
+        catch( OutOfMemoryError e )
+        {
+            // fall through to the alternative type.
         }
 
-        return allocate( capacity, false );
+        return allocate( capacity, !preferDirectBuffers );
     }
 
     /**
