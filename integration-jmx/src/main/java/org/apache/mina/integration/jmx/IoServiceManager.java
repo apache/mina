@@ -23,6 +23,10 @@ package org.apache.mina.integration.jmx;
 import java.net.SocketAddress;
 import java.util.Iterator;
 
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.management.IoSessionStat;
@@ -33,16 +37,31 @@ import org.apache.mina.management.StatCollector;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoServiceManager implements IoServiceManagerMBean
+public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistration
 {
     private IoService service;
 
     private StatCollector collector = null;
 
+    private int milliSecondsPolling; 
 
-    public IoServiceManager( IoService service )
+    private boolean autoStartCollecting = false;
+    
+    public IoServiceManager( IoService service , int milliSecondsPolling, boolean autoStartCollecting)
     {
+    	this.autoStartCollecting = autoStartCollecting;
         this.service = service;
+        this.milliSecondsPolling = milliSecondsPolling;
+    }
+
+    public IoServiceManager( IoService service, int milliSecondsPolling ) 
+    {
+    	this( service, milliSecondsPolling, false );
+    }
+
+    public IoServiceManager( IoService service ) 
+    {
+    	this( service, 5000, false );
     }
 
 
@@ -60,18 +79,26 @@ public class IoServiceManager implements IoServiceManagerMBean
     }
 
 
-    public void startCollectingStats( int millisecondsPolling )
+    public void startCollectingStats()
     {
         if ( collector != null && collector.isRunning() )
         {
             throw new RuntimeException( "Already collecting stats" );
         }
 
-        collector = new StatCollector( service, millisecondsPolling );
+        collector = new StatCollector( service, milliSecondsPolling );
         collector.start();
-
     }
-
+    
+    public int getStatsPollingInterval()
+    {
+    	return milliSecondsPolling;
+    }
+    
+    public void setStatsPollingInterval( int millisecondsPolling ) 
+    {
+    	this.milliSecondsPolling = millisecondsPolling;
+    }
 
     public void stopCollectingStats()
     {
@@ -247,4 +274,34 @@ public class IoServiceManager implements IoServiceManagerMBean
         }
 
     }
+
+	public ObjectName preRegister( MBeanServer server, ObjectName name ) throws Exception 
+	{
+		return name;
+	}
+
+	public void postRegister( Boolean registrationDone ) 
+	{
+		if( registrationDone ) 
+		{
+			if( autoStartCollecting ) 
+			{
+				startCollectingStats();
+			}
+				
+		}
+	}
+	
+	public void preDeregister() throws Exception 
+	{
+		if ( collector != null && collector.isRunning() ) 
+		{
+			stopCollectingStats();
+		}
+	}
+
+	public void postDeregister() 
+	{
+	}
+
 }
