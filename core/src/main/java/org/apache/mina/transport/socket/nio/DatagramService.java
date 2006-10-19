@@ -19,32 +19,26 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.IoConnectorConfig;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.support.BaseIoConnectorConfig;
+import org.apache.mina.common.IoSessionRecycler;
+
 
 /**
- * An {@link IoConnectorConfig} for {@link SocketConnector}.
- *
+ * A base interface for {@link DatagramAcceptor} and {@link DatagramConnector}.
+ * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketConnectorConfig extends BaseIoConnectorConfig
+public interface DatagramService
 {
-    private IoSessionConfig sessionConfig = new SocketSessionConfigImpl();
+    /**
+     * Returns the {@link IoSessionRecycler} for this service.
+     */
+    IoSessionRecycler getSessionRecycler();
 
     /**
-     * Creates a new instance.
+     * Sets the {@link IoSessionRecycler} for this service.
      * 
-     * @throws RuntimeIOException if failed to get the default configuration
+     * @param sessionRecycler <tt>null</tt> to use the default recycler
      */
-    public SocketConnectorConfig()
-    {
-    }
-
-    public IoSessionConfig getSessionConfig()
-    {
-        return sessionConfig;
-    }
+    void setSessionRecycler( IoSessionRecycler sessionRecycler );
 }

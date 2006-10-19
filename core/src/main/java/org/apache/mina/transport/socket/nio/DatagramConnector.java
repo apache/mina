@@ -20,9 +20,11 @@
 package org.apache.mina.transport.socket.nio;
 
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.support.DelegatedIoConnector;
 import org.apache.mina.transport.socket.nio.support.DatagramConnectorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -31,7 +33,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends DelegatedIoConnector
+public class DatagramConnector extends DelegatedIoConnector implements DatagramService
 {
     /**
      * Creates a new instance using a NewThreadExecutor 
@@ -51,14 +53,13 @@ public class DatagramConnector extends DelegatedIoConnector
         init( new DatagramConnectorDelegate( this, executor ) );
     }
     
-    /**
-     * Sets the default config this connector should use.
-     * 
-     * @param defaultConfig the default config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setDefaultConfig( DatagramConnectorConfig defaultConfig )
+    public IoSessionRecycler getSessionRecycler()
     {
-        ( ( DatagramConnectorDelegate ) delegate ).setDefaultConfig( defaultConfig );
+        return ( ( DatagramConnectorDelegate ) delegate ).getSessionRecycler();
+    }
+
+    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
+    {
+        ( ( DatagramConnectorDelegate ) delegate ).setSessionRecycler( sessionRecycler );
     }
 }

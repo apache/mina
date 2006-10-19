@@ -45,31 +45,36 @@ import org.apache.mina.util.AvailablePortFinder;
 public class DatagramConfigTest extends TestCase
 {
     private final IoAcceptor acceptor = new DatagramAcceptor();
+
     private final IoConnector connector = new DatagramConnector();
+
     private String result;
 
     public DatagramConfigTest()
     {
     }
-    
+
     protected void setUp() throws Exception
     {
         result = "";
     }
-    
+
     public void testAcceptorFilterChain() throws Exception
     {
         int port = AvailablePortFinder.getNextAvailable( 1024 );
-        DatagramAcceptorConfig expectedConfig = new DatagramAcceptorConfig();
         IoFilter mockFilter = new MockFilter();
         IoHandler mockHandler = new MockHandler();
         
-        expectedConfig.getFilterChain().addLast( "mock", mockFilter );
-        acceptor.bind( new InetSocketAddress( port ), mockHandler, expectedConfig );
+        acceptor.getFilterChain().addLast( "mock", mockFilter );
+        acceptor.setLocalAddress( new InetSocketAddress( port ) );
+        acceptor.setHandler( mockHandler );
+        acceptor.bind();
         
         try
         {
-            ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ), new IoHandlerAdapter() );
+            connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
+            connector.setHandler( new IoHandlerAdapter() );
+            ConnectFuture future = connector.connect();
             future.join();
             
             WriteFuture writeFuture = future.getSession().write( ByteBuffer.allocate( 16 ).putInt( 0 ).flip() );
@@ -91,24 +96,26 @@ public class DatagramConfigTest extends TestCase
         }
         finally
         {
-            acceptor.unbind( new InetSocketAddress( port ) );
+            acceptor.unbind();
         }
     }
-    
+
     private class MockFilter extends IoFilterAdapter
     {
 
-        public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
+        public void messageReceived( NextFilter nextFilter, IoSession session,
+                Object message ) throws Exception
         {
             result += "F";
             nextFilter.messageReceived( session, message );
         }
-        
+
     }
-    
+
     private class MockHandler extends IoHandlerAdapter
     {
-        public void messageReceived( IoSession session, Object message ) throws Exception
+        public void messageReceived( IoSession session, Object message )
+                throws Exception
         {
             result += "H";
         }

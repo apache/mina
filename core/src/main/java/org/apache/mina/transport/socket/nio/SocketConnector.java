@@ -22,7 +22,6 @@ package org.apache.mina.transport.socket.nio;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -32,15 +31,14 @@ import java.util.Set;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoConnectorConfig;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
-import org.apache.mina.util.Queue;
-import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.NamePreservingRunnable;
+import org.apache.mina.util.NewThreadExecutor;
+import org.apache.mina.util.Queue;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -56,10 +54,11 @@ public class SocketConnector extends BaseIoConnector
      */
     private static volatile int nextId = 0;
 
+    private IoSessionConfig sessionConfig = new SocketSessionConfigImpl();
+
     private final Object lock = new Object();
     private final int id = nextId++;
     private final String threadName = "SocketConnector-" + id;
-    private SocketConnectorConfig defaultConfig = new SocketConnectorConfig();
     private final Queue connectQueue = new Queue();
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
@@ -104,6 +103,16 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
+    protected Class getAddressType()
+    {
+        return InetSocketAddress.class;
+    }
+
+    public IoSessionConfig getSessionConfig()
+    {
+        return sessionConfig;
+    }
+
     /**
      * How many seconds to keep the connection thread alive between connection requests
      *
@@ -128,49 +137,25 @@ public class SocketConnector extends BaseIoConnector
         this.workerTimeout = workerTimeout;
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
+    protected ConnectFuture doConnect()
     {
-        return connect( address, null, handler, config );
-    }
-
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoServiceConfig config )
-    {
-        if( address == null )
-            throw new NullPointerException( "address" );
-        if( handler == null )
-            throw new NullPointerException( "handler" );
-
-        if( ! ( address instanceof InetSocketAddress ) )
-            throw new IllegalArgumentException( "Unexpected address type: "
-                                                + address.getClass() );
-
-        if( localAddress != null && !( localAddress instanceof InetSocketAddress ) )
-            throw new IllegalArgumentException( "Unexpected local address type: "
-                                                + localAddress.getClass() );
-
-        if( config == null )
-        {
-            config = getDefaultConfig();
-        }
-
         SocketChannel ch = null;
         boolean success = false;
         try
         {
             ch = SocketChannel.open();
             ch.socket().setReuseAddress( true );
-            if( localAddress != null )
+            if( getLocalAddress() != null )
             {
-                ch.socket().bind( localAddress );
+                ch.socket().bind( getLocalAddress() );
             }
 
             ch.configureBlocking( false );
 
-            if( ch.connect( address ) )
+            if( ch.connect( getRemoteAddress() ) )
             {
                 DefaultConnectFuture future = new DefaultConnectFuture();
-                newSession( ch, handler, config, future );
+                newSession( ch, future );
                 success = true;
                 return future;
             }
@@ -196,7 +181,7 @@ public class SocketConnector extends BaseIoConnector
             }
         }
 
-        ConnectionRequest request = new ConnectionRequest( ch, handler, config );
+        ConnectionRequest request = new ConnectionRequest( ch );
         synchronized( lock )
         {
             try
@@ -225,26 +210,6 @@ public class SocketConnector extends BaseIoConnector
         selector.wakeup();
 
         return request;
-    }
-
-    public IoServiceConfig getDefaultConfig()
-    {
-        return defaultConfig;
-    }
-
-    /**
-     * Sets the config this connector will use by default.
-     * 
-     * @param defaultConfig the default config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setDefaultConfig( SocketConnectorConfig defaultConfig )
-    {
-        if( defaultConfig == null )
-        {
-            throw new NullPointerException( "defaultConfig" );
-        }
-        this.defaultConfig = defaultConfig;
     }
     
     private synchronized void startupWorker() throws IOException
@@ -303,7 +268,7 @@ public class SocketConnector extends BaseIoConnector
             try
             {
                 ch.finishConnect();
-                newSession( ch, entry.handler, entry.config, entry );
+                newSession( ch, entry );
                 success = true;
             }
             catch( Throwable e )
@@ -363,17 +328,16 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
-    private void newSession( SocketChannel ch, IoHandler handler, IoServiceConfig config, ConnectFuture connectFuture )
+    private void newSession( SocketChannel ch, ConnectFuture connectFuture )
         throws IOException
     {
-        SocketSessionImpl session = new SocketSessionImpl(
-                this, nextProcessor(), getListeners(),
-                config, ch, handler, ch.socket().getRemoteSocketAddress() );
+        SocketSessionImpl session =
+            new SocketSessionImpl( this, getListeners(), nextProcessor(), ch );
+
         try
         {
             getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-            config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-            config.getThreadModel().buildFilterChain( session.getFilterChain() );
+            getThreadModel().buildFilterChain( session.getFilterChain() );
         }
         catch( Throwable e )
         {
@@ -469,24 +433,11 @@ public class SocketConnector extends BaseIoConnector
     {
         private final SocketChannel channel;
         private final long deadline;
-        private final IoHandler handler;
-        private final IoServiceConfig config;
 
-        private ConnectionRequest( SocketChannel channel, IoHandler handler, IoServiceConfig config )
+        private ConnectionRequest( SocketChannel channel )
         {
             this.channel = channel;
-            long timeout;
-            if( config instanceof IoConnectorConfig )
-            {
-                timeout = ( ( IoConnectorConfig ) config ).getConnectTimeoutMillis();
-            }
-            else
-            {
-                timeout = ( ( IoConnectorConfig ) getDefaultConfig() ).getConnectTimeoutMillis();
-            }
-            this.deadline = System.currentTimeMillis() + timeout;
-            this.handler = handler;
-            this.config = config;
+            this.deadline = System.currentTimeMillis() + getConnectTimeoutMillis();
         }
     }
 }

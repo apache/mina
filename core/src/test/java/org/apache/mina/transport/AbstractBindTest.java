@@ -34,7 +34,6 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +58,8 @@ public abstract class AbstractBindTest extends TestCase
     
     protected void bind( boolean reuseAddress ) throws IOException
     {
+        acceptor.setHandler( new EchoProtocolHandler() );
+
         setReuseAddress( reuseAddress );
 
         // Find an availble test port and bind to it.
@@ -72,8 +73,8 @@ public abstract class AbstractBindTest extends TestCase
             socketBound = false;
             try
             {
-                acceptor.bind( createSocketAddress( port ),
-                        new EchoProtocolHandler() );
+                acceptor.setLocalAddress( createSocketAddress( port ) );
+                acceptor.bind();
                 socketBound = true;
                 break;
             }
@@ -95,11 +96,11 @@ public abstract class AbstractBindTest extends TestCase
     {
         if( acceptor instanceof DatagramAcceptor )
         {
-            ( ( DatagramSessionConfig ) acceptor.getDefaultConfig().getSessionConfig() ).setReuseAddress( reuseAddress );
+            ( ( DatagramSessionConfig ) acceptor.getSessionConfig() ).setReuseAddress( reuseAddress );
         }
         else if( acceptor instanceof SocketAcceptor )
         {
-            ( ( SocketAcceptorConfig ) acceptor.getDefaultConfig() ).setReuseAddress( reuseAddress );
+            ( ( SocketAcceptor ) acceptor ).setReuseAddress( reuseAddress );
         }
     }
     
@@ -107,7 +108,7 @@ public abstract class AbstractBindTest extends TestCase
     {
         try
         {
-            acceptor.unbind( createSocketAddress( port ) );
+            acceptor.unbind();
         }
         catch( Exception e )
         {
@@ -121,10 +122,10 @@ public abstract class AbstractBindTest extends TestCase
         
         try
         {
-            acceptor.bind( createSocketAddress( port ), new EchoProtocolHandler() );
-            Assert.fail( "IOException is not thrown" );
+            acceptor.bind();
+            Assert.fail( "IllegalStateException is not thrown" );
         }
-        catch( IOException e )
+        catch( IllegalStateException e )
         {
         }
     }
@@ -134,29 +135,20 @@ public abstract class AbstractBindTest extends TestCase
         bind( false );
         
         // this should succeed
-        acceptor.unbind( createSocketAddress( port ) );
+        acceptor.unbind();
         
-        try
-        {
-            // this should fail
-            acceptor.unbind( createSocketAddress( port ) );
-            Assert.fail( "Exception is not thrown" );
-        }
-        catch( Exception e )
-        {
-        }
+        // this shouldn't fail
+        acceptor.unbind();
     }
     
     public void testManyTimes() throws IOException
     {
         bind( true );
         
-        SocketAddress addr = createSocketAddress( port );
-        EchoProtocolHandler handler = new EchoProtocolHandler();
         for( int i = 0; i < 1024; i++ ) 
         {
-            acceptor.unbind( addr );
-            acceptor.bind( addr, handler );
+            acceptor.unbind();
+            acceptor.bind();
         }
     }
     
@@ -166,9 +158,11 @@ public abstract class AbstractBindTest extends TestCase
 
         SocketAddress addr = createSocketAddress( port );
         EchoProtocolHandler handler = new EchoProtocolHandler();
+        acceptor.setLocalAddress( addr );
+        acceptor.setHandler( handler );
         for( int i = 0; i < 1048576; i++ )
         {
-            acceptor.bind( addr, handler );
+            acceptor.bind();
             testDuplicateBind();
             testDuplicateUnbind();
             if( i % 100 == 0 )

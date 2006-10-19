@@ -21,17 +21,13 @@ package org.apache.mina.transport.vmpipe;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.common.support.BaseIoAcceptorConfig;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 
@@ -47,80 +43,54 @@ public class VmPipeAcceptor extends BaseIoAcceptor
     static final Map boundHandlers = new HashMap();
     
     private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
-    private final IoServiceConfig defaultConfig = new BaseIoAcceptorConfig()
+
+    /**
+     * Creates a new instance.
+     */
+    public VmPipeAcceptor()
     {
-        public IoSessionConfig getSessionConfig()
-        {
-            return CONFIG;
-        }
-    };
+    }
 
-    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
+    protected Class getAddressType()
     {
-        if( address == null )
-            throw new NullPointerException( "address" );
-        if( handler == null )
-            throw new NullPointerException( "handler" );
-        if( !( address instanceof VmPipeAddress ) )
-            throw new IllegalArgumentException(
-                    "address must be VmPipeAddress." );
+        return VmPipeAddress.class;
+    }
 
-        if( config == null )
-        {
-            config = getDefaultConfig();
-        }
-
+    protected void doBind() throws IOException
+    {
         synchronized( boundHandlers )
         {
-            if( boundHandlers.containsKey( address ) )
+            if( boundHandlers.containsKey( getLocalAddress() ) )
             {
-                throw new IOException( "Address already bound: " + address );
+                throw new IOException( "Address already bound: " + getLocalAddress() );
             }
 
-            boundHandlers.put( address, 
+            boundHandlers.put( getLocalAddress(), 
                                new VmPipe( this,
-                                          ( VmPipeAddress ) address,
-                                          handler, config, getListeners() ) );
+                                          ( VmPipeAddress ) getLocalAddress(),
+                                          getHandler(), getListeners() ) );
         }
         
-        getListeners().fireServiceActivated( this, address, handler, config );
+        getListeners().fireServiceActivated();
     }
     
-    public void unbind( SocketAddress address )
+    protected void doUnbind()
     {
-        if( address == null )
-            throw new NullPointerException( "address" );
+        synchronized( boundHandlers )
+        {
+            boundHandlers.remove( getLocalAddress() );
+        }
+        
+        getListeners().fireServiceDeactivated();
+    }
 
-        VmPipe pipe = null;
-        synchronized( boundHandlers )
-        {
-            if( !boundHandlers.containsKey( address ) )
-            {
-                throw new IllegalArgumentException( "Address not bound: " + address );
-            }
-            
-            pipe = ( VmPipe ) boundHandlers.remove( address );
-        }
-        
-        getListeners().fireServiceDeactivated(
-                this, pipe.getAddress(),
-                pipe.getHandler(), pipe.getConfig() );
-    }
-    
-    public void unbindAll()
+    public IoSessionConfig getSessionConfig()
     {
-        synchronized( boundHandlers )
-        {
-            List addresses = new ArrayList( boundHandlers.keySet() );
-            for( Iterator i = addresses.iterator(); i.hasNext(); )
-            {
-                unbind( ( SocketAddress ) i.next() );
-            }
-        }
+        return CONFIG;
     }
-    
-    public IoServiceConfig getDefaultConfig()
+
+    public IoSession newSession( SocketAddress remoteAddress )
     {
-        return defaultConfig;
+        throw new UnsupportedOperationException();
     }
 }

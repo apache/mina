@@ -28,8 +28,6 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.util.AvailablePortFinder;
@@ -42,8 +40,8 @@ import org.apache.mina.util.AvailablePortFinder;
  */
 public class DatagramRecyclerTest extends TestCase
 {
-    private final IoAcceptor acceptor = new DatagramAcceptor();
-    private final IoConnector connector = new DatagramConnector();
+    private final DatagramAcceptor acceptor = new DatagramAcceptor();
+    private final DatagramConnector connector = new DatagramConnector();
 
     public DatagramRecyclerTest()
     {
@@ -52,19 +50,22 @@ public class DatagramRecyclerTest extends TestCase
     public void testDatagramRecycler() throws Exception
     {
         int port = AvailablePortFinder.getNextAvailable( 1024 );
-        DatagramAcceptorConfig config = new DatagramAcceptorConfig();
         ExpiringSessionRecycler recycler = new ExpiringSessionRecycler( 1, 1 );
-        config.setSessionRecycler( recycler );
         
         MockHandler acceptorHandler = new MockHandler();
         MockHandler connectorHandler = new MockHandler();
         
-        acceptor.bind( new InetSocketAddress( port ), acceptorHandler, config );
+        acceptor.setLocalAddress( new InetSocketAddress( port ) );
+        acceptor.setHandler( acceptorHandler );
+        acceptor.setSessionRecycler( recycler );
+        acceptor.bind();
         
         try
         {
-            ConnectFuture future = connector.connect(
-                    new InetSocketAddress( "localhost", port ), connectorHandler, config );
+            connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
+            connector.setHandler( connectorHandler );
+            connector.setSessionRecycler( recycler );
+            ConnectFuture future = connector.connect();
             future.join();
             
             // Write whatever to trigger the acceptor.
@@ -83,7 +84,7 @@ public class DatagramRecyclerTest extends TestCase
         }
         finally
         {
-            acceptor.unbind( new InetSocketAddress( port ) );
+            acceptor.unbind();
         }
     }
     

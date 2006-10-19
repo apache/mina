@@ -27,8 +27,9 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoServiceListener;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.ThreadModel;
 
 /**
  * A delegated {@link IoConnector} that wraps the other {@link IoConnector}.
@@ -56,48 +57,6 @@ public class DelegatedIoConnector implements IoConnector
         this.delegate = delegate;
     }
     
-    public ConnectFuture connect( SocketAddress address, IoHandler handler )
-    {
-        return delegate.connect( address, handler );
-    }
-
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
-    {
-        return delegate.connect( address, handler, config );
-    }
-
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler )
-    {
-        return delegate.connect( address, localAddress, handler );
-    }
-
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoServiceConfig config )
-    {
-        return delegate.connect( address, localAddress, handler, config );
-    }
-
-    public boolean isManaged( SocketAddress serviceAddress )
-    {
-        return delegate.isManaged( serviceAddress );
-    }
-    
-    public Set getManagedServiceAddresses()
-    {
-        return delegate.getManagedServiceAddresses();
-    }
-
-    public Set getManagedSessions( SocketAddress serviceAddress )
-    {
-        return delegate.getManagedSessions( serviceAddress );
-    }
-    
-    public IoServiceConfig getDefaultConfig()
-    {
-        return delegate.getDefaultConfig();
-    }
-
     public IoFilterChainBuilder getFilterChainBuilder()
     {
         return delegate.getFilterChainBuilder();
@@ -121,5 +80,80 @@ public class DelegatedIoConnector implements IoConnector
     public void removeListener( IoServiceListener listener )
     {
         delegate.removeListener( listener );
+    }
+
+    public ConnectFuture connect()
+    {
+        return delegate.connect();
+    }
+
+    public int getConnectTimeout()
+    {
+        return delegate.getConnectTimeout();
+    }
+
+    public long getConnectTimeoutMillis()
+    {
+        return delegate.getConnectTimeoutMillis();
+    }
+
+    public SocketAddress getLocalAddress()
+    {
+        return delegate.getLocalAddress();
+    }
+
+    public SocketAddress getRemoteAddress()
+    {
+        return delegate.getRemoteAddress();
+    }
+
+    public void setConnectTimeout( int connectTimeout )
+    {
+        delegate.setConnectTimeout( connectTimeout );
+    }
+
+    public void setLocalAddress( SocketAddress localAddress )
+    {
+        delegate.setLocalAddress( localAddress );
+    }
+
+    public void setRemoteAddress( SocketAddress remoteAddress )
+    {
+        delegate.setRemoteAddress( remoteAddress );
+    }
+
+    public IoHandler getHandler()
+    {
+        return delegate.getHandler();
+    }
+
+    public Set getManagedSessions()
+    {
+        return delegate.getManagedSessions();
+    }
+
+    public SocketAddress getServiceAddress()
+    {
+        return delegate.getServiceAddress();
+    }
+
+    public IoSessionConfig getSessionConfig()
+    {
+        return delegate.getSessionConfig();
+    }
+
+    public ThreadModel getThreadModel()
+    {
+        return delegate.getThreadModel();
+    }
+
+    public void setHandler( IoHandler handler )
+    {
+        delegate.setHandler( handler );
+    }
+
+    public void setThreadModel( ThreadModel threadModel )
+    {
+        delegate.setThreadModel( threadModel );
     }
 }

@@ -19,13 +19,15 @@
  */
 package org.apache.mina.common.support;
 
-import java.net.SocketAddress;
 import java.util.Set;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.ExecutorThreadModel;
 import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListener;
+import org.apache.mina.common.ThreadModel;
 
 /**
  * Base implementation of {@link IoService}s.
@@ -36,9 +38,24 @@ import org.apache.mina.common.IoServiceListener;
 public abstract class BaseIoService implements IoService
 {
     /**
+     * The default thread model.
+     */
+    private final ThreadModel defaultThreadModel = ExecutorThreadModel.getInstance("AnonymousIoService");
+    
+    /**
      * Current filter chain builder.
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
+
+    /**
+     * Current thread model.
+     */
+    private ThreadModel threadModel = defaultThreadModel;
+    
+    /**
+     * Current handler.
+     */    
+    private IoHandler handler;
 
     /**
      * Maintains the {@link IoServiceListener}s of this service.
@@ -47,8 +64,13 @@ public abstract class BaseIoService implements IoService
     
     protected BaseIoService()
     {
-        this.listeners = new IoServiceListenerSupport();
+        this.listeners = new IoServiceListenerSupport( this );
     }
+    
+    /**
+     * Returns the type of {@link SocketAddress} this service uses.
+     */
+    protected abstract Class getAddressType();
     
     public IoFilterChainBuilder getFilterChainBuilder()
     {
@@ -77,6 +99,22 @@ public abstract class BaseIoService implements IoService
         }
     }
     
+    public ThreadModel getThreadModel()
+    {
+        return threadModel;
+    }
+
+    public void setThreadModel( ThreadModel threadModel )
+    {
+        if( threadModel == null )
+        {
+            // We reuse the previous default model to prevent too much
+            // daemon threads are created.
+            threadModel = defaultThreadModel;
+        }
+        this.threadModel = threadModel;
+    }
+
     public void addListener( IoServiceListener listener )
     {
         getListeners().add( listener );
@@ -87,19 +125,24 @@ public abstract class BaseIoService implements IoService
         getListeners().remove( listener );
     }
     
-    public Set getManagedServiceAddresses()
+    public Set getManagedSessions()
     {
-        return getListeners().getManagedServiceAddresses();
+        return getListeners().getManagedSessions();
     }
-
-    public Set getManagedSessions( SocketAddress serviceAddress )
+    
+    public IoHandler getHandler()
     {
-        return getListeners().getManagedSessions( serviceAddress );
+        return handler;
     }
-
-    public boolean isManaged( SocketAddress serviceAddress )
+    
+    public void setHandler( IoHandler handler )
     {
-        return getListeners().isManaged( serviceAddress );
+        if( handler == null )
+        {
+            throw new NullPointerException( "handler" );
+        }
+
+        this.handler = handler;
     }
 
     protected IoServiceListenerSupport getListeners()

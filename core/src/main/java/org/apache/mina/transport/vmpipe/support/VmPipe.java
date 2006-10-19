@@ -20,7 +20,6 @@
 package org.apache.mina.transport.vmpipe.support;
 
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.vmpipe.VmPipeAcceptor;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
@@ -34,19 +33,16 @@ public class VmPipe
     private final VmPipeAcceptor acceptor;
     private final VmPipeAddress address;
     private final IoHandler handler;
-    private final IoServiceConfig config;
     private final IoServiceListenerSupport listeners;
     
     public VmPipe( VmPipeAcceptor acceptor,
                    VmPipeAddress address,
                    IoHandler handler,
-                   IoServiceConfig config,
                    IoServiceListenerSupport listeners)
     {
         this.acceptor = acceptor;
         this.address = address;
         this.handler = handler;
-        this.config = config;
         this.listeners = listeners;
     }
 
@@ -63,11 +59,6 @@ public class VmPipe
     public IoHandler getHandler()
     {
         return handler;
-    }
-    
-    public IoServiceConfig getConfig()
-    {
-        return config;
     }
     
     public IoServiceListenerSupport getListeners()

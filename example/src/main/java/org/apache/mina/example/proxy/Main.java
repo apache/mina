@@ -21,11 +21,8 @@ package org.apache.mina.example.proxy;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 /**
@@ -55,22 +52,24 @@ public class Main
         }
 
         // Create TCP/IP acceptor.
-        IoAcceptor acceptor = new SocketAcceptor();
-        ( ( SocketAcceptorConfig ) acceptor.getDefaultConfig() ).setReuseAddress( true );
+        SocketAcceptor acceptor = new SocketAcceptor();
+        acceptor.setReuseAddress( true );
         
         // Create TCP/IP connector.
         IoConnector connector = new SocketConnector();
 
         // Set connect timeout.
-        ( ( IoConnectorConfig ) connector.getDefaultConfig()).setConnectTimeout( 30 );
+        connector.setConnectTimeout( 30 );
         
-        ClientToProxyIoHandler handler = new ClientToProxyIoHandler( 
-                new ServerToProxyIoHandler(), connector,
-                new InetSocketAddress( args[ 1 ],
-                        Integer.parseInt( args[ 2 ] ) ) );
+        connector.setRemoteAddress(
+            new InetSocketAddress( args[ 1 ], Integer.parseInt( args[ 2 ] ) ) );
+        
+        ClientToProxyIoHandler handler = new ClientToProxyIoHandler( connector );
         
         // Start proxy.
-        acceptor.bind( new InetSocketAddress( Integer.parseInt( args[ 0 ] ) ), handler );
+        acceptor.setLocalAddress( new InetSocketAddress( Integer.parseInt( args[ 0 ] ) ) );
+        acceptor.setHandler( handler );
+        acceptor.bind();
 
         System.out.println( "Listening on port " + Integer.parseInt( args[ 0 ] ) );
     }

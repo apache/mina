@@ -33,14 +33,13 @@ import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.apache.mina.util.SessionLog;
 
 /**
  * Tests echo server example.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
 public abstract class AbstractTest extends TestCase
 {
@@ -92,8 +91,8 @@ public abstract class AbstractTest extends TestCase
         datagramAcceptor = new DatagramAcceptor();
         socketAcceptor = new SocketAcceptor();
         
-        ( ( DatagramSessionConfig ) datagramAcceptor.getDefaultConfig().getSessionConfig() ).setReuseAddress( true );
-        ( ( SocketAcceptorConfig ) socketAcceptor.getDefaultConfig() ).setReuseAddress( true );
+        ( ( DatagramSessionConfig ) datagramAcceptor.getSessionConfig() ).setReuseAddress( true );
+        ( ( SocketAcceptor ) socketAcceptor ).setReuseAddress( true );
         
 
         // Find an availble test port and bind to it.
@@ -115,7 +114,8 @@ public abstract class AbstractTest extends TestCase
             
             try
             {
-                socketAcceptor.bind( address, new EchoProtocolHandler()
+                socketAcceptor.setLocalAddress( address );
+                socketAcceptor.setHandler( new EchoProtocolHandler()
                 {
                     public void sessionCreated( IoSession session )
                     {
@@ -152,9 +152,12 @@ public abstract class AbstractTest extends TestCase
                         }
                     }
                 } );
+                socketAcceptor.bind();
                 socketBound = true;
 
-                datagramAcceptor.bind( address, new EchoProtocolHandler() );
+                datagramAcceptor.setLocalAddress( address );
+                datagramAcceptor.setHandler( new EchoProtocolHandler() );
+                datagramAcceptor.bind();
                 datagramBound = true;
 
                 break;
@@ -166,11 +169,11 @@ public abstract class AbstractTest extends TestCase
             {
                 if( socketBound && !datagramBound )
                 {
-                    socketAcceptor.unbind( address );
+                    socketAcceptor.unbind();
                 }
                 if( datagramBound && !socketBound )
                 {
-                    datagramAcceptor.unbind( address );
+                    datagramAcceptor.unbind();
                 }
             }
         }
@@ -189,8 +192,8 @@ public abstract class AbstractTest extends TestCase
     {
         if( boundAddress != null )
         {
-            socketAcceptor.unbind( boundAddress );
-            datagramAcceptor.unbind( boundAddress );
+            socketAcceptor.unbind();
+            datagramAcceptor.unbind();
         }
     }
 }

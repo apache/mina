@@ -43,44 +43,47 @@ import java.net.SocketAddress;
 public interface IoConnector extends IoService
 {
     /**
-     * Connects to the specified <code>address</code>.  If communication starts
-     * successfully, events are fired to the specified
-     * <code>handler</code>.
-     * 
-     * @return {@link ConnectFuture} that will tell the result of the connection attempt
+     * Returns the local address to bind.
+     * @return <tt>null</tt> if no local address is specified.
      */
-    ConnectFuture connect( SocketAddress address, IoHandler handler );
+    SocketAddress getLocalAddress();
     
     /**
-     * Connects to the specified <code>address</code>.  If communication starts
-     * successfully, events are fired to the specified
-     * <code>handler</code>.
-     * 
-     * @param config the configuration
-     * @return {@link ConnectFuture} that will tell the result of the connection attempt
+     * Sets the local address to bind.
+     * @param localAddress <tt>null</tt> to specify no specific local address 
      */
-    ConnectFuture connect( SocketAddress address, IoHandler handler,
-                           IoServiceConfig config );
+    void setLocalAddress( SocketAddress localAddress );
+    
+    /**
+     * Returns the address of the remote peer to connect to.
+     */
+    SocketAddress getRemoteAddress();
+    
+    /**
+     * Sets the address of the remote peer to connect to.
+     */
+    void setRemoteAddress( SocketAddress remoteAddress );
+    
+    /**
+     * Returns the connect timeout in seconds.  The default value is 1 minute.
+     */
+    int getConnectTimeout();
 
     /**
-     * Connects to the specified <code>address</code>.  If communication starts
-     * successfully, events are fired to the specified
-     * <code>handler</code>.
-     * 
-     * @param localAddress the local address the channel is bound to
-     * @return {@link ConnectFuture} that will tell the result of the connection attempt
+     * Returns the connect timeout in milliseconds.  The default value is 1 minute.
      */
-    ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                           IoHandler handler );
+    long getConnectTimeoutMillis();
 
     /**
-     * Connects to the specified <code>address</code>.  If communication starts
-     * successfully, events are fired to the specified
-     * <code>handler</code>.
-     * 
-     * @param config the configuration
-     * @return {@link ConnectFuture} that will tell the result of the connection attempt
+     * Sets the connect timeout in seconds.  The default value is 1 minute.
      */
-    ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                           IoHandler handler, IoServiceConfig config );
+    void setConnectTimeout( int connectTimeout );
+    
+    /**
+     * Connects to the configured remote address.
+     * 
+     * @return the {@link ConnectFuture} instance which is completed when the 
+     *         connection attempt initiated by this call succeeds or fails.
+     */
+    ConnectFuture connect();
 }

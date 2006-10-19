@@ -23,11 +23,9 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 
 /**
  * (<b>Entry point</b>) HTTP server
@@ -45,8 +43,7 @@ public class Main
     public static void main( String[] args ) throws Exception
     {
         IoAcceptor acceptor = new SocketAcceptor();
-        IoAcceptorConfig config = new SocketAcceptorConfig();
-        DefaultIoFilterChainBuilder chain = config.getFilterChain();
+        DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
 
         // Add SSL filter if SSL is enabled.
         if( USE_SSL )
@@ -55,10 +52,9 @@ public class Main
         }
 
         // Bind
-        acceptor.bind(
-                new InetSocketAddress( PORT ),
-                new HttpProtocolHandler(),
-                config );
+        acceptor.setLocalAddress( new InetSocketAddress( PORT ) );
+        acceptor.setHandler( new HttpProtocolHandler() );
+        acceptor.bind();
 
         System.out.println( "Listening on port " + PORT );
     }

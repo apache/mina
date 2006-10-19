@@ -45,52 +45,51 @@ public interface IoService
     void removeListener( IoServiceListener listener );
     
     /**
-     * Returns all {@link SocketAddress}es this service is managing.
-     * If this service is an {@link IoAcceptor}, a set of bind addresses will
-     * be returned.  If this service is an {@link IoConnector}, a set of remote
-     * addresses will be returned.
+     * Returns the handler which will handle all connections managed by this service.
      */
-    Set getManagedServiceAddresses();
+    IoHandler getHandler();
     
     /**
-     * Returns <tt>true</tt> if this service is managing the specified <tt>serviceAddress</tt>.
-     * If this service is an {@link IoAcceptor}, <tt>serviceAddress</tt> is a bind address.
-     * If this service is an {@link IoConnector}, <tt>serviceAddress</tt> is a remote address.
+     * Sets the handler which will handle all connections managed by this service.
      */
-    boolean isManaged( SocketAddress serviceAddress );
+    void setHandler( IoHandler handler );
     
     /**
-     * Returns all sessions with the specified remote or local address,
-     * which are currently managed by this service.
+     * Returns the {@link SocketAddress} this service is managing.
+     * If this service is an {@link IoAcceptor}, the bind address will
+     * be returned.  If this service is an {@link IoConnector}, the remote
+     * address will be returned.
+     */
+    SocketAddress getServiceAddress();
+    
+    /**
+     * Returns all sessions which are currently managed by this service.
      * {@link IoAcceptor} will assume the specified <tt>address</tt> is a local
      * address, and {@link IoConnector} will assume it's a remote address.
      * 
-     * @param serviceAddress the address to return all sessions for.
      * @return the sessions. An empty collection if there's no session.
-     * @throws IllegalArgumentException if the specified <tt>address</tt> has 
-     *         not been bound.
      * @throws UnsupportedOperationException if this operation isn't supported
      *         for the particular transport type implemented by this {@link IoService}.
      */
-    Set getManagedSessions( SocketAddress serviceAddress );
+    Set getManagedSessions();
 
     /**
-     * Returns the default configuration which is used when you didn't specify
-     * any configuration.
+     * Resturns the default configuration of the new {@link IoSession}s
+     * created by this service.
      */
-    IoServiceConfig getDefaultConfig();
+    IoSessionConfig getSessionConfig();
     
     /**
-     * Returns the global {@link IoFilterChainBuilder} which will modify the
-     * {@link IoFilterChain} of all {@link IoSession}s which is managed
+     * Returns the {@link IoFilterChainBuilder} which will build the
+     * {@link IoFilterChain} of all {@link IoSession}s which is created
      * by this service.
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
      */
     IoFilterChainBuilder getFilterChainBuilder();
     
     /**
-     * Sets the global {@link IoFilterChainBuilder} which will modify the
-     * {@link IoFilterChain} of all {@link IoSession}s which is managed
+     * Sets the {@link IoFilterChainBuilder} which will build the
+     * {@link IoFilterChain} of all {@link IoSession}s which is created
      * by this service.
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
@@ -108,4 +107,24 @@ public interface IoService
      *                               not a {@link DefaultIoFilterChainBuilder}
      */
     DefaultIoFilterChainBuilder getFilterChain();
+    
+    /**
+     * Returns the default {@link ThreadModel} of the {@link IoService}.
+     * The default value is an {@link ExecutorThreadModel} whose service name is
+     * <tt>'AnonymousIoService'</tt> and which has 16 maximum active threads.
+     * It is strongly recommended to set a new {@link ExecutorThreadModel} by calling
+     * {@link ExecutorThreadModel#getInstance(String)}.
+     */
+    ThreadModel getThreadModel();
+    
+    /**
+     * Sets the default {@link ThreadModel} of the {@link IoService}.
+     * If you specify <tt>null</tt>, this property will be set to the
+     * default value.
+     * The default value is an {@link ExecutorThreadModel} whose service name is
+     * <tt>'AnonymousIoService'</tt> with 16 threads.
+     * It is strongly recommended to set a new {@link ExecutorThreadModel} by calling
+     * {@link ExecutorThreadModel#getInstance(String)}.
+     */
+    void setThreadModel( ThreadModel threadModel );
 }

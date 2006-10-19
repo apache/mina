@@ -20,7 +20,6 @@
 package org.apache.mina.integration.jmx;
 
 
-import java.net.SocketAddress;
 import java.util.Iterator;
 
 import javax.management.MBeanRegistration;
@@ -67,15 +66,7 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
 
     public int getManagedSessionCount()
     {
-
-        int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            count += service.getManagedSessions( element ).size();
-        }
-        return count;
+        return service.getManagedSessions().size();
     }
 
 
@@ -111,16 +102,11 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     public float getTotalByteReadThroughput()
     {
         float total = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getByteReadThroughput();
-            }
+            IoSession session = ( IoSession ) iter.next();
+            total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
+                .getByteReadThroughput();
         }
         return total;
     }
@@ -129,16 +115,11 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     public float getTotalByteWrittenThroughput()
     {
         float total = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getByteWrittenThroughput();
-            }
+            IoSession session = ( IoSession ) iter.next();
+            total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
+                .getByteWrittenThroughput();
         }
         return total;
     }
@@ -147,16 +128,11 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     public float getTotalMessageReadThroughput()
     {
         float total = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getMessageReadThroughput();
-            }
+            IoSession session = ( IoSession ) iter.next();
+            total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
+                .getMessageReadThroughput();
         }
         return total;
     }
@@ -165,16 +141,11 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     public float getTotalMessageWrittenThroughput()
     {
         float total = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getMessageWrittenThroughput();
-            }
+            IoSession session = ( IoSession ) iter.next();
+            total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
+                .getMessageWrittenThroughput();
         }
         return total;
     }
@@ -184,17 +155,12 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     {
         float total = 0;
         int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getByteReadThroughput();
-                count++;
-            }
+            IoSession session = ( IoSession ) iter.next();
+            total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
+                .getByteReadThroughput();
+            count++;
         }
         return total / count;
     }
@@ -204,17 +170,12 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     {
         float total = 0;
         int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getByteWrittenThroughput();
-                count++;
-            }
+            IoSession session = ( IoSession ) iter.next();
+            total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
+                .getByteWrittenThroughput();
+            count++;
         }
         return total / count;
     }
@@ -224,17 +185,12 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     {
         float total = 0;
         int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getMessageReadThroughput();
-                count++;
-            }
+            IoSession session = ( IoSession ) iter.next();
+            total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
+                .getMessageReadThroughput();
+            count++;
         }
         return total / count;
     }
@@ -244,17 +200,12 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     {
         float total = 0;
         int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getMessageWrittenThroughput();
-                count++;
-            }
+            IoSession session = ( IoSession ) iter.next();
+            total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
+                .getMessageWrittenThroughput();
+            count++;
         }
         return total / count;
     }
@@ -262,46 +213,39 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
 
     public void closeAllSessions()
     {
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
         {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                session.close();
-            }
+            IoSession session = ( IoSession ) iter.next();
+            session.close();
         }
-
     }
 
-	public ObjectName preRegister( MBeanServer server, ObjectName name ) throws Exception 
-	{
-		return name;
-	}
+    public ObjectName preRegister( MBeanServer server, ObjectName name ) throws Exception 
+    {
+        return name;
+    }
 
-	public void postRegister( Boolean registrationDone ) 
-	{
-		if( registrationDone ) 
-		{
-			if( autoStartCollecting ) 
-			{
-				startCollectingStats();
-			}
-				
-		}
-	}
-	
-	public void preDeregister() throws Exception 
-	{
-		if ( collector != null && collector.isRunning() ) 
-		{
-			stopCollectingStats();
-		}
-	}
+    public void postRegister( Boolean registrationDone )
+    {
+        if( registrationDone.booleanValue() )
+        {
+            if( autoStartCollecting )
+            {
+                startCollectingStats();
+            }
 
-	public void postDeregister() 
-	{
-	}
+        }
+    }
 
+    public void preDeregister() throws Exception
+    {
+        if( collector != null && collector.isRunning() )
+        {
+            stopCollectingStats();
+        }
+    }
+
+    public void postDeregister()
+    {
+    }
 }

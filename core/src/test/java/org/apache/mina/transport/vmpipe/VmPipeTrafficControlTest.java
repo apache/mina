@@ -46,7 +46,9 @@ public class VmPipeTrafficControlTest extends AbstractTrafficControlTest
     {
         IoConnector connector = new VmPipeConnector();
         SocketAddress addr = new VmPipeAddress( port );
-        return connector.connect( addr, handler );
+        connector.setRemoteAddress( addr );
+        connector.setHandler( handler );
+        return connector.connect();
     }
 
     protected SocketAddress createServerSocketAddress( int port )

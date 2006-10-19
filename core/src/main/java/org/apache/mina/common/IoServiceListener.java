@@ -19,7 +19,6 @@
  */
 package org.apache.mina.common;
 
-import java.net.SocketAddress;
 import java.util.EventListener;
 
 /**
@@ -35,27 +34,15 @@ public interface IoServiceListener extends EventListener
      * Invoked when a new service is activated by an {@link IoService}.
      * 
      * @param service the {@link IoService}
-     * @param serviceAddress the socket address of the {@link IoService} listens
-     *                       to manage sessions.  If the service is an {@link IoAcceptor},
-     *                       it is a bind address.  If the service is an {@link IoConnector},
-     *                       it is a remote address.
-     * @param handler the {@link IoHandler} that serves the new service
-     * @param config  the {@link IoServiceConfig} of the new service
      */
-    void serviceActivated( IoService service, SocketAddress serviceAddress, IoHandler handler, IoServiceConfig config );
+    void serviceActivated( IoService service );
     
     /**
      * Invoked when a service is deactivated by an {@link IoService}.
      * 
      * @param service the {@link IoService}
-     * @param serviceAddress the socket address of the {@link IoService} listens
-     *                       to manage sessions.  If the service is an {@link IoAcceptor},
-     *                       it is a bind address.  If the service is an {@link IoConnector},
-     *                       it is a remote address.
-     * @param handler the {@link IoHandler} that serves the service
-     * @param config  the {@link IoServiceConfig} of the service
      */
-    void serviceDeactivated( IoService service, SocketAddress serviceAddress, IoHandler handler, IoServiceConfig config );
+    void serviceDeactivated( IoService service );
     
     /**
      * Invoked when a new session is created by an {@link IoService}.

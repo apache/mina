@@ -57,10 +57,12 @@ public class VmPipeBindTest extends AbstractBindTest
         SocketAddress addr = createSocketAddress( port );
      
         IoConnector connector = new VmPipeConnector();
+        connector.setRemoteAddress( addr );
+        connector.setHandler( new IoHandlerAdapter() );
         IoSession[] sessions = new IoSession[ 5 ];
         for( int i = 0; i < sessions.length; i++ )
         {
-            ConnectFuture future = connector.connect( addr, new IoHandlerAdapter() );
+            ConnectFuture future = connector.connect();
             future.join();
             sessions[ i ] = future.getSession();
             Assert.assertTrue( sessions[ i ].isConnected() );
@@ -69,7 +71,7 @@ public class VmPipeBindTest extends AbstractBindTest
         // Wait for the server side sessions to be created.
         Thread.sleep( 500 );
         
-        Collection managedSessions = acceptor.getManagedSessions( addr );
+        Collection managedSessions = acceptor.getManagedSessions();
         Assert.assertEquals( 5, managedSessions.size() );
         // Make sure it's the server side sessions we get when calling getManagedSessions()
         for( int i = 0; i < sessions.length; i++ )
@@ -77,7 +79,7 @@ public class VmPipeBindTest extends AbstractBindTest
             Assert.assertFalse( managedSessions.contains( sessions[ i ] ) );
         }
         
-        acceptor.unbind( addr );
+        acceptor.unbind();
         
         // Wait for the client side sessions to close.
         Thread.sleep( 500 );

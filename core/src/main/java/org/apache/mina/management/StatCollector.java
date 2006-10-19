@@ -20,14 +20,11 @@
 package org.apache.mina.management;
 
 
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 
@@ -71,13 +68,11 @@ public class StatCollector
 
     private final IoServiceListener serviceListener = new IoServiceListener()
     {
-        public void serviceActivated( IoService service, SocketAddress serviceAddress, IoHandler handler,
-            IoServiceConfig config )
+        public void serviceActivated( IoService service )
         {
         }
 
-        public void serviceDeactivated( IoService service, SocketAddress serviceAddress, IoHandler handler,
-            IoServiceConfig config )
+        public void serviceDeactivated( IoService service )
         {
         }
 
@@ -128,15 +123,9 @@ public class StatCollector
     
             polledSessions = new ArrayList();
     
-            for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+            for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
             {
-                SocketAddress element = ( SocketAddress ) iter.next();
-    
-                for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-                {
-                    addSession( ( IoSession ) iter2.next() );
-    
-                }
+                addSession( ( IoSession ) iter.next() );
             }
 
             // listen for new ones

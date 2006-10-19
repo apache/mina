@@ -22,12 +22,10 @@ package org.apache.mina.example.reverser;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
-import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 
 /**
  * (<b>Entry point</b>) Reverser server which reverses all text lines from
@@ -42,21 +40,20 @@ public class Main
 
     public static void main( String[] args ) throws Exception
     {
-        IoAcceptor acceptor = new SocketAcceptor();
+        SocketAcceptor acceptor = new SocketAcceptor();
 
         // Prepare the configuration
-        SocketAcceptorConfig cfg = new SocketAcceptorConfig();
-        cfg.setReuseAddress( true );
-        cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
-        cfg.getFilterChain().addLast(
+        acceptor.setReuseAddress( true );
+        acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+        acceptor.getFilterChain().addLast(
                 "codec",
                 new ProtocolCodecFilter(
                         new TextLineCodecFactory( Charset.forName( "UTF-8" ) ) ) );
 
         // Bind
-        acceptor.bind(
-                new InetSocketAddress( PORT ),
-                new ReverseProtocolHandler(), cfg );
+        acceptor.setLocalAddress( new InetSocketAddress( PORT ) );
+        acceptor.setHandler( new ReverseProtocolHandler() );
+        acceptor.bind();
 
         System.out.println( "Listening on port " + PORT );
     }

@@ -29,7 +29,6 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.transport.socket.nio.SocketConnector;
-import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
 
 /**
  * A simple chat client for a given user.
@@ -63,16 +62,17 @@ public class ChatClientSupport
         try
         {
             
-            SocketConnectorConfig config = new SocketConnectorConfig();
             if( useSsl )
             {
                 SSLContext sslContext = BogusSSLContextFactory.getInstance( false );
                 SSLFilter sslFilter = new SSLFilter( sslContext );
                 sslFilter.setUseClientMode( true );
-                config.getFilterChain().addLast( "sslFilter", sslFilter );
+                connector.getFilterChain().addLast( "sslFilter", sslFilter );
             }
      
-            ConnectFuture future1 = connector.connect( address, handler, config );
+            connector.setRemoteAddress( address );
+            connector.setHandler( handler );
+            ConnectFuture future1 = connector.connect();
             future1.join();
             if( ! future1.isConnected() )
             {
