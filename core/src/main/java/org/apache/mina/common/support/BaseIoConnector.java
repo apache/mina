@@ -35,6 +35,7 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
     private SocketAddress localAddress;
     private SocketAddress remoteAddress;
     private int connectTimeout = 60; // 1 minute
+    private boolean calledConnect;
 
     protected BaseIoConnector()
     {
@@ -80,6 +81,12 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
                     "remoteAddress type: " + remoteAddress.getClass() + 
                     " (expected: " + getAddressType() + ")");
         }
+        
+        if( calledConnect )
+        {
+            throw new IllegalStateException(
+                    "remoteAddress property can't be set after connect() is called." );
+        }
 
         this.remoteAddress = remoteAddress;
     }
@@ -110,6 +117,8 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
         if( getHandler() == null )
             throw new IllegalStateException( "handler is not set." );
 
+        calledConnect = true;
+        
         return doConnect();
     }
 
