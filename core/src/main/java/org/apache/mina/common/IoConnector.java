@@ -55,12 +55,16 @@ public interface IoConnector extends IoService
     void setLocalAddress( SocketAddress localAddress );
     
     /**
-     * Returns the address of the remote peer to connect to.
+     * Returns the address of the remote peer to connect to.  This property can't
+     * be changed once after {@link #connect()} method is called.
      */
     SocketAddress getRemoteAddress();
     
     /**
-     * Sets the address of the remote peer to connect to.
+     * Sets the address of the remote peer to connect to.  This property can't be
+     * changed once after {@link #connect()} method is called.
+     * 
+     * @throws IllegalStateException if {@link #connect()} method is already called
      */
     void setRemoteAddress( SocketAddress remoteAddress );
     
