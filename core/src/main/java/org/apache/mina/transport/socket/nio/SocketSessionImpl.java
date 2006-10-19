@@ -27,7 +27,6 @@ import java.nio.channels.SocketChannel;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
@@ -46,8 +45,8 @@ import org.apache.mina.util.Queue;
  */
 class SocketSessionImpl extends BaseIoSession
 {
-    private final IoService manager;
-    private final IoServiceConfig serviceConfig;
+    private final IoService service;
+    private final IoServiceListenerSupport serviceListeners;
     private final SocketSessionConfig config = new SessionConfigImpl();
     private final SocketIoProcessor ioProcessor;
     private final SocketFilterChain filterChain;
@@ -57,35 +56,27 @@ class SocketSessionImpl extends BaseIoSession
     private final SocketAddress remoteAddress;
     private final SocketAddress localAddress;
     private final SocketAddress serviceAddress;
-    private final IoServiceListenerSupport serviceListeners;
     private SelectionKey key;
     private int readBufferSize;
 
     /**
      * Creates a new instance.
      */
-    SocketSessionImpl( IoService manager,
-                       SocketIoProcessor ioProcessor,
-                       IoServiceListenerSupport listeners,
-                       IoServiceConfig serviceConfig,
-                       SocketChannel ch,
-                       IoHandler defaultHandler,
-                       SocketAddress serviceAddress )
+    SocketSessionImpl( IoService service, IoServiceListenerSupport serviceListeners, SocketIoProcessor ioProcessor, SocketChannel ch )
     {
-        this.manager = manager;
-        this.serviceListeners = listeners;
+        this.service = service;
         this.ioProcessor = ioProcessor;
         this.filterChain = new SocketFilterChain( this );
         this.ch = ch;
         this.writeRequestQueue = new Queue();
-        this.handler = defaultHandler;
+        this.handler = service.getHandler();
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
-        this.serviceAddress = serviceAddress;
-        this.serviceConfig = serviceConfig;
+        this.serviceAddress = service.getServiceAddress();
+        this.serviceListeners = serviceListeners;
 
         // Apply the initial session settings
-        IoSessionConfig sessionConfig = serviceConfig.getSessionConfig();
+        IoSessionConfig sessionConfig = service.getSessionConfig();
         if( sessionConfig instanceof SocketSessionConfig )
         {
             SocketSessionConfig cfg = ( SocketSessionConfig ) sessionConfig;
@@ -107,19 +98,19 @@ class SocketSessionImpl extends BaseIoSession
 
     public IoService getService()
     {
-        return manager;
+        return service;
     }
     
-    public IoServiceConfig getServiceConfig()
-    {
-        return serviceConfig;
-    }
-
     public IoSessionConfig getConfig()
     {
         return config;
     }
-
+    
+    IoServiceListenerSupport getServiceListeners()
+    {
+        return serviceListeners;
+    }
+    
     SocketIoProcessor getIoProcessor()
     {
         return ioProcessor;
@@ -133,11 +124,6 @@ class SocketSessionImpl extends BaseIoSession
     SocketChannel getChannel()
     {
         return ch;
-    }
-
-    IoServiceListenerSupport getServiceListeners()
-    {
-        return serviceListeners;
     }
 
     SelectionKey getSelectionKey()

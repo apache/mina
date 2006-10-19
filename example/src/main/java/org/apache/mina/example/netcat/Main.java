@@ -21,7 +21,6 @@ package org.apache.mina.example.netcat;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 /**
@@ -46,12 +45,12 @@ public class Main
         SocketConnector connector = new SocketConnector();
 
         // Set connect timeout.
-        ( ( IoConnectorConfig ) connector.getDefaultConfig()).setConnectTimeout( 30 );
+        connector.setConnectTimeout( 30 );
         
         // Start communication.
-        connector.connect( 
-                new InetSocketAddress( args[ 0 ],
-                Integer.parseInt( args[ 1 ] ) ),
-                new NetCatProtocolHandler() );
+        connector.setRemoteAddress(
+                new InetSocketAddress( args[ 0 ], Integer.parseInt( args[ 1 ] ) ) );
+        connector.setHandler( new NetCatProtocolHandler() );
+        connector.connect();
     }
 }

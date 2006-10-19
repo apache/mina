@@ -47,7 +47,9 @@ public class DatagramTrafficControlTest extends AbstractTrafficControlTest
     {
         IoConnector connector = new DatagramConnector();
         SocketAddress addr = new InetSocketAddress( "localhost", port );
-        return connector.connect( addr, handler );
+        connector.setRemoteAddress( addr );
+        connector.setHandler( handler );
+        return connector.connect();
     }
 
     protected SocketAddress createServerSocketAddress( int port )

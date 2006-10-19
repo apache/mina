@@ -26,12 +26,10 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
@@ -46,50 +44,46 @@ import org.easymock.MockControl;
 public class IoServiceListenerSupportTest extends TestCase
 {
     private static final SocketAddress ADDRESS = new InetSocketAddress( 8080 );
+    
+    private final IoService mockService = ( IoService ) MockControl.createControl( IoService.class ).getMock();
 
     public void testServiceLifecycle() throws Exception
     {
-        IoServiceListenerSupport support = new IoServiceListenerSupport();
+        IoServiceListenerSupport support = new IoServiceListenerSupport( mockService );
     
         MockControl listenerControl = MockControl.createStrictControl( IoServiceListener.class );
         IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
         
         // Test activation
-        listener.serviceActivated( null, ADDRESS, null, null );
+        listener.serviceActivated( mockService );
         
         listenerControl.replay();
         
         support.add( listener );
-        support.fireServiceActivated( null, ADDRESS, null, null );
+        support.fireServiceActivated();
         
         listenerControl.verify();
-        
-        Assert.assertEquals( 1, support.getManagedServiceAddresses().size() );
-        Assert.assertTrue( support.getManagedServiceAddresses().contains( ADDRESS ) );
         
         // Test deactivation & other side effects
         listenerControl.reset();
-        listener.serviceDeactivated( null, ADDRESS, null, null );
+        listener.serviceDeactivated( mockService );
 
         listenerControl.replay();
         //// Activate more than once
-        support.fireServiceActivated( null, ADDRESS, null, null );
+        support.fireServiceActivated();
         //// Deactivate
-        support.fireServiceDeactivated( null, ADDRESS, null, null );
+        support.fireServiceDeactivated();
         //// Deactivate more than once
-        support.fireServiceDeactivated( null, ADDRESS, null, null );
+        support.fireServiceDeactivated();
         
         listenerControl.verify();
-
-        Assert.assertEquals( 0, support.getManagedServiceAddresses().size() );
-        Assert.assertFalse( support.getManagedServiceAddresses().contains( ADDRESS ) );
     }
     
     public void testSessionLifecycle() throws Exception
     {
-        IoServiceListenerSupport support = new IoServiceListenerSupport();
+        IoServiceListenerSupport support = new IoServiceListenerSupport( mockService );
     
-        TestSession session = new TestSession( ADDRESS );
+        TestSession session = new TestSession( mockService, ADDRESS );
         
         MockControl chainControl = MockControl.createStrictControl( IoFilterChain.class );
         IoFilterChain chain = ( IoFilterChain ) chainControl.getMock();
@@ -112,8 +106,8 @@ public class IoServiceListenerSupportTest extends TestCase
         listenerControl.verify();
         chainControl.verify();
         
-        Assert.assertEquals( 1, support.getManagedSessions( ADDRESS ).size() );
-        Assert.assertTrue( support.getManagedSessions( ADDRESS ).contains( session ) );
+        Assert.assertEquals( 1, support.getManagedSessions().size() );
+        Assert.assertTrue( support.getManagedSessions().contains( session ) );
         
         // Test destruction & other side effects
         listenerControl.reset();
@@ -132,21 +126,18 @@ public class IoServiceListenerSupportTest extends TestCase
         listenerControl.verify();
 
         Assert.assertFalse( session.isClosing() );
-        Assert.assertEquals( 0, support.getManagedSessions( ADDRESS ).size() );
-        Assert.assertFalse( support.getManagedSessions( ADDRESS ).contains( session ) );
+        Assert.assertEquals( 0, support.getManagedSessions().size() );
+        Assert.assertFalse( support.getManagedSessions().contains( session ) );
     }
     
     public void testDisconnectOnUnbind() throws Exception
     {
-        final IoServiceListenerSupport support = new IoServiceListenerSupport();
-    
         MockControl acceptorControl = MockControl.createStrictControl( IoAcceptor.class );
         IoAcceptor acceptor = ( IoAcceptor ) acceptorControl.getMock();
 
+        final IoServiceListenerSupport support = new IoServiceListenerSupport( acceptor );
+        
         final TestSession session = new TestSession( acceptor, ADDRESS );
-
-        MockControl configControl = MockControl.createStrictControl( IoAcceptorConfig.class );
-        IoAcceptorConfig config = ( IoAcceptorConfig ) configControl.getMock();
 
         MockControl chainControl = MockControl.createStrictControl( IoFilterChain.class );
         IoFilterChain chain = ( IoFilterChain ) chainControl.getMock();
@@ -156,7 +147,7 @@ public class IoServiceListenerSupportTest extends TestCase
         IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
         
         // Activate a service and create a session.
-        listener.serviceActivated( acceptor, ADDRESS, null, config );
+        listener.serviceActivated( acceptor );
         listener.sessionCreated( session );
         chain.fireSessionCreated( session );
         chain.fireSessionOpened( session );
@@ -165,7 +156,7 @@ public class IoServiceListenerSupportTest extends TestCase
         chainControl.replay();
         
         support.add( listener );
-        support.fireServiceActivated( acceptor, ADDRESS, null, config );
+        support.fireServiceActivated();
         support.fireSessionCreated( session );
         
         listenerControl.verify();
@@ -175,13 +166,13 @@ public class IoServiceListenerSupportTest extends TestCase
         listenerControl.reset();
         chainControl.reset();
 
-        listener.serviceDeactivated( acceptor, ADDRESS, null, config );
-        configControl.expectAndReturn(config.isDisconnectOnUnbind(), true );
+        listener.serviceDeactivated( acceptor );
+        acceptorControl.expectAndReturn(acceptor.isDisconnectOnUnbind(), true );
         listener.sessionDestroyed( session );
         chain.fireSessionClosed( session );
 
         listenerControl.replay();
-        configControl.replay();
+        acceptorControl.replay();
         chainControl.replay();
 
         new Thread()
@@ -200,24 +191,24 @@ public class IoServiceListenerSupportTest extends TestCase
                 support.fireSessionDestroyed( session );
             }
         }.start();
-        support.fireServiceDeactivated( acceptor, ADDRESS, null, config );
+        support.fireServiceDeactivated();
         
         listenerControl.verify();
-        configControl.verify();
+        acceptorControl.verify();
         chainControl.verify();
 
         Assert.assertTrue( session.isClosing() );
-        Assert.assertEquals( 0, support.getManagedSessions( ADDRESS ).size() );
-        Assert.assertFalse( support.getManagedSessions( ADDRESS ).contains( session ) );
+        Assert.assertEquals( 0, support.getManagedSessions().size() );
+        Assert.assertFalse( support.getManagedSessions().contains( session ) );
     }
     
     public void testConnectorActivation() throws Exception
     {
-        IoServiceListenerSupport support = new IoServiceListenerSupport();
-    
         MockControl connectorControl = MockControl.createStrictControl( IoConnector.class );
         IoConnector connector = ( IoConnector ) connectorControl.getMock();
 
+        IoServiceListenerSupport support = new IoServiceListenerSupport( connector );
+        
         final TestSession session = new TestSession( connector, ADDRESS );
 
         MockControl chainControl = MockControl.createStrictControl( IoFilterChain.class );
@@ -228,7 +219,7 @@ public class IoServiceListenerSupportTest extends TestCase
         IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
         
         // Creating a session should activate a service automatically.
-        listener.serviceActivated( connector, ADDRESS, null, null );
+        listener.serviceActivated( connector );
         listener.sessionCreated( session );
         chain.fireSessionCreated( session );
         chain.fireSessionOpened( session );
@@ -247,7 +238,7 @@ public class IoServiceListenerSupportTest extends TestCase
         chainControl.reset();
         listener.sessionDestroyed( session );
         chain.fireSessionClosed( session );
-        listener.serviceDeactivated( connector, ADDRESS, null, null );
+        listener.serviceDeactivated( connector );
         
         listenerControl.replay();
         chainControl.replay();
@@ -257,8 +248,8 @@ public class IoServiceListenerSupportTest extends TestCase
         listenerControl.verify();
         chainControl.verify();
 
-        Assert.assertEquals( 0, support.getManagedSessions( ADDRESS ).size() );
-        Assert.assertFalse( support.getManagedSessions( ADDRESS ).contains( session ) );
+        Assert.assertEquals( 0, support.getManagedSessions().size() );
+        Assert.assertFalse( support.getManagedSessions().contains( session ) );
     }
     
     private static class TestSession extends BaseIoSession
@@ -330,11 +321,6 @@ public class IoServiceListenerSupportTest extends TestCase
         public SocketAddress getServiceAddress()
         {
             return serviceAddress;
-        }
-
-        public IoServiceConfig getServiceConfig()
-        {
-            return null;
         }
 
         public TransportType getTransportType()

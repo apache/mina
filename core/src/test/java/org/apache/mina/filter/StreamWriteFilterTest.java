@@ -31,8 +31,6 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -41,7 +39,6 @@ import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 import org.apache.mina.util.Queue;
@@ -379,31 +376,37 @@ public class StreamWriteFilterTest extends TestCase {
     
     public void testWriteUsingSocketTransport() throws Exception
     {
-        IoAcceptor acceptor = new SocketAcceptor();
-        ( ( SocketAcceptorConfig ) acceptor.getDefaultConfig() ).setReuseAddress( true );
+        SocketAcceptor acceptor = new SocketAcceptor();
+        acceptor.setReuseAddress( true );
         SocketAddress address = new InetSocketAddress( "localhost", AvailablePortFinder.getNextAvailable() );
 
-        IoConnector connector = new SocketConnector();
+        SocketConnector connector = new SocketConnector();
         
         FixedRandomInputStream stream = new FixedRandomInputStream( 4 * 1024 * 1024 );
         
         SenderHandler sender = new SenderHandler( stream );
         ReceiverHandler receiver = new ReceiverHandler( stream.size );
         
-        acceptor.bind( address, sender );
+        acceptor.setLocalAddress( address );
+        acceptor.setHandler( sender );
+        
+        connector.setRemoteAddress( address );
+        connector.setHandler( receiver );
+
+        acceptor.bind();
         
         synchronized( sender.lock )
         {
             synchronized( receiver.lock )
             {
-                connector.connect( address, receiver );
+                connector.connect();
                 
                 sender.lock.wait();
                 receiver.lock.wait();
             }
         }
         
-        acceptor.unbind( address );
+        acceptor.unbind();
         
         assertEquals( stream.bytesRead, receiver.bytesRead );
         assertEquals( stream.size, receiver.bytesRead );

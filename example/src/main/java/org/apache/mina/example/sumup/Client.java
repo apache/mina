@@ -29,7 +29,6 @@ import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.transport.socket.nio.SocketConnector;
-import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
 
 /**
  * (<strong>Entry Point</strong>) Starts SumUp client.
@@ -67,31 +66,30 @@ public class Client
         connector.setWorkerTimeout( 1 );
         
         // Configure the service.
-        SocketConnectorConfig cfg = new SocketConnectorConfig();
-        cfg.setConnectTimeout( CONNECT_TIMEOUT );
+        connector.setConnectTimeout( CONNECT_TIMEOUT );
         if( USE_CUSTOM_CODEC )
         {
-            cfg.getFilterChain().addLast(
+            connector.getFilterChain().addLast(
                     "codec",
                     new ProtocolCodecFilter( new SumUpProtocolCodecFactory( false ) ) );
         }
         else
         {
-            cfg.getFilterChain().addLast(
+            connector.getFilterChain().addLast(
                     "codec",
                     new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
         }
-        cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
+        connector.getFilterChain().addLast( "logger", new LoggingFilter() );
+        
+        connector.setRemoteAddress( new InetSocketAddress( HOSTNAME, PORT ) );
+        connector.setHandler( new ClientSessionHandler( values ) );
         
         IoSession session;
         for( ;; )
         {
             try
             {
-                ConnectFuture future = connector.connect(
-                        new InetSocketAddress( HOSTNAME, PORT ),
-                        new ClientSessionHandler( values ), cfg );
-                
+                ConnectFuture future = connector.connect();
                 future.join();
                 session = future.getSession();
                 break;

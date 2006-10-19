@@ -313,11 +313,6 @@ public class IoFilterChainTest extends TestCase
         public int getScheduledWriteBytes() {
             return 0;
         }
-
-        public IoServiceConfig getServiceConfig()
-        {
-            return null;
-        }
     }
 
     private class EventOrderTestFilter extends IoFilterAdapter
@@ -448,11 +443,6 @@ public class IoFilterChainTest extends TestCase
                 public int getScheduledWriteBytes()
                 {
                     return 0;
-                }
-
-                public IoServiceConfig getServiceConfig()
-                {
-                    return null;
                 }
             } );
         }

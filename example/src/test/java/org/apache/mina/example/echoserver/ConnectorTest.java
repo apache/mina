@@ -41,7 +41,7 @@ import org.apache.mina.util.SessionLog;
  * Tests echo server example.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
 public class ConnectorTest extends AbstractTest
 {
@@ -76,7 +76,7 @@ public class ConnectorTest extends AbstractTest
         IoConnector connector = new SocketConnector();
         
         // Add an SSL filter to connector
-        connector.getDefaultConfig().getFilterChain().addLast( "SSL", connectorSSLFilter );
+        connector.getFilterChain().addLast( "SSL", connectorSSLFilter );
         testConnector( connector );
     }
     
@@ -102,9 +102,10 @@ public class ConnectorTest extends AbstractTest
         IoSession session = null;
         if( !useLocalAddress )
         {
-            ConnectFuture future = connector.connect(
-                    new InetSocketAddress( "localhost", port ),
-                    handler );
+            connector.setLocalAddress( null );
+            connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
+            connector.setHandler( handler );
+            ConnectFuture future = connector.connect();
             future.join();
             session = future.getSession();
         }
@@ -116,10 +117,10 @@ public class ConnectorTest extends AbstractTest
                 clientPort = AvailablePortFinder.getNextAvailable( clientPort + 1 );
                 try
                 {
-                    ConnectFuture future = connector.connect(
-                            new InetSocketAddress( "localhost", port ),
-                            new InetSocketAddress( clientPort ),
-                            handler );
+                    connector.setLocalAddress( new InetSocketAddress( clientPort ) );
+                    connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
+                    connector.setHandler( handler );
+                    ConnectFuture future = connector.connect();
                     future.join();
                     session = future.getSession();
                     break;

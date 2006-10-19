@@ -21,26 +21,25 @@ package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.util.Queue;
-import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.NamePreservingRunnable;
+import org.apache.mina.util.NewThreadExecutor;
+import org.apache.mina.util.Queue;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -56,13 +55,16 @@ public class SocketAcceptor extends BaseIoAcceptor
      */
     private static volatile int nextId = 0;
 
+    private IoSessionConfig sessionConfig = new SocketSessionConfigImpl();
+    private int backlog = 50;
+    private boolean reuseAddress;
+
     private final Executor executor;
     private final Object lock = new Object();
     private final int id = nextId ++;
     private final String threadName = "SocketAcceptor-" + id;
-    private SocketAcceptorConfig defaultConfig = new SocketAcceptorConfig();
-    private final Map channels = new HashMap();
 
+    private ServerSocketChannel serverSocketChannel;
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
 
@@ -96,7 +98,34 @@ public class SocketAcceptor extends BaseIoAcceptor
         {
             throw new IllegalArgumentException( "Must have at least one processor" );
         }
-
+        
+        // Get the default configuration
+        ServerSocket s = null;
+        try
+        {
+            s = new ServerSocket();
+            reuseAddress = s.getReuseAddress();
+        }
+        catch( IOException e )
+        {
+            throw new RuntimeIOException( "Failed to get the default configuration.", e );
+        }
+        finally
+        {
+            if( s != null )
+            {
+                try
+                {
+                    s.close();
+                }
+                catch( IOException e )
+                {
+                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                }
+            }
+        }
+        
+        // Set other properties and initialize
         this.executor = executor;
         this.processorCount = processorCount;
         ioProcessors = new SocketIoProcessor[processorCount];
@@ -107,40 +136,68 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-    /**
-     * Binds to the specified <code>address</code> and handles incoming connections with the specified
-     * <code>handler</code>.  Backlog value is configured to the value of <code>backlog</code> property.
-     *
-     * @throws IOException if failed to bind
-     */
-    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
+    protected Class getAddressType()
     {
-        if( address == null )
+        return InetSocketAddress.class;
+    }
+
+    public IoSessionConfig getSessionConfig()
+    {
+        return sessionConfig;
+    }
+
+    /**
+     * @see ServerSocket#getReuseAddress()
+     */
+    public boolean isReuseAddress()
+    {
+        return reuseAddress;
+    }
+
+    /**
+     * @see ServerSocket#setReuseAddress(boolean)
+     */
+    public void setReuseAddress( boolean reuseAddress )
+    {
+        synchronized( bindLock )
         {
-            throw new NullPointerException( "address" );
+            if( isBound() )
+            {
+                throw new IllegalStateException(
+                        "backlog can't be set while the acceptor is bound." );
+            }
+    
+            this.reuseAddress = reuseAddress;
+        }
+    }
+
+    public int getBacklog()
+    {
+        return backlog;
+    }
+
+    public void setBacklog( int backlog )
+    {
+        synchronized( bindLock )
+        {
+            if( isBound() )
+            {
+                throw new IllegalStateException(
+                        "backlog can't be set while the acceptor is bound." );
+            }
+    
+            this.backlog = backlog;
+        }
+    }
+    
+    protected void doBind() throws IOException
+    {
+        if( ( ( InetSocketAddress ) getLocalAddress() ).getPort() == 0 )
+        {
+            throw new IllegalStateException( "Unsupported port number: 0" );
         }
 
-        if( handler == null )
-        {
-            throw new NullPointerException( "handler" );
-        }
-
-        if( !( address instanceof InetSocketAddress ) )
-        {
-            throw new IllegalArgumentException( "Unexpected address type: " + address.getClass() );
-        }
-
-        if( ( ( InetSocketAddress ) address ).getPort() == 0 )
-        {
-            throw new IllegalArgumentException( "Unsupported port number: 0" );
-        }
-
-        if( config == null )
-        {
-            config = getDefaultConfig();
-        }
-
-        RegistrationRequest request = new RegistrationRequest( address, handler, config );
+        RegistrationRequest request = new RegistrationRequest();
 
         synchronized( registerQueue )
         {
@@ -168,7 +225,19 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         if( request.exception != null )
         {
-            throw request.exception;
+            // TODO better excaption handling.
+            if( request.exception instanceof RuntimeException )
+            {
+                throw ( RuntimeException ) request.exception;
+            }
+            else if( request.exception instanceof IOException )
+            {
+                throw ( IOException ) request.exception;
+            }
+            else
+            {
+                throw new RuntimeIOException( request.exception );
+            }
         }
     }
 
@@ -187,14 +256,9 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-    public void unbind( SocketAddress address )
+    protected void doUnbind()
     {
-        if( address == null )
-        {
-            throw new NullPointerException( "address" );
-        }
-
-        CancellationRequest request = new CancellationRequest( address );
+        CancellationRequest request = new CancellationRequest();
 
         try
         {
@@ -206,7 +270,7 @@ public class SocketAcceptor extends BaseIoAcceptor
             // running and failed to open a selector.  We simply throw
             // IllegalArgumentException here because we can simply
             // conclude that nothing is bound to the selector.
-            throw new IllegalArgumentException( "Address not bound: " + address );
+            throw new IllegalArgumentException( "Address not bound: " + getLocalAddress() );
         }
 
         synchronized( cancelQueue )
@@ -236,20 +300,6 @@ public class SocketAcceptor extends BaseIoAcceptor
             request.exception.fillInStackTrace();
 
             throw request.exception;
-        }
-    }
-
-    public void unbindAll()
-    {
-        List addresses;
-        synchronized( channels )
-        {
-            addresses = new ArrayList( channels.keySet() );
-        }
-
-        for( Iterator i = addresses.iterator(); i.hasNext(); )
-        {
-            unbind( ( SocketAddress ) i.next() );
         }
     }
 
@@ -342,13 +392,10 @@ public class SocketAcceptor extends BaseIoAcceptor
                 boolean success = false;
                 try
                 {
-                    RegistrationRequest req = ( RegistrationRequest ) key.attachment();
                     SocketSessionImpl session = new SocketSessionImpl(
-                            SocketAcceptor.this, nextProcessor(), getListeners(),
-                            req.config, ch, req.handler, req.address );
+                            SocketAcceptor.this, getListeners(), nextProcessor(), ch );
                     getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-                    req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-                    req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
+                    getThreadModel().buildFilterChain( session.getFilterChain() );
                     session.getIoProcessor().addNew( session );
                     success = true;
                 }
@@ -370,26 +417,6 @@ public class SocketAcceptor extends BaseIoAcceptor
     private SocketIoProcessor nextProcessor()
     {
         return ioProcessors[processorDistributor++ % processorCount];
-    }
-
-    public IoServiceConfig getDefaultConfig()
-    {
-        return defaultConfig;
-    }
-
-    /**
-     * Sets the config this acceptor will use by default.
-     * 
-     * @param defaultConfig the default config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setDefaultConfig( SocketAcceptorConfig defaultConfig )
-    {
-        if( defaultConfig == null )
-        {
-            throw new NullPointerException( "defaultConfig" );
-        }
-        this.defaultConfig = defaultConfig;
     }
 
     private void registerNew()
@@ -421,33 +448,20 @@ public class SocketAcceptor extends BaseIoAcceptor
                 ssc.configureBlocking( false );
 
                 // Configure the server socket,
-                SocketAcceptorConfig cfg;
-                if( req.config instanceof SocketAcceptorConfig )
-                {
-                    cfg = ( SocketAcceptorConfig ) req.config;
-                }
-                else
-                {
-                    cfg = ( SocketAcceptorConfig ) getDefaultConfig();
-                }
-
-                ssc.socket().setReuseAddress( cfg.isReuseAddress() );
+                ssc.socket().setReuseAddress( isReuseAddress() );
                 ssc.socket().setReceiveBufferSize(
-                    ( ( SocketSessionConfig ) cfg.getSessionConfig() ).getReceiveBufferSize() );
+                    ( ( SocketSessionConfig ) getSessionConfig() ).getReceiveBufferSize() );
 
                 // and bind.
-                ssc.socket().bind( req.address, cfg.getBacklog() );
+                ssc.socket().bind( getLocalAddress(), getBacklog() );
                 ssc.register( selector, SelectionKey.OP_ACCEPT, req );
-
-                synchronized( channels )
-                {
-                    channels.put( req.address, ssc );
-                }
-
-                getListeners().fireServiceActivated(
-                        this, req.address, req.handler, req.config );
+                
+                serverSocketChannel = ssc;
+                
+                // and notify.
+                getListeners().fireServiceActivated();
             }
-            catch( IOException e )
+            catch( Throwable e )  // TODO better exception handling.
             {
                 req.exception = e;
             }
@@ -497,29 +511,16 @@ public class SocketAcceptor extends BaseIoAcceptor
                 break;
             }
 
-            ServerSocketChannel ssc;
-            synchronized( channels )
-            {
-                ssc = ( ServerSocketChannel ) channels.remove( request.address );
-            }
-
             // close the channel
             try
             {
-                if( ssc == null )
-                {
-                    request.exception = new IllegalArgumentException( "Address not bound: " + request.address );
-                }
-                else
-                {
-                    SelectionKey key = ssc.keyFor( selector );
-                    request.registrationRequest = ( RegistrationRequest ) key.attachment();
-                    key.cancel();
+                SelectionKey key = serverSocketChannel.keyFor( selector );
+                key.cancel();
 
-                    selector.wakeup(); // wake up again to trigger thread death
+                selector.wakeup(); // wake up again to trigger thread death
 
-                    ssc.close();
-                }
+                serverSocketChannel.close();
+                serverSocketChannel = null;
             }
             catch( IOException e )
             {
@@ -535,10 +536,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
                 if( request.exception == null )
                 {
-                    getListeners().fireServiceDeactivated(
-                            this, request.address,
-                            request.registrationRequest.handler,
-                            request.registrationRequest.config );
+                    getListeners().fireServiceDeactivated();
                 }
             }
         }
@@ -546,31 +544,19 @@ public class SocketAcceptor extends BaseIoAcceptor
 
     private static class RegistrationRequest
     {
-        private final SocketAddress address;
-        private final IoHandler handler;
-        private final IoServiceConfig config;
-        private IOException exception;
+        private Throwable exception;
         private boolean done;
-
-        private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
-        {
-            this.address = address;
-            this.handler = handler;
-            this.config = config;
-        }
     }
 
 
     private static class CancellationRequest
     {
-        private final SocketAddress address;
         private boolean done;
-        private RegistrationRequest registrationRequest;
         private RuntimeException exception;
+    }
 
-        private CancellationRequest( SocketAddress address )
-        {
-            this.address = address;
-        }
+    public IoSession newSession( SocketAddress remoteAddress )
+    {
+        throw new UnsupportedOperationException();
     }
 }

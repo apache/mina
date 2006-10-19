@@ -24,7 +24,6 @@ import java.net.SocketAddress;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
@@ -45,7 +44,6 @@ public class VmPipeSessionImpl extends BaseIoSession
     private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
     
     private final IoService service;
-    private final IoServiceConfig serviceConfig;
     private final IoServiceListenerSupport serviceListeners;
     private final SocketAddress localAddress;
     private final SocketAddress remoteAddress;
@@ -60,12 +58,11 @@ public class VmPipeSessionImpl extends BaseIoSession
      * Constructor for client-side session.
      */
     public VmPipeSessionImpl(
-            IoService service, IoServiceConfig serviceConfig,
+            IoService service,
             IoServiceListenerSupport serviceListeners, Object lock, SocketAddress localAddress,
             IoHandler handler, VmPipe remoteEntry )
     {
         this.service = service;
-        this.serviceConfig = serviceConfig;
         this.serviceListeners = serviceListeners;
         this.lock = lock;
         this.localAddress = localAddress;
@@ -83,7 +80,6 @@ public class VmPipeSessionImpl extends BaseIoSession
     private VmPipeSessionImpl( VmPipeSessionImpl remoteSession, VmPipe entry )
     {
         this.service = entry.getAcceptor();
-        this.serviceConfig = entry.getConfig();
         this.serviceListeners = entry.getListeners();
         this.lock = remoteSession.lock;
         this.localAddress = this.serviceAddress = remoteSession.remoteAddress;
@@ -102,11 +98,6 @@ public class VmPipeSessionImpl extends BaseIoSession
     IoServiceListenerSupport getServiceListeners()
     {
         return serviceListeners;
-    }
-    
-    public IoServiceConfig getServiceConfig()
-    {
-        return serviceConfig;
     }
     
     public IoSessionConfig getConfig()

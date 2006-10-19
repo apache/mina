@@ -21,7 +21,6 @@ package org.apache.mina.transport.socket.nio.support;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -31,17 +30,15 @@ import java.util.Set;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
-import org.apache.mina.transport.socket.nio.DatagramConnectorConfig;
-import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
@@ -56,13 +53,17 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  */
 public class DatagramConnectorDelegate extends BaseIoConnector implements DatagramService
 {
+    private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
+
     private static volatile int nextId = 0;
+
+    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
+    private final IoSessionConfig sessionConfig = new DatagramSessionConfigImpl();
 
     private final IoConnector wrapper;
     private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
-    private DatagramConnectorConfig defaultConfig = new DatagramConnectorConfig();
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
     private final Queue flushingSessions = new Queue();
@@ -78,48 +79,19 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         this.executor = executor;
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
+    protected Class getAddressType()
     {
-        return connect( address, null, handler, config );
+        return InetSocketAddress.class;
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoServiceConfig config )
+    protected ConnectFuture doConnect()
     {
-        if( address == null )
-            throw new NullPointerException( "address" );
-        if( handler == null )
-            throw new NullPointerException( "handler" );
-
-        if( !( address instanceof InetSocketAddress ) )
-            throw new IllegalArgumentException( "Unexpected address type: "
-                                                + address.getClass() );
-        
-        if( localAddress != null && !( localAddress instanceof InetSocketAddress ) )
-        {
-            throw new IllegalArgumentException( "Unexpected local address type: "
-                                                + localAddress.getClass() );
-        }
-        
-        if( config == null )
-        {
-            config = getDefaultConfig();
-        }
-        
         DatagramChannel ch = null;
         boolean initialized = false;
         try
         {
             ch = DatagramChannel.open();
-            DatagramSessionConfig cfg;
-            if( config.getSessionConfig() instanceof DatagramSessionConfig )
-            {
-                cfg = ( DatagramSessionConfig ) config.getSessionConfig();
-            }
-            else
-            {
-                cfg = ( DatagramSessionConfig ) getDefaultConfig().getSessionConfig();
-            }
+            DatagramSessionConfig cfg = ( DatagramSessionConfig ) getSessionConfig();
             
             ch.socket().setReuseAddress( cfg.isReuseAddress() );
             ch.socket().setBroadcast( cfg.isBroadcast() );
@@ -131,11 +103,11 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 ch.socket().setTrafficClass( cfg.getTrafficClass() );
             }
 
-            if( localAddress != null )
+            if( getLocalAddress() != null )
             {
-                ch.socket().bind( localAddress );
+                ch.socket().bind( getLocalAddress() );
             }
-            ch.connect( address );
+            ch.connect( getRemoteAddress() );
             ch.configureBlocking( false );
             initialized = true;
         }
@@ -159,7 +131,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             }
         }
 
-        RegistrationRequest request = new RegistrationRequest( ch, handler, config );
+        RegistrationRequest request = new RegistrationRequest( ch );
         synchronized( this )
         {
             try
@@ -191,26 +163,26 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         return request;
     }
     
-    public IoServiceConfig getDefaultConfig()
+    public IoSessionRecycler getSessionRecycler()
     {
-        return defaultConfig;
+        return sessionRecycler;
     }
-    
-    /**
-     * Sets the config this connector will use by default.
-     * 
-     * @param defaultConfig the default config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setDefaultConfig( DatagramConnectorConfig defaultConfig )
+
+    // FIXME There can be a problem if a user changes the recycler after the service is activated.
+    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
     {
-        if( defaultConfig == null )
+        if( sessionRecycler == null )
         {
-            throw new NullPointerException( "defaultConfig" );
+            sessionRecycler = DEFAULT_RECYCLER;
         }
-        this.defaultConfig = defaultConfig;
+        this.sessionRecycler = sessionRecycler;
     }
-    
+
+    public IoSessionConfig getSessionConfig()
+    {
+        return sessionConfig;
+    }
+
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
@@ -431,7 +403,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     
     private DatagramSessionImpl getRecycledSession( IoSession session )
     {
-        IoSessionRecycler sessionRecycler = getSessionRecycler( session );
+        IoSessionRecycler sessionRecycler = getSessionRecycler();
         DatagramSessionImpl replaceSession = null;
 
         if ( sessionRecycler != null )
@@ -453,21 +425,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         return null;
     }
     
-    private IoSessionRecycler getSessionRecycler( IoSession session )
-    {
-        IoServiceConfig config = session.getServiceConfig();
-        IoSessionRecycler sessionRecycler;
-        if( config instanceof DatagramServiceConfig )
-        {
-            sessionRecycler = ( ( DatagramServiceConfig ) config ).getSessionRecycler();
-        }
-        else
-        {
-            sessionRecycler = defaultConfig.getSessionRecycler();
-        }
-        return sessionRecycler;
-    }
-
     private void readSession( DatagramSessionImpl session )
     {
 
@@ -611,8 +568,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             DatagramSessionImpl session = new DatagramSessionImpl(
                     wrapper, this,
-                    req.config,
-                    req.channel, req.handler,
+                    req.channel, getHandler(),
                     req.channel.socket().getRemoteSocketAddress() );
             
             // AbstractIoFilterChain will notify the connect future.
@@ -633,7 +589,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                             SelectionKey.OP_READ, session );
 
                     session.setSelectionKey( key );
-                    buildFilterChain( req, session );
+                    buildFilterChain( session );
                     // The CONNECT_FUTURE attribute is cleared and notified here.
                     getListeners().fireSessionCreated( session );
                 }
@@ -662,11 +618,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
     }
 
-    private void buildFilterChain( RegistrationRequest req, IoSession session ) throws Exception
+    private void buildFilterChain( IoSession session ) throws Exception
     {
         getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-        req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-        req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
+        getThreadModel().buildFilterChain( session.getFilterChain() );
     }
 
     private void cancelKeys()
@@ -709,16 +664,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private static class RegistrationRequest extends DefaultConnectFuture
     {
         private final DatagramChannel channel;
-        private final IoHandler handler;
-        private final IoServiceConfig config;
 
-        private RegistrationRequest( DatagramChannel channel,
-                                     IoHandler handler,
-                                     IoServiceConfig config )
+        private RegistrationRequest( DatagramChannel channel )
         {
             this.channel = channel;
-            this.handler = handler;
-            this.config = config;
         }
     }
 }

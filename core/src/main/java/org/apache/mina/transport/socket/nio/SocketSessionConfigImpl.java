@@ -19,21 +19,20 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IoConnectorConfig;
-import org.apache.mina.common.support.BaseIoSessionConfig;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.support.BaseIoSessionConfig;
+
 /**
- * An {@link IoConnectorConfig} for {@link SocketConnector}.
+ * The default implementation of {@link SocketSessionConfig}.
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
+class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
 {
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
@@ -152,7 +151,7 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
     /**
      * Creates a new instance.
      */
-    public SocketSessionConfigImpl()
+    SocketSessionConfigImpl()
     {
     }
 

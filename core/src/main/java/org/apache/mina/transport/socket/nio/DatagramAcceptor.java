@@ -20,6 +20,7 @@
 package org.apache.mina.transport.socket.nio;
 
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.support.DelegatedIoAcceptor;
 import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
@@ -32,7 +33,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptor extends DelegatedIoAcceptor
+public class DatagramAcceptor extends DelegatedIoAcceptor implements DatagramService
 {
     /**
      * Creates a new instance using a NewThreadExecutor
@@ -51,15 +52,14 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
     {
         init( new DatagramAcceptorDelegate( this, executor ) );
     }
-    
-    /**
-     * Sets the config this acceptor will use by default.
-     * 
-     * @param defaultConfig the default config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setDefaultConfig( DatagramAcceptorConfig defaultConfig )
+
+    public IoSessionRecycler getSessionRecycler()
     {
-        ( ( DatagramAcceptorDelegate ) delegate ).setDefaultConfig( defaultConfig );
-    }    
+        return ( ( DatagramAcceptorDelegate ) delegate ).getSessionRecycler();
+    }
+
+    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
+    {
+        ( ( DatagramAcceptorDelegate ) delegate ).setSessionRecycler( sessionRecycler );
+    }
 }

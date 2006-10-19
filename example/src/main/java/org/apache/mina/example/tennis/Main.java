@@ -49,12 +49,15 @@ public class Main
         VmPipeAddress address = new VmPipeAddress( 8080 );
 
         // Set up server
-        acceptor.bind( address, new TennisPlayer() );
+        acceptor.setLocalAddress( address );
+        acceptor.setHandler( new TennisPlayer() );
+        acceptor.bind();
 
         // Connect to the server.
         VmPipeConnector connector = new VmPipeConnector();
-        ConnectFuture future = connector.connect( address,
-                                                  new TennisPlayer() );
+        connector.setRemoteAddress( address );
+        connector.setHandler( new TennisPlayer() );
+        ConnectFuture future = connector.connect();
         future.join();
         IoSession session = future.getSession();
 
@@ -64,6 +67,6 @@ public class Main
         // Wait until the match ends.
         session.getCloseFuture().join();
         
-        acceptor.unbind( address );
+        acceptor.unbind();
     }
 }

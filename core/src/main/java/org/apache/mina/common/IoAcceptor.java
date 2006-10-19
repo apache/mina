@@ -44,46 +44,59 @@ import java.net.SocketAddress;
 public interface IoAcceptor extends IoService
 {
     /**
-     * Binds to the specified <code>address</code> and handles incoming
-     * connections with the specified <code>handler</code>.
+     * Returns the local address to bind.
+     */
+    SocketAddress getLocalAddress();
+    
+    /**
+     * Sets the local address to bind.
+     * 
+     * @throws IllegalStateException if this service is already running.
+     */
+    void setLocalAddress( SocketAddress localAddress );
+    
+    /**
+     * Returns <tt>true</tt> if and only if all clients are disconnected
+     * when this acceptor unbinds the related local address.
+     */
+    boolean isDisconnectOnUnbind();
+    
+    /**
+     * Sets whether all clients are disconnected when this acceptor unbinds the
+     * related local address.  The default value is <tt>true</tt>.
+     */
+    void setDisconnectOnUnbind( boolean disconnectOnUnbind );
+
+    /**
+     * Bind to the configured local address and start to accept incoming connections.
      * 
      * @throws IOException if failed to bind
      */
-    void bind( SocketAddress address, IoHandler handler ) throws IOException;
-
-    /**
-     * Binds to the specified <code>address</code> and handles incoming
-     * connections with the specified <code>handler</code>.
-     *
-     * @param config the configuration
-     * @throws IOException if failed to bind
-     */
-    void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException;
-
-    /**
-     * Unbinds from the specified <code>address</code> and disconnects all clients
-     * connected there.
-     */
-    void unbind( SocketAddress address );
-
-    /**
-     * Unbinds all addresses which were bound by this acceptor.
-     */
-    void unbindAll();
+    void bind() throws IOException;
     
     /**
-     * (Optional) Returns an {@link IoSession} that is bound to the specified
-     * <tt>localAddress</tt> and <tt>remoteAddress</tt> which reuses
-     * the <tt>localAddress</tt> that is already bound by {@link IoAcceptor}
-     * via {@link #bind(SocketAddress, IoHandler)}.
+     * Unbind from the configured local address and stop to accept incoming connections.
+     * All managed connections will be closed if <tt>disconnectOnUnbind</tt> property is set.
+     * This method does nothing if not bound yet.
+     */
+    void unbind();
+    
+    /**
+     * Returns <tt>true</tt> if and if only this service is bound to the local address.
+     */
+    boolean isBound();
+
+    /**
+     * (Optional) Returns an {@link IoSession} that is bound to the current
+     * local address and the specified <tt>remoteAddress</tt> which reuses
+     * the local address that is already bound by this service.
      * <p>
      * This operation is optional.  Please throw {@link UnsupportedOperationException}
      * if the transport type doesn't support this operation.  This operation is
      * usually implemented for connectionless transport types.
      * 
      * @throws UnsupportedOperationException if this operation is not supported
-     * @throws IllegalArgumentException if the specified <tt>localAddress</tt> is
-     *                                  not bound yet. (see {@link #bind(SocketAddress, IoHandler)})
+     * @throws IllegalStateException if this service is not running.
      */
-    IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress );
+    IoSession newSession( SocketAddress remoteAddress );
 }

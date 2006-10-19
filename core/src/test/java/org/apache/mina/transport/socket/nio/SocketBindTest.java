@@ -55,13 +55,13 @@ public class SocketBindTest extends AbstractBindTest
         // TODO: This test is almost identical to the test with the same name in VmPipeBindTest
         bind( false );
         
-        SocketAddress addr = createSocketAddress( port );
-     
         IoConnector connector = new SocketConnector();
         IoSession[] sessions = new IoSession[ 5 ];
+        connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
+        connector.setHandler( new IoHandlerAdapter() );
         for( int i = 0; i < sessions.length; i++ )
         {
-            ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ), new IoHandlerAdapter() );
+            ConnectFuture future = connector.connect();
             future.join();
             sessions[ i ] = future.getSession();
             Assert.assertTrue( sessions[ i ].isConnected() );
@@ -70,10 +70,10 @@ public class SocketBindTest extends AbstractBindTest
         // Wait for the server side sessions to be created.
         Thread.sleep( 500 );
         
-        Collection managedSessions = acceptor.getManagedSessions( addr );
+        Collection managedSessions = acceptor.getManagedSessions();
         Assert.assertEquals( 5, managedSessions.size() );
         
-        acceptor.unbind( addr );
+        acceptor.unbind();
         
         // Wait for the client side sessions to close.
         Thread.sleep( 500 );

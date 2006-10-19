@@ -47,32 +47,33 @@ public abstract class AbstractConnectorTest extends TestCase {
     {
         int port = AvailablePortFinder.getNextAvailable( 1025 );
         IoAcceptor acceptor = createAcceptor();
-        acceptor.bind( new InetSocketAddress( port ), new IoHandlerAdapter() );
+        acceptor.setLocalAddress( new InetSocketAddress( port ) );
+        acceptor.setHandler( new IoHandlerAdapter() );
+        acceptor.bind();
         
         try
         {
             final StringBuffer buf = new StringBuffer();
             IoConnector connector = createConnector();
-            ConnectFuture future = connector.connect(
-                    new InetSocketAddress( "localhost", port ),
-                    new IoHandlerAdapter()
-                    {
-                        public void sessionCreated( IoSession session )
-                        {
-                            buf.append( "1" );
-                        }
-                        
-                        public void sessionOpened( IoSession session )
-                        {
-                            buf.append( "2" );
-                        }
-                        
-                        public void exceptionCaught( IoSession session, Throwable cause )
-                        {
-                            buf.append( "X" );
-                        }
-                    });
-            
+            connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
+            connector.setHandler( new IoHandlerAdapter()
+            {
+                public void sessionCreated( IoSession session )
+                {
+                    buf.append( "1" );
+                }
+                
+                public void sessionOpened( IoSession session )
+                {
+                    buf.append( "2" );
+                }
+                
+                public void exceptionCaught( IoSession session, Throwable cause )
+                {
+                    buf.append( "X" );
+                }
+            });
+            ConnectFuture future = connector.connect();
             future.join();
             buf.append("3");
             future.getSession().close();
@@ -80,7 +81,7 @@ public abstract class AbstractConnectorTest extends TestCase {
         }
         finally
         {
-            acceptor.unbind( new InetSocketAddress( port ) );
+            acceptor.unbind();
         }
     }
 
@@ -90,26 +91,25 @@ public abstract class AbstractConnectorTest extends TestCase {
         final StringBuffer buf = new StringBuffer();
 
         IoConnector connector = createConnector();
-        ConnectFuture future = connector.connect(
-                new InetSocketAddress( "localhost", port ),
-                new IoHandlerAdapter()
-                {
-                    public void sessionCreated( IoSession session )
-                    {
-                        buf.append( "X" );
-                    }
-                    
-                    public void sessionOpened( IoSession session )
-                    {
-                        buf.append( "Y" );
-                    }
-                    
-                    public void exceptionCaught( IoSession session, Throwable cause )
-                    {
-                        buf.append( "Z" );
-                    }
-                });
-        
+        connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
+        connector.setHandler( new IoHandlerAdapter()
+        {
+            public void sessionCreated( IoSession session )
+            {
+                buf.append( "X" );
+            }
+            
+            public void sessionOpened( IoSession session )
+            {
+                buf.append( "Y" );
+            }
+            
+            public void exceptionCaught( IoSession session, Throwable cause )
+            {
+                buf.append( "Z" );
+            }
+        });
+        ConnectFuture future = connector.connect();
         future.join();
         buf.append("1");
         try

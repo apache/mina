@@ -23,7 +23,6 @@ import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoHandler;
 
 /**
  * A base implementation of {@link IoConnector}.
@@ -33,17 +32,89 @@ import org.apache.mina.common.IoHandler;
  */
 public abstract class BaseIoConnector extends BaseIoService implements IoConnector
 {
+    private SocketAddress localAddress;
+    private SocketAddress remoteAddress;
+    private int connectTimeout = 60; // 1 minute
+
     protected BaseIoConnector()
     {
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler )
+    public SocketAddress getServiceAddress()
     {
-        return connect( address, handler, getDefaultConfig() );
+        return getRemoteAddress();
+    }
+    
+    public SocketAddress getLocalAddress()
+    {
+        return localAddress;
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler )
+    public void setLocalAddress( SocketAddress localAddress )
     {
-        return connect( address, localAddress, handler, getDefaultConfig() );
+        if( localAddress != null && !getAddressType().isAssignableFrom( localAddress.getClass() ) )
+        {
+            throw new IllegalArgumentException(
+                    "localAddress type: " + localAddress.getClass() + 
+                    " (expected: " + getAddressType() + ")");
+        }
+
+        this.localAddress = localAddress;
     }
+
+    public SocketAddress getRemoteAddress()
+    {
+        return remoteAddress;
+    }
+
+    public void setRemoteAddress( SocketAddress remoteAddress )
+    {
+        if( remoteAddress == null )
+        {
+            throw new NullPointerException( "remoteAddress" );
+        }
+
+        if( !getAddressType().isAssignableFrom( remoteAddress.getClass() ) )
+        {
+            throw new IllegalArgumentException(
+                    "remoteAddress type: " + remoteAddress.getClass() + 
+                    " (expected: " + getAddressType() + ")");
+        }
+
+        this.remoteAddress = remoteAddress;
+    }
+
+    public int getConnectTimeout()
+    {
+        return connectTimeout;
+    }
+
+    public long getConnectTimeoutMillis()
+    {
+        return connectTimeout * 1000L;
+    }
+
+    public void setConnectTimeout( int connectTimeout )
+    {
+        if( connectTimeout <= 0 )
+        {
+            throw new IllegalArgumentException( "connectTimeout: " + connectTimeout );
+        }
+        this.connectTimeout = connectTimeout;
+    }
+    
+    public final ConnectFuture connect()
+    {
+        if( getRemoteAddress() == null )
+            throw new IllegalStateException( "remoteAddress is not set." );
+        if( getHandler() == null )
+            throw new IllegalStateException( "handler is not set." );
+
+        return doConnect();
+    }
+
+    /**
+     * Implement this method to perform the actual connect operation.
+     */
+    protected abstract ConnectFuture doConnect();
 }

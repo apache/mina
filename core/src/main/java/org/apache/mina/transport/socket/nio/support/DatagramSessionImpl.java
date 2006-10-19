@@ -28,7 +28,6 @@ import org.apache.mina.common.BroadcastIoSession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
@@ -36,7 +35,6 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.Queue;
 
@@ -49,7 +47,6 @@ import org.apache.mina.util.Queue;
 class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 {
     private final IoService wrapperManager;
-    private final IoServiceConfig serviceConfig;
     private final DatagramSessionConfig config = new SessionConfigImpl();
     private final DatagramService managerDelegate;
     private final DatagramFilterChain filterChain;
@@ -67,7 +64,6 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
      */
     DatagramSessionImpl( IoService wrapperManager,
                          DatagramService managerDelegate,
-                         IoServiceConfig serviceConfig,
                          DatagramChannel ch, IoHandler defaultHandler,
                          SocketAddress serviceAddress )
     {
@@ -83,10 +79,9 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         // the case that getLocalSocketAddress() returns IPv6 address while
         // serviceAddress represents the same address in IPv4.
         this.localAddress = this.serviceAddress = serviceAddress;
-        this.serviceConfig = serviceConfig;
 
         // Apply the initial session settings
-        IoSessionConfig sessionConfig = serviceConfig.getSessionConfig();
+        IoSessionConfig sessionConfig = wrapperManager.getSessionConfig();
         if( sessionConfig instanceof DatagramSessionConfig )
         {
             DatagramSessionConfig cfg = ( DatagramSessionConfig ) sessionConfig;
@@ -106,11 +101,6 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     public IoService getService()
     {
         return wrapperManager;
-    }
-
-    public IoServiceConfig getServiceConfig()
-    {
-        return serviceConfig;
     }
 
     public IoSessionConfig getConfig()
@@ -150,11 +140,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     
     protected void close0()
     {
-        IoServiceConfig config = getServiceConfig();
-        if( config instanceof DatagramServiceConfig )
-        {
-            ( ( DatagramServiceConfig ) config ).getSessionRecycler().remove( this );
-        }
+        managerDelegate.getSessionRecycler().remove( this );
         filterChain.fireFilterClose( this );
     }
 

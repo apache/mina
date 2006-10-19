@@ -19,8 +19,6 @@
  */
 package org.apache.mina.example.proxy;
 
-import java.net.InetSocketAddress;
-
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFuture;
@@ -38,21 +36,19 @@ import org.apache.mina.common.TrafficMask;
  */
 public class ClientToProxyIoHandler extends AbstractProxyIoHandler
 {
-    private final ServerToProxyIoHandler connectorHandler; 
+    private final ServerToProxyIoHandler connectorHandler = new ServerToProxyIoHandler(); 
     private final IoConnector connector; 
-    private final InetSocketAddress address;
 
-    public ClientToProxyIoHandler( ServerToProxyIoHandler connectorHandler, 
-                        IoConnector connector, InetSocketAddress address )
+    public ClientToProxyIoHandler( IoConnector connector )
     {
-        this.connectorHandler = connectorHandler;
         this.connector = connector;
-        this.address = address;
+        connector.setHandler( connectorHandler );
     }
 
     public void sessionOpened( final IoSession session ) throws Exception 
     {
-        connector.connect( address, connectorHandler ).addListener( 
+        
+        connector.connect().addListener( 
                 new IoFutureListener()
         {
             public void operationComplete( IoFuture f )

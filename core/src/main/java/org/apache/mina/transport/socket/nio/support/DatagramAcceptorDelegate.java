@@ -25,25 +25,21 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
-import org.apache.mina.transport.socket.nio.DatagramAcceptorConfig;
-import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
@@ -58,13 +54,17 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  */
 public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAcceptor, DatagramService
 {
+    private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
+    
     private static volatile int nextId = 0;
 
+    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
+    private final IoSessionConfig sessionConfig = new DatagramSessionConfigImpl();
+        
     private final IoAcceptor wrapper;
     private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
-    private DatagramAcceptorConfig defaultConfig = new DatagramAcceptorConfig();
     private final Map channels = new HashMap();
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
@@ -80,25 +80,17 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         this.executor = executor;
     }
 
-    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config )
-            throws IOException
+    protected Class getAddressType()
     {
-        if( address == null )
-            throw new NullPointerException( "address" );
-        if( handler == null )
-            throw new NullPointerException( "handler" );
-        if( config == null )
-        {
-            config = getDefaultConfig();
-        }
+        return InetSocketAddress.class;
+    }
 
-        if( !( address instanceof InetSocketAddress ) )
-            throw new IllegalArgumentException( "Unexpected address type: "
-                                                + address.getClass() );
-        if( ( ( InetSocketAddress ) address ).getPort() == 0 )
+    protected void doBind() throws IOException
+    {
+        if( ( ( InetSocketAddress ) getLocalAddress() ).getPort() == 0 )
             throw new IllegalArgumentException( "Unsupported port number: 0" );
         
-        RegistrationRequest request = new RegistrationRequest( address, handler, config );
+        RegistrationRequest request = new RegistrationRequest();
         synchronized( this )
         {
             synchronized( registerQueue )
@@ -129,12 +121,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
 
-    public void unbind( SocketAddress address )
+    protected void doUnbind()
     {
-        if( address == null )
-            throw new NullPointerException( "address" );
-
-        CancellationRequest request = new CancellationRequest( address );
+        CancellationRequest request = new CancellationRequest();
         synchronized( this )
         {
             try
@@ -147,7 +136,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 // running and failed to open a selector.  We simply throw
                 // IllegalArgumentException here because we can simply
                 // conclude that nothing is bound to the selector.
-                throw new IllegalArgumentException( "Address not bound: " + address );
+                throw new IllegalArgumentException( "Address not bound: " + getLocalAddress() );
             }
 
             synchronized( cancelQueue )
@@ -177,50 +166,35 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
     
-    public void unbindAll()
-    {
-        List addresses;
-        synchronized( channels )
-        {
-            addresses = new ArrayList( channels.keySet() );
-        }
-        
-        for( Iterator i = addresses.iterator(); i.hasNext(); )
-        {
-            unbind( ( SocketAddress ) i.next() );
-        }
-    }
-    
-    public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
+    public IoSession newSession( SocketAddress remoteAddress )
     {
         if( remoteAddress == null )
         {
             throw new NullPointerException( "remoteAddress" );
         }
-        if( localAddress == null )
+        if( getLocalAddress() == null )
         {
             throw new NullPointerException( "localAddress" );
         }
         
         Selector selector = this.selector;
-        DatagramChannel ch = ( DatagramChannel ) channels.get( localAddress );
+        DatagramChannel ch = ( DatagramChannel ) channels.get( getLocalAddress() );
         if( selector == null || ch == null )
         {
-            throw new IllegalArgumentException( "Unknown localAddress: " + localAddress );
+            throw new IllegalArgumentException( "Unknown localAddress: " + getLocalAddress() );
         }
             
         SelectionKey key = ch.keyFor( selector );
         if( key == null )
         {
-            throw new IllegalArgumentException( "Unknown localAddress: " + localAddress );
+            throw new IllegalArgumentException( "Unknown localAddress: " + getLocalAddress() );
         }
 
-        RegistrationRequest req = ( RegistrationRequest ) key.attachment();
         IoSession session;
-        IoSessionRecycler sessionRecycler = getSessionRecycler( req );
+        IoSessionRecycler sessionRecycler = getSessionRecycler();
         synchronized ( sessionRecycler )
         {
-            session = sessionRecycler.recycle( localAddress, remoteAddress );
+            session = sessionRecycler.recycle( getLocalAddress(), remoteAddress );
             if( session != null )
             {
                 return session;
@@ -228,19 +202,17 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
             // If a new session needs to be created.
             DatagramSessionImpl datagramSession = new DatagramSessionImpl(
-                    wrapper, this,
-                    req.config, ch, req.handler,
-                    req.address );
+                    wrapper, this, ch, getHandler(), getLocalAddress() );
             datagramSession.setRemoteAddress( remoteAddress );
             datagramSession.setSelectionKey( key );
             
-            getSessionRecycler( req ).put( datagramSession );
+            getSessionRecycler().put( datagramSession );
             session = datagramSession;
         }
         
         try
         {
-            buildFilterChain( req, session );
+            buildFilterChain( session );
             getListeners().fireSessionCreated( session );
         }
         catch( Throwable t )
@@ -251,50 +223,44 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         return session;
     }
 
-    private IoSessionRecycler getSessionRecycler( RegistrationRequest req )
+    public IoSessionRecycler getSessionRecycler()
     {
-        IoSessionRecycler sessionRecycler;
-        if( req.config instanceof DatagramServiceConfig )
-        {
-            sessionRecycler = ( ( DatagramServiceConfig ) req.config ).getSessionRecycler();
-        }
-        else
-        {
-            sessionRecycler = defaultConfig.getSessionRecycler();
-        }
         return sessionRecycler;
     }
-    
+
+    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
+    {
+        synchronized( bindLock )
+        {
+            if( isBound() )
+            {
+                throw new IllegalStateException(
+                        "sessionRecycler can't be set while the acceptor is bound." );
+            }
+
+            if( sessionRecycler == null )
+            {
+                sessionRecycler = DEFAULT_RECYCLER;
+            }
+            this.sessionRecycler = sessionRecycler;
+        }
+    }
+
+
+    public IoSessionConfig getSessionConfig()
+    {
+        return sessionConfig;
+    }
+
     public IoServiceListenerSupport getListeners()
     {
         return super.getListeners();
     }
 
-    private void buildFilterChain( RegistrationRequest req, IoSession session ) throws Exception
+    private void buildFilterChain( IoSession session ) throws Exception
     {
         this.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-        req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-        req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
-    }
-    
-    public IoServiceConfig getDefaultConfig()
-    {
-        return defaultConfig;
-    }
-    
-    /**
-     * Sets the config this acceptor will use by default.
-     * 
-     * @param defaultConfig the default config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setDefaultConfig( DatagramAcceptorConfig defaultConfig )
-    {
-        if( defaultConfig == null )
-        {
-            throw new NullPointerException( "defaultConfig" );
-        }
-        this.defaultConfig = defaultConfig;
+        this.getThreadModel().buildFilterChain( session.getFilterChain() );
     }
     
     private synchronized void startupWorker() throws IOException
@@ -403,17 +369,16 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
             DatagramChannel ch = ( DatagramChannel ) key.channel();
 
-            RegistrationRequest req = ( RegistrationRequest ) key.attachment();
             try
             {
                 if( key.isReadable() )
                 {
-                    readSession( ch, req );
+                    readSession( ch );
                 }
 
                 if( key.isWritable() )
                 {
-                    for( Iterator i = getManagedSessions( req.address ).iterator();
+                    for( Iterator i = getManagedSessions().iterator();
                          i.hasNext(); )
                     {
                         scheduleFlush( ( DatagramSessionImpl ) i.next() );
@@ -427,10 +392,10 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
 
-    private void readSession( DatagramChannel channel, RegistrationRequest req ) throws Exception
+    private void readSession( DatagramChannel channel ) throws Exception
     {
         ByteBuffer readBuf = ByteBuffer.allocate(
-                ( ( DatagramSessionConfig ) req.config.getSessionConfig() ).getReceiveBufferSize() );
+                ( ( DatagramSessionConfig ) getSessionConfig() ).getReceiveBufferSize() );
         try
         {
             SocketAddress remoteAddress = channel.receive(
@@ -438,7 +403,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             if( remoteAddress != null )
             {
                 DatagramSessionImpl session =
-                    ( DatagramSessionImpl ) newSession( remoteAddress, req.address );
+                    ( DatagramSessionImpl ) newSession( remoteAddress );
 
                 readBuf.flip();
 
@@ -579,16 +544,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             try
             {
                 ch = DatagramChannel.open();
-                DatagramSessionConfig cfg;
-                if( req.config.getSessionConfig() instanceof DatagramSessionConfig )
-                {
-                    cfg = ( DatagramSessionConfig ) req.config.getSessionConfig();
-                }
-                else
-                {
-                    cfg = ( DatagramSessionConfig ) getDefaultConfig().getSessionConfig();
-                }
-
+                DatagramSessionConfig cfg = ( DatagramSessionConfig ) getSessionConfig();
                 ch.socket().setReuseAddress( cfg.isReuseAddress() );
                 ch.socket().setBroadcast( cfg.isBroadcast() );
                 ch.socket().setReceiveBufferSize( cfg.getReceiveBufferSize() );
@@ -600,15 +556,14 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 }
 
                 ch.configureBlocking( false );
-                ch.socket().bind( req.address );
+                ch.socket().bind( getLocalAddress() );
                 ch.register( selector, SelectionKey.OP_READ, req );
                 synchronized( channels )
                 {
-                    channels.put( req.address, ch );
+                    channels.put( getLocalAddress(), ch );
                 }
                 
-                getListeners().fireServiceActivated(
-                        this, req.address, req.handler, req.config);
+                getListeners().fireServiceActivated();
             }
             catch( Throwable t )
             {
@@ -659,7 +614,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             DatagramChannel ch;
             synchronized( channels )
             {
-                ch = ( DatagramChannel ) channels.remove( request.address );
+                ch = ( DatagramChannel ) channels.remove( getLocalAddress() );
             }
 
             // close the channel
@@ -668,12 +623,11 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 if( ch == null )
                 {
                     request.exception = new IllegalArgumentException(
-                            "Address not bound: " + request.address );
+                            "Address not bound: " + getLocalAddress() );
                 }
                 else
                 {
                     SelectionKey key = ch.keyFor( selector );
-                    request.registrationRequest = ( RegistrationRequest ) key.attachment();
                     key.cancel();
                     selector.wakeup(); // wake up again to trigger thread death
                     ch.disconnect();
@@ -694,10 +648,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
                 if( request.exception == null )
                 {
-                    getListeners().fireServiceDeactivated(
-                            this, request.address,
-                            request.registrationRequest.handler,
-                            request.registrationRequest.config );
+                    getListeners().fireServiceDeactivated();
                 }
             }
         }
@@ -712,31 +663,13 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
     private static class RegistrationRequest
     {
-        private final SocketAddress address;
-        private final IoHandler handler;
-        private final IoServiceConfig config;
-
         private Throwable exception; 
         private boolean done;
-        
-        private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
-        {
-            this.address = address;
-            this.handler = handler;
-            this.config = config;
-        }
     }
 
     private static class CancellationRequest
     {
-        private final SocketAddress address;
         private boolean done;
-        private RegistrationRequest registrationRequest;
         private RuntimeException exception;
-        
-        private CancellationRequest( SocketAddress address )
-        {
-            this.address = address;
-        }
     }
 }

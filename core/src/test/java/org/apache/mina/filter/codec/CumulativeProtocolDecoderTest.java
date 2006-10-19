@@ -30,9 +30,8 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoSession;
@@ -228,11 +227,6 @@ public class CumulativeProtocolDecoderTest extends TestCase
         }
 
         public IoService getService()
-        {
-            return null;
-        }
-
-        public IoServiceConfig getServiceConfig()
         {
             return null;
         }
