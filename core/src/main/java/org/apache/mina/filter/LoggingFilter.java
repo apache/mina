@@ -54,7 +54,8 @@ public class LoggingFilter extends IoFilterAdapter
     
     public void sessionCreated( NextFilter nextFilter, IoSession session )
     {
-        nextFilter.sessionCreated( session );
+    	SessionLog.info( session, "CREATED" );
+    	nextFilter.sessionCreated( session );
     }
     
     public void sessionOpened( NextFilter nextFilter, IoSession session )
