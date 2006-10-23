@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TrafficMask;
@@ -447,6 +448,19 @@ public abstract class BaseIoSession implements IoSession
         else
             throw new IllegalArgumentException( "Unknown idle status: "
                                                 + status );
+    }
+    
+    public SocketAddress getServiceAddress()
+    {
+        IoService service = getService();
+        if( service instanceof IoAcceptor )
+        {
+            return ( ( IoAcceptor ) service ).getLocalAddress();
+        }
+        else
+        {
+            return getRemoteAddress();
+        }
     }
     
     public String toString()

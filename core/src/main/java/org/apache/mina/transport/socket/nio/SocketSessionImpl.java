@@ -24,7 +24,6 @@ import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -173,18 +172,6 @@ class SocketSessionImpl extends BaseIoSession
     public SocketAddress getLocalAddress()
     {
         return ch.socket().getLocalSocketAddress();
-    }
-
-    public SocketAddress getServiceAddress()
-    {
-        if( getService() instanceof IoAcceptor )
-        {
-            return getLocalAddress();
-        }
-        else
-        {
-            return getRemoteAddress();
-        }
     }
 
     protected void updateTrafficMask()
