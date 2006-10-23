@@ -118,8 +118,8 @@ public class ConnectorTest extends AbstractTest
                 {
                     connector.setHandler( handler );
                     ConnectFuture future = connector.connect(
-                            new InetSocketAddress( clientPort ),
-                            new InetSocketAddress( "localhost", port ) );
+                            new InetSocketAddress( "localhost", port ),
+                            new InetSocketAddress( clientPort ) );
                     future.join();
                     session = future.getSession();
                     break;
