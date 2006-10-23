@@ -62,10 +62,9 @@ public class DatagramRecyclerTest extends TestCase
         
         try
         {
-            connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
             connector.setHandler( connectorHandler );
             connector.setSessionRecycler( recycler );
-            ConnectFuture future = connector.connect();
+            ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
             future.join();
             
             // Write whatever to trigger the acceptor.

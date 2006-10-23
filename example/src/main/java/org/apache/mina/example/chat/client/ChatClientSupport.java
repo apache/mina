@@ -70,9 +70,8 @@ public class ChatClientSupport
                 connector.getFilterChain().addLast( "sslFilter", sslFilter );
             }
      
-            connector.setRemoteAddress( address );
             connector.setHandler( handler );
-            ConnectFuture future1 = connector.connect();
+            ConnectFuture future1 = connector.connect( address );
             future1.join();
             if( ! future1.isConnected() )
             {

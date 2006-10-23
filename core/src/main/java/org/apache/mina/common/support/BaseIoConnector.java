@@ -32,63 +32,10 @@ import org.apache.mina.common.IoConnector;
  */
 public abstract class BaseIoConnector extends BaseIoService implements IoConnector
 {
-    private SocketAddress localAddress;
-    private SocketAddress remoteAddress;
     private int connectTimeout = 60; // 1 minute
-    private boolean calledConnect;
 
     protected BaseIoConnector()
     {
-    }
-
-    public SocketAddress getServiceAddress()
-    {
-        return getRemoteAddress();
-    }
-    
-    public SocketAddress getLocalAddress()
-    {
-        return localAddress;
-    }
-
-    public void setLocalAddress( SocketAddress localAddress )
-    {
-        if( localAddress != null && !getAddressType().isAssignableFrom( localAddress.getClass() ) )
-        {
-            throw new IllegalArgumentException(
-                    "localAddress type: " + localAddress.getClass() + 
-                    " (expected: " + getAddressType() + ")");
-        }
-
-        this.localAddress = localAddress;
-    }
-
-    public SocketAddress getRemoteAddress()
-    {
-        return remoteAddress;
-    }
-
-    public void setRemoteAddress( SocketAddress remoteAddress )
-    {
-        if( remoteAddress == null )
-        {
-            throw new NullPointerException( "remoteAddress" );
-        }
-
-        if( !getAddressType().isAssignableFrom( remoteAddress.getClass() ) )
-        {
-            throw new IllegalArgumentException(
-                    "remoteAddress type: " + remoteAddress.getClass() + 
-                    " (expected: " + getAddressType() + ")");
-        }
-        
-        if( calledConnect )
-        {
-            throw new IllegalStateException(
-                    "remoteAddress property can't be set after connect() is called." );
-        }
-
-        this.remoteAddress = remoteAddress;
     }
 
     public int getConnectTimeout()
@@ -110,20 +57,40 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
         this.connectTimeout = connectTimeout;
     }
     
-    public final ConnectFuture connect()
+    public final ConnectFuture connect( SocketAddress remoteAddress )
     {
-        if( getRemoteAddress() == null )
-            throw new IllegalStateException( "remoteAddress is not set." );
+        return connect( remoteAddress, null );
+    }
+    
+    public final ConnectFuture connect( SocketAddress remoteAddress, SocketAddress localAddress )
+    {
+        if( remoteAddress == null )
+            throw new NullPointerException( "remoteAddress" );
+        
+        if( !getAddressType().isAssignableFrom( remoteAddress.getClass() ) )
+        {
+            throw new IllegalArgumentException(
+                    "remoteAddress type: " + remoteAddress.getClass() + 
+                    " (expected: " + getAddressType() + ")");
+        }
+
+        if( localAddress != null && !getAddressType().isAssignableFrom( localAddress.getClass() ) )
+        {
+            throw new IllegalArgumentException(
+                    "localAddress type: " + localAddress.getClass() + 
+                    " (expected: " + getAddressType() + ")");
+        }
+        
         if( getHandler() == null )
             throw new IllegalStateException( "handler is not set." );
-
-        calledConnect = true;
         
-        return doConnect();
+        return doConnect( remoteAddress, localAddress );
     }
 
     /**
      * Implement this method to perform the actual connect operation.
+     * 
+     * @param localAddress <tt>null</tt> if no local address is specified
      */
-    protected abstract ConnectFuture doConnect();
+    protected abstract ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress );
 }

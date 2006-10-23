@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -35,6 +36,7 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
+import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.Queue;
@@ -137,7 +139,7 @@ public class SocketConnector extends BaseIoConnector
         this.workerTimeout = workerTimeout;
     }
 
-    protected ConnectFuture doConnect()
+    protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
         SocketChannel ch = null;
         boolean success = false;
@@ -145,16 +147,16 @@ public class SocketConnector extends BaseIoConnector
         {
             ch = SocketChannel.open();
             ch.socket().setReuseAddress( true );
-            if( getLocalAddress() != null )
+            if( localAddress != null )
             {
-                ch.socket().bind( getLocalAddress() );
+                ch.socket().bind( localAddress );
             }
 
             ch.configureBlocking( false );
 
-            if( ch.connect( getRemoteAddress() ) )
+            if( ch.connect( remoteAddress ) )
             {
-                DefaultConnectFuture future = new DefaultConnectFuture();
+                ConnectFuture future = new DefaultConnectFuture();
                 newSession( ch, future );
                 success = true;
                 return future;
@@ -332,7 +334,7 @@ public class SocketConnector extends BaseIoConnector
         throws IOException
     {
         SocketSessionImpl session =
-            new SocketSessionImpl( this, getListeners(), nextProcessor(), ch );
+            new SocketSessionImpl( this, nextProcessor(), ch );
 
         try
         {
@@ -439,5 +441,10 @@ public class SocketConnector extends BaseIoConnector
             this.channel = channel;
             this.deadline = System.currentTimeMillis() + getConnectTimeoutMillis();
         }
+    }
+
+    protected IoServiceListenerSupport getListeners()
+    {
+        return super.getListeners();
     }
 }

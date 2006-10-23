@@ -81,7 +81,6 @@ public class Client
         }
         connector.getFilterChain().addLast( "logger", new LoggingFilter() );
         
-        connector.setRemoteAddress( new InetSocketAddress( HOSTNAME, PORT ) );
         connector.setHandler( new ClientSessionHandler( values ) );
         
         IoSession session;
@@ -89,7 +88,8 @@ public class Client
         {
             try
             {
-                ConnectFuture future = connector.connect();
+                ConnectFuture future = connector.connect(
+                        new InetSocketAddress( HOSTNAME, PORT ) );
                 future.join();
                 session = future.getSession();
                 break;

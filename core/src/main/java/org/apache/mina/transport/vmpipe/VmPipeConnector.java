@@ -20,6 +20,7 @@
 package org.apache.mina.transport.vmpipe;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
@@ -58,13 +59,13 @@ public class VmPipeConnector extends BaseIoConnector
         return VmPipeAddress.class;
     }
 
-    protected ConnectFuture doConnect()
+    protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
-        VmPipe entry = ( VmPipe ) VmPipeAcceptor.boundHandlers.get( getRemoteAddress() );
+        VmPipe entry = ( VmPipe ) VmPipeAcceptor.boundHandlers.get( remoteAddress );
         if( entry == null )
         {
             return DefaultConnectFuture.newFailedFuture(
-                    new IOException( "Endpoint unavailable: " + getRemoteAddress() ) );
+                    new IOException( "Endpoint unavailable: " + remoteAddress ) );
         }
 
         DefaultConnectFuture future = new DefaultConnectFuture();

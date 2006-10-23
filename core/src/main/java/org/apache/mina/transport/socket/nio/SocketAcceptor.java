@@ -36,6 +36,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoAcceptor;
+import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.Queue;
@@ -393,7 +394,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                 try
                 {
                     SocketSessionImpl session = new SocketSessionImpl(
-                            SocketAcceptor.this, getListeners(), nextProcessor(), ch );
+                            SocketAcceptor.this, nextProcessor(), ch );
                     getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     getThreadModel().buildFilterChain( session.getFilterChain() );
                     session.getIoProcessor().addNew( session );
@@ -558,5 +559,10 @@ public class SocketAcceptor extends BaseIoAcceptor
     public IoSession newSession( SocketAddress remoteAddress )
     {
         throw new UnsupportedOperationException();
+    }
+    
+    protected IoServiceListenerSupport getListeners()
+    {
+        return super.getListeners();
     }
 }

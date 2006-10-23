@@ -47,11 +47,6 @@ public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor
     {
     }
     
-    public SocketAddress getServiceAddress()
-    {
-        return getLocalAddress();
-    }
-    
     public SocketAddress getLocalAddress()
     {
         return localAddress;

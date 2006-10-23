@@ -19,7 +19,6 @@
  */
 package org.apache.mina.common;
 
-import java.net.SocketAddress;
 import java.util.Set;
 
 
@@ -53,14 +52,6 @@ public interface IoService
      * Sets the handler which will handle all connections managed by this service.
      */
     void setHandler( IoHandler handler );
-    
-    /**
-     * Returns the {@link SocketAddress} this service is managing.
-     * If this service is an {@link IoAcceptor}, the bind address will
-     * be returned.  If this service is an {@link IoConnector}, the remote
-     * address will be returned.
-     */
-    SocketAddress getServiceAddress();
     
     /**
      * Returns all sessions which are currently managed by this service.

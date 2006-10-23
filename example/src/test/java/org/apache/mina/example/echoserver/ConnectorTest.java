@@ -102,10 +102,9 @@ public class ConnectorTest extends AbstractTest
         IoSession session = null;
         if( !useLocalAddress )
         {
-            connector.setLocalAddress( null );
-            connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
             connector.setHandler( handler );
-            ConnectFuture future = connector.connect();
+            ConnectFuture future = connector.connect(
+                    new InetSocketAddress( "localhost", port ) );
             future.join();
             session = future.getSession();
         }
@@ -117,10 +116,10 @@ public class ConnectorTest extends AbstractTest
                 clientPort = AvailablePortFinder.getNextAvailable( clientPort + 1 );
                 try
                 {
-                    connector.setLocalAddress( new InetSocketAddress( clientPort ) );
-                    connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
                     connector.setHandler( handler );
-                    ConnectFuture future = connector.connect();
+                    ConnectFuture future = connector.connect(
+                            new InetSocketAddress( clientPort ),
+                            new InetSocketAddress( "localhost", port ) );
                     future.join();
                     session = future.getSession();
                     break;

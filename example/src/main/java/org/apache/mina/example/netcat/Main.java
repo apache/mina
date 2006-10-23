@@ -48,9 +48,7 @@ public class Main
         connector.setConnectTimeout( 30 );
         
         // Start communication.
-        connector.setRemoteAddress(
-                new InetSocketAddress( args[ 0 ], Integer.parseInt( args[ 1 ] ) ) );
         connector.setHandler( new NetCatProtocolHandler() );
-        connector.connect();
+        connector.connect( new InetSocketAddress( args[ 0 ], Integer.parseInt( args[ 1 ] ) ) );
     }
 }
