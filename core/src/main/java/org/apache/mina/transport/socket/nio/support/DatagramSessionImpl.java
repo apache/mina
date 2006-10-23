@@ -25,6 +25,8 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
 import org.apache.mina.common.BroadcastIoSession;
+import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -46,42 +48,60 @@ import org.apache.mina.util.Queue;
  */
 class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 {
-    private final IoService wrapperManager;
+    private final IoService service;
     private final DatagramSessionConfig config = new SessionConfigImpl();
     private final DatagramService managerDelegate;
-    private final DatagramFilterChain filterChain;
+    private final DatagramFilterChain filterChain = new DatagramFilterChain( this );
     private final DatagramChannel ch;
-    private final Queue writeRequestQueue;
+    private final Queue writeRequestQueue = new Queue();
     private final IoHandler handler;
     private final SocketAddress localAddress;
-    private final SocketAddress serviceAddress;
-    private SocketAddress remoteAddress;
+    private final SocketAddress remoteAddress;
     private SelectionKey key;
     private int readBufferSize;
 
     /**
-     * Creates a new instance.
+     * Creates a new acceptor instance.
      */
-    DatagramSessionImpl( IoService wrapperManager,
+    DatagramSessionImpl( IoAcceptor service,
                          DatagramService managerDelegate,
                          DatagramChannel ch, IoHandler defaultHandler,
-                         SocketAddress serviceAddress )
+                         SocketAddress remoteAddress )
     {
-        this.wrapperManager = wrapperManager;
+        this.service = service;
         this.managerDelegate = managerDelegate;
-        this.filterChain = new DatagramFilterChain( this );
         this.ch = ch;
-        this.writeRequestQueue = new Queue();
         this.handler = defaultHandler;
-        this.remoteAddress = ch.socket().getRemoteSocketAddress();
+        this.remoteAddress = remoteAddress;
 
-        // We didn't set the localhost by calling getLocalSocketAddress() to avoid
+        // We didn't set the localAddress by calling getLocalSocketAddress() to avoid
         // the case that getLocalSocketAddress() returns IPv6 address while
         // serviceAddress represents the same address in IPv4.
-        this.localAddress = this.serviceAddress = serviceAddress;
+        this.localAddress = service.getLocalAddress();
 
+        applySettings();
+    }
+
+    /**
+     * Creates a new connector instance.
+     */
+    DatagramSessionImpl( IoConnector service,
+                         DatagramService managerDelegate,
+                         DatagramChannel ch, IoHandler defaultHandler )
+    {
+        this.service = service;
+        this.managerDelegate = managerDelegate;
+        this.ch = ch;
+        this.handler = defaultHandler;
+        this.remoteAddress = ch.socket().getRemoteSocketAddress();
+        this.localAddress = ch.socket().getLocalSocketAddress();
+
+        applySettings();
+    }
+
+    private void applySettings() {
         // Apply the initial session settings
-        IoSessionConfig sessionConfig = wrapperManager.getSessionConfig();
+        IoSessionConfig sessionConfig = getService().getSessionConfig();
         if( sessionConfig instanceof DatagramSessionConfig )
         {
             DatagramSessionConfig cfg = ( DatagramSessionConfig ) sessionConfig;
@@ -100,7 +120,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
     public IoService getService()
     {
-        return wrapperManager;
+        return service;
     }
 
     public IoSessionConfig getConfig()
@@ -190,19 +210,9 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         return remoteAddress;
     }
 
-    void setRemoteAddress( SocketAddress remoteAddress )
-    {
-        this.remoteAddress = remoteAddress;
-    }
-
     public SocketAddress getLocalAddress()
     {
         return localAddress;
-    }
-
-    public SocketAddress getServiceAddress()
-    {
-        return serviceAddress;
     }
 
     protected void updateTrafficMask()

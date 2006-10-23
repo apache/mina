@@ -202,8 +202,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
             // If a new session needs to be created.
             DatagramSessionImpl datagramSession = new DatagramSessionImpl(
-                    wrapper, this, ch, getHandler(), getLocalAddress() );
-            datagramSession.setRemoteAddress( remoteAddress );
+                    wrapper, this, ch, getHandler(), remoteAddress );
             datagramSession.setSelectionKey( key );
             
             getSessionRecycler().put( datagramSession );

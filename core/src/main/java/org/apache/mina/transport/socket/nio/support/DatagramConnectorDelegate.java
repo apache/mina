@@ -568,9 +568,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 break;
 
             DatagramSessionImpl session = new DatagramSessionImpl(
-                    wrapper, this,
-                    req.channel, getHandler(),
-                    req.channel.socket().getRemoteSocketAddress() );
+                    wrapper, this, req.channel, getHandler() );
             
             // AbstractIoFilterChain will notify the connect future.
             session.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, req );
