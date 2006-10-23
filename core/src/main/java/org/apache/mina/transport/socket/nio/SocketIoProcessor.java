@@ -29,10 +29,14 @@ import java.util.Set;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteTimeoutException;
+import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -169,7 +173,7 @@ class SocketIoProcessor
 
                 // AbstractIoFilterChain.CONNECT_FUTURE is cleared inside here
                 // in AbstractIoFilterChain.fireSessionOpened().
-                session.getServiceListeners().fireSessionCreated( session );
+                getServiceListeners( session ).fireSessionCreated( session );
             }
             catch( IOException e )
             {
@@ -177,6 +181,19 @@ class SocketIoProcessor
                 // and call ConnectFuture.setException().
                 session.getFilterChain().fireExceptionCaught( session, e );
             }
+        }
+    }
+    
+    private IoServiceListenerSupport getServiceListeners( IoSession session )
+    {
+        IoService service = session.getService();
+        if( service instanceof SocketAcceptor )
+        {
+            return ( ( SocketAcceptor ) service ).getListeners();
+        }
+        else
+        {
+            return ( ( SocketConnector ) service ).getListeners();
         }
     }
 
@@ -224,7 +241,7 @@ class SocketIoProcessor
             finally
             {
                 releaseWriteBuffers( session );
-                session.getServiceListeners().fireSessionDestroyed( session );
+                getServiceListeners( session ).fireSessionDestroyed( session );
             }
         }
     }
@@ -392,6 +409,7 @@ class SocketIoProcessor
                 continue;
             }
 
+            
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
             // (In case that Session.write() is called before addSession() is processed)

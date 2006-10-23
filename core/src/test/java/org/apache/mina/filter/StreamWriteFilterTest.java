@@ -390,7 +390,6 @@ public class StreamWriteFilterTest extends TestCase {
         acceptor.setLocalAddress( address );
         acceptor.setHandler( sender );
         
-        connector.setRemoteAddress( address );
         connector.setHandler( receiver );
 
         acceptor.bind();
@@ -399,7 +398,7 @@ public class StreamWriteFilterTest extends TestCase {
         {
             synchronized( receiver.lock )
             {
-                connector.connect();
+                connector.connect( address );
                 
                 sender.lock.wait();
                 receiver.lock.wait();

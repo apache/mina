@@ -43,32 +43,6 @@ import java.net.SocketAddress;
 public interface IoConnector extends IoService
 {
     /**
-     * Returns the local address to bind.
-     * @return <tt>null</tt> if no local address is specified.
-     */
-    SocketAddress getLocalAddress();
-    
-    /**
-     * Sets the local address to bind.
-     * @param localAddress <tt>null</tt> to specify no specific local address 
-     */
-    void setLocalAddress( SocketAddress localAddress );
-    
-    /**
-     * Returns the address of the remote peer to connect to.  This property can't
-     * be changed once after {@link #connect()} method is called.
-     */
-    SocketAddress getRemoteAddress();
-    
-    /**
-     * Sets the address of the remote peer to connect to.  This property can't be
-     * changed once after {@link #connect()} method is called.
-     * 
-     * @throws IllegalStateException if {@link #connect()} method is already called
-     */
-    void setRemoteAddress( SocketAddress remoteAddress );
-    
-    /**
      * Returns the connect timeout in seconds.  The default value is 1 minute.
      */
     int getConnectTimeout();
@@ -84,10 +58,18 @@ public interface IoConnector extends IoService
     void setConnectTimeout( int connectTimeout );
     
     /**
-     * Connects to the configured remote address.
+     * Connects to the specified remote address.
      * 
      * @return the {@link ConnectFuture} instance which is completed when the 
      *         connection attempt initiated by this call succeeds or fails.
      */
-    ConnectFuture connect();
+    ConnectFuture connect( SocketAddress remoteAddress );
+
+    /**
+     * Connects to the specified remote address binding to the specified local address.
+     * 
+     * @return the {@link ConnectFuture} instance which is completed when the 
+     *         connection attempt initiated by this call succeeds or fails.
+     */
+    ConnectFuture connect( SocketAddress remoteAddress, SocketAddress localAddress );
 }

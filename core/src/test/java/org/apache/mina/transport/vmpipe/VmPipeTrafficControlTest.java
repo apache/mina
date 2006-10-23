@@ -45,10 +45,8 @@ public class VmPipeTrafficControlTest extends AbstractTrafficControlTest
             throws Exception
     {
         IoConnector connector = new VmPipeConnector();
-        SocketAddress addr = new VmPipeAddress( port );
-        connector.setRemoteAddress( addr );
         connector.setHandler( handler );
-        return connector.connect();
+        return connector.connect( new VmPipeAddress( port ) );
     }
 
     protected SocketAddress createServerSocketAddress( int port )

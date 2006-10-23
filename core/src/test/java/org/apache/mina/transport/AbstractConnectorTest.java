@@ -55,7 +55,6 @@ public abstract class AbstractConnectorTest extends TestCase {
         {
             final StringBuffer buf = new StringBuffer();
             IoConnector connector = createConnector();
-            connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
             connector.setHandler( new IoHandlerAdapter()
             {
                 public void sessionCreated( IoSession session )
@@ -73,7 +72,7 @@ public abstract class AbstractConnectorTest extends TestCase {
                     buf.append( "X" );
                 }
             });
-            ConnectFuture future = connector.connect();
+            ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
             future.join();
             buf.append("3");
             future.getSession().close();
@@ -91,7 +90,6 @@ public abstract class AbstractConnectorTest extends TestCase {
         final StringBuffer buf = new StringBuffer();
 
         IoConnector connector = createConnector();
-        connector.setRemoteAddress( new InetSocketAddress( "localhost", port ) );
         connector.setHandler( new IoHandlerAdapter()
         {
             public void sessionCreated( IoSession session )
@@ -109,7 +107,7 @@ public abstract class AbstractConnectorTest extends TestCase {
                 buf.append( "Z" );
             }
         });
-        ConnectFuture future = connector.connect();
+        ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
         future.join();
         buf.append("1");
         try

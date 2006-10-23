@@ -57,12 +57,11 @@ public class VmPipeBindTest extends AbstractBindTest
         SocketAddress addr = createSocketAddress( port );
      
         IoConnector connector = new VmPipeConnector();
-        connector.setRemoteAddress( addr );
         connector.setHandler( new IoHandlerAdapter() );
         IoSession[] sessions = new IoSession[ 5 ];
         for( int i = 0; i < sessions.length; i++ )
         {
-            ConnectFuture future = connector.connect();
+            ConnectFuture future = connector.connect( addr );
             future.join();
             sessions[ i ] = future.getSession();
             Assert.assertTrue( sessions[ i ].isConnected() );

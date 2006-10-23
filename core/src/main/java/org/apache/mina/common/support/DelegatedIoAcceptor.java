@@ -128,11 +128,6 @@ public class DelegatedIoAcceptor implements IoAcceptor
         return delegate.getManagedSessions();
     }
 
-    public SocketAddress getServiceAddress()
-    {
-        return delegate.getServiceAddress();
-    }
-
     public IoSessionConfig getSessionConfig()
     {
         return delegate.getSessionConfig();

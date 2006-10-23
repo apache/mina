@@ -61,10 +61,9 @@ public class Main
         // Set connect timeout.
         connector.setConnectTimeout( 30 );
         
-        connector.setRemoteAddress(
-            new InetSocketAddress( args[ 1 ], Integer.parseInt( args[ 2 ] ) ) );
-        
-        ClientToProxyIoHandler handler = new ClientToProxyIoHandler( connector );
+        ClientToProxyIoHandler handler = new ClientToProxyIoHandler(
+                connector,
+                new InetSocketAddress( args[ 1 ], Integer.parseInt( args[ 2 ] ) ) );
         
         // Start proxy.
         acceptor.setLocalAddress( new InetSocketAddress( Integer.parseInt( args[ 0 ] ) ) );

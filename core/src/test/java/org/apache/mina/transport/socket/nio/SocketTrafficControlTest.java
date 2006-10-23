@@ -46,10 +46,8 @@ public class SocketTrafficControlTest extends AbstractTrafficControlTest
             throws Exception
     {
         IoConnector connector = new SocketConnector();
-        SocketAddress addr = new InetSocketAddress( "localhost", port );
-        connector.setRemoteAddress( addr );
         connector.setHandler( handler );
-        return connector.connect();
+        return connector.connect( new InetSocketAddress( "localhost", port ) );
     }
 
     protected SocketAddress createServerSocketAddress( int port )

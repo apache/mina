@@ -82,9 +82,14 @@ public class DelegatedIoConnector implements IoConnector
         delegate.removeListener( listener );
     }
 
-    public ConnectFuture connect()
+    public ConnectFuture connect( SocketAddress remoteAddress )
     {
-        return delegate.connect();
+        return delegate.connect( remoteAddress );
+    }
+
+    public ConnectFuture connect( SocketAddress remoteAddress, SocketAddress localAddress )
+    {
+        return delegate.connect( remoteAddress, localAddress );
     }
 
     public int getConnectTimeout()
@@ -97,29 +102,9 @@ public class DelegatedIoConnector implements IoConnector
         return delegate.getConnectTimeoutMillis();
     }
 
-    public SocketAddress getLocalAddress()
-    {
-        return delegate.getLocalAddress();
-    }
-
-    public SocketAddress getRemoteAddress()
-    {
-        return delegate.getRemoteAddress();
-    }
-
     public void setConnectTimeout( int connectTimeout )
     {
         delegate.setConnectTimeout( connectTimeout );
-    }
-
-    public void setLocalAddress( SocketAddress localAddress )
-    {
-        delegate.setLocalAddress( localAddress );
-    }
-
-    public void setRemoteAddress( SocketAddress remoteAddress )
-    {
-        delegate.setRemoteAddress( remoteAddress );
     }
 
     public IoHandler getHandler()
@@ -130,11 +115,6 @@ public class DelegatedIoConnector implements IoConnector
     public Set getManagedSessions()
     {
         return delegate.getManagedSessions();
-    }
-
-    public SocketAddress getServiceAddress()
-    {
-        return delegate.getServiceAddress();
     }
 
     public IoSessionConfig getSessionConfig()

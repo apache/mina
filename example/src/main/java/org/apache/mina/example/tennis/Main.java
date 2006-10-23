@@ -55,9 +55,8 @@ public class Main
 
         // Connect to the server.
         VmPipeConnector connector = new VmPipeConnector();
-        connector.setRemoteAddress( address );
         connector.setHandler( new TennisPlayer() );
-        ConnectFuture future = connector.connect();
+        ConnectFuture future = connector.connect( address );
         future.join();
         IoSession session = future.getSession();
 

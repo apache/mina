@@ -21,6 +21,7 @@ package org.apache.mina.transport.socket.nio.support;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -84,7 +85,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         return InetSocketAddress.class;
     }
 
-    protected ConnectFuture doConnect()
+    protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
         DatagramChannel ch = null;
         boolean initialized = false;
@@ -103,11 +104,11 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 ch.socket().setTrafficClass( cfg.getTrafficClass() );
             }
 
-            if( getLocalAddress() != null )
+            if( localAddress != null )
             {
-                ch.socket().bind( getLocalAddress() );
+                ch.socket().bind( localAddress );
             }
-            ch.connect( getRemoteAddress() );
+            ch.connect( remoteAddress );
             ch.configureBlocking( false );
             initialized = true;
         }
