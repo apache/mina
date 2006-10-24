@@ -115,24 +115,14 @@ public class SocketAcceptor extends BaseIoAcceptor
      */
     public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
     {
-        if( address == null )
-        {
-            throw new NullPointerException( "address" );
-        }
-
         if( handler == null )
         {
             throw new NullPointerException( "handler" );
         }
 
-        if( !( address instanceof InetSocketAddress ) )
+        if( address != null && !( address instanceof InetSocketAddress ) )
         {
             throw new IllegalArgumentException( "Unexpected address type: " + address.getClass() );
-        }
-
-        if( ( ( InetSocketAddress ) address ).getPort() == 0 )
-        {
-            throw new IllegalArgumentException( "Unsupported port number: 0" );
         }
 
         if( config == null )
@@ -437,6 +427,10 @@ public class SocketAcceptor extends BaseIoAcceptor
 
                 // and bind.
                 ssc.socket().bind( req.address, cfg.getBacklog() );
+                if( req.address == null || req.address.getPort() == 0 )
+                {
+                    req.address = ( InetSocketAddress ) ssc.socket().getLocalSocketAddress();
+                }
                 ssc.register( selector, SelectionKey.OP_ACCEPT, req );
 
                 synchronized( channels )
@@ -546,7 +540,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
     private static class RegistrationRequest
     {
-        private final SocketAddress address;
+        private InetSocketAddress address;
         private final IoHandler handler;
         private final IoServiceConfig config;
         private IOException exception;
@@ -554,7 +548,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
         {
-            this.address = address;
+            this.address = ( InetSocketAddress ) address;
             this.handler = handler;
             this.config = config;
         }

@@ -42,4 +42,9 @@ public class DatagramBindTest extends AbstractBindTest
     {
         return new InetSocketAddress( port );
     }    
+
+    protected int getPort( SocketAddress address )
+    {
+        return ( ( InetSocketAddress ) address ).getPort();
+    }
 }

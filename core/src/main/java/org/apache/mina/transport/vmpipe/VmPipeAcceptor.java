@@ -57,11 +57,9 @@ public class VmPipeAcceptor extends BaseIoAcceptor
 
     public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
     {
-        if( address == null )
-            throw new NullPointerException( "address" );
         if( handler == null )
             throw new NullPointerException( "handler" );
-        if( !( address instanceof VmPipeAddress ) )
+        if( address != null && !( address instanceof VmPipeAddress ) )
             throw new IllegalArgumentException(
                     "address must be VmPipeAddress." );
 
@@ -72,7 +70,18 @@ public class VmPipeAcceptor extends BaseIoAcceptor
 
         synchronized( boundHandlers )
         {
-            if( boundHandlers.containsKey( address ) )
+            if( address == null || ( ( VmPipeAddress ) address ).getPort() == 0 )
+            {
+                for( int i = 1; i < Integer.MAX_VALUE; i++ )
+                {
+                    address = new VmPipeAddress( i );
+                    if( !boundHandlers.containsKey( address ) )
+                    {
+                        break;
+                    }
+                }
+            }
+            else if( boundHandlers.containsKey( address ) )
             {
                 throw new IOException( "Address already bound: " + address );
             }

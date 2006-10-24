@@ -83,8 +83,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config )
             throws IOException
     {
-        if( address == null )
-            throw new NullPointerException( "address" );
         if( handler == null )
             throw new NullPointerException( "handler" );
         if( config == null )
@@ -92,11 +90,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             config = getDefaultConfig();
         }
 
-        if( !( address instanceof InetSocketAddress ) )
+        if( address != null && !( address instanceof InetSocketAddress ) )
             throw new IllegalArgumentException( "Unexpected address type: "
                                                 + address.getClass() );
-        if( ( ( InetSocketAddress ) address ).getPort() == 0 )
-            throw new IllegalArgumentException( "Unsupported port number: 0" );
         
         RegistrationRequest request = new RegistrationRequest( address, handler, config );
         synchronized( this )
@@ -601,6 +597,10 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
                 ch.configureBlocking( false );
                 ch.socket().bind( req.address );
+                if( req.address == null || req.address.getPort() == 0 )
+                {
+                    req.address = ( InetSocketAddress ) ch.socket().getLocalSocketAddress();
+                }
                 ch.register( selector, SelectionKey.OP_READ, req );
                 synchronized( channels )
                 {
@@ -712,7 +712,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
     private static class RegistrationRequest
     {
-        private final SocketAddress address;
+        private InetSocketAddress address;
         private final IoHandler handler;
         private final IoServiceConfig config;
 
@@ -721,7 +721,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         
         private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
         {
-            this.address = address;
+            this.address = ( InetSocketAddress ) address;
             this.handler = handler;
             this.config = config;
         }
