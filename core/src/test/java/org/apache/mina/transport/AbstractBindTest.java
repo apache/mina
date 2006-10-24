@@ -55,6 +55,7 @@ public abstract class AbstractBindTest extends TestCase
     }
     
     protected abstract SocketAddress createSocketAddress( int port );
+    protected abstract int getPort( SocketAddress address );
     
     protected void bind( boolean reuseAddress ) throws IOException
     {
@@ -114,6 +115,21 @@ public abstract class AbstractBindTest extends TestCase
         {
             // ignore
         }
+        
+        acceptor.setLocalAddress( null );
+    }
+    
+    public void testAnonymousBind() throws Exception
+    {
+        acceptor.setHandler( new IoHandlerAdapter() );
+        acceptor.setLocalAddress( null );
+        acceptor.bind();
+        Assert.assertNotNull( acceptor.getLocalAddress() );
+        acceptor.unbind();
+        acceptor.setLocalAddress( createSocketAddress( 0 ) );
+        Assert.assertNotNull( acceptor.getLocalAddress() );
+        Assert.assertTrue( getPort( acceptor.getLocalAddress() ) != 0 );
+        acceptor.unbind();
     }
     
     public void testDuplicateBind() throws IOException
