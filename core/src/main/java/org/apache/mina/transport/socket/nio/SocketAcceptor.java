@@ -193,11 +193,6 @@ public class SocketAcceptor extends BaseIoAcceptor
     
     protected void doBind() throws IOException
     {
-        if( ( ( InetSocketAddress ) getLocalAddress() ).getPort() == 0 )
-        {
-            throw new IllegalStateException( "Unsupported port number: 0" );
-        }
-
         RegistrationRequest request = new RegistrationRequest();
 
         synchronized( registerQueue )
@@ -226,7 +221,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         if( request.exception != null )
         {
-            // TODO better excaption handling.
+            // TODO better exception handling.
             if( request.exception instanceof RuntimeException )
             {
                 throw ( RuntimeException ) request.exception;
@@ -239,6 +234,13 @@ public class SocketAcceptor extends BaseIoAcceptor
             {
                 throw new RuntimeIOException( request.exception );
             }
+        }
+        else
+        {
+            // Update the local address.
+            // setLocalAddress() shouldn't be called from the worker thread
+            // because of deadlock.
+            setLocalAddress(serverSocketChannel.socket().getLocalSocketAddress());
         }
     }
 

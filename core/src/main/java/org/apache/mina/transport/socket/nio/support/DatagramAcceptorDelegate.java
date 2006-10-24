@@ -25,9 +25,7 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
@@ -65,7 +63,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
-    private final Map channels = new HashMap();
+    private DatagramChannel channel;
     private final Queue registerQueue = new Queue();
     private final Queue cancelQueue = new Queue();
     private final Queue flushingSessions = new Queue();
@@ -87,9 +85,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
     protected void doBind() throws IOException
     {
-        if( ( ( InetSocketAddress ) getLocalAddress() ).getPort() == 0 )
-            throw new IllegalArgumentException( "Unsupported port number: 0" );
-        
         RegistrationRequest request = new RegistrationRequest();
         synchronized( this )
         {
@@ -118,6 +113,10 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         if( request.exception != null )
         {
             throw ( IOException ) new IOException( "Failed to bind" ).initCause( request.exception );
+        }
+        else
+        {
+            setLocalAddress( channel.socket().getLocalSocketAddress() );
         }
     }
 
@@ -172,23 +171,23 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         {
             throw new NullPointerException( "remoteAddress" );
         }
-        if( getLocalAddress() == null )
-        {
-            throw new NullPointerException( "localAddress" );
-        }
         
+        synchronized( bindLock )
+        {
+            if( !isBound() )
+            {
+                throw new IllegalStateException( "Can't create a session from a unbound service." );
+            }
+         
+            return newSessionWithoutLock( remoteAddress );
+        }
+    }
+    
+    private IoSession newSessionWithoutLock( SocketAddress remoteAddress )
+    {
         Selector selector = this.selector;
-        DatagramChannel ch = ( DatagramChannel ) channels.get( getLocalAddress() );
-        if( selector == null || ch == null )
-        {
-            throw new IllegalArgumentException( "Unknown localAddress: " + getLocalAddress() );
-        }
-            
+        DatagramChannel ch = this.channel;
         SelectionKey key = ch.keyFor( selector );
-        if( key == null )
-        {
-            throw new IllegalArgumentException( "Unknown localAddress: " + getLocalAddress() );
-        }
 
         IoSession session;
         IoSessionRecycler sessionRecycler = getSessionRecycler();
@@ -402,7 +401,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             if( remoteAddress != null )
             {
                 DatagramSessionImpl session =
-                    ( DatagramSessionImpl ) newSession( remoteAddress );
+                    ( DatagramSessionImpl ) newSessionWithoutLock( remoteAddress );
 
                 readBuf.flip();
 
@@ -557,10 +556,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 ch.configureBlocking( false );
                 ch.socket().bind( getLocalAddress() );
                 ch.register( selector, SelectionKey.OP_READ, req );
-                synchronized( channels )
-                {
-                    channels.put( getLocalAddress(), ch );
-                }
+                this.channel = ch;
                 
                 getListeners().fireServiceActivated();
             }
@@ -610,28 +606,17 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 break;
             }
 
-            DatagramChannel ch;
-            synchronized( channels )
-            {
-                ch = ( DatagramChannel ) channels.remove( getLocalAddress() );
-            }
+            DatagramChannel ch = this.channel;
+            this.channel = null;
 
             // close the channel
             try
             {
-                if( ch == null )
-                {
-                    request.exception = new IllegalArgumentException(
-                            "Address not bound: " + getLocalAddress() );
-                }
-                else
-                {
-                    SelectionKey key = ch.keyFor( selector );
-                    key.cancel();
-                    selector.wakeup(); // wake up again to trigger thread death
-                    ch.disconnect();
-                    ch.close();
-                }
+                SelectionKey key = ch.keyFor( selector );
+                key.cancel();
+                selector.wakeup(); // wake up again to trigger thread death
+                ch.disconnect();
+                ch.close();
             }
             catch( Throwable t )
             {

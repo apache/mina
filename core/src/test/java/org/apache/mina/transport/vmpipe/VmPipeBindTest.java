@@ -49,6 +49,11 @@ public class VmPipeBindTest extends AbstractBindTest
         return new VmPipeAddress( port );
     }
     
+    protected int getPort( SocketAddress address )
+    {
+        return ( ( VmPipeAddress ) address ).getPort();
+    }
+    
     public void testUnbindDisconnectsClients() throws Exception
     {
         // TODO: This test is almost identical to the test with the same name in SocketBindTest

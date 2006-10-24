@@ -58,19 +58,32 @@ public class VmPipeAcceptor extends BaseIoAcceptor
 
     protected void doBind() throws IOException
     {
+        VmPipeAddress localAddress = ( VmPipeAddress ) getLocalAddress();
+        
         synchronized( boundHandlers )
         {
-            if( boundHandlers.containsKey( getLocalAddress() ) )
+            if( localAddress == null || localAddress.getPort() == 0 )
             {
-                throw new IOException( "Address already bound: " + getLocalAddress() );
+                for( int i = 1; i < Integer.MAX_VALUE; i++ )
+                {
+                    localAddress = new VmPipeAddress( i );
+                    if( !boundHandlers.containsKey( localAddress ) )
+                    {
+                        break;
+                    }
+                }
+            }
+            else if( boundHandlers.containsKey( localAddress ) )
+            {
+                throw new IOException( "Address already bound: " + localAddress );
             }
 
-            boundHandlers.put( getLocalAddress(), 
-                               new VmPipe( this,
-                                          ( VmPipeAddress ) getLocalAddress(),
-                                          getHandler(), getListeners() ) );
+            boundHandlers.put(
+                    localAddress, 
+                    new VmPipe( this, localAddress, getHandler(), getListeners() ) );
         }
         
+        setLocalAddress( localAddress );
         getListeners().fireServiceActivated();
     }
     
