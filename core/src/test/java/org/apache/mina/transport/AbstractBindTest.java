@@ -127,6 +127,7 @@ public abstract class AbstractBindTest extends TestCase
         Assert.assertNotNull( acceptor.getLocalAddress() );
         acceptor.unbind();
         acceptor.setLocalAddress( createSocketAddress( 0 ) );
+        acceptor.bind();
         Assert.assertNotNull( acceptor.getLocalAddress() );
         Assert.assertTrue( getPort( acceptor.getLocalAddress() ) != 0 );
         acceptor.unbind();
