@@ -30,15 +30,8 @@
     <release>
       <Version>
         <name>Stable branch</name>
-        <created>2005-02-25</created>
-        <revision>0.8.2</revision>
-      </Version>
-    </release>
-    <release>
-      <Version>
-        <name>Unstable branch</name>
-        <created>2005-04-04</created>
-        <revision>0.9.3</revision>
+        <created>2006-10-02</created>
+        <revision>1.0</revision>
       </Version>
     </release>
     <repository>
