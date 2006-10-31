@@ -8,7 +8,7 @@
   <body>
     <section name="Getting Started">
       <p>
-        Must-reads:
+        Must-reads (but out of date for the current API)
         <ul>
           <li>Introduction to MINA (from ApacheCon US 2005)
             <ul>
@@ -82,7 +82,7 @@
         <p>
           Source code:
 <source>
-$ svn co https://svn.apache.org/repos/asf/directory/trunks/mina
+$ svn co https://svn.apache.org/repos/asf/directory/branches/mina/1.0
 $ cd mina
 $ mvn package           # Build packages (JARs) for the core API and other extensions
 $ mvn -N site           # Generate documentation

@@ -33,8 +33,7 @@
           <li>JMX managability, (coming soon)</li>
           <li>Traffic throttling, (coming soon)</li>
           <li>Overload shielding, (coming soon)</li>
-          <li>Integration with well known containers such as Spring
-            	and OSGi, (coming soon)</li>
+          <li>Integration with well known containers such as PicoContainer, Spring and (coming soon), OSGi</li>
           <li>Smooth migration from Netty, a popular NIO framework.
             	(See <a href="http://gleamynode.net/dev/tl-netty2-example-sumup/docs/">Netty Tutorial</a>)</li>
         </ul>
