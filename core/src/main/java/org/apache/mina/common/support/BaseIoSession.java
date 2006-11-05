@@ -6,45 +6,46 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common.support;
 
 import java.net.SocketAddress;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.common.IoFilter.WriteRequest;
 
 /**
  * Base implementation of {@link IoSession}.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseIoSession implements IoSession
 {
-    private final Map attributes = new HashMap();
+    private final Object lock = new Object();
+    private final Map<String,Object> attributes = new ConcurrentHashMap<String, Object>( );
     private final long creationTime;
 
-    /** 
+    /**
      * A future that will be set 'closed' when the connection is closed.
      */
     private final CloseFuture closeFuture = new DefaultCloseFuture( this );
@@ -55,22 +56,22 @@ public abstract class BaseIoSession implements IoSession
     private int idleTimeForWrite;
     private int idleTimeForBoth;
     private int writeTimeout;
-    private TrafficMask trafficMask = TrafficMask.ALL; 
-    
+    private TrafficMask trafficMask = TrafficMask.ALL;
+
     // Status variables
     private long readBytes;
     private long writtenBytes;
-    
+
     private long readMessages;
     private long writtenMessages;
-    
+
     private long lastReadTime;
     private long lastWriteTime;
 
     private int idleCountForBoth;
     private int idleCountForRead;
     private int idleCountForWrite;
-    
+
     private long lastIdleTimeForBoth;
     private long lastIdleTimeForRead;
     private long lastIdleTimeForWrite;
@@ -82,25 +83,28 @@ public abstract class BaseIoSession implements IoSession
             lastIdleTimeForBoth = lastIdleTimeForRead = lastIdleTimeForWrite =
                 System.currentTimeMillis();
     }
-    
+
     public boolean isConnected()
     {
         return !closeFuture.isClosed();
     }
-    
-    public synchronized boolean isClosing()
+
+    public boolean isClosing()
     {
-        return closing || closeFuture.isClosed();
+        synchronized( lock )
+        {
+            return closing || closeFuture.isClosed();
+        }
     }
-    
+
     public CloseFuture getCloseFuture()
     {
         return closeFuture;
     }
-    
+
     public CloseFuture close()
     {
-        synchronized( this )
+        synchronized( lock )
         {
             if( isClosing() )
             {
@@ -125,15 +129,15 @@ public abstract class BaseIoSession implements IoSession
     {
         closeFuture.setClosed();
     }
-    
+
     public WriteFuture write( Object message )
     {
         return write( message, null );
     }
-    
+
     public WriteFuture write( Object message, SocketAddress remoteAddress )
     {
-        synchronized( this )
+        synchronized( lock )
         {
             if( isClosing() || !isConnected() )
             {
@@ -143,14 +147,14 @@ public abstract class BaseIoSession implements IoSession
 
         WriteFuture future = new DefaultWriteFuture( this );
         write0( new WriteRequest( message, future, remoteAddress ) );
-        
+
         return future;
     }
-    
+
     /**
      * Implement this method to perform real write operation with
      * the specified <code>writeRequest</code>.
-     * 
+     *
      * By default, this method is implemented to set the future to
      * 'not written' immediately.
      */
@@ -159,65 +163,47 @@ public abstract class BaseIoSession implements IoSession
         writeRequest.getFuture().setWritten( false );
     }
 
-    
+
     public Object getAttachment()
     {
-        synchronized( attributes )
-        {
-            return attributes.get( "" );
-        }
+        return attributes.get( "" );
     }
 
     public Object setAttachment( Object attachment )
     {
-        synchronized( attributes )
-        {
-            return attributes.put( "", attachment );
-        }
+        return attributes.put( "", attachment );
     }
 
     public Object getAttribute( String key )
     {
-        synchronized( attributes )
-        {
-            return attributes.get( key );
-        }
+        return attributes.get( key );
     }
 
     public Object setAttribute( String key, Object value )
     {
-        synchronized( attributes )
-        {
-            return attributes.put( key, value );
-        }
+        return attributes.put( key, value );
     }
-    
+
     public Object setAttribute( String key )
     {
         return setAttribute( key, Boolean.TRUE );
     }
-    
+
     public Object removeAttribute( String key )
     {
-        synchronized( attributes )
-        {
-            return attributes.remove( key );
-        }
+        return attributes.remove( key );
     }
-    
+
     public boolean containsAttribute( String key )
     {
         return getAttribute( key ) != null;
     }
 
-    public Set getAttributeKeys()
+    public Set<String> getAttributeKeys()
     {
-        synchronized( attributes )
-        {
-            return new HashSet( attributes.keySet() );
-        }
+        return new HashSet<String>( attributes.keySet() );
     }
-    
+
     public int getIdleTime( IdleStatus status )
     {
         if( status == IdleStatus.BOTH_IDLE )
@@ -276,23 +262,23 @@ public abstract class BaseIoSession implements IoSession
     {
         return trafficMask;
     }
-    
+
     public void setTrafficMask( TrafficMask trafficMask )
     {
         if( trafficMask == null )
         {
             throw new NullPointerException( "trafficMask" );
         }
-        
+
         if( this.trafficMask == trafficMask )
         {
             return;
         }
-        
+
         this.trafficMask = trafficMask;
         updateTrafficMask();
     }
-    
+
     public void suspendRead()
     {
         setTrafficMask( getTrafficMask().and( TrafficMask.READ.not() ) );
@@ -318,7 +304,7 @@ public abstract class BaseIoSession implements IoSession
      * session has been changed.
      */
     protected abstract void updateTrafficMask();
-    
+
     public long getReadBytes()
     {
         return readBytes;
@@ -328,22 +314,22 @@ public abstract class BaseIoSession implements IoSession
     {
         return writtenBytes;
     }
-    
+
     public long getWrittenWriteRequests()
     {
         return writtenMessages;
     }
-    
+
     public long getReadMessages()
     {
         return readMessages;
     }
-        
+
     public long getWrittenMessages()
     {
-        return writtenMessages;        
+        return writtenMessages;
     }
-    
+
     public void increaseReadBytes( int increment )
     {
         readBytes += increment;
@@ -359,17 +345,17 @@ public abstract class BaseIoSession implements IoSession
         idleCountForBoth = 0;
         idleCountForWrite = 0;
     }
-    
+
     public void increaseReadMessages()
     {
         readMessages++;
     }
-    
+
     public void increaseWrittenMessages()
     {
         writtenMessages++;
     }
-    
+
     public long getCreationTime()
     {
         return creationTime;
@@ -417,7 +403,7 @@ public abstract class BaseIoSession implements IoSession
 
         throw new IllegalArgumentException( "Unknown idle status: " + status );
     }
-    
+
     public long getLastIdleTime( IdleStatus status )
     {
         if( status == IdleStatus.BOTH_IDLE )
@@ -453,7 +439,8 @@ public abstract class BaseIoSession implements IoSession
             throw new IllegalArgumentException( "Unknown idle status: "
                                                 + status );
     }
-    
+
+    @Override
     public String toString()
     {
         return "(" + getTransportType() +
