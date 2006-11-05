@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec.textline;
 
@@ -25,7 +25,6 @@ import org.apache.mina.common.BufferDataException;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.util.CharsetUtil;
 
 /**
  * A {@link ProtocolCodecFactory} that performs encoding and decoding between
@@ -39,15 +38,15 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
 {
     private final TextLineEncoder encoder;
     private final TextLineDecoder decoder;
-    
+
     /**
      * Creates a new instance with the current default {@link Charset}.
      */
     public TextLineCodecFactory()
     {
-        this( Charset.forName( CharsetUtil.getDefaultCharsetName() ) );
+        this( Charset.defaultCharset() );
     }
-    
+
     /**
      * Creates a new instance with the specified {@link Charset}.
      */
@@ -66,7 +65,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
     {
         return decoder;
     }
-    
+
     /**
      * Returns the allowed maximum size of the encoded line.
      * If the size of the encoded line exceeds this value, the encoder
@@ -79,7 +78,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
     {
         return encoder.getMaxLineLength();
     }
-    
+
     /**
      * Sets the allowed maximum size of the encoded line.
      * If the size of the encoded line exceeds this value, the encoder
@@ -92,7 +91,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
     {
         encoder.setMaxLineLength( maxLineLength );
     }
-    
+
     /**
      * Returns the allowed maximum size of the line to be decoded.
      * If the size of the line to be decoded exceeds this value, the
@@ -105,7 +104,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
     {
         return decoder.getMaxLineLength();
     }
-    
+
     /**
      * Sets the allowed maximum size of the line to be decoded.
      * If the size of the line to be decoded exceeds this value, the
