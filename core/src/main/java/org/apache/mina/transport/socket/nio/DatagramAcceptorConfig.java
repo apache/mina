@@ -6,23 +6,22 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
 
 import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IoAcceptorConfig;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoAcceptorConfig;
@@ -37,7 +36,7 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
 public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements DatagramServiceConfig
 {
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
-    
+
     /**
      * Current session recycler
      */
@@ -47,7 +46,7 @@ public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements Data
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @throws RuntimeIOException if failed to get the default configuration
      */
     public DatagramAcceptorConfig()
@@ -55,11 +54,11 @@ public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements Data
         super();
     }
 
-    public IoSessionConfig getSessionConfig()
+    public DatagramSessionConfig getSessionConfig()
     {
         return sessionConfig;
     }
-    
+
     public IoSessionRecycler getSessionRecycler()
     {
         return sessionRecycler;

@@ -403,8 +403,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                 }
 
                 ssc.socket().setReuseAddress( cfg.isReuseAddress() );
-                ssc.socket().setReceiveBufferSize(
-                    ( ( SocketSessionConfig ) cfg.getSessionConfig() ).getReceiveBufferSize() );
+                ssc.socket().setReceiveBufferSize( cfg.getSessionConfig().getReceiveBufferSize() );
 
                 // and bind.
                 ssc.socket().bind( req.address, cfg.getBacklog() );
