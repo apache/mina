@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.integration.jmx;
 
@@ -24,7 +24,7 @@ import java.util.Date;
 
 
 /**
- * MBean interface for the session manager, it's used for instrumenting IoSession 
+ * MBean interface for the session manager, it's used for instrumenting IoSession
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -53,14 +53,14 @@ public interface IoSessionManagerMBean
 
     /**
      * PDU decoded from the beginning. Only revelent if a ProtocolCodecFilter is installed.
-     * @return
+     * @return Number of read messages
      */
     public long getReadMessages();
 
 
     /**
      * PDU encoded from the beginning. Only revelent if a ProtocolCodecFilter is installed.
-     * @return
+     * @return Number of written messages
      */
     public long getWrittenMessages();
 
@@ -68,7 +68,7 @@ public interface IoSessionManagerMBean
     /**
      * close the session
      */
-    public void close();
+    public void close() throws InterruptedException;
 
 
     /**
@@ -147,32 +147,32 @@ public interface IoSessionManagerMBean
      * @return write idle time in milli-seconds
      */
     public long getWriteIdleTime();
-    
-    
+
+
     /**
      * get the read bytes per second throughput
-     * works only if a stat collector is inspecting this session, 
+     * works only if a stat collector is inspecting this session,
      * @return read bytes per seconds
      */
     public float getByteReadThroughtput();
-    
+
     /**
      * get the written bytes per second throughput
-     * works only if a stat collector is inspecting this session, 
+     * works only if a stat collector is inspecting this session,
      * @return written bytes per seconds
      */
     public float getByteWrittenThroughtput();
-    
+
     /**
      * get the read messages per second throughput
-     * works only if a stat collector is inspecting this session, and only if a ProtocolDecoderFilter is used 
+     * works only if a stat collector is inspecting this session, and only if a ProtocolDecoderFilter is used
      * @return read messages per seconds
      */
     public float getMessageReadThroughtput();
 
     /**
      * get the written messages per second throughput
-     * works only if a stat collector is inspecting this session, and only if a ProtocolDecoderFilter is used 
+     * works only if a stat collector is inspecting this session, and only if a ProtocolDecoderFilter is used
      * @return written messages per seconds
      */
     public float getMessageWrittenThroughtput();

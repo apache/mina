@@ -6,22 +6,24 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common.support;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
@@ -29,116 +31,47 @@ import org.apache.mina.common.IoSession;
 
 /**
  * A default implementation of {@link IoFuture}.
- *  
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultIoFuture implements IoFuture
 {
     private final IoSession session;
-    private final Object lock;
-    private final List listeners = new ArrayList();
-    private Object result;
-    private boolean ready;
+    private final CountDownLatch completionLatch = new CountDownLatch( 1 );
+    private final List<IoFutureListener> listeners = new CopyOnWriteArrayList<IoFutureListener>();
+    private final AtomicBoolean ready = new AtomicBoolean( false );
+
+    private volatile Object result;
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param session an {@link IoSession} which is associated with this future
      */
     public DefaultIoFuture( IoSession session )
     {
         this.session = session;
-        this.lock = this;
     }
-    
-    /**
-     * Creates a new instance which uses the specified object as a lock.
-     */
-    public DefaultIoFuture( IoSession session, Object lock )
-    {
-        if( lock == null )
-        {
-            throw new NullPointerException( "lock" );
-        }
-        this.session = session;
-        this.lock = lock;
-    }
-    
+
     public IoSession getSession()
     {
         return session;
     }
-    
-    public Object getLock()
+
+    public void join() throws InterruptedException
     {
-        return lock;
-    }
-    
-    public void join()
-    {
-        synchronized( lock )
-        {
-            while( !ready )
-            {
-                try
-                {
-                    lock.wait();
-                }
-                catch( InterruptedException e )
-                {
-                }
-            }
-        }
+        completionLatch.await();
     }
 
-    public boolean join( long timeoutInMillis )
+    public boolean join( long timeoutInMillis ) throws InterruptedException
     {
-        long startTime = ( timeoutInMillis <= 0 ) ? 0 : System
-                .currentTimeMillis();
-        long waitTime = timeoutInMillis;
-        
-        synchronized( lock )
-        {
-            if( ready )
-            {
-                return ready;
-            }
-            else if( waitTime <= 0 )
-            {
-                return ready;
-            }
-
-            for( ;; )
-            {
-                try
-                {
-                    lock.wait( waitTime );
-                }
-                catch( InterruptedException e )
-                {
-                }
-
-                if( ready )
-                    return true;
-                else
-                {
-                    waitTime = timeoutInMillis - ( System.currentTimeMillis() - startTime );
-                    if( waitTime <= 0 )
-                    {
-                        return ready;
-                    }
-                }
-            }
-        }
+        return completionLatch.await( timeoutInMillis, TimeUnit.MILLISECONDS );
     }
 
     public boolean isReady()
     {
-        synchronized( lock )
-        {
-            return ready;
-        }
+        return ready.get();
     }
 
     /**
@@ -146,18 +79,10 @@ public class DefaultIoFuture implements IoFuture
      */
     protected void setValue( Object newValue )
     {
-        synchronized( lock )
+        if( ready.compareAndSet( false, true ) )
         {
-            // Allow only once.
-            if( ready )
-            {
-                return;
-            }
-
             result = newValue;
-            ready = true;
-            lock.notifyAll();
-    
+            completionLatch.countDown();
             notifyListeners();
         }
     }
@@ -167,12 +92,9 @@ public class DefaultIoFuture implements IoFuture
      */
     protected Object getValue()
     {
-        synchronized( lock )
-        {
-            return result;
-        }
+        return result;
     }
-    
+
     public void addListener( IoFutureListener listener )
     {
         if( listener == null )
@@ -180,16 +102,14 @@ public class DefaultIoFuture implements IoFuture
             throw new NullPointerException( "listener" );
         }
 
-        synchronized( lock )
+        listeners.add( listener );
+
+        if( ready.get() )
         {
-            listeners.add( listener );
-            if( ready )
-            {
-                listener.operationComplete( this );
-            }
+            listener.operationComplete( this );
         }
     }
-    
+
     public void removeListener( IoFutureListener listener )
     {
         if( listener == null )
@@ -197,19 +117,14 @@ public class DefaultIoFuture implements IoFuture
             throw new NullPointerException( "listener" );
         }
 
-        synchronized( lock )
-        {
-            listeners.remove( listener );
-        }
+        listeners.remove( listener );
     }
 
     private void notifyListeners()
     {
-        synchronized( lock )
+        for( IoFutureListener listener : listeners )
         {
-            for( Iterator i = listeners.iterator(); i.hasNext(); ) {
-                ( ( IoFutureListener ) i.next() ).operationComplete( this );
-            }
+            listener.operationComplete( this );
         }
     }
 }

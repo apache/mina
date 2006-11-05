@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.integration.jmx;
 
@@ -23,11 +23,9 @@ package org.apache.mina.integration.jmx;
 import java.util.Date;
 import java.util.List;
 
-
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.management.IoSessionStat;
 import org.apache.mina.management.StatCollector;
@@ -52,28 +50,16 @@ public class IoSessionManager implements IoSessionManagerMBean
         this.session = session;
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#isConnected()
-     */
     public boolean isConnected()
     {
         return session.isConnected();
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getReadBytes()
-     */
     public long getReadBytes()
     {
         return session.getReadBytes();
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getWrittenBytes()
-     */
     public long getWrittenBytes()
     {
         return session.getWrittenBytes();
@@ -82,63 +68,42 @@ public class IoSessionManager implements IoSessionManagerMBean
 
     public long getReadMessages()
     {
-        return ( ( BaseIoSession ) session ).getReadMessages();
+        return session.getReadMessages();
     }
 
 
     public long getWrittenMessages()
     {
-        return ( ( BaseIoSession ) session ).getWrittenMessages();
+        return session.getWrittenMessages();
     }
 
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#close()
-     */
-    public void close()
+    public void close() throws InterruptedException
     {
         session.close().join();
     }
 
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getCreationTime()
-     */
     public Date getCreationTime()
     {
         return new Date( session.getCreationTime() );
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getLastIoTime()
-     */
     public Date getLastIoTime()
     {
         return new Date( session.getLastIoTime() );
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getLastReadTime()
-     */
     public Date getLastReadTime()
     {
         return new Date( session.getLastReadTime() );
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getLastWriteTime()
-     */
     public Date getLastWriteTime()
     {
         return new Date( session.getLastWriteTime() );
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getInstalledFilters()
-     */
     public String[] getInstalledFilters()
     {
         List filters = session.getFilterChain().getAll();
@@ -150,36 +115,23 @@ public class IoSessionManager implements IoSessionManagerMBean
         return res;
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#addLastLoggingFilter()
-     */
     public void addLastLoggingFilter()
     {
         LoggingFilter f = new LoggingFilter();
         session.getFilterChain().addLast( "LoggerLast", f );
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#removeLastLoggingFilter()
-     */
     public void removeLastLoggingFilter()
     {
 
         session.getFilterChain().remove( "LoggerLast" );
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#addFirstLoggingFilter()
-     */
     public void addFirstLoggingFilter()
     {
         LoggingFilter f = new LoggingFilter();
         session.getFilterChain().addFirst( "LoggerFirst", f );
     }
-
 
     public void removeFirstLoggingFilter()
     {
@@ -190,27 +142,16 @@ public class IoSessionManager implements IoSessionManagerMBean
 
     //  IDLE monitoring
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getReadIdleTime()
-     */
     public long getReadIdleTime()
     {
         return session.getIdleTimeInMillis( IdleStatus.READER_IDLE );
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getWriteIdleTime()
-     */
     public long getWriteIdleTime()
     {
         return session.getIdleTimeInMillis( IdleStatus.WRITER_IDLE );
     }
 
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getBothIdleTime()
-     */
     public long getBothIdleTime()
     {
         return session.getIdleTimeInMillis( IdleStatus.BOTH_IDLE );

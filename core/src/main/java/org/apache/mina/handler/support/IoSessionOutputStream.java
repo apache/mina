@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.handler.support;
 
@@ -24,6 +24,7 @@ import java.io.OutputStream;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteFuture;
 
 /**
@@ -32,21 +33,27 @@ import org.apache.mina.common.WriteFuture;
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
- *
  */
 public class IoSessionOutputStream extends OutputStream
 {
     private final IoSession session;
     private WriteFuture lastWriteFuture;
-    
+
     public IoSessionOutputStream( IoSession session )
     {
         this.session = session;
     }
-    
+
+    @Override
     public void close()
     {
-        session.close().join();
+        try
+        {
+            session.close().join();
+        } catch( InterruptedException e )
+        {
+            throw new RuntimeIOException( e );
+        }
     }
 
     private void checkClosed() throws IOException
@@ -56,19 +63,20 @@ public class IoSessionOutputStream extends OutputStream
             throw new IOException( "The session has been closed." );
         }
     }
-    
+
     private synchronized void write( ByteBuffer buf ) throws IOException
     {
         checkClosed();
-        WriteFuture future = session.write( buf );
-        lastWriteFuture = future;
+        lastWriteFuture = session.write( buf );
     }
-    
+
+    @Override
     public void write( byte[] b, int off, int len ) throws IOException
     {
         write( ByteBuffer.wrap( b, off, len ) );
     }
 
+    @Override
     public void write( int b ) throws IOException
     {
         ByteBuffer buf = ByteBuffer.allocate( 1 );
@@ -76,15 +84,23 @@ public class IoSessionOutputStream extends OutputStream
         buf.flip();
         write( buf );
     }
-    
+
+    @Override
     public synchronized void flush() throws IOException
     {
         if( lastWriteFuture == null )
         {
             return;
         }
-        
-        lastWriteFuture.join();
+
+        try
+        {
+            lastWriteFuture.join();
+        } catch( InterruptedException e )
+        {
+            throw new RuntimeIOException( e );
+        }
+
         if( !lastWriteFuture.isWritten() )
         {
             throw new IOException( "The bytes could not be written to the session" );
