@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.vmpipe.support;
 
@@ -35,6 +35,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
         super( session );
     }
 
+    @Override
     public void fireMessageReceived( IoSession session, Object message )
     {
         VmPipeSessionImpl s = ( VmPipeSessionImpl ) session;
@@ -42,10 +43,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
         {
             if( !s.getTrafficMask().isReadable() )
             {
-                synchronized( s.pendingDataQueue )
-                {
-                    s.pendingDataQueue.push( message );
-                }
+                s.pendingDataQueue.add( message );
             }
             else
             {
@@ -54,14 +52,15 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                 {
                     byteCount = ( ( ByteBuffer ) message ).remaining();
                 }
-                
+
                 s.increaseReadBytes( byteCount );
-                
+
                 super.fireMessageReceived( s, message );
             }
         }
     }
 
+    @Override
     protected void doWrite( IoSession session, WriteRequest writeRequest )
     {
         VmPipeSessionImpl s = ( VmPipeSessionImpl ) session;
@@ -69,19 +68,15 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
         {
             if( s.isConnected() )
             {
-                
                 if( !s.getTrafficMask().isWritable() )
                 {
-                    synchronized( s.pendingDataQueue )
-                    {
-                        s.pendingDataQueue.push( writeRequest );
-                    }
+                    s.pendingDataQueue.add( writeRequest );
                 }
                 else
                 {
-                
+
                     Object message = writeRequest.getMessage();
-                    
+
                     int byteCount = 1;
                     Object messageCopy = message;
                     if( message instanceof ByteBuffer )
@@ -95,22 +90,23 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                         rb.reset();
                         messageCopy = wb;
                     }
-                    
+
                     s.increaseWrittenBytes( byteCount );
                     s.increaseWrittenMessages();
-    
+
                     s.getFilterChain().fireMessageSent( s, writeRequest );
                     s.getRemoteSession().getFilterChain()
                                 .fireMessageReceived( s.getRemoteSession(), messageCopy );
                 }
             }
-            else 
+            else
             {
                 writeRequest.getFuture().setWritten( false );
             }
         }
     }
 
+    @Override
     protected void doClose( IoSession session )
     {
         VmPipeSessionImpl s = ( VmPipeSessionImpl ) session;
@@ -123,5 +119,5 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
             }
         }
     }
-    
+
 }

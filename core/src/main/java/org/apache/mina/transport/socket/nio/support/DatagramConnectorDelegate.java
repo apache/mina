@@ -26,17 +26,21 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
@@ -44,9 +48,6 @@ import org.apache.mina.transport.socket.nio.DatagramConnectorConfig;
 import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
-import org.apache.mina.util.Queue;
-
-import java.util.concurrent.Executor;
 
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
@@ -56,17 +57,18 @@ import java.util.concurrent.Executor;
  */
 public class DatagramConnectorDelegate extends BaseIoConnector implements DatagramService
 {
-    private static volatile int nextId = 0;
+    private static final AtomicInteger nextId = new AtomicInteger( );
 
+    private final Object lock = new Object();
     private final IoConnector wrapper;
     private final Executor executor;
-    private final int id = nextId ++ ;
+    private final int id = nextId.getAndIncrement();
     private Selector selector;
     private DatagramConnectorConfig defaultConfig = new DatagramConnectorConfig();
-    private final Queue registerQueue = new Queue();
-    private final Queue cancelQueue = new Queue();
-    private final Queue flushingSessions = new Queue();
-    private final Queue trafficControllingSessions = new Queue();
+    private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
+    private final Queue<DatagramSessionImpl> cancelQueue = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+    private final Queue<DatagramSessionImpl> flushingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+    private final Queue<DatagramSessionImpl> trafficControllingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
     private Worker worker;
 
     /**
@@ -93,12 +95,12 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
         if( !( address instanceof InetSocketAddress ) )
             throw new IllegalArgumentException( "Unexpected address type: "
-                                                + address.getClass() );
+                + address.getClass() );
 
         if( localAddress != null && !( localAddress instanceof InetSocketAddress ) )
         {
             throw new IllegalArgumentException( "Unexpected local address type: "
-                                                + localAddress.getClass() );
+                + localAddress.getClass() );
         }
 
         if( config == null )
@@ -160,32 +162,26 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
 
         RegistrationRequest request = new RegistrationRequest( ch, handler, config );
-        synchronized( this )
+        try
+        {
+            startupWorker();
+        }
+        catch( IOException e )
         {
             try
             {
-                startupWorker();
+                ch.disconnect();
+                ch.close();
             }
-            catch( IOException e )
+            catch( IOException e2 )
             {
-                try
-                {
-                    ch.disconnect();
-                    ch.close();
-                }
-                catch( IOException e2 )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e2 );
-                }
-
-                return DefaultConnectFuture.newFailedFuture( e );
+                ExceptionMonitor.getInstance().exceptionCaught( e2 );
             }
 
-            synchronized( registerQueue )
-            {
-                registerQueue.push( request );
-            }
+            return DefaultConnectFuture.newFailedFuture( e );
         }
+
+        registerQueue.add( request );
 
         selector.wakeup();
         return request;
@@ -211,39 +207,36 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         this.defaultConfig = defaultConfig;
     }
 
-    private synchronized void startupWorker() throws IOException
+    private void startupWorker() throws IOException
     {
-        if( worker == null )
+        synchronized( lock )
         {
-            selector = Selector.open();
-            worker = new Worker();
-            executor.execute( new NamePreservingRunnable( worker ) );
+            if( worker == null )
+            {
+                selector = Selector.open();
+                worker = new Worker();
+                executor.execute( new NamePreservingRunnable( worker ) );
+            }
         }
     }
 
     public void closeSession( DatagramSessionImpl session )
     {
-        synchronized( this )
+        try
         {
-            try
-            {
-                startupWorker();
-            }
-            catch( IOException e )
-            {
-                // IOException is thrown only when Worker thread is not
-                // running and failed to open a selector.  We simply return
-                // silently here because it we can simply conclude that
-                // this session is not managed by this connector or
-                // already closed.
-                return;
-            }
-
-            synchronized( cancelQueue )
-            {
-                cancelQueue.push( session );
-            }
+            startupWorker();
         }
+        catch( IOException e )
+        {
+            // IOException is thrown only when Worker thread is not
+            // running and failed to open a selector.  We simply return
+            // silently here because it we can simply conclude that
+            // this session is not managed by this connector or
+            // already closed.
+            return;
+        }
+
+        cancelQueue.add( session );
 
         selector.wakeup();
     }
@@ -260,10 +253,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
     private void scheduleFlush( DatagramSessionImpl session )
     {
-        synchronized( flushingSessions )
-        {
-            flushingSessions.push( session );
-        }
+        flushingSessions.add( session );
     }
 
     public void updateTrafficMask( DatagramSessionImpl session )
@@ -274,15 +264,11 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         {
             selector.wakeup();
         }
-        selector.wakeup();
     }
 
     private void scheduleTrafficControl( DatagramSessionImpl session )
     {
-        synchronized( trafficControllingSessions )
-        {
-            trafficControllingSessions.push( session );
-        }
+        trafficControllingSessions.add( session );
     }
 
     private void doUpdateTrafficMask()
@@ -290,14 +276,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         if( trafficControllingSessions.isEmpty() )
             return;
 
-        for( ;; )
+        for( ; ; )
         {
-            DatagramSessionImpl session;
-
-            synchronized( trafficControllingSessions )
-            {
-                session = ( DatagramSessionImpl ) trafficControllingSessions.pop();
-            }
+            DatagramSessionImpl session = trafficControllingSessions.poll();
 
             if( session == null )
                 break;
@@ -320,13 +301,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             // The normal is OP_READ and, if there are write requests in the
             // session's write queue, set OP_WRITE to trigger flushing.
             int ops = SelectionKey.OP_READ;
-            Queue writeRequestQueue = session.getWriteRequestQueue();
-            synchronized( writeRequestQueue )
+            if( !session.getWriteRequestQueue().isEmpty() )
             {
-                if( !writeRequestQueue.isEmpty() )
-                {
-                    ops |= SelectionKey.OP_WRITE;
-                }
+                ops |= SelectionKey.OP_WRITE;
             }
 
             // Now mask the preferred ops with the mask of the current session
@@ -341,7 +318,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         {
             Thread.currentThread().setName( "DatagramConnector-" + id );
 
-            for( ;; )
+            for( ; ; )
             {
                 try
                 {
@@ -360,7 +337,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
                     if( selector.keys().isEmpty() )
                     {
-                        synchronized( DatagramConnectorDelegate.this )
+                        synchronized( lock )
                         {
                             if( selector.keys().isEmpty() &&
                                 registerQueue.isEmpty() &&
@@ -386,7 +363,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 }
                 catch( IOException e )
                 {
-                    ExceptionMonitor.getInstance().exceptionCaught(  e );
+                    ExceptionMonitor.getInstance().exceptionCaught( e );
 
                     try
                     {
@@ -394,25 +371,26 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                     }
                     catch( InterruptedException e1 )
                     {
+                        ExceptionMonitor.getInstance().exceptionCaught( e1 );
                     }
                 }
             }
         }
     }
 
-    private void processReadySessions( Set keys )
+    private void processReadySessions( Set<SelectionKey> keys )
     {
-        Iterator it = keys.iterator();
+        Iterator<SelectionKey> it = keys.iterator();
         while( it.hasNext() )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
+            SelectionKey key = it.next();
             it.remove();
 
             DatagramSessionImpl session = ( DatagramSessionImpl ) key.attachment();
 
-            DatagramSessionImpl replaceSession = getRecycledSession(session);
+            DatagramSessionImpl replaceSession = getRecycledSession( session );
 
-            if(replaceSession != null)
+            if( replaceSession != null )
             {
                 session = replaceSession;
             }
@@ -432,16 +410,16 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private DatagramSessionImpl getRecycledSession( IoSession session )
     {
         IoSessionRecycler sessionRecycler = getSessionRecycler( session );
-        DatagramSessionImpl replaceSession = null;
 
-        if ( sessionRecycler != null )
+        if( sessionRecycler != null )
         {
-            synchronized ( sessionRecycler )
+            synchronized( sessionRecycler )
             {
-                replaceSession = ( DatagramSessionImpl ) sessionRecycler.recycle( session.getLocalAddress(), session
-                        .getRemoteAddress() );
+                DatagramSessionImpl replaceSession =
+                    ( DatagramSessionImpl ) sessionRecycler.recycle( session.getLocalAddress(),
+                        session.getRemoteAddress() );
 
-                if ( replaceSession != null )
+                if( replaceSession != null )
                 {
                     return replaceSession;
                 }
@@ -501,14 +479,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         if( flushingSessions.size() == 0 )
             return;
 
-        for( ;; )
+        for( ; ; )
         {
-            DatagramSessionImpl session;
-
-            synchronized( flushingSessions )
-            {
-                session = ( DatagramSessionImpl ) flushingSessions.pop();
-            }
+            DatagramSessionImpl session = flushingSessions.poll();
 
             if( session == null )
                 break;
@@ -528,15 +501,11 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     {
         DatagramChannel ch = session.getChannel();
 
-        Queue writeRequestQueue = session.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
-        WriteRequest req;
-        for( ;; )
+        for( ; ; )
         {
-            synchronized( writeRequestQueue )
-            {
-                req = ( WriteRequest ) writeRequestQueue.first();
-            }
+            WriteRequest req = writeRequestQueue.peek();
 
             if( req == null )
                 break;
@@ -545,10 +514,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             if( buf.remaining() == 0 )
             {
                 // pop and fire event
-                synchronized( writeRequestQueue )
-                {
-                    writeRequestQueue.pop();
-                }
+                writeRequestQueue.poll();
 
                 session.increaseWrittenMessages();
                 buf.reset();
@@ -577,13 +543,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             else if( writtenBytes > 0 )
             {
                 key.interestOps( key.interestOps()
-                                 & ( ~SelectionKey.OP_WRITE ) );
+                    & ( ~SelectionKey.OP_WRITE ) );
 
                 // pop and fire event
-                synchronized( writeRequestQueue )
-                {
-                    writeRequestQueue.pop();
-                }
+                writeRequestQueue.poll();
 
                 session.increaseWrittenBytes( writtenBytes );
                 session.increaseWrittenMessages();
@@ -598,22 +561,18 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         if( registerQueue.isEmpty() )
             return;
 
-        for( ;; )
+        for( ; ; )
         {
-            RegistrationRequest req;
-            synchronized( registerQueue )
-            {
-                req = ( RegistrationRequest ) registerQueue.pop();
-            }
+            RegistrationRequest req = registerQueue.poll();
 
             if( req == null )
                 break;
 
             DatagramSessionImpl session = new DatagramSessionImpl(
-                    wrapper, this,
-                    req.config,
-                    req.channel, req.handler,
-                    req.channel.socket().getRemoteSocketAddress() );
+                wrapper, this,
+                req.config,
+                req.channel, req.handler,
+                req.channel.socket().getRemoteSocketAddress() );
 
             // AbstractIoFilterChain will notify the connect future.
             session.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, req );
@@ -623,14 +582,14 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             {
                 DatagramSessionImpl replaceSession = getRecycledSession( session );
 
-                if ( replaceSession != null )
+                if( replaceSession != null )
                 {
                     session = replaceSession;
                 }
                 else
                 {
                     SelectionKey key = req.channel.register( selector,
-                            SelectionKey.OP_READ, session );
+                        SelectionKey.OP_READ, session );
 
                     session.setSelectionKey( key );
                     buildFilterChain( req, session );
@@ -653,7 +612,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                         req.channel.disconnect();
                         req.channel.close();
                     }
-                    catch (IOException e)
+                    catch( IOException e )
                     {
                         ExceptionMonitor.getInstance().exceptionCaught( e );
                     }
@@ -674,13 +633,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         if( cancelQueue.isEmpty() )
             return;
 
-        for( ;; )
+        for( ; ; )
         {
-            DatagramSessionImpl session;
-            synchronized( cancelQueue )
-            {
-                session = ( DatagramSessionImpl ) cancelQueue.pop();
-            }
+            DatagramSessionImpl session = cancelQueue.poll();
 
             if( session == null )
                 break;

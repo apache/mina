@@ -20,10 +20,8 @@
 package org.apache.mina.util;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -125,7 +123,8 @@ public class ExpiringMap implements Map
         delegate.clear();
     }
 
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -135,7 +134,8 @@ public class ExpiringMap implements Map
         return delegate.keySet();
     }
 
-    public boolean equals( Object obj )
+    @Override
+	public boolean equals( Object obj )
     {
         return delegate.equals( obj );
     }
@@ -144,18 +144,13 @@ public class ExpiringMap implements Map
     {
         synchronized( inMap )
         {
-            Iterator inMapKeysIt = inMap.keySet().iterator();
+			for ( Object key : inMap.keySet() ) {
+				Object value = inMap.get( key );
 
-            while( inMapKeysIt.hasNext() )
-            {
-                Object key = inMapKeysIt.next();
-                Object value = inMap.get( key );
-
-                if( value instanceof ExpiringObject )
-                {
-                    delegate.put( key, value );
-                }
-            }
+				if ( value instanceof ExpiringObject ) {
+					delegate.put( key, value );
+				}
+			}
         }
     }
 
@@ -214,7 +209,7 @@ public class ExpiringMap implements Map
 
         private ReadWriteLock lastAccessTimeLock = new ReentrantReadWriteLock();
 
-        public ExpiringObject( Object key, Object value, long lastAccessTime )
+        ExpiringObject( Object key, Object value, long lastAccessTime )
         {
             if( value == null )
             {
@@ -264,12 +259,14 @@ public class ExpiringMap implements Map
             return value;
         }
 
-        public boolean equals( Object obj )
+        @Override
+		public boolean equals( Object obj )
         {
             return value.equals( obj );
         }
 
-        public int hashCode()
+        @Override
+		public int hashCode()
         {
             return value.hashCode();
         }
@@ -305,7 +302,9 @@ public class ExpiringMap implements Map
                 }
                 catch( InterruptedException e )
                 {
-                }
+					//Abort on interruption
+					return;
+				}
             }
         }
 
@@ -313,31 +312,24 @@ public class ExpiringMap implements Map
         {
             long timeNow = System.currentTimeMillis();
 
-            Iterator expiringObjectsIterator = delegate.values().iterator();
+			for ( Object o : delegate.values() ) {
+				ExpiringObject expObject = (ExpiringObject) o;
 
-            while( expiringObjectsIterator.hasNext() )
-            {
-                ExpiringObject expObject = ( ExpiringObject ) expiringObjectsIterator.next();
+				if ( timeToLiveMillis <= 0 )
+					continue;
 
-                if( timeToLiveMillis <= 0 )
-                    continue;
+				long timeIdle = timeNow - expObject.getLastAccessTime();
 
-                long timeIdle = timeNow - expObject.getLastAccessTime();
+				if ( timeIdle >= timeToLiveMillis ) {
+					delegate.remove( expObject.getKey() );
 
-                if( timeIdle >= timeToLiveMillis )
-                {
-                    delegate.remove( expObject.getKey() );
+					for ( Object expirationListener : expirationListeners ) {
+						ExpirationListener listener = (ExpirationListener) expirationListener;
 
-                    Iterator listenerIterator = expirationListeners.iterator();
-
-                    while( listenerIterator.hasNext() )
-                    {
-                        ExpirationListener listener = ( ExpirationListener ) listenerIterator.next();
-
-                        listener.expired( expObject.getValue() );
-                    }
-                }
-            }
+						listener.expired( expObject.getValue() );
+					}
+				}
+			}
         }
 
         public void startExpiring()

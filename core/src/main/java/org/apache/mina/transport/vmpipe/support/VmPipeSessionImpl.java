@@ -6,21 +6,26 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.vmpipe.support;
 
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -28,22 +33,22 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.IoServiceListenerSupport;
-import org.apache.mina.util.Queue;
 
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeSessionImpl extends BaseIoSession
 {
-    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
-    
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig()
+    {
+    };
+
     private final IoService service;
     private final IoServiceConfig serviceConfig;
     private final IoServiceListenerSupport serviceListeners;
@@ -54,15 +59,15 @@ public class VmPipeSessionImpl extends BaseIoSession
     private final VmPipeFilterChain filterChain;
     private final VmPipeSessionImpl remoteSession;
     final Object lock;
-    final Queue pendingDataQueue;
+    final BlockingQueue<Object> pendingDataQueue;
 
     /**
      * Constructor for client-side session.
      */
     public VmPipeSessionImpl(
-            IoService service, IoServiceConfig serviceConfig,
-            IoServiceListenerSupport serviceListeners, Object lock, SocketAddress localAddress,
-            IoHandler handler, VmPipe remoteEntry )
+        IoService service, IoServiceConfig serviceConfig,
+        IoServiceListenerSupport serviceListeners, Object lock, SocketAddress localAddress,
+        IoHandler handler, VmPipe remoteEntry )
     {
         this.service = service;
         this.serviceConfig = serviceConfig;
@@ -72,7 +77,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
         this.filterChain = new VmPipeFilterChain( this );
-        this.pendingDataQueue = new Queue();
+        this.pendingDataQueue = new LinkedBlockingQueue<Object>();
 
         remoteSession = new VmPipeSessionImpl( this, remoteEntry );
     }
@@ -91,24 +96,24 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.handler = entry.getHandler();
         this.filterChain = new VmPipeFilterChain( this );
         this.remoteSession = remoteSession;
-        this.pendingDataQueue = new Queue();
+        this.pendingDataQueue = new LinkedBlockingQueue<Object>();
     }
-    
+
     public IoService getService()
     {
         return service;
     }
-    
+
     IoServiceListenerSupport getServiceListeners()
     {
         return serviceListeners;
     }
-    
+
     public IoServiceConfig getServiceConfig()
     {
         return serviceConfig;
     }
-    
+
     public IoSessionConfig getConfig()
     {
         return CONFIG;
@@ -118,7 +123,7 @@ public class VmPipeSessionImpl extends BaseIoSession
     {
         return filterChain;
     }
-    
+
     public VmPipeSessionImpl getRemoteSession()
     {
         return remoteSession;
@@ -129,11 +134,13 @@ public class VmPipeSessionImpl extends BaseIoSession
         return handler;
     }
 
+    @Override
     protected void close0()
     {
         filterChain.fireFilterClose( this );
     }
-    
+
+    @Override
     protected void write0( WriteRequest writeRequest )
     {
         this.filterChain.fireFilterWrite( this, writeRequest );
@@ -148,7 +155,7 @@ public class VmPipeSessionImpl extends BaseIoSession
     {
         return 0;
     }
-    
+
     public TransportType getTransportType()
     {
         return TransportType.VM_PIPE;
@@ -163,33 +170,31 @@ public class VmPipeSessionImpl extends BaseIoSession
     {
         return localAddress;
     }
-    
+
     public SocketAddress getServiceAddress()
     {
         return serviceAddress;
     }
 
+    @Override
     protected void updateTrafficMask()
     {
-        if( getTrafficMask().isReadable() || getTrafficMask().isWritable())
+        if( getTrafficMask().isReadable() || getTrafficMask().isWritable() )
         {
-            Object[] data;
-            synchronized( pendingDataQueue )
+            List<Object> data = new ArrayList<Object>();
+
+            pendingDataQueue.drainTo( data );
+
+            for( Object aData : data )
             {
-                data = pendingDataQueue.toArray();
-                pendingDataQueue.clear();
-            }
-            
-            for( int i = 0; i < data.length; i++ )
-            {
-                if( data[ i ] instanceof WriteRequest )
+                if( aData instanceof WriteRequest )
                 {
-                    WriteRequest wr = ( WriteRequest ) data[ i ];
+                    WriteRequest wr = ( WriteRequest ) aData;
                     filterChain.doWrite( this, wr );
                 }
                 else
                 {
-                    filterChain.fireMessageReceived( this, data[ i ] );
+                    filterChain.fireMessageReceived( this, aData );
                 }
             }
         }

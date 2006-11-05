@@ -27,21 +27,23 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.util.Queue;
-import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.NamePreservingRunnable;
-import java.util.concurrent.Executor;
+import org.apache.mina.util.NewThreadExecutor;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).
@@ -51,27 +53,21 @@ import java.util.concurrent.Executor;
  */
 public class SocketAcceptor extends BaseIoAcceptor
 {
-    /**
-     * @noinspection StaticNonFinalField
-     */
-    private static volatile int nextId = 0;
+    private static final AtomicInteger nextId = new AtomicInteger();
 
     private final Executor executor;
     private final Object lock = new Object();
-    private final int id = nextId ++;
+    private final int id = nextId.getAndIncrement();
     private final String threadName = "SocketAcceptor-" + id;
     private SocketAcceptorConfig defaultConfig = new SocketAcceptorConfig();
-    private final Map channels = new HashMap();
+    private final Map<SocketAddress, ServerSocketChannel> channels = new ConcurrentHashMap<SocketAddress, ServerSocketChannel>();
 
-    private final Queue registerQueue = new Queue();
-    private final Queue cancelQueue = new Queue();
+    private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
+    private final Queue<CancellationRequest> cancelQueue = new ConcurrentLinkedQueue<CancellationRequest>();
 
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
 
-    /**
-     * @noinspection FieldAccessedSynchronizedAndUnsynchronized
-     */
     private Selector selector;
     private Worker worker;
     private int processorDistributor = 0;
@@ -88,7 +84,7 @@ public class SocketAcceptor extends BaseIoAcceptor
      * Create an acceptor with the desired number of processing threads
      *
      * @param processorCount Number of processing threads
-     * @param executor Executor to use for launching threads
+     * @param executor       Executor to use for launching threads
      */
     public SocketAcceptor( int processorCount, Executor executor )
     {
@@ -132,10 +128,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         RegistrationRequest request = new RegistrationRequest( address, handler, config );
 
-        synchronized( registerQueue )
-        {
-            registerQueue.push( request );
-        }
+        registerQueue.add( request );
 
         startupWorker();
 
@@ -199,10 +192,7 @@ public class SocketAcceptor extends BaseIoAcceptor
             throw new IllegalArgumentException( "Address not bound: " + address );
         }
 
-        synchronized( cancelQueue )
-        {
-            cancelQueue.push( request );
-        }
+        cancelQueue.add( request );
 
         selector.wakeup();
 
@@ -231,15 +221,11 @@ public class SocketAcceptor extends BaseIoAcceptor
 
     public void unbindAll()
     {
-        List addresses;
-        synchronized( channels )
-        {
-            addresses = new ArrayList( channels.keySet() );
-        }
+        List<SocketAddress> addresses = new ArrayList<SocketAddress>( channels.keySet() );
 
-        for( Iterator i = addresses.iterator(); i.hasNext(); )
+        for( SocketAddress address : addresses )
         {
-            unbind( ( SocketAddress ) i.next() );
+            unbind( address );
         }
     }
 
@@ -247,7 +233,7 @@ public class SocketAcceptor extends BaseIoAcceptor
     {
         public void run()
         {
-            Thread.currentThread().setName(SocketAcceptor.this.threadName );
+            Thread.currentThread().setName( SocketAcceptor.this.threadName );
 
             for( ; ; )
             {
@@ -306,12 +292,12 @@ public class SocketAcceptor extends BaseIoAcceptor
             }
         }
 
-        private void processSessions( Set keys ) throws IOException
+        private void processSessions( Set<SelectionKey> keys ) throws IOException
         {
-            Iterator it = keys.iterator();
+            Iterator<SelectionKey> it = keys.iterator();
             while( it.hasNext() )
             {
-                SelectionKey key = ( SelectionKey ) it.next();
+                SelectionKey key = it.next();
 
                 it.remove();
 
@@ -334,8 +320,8 @@ public class SocketAcceptor extends BaseIoAcceptor
                 {
                     RegistrationRequest req = ( RegistrationRequest ) key.attachment();
                     SocketSessionImpl session = new SocketSessionImpl(
-                            SocketAcceptor.this, nextProcessor(), getListeners(),
-                            req.config, ch, req.handler, req.address );
+                        SocketAcceptor.this, nextProcessor(), getListeners(),
+                        req.config, ch, req.handler, req.address );
                     getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
                     req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
@@ -391,12 +377,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         for( ; ; )
         {
-            RegistrationRequest req;
-
-            synchronized( registerQueue )
-            {
-                req = ( RegistrationRequest ) registerQueue.pop();
-            }
+            RegistrationRequest req = registerQueue.poll();
 
             if( req == null )
             {
@@ -433,13 +414,10 @@ public class SocketAcceptor extends BaseIoAcceptor
                 }
                 ssc.register( selector, SelectionKey.OP_ACCEPT, req );
 
-                synchronized( channels )
-                {
-                    channels.put( req.address, ssc );
-                }
+                channels.put( req.address, ssc );
 
                 getListeners().fireServiceActivated(
-                        this, req.address, req.handler, req.config );
+                    this, req.address, req.handler, req.config );
             }
             catch( IOException e )
             {
@@ -479,23 +457,14 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         for( ; ; )
         {
-            CancellationRequest request;
-
-            synchronized( cancelQueue )
-            {
-                request = ( CancellationRequest ) cancelQueue.pop();
-            }
+            CancellationRequest request = cancelQueue.poll();
 
             if( request == null )
             {
                 break;
             }
 
-            ServerSocketChannel ssc;
-            synchronized( channels )
-            {
-                ssc = ( ServerSocketChannel ) channels.remove( request.address );
-            }
+            ServerSocketChannel ssc = channels.remove( request.address );
 
             // close the channel
             try
@@ -530,9 +499,9 @@ public class SocketAcceptor extends BaseIoAcceptor
                 if( request.exception == null )
                 {
                     getListeners().fireServiceDeactivated(
-                            this, request.address,
-                            request.registrationRequest.handler,
-                            request.registrationRequest.config );
+                        this, request.address,
+                        request.registrationRequest.handler,
+                        request.registrationRequest.config );
                 }
             }
         }

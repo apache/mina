@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common.support;
 
@@ -29,7 +29,7 @@ import org.apache.mina.common.ThreadModel;
 
 /**
  * A base implementation of {@link IoServiceConfig}.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -39,17 +39,17 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
      * Current filter chain builder.
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
-    
+
     /**
      * The default thread model.
      */
     private final ThreadModel defaultThreadModel = ExecutorThreadModel.getInstance("AnonymousIoService");
-    
+
     /**
      * Current thread model.
      */
     private ThreadModel threadModel = defaultThreadModel;
-    
+
     public BaseIoServiceConfig()
     {
         super();
@@ -68,7 +68,7 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
         }
         filterChainBuilder = builder;
     }
-    
+
     public DefaultIoFilterChainBuilder getFilterChain()
     {
         if( filterChainBuilder instanceof DefaultIoFilterChainBuilder )
@@ -81,7 +81,7 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
                     "Current filter chain builder is not a DefaultIoFilterChainBuilder." );
         }
     }
-    
+
     public ThreadModel getThreadModel()
     {
         return threadModel;
@@ -97,7 +97,9 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
         }
         this.threadModel = threadModel;
     }
-    
+
+    @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException"})
+    @Override
     public Object clone()
     {
         BaseIoServiceConfig ret;
@@ -109,20 +111,21 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
         {
             throw ( InternalError ) new InternalError().initCause( e );
         }
-        
+
         // Try to clone the chain builder.
         try
         {
-            Method cloneMethod = this.filterChainBuilder.getClass().getMethod( "clone", null );
+            Method cloneMethod = this.filterChainBuilder.getClass().getMethod( "clone" );
             if( cloneMethod.isAccessible() )
             {
-                ret.filterChainBuilder = ( IoFilterChainBuilder ) cloneMethod.invoke( this.filterChainBuilder, null );
+                ret.filterChainBuilder = ( IoFilterChainBuilder ) cloneMethod.invoke( this.filterChainBuilder );
             }
         }
         catch( Exception e )
         {
+            // uncloneable
         }
-        
+
         return ret;
     }
 }

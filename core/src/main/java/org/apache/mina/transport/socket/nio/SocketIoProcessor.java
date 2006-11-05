@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ByteBuffer;
@@ -33,7 +34,6 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.WriteTimeoutException;
 import org.apache.mina.util.NamePreservingRunnable;
-import org.apache.mina.util.Queue;
 
 /**
  * Performs all I/O operations for sockets which is connected or bound. This class is used by MINA internally.
@@ -47,15 +47,12 @@ class SocketIoProcessor
 
     private final String threadName;
     private final Executor executor;
-    /**
-     * @noinspection FieldAccessedSynchronizedAndUnsynchronized
-     */
     private Selector selector;
 
-    private final Queue newSessions = new Queue();
-    private final Queue removingSessions = new Queue();
-    private final Queue flushingSessions = new Queue();
-    private final Queue trafficControllingSessions = new Queue();
+    private final Queue<SocketSessionImpl> newSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> removingSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> flushingSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> trafficControllingSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
 
     private Worker worker;
     private long lastIdleCheckTime = System.currentTimeMillis();
@@ -68,10 +65,7 @@ class SocketIoProcessor
 
     void addNew( SocketSessionImpl session ) throws IOException
     {
-        synchronized( newSessions )
-        {
-            newSessions.push( session );
-        }
+        newSessions.add( session );
 
         startupWorker();
 
@@ -120,41 +114,24 @@ class SocketIoProcessor
 
     private void scheduleRemove( SocketSessionImpl session )
     {
-        synchronized( removingSessions )
-        {
-            removingSessions.push( session );
-        }
+        removingSessions.add( session );
     }
 
     private void scheduleFlush( SocketSessionImpl session )
     {
-        synchronized( flushingSessions )
-        {
-            flushingSessions.push( session );
-        }
+        flushingSessions.add( session );
     }
 
     private void scheduleTrafficControl( SocketSessionImpl session )
     {
-        synchronized( trafficControllingSessions )
-        {
-            trafficControllingSessions.push( session );
-        }
+        trafficControllingSessions.add( session );
     }
 
     private void doAddNew()
     {
-        if( newSessions.isEmpty() )
-            return;
-
         for( ; ; )
         {
-            SocketSessionImpl session;
-
-            synchronized( newSessions )
-            {
-                session = ( SocketSessionImpl ) newSessions.pop();
-            }
+            SocketSessionImpl session = newSessions.poll();
 
             if( session == null )
                 break;
@@ -164,8 +141,8 @@ class SocketIoProcessor
             {
                 ch.configureBlocking( false );
                 session.setSelectionKey( ch.register( selector,
-                                                      SelectionKey.OP_READ,
-                                                      session ) );
+                    SelectionKey.OP_READ,
+                    session ) );
 
                 // AbstractIoFilterChain.CONNECT_FUTURE is cleared inside here
                 // in AbstractIoFilterChain.fireSessionOpened().
@@ -182,17 +159,9 @@ class SocketIoProcessor
 
     private void doRemove()
     {
-        if( removingSessions.isEmpty() )
-            return;
-
         for( ; ; )
         {
-            SocketSessionImpl session;
-
-            synchronized( removingSessions )
-            {
-                session = ( SocketSessionImpl ) removingSessions.pop();
-            }
+            SocketSessionImpl session = removingSessions.poll();
 
             if( session == null )
                 break;
@@ -229,13 +198,10 @@ class SocketIoProcessor
         }
     }
 
-    private void process( Set selectedKeys )
+    private void process( Set<SelectionKey> selectedKeys )
     {
-        Iterator it = selectedKeys.iterator();
-
-        while( it.hasNext() )
+        for( SelectionKey key : selectedKeys )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
             SocketSessionImpl session = ( SocketSessionImpl ) key.attachment();
 
             if( key.isReadable() && session.getTrafficMask().isReadable() )
@@ -308,12 +274,11 @@ class SocketIoProcessor
         if( ( currentTime - lastIdleCheckTime ) >= 1000 )
         {
             lastIdleCheckTime = currentTime;
-            Set keys = selector.keys();
+            Set<SelectionKey> keys = selector.keys();
             if( keys != null )
             {
-                for( Iterator it = keys.iterator(); it.hasNext(); )
+                for( SelectionKey key : keys )
                 {
-                    SelectionKey key = ( SelectionKey ) it.next();
                     SocketSessionImpl session = ( SocketSessionImpl ) key.attachment();
                     notifyIdleness( session, currentTime );
                 }
@@ -371,17 +336,9 @@ class SocketIoProcessor
 
     private void doFlush()
     {
-        if( flushingSessions.size() == 0 )
-            return;
-
         for( ; ; )
         {
-            SocketSessionImpl session;
-
-            synchronized( flushingSessions )
-            {
-                session = ( SocketSessionImpl ) flushingSessions.pop();
-            }
+            SocketSessionImpl session = flushingSessions.poll();
 
             if( session == null )
                 break;
@@ -420,10 +377,10 @@ class SocketIoProcessor
 
     private void releaseWriteBuffers( SocketSessionImpl session )
     {
-        Queue writeRequestQueue = session.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
 
-        while( ( req = ( WriteRequest ) writeRequestQueue.pop() ) != null )
+        while( ( req = writeRequestQueue.poll() ) != null )
         {
             try
             {
@@ -447,16 +404,11 @@ class SocketIoProcessor
         key.interestOps( key.interestOps() & ( ~SelectionKey.OP_WRITE ) );
 
         SocketChannel ch = session.getChannel();
-        Queue writeRequestQueue = session.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
         for( ; ; )
         {
-            WriteRequest req;
-
-            synchronized( writeRequestQueue )
-            {
-                req = ( WriteRequest ) writeRequestQueue.first();
-            }
+            WriteRequest req = writeRequestQueue.peek();
 
             if( req == null )
                 break;
@@ -464,10 +416,7 @@ class SocketIoProcessor
             ByteBuffer buf = ( ByteBuffer ) req.getMessage();
             if( buf.remaining() == 0 )
             {
-                synchronized( writeRequestQueue )
-                {
-                    writeRequestQueue.pop();
-                }
+                writeRequestQueue.poll();
 
                 session.increaseWrittenMessages();
 
@@ -498,12 +447,7 @@ class SocketIoProcessor
 
         for( ; ; )
         {
-            SocketSessionImpl session;
-
-            synchronized( trafficControllingSessions )
-            {
-                session = ( SocketSessionImpl ) trafficControllingSessions.pop();
-            }
+            SocketSessionImpl session = trafficControllingSessions.poll();
 
             if( session == null )
                 break;
@@ -526,7 +470,7 @@ class SocketIoProcessor
             // The normal is OP_READ and, if there are write requests in the
             // session's write queue, set OP_WRITE to trigger flushing.
             int ops = SelectionKey.OP_READ;
-            Queue writeRequestQueue = session.getWriteRequestQueue();
+            Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
             synchronized( writeRequestQueue )
             {
                 if( !writeRequestQueue.isEmpty() )

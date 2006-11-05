@@ -26,8 +26,11 @@ import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
@@ -38,10 +41,8 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
-import org.apache.mina.util.Queue;
-import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.NamePreservingRunnable;
-import java.util.concurrent.Executor;
+import org.apache.mina.util.NewThreadExecutor;
 
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
@@ -51,23 +52,17 @@ import java.util.concurrent.Executor;
  */
 public class SocketConnector extends BaseIoConnector
 {
-    /**
-     * @noinspection StaticNonFinalField
-     */
-    private static volatile int nextId = 0;
+    private static final AtomicInteger nextId = new AtomicInteger( );
 
     private final Object lock = new Object();
-    private final int id = nextId++;
+    private final int id = nextId.getAndIncrement();
     private final String threadName = "SocketConnector-" + id;
     private SocketConnectorConfig defaultConfig = new SocketConnectorConfig();
-    private final Queue connectQueue = new Queue();
+    private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>( );
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
     private final Executor executor;
 
-    /**
-     * @noinspection FieldAccessedSynchronizedAndUnsynchronized
-     */
     private Selector selector;
     private Worker worker;
     private int processorDistributor = 0;
@@ -218,10 +213,7 @@ public class SocketConnector extends BaseIoConnector
             }
         }
 
-        synchronized( connectQueue )
-        {
-            connectQueue.push( request );
-        }
+        connectQueue.add( request );
         selector.wakeup();
 
         return request;
@@ -264,11 +256,7 @@ public class SocketConnector extends BaseIoConnector
 
         for( ; ; )
         {
-            ConnectionRequest req;
-            synchronized( connectQueue )
-            {
-                req = ( ConnectionRequest ) connectQueue.pop();
-            }
+            ConnectionRequest req = connectQueue.poll();
 
             if( req == null )
                 break;
@@ -285,14 +273,10 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
-    private void processSessions( Set keys )
+    private void processSessions( Set<SelectionKey> keys )
     {
-        Iterator it = keys.iterator();
-
-        while( it.hasNext() )
+        for( SelectionKey key : keys )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
-
             if( !key.isConnectable() )
                 continue;
 
@@ -330,15 +314,12 @@ public class SocketConnector extends BaseIoConnector
         keys.clear();
     }
 
-    private void processTimedOutSessions( Set keys )
+    private void processTimedOutSessions( Set<SelectionKey> keys )
     {
         long currentTime = System.currentTimeMillis();
-        Iterator it = keys.iterator();
 
-        while( it.hasNext() )
+        for( SelectionKey key : keys )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
-
             if( !key.isValid() )
                 continue;
 

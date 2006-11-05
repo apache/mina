@@ -6,26 +6,27 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec.textline;
 
 import java.net.SocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -36,7 +37,6 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.apache.mina.util.Queue;
 
 /**
  * Tests {@link TextLineDecoder}.
@@ -56,19 +56,19 @@ public class TextLineDecoderTest extends TestCase
         TextLineDecoder decoder =
             new TextLineDecoder(
                     Charset.forName( "UTF-8" ), LineDelimiter.WINDOWS );
-        
+
         CharsetEncoder encoder = Charset.forName( "UTF-8" ).newEncoder();
         IoSession session = new DummySession();
         TestDecoderOutput out = new TestDecoderOutput();
         ByteBuffer in = ByteBuffer.allocate( 16 );
-     
+
         // Test one decode and one output
         in.putString( "ABC\r\n", encoder );
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "ABC", out.getMessageQueue().pop() );
-        
+        Assert.assertEquals( "ABC", out.getMessageQueue().poll() );
+
         // Test two decode and one output
         in.clear();
         in.putString( "DEF", encoder );
@@ -80,17 +80,17 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "DEFGHI", out.getMessageQueue().pop() );
-        
+        Assert.assertEquals( "DEFGHI", out.getMessageQueue().poll() );
+
         // Test one decode and two output
         in.clear();
         in.putString( "JKL\r\nMNO\r\n", encoder );
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 2, out.getMessageQueue().size() );
-        Assert.assertEquals( "JKL", out.getMessageQueue().pop() );
-        Assert.assertEquals( "MNO", out.getMessageQueue().pop() );
-        
+        Assert.assertEquals( "JKL", out.getMessageQueue().poll() );
+        Assert.assertEquals( "MNO", out.getMessageQueue().poll() );
+
         // Test splitted long delimiter
         decoder = new TextLineDecoder(
                 Charset.forName( "UTF-8" ),
@@ -110,27 +110,27 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "PQR", out.getMessageQueue().pop() );
+        Assert.assertEquals( "PQR", out.getMessageQueue().poll() );
     }
-    
+
     public void testAutoDecode() throws Exception
     {
         TextLineDecoder decoder =
             new TextLineDecoder(
                     Charset.forName( "UTF-8" ), LineDelimiter.AUTO );
-        
+
         CharsetEncoder encoder = Charset.forName( "UTF-8" ).newEncoder();
         IoSession session = new DummySession();
         TestDecoderOutput out = new TestDecoderOutput();
         ByteBuffer in = ByteBuffer.allocate( 16 );
-     
+
         // Test one decode and one output
         in.putString( "ABC\r\n", encoder );
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "ABC", out.getMessageQueue().pop() );
-        
+        Assert.assertEquals( "ABC", out.getMessageQueue().poll() );
+
         // Test two decode and one output
         in.clear();
         in.putString( "DEF", encoder );
@@ -142,27 +142,27 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "DEFGHI", out.getMessageQueue().pop() );
-        
+        Assert.assertEquals( "DEFGHI", out.getMessageQueue().poll() );
+
         // Test one decode and two output
         in.clear();
         in.putString( "JKL\r\nMNO\r\n", encoder );
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 2, out.getMessageQueue().size() );
-        Assert.assertEquals( "JKL", out.getMessageQueue().pop() );
-        Assert.assertEquals( "MNO", out.getMessageQueue().pop() );
-        
+        Assert.assertEquals( "JKL", out.getMessageQueue().poll() );
+        Assert.assertEquals( "MNO", out.getMessageQueue().poll() );
+
         // Test multiple '\n's
         in.clear();
         in.putString( "\n\n\n", encoder );
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 3, out.getMessageQueue().size() );
-        Assert.assertEquals( "", out.getMessageQueue().pop() );
-        Assert.assertEquals( "", out.getMessageQueue().pop() );
-        Assert.assertEquals( "", out.getMessageQueue().pop() );
-        
+        Assert.assertEquals( "", out.getMessageQueue().poll() );
+        Assert.assertEquals( "", out.getMessageQueue().poll() );
+        Assert.assertEquals( "", out.getMessageQueue().poll() );
+
         // Test splitted long delimiter (\r\r\n)
         in.clear();
         in.putString( "PQR\r", encoder );
@@ -179,11 +179,12 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "PQR", out.getMessageQueue().pop() );
+        Assert.assertEquals( "PQR", out.getMessageQueue().poll() );
     }
-    
+
     private static class DummySession extends BaseIoSession
     {
+        @Override
         protected void updateTrafficMask()
         {
         }
@@ -192,7 +193,7 @@ public class TextLineDecoderTest extends TestCase
         {
             return null;
         }
-        
+
         public IoServiceConfig getServiceConfig()
         {
             return null;
@@ -243,17 +244,17 @@ public class TextLineDecoderTest extends TestCase
             return 0;
         }
     }
-    
+
     private static class TestDecoderOutput implements ProtocolDecoderOutput
     {
-        private Queue messageQueue = new Queue();
+        private Queue<Object> messageQueue = new LinkedList<Object>( );
 
         public void write( Object message )
         {
-            messageQueue.push( message );
+            messageQueue.add( message );
         }
-        
-        public Queue getMessageQueue()
+
+        public Queue<Object> getMessageQueue()
         {
             return messageQueue;
         }

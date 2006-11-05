@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -23,7 +23,10 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -32,11 +35,10 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.IoServiceListenerSupport;
-import org.apache.mina.util.Queue;
 
 /**
  * An {@link IoSession} for socket transport (TCP/IP).
@@ -52,7 +54,7 @@ class SocketSessionImpl extends BaseIoSession
     private final SocketIoProcessor ioProcessor;
     private final SocketFilterChain filterChain;
     private final SocketChannel ch;
-    private final Queue writeRequestQueue;
+    private final Queue<WriteRequest> writeRequestQueue;
     private final IoHandler handler;
     private final SocketAddress remoteAddress;
     private final SocketAddress localAddress;
@@ -77,7 +79,7 @@ class SocketSessionImpl extends BaseIoSession
         this.ioProcessor = ioProcessor;
         this.filterChain = new SocketFilterChain( this );
         this.ch = ch;
-        this.writeRequestQueue = new Queue();
+        this.writeRequestQueue = new ConcurrentLinkedQueue<WriteRequest>();
         this.handler = defaultHandler;
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
         this.localAddress = ch.socket().getLocalSocketAddress();
@@ -109,7 +111,7 @@ class SocketSessionImpl extends BaseIoSession
     {
         return manager;
     }
-    
+
     public IoServiceConfig getServiceConfig()
     {
         return serviceConfig;
@@ -149,18 +151,19 @@ class SocketSessionImpl extends BaseIoSession
     {
         this.key = key;
     }
-    
+
     public IoHandler getHandler()
     {
         return handler;
     }
 
+    @Override
     protected void close0()
     {
         filterChain.fireFilterClose( this );
     }
 
-    Queue getWriteRequestQueue()
+    Queue<WriteRequest> getWriteRequestQueue()
     {
         return writeRequestQueue;
     }
@@ -173,14 +176,25 @@ class SocketSessionImpl extends BaseIoSession
         }
     }
 
+    /**
+     * Returns the sum of the '<tt>remaining</tt>' of all {@link ByteBuffer}s
+     * in the writeRequestQueue queue.
+     *
+     * @throws ClassCastException if an element is not a {@link ByteBuffer}
+     */
     public int getScheduledWriteBytes()
     {
-        synchronized( writeRequestQueue )
+        int byteSize = 0;
+
+        for( WriteRequest request : writeRequestQueue )
         {
-            return writeRequestQueue.byteSize();
+            byteSize += ( ( ByteBuffer ) request.getMessage() ).remaining();
         }
+
+        return byteSize;
     }
 
+    @Override
     protected void write0( WriteRequest writeRequest )
     {
         filterChain.fireFilterWrite( this, writeRequest );
@@ -206,6 +220,7 @@ class SocketSessionImpl extends BaseIoSession
         return serviceAddress;
     }
 
+    @Override
     protected void updateTrafficMask()
     {
         this.ioProcessor.updateTrafficMask( this );
@@ -216,6 +231,7 @@ class SocketSessionImpl extends BaseIoSession
         return readBufferSize;
     }
 
+    @SuppressWarnings( {"CloneableClassWithoutClone"} )
     private class SessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
     {
         public boolean isKeepAlive()

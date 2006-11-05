@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio.support;
 
@@ -23,8 +23,12 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.common.BroadcastIoSession;
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -34,15 +38,13 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
-import org.apache.mina.util.Queue;
 
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -54,7 +56,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     private final DatagramService managerDelegate;
     private final DatagramFilterChain filterChain;
     private final DatagramChannel ch;
-    private final Queue writeRequestQueue;
+    private final Queue<WriteRequest> writeRequestQueue;
     private final IoHandler handler;
     private final SocketAddress localAddress;
     private final SocketAddress serviceAddress;
@@ -75,7 +77,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         this.managerDelegate = managerDelegate;
         this.filterChain = new DatagramFilterChain( this );
         this.ch = ch;
-        this.writeRequestQueue = new Queue();
+        this.writeRequestQueue = new ConcurrentLinkedQueue<WriteRequest>( );
         this.handler = defaultHandler;
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
 
@@ -147,7 +149,8 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     {
         return handler;
     }
-    
+
+    @Override
     protected void close0()
     {
         IoServiceConfig config = getServiceConfig();
@@ -158,21 +161,23 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         filterChain.fireFilterClose( this );
     }
 
-    Queue getWriteRequestQueue()
+    Queue<WriteRequest> getWriteRequestQueue()
     {
         return writeRequestQueue;
     }
-    
+
+    @Override
     public WriteFuture write( Object message, SocketAddress destination )
     {
         if( !this.config.isBroadcast() )
         {
             throw new IllegalStateException( "Non-broadcast session" );
         }
-        
+
         return super.write( message, destination );
     }
 
+    @Override
     protected void write0( WriteRequest writeRequest )
     {
         filterChain.fireFilterWrite( this, writeRequest );
@@ -180,18 +185,19 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
     public int getScheduledWriteRequests()
     {
-        synchronized( writeRequestQueue )
-        {
-            return writeRequestQueue.size();
-        }
+        return writeRequestQueue.size();
     }
 
     public int getScheduledWriteBytes()
     {
-        synchronized( writeRequestQueue )
+        int byteSize = 0;
+
+        for( WriteRequest request : writeRequestQueue )
         {
-            return writeRequestQueue.byteSize();
+            byteSize += ( ( ByteBuffer ) request.getMessage() ).remaining();
         }
+
+        return byteSize;
     }
 
     public TransportType getTransportType()
@@ -219,6 +225,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         return serviceAddress;
     }
 
+    @Override
     protected void updateTrafficMask()
     {
         managerDelegate.updateTrafficMask( this );
@@ -229,8 +236,10 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         return readBufferSize;
     }
 
+    @SuppressWarnings({"CloneableClassWithoutClone"})
     private class SessionConfigImpl extends DatagramSessionConfigImpl implements DatagramSessionConfig
     {
+        @Override
         public int getReceiveBufferSize()
         {
             try
@@ -243,6 +252,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public void setReceiveBufferSize( int receiveBufferSize )
         {
             if( DatagramSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
@@ -259,6 +269,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public boolean isBroadcast()
         {
             try
@@ -271,6 +282,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public void setBroadcast( boolean broadcast )
         {
             try
@@ -283,6 +295,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public int getSendBufferSize()
         {
             try
@@ -295,6 +308,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public void setSendBufferSize( int sendBufferSize )
         {
             if( DatagramSessionConfigImpl.isSetSendBufferSizeAvailable() )
@@ -310,6 +324,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public boolean isReuseAddress()
         {
             try
@@ -322,6 +337,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public void setReuseAddress( boolean reuseAddress )
         {
             try
@@ -334,6 +350,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public int getTrafficClass()
         {
             if( DatagramSessionConfigImpl.isGetTrafficClassAvailable() )
@@ -353,6 +370,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             }
         }
 
+        @Override
         public void setTrafficClass( int trafficClass )
         {
             if( DatagramSessionConfigImpl.isSetTrafficClassAvailable() )
