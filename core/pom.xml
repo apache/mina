@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>build</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>mina-core</artifactId>
   <name>Apache MINA Core API</name>
@@ -19,13 +19,6 @@
       <artifactId>slf4j-simple</artifactId>
       <version>1.0</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>backport-util-concurrent</groupId>
-      <artifactId>backport-util-concurrent</artifactId>
-      <version>2.2</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>

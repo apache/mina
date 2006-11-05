@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -41,7 +41,7 @@ import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.util.Queue;
 import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.NamePreservingRunnable;
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import java.util.concurrent.Executor;
 
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
@@ -74,7 +74,7 @@ public class SocketConnector extends BaseIoConnector
     private int workerTimeout = 60;  // 1 min.
 
     /**
-     * Create a connector with a single processing thread using a NewThreadExecutor 
+     * Create a connector with a single processing thread using a NewThreadExecutor
      */
     public SocketConnector()
     {
@@ -234,7 +234,7 @@ public class SocketConnector extends BaseIoConnector
 
     /**
      * Sets the config this connector will use by default.
-     * 
+     *
      * @param defaultConfig the default config.
      * @throws NullPointerException if the specified value is <code>null</code>.
      */
@@ -246,7 +246,7 @@ public class SocketConnector extends BaseIoConnector
         }
         this.defaultConfig = defaultConfig;
     }
-    
+
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
@@ -379,7 +379,7 @@ public class SocketConnector extends BaseIoConnector
         {
             throw ( IOException ) new IOException( "Failed to create a session." ).initCause( e );
         }
-        
+
         // Set the ConnectFuture of the specified session, which will be
         // removed and notified by AbstractIoFilterChain eventually.
         session.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, connectFuture );

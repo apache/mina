@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio.support;
 
@@ -48,11 +48,11 @@ import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import java.util.concurrent.Executor;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -70,7 +70,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private final Queue cancelQueue = new Queue();
     private final Queue flushingSessions = new Queue();
     private Worker worker;
-    
+
     /**
      * Creates a new instance.
      */
@@ -93,7 +93,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         if( address != null && !( address instanceof InetSocketAddress ) )
             throw new IllegalArgumentException( "Unexpected address type: "
                                                 + address.getClass() );
-        
+
         RegistrationRequest request = new RegistrationRequest( address, handler, config );
         synchronized( this )
         {
@@ -104,7 +104,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             startupWorker();
         }
         selector.wakeup();
-        
+
         synchronized( request )
         {
             while( !request.done )
@@ -118,7 +118,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 }
             }
         }
-        
+
         if( request.exception != null )
         {
             throw ( IOException ) new IOException( "Failed to bind" ).initCause( request.exception );
@@ -152,7 +152,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             }
         }
         selector.wakeup();
-        
+
         synchronized( request )
         {
             while( !request.done )
@@ -166,13 +166,13 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 }
             }
         }
-        
+
         if( request.exception != null )
         {
             throw new RuntimeException( "Failed to unbind" , request.exception );
         }
     }
-    
+
     public void unbindAll()
     {
         List addresses;
@@ -180,13 +180,13 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         {
             addresses = new ArrayList( channels.keySet() );
         }
-        
+
         for( Iterator i = addresses.iterator(); i.hasNext(); )
         {
             unbind( ( SocketAddress ) i.next() );
         }
     }
-    
+
     public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
     {
         if( remoteAddress == null )
@@ -197,14 +197,14 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         {
             throw new NullPointerException( "localAddress" );
         }
-        
+
         Selector selector = this.selector;
         DatagramChannel ch = ( DatagramChannel ) channels.get( localAddress );
         if( selector == null || ch == null )
         {
             throw new IllegalArgumentException( "Unknown localAddress: " + localAddress );
         }
-            
+
         SelectionKey key = ch.keyFor( selector );
         if( key == null )
         {
@@ -229,11 +229,11 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                     req.address );
             datagramSession.setRemoteAddress( remoteAddress );
             datagramSession.setSelectionKey( key );
-            
+
             getSessionRecycler( req ).put( datagramSession );
             session = datagramSession;
         }
-        
+
         try
         {
             buildFilterChain( req, session );
@@ -243,7 +243,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         {
             ExceptionMonitor.getInstance().exceptionCaught( t );
         }
-        
+
         return session;
     }
 
@@ -260,7 +260,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
         return sessionRecycler;
     }
-    
+
     public IoServiceListenerSupport getListeners()
     {
         return super.getListeners();
@@ -272,15 +272,15 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
         req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
     }
-    
+
     public IoServiceConfig getDefaultConfig()
     {
         return defaultConfig;
     }
-    
+
     /**
      * Sets the config this acceptor will use by default.
-     * 
+     *
      * @param defaultConfig the default config.
      * @throws NullPointerException if the specified value is <code>null</code>.
      */
@@ -292,7 +292,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
         this.defaultConfig = defaultConfig;
     }
-    
+
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
@@ -528,7 +528,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             {
                 destination = session.getRemoteAddress();
             }
-            
+
             int writtenBytes = ch.send( buf.buf(), destination );
 
             if( writtenBytes == 0 )
@@ -606,7 +606,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 {
                     channels.put( req.address, ch );
                 }
-                
+
                 getListeners().fireServiceActivated(
                         this, req.address, req.handler, req.config);
             }
@@ -650,7 +650,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             {
                 request = ( CancellationRequest ) cancelQueue.pop();
             }
-            
+
             if( request == null )
             {
                 break;
@@ -702,7 +702,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             }
         }
     }
-    
+
     public void updateTrafficMask( DatagramSessionImpl session )
     {
         // There's no point in changing the traffic mask for sessions originating
@@ -716,9 +716,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         private final IoHandler handler;
         private final IoServiceConfig config;
 
-        private Throwable exception; 
+        private Throwable exception;
         private boolean done;
-        
+
         private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
         {
             this.address = ( InetSocketAddress ) address;
@@ -733,7 +733,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         private boolean done;
         private RegistrationRequest registrationRequest;
         private RuntimeException exception;
-        
+
         private CancellationRequest( SocketAddress address )
         {
             this.address = address;

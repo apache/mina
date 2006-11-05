@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.integration.spring;
 
@@ -23,14 +23,14 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ExecutorThreadModel;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executor;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Tests {@link ExecutorThreadModelFactoryBean}.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -46,7 +46,7 @@ public class ExecutorThreadModelFactoryBeanTest extends TestCase
         ExecutorThreadModel threadModel = ( ExecutorThreadModel ) factory.getObject();
         assertSame( executor, threadModel.getExecutor() );
     }
-    
+
     public void testSuccessfulCreationWithoutExecutor() throws Exception
     {
         ExecutorThreadModelFactoryBean factory = new  ExecutorThreadModelFactoryBean();
@@ -55,7 +55,7 @@ public class ExecutorThreadModelFactoryBeanTest extends TestCase
         ExecutorThreadModel threadModel = ( ExecutorThreadModel ) factory.getObject();
         assertTrue( threadModel.getExecutor() instanceof ThreadPoolExecutor );
     }
-    
+
     public void testUnsuccessfulCreation() throws Exception
     {
         ExecutorThreadModelFactoryBean factory = new  ExecutorThreadModelFactoryBean();

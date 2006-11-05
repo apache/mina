@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.executor;
 
@@ -37,28 +37,28 @@ import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ExecutorFilterRegressionTest extends TestCase
 {
     private ExecutorFilter filter;
-    
+
     public ExecutorFilterRegressionTest()
     {
     }
-    
+
     public void setUp() throws Exception
     {
         filter = new ExecutorFilter();
     }
-    
+
     public void tearDown() throws Exception
     {
         ( ( ThreadPoolExecutor ) filter.getExecutor() ).shutdown();
         filter = null;
     }
-    
+
     public void testEventOrder() throws Throwable
     {
         final EventOrderChecker nextFilter = new EventOrderChecker();
@@ -79,7 +79,7 @@ public class ExecutorFilterRegressionTest extends TestCase
         final int end = sessions.length - 1;
         final ExecutorFilter filter = this.filter;
         ( ( ThreadPoolExecutor ) filter.getExecutor() ).setKeepAliveTime( 3, TimeUnit.SECONDS );
-        
+
         for( int i = 0; i < loop ; i++ )
         {
             Integer objI = new Integer( i );
@@ -94,15 +94,15 @@ public class ExecutorFilterRegressionTest extends TestCase
                 throw nextFilter.throwable;
             }
         }
-        
+
         Thread.sleep( 1000 );
-        
+
         for( int i = end; i >= 0; i-- )
         {
             Assert.assertEquals( loop - 1, sessions[ i ].lastCount.intValue() );
         }
     }
-    
+
     private static class EventOrderCounter extends BaseIoSession
     {
         private Integer lastCount = null;
@@ -113,7 +113,7 @@ public class ExecutorFilterRegressionTest extends TestCase
             {
                 Assert.assertEquals( lastCount.intValue() + 1, newCount.intValue() );
             }
-            
+
             lastCount = newCount;
         }
 
@@ -186,7 +186,7 @@ public class ExecutorFilterRegressionTest extends TestCase
             return 0;
         }
     }
-    
+
     private static class EventOrderChecker implements NextFilter
     {
         private Throwable throwable;
@@ -238,7 +238,7 @@ public class ExecutorFilterRegressionTest extends TestCase
         {
         }
     }
-    
+
     public static void main( String[] args )
     {
         junit.textui.TestRunner.run( ExecutorFilterRegressionTest.class );

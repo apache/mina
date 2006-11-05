@@ -6,37 +6,37 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.integration.spring;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.Executors;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
-import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Spring {@link FactoryBean} which enables the configuration of
  * {@link ThreadPoolExecutor} instances using Spring. Most of this code
  * has been copied from the <code>ThreadPoolTaskExecutor</code> class
- * available in Spring 2.0. 
- * 
+ * available in Spring 2.0.
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -85,7 +85,7 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
      * <p>
      * Any positive value will lead to a LinkedBlockingQueue instance; any other
      * value will lead to a SynchronousQueue instance.
-     * 
+     *
      * @see LinkedBlockingQueue
      * @see SynchronousQueue
      */
@@ -97,7 +97,7 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
     /**
      * Set the ThreadFactory to use for the ThreadPoolExecutor's thread pool.
      * Default is the ThreadPoolExecutor's default thread factory.
-     * 
+     *
      * @see Executors#defaultThreadFactory()
      */
     public void setThreadFactory( ThreadFactory threadFactory )
@@ -109,21 +109,21 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
     /**
      * Set the RejectedExecutionHandler to use for the ThreadPoolExecutor.
      * Default is the ThreadPoolExecutor's default abort policy.
-     * 
+     *
      * @see ThreadPoolExecutor.AbortPolicy
      */
     public void setRejectedExecutionHandler(
             RejectedExecutionHandler rejectedExecutionHandler )
     {
-        this.rejectedExecutionHandler = ( rejectedExecutionHandler != null 
+        this.rejectedExecutionHandler = ( rejectedExecutionHandler != null
                 ? rejectedExecutionHandler
                 : new ThreadPoolExecutor.AbortPolicy() );
     }
-    
+
     protected Object createInstance() throws Exception
     {
         BlockingQueue queue = null;
-        if( queueCapacity > 0 ) 
+        if( queueCapacity > 0 )
         {
             queue = new LinkedBlockingQueue( queueCapacity );
         }

@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio.support;
 
@@ -46,11 +46,11 @@ import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import java.util.concurrent.Executor;
 
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -94,18 +94,18 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         if( !( address instanceof InetSocketAddress ) )
             throw new IllegalArgumentException( "Unexpected address type: "
                                                 + address.getClass() );
-        
+
         if( localAddress != null && !( localAddress instanceof InetSocketAddress ) )
         {
             throw new IllegalArgumentException( "Unexpected local address type: "
                                                 + localAddress.getClass() );
         }
-        
+
         if( config == null )
         {
             config = getDefaultConfig();
         }
-        
+
         DatagramChannel ch = null;
         boolean initialized = false;
         try
@@ -120,7 +120,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             {
                 cfg = ( DatagramSessionConfig ) getDefaultConfig().getSessionConfig();
             }
-            
+
             ch.socket().setReuseAddress( cfg.isReuseAddress() );
             ch.socket().setBroadcast( cfg.isBroadcast() );
             ch.socket().setReceiveBufferSize( cfg.getReceiveBufferSize() );
@@ -180,7 +180,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
                 return DefaultConnectFuture.newFailedFuture( e );
             }
-            
+
             synchronized( registerQueue )
             {
                 registerQueue.push( request );
@@ -190,15 +190,15 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         selector.wakeup();
         return request;
     }
-    
+
     public IoServiceConfig getDefaultConfig()
     {
         return defaultConfig;
     }
-    
+
     /**
      * Sets the config this connector will use by default.
-     * 
+     *
      * @param defaultConfig the default config.
      * @throws NullPointerException if the specified value is <code>null</code>.
      */
@@ -210,7 +210,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
         this.defaultConfig = defaultConfig;
     }
-    
+
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )
@@ -276,7 +276,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
         selector.wakeup();
     }
-    
+
     private void scheduleTrafficControl( DatagramSessionImpl session )
     {
         synchronized( trafficControllingSessions )
@@ -284,8 +284,8 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             trafficControllingSessions.push( session );
         }
     }
-    
-    private void doUpdateTrafficMask() 
+
+    private void doUpdateTrafficMask()
     {
         if( trafficControllingSessions.isEmpty() )
             return;
@@ -304,7 +304,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
-            // (In case that Session.suspend??() or session.resume??() is 
+            // (In case that Session.suspend??() or session.resume??() is
             // called before addSession() is processed)
             if( key == null )
             {
@@ -334,7 +334,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             key.interestOps( ops & mask );
         }
     }
-    
+
     private class Worker implements Runnable
     {
         public void run()
@@ -428,7 +428,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             }
         }
     }
-    
+
     private DatagramSessionImpl getRecycledSession( IoSession session )
     {
         IoSessionRecycler sessionRecycler = getSessionRecycler( session );
@@ -452,7 +452,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
         return null;
     }
-    
+
     private IoSessionRecycler getSessionRecycler( IoSession session )
     {
         IoServiceConfig config = session.getServiceConfig();
@@ -614,7 +614,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                     req.config,
                     req.channel, req.handler,
                     req.channel.socket().getRemoteSocketAddress() );
-            
+
             // AbstractIoFilterChain will notify the connect future.
             session.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, req );
 
@@ -697,7 +697,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 {
                     ExceptionMonitor.getInstance().exceptionCaught( e );
                 }
-                
+
                 getListeners().fireSessionDestroyed( session );
                 session.getCloseFuture().setClosed();
                 key.cancel();
