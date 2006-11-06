@@ -34,6 +34,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -134,19 +135,13 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         selector.wakeup();
 
-        synchronized( request )
+        try
         {
-            while( !request.done )
-            {
-                try
-                {
-                    request.wait();
-                }
-                catch( InterruptedException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                }
-            }
+            request.done.await();
+        }
+        catch( InterruptedException e )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( e );
         }
 
         if( request.exception != null )
@@ -154,7 +149,6 @@ public class SocketAcceptor extends BaseIoAcceptor
             throw request.exception;
         }
     }
-
 
     private synchronized void startupWorker() throws IOException
     {
@@ -196,19 +190,13 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         selector.wakeup();
 
-        synchronized( request )
+        try
         {
-            while( !request.done )
-            {
-                try
-                {
-                    request.wait();
-                }
-                catch( InterruptedException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                }
-            }
+            request.done.await();
+        }
+        catch( InterruptedException e )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( e );
         }
 
         if( request.exception != null )
@@ -424,12 +412,7 @@ public class SocketAcceptor extends BaseIoAcceptor
             }
             finally
             {
-                synchronized( req )
-                {
-                    req.done = true;
-
-                    req.notifyAll();
-                }
+                req.done.countDown();
 
                 if( ssc != null && req.exception != null )
                 {
@@ -489,11 +472,7 @@ public class SocketAcceptor extends BaseIoAcceptor
             }
             finally
             {
-                synchronized( request )
-                {
-                    request.done = true;
-                    request.notifyAll();
-                }
+                request.done.countDown();
 
                 if( request.exception == null )
                 {
@@ -511,8 +490,8 @@ public class SocketAcceptor extends BaseIoAcceptor
         private InetSocketAddress address;
         private final IoHandler handler;
         private final IoServiceConfig config;
-        private IOException exception;
-        private boolean done;
+        private final CountDownLatch done = new CountDownLatch( 1 );
+        private volatile IOException exception;
 
         private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
         {
@@ -522,13 +501,12 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-
     private static class CancellationRequest
     {
         private final SocketAddress address;
-        private boolean done;
+        private final CountDownLatch done = new CountDownLatch( 1 );
         private RegistrationRequest registrationRequest;
-        private RuntimeException exception;
+        private volatile RuntimeException exception;
 
         private CancellationRequest( SocketAddress address )
         {
