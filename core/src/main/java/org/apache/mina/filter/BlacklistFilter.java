@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter;
 
@@ -23,8 +23,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
@@ -35,22 +35,22 @@ import org.apache.mina.util.SessionLog;
 /**
  * A {@link IoFilter} which blocks connections from blacklisted remote
  * address.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
 public class BlacklistFilter extends IoFilterAdapter
 {
-    private final Set blacklist = new HashSet();
+    private final Set<InetAddress> blacklist = new CopyOnWriteArraySet<InetAddress>( );
 
     /**
      * Sets the addresses to be blacklisted.
-     * 
+     *
      * NOTE: this call will remove any previously blacklisted addresses.
-     * 
+     *
      * @param addresses an array of addresses to be blacklisted.
      */
-    public void setBlacklist( InetAddress[] addresses )
+    public void setBlacklist( InetAddress... addresses )
     {
         if( addresses == null )
             throw new NullPointerException( "addresses" );
@@ -61,18 +61,18 @@ public class BlacklistFilter extends IoFilterAdapter
             block (addr, "addresses[" + i + ']' );
         }
     }
-    
+
     /**
      * Sets the addresses to be blacklisted.
-     * 
+     *
      * NOTE: this call will remove any previously blacklisted addresses.
-     * 
-     * @param addresses a collection of InetAddress objects representing the 
+     *
+     * @param addresses a collection of InetAddress objects representing the
      *        addresses to be blacklisted.
-     * @throws IllegalArgumentException if the specified collections contains 
+     * @throws IllegalArgumentException if the specified collections contains
      *         non-{@link InetAddress} objects.
      */
-    public void setBlacklist( Collection addresses )
+    public void setBlacklist( Collection<InetAddress> addresses )
     {
         if( addresses == null )
             throw new NullPointerException( "addresses" );
@@ -80,7 +80,7 @@ public class BlacklistFilter extends IoFilterAdapter
         InetAddress[] inetAddresses = new InetAddress[ addresses.size() ];
         try
         {
-            setBlacklist( ( InetAddress[] ) addresses.toArray( inetAddresses ) );
+            setBlacklist( addresses.toArray( inetAddresses ) );
         }
         catch ( ArrayStoreException ase )
         {
@@ -90,11 +90,11 @@ public class BlacklistFilter extends IoFilterAdapter
             throw iae;
         }
     }
-    
+
     /**
      * Blocks the specified endpoint.
      */
-    public synchronized void block( InetAddress address , String error_string )
+    public void block( InetAddress address , String error_string )
     {
         if( address == null )
             throw new NullPointerException( error_string );
@@ -104,7 +104,7 @@ public class BlacklistFilter extends IoFilterAdapter
     /**
      * Blocks the specified endpoint.
      */
-    public synchronized void block( InetAddress address )
+    public void block( InetAddress address )
     {
         block( address, "address" );
     }
@@ -112,13 +112,14 @@ public class BlacklistFilter extends IoFilterAdapter
     /**
      * Unblocks the specified endpoint.
      */
-    public synchronized void unblock( InetAddress address )
+    public void unblock( InetAddress address )
     {
         if( address == null )
             throw new NullPointerException( "address" );
         blacklist.remove( address );
     }
-    
+
+    @Override
     public void sessionCreated( NextFilter nextFilter, IoSession session )
     {
         if( !isBlocked( session ) )
@@ -131,7 +132,8 @@ public class BlacklistFilter extends IoFilterAdapter
             blockSession( session );
         }
     }
-    
+
+    @Override
     public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
     {
         if( !isBlocked( session ) )
@@ -145,6 +147,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
     {
         if( !isBlocked( session ) )
@@ -158,6 +161,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status ) throws Exception
     {
         if( !isBlocked( session ) )
@@ -171,6 +175,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void messageReceived( NextFilter nextFilter, IoSession session, Object message )
     {
         if( !isBlocked( session ) )
@@ -184,6 +189,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
     {
         if( !isBlocked( session ) )
