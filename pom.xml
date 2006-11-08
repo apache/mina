@@ -7,7 +7,7 @@
     <version>1.0.6-SNAPSHOT</version>
   </parent>
   <groupId>org.apache.mina</groupId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.5.0-SNAPSHOT</version>
   <artifactId>build</artifactId>
   <name>Apache MINA</name>
   <packaging>pom</packaging>
@@ -313,7 +313,6 @@ Use JDK 1.5 to make sure these modules build.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
-        <version>2.1</version>
       </plugin>
     </plugins>
   </build>
