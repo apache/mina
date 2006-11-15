@@ -43,7 +43,10 @@ public class IoSessionStat
 
     float messageWrittenThroughput = 0;
     float messageReadThroughput = 0;
-
+    
+    // last time the session was polled
+    long lastPollingTime;
+    
     /**
      * Bytes read per second  
      * @return bytes per second
