@@ -25,7 +25,6 @@ import java.util.Iterator;
 
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.management.IoSessionStat;
 import org.apache.mina.management.StatCollector;
 
 
@@ -83,153 +82,49 @@ public class IoServiceManager implements IoServiceManagerMBean
 
     public float getTotalByteReadThroughput()
     {
-        float total = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getByteReadThroughput();
-            }
-        }
-        return total;
+    	return collector.getBytesReadThroughput();
     }
 
 
     public float getTotalByteWrittenThroughput()
     {
-        float total = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getByteWrittenThroughput();
-            }
-        }
-        return total;
+    	return collector.getBytesWrittenThroughput();
     }
 
 
     public float getTotalMessageReadThroughput()
     {
-        float total = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getMessageReadThroughput();
-            }
-        }
-        return total;
+    	return collector.getMsgReadThroughput();
     }
 
 
     public float getTotalMessageWrittenThroughput()
     {
-        float total = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getMessageWrittenThroughput();
-            }
-        }
-        return total;
+    	return collector.getMsgWrittenThroughput();
     }
 
 
     public float getAverageByteReadThroughput()
     {
-        float total = 0;
-        int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getByteReadThroughput();
-                count++;
-            }
-        }
-        return total / count;
+        return collector.getBytesReadThroughput() / (float) collector.getSessionCount();
     }
 
 
     public float getAverageByteWrittenThroughput()
     {
-        float total = 0;
-        int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getByteWrittenThroughput();
-                count++;
-            }
-        }
-        return total / count;
+        return collector.getBytesWrittenThroughput() / (float) collector.getSessionCount();    
     }
 
 
     public float getAverageMessageReadThroughput()
     {
-        float total = 0;
-        int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getMessageReadThroughput();
-                count++;
-            }
-        }
-        return total / count;
+        return collector.getMsgReadThroughput() / (float) collector.getSessionCount();
     }
 
 
     public float getAverageMessageWrittenThroughput()
     {
-        float total = 0;
-        int count = 0;
-        for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
-        {
-            SocketAddress element = ( SocketAddress ) iter.next();
-
-            for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
-            {
-                IoSession session = ( IoSession ) iter2.next();
-                total += ( ( IoSessionStat ) session.getAttribute( StatCollector.KEY ) )
-                    .getMessageWrittenThroughput();
-                count++;
-            }
-        }
-        return total / count;
+        return collector.getMsgWrittenThroughput() / (float) collector.getSessionCount();    
     }
 
 
