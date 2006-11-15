@@ -31,7 +31,6 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 
-
 /**
  * Collects statistics of an {@link IoService}. It's polling all the sessions of a given
  * IoService. It's attaching a {@link IoSessionStat} object to all the sessions polled
@@ -69,6 +68,13 @@ public class StatCollector
     private int pollingInterval = 5000;
     private List polledSessions;
 
+    // resume of session stats, for simplifying acces to the statistics 
+    private long totalProcessedSessions = 0L;
+    private float msgWrittenThroughput = 0f;
+    private float msgReadThroughput = 0f;
+    private float bytesWrittenThroughput = 0f;
+    private float bytesReadThroughput = 0f;
+    
     private final IoServiceListener serviceListener = new IoServiceListener()
     {
         public void serviceActivated( IoService service, SocketAddress serviceAddress, IoHandler handler,
@@ -99,7 +105,6 @@ public class StatCollector
     public StatCollector( IoService service )
     {
         this( service,5000 );
-
     }
 
     /**
@@ -197,16 +202,72 @@ public class StatCollector
 
     private void addSession( IoSession session )
     {
-        polledSessions.add( session );
-        session.setAttribute( KEY, new IoSessionStat() );
+    	synchronized (this) 
+    	{
+        	totalProcessedSessions += 1;
+        	polledSessions.add( session );
+            session.setAttribute( KEY, new IoSessionStat() );
+		}
     }
 
     private void removeSession( IoSession session )
     {
-        polledSessions.remove( session );
-        session.removeAttribute( KEY );
+    	synchronized (this)
+    	{
+
+    		// remove the session from the list of polled sessions
+    		polledSessions.remove( session );
+
+    		// add the bytes processed between last polling and session closing
+    		// prevent non seen byte with non-connected protocols like HTTP and datagrams
+    		IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
+    		
+    		// computing with time between polling and closing
+        	bytesReadThroughput += ( (float) (session.getReadBytes() - sessStat.lastByteRead) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+        	bytesWrittenThroughput += ( (float) (session.getWrittenBytes() - sessStat.lastByteWrite) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+        	msgReadThroughput += ( (float) (session.getReadMessages() - sessStat.lastMessageRead) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+        	msgWrittenThroughput += ( (float) (session.getWrittenMessages() - sessStat.lastMessageWrite) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+        	        	        	
+            session.removeAttribute( KEY );
+			
+		}
     }
 
+
+    /**
+     * total number of sessions processed by the stat collector
+     * @return number of sessions
+     */
+    public long getTotalProcessedSessions()
+    {
+    	return totalProcessedSessions;
+    }
+    
+	public float getBytesReadThroughput()
+	{
+		return bytesReadThroughput;
+	}
+
+	public float getBytesWrittenThroughput()
+	{
+		return bytesWrittenThroughput;
+	}
+
+	public float getMsgReadThroughput()
+	{
+		return msgReadThroughput;
+	}
+
+	public float getMsgWrittenThroughput() 
+	{
+		return msgWrittenThroughput;
+	}
+	
+	public long getSessionCount() 
+	{
+		return polledSessions.size();
+	}
+	
     private class Worker extends Thread
     {
 
@@ -240,22 +301,37 @@ public class StatCollector
                 catch ( InterruptedException e )
                 {
                 }
-
+                
+                
+                msgWrittenThroughput = 0f;
+                msgReadThroughput = 0f;
+                bytesWrittenThroughput = 0f;
+                bytesReadThroughput = 0f;
+                
                 for ( Iterator iter = polledSessions.iterator(); iter.hasNext(); )
                 {
+                	
+                	// upadating individual session statistics
                     IoSession session = ( IoSession ) iter.next();
                     IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
 
                     sessStat.byteReadThroughput = ( session.getReadBytes() - sessStat.lastByteRead )
                         / ( pollingInterval / 1000f );
+                    bytesReadThroughput += sessStat.byteReadThroughput;
+                    
                     sessStat.byteWrittenThroughput = ( session.getWrittenBytes() - sessStat.lastByteWrite )
                         / ( pollingInterval / 1000f );
+                    bytesWrittenThroughput += sessStat.byteWrittenThroughput;
 
                     sessStat.messageReadThroughput = ( session.getReadMessages() - sessStat.lastMessageRead )
                         / ( pollingInterval / 1000f );
+                    msgReadThroughput += sessStat.messageReadThroughput;
+                    
                     sessStat.messageWrittenThroughput = ( session.getWrittenMessages() - sessStat.lastMessageWrite )
                         / ( pollingInterval / 1000f );
-
+                    msgWrittenThroughput += sessStat.messageWrittenThroughput;
+                    
+                    sessStat.lastPollingTime = System.currentTimeMillis();
                 }
             }
         }
