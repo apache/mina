@@ -310,10 +310,10 @@ Use JDK 1.5 to make sure these modules build.
           <includeSite>true</includeSite>
         </configuration>
       </plugin>
-      <plugin>
+      <!--plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
-      </plugin>
+      </plugin-->
     </plugins>
   </build>
 
