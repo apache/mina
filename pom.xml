@@ -170,7 +170,7 @@
         <configuration>
           <descriptor>release.xml</descriptor>
           <finalName>mina-${pom.version}</finalName>
-          <includeSite>true</includeSite>
+          <includeSite>false</includeSite>
         </configuration>
       </plugin>
     </plugins>
