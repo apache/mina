@@ -9,6 +9,7 @@
   <artifactId>mina-example</artifactId>
   <name>Apache MINA Examples</name>
   <packaging>jar</packaging>  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.mina</groupId>

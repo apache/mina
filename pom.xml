@@ -2,24 +2,22 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.directory</groupId>
-    <artifactId>build</artifactId>
-    <version>1.0.5</version>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>3</version>
   </parent>
+  <organization>
+    <name>Apache MINA Project</name>
+    <url>http://mina.apace.org/</url>
+  </organization>
   <groupId>org.apache.mina</groupId>
   <version>1.1.0-SNAPSHOT</version>
   <artifactId>build</artifactId>
-  <name>Apache MINA</name>
+  <name>Apache MINA Root Build POM</name>
   <packaging>pom</packaging>
 
-  <url>http://directory.apache.org/subprojects/mina/</url>
-
-  <distributionManagement>
-    <site>
-      <id>apache.websites</id>
-      <url>scp://people.apache.org/www/directory.apache.org/subprojects/mina/</url>
-    </site>
-  </distributionManagement>
+  <url>http://mina.apache.org/</url>
+  <inceptionYear>2004</inceptionYear>
 
   <issueManagement>
     <system>jira</system>
@@ -27,16 +25,16 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/directory/trunks/mina</connection>
-    <url>http://svn.apache.org/viewvc/directory/trunks/mina/</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/directory/trunks/mina</developerConnection>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/branches/1.1</connection>
+    <url>http://svn.apache.org/viewvc/directory/mina/branches/1.1</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/1.1</developerConnection>
   </scm>
 
   <ciManagement>
     <notifiers>
       <notifier>
         <type>mail</type>
-        <address>mina-dev@directory.apache.org</address>
+        <address>dev@mina.apache.org</address>
       </notifier>
     </notifiers>
   </ciManagement>
@@ -46,81 +44,6 @@
     network application framework which helps users develop high
     performance and highly scalable network applications easily.
   </description>
-
-  <mailingLists>
-    <mailingList>
-      <name>Apache MINA Developement</name>
-      <subscribe>mina-dev-subscribe@directory.apache.org</subscribe>
-      <unsubscribe>mina-dev-unsubscribe@directory.apache.org</unsubscribe>
-      <post>mina-dev@directory.apache.org</post>
-      <archive>http://mail-archives.apache.org/mod_mbox/directory-mina-dev/</archive>
-      <otherArchives>
-        <archive>http://dir.gmane.org/gmane.comp.apache.directory.mina.devel</archive>
-      </otherArchives>
-    </mailingList>
-  </mailingLists>
-
-  <developers>
-    <developer>
-      <id>trustin</id>
-      <name>Trustin Lee</name>
-      <email>trustin@gmail.com</email>
-      <url>http://gleamynode.net/</url>
-      <organization>Chutnoon, Inc.</organization>
-      <organizationUrl>http://www.1nooncorp.com/</organizationUrl>
-      <roles>
-        <role>Project Lead</role>
-        <role>Developer</role>
-      </roles>
-      <timezone>+9</timezone>
-    </developer>
-    <developer>
-      <id>niklas</id>
-      <name>Niklas Therning</name>
-      <email>niklas@trillian.se</email>
-      <url>http://therning.org/niklas/</url>
-      <organization>Trillian AB</organization>
-      <organizationUrl>http://www.trillian.se/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>akarasulu</id>
-      <name>Alex Karasulu</name>
-      <email>akarasulu@apache.org</email>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>-5</timezone>
-    </developer>
-    <developer>
-      <id>proyal</id>
-      <name>Peter Royal</name>
-      <email>proyal@apache.org</email>
-      <url>http://fotap.org/~osi</url>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>-8</timezone>
-    </developer>
-  </developers>
-
-  <contributors>
-    <contributor>
-      <name>Jan Andersson</name>
-      <email>janne@minq.se</email>
-    </contributor>
-    <contributor>
-      <name>Julien Vermillard</name>
-      <email>jvermillard@archean.fr</email>
-    </contributor>
-    <contributor>
-      <name>Vinod Panicker</name>
-      <email>vinod.p@gmail.com</email>
-    </contributor>
-  </contributors>
 
   <licenses>
     <license>
@@ -140,21 +63,6 @@
   </dependencies>
 
   <repositories>
-    <!-- For releases -->
-    <!--
-    <repository>
-      <id>playboy.mirror</id>
-      <name>Apache Repository @ Playboy</name>
-      <url>http://mirrors.playboy.com/apache/maven-repository/</url>
-    </repository>
-    -->
-
-    <!-- For snapshots (no release jars or non-apache jars) -->
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-    </repository>
   </repositories>
 
   <profiles>
@@ -165,24 +73,72 @@
       </activation>
       <modules>
         <module>core</module>
+        <module>java5</module>
         <module>filter-ssl</module>
         <module>filter-codec-netty</module>
         <module>filter-compression</module>
         <module>integration-spring</module>
-		<module>integration-jmx</module>
+	      <module>integration-jmx</module>
         <module>example</module>
       </modules>
     </profile>
-  </profiles>
 
+    <profile>
+      <id>jdk1.4</id>
+      <activation>
+        <jdk>1.4</jdk>
+      </activation>
+      <modules>
+        <module>core</module>
+        <module>filter-codec-netty</module>
+        <module>filter-compression</module>
+      </modules>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>validate</phase>
+                <configuration>
+                  <tasks>
+                    <echo>
+====================================================================
+                       W A R N I N G
+                       -------------
+
+Build with 1.4 jvm will not include modules:
+ 
+ o mina-java5
+ o mina-filter-ssl
+ o mina-integration-spring
+ o mina-example
+ o mina-jmx
+
+Use JDK 1.5 to make sure these modules build.
+====================================================================
+                    </echo>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.4</source>
+          <target>1.4</target>
           <debug>true</debug>
           <optimize>true</optimize>
           <showDeprecations>true</showDeprecations>
@@ -213,10 +169,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
       </plugin>
       <plugin>
         <inherited>false</inherited>
@@ -259,47 +211,17 @@
         <configuration>
           <descriptor>release.xml</descriptor>
           <finalName>mina-${pom.version}</finalName>
-          <includeSite>true</includeSite>
+          <includeSite>false</includeSite>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagBase>
+            https://svn.apache.org/repos/asf/mina/tags
+          </tagBase>
+        </configuration>
       </plugin>
     </plugins>
   </build>
-
-  <!-- <reporting>
-    <plugins> -->
-      <!-- This has been disabled to due license expiration issue. -->
-      <!-- <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clover-plugin</artifactId>
-      </plugin> -->
-      <!-- <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-      </plugin> -->
-      <!-- This is no longer needed while it cannot do
-           fully connected multi module apidocs. -->
-      <!-- <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin> -->
-      <!-- <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-      </plugin> -->
-      <!-- This has been disabled due to incorrect functioning. -->
-      <!-- <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jxr-maven-plugin</artifactId>
-      </plugin> -->
-      <!-- <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>surefire-report-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reporting> -->
-
 </project>

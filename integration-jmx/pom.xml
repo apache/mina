@@ -9,6 +9,7 @@
   <artifactId>mina-integration-jmx</artifactId>
   <name>Apache MINA JMX integration</name>
   <packaging>jar</packaging>  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.mina</groupId>
