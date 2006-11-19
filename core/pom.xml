@@ -8,9 +8,7 @@
   </parent>
   <artifactId>mina-core</artifactId>
   <name>Apache MINA Core API</name>
-  <inceptionYear>2004</inceptionYear>
-
-  <url>http://directory.apache.org/projects/mina/</url>
+  <packaging>jar</packaging>
 
   <dependencies>
 
