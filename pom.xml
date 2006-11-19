@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.directory</groupId>
@@ -7,7 +7,7 @@
     <version>1.0.5</version>
   </parent>
   <groupId>org.apache.directory.mina</groupId>
-  <version>0.8.4-SNAPSHOT</version>
+  <version>0.8.4</version>
   <artifactId>mina</artifactId>
   <name>Apache MINA</name>
   <packaging>jar</packaging>
@@ -27,9 +27,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/directory/branches/mina/0.8</connection>
-    <url>http://svn.apache.org/viewvc/directory/branches/mina/0.8/</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/directory/branches/mina/0.8</developerConnection>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/0.8.4</connection>
+    <url>https://svn.apache.org/repos/asf/mina/tags/0.8.4</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/0.8.4</developerConnection>
   </scm>
 
   <ciManagement>
@@ -224,9 +224,9 @@
             <configuration>
               <tasks>
                 <javadoc destdir="target/site/apidocs" author="true" use="true" windowtitle="Apache MINA API Documentation" encoding="UTF-8" docencoding="UTF-8" locale="en_US">
-                  <package name="org.apache.mina.*"/>
-                  <excludepackage name="**.examples.**"/>
-                  <excludepackage name="**.support"/>
+                  <package name="org.apache.mina.*" />
+                  <excludepackage name="**.examples.**" />
+                  <excludepackage name="**.support" />
 
                   <sourcepath>
                     <dirset dir=".">
@@ -259,8 +259,12 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagBase>
+            https://svn.apache.org/repos/asf/mina/tags
+          </tagBase>
+        </configuration>
       </plugin>
     </plugins>
   </build>
