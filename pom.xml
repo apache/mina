@@ -63,21 +63,6 @@
   </dependencies>
 
   <repositories>
-    <!-- For releases -->
-    <!--
-    <repository>
-      <id>playboy.mirror</id>
-      <name>Apache Repository @ Playboy</name>
-      <url>http://mirrors.playboy.com/apache/maven-repository/</url>
-    </repository>
-    -->
-
-    <!-- For snapshots (no release jars or non-apache jars) -->
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-    </repository>
   </repositories>
 
   <modules>
@@ -171,6 +156,14 @@
           <descriptor>release.xml</descriptor>
           <finalName>mina-${pom.version}</finalName>
           <includeSite>false</includeSite>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagBase>
+            https://svn.apache.org/repos/asf/mina/tags
+          </tagBase>
         </configuration>
       </plugin>
     </plugins>
