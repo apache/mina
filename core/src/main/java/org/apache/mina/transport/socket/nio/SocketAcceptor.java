@@ -29,6 +29,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
@@ -40,8 +41,6 @@ import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.Queue;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).

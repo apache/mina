@@ -19,12 +19,12 @@
  */
 package org.apache.mina.integration.spring;
 
+import java.util.concurrent.Executor;
+
 import org.apache.mina.common.ExecutorThreadModel;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * Spring {@link FactoryBean} which makes it possible to set up a MINA

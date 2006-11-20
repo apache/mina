@@ -19,14 +19,14 @@
  */
 package org.apache.mina.integration.spring;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ExecutorThreadModel;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * Tests {@link ExecutorThreadModelFactoryBean}.

@@ -20,13 +20,6 @@
     </dependency>
 
     <dependency>
-      <groupId>backport-util-concurrent</groupId>
-      <artifactId>backport-util-concurrent</artifactId>
-      <version>2.2</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
       <groupId>easymock</groupId>
       <artifactId>easymock</artifactId>
       <version>1.2_Java1.3</version>

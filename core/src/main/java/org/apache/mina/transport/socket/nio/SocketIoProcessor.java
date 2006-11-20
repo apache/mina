@@ -25,6 +25,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
@@ -36,8 +37,6 @@ import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * Performs all I/O operations for sockets which is connected or bound. This class is used by MINA internally.

@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common.support;
 
+import java.net.SocketAddress;
 import java.util.Set;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;

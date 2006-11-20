@@ -19,13 +19,13 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.util.concurrent.Executor;
+
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.support.DelegatedIoAcceptor;
 import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).

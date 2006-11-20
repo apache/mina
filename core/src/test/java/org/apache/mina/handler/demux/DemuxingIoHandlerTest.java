@@ -22,8 +22,6 @@ package org.apache.mina.handler.demux;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.IoSession;
-import org.apache.mina.handler.demux.DemuxingIoHandler;
-import org.apache.mina.handler.demux.MessageHandler;
 import org.easymock.MockControl;
 
 /**

@@ -19,6 +19,8 @@
  */
 package org.apache.mina.management;
 
+import org.apache.mina.common.IoSession;
+
 /**
  * The collected stats for a session. It's used by {@link StatCollector} to attach
  * throughput stats to an {@link IoSession}. You can accces a session stat using 

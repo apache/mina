@@ -18,7 +18,7 @@
  */
 package org.apache.mina.util;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import java.util.concurrent.Executor;
 
 /**
  * An Executor that just launches in a new thread.

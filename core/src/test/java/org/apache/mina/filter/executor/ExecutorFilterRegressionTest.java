@@ -20,6 +20,8 @@
 package org.apache.mina.filter.executor;
 
 import java.net.SocketAddress;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -35,9 +37,6 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class ExecutorFilterRegressionTest extends TestCase
 {
