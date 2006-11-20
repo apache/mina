@@ -64,19 +64,42 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
     private static class SimpleByteBuffer extends BaseByteBuffer
     {
         private java.nio.ByteBuffer buf;
+        private int refCount = 1;
 
         protected SimpleByteBuffer( java.nio.ByteBuffer buf )
         {
             this.buf = buf;
             buf.order( ByteOrder.BIG_ENDIAN );
+            refCount = 1;
         }
 
-        public void acquire()
+        public synchronized void acquire()
         {
+            if( refCount <= 0 )
+            {
+                throw new IllegalStateException( "Already released buffer." );
+            }
+
+            refCount ++;
         }
 
         public void release()
         {
+            synchronized( this )
+            {
+                if( refCount <= 0 )
+                {
+                    refCount = 0;
+                    throw new IllegalStateException(
+                            "Already released buffer.  You released the buffer too many times." );
+                }
+
+                refCount --;
+                if( refCount > 0)
+                {
+                    return;
+                }
+            }
         }
 
         public java.nio.ByteBuffer buf()
