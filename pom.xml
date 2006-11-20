@@ -67,7 +67,6 @@
 
   <modules>
     <module>core</module>
-    <module>java5</module>
     <module>filter-ssl</module>
     <module>filter-codec-netty</module>
     <module>filter-compression</module>

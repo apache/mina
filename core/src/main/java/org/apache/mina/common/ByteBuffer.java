@@ -158,7 +158,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  */
 public abstract class ByteBuffer implements Comparable
 {
-    private static ByteBufferAllocator allocator = new PooledByteBufferAllocator();
+    private static ByteBufferAllocator allocator = new SimpleByteBufferAllocator();
 
     private static boolean preferDirectBuffers = false;
 
