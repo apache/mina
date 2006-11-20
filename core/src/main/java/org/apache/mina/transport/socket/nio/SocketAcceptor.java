@@ -28,9 +28,9 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ExceptionMonitor;
@@ -66,8 +66,8 @@ public class SocketAcceptor extends BaseIoAcceptor
     private final String threadName = "SocketAcceptor-" + id;
 
     private ServerSocketChannel serverSocketChannel;
-    private final Queue<RegistrationRequest> registerQueue = new LinkedList<RegistrationRequest>();
-    private final Queue<CancellationRequest> cancelQueue = new LinkedList<CancellationRequest>();
+    private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
+    private final Queue<CancellationRequest> cancelQueue = new ConcurrentLinkedQueue<CancellationRequest>();
 
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
@@ -195,10 +195,7 @@ public class SocketAcceptor extends BaseIoAcceptor
     {
         RegistrationRequest request = new RegistrationRequest();
 
-        synchronized( registerQueue )
-        {
-            registerQueue.offer( request );
-        }
+        registerQueue.offer( request );
 
         startupWorker();
 
@@ -276,11 +273,7 @@ public class SocketAcceptor extends BaseIoAcceptor
             throw new IllegalArgumentException( "Address not bound: " + getLocalAddress() );
         }
 
-        synchronized( cancelQueue )
-        {
-            cancelQueue.offer( request );
-        }
-
+        cancelQueue.offer( request );
         selector.wakeup();
 
         synchronized( request )
@@ -424,20 +417,9 @@ public class SocketAcceptor extends BaseIoAcceptor
 
     private void registerNew()
     {
-        if( registerQueue.isEmpty() )
-        {
-            return;
-        }
-
         for( ; ; )
         {
-            RegistrationRequest req;
-
-            synchronized( registerQueue )
-            {
-                req = registerQueue.poll();
-            }
-
+            RegistrationRequest req = registerQueue.poll();
             if( req == null )
             {
                 break;
@@ -495,20 +477,9 @@ public class SocketAcceptor extends BaseIoAcceptor
 
     private void cancelKeys()
     {
-        if( cancelQueue.isEmpty() )
-        {
-            return;
-        }
-
         for( ; ; )
         {
-            CancellationRequest request;
-
-            synchronized( cancelQueue )
-            {
-                request = cancelQueue.poll();
-            }
-
+            CancellationRequest request = cancelQueue.poll();
             if( request == null )
             {
                 break;

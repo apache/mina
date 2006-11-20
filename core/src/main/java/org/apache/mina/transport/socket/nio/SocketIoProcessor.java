@@ -24,9 +24,9 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ByteBuffer;
@@ -56,10 +56,10 @@ class SocketIoProcessor
      */
     private Selector selector;
 
-    private final Queue<SocketSessionImpl> newSessions = new LinkedList<SocketSessionImpl>();
-    private final Queue<SocketSessionImpl> removingSessions = new LinkedList<SocketSessionImpl>();
-    private final Queue<SocketSessionImpl> flushingSessions = new LinkedList<SocketSessionImpl>();
-    private final Queue<SocketSessionImpl> trafficControllingSessions = new LinkedList<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> newSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> removingSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> flushingSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> trafficControllingSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
 
     private Worker worker;
     private long lastIdleCheckTime = System.currentTimeMillis();
@@ -72,10 +72,7 @@ class SocketIoProcessor
 
     void addNew( SocketSessionImpl session ) throws IOException
     {
-        synchronized( newSessions )
-        {
-            newSessions.offer( session );
-        }
+        newSessions.offer( session );
 
         startupWorker();
 
@@ -124,41 +121,24 @@ class SocketIoProcessor
 
     private void scheduleRemove( SocketSessionImpl session )
     {
-        synchronized( removingSessions )
-        {
-            removingSessions.offer( session );
-        }
+        removingSessions.offer( session );
     }
 
     private void scheduleFlush( SocketSessionImpl session )
     {
-        synchronized( flushingSessions )
-        {
-            flushingSessions.offer( session );
-        }
+        flushingSessions.offer( session );
     }
 
     private void scheduleTrafficControl( SocketSessionImpl session )
     {
-        synchronized( trafficControllingSessions )
-        {
-            trafficControllingSessions.offer( session );
-        }
+        trafficControllingSessions.offer( session );
     }
 
     private void doAddNew()
     {
-        if( newSessions.isEmpty() )
-            return;
-
         for( ; ; )
         {
-            SocketSessionImpl session;
-
-            synchronized( newSessions )
-            {
-                session = newSessions.poll();
-            }
+            SocketSessionImpl session = newSessions.poll();
 
             if( session == null )
                 break;
@@ -199,17 +179,9 @@ class SocketIoProcessor
 
     private void doRemove()
     {
-        if( removingSessions.isEmpty() )
-            return;
-
         for( ; ; )
         {
-            SocketSessionImpl session;
-
-            synchronized( removingSessions )
-            {
-                session = removingSessions.poll();
-            }
+            SocketSessionImpl session = removingSessions.poll();
 
             if( session == null )
                 break;
@@ -393,12 +365,7 @@ class SocketIoProcessor
 
         for( ; ; )
         {
-            SocketSessionImpl session;
-
-            synchronized( flushingSessions )
-            {
-                session = flushingSessions.poll();
-            }
+            SocketSessionImpl session = flushingSessions.poll();
 
             if( session == null )
                 break;
@@ -511,17 +478,11 @@ class SocketIoProcessor
 
     private void doUpdateTrafficMask()
     {
-        if( trafficControllingSessions.isEmpty() )
-            return;
-
         for( ; ; )
         {
             SocketSessionImpl session;
 
-            synchronized( trafficControllingSessions )
-            {
-                session = trafficControllingSessions.poll();
-            }
+            session = trafficControllingSessions.poll();
 
             if( session == null )
                 break;

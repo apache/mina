@@ -26,9 +26,9 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ByteBuffer;
@@ -64,9 +64,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private final int id = nextId ++ ;
     private Selector selector;
     private DatagramChannel channel;
-    private final Queue<RegistrationRequest> registerQueue = new LinkedList<RegistrationRequest>();
-    private final Queue<CancellationRequest> cancelQueue = new LinkedList<CancellationRequest>();
-    private final Queue<DatagramSessionImpl> flushingSessions = new LinkedList<DatagramSessionImpl>();
+    private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
+    private final Queue<CancellationRequest> cancelQueue = new ConcurrentLinkedQueue<CancellationRequest>();
+    private final Queue<DatagramSessionImpl> flushingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
     private Worker worker;
     
     /**
@@ -88,10 +88,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         RegistrationRequest request = new RegistrationRequest();
         synchronized( this )
         {
-            synchronized( registerQueue )
-            {
-                registerQueue.offer( request );
-            }
+            registerQueue.offer( request );
             startupWorker();
         }
         selector.wakeup();
@@ -138,10 +135,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 throw new IllegalArgumentException( "Address not bound: " + getLocalAddress() );
             }
 
-            synchronized( cancelQueue )
-            {
-                cancelQueue.offer( request );
-            }
+            cancelQueue.offer( request );
         }
         selector.wakeup();
         
@@ -287,10 +281,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
     private void scheduleFlush( DatagramSessionImpl session )
     {
-        synchronized( flushingSessions )
-        {
-            flushingSessions.offer( session );
-        }
+        flushingSessions.offer( session );
     }
 
     private class Worker implements Runnable
@@ -421,18 +412,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
     private void flushSessions()
     {
-        if( flushingSessions.size() == 0 )
-            return;
-
         for( ;; )
         {
-            DatagramSessionImpl session;
-
-            synchronized( flushingSessions )
-            {
-                session = flushingSessions.poll();
-            }
-
+            DatagramSessionImpl session = flushingSessions.poll();
             if( session == null )
                 break;
 
@@ -529,12 +511,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
         for( ;; )
         {
-            RegistrationRequest req;
-            synchronized( registerQueue )
-            {
-                req = registerQueue.poll();
-            }
-
+            RegistrationRequest req = registerQueue.poll();
             if( req == null )
                 break;
 
@@ -590,17 +567,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
     private void cancelKeys()
     {
-        if( cancelQueue.isEmpty() )
-            return;
-
         for( ;; )
         {
-            CancellationRequest request;
-            synchronized( cancelQueue )
-            {
-                request = cancelQueue.poll();
-            }
-            
+            CancellationRequest request = cancelQueue.poll();
             if( request == null )
             {
                 break;

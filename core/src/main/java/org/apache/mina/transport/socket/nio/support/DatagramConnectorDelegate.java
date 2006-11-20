@@ -26,9 +26,9 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ByteBuffer;
@@ -65,10 +65,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
-    private final Queue<RegistrationRequest> registerQueue = new LinkedList<RegistrationRequest>();
-    private final Queue<DatagramSessionImpl> cancelQueue = new LinkedList<DatagramSessionImpl>();
-    private final Queue<DatagramSessionImpl> flushingSessions = new LinkedList<DatagramSessionImpl>();
-    private final Queue<DatagramSessionImpl> trafficControllingSessions = new LinkedList<DatagramSessionImpl>();
+    private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
+    private final Queue<DatagramSessionImpl> cancelQueue = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+    private final Queue<DatagramSessionImpl> flushingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+    private final Queue<DatagramSessionImpl> trafficControllingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
     private Worker worker;
 
     /**
@@ -154,10 +154,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 return DefaultConnectFuture.newFailedFuture( e );
             }
             
-            synchronized( registerQueue )
-            {
-                registerQueue.offer( request );
-            }
+            registerQueue.offer( request );
         }
 
         selector.wakeup();
@@ -212,10 +209,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 return;
             }
 
-            synchronized( cancelQueue )
-            {
-                cancelQueue.offer( session );
-            }
+            cancelQueue.offer( session );
         }
 
         selector.wakeup();
@@ -233,10 +227,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
     private void scheduleFlush( DatagramSessionImpl session )
     {
-        synchronized( flushingSessions )
-        {
-            flushingSessions.offer( session );
-        }
+        flushingSessions.offer( session );
     }
 
     public void updateTrafficMask( DatagramSessionImpl session )
@@ -252,26 +243,14 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     
     private void scheduleTrafficControl( DatagramSessionImpl session )
     {
-        synchronized( trafficControllingSessions )
-        {
-            trafficControllingSessions.offer( session );
-        }
+        trafficControllingSessions.offer( session );
     }
     
     private void doUpdateTrafficMask() 
     {
-        if( trafficControllingSessions.isEmpty() )
-            return;
-
         for( ;; )
         {
-            DatagramSessionImpl session;
-
-            synchronized( trafficControllingSessions )
-            {
-                session = trafficControllingSessions.poll();
-            }
-
+            DatagramSessionImpl session = trafficControllingSessions.poll();
             if( session == null )
                 break;
 
@@ -456,18 +435,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
     private void flushSessions()
     {
-        if( flushingSessions.size() == 0 )
-            return;
-
         for( ;; )
         {
-            DatagramSessionImpl session;
-
-            synchronized( flushingSessions )
-            {
-                session = flushingSessions.poll();
-            }
-
+            DatagramSessionImpl session = flushingSessions.poll();
             if( session == null )
                 break;
 
@@ -553,17 +523,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
     private void registerNew()
     {
-        if( registerQueue.isEmpty() )
-            return;
-
         for( ;; )
         {
-            RegistrationRequest req;
-            synchronized( registerQueue )
-            {
-                req = registerQueue.poll();
-            }
-
+            RegistrationRequest req = registerQueue.poll();
             if( req == null )
                 break;
 
@@ -625,17 +587,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
     private void cancelKeys()
     {
-        if( cancelQueue.isEmpty() )
-            return;
-
         for( ;; )
         {
-            DatagramSessionImpl session;
-            synchronized( cancelQueue )
-            {
-                session = cancelQueue.poll();
-            }
-
+            DatagramSessionImpl session = cancelQueue.poll();
             if( session == null )
                 break;
             else

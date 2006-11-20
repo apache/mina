@@ -27,9 +27,9 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ConnectFuture;
@@ -61,7 +61,7 @@ public class SocketConnector extends BaseIoConnector
     private final Object lock = new Object();
     private final int id = nextId++;
     private final String threadName = "SocketConnector-" + id;
-    private final Queue<ConnectionRequest> connectQueue = new LinkedList<ConnectionRequest>();
+    private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
     private final Executor executor;
@@ -205,10 +205,7 @@ public class SocketConnector extends BaseIoConnector
             }
         }
 
-        synchronized( connectQueue )
-        {
-            connectQueue.offer( request );
-        }
+        connectQueue.offer( request );
         selector.wakeup();
 
         return request;
@@ -226,17 +223,9 @@ public class SocketConnector extends BaseIoConnector
 
     private void registerNew()
     {
-        if( connectQueue.isEmpty() )
-            return;
-
         for( ; ; )
         {
-            ConnectionRequest req;
-            synchronized( connectQueue )
-            {
-                req = connectQueue.poll();
-            }
-
+            ConnectionRequest req = connectQueue.poll();
             if( req == null )
                 break;
 
