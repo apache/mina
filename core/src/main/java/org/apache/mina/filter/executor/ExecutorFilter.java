@@ -292,13 +292,13 @@ public class ExecutorFilter extends IoFilterAdapter
 
                 synchronized( buffer.eventQueue )
                 {
-                    if( buffer.eventQueue.isEmpty() )
+                    event = buffer.eventQueue.poll();
+                    
+                    if( event == null )
                     {
                         buffer.processingCompleted = true;
                         break;
                     }
-
-                    event = buffer.eventQueue.poll();
                 }
 
                 processEvent( event.getNextFilter(), buffer.session, event.getType(), event.getData() );
