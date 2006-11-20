@@ -270,11 +270,6 @@ public interface IoFilter
                 return null;
             }
 
-            public Object getLock()
-            {
-                return this;
-            }
-
             public void join()
             {
             }

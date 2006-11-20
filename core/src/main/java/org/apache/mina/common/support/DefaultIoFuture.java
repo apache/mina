@@ -52,27 +52,9 @@ public class DefaultIoFuture implements IoFuture
         this.lock = this;
     }
     
-    /**
-     * Creates a new instance which uses the specified object as a lock.
-     */
-    public DefaultIoFuture( IoSession session, Object lock )
-    {
-        if( lock == null )
-        {
-            throw new NullPointerException( "lock" );
-        }
-        this.session = session;
-        this.lock = lock;
-    }
-    
     public IoSession getSession()
     {
         return session;
-    }
-    
-    public Object getLock()
-    {
-        return lock;
     }
     
     public void join()
