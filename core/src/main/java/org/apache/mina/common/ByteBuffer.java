@@ -460,7 +460,7 @@ public abstract class ByteBuffer implements Comparable
      */
     public boolean hasRemaining()
     {
-        return remaining() > 0;
+        return limit() > position();
     }
 
     /**
@@ -967,56 +967,87 @@ public abstract class ByteBuffer implements Comparable
 
         int oldPos = position();
         int oldLimit = limit();
-        int end;
+        int end = -1;
+        int newPos;
 
         if( !utf16 )
         {
-            while( hasRemaining() )
+            int i;
+            for( i = oldPos; i < oldLimit; i++ )
             {
-                if( get() == 0 )
+                if( get(i) == 0 )
                 {
+                    end = i;
                     break;
                 }
             }
-
-            end = position();
-            if( end == oldLimit && get( end - 1 ) != 0 )
+            
+            if( end < 0 )
             {
-                limit( end );
+                newPos = end = oldLimit;
             }
             else
             {
-                limit( end - 1 );
+                newPos = end + 1;
             }
         }
         else
         {
-            while( remaining() >= 2 )
+            int i = oldPos;
+            for( ;; )
             {
-                if( ( get() == 0 ) && ( get() == 0 ) )
+                boolean wasZero = get( i ) == 0;
+                i ++;
+                
+                if( i >= oldLimit )
                 {
+                    break;
+                }
+                
+                if( get( i ) != 0 )
+                {
+                    i ++;
+                    if( i >= oldLimit )
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                
+                if( wasZero )
+                {
+                    end = i - 1;
                     break;
                 }
             }
 
-            end = position();
-            if( end == oldLimit || end == oldLimit - 1 )
+            if( end < 0 )
             {
-                limit( end );
+                newPos = end = oldPos + ( ( oldLimit - oldPos ) & 0xFFFFFFFE );
             }
             else
             {
-                limit( end - 2 );
+                if( end + 2 <= oldLimit )
+                {
+                    newPos = end + 2;
+                }
+                else
+                {
+                    newPos = end;
+                }
             }
         }
 
-        position( oldPos );
-        if( !hasRemaining() )
+        if( oldPos == end )
         {
-            limit( oldLimit );
-            position( end );
+            position( newPos );
             return "";
         }
+
+        limit( end );
         decoder.reset();
 
         int expectedLength = (int)( remaining() * decoder.averageCharsPerByte() ) + 1;
@@ -1051,7 +1082,7 @@ public abstract class ByteBuffer implements Comparable
         }
 
         limit( oldLimit );
-        position( end );
+        position( newPos );
         return out.flip().toString();
     }
 
@@ -1084,7 +1115,7 @@ public abstract class ByteBuffer implements Comparable
 
         int oldPos = position();
         int oldLimit = limit();
-        int end = position() + fieldSize;
+        int end = oldPos + fieldSize;
 
         if( oldLimit < end )
         {
@@ -1095,44 +1126,43 @@ public abstract class ByteBuffer implements Comparable
 
         if( !utf16 )
         {
-            for( i = 0; i < fieldSize; i ++ )
+            for( i = oldPos; i < end; i ++ )
             {
-                if( get() == 0 )
+                if( get( i ) == 0 )
                 {
                     break;
                 }
             }
 
-            if( i == fieldSize )
+            if( i == end )
             {
                 limit( end );
             }
             else
             {
-                limit( position() - 1 );
+                limit( i );
             }
         }
         else
         {
-            for( i = 0; i < fieldSize; i += 2 )
+            for( i = oldPos; i < end; i += 2 )
             {
-                if( ( get() == 0 ) && ( get() == 0 ) )
+                if( ( get( i ) == 0 ) && ( get( i + 1 ) == 0 ) )
                 {
                     break;
                 }
             }
 
-            if( i == fieldSize )
+            if( i == end )
             {
                 limit( end );
             }
             else
             {
-                limit( position() - 2 );
+                limit( i );
             }
         }
 
-        position( oldPos );
         if( !hasRemaining() )
         {
             limit( oldLimit );
