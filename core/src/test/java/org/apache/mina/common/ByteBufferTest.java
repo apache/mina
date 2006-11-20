@@ -176,6 +176,7 @@ public class ByteBufferTest extends TestCase
     
     public void testPooledProperty() throws Exception
     {
+        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
         ByteBuffer buf = ByteBuffer.allocate( 16 );
         java.nio.ByteBuffer nioBuf = buf.buf();
         buf.release();
@@ -536,7 +537,7 @@ public class ByteBufferTest extends TestCase
     {
         ByteBuffer buf = ByteBuffer.allocate( 16 );
         buf.setAutoExpand( true );
-        List o = new ArrayList();
+        List<Object> o = new ArrayList<Object>();
         o.add( new Date() );
 
         // Test writing an object.
@@ -610,6 +611,7 @@ public class ByteBufferTest extends TestCase
 
     public void testPoolExpiration() throws Exception
     {
+        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
         PooledByteBufferAllocator allocator =
             ( PooledByteBufferAllocator ) ByteBuffer.getAllocator();
 
@@ -637,6 +639,7 @@ public class ByteBufferTest extends TestCase
 
     public void testAllocatorDisposal() throws Exception
     {
+        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
         PooledByteBufferAllocator allocator =
             ( PooledByteBufferAllocator ) ByteBuffer.getAllocator();
 
@@ -671,6 +674,7 @@ public class ByteBufferTest extends TestCase
 
     public void testDuplicate() throws Exception
     {
+        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
         java.nio.ByteBuffer nioBuf;
         ByteBuffer original;
         ByteBuffer duplicate;

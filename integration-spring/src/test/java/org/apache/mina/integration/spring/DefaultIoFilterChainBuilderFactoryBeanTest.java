@@ -75,7 +75,7 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
     
     public void testIllegalObjectsInFilterList() throws Exception
     {
-        LinkedList mappings = new LinkedList();
+        LinkedList<Object> mappings = new LinkedList<Object>();
         mappings.add( new IoFilterMapping( "f0", filters[ 0 ] ) );
         mappings.add( new Object() );
         DefaultIoFilterChainBuilderFactoryBean factory = 
@@ -92,7 +92,7 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
     
     public void testNamedAndUnnamedFilters() throws Exception
     {
-        LinkedList mappings = new LinkedList();
+        LinkedList<Object> mappings = new LinkedList<Object>();
         mappings.add( new IoFilterMapping( "f0", filters[ 0 ] ) );
         mappings.add( filters[ 1 ] );
         mappings.add( new IoFilterMapping( "f2", filters[ 2 ] ) );

@@ -20,6 +20,8 @@
 package org.apache.mina.filter.support;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -34,7 +36,6 @@ import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.SSLFilter;
-import org.apache.mina.util.Queue;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -53,7 +54,7 @@ public class SSLHandler
     private final SSLFilter parent;
     private final SSLContext ctx;
     private final IoSession session;
-    private final Queue scheduledWrites = new Queue();
+    private final Queue<ScheduledWrite> scheduledWrites = new LinkedList<ScheduledWrite>();
 
     private SSLEngine sslEngine;
 
@@ -242,14 +243,14 @@ public class SSLHandler
     
     public void scheduleWrite( NextFilter nextFilter, WriteRequest writeRequest )
     {
-        scheduledWrites.push( new ScheduledWrite( nextFilter, writeRequest ) );
+        scheduledWrites.offer( new ScheduledWrite( nextFilter, writeRequest ) );
     }
     
     public void flushScheduledWrites() throws SSLException
     {
         ScheduledWrite scheduledWrite;
         
-        while( ( scheduledWrite = ( ScheduledWrite ) scheduledWrites.pop() ) != null )
+        while( ( scheduledWrite = scheduledWrites.poll() ) != null )
         {
             if( SessionLog.isDebugEnabled( session ) )
             {

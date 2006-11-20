@@ -66,7 +66,7 @@ public class HttpProtocolHandler extends StreamIoHandler
         public void run()
         {
             String url;
-            Map headers = new TreeMap();
+            Map<String, String> headers = new TreeMap<String, String>();
             BufferedReader in = new BufferedReader(
                     new InputStreamReader( this.in ) );
             PrintWriter out = new PrintWriter(

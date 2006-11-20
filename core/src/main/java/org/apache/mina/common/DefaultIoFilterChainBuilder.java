@@ -56,8 +56,8 @@ import org.apache.mina.common.IoFilterChain.Entry;
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Cloneable
 {
-    private List entries = new ArrayList();
-    private final Map entriesByName = new HashMap();
+    private List<Entry> entries = new ArrayList<Entry>();
+    private final Map<String, Entry> entriesByName = new HashMap<String, Entry>();
     
     /**
      * Creates a new instance with an empty filter list.
@@ -71,7 +71,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
      */
     public synchronized Entry getEntry( String name )
     {
-        return ( Entry ) entriesByName.get( name );
+        return entriesByName.get( name );
     }
 
     /**
@@ -93,7 +93,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
      */
     public List getAll()
     {
-        return new ArrayList( entries );
+        return new ArrayList<Entry>( entries );
     }
     
     /**
@@ -134,7 +134,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     /**
      * @see IoFilterChain#contains(Class)
      */
-    public boolean contains( Class filterType )
+    public boolean contains( Class<? extends IoFilter> filterType )
     {
         for( Iterator i = entries.iterator(); i.hasNext(); )
         {
@@ -189,11 +189,11 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     {
         checkBaseName( baseName );
         
-        List entries = new ArrayList( this.entries );
+        List<Entry> entries = new ArrayList<Entry>( this.entries );
         
-        for( ListIterator i = entries.listIterator(); i.hasNext(); )
+        for( ListIterator<Entry> i = entries.listIterator(); i.hasNext(); )
         {
-            Entry base = ( Entry ) i.next();
+            Entry base = i.next();
             if( base.getName().equals( baseName ) )
             {
                 register( i.nextIndex(), new EntryImpl( name, filter ) );
@@ -212,9 +212,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
             throw new NullPointerException( "name" );
         }
 
-        for( ListIterator i = entries.listIterator(); i.hasNext(); )
+        for( ListIterator<Entry> i = entries.listIterator(); i.hasNext(); )
         {
-            Entry e = ( Entry ) i.next();
+            Entry e = i.next();
             if( e.getName().equals( name ) )
             {
                 deregister( i.previousIndex(), e );
@@ -230,15 +230,15 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
      */
     public synchronized void clear() throws Exception
     {
-        entries = new ArrayList();
+        entries = new ArrayList<Entry>();
         entriesByName.clear();
     }
     
     public void buildFilterChain( IoFilterChain chain ) throws Exception
     {
-        for( Iterator i = entries.iterator(); i.hasNext(); )
+        for( Iterator<Entry> i = entries.iterator(); i.hasNext(); )
         {
-            Entry e = ( Entry ) i.next();
+            Entry e = i.next();
             chain.addLast( e.getName(), e.getFilter() );
         }
     }
@@ -250,9 +250,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
         
         boolean empty = true;
         
-        for( Iterator i = entries.iterator(); i.hasNext(); )
+        for( Iterator<Entry> i = entries.iterator(); i.hasNext(); )
         {
-            Entry e = ( Entry ) i.next();
+            Entry e = i.next();
             if( !empty )
             {
                 buf.append( ", " );
@@ -309,7 +309,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
             throw new IllegalArgumentException( "Other filter is using the same name: " + e.getName() );
         }
 
-        List newEntries = new ArrayList( entries );
+        List<Entry> newEntries = new ArrayList<Entry>( entries );
         newEntries.add( index, e );
         this.entries = newEntries;
         entriesByName.put( e.getName(), e );
@@ -317,7 +317,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     
     private void deregister( int index, Entry e )
     {
-        List newEntries = new ArrayList( entries );
+        List<Entry> newEntries = new ArrayList<Entry>( entries );
         newEntries.remove( index );
         this.entries = newEntries;
         entriesByName.remove( e.getName() );

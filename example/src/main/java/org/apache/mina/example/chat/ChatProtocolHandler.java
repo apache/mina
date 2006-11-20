@@ -37,8 +37,8 @@ import org.apache.mina.util.SessionLog;
  */
 public class ChatProtocolHandler extends IoHandlerAdapter
 {
-    private Set sessions = Collections.synchronizedSet( new HashSet() );
-    private Set users = Collections.synchronizedSet( new HashSet() );
+    private Set<IoSession> sessions = Collections.synchronizedSet( new HashSet<IoSession>() );
+    private Set<String> users = Collections.synchronizedSet( new HashSet<String>() );
 
     public void exceptionCaught( IoSession session, Throwable cause )
     {

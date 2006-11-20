@@ -37,11 +37,11 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  */
 public class AddMessageEncoder extends AbstractMessageEncoder
 {
-    private static final Set TYPES;
+    private static final Set<Class> TYPES;
    
     static
     {
-        Set types = new HashSet();
+        Set<Class> types = new HashSet<Class>();
         types.add( AddMessage.class );
         TYPES = Collections.unmodifiableSet( types );
     }
@@ -57,7 +57,7 @@ public class AddMessageEncoder extends AbstractMessageEncoder
         out.putInt( m.getValue() );
     }
 
-    public Set getMessageTypes()
+    public Set<Class> getMessageTypes()
     {
         return TYPES;
     }

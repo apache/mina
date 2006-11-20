@@ -32,15 +32,15 @@ import java.util.Set;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IdentityHashSet extends AbstractSet
+public class IdentityHashSet<E> extends AbstractSet<E>
 {
-    private final Map delegate = new IdentityHashMap();
+    private final Map<E, Boolean> delegate = new IdentityHashMap<E, Boolean>();
 
     public IdentityHashSet()
     {
     }
     
-    public IdentityHashSet( Collection c )
+    public IdentityHashSet( Collection<E> c )
     {
         addAll( c );
     }
@@ -55,19 +55,19 @@ public class IdentityHashSet extends AbstractSet
         return delegate.containsKey( o );
     }
 
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return delegate.keySet().iterator();
     }
 
-    public boolean add( Object arg0 )
+    public boolean add( E arg0 )
     {
         return delegate.put( arg0, Boolean.TRUE ) == null;
     }
 
-    public boolean remove( Object o )
+    public boolean remove( Object arg0 )
     {
-        return delegate.remove( o ) != null;
+        return delegate.remove( arg0 ) != null;
     }
 
     public void clear()

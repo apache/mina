@@ -22,6 +22,8 @@ package org.apache.mina.filter.codec.textline;
 import java.net.SocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -35,7 +37,6 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.apache.mina.util.Queue;
 
 /**
  * Tests {@link TextLineDecoder}.
@@ -66,7 +67,7 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "ABC", out.getMessageQueue().pop() );
+        Assert.assertEquals( "ABC", out.getMessageQueue().poll() );
         
         // Test two decode and one output
         in.clear();
@@ -79,7 +80,7 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "DEFGHI", out.getMessageQueue().pop() );
+        Assert.assertEquals( "DEFGHI", out.getMessageQueue().poll() );
         
         // Test one decode and two output
         in.clear();
@@ -87,8 +88,8 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 2, out.getMessageQueue().size() );
-        Assert.assertEquals( "JKL", out.getMessageQueue().pop() );
-        Assert.assertEquals( "MNO", out.getMessageQueue().pop() );
+        Assert.assertEquals( "JKL", out.getMessageQueue().poll() );
+        Assert.assertEquals( "MNO", out.getMessageQueue().poll() );
         
         // Test splitted long delimiter
         decoder = new TextLineDecoder(
@@ -109,7 +110,7 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "PQR", out.getMessageQueue().pop() );
+        Assert.assertEquals( "PQR", out.getMessageQueue().poll() );
     }
     
     public void testAutoDecode() throws Exception
@@ -128,7 +129,7 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "ABC", out.getMessageQueue().pop() );
+        Assert.assertEquals( "ABC", out.getMessageQueue().poll() );
         
         // Test two decode and one output
         in.clear();
@@ -141,7 +142,7 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "DEFGHI", out.getMessageQueue().pop() );
+        Assert.assertEquals( "DEFGHI", out.getMessageQueue().poll() );
         
         // Test one decode and two output
         in.clear();
@@ -149,8 +150,8 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 2, out.getMessageQueue().size() );
-        Assert.assertEquals( "JKL", out.getMessageQueue().pop() );
-        Assert.assertEquals( "MNO", out.getMessageQueue().pop() );
+        Assert.assertEquals( "JKL", out.getMessageQueue().poll() );
+        Assert.assertEquals( "MNO", out.getMessageQueue().poll() );
         
         // Test multiple '\n's
         in.clear();
@@ -158,9 +159,9 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 3, out.getMessageQueue().size() );
-        Assert.assertEquals( "", out.getMessageQueue().pop() );
-        Assert.assertEquals( "", out.getMessageQueue().pop() );
-        Assert.assertEquals( "", out.getMessageQueue().pop() );
+        Assert.assertEquals( "", out.getMessageQueue().poll() );
+        Assert.assertEquals( "", out.getMessageQueue().poll() );
+        Assert.assertEquals( "", out.getMessageQueue().poll() );
         
         // Test splitted long delimiter (\r\r\n)
         in.clear();
@@ -178,7 +179,7 @@ public class TextLineDecoderTest extends TestCase
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
-        Assert.assertEquals( "PQR", out.getMessageQueue().pop() );
+        Assert.assertEquals( "PQR", out.getMessageQueue().poll() );
     }
     
     private static class DummySession extends BaseIoSession
@@ -240,11 +241,11 @@ public class TextLineDecoderTest extends TestCase
     
     private static class TestDecoderOutput implements ProtocolDecoderOutput
     {
-        private Queue messageQueue = new Queue();
+        private Queue<Object> messageQueue = new LinkedList<Object>();
 
         public void write( Object message )
         {
-            messageQueue.push( message );
+            messageQueue.offer( message );
         }
         
         public Queue getMessageQueue()

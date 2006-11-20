@@ -24,6 +24,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
@@ -36,7 +38,6 @@ import org.apache.mina.common.WriteTimeoutException;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
-import org.apache.mina.util.Queue;
 
 /**
  * Performs all I/O operations for sockets which is connected or bound. This class is used by MINA internally.
@@ -55,10 +56,10 @@ class SocketIoProcessor
      */
     private Selector selector;
 
-    private final Queue newSessions = new Queue();
-    private final Queue removingSessions = new Queue();
-    private final Queue flushingSessions = new Queue();
-    private final Queue trafficControllingSessions = new Queue();
+    private final Queue<SocketSessionImpl> newSessions = new LinkedList<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> removingSessions = new LinkedList<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> flushingSessions = new LinkedList<SocketSessionImpl>();
+    private final Queue<SocketSessionImpl> trafficControllingSessions = new LinkedList<SocketSessionImpl>();
 
     private Worker worker;
     private long lastIdleCheckTime = System.currentTimeMillis();
@@ -73,7 +74,7 @@ class SocketIoProcessor
     {
         synchronized( newSessions )
         {
-            newSessions.push( session );
+            newSessions.offer( session );
         }
 
         startupWorker();
@@ -125,7 +126,7 @@ class SocketIoProcessor
     {
         synchronized( removingSessions )
         {
-            removingSessions.push( session );
+            removingSessions.offer( session );
         }
     }
 
@@ -133,7 +134,7 @@ class SocketIoProcessor
     {
         synchronized( flushingSessions )
         {
-            flushingSessions.push( session );
+            flushingSessions.offer( session );
         }
     }
 
@@ -141,7 +142,7 @@ class SocketIoProcessor
     {
         synchronized( trafficControllingSessions )
         {
-            trafficControllingSessions.push( session );
+            trafficControllingSessions.offer( session );
         }
     }
 
@@ -156,7 +157,7 @@ class SocketIoProcessor
 
             synchronized( newSessions )
             {
-                session = ( SocketSessionImpl ) newSessions.pop();
+                session = newSessions.poll();
             }
 
             if( session == null )
@@ -207,7 +208,7 @@ class SocketIoProcessor
 
             synchronized( removingSessions )
             {
-                session = ( SocketSessionImpl ) removingSessions.pop();
+                session = removingSessions.poll();
             }
 
             if( session == null )
@@ -396,7 +397,7 @@ class SocketIoProcessor
 
             synchronized( flushingSessions )
             {
-                session = ( SocketSessionImpl ) flushingSessions.pop();
+                session = flushingSessions.poll();
             }
 
             if( session == null )
@@ -440,7 +441,7 @@ class SocketIoProcessor
         Queue writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
 
-        while( ( req = ( WriteRequest ) writeRequestQueue.pop() ) != null )
+        while( ( req = ( WriteRequest ) writeRequestQueue.poll() ) != null )
         {
             try
             {
@@ -472,7 +473,7 @@ class SocketIoProcessor
 
             synchronized( writeRequestQueue )
             {
-                req = ( WriteRequest ) writeRequestQueue.first();
+                req = ( WriteRequest ) writeRequestQueue.peek();
             }
 
             if( req == null )
@@ -483,7 +484,7 @@ class SocketIoProcessor
             {
                 synchronized( writeRequestQueue )
                 {
-                    writeRequestQueue.pop();
+                    writeRequestQueue.poll();
                 }
 
                 session.increaseWrittenMessages();
@@ -519,7 +520,7 @@ class SocketIoProcessor
 
             synchronized( trafficControllingSessions )
             {
-                session = ( SocketSessionImpl ) trafficControllingSessions.pop();
+                session = trafficControllingSessions.poll();
             }
 
             if( session == null )

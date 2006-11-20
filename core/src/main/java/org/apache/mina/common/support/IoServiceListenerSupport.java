@@ -50,12 +50,12 @@ public class IoServiceListenerSupport
     /**
      * A list of {@link IoServiceListener}s.
      */
-    private final List listeners = new ArrayList();
+    private final List<IoServiceListener> listeners = new ArrayList<IoServiceListener>();
 
     /**
      * Tracks managed sesssions.
      */
-    private final Set managedSessions = new IdentityHashSet();
+    private final Set<IoSession> managedSessions = new IdentityHashSet<IoSession>();
     
     private boolean activated;
     
@@ -97,7 +97,7 @@ public class IoServiceListenerSupport
     {
         synchronized( managedSessions )
         {
-            return new IdentityHashSet( managedSessions );
+            return new IdentityHashSet<IoSession>( managedSessions );
         }
     }
 
@@ -263,7 +263,7 @@ public class IoServiceListenerSupport
         Set sessionsCopy;
         synchronized( managedSessions )
         {
-            sessionsCopy = new IdentityHashSet( managedSessions );
+            sessionsCopy = new IdentityHashSet<IoSession>( managedSessions );
         }
         
         for( Iterator i = sessionsCopy.iterator(); i.hasNext(); )

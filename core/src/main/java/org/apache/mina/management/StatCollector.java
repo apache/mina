@@ -63,7 +63,7 @@ public class StatCollector
     private final IoService service;
     private Worker worker;
     private int pollingInterval = 5000;
-    private List polledSessions;
+    private List<IoSession> polledSessions;
 
     // resume of session stats, for simplifying acces to the statistics 
     private long totalProcessedSessions = 0L;
@@ -126,7 +126,7 @@ public class StatCollector
     
             // add all current sessions
     
-            polledSessions = new ArrayList();
+            polledSessions = new ArrayList<IoSession>();
     
             for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
             {
@@ -193,10 +193,10 @@ public class StatCollector
     {
     	synchronized (this) 
     	{
-        	totalProcessedSessions += 1;
-        	polledSessions.add( session );
-            session.setAttribute( KEY, new IoSessionStat() );
-		}
+    	    totalProcessedSessions += 1;
+    	    polledSessions.add( session );
+    	    session.setAttribute( KEY, new IoSessionStat() );
+    	}
     }
 
     private void removeSession( IoSession session )
@@ -204,22 +204,21 @@ public class StatCollector
     	synchronized (this)
     	{
 
-    		// remove the session from the list of polled sessions
-    		polledSessions.remove( session );
+    	    // remove the session from the list of polled sessions
+    	    polledSessions.remove( session );
 
-    		// add the bytes processed between last polling and session closing
-    		// prevent non seen byte with non-connected protocols like HTTP and datagrams
-    		IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
+    	    // add the bytes processed between last polling and session closing
+    	    // prevent non seen byte with non-connected protocols like HTTP and datagrams
+    	    IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
     		
-    		// computing with time between polling and closing
-        	bytesReadThroughput += ( (float) (session.getReadBytes() - sessStat.lastByteRead) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
-        	bytesWrittenThroughput += ( (float) (session.getWrittenBytes() - sessStat.lastByteWrite) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
-        	msgReadThroughput += ( (float) (session.getReadMessages() - sessStat.lastMessageRead) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
-        	msgWrittenThroughput += ( (float) (session.getWrittenMessages() - sessStat.lastMessageWrite) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
-        	        	        	
+    	    // computing with time between polling and closing
+    	    bytesReadThroughput += (session.getReadBytes() - sessStat.lastByteRead) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+    	    bytesWrittenThroughput += (session.getWrittenBytes() - sessStat.lastByteWrite) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+    	    msgReadThroughput += (session.getReadMessages() - sessStat.lastMessageRead) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+    	    msgWrittenThroughput += (session.getWrittenMessages() - sessStat.lastMessageWrite) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+
             session.removeAttribute( KEY );
-			
-		}
+    	}
     }
 
 

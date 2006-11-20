@@ -20,13 +20,13 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
+import java.util.Queue;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
-import org.apache.mina.util.Queue;
 
 /**
  * An {@link IoFilterChain} for socket transport (TCP/IP).
@@ -43,14 +43,14 @@ class SocketFilterChain extends AbstractIoFilterChain {
     protected void doWrite( IoSession session, WriteRequest writeRequest )
     {
         SocketSessionImpl s = ( SocketSessionImpl ) session;
-        Queue writeRequestQueue = s.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = s.getWriteRequestQueue();
         
         // SocketIoProcessor.doFlush() will reset it after write is finished
         // because the buffer will be passed with messageSent event. 
         ( ( ByteBuffer ) writeRequest.getMessage() ).mark();
         synchronized( writeRequestQueue )
         {
-            writeRequestQueue.push( writeRequest );
+            writeRequestQueue.offer( writeRequest );
             if( writeRequestQueue.size() == 1 && session.getTrafficMask().isWritable() )
             {
                 // Notify SocketIoProcessor only when writeRequestQueue was empty.

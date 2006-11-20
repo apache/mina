@@ -44,7 +44,8 @@ public class ExecutorThreadModel implements ThreadModel
      * Maps a service name to a PooledThreadModel instance.
      * Without this map, we might create extremely many thread pools that leads the system to
      * coma. */
-    private static final Map service2model = new HashMap();
+    private static final Map<String, ExecutorThreadModel> service2model =
+        new HashMap<String, ExecutorThreadModel>();
     
     /**
      * Returns a {@link ExecutorThreadModel} instance for the specified <tt>serviceName</tt>.
@@ -64,7 +65,7 @@ public class ExecutorThreadModel implements ThreadModel
         ExecutorThreadModel model;
         synchronized( service2model )
         {
-            model = ( ExecutorThreadModel ) service2model.get( serviceName );
+            model = service2model.get( serviceName );
             if( model == null )
             {
                 model = new ExecutorThreadModel( serviceName );

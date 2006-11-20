@@ -26,6 +26,8 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
@@ -41,7 +43,6 @@ import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
-import org.apache.mina.util.Queue;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
@@ -63,9 +64,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private final int id = nextId ++ ;
     private Selector selector;
     private DatagramChannel channel;
-    private final Queue registerQueue = new Queue();
-    private final Queue cancelQueue = new Queue();
-    private final Queue flushingSessions = new Queue();
+    private final Queue<RegistrationRequest> registerQueue = new LinkedList<RegistrationRequest>();
+    private final Queue<CancellationRequest> cancelQueue = new LinkedList<CancellationRequest>();
+    private final Queue<DatagramSessionImpl> flushingSessions = new LinkedList<DatagramSessionImpl>();
     private Worker worker;
     
     /**
@@ -77,7 +78,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         this.executor = executor;
     }
 
-    protected Class getAddressType()
+    protected Class<? extends SocketAddress> getAddressType()
     {
         return InetSocketAddress.class;
     }
@@ -89,7 +90,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         {
             synchronized( registerQueue )
             {
-                registerQueue.push( request );
+                registerQueue.offer( request );
             }
             startupWorker();
         }
@@ -139,7 +140,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
             synchronized( cancelQueue )
             {
-                cancelQueue.push( request );
+                cancelQueue.offer( request );
             }
         }
         selector.wakeup();
@@ -288,7 +289,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     {
         synchronized( flushingSessions )
         {
-            flushingSessions.push( session );
+            flushingSessions.offer( session );
         }
     }
 
@@ -429,7 +430,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
             synchronized( flushingSessions )
             {
-                session = ( DatagramSessionImpl ) flushingSessions.pop();
+                session = flushingSessions.poll();
             }
 
             if( session == null )
@@ -457,7 +458,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         {
             synchronized( writeRequestQueue )
             {
-                req = ( WriteRequest ) writeRequestQueue.first();
+                req = ( WriteRequest ) writeRequestQueue.peek();
             }
 
             if( req == null )
@@ -469,7 +470,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 // pop and fire event
                 synchronized( writeRequestQueue )
                 {
-                    writeRequestQueue.pop();
+                    writeRequestQueue.poll();
                 }
 
                 session.increaseWrittenMessages();
@@ -510,7 +511,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 // pop and fire event
                 synchronized( writeRequestQueue )
                 {
-                    writeRequestQueue.pop();
+                    writeRequestQueue.poll();
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
@@ -531,7 +532,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             RegistrationRequest req;
             synchronized( registerQueue )
             {
-                req = ( RegistrationRequest ) registerQueue.pop();
+                req = registerQueue.poll();
             }
 
             if( req == null )
@@ -597,7 +598,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             CancellationRequest request;
             synchronized( cancelQueue )
             {
-                request = ( CancellationRequest ) cancelQueue.pop();
+                request = cancelQueue.poll();
             }
             
             if( request == null )

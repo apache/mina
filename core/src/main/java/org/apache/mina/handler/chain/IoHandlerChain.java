@@ -39,7 +39,7 @@ public class IoHandlerChain implements IoHandlerCommand
     
     private final int id = nextId++;
     private final String NEXT_COMMAND = IoHandlerChain.class.getName() + '.' + id + ".nextCommand";
-    private final Map name2entry = new HashMap();
+    private final Map<String, Entry> name2entry = new HashMap<String, Entry>();
     
     private final Entry head;
     private final Entry tail;
@@ -82,7 +82,7 @@ public class IoHandlerChain implements IoHandlerCommand
     
     public Entry getEntry( String name )
     {
-        Entry e = ( Entry ) name2entry.get( name );
+        Entry e = name2entry.get( name );
         if ( e == null )
         {
             return null;
@@ -153,10 +153,10 @@ public class IoHandlerChain implements IoHandlerCommand
 
     public synchronized void clear() throws Exception
     {
-        Iterator it = new ArrayList( name2entry.keySet() ).iterator();
+        Iterator<String> it = new ArrayList<String>( name2entry.keySet() ).iterator();
         while ( it.hasNext() )
         {
-            this.remove( ( String ) it.next() );
+            this.remove( it.next() );
         }
     }
 
@@ -186,7 +186,7 @@ public class IoHandlerChain implements IoHandlerCommand
      */
     private Entry checkOldName( String baseName )
     {
-        Entry e = ( Entry ) name2entry.get( baseName );
+        Entry e = name2entry.get( baseName );
         if ( e == null )
         {
             throw new IllegalArgumentException( "Unknown filter name:" +
@@ -231,7 +231,7 @@ public class IoHandlerChain implements IoHandlerCommand
     
     public List getAll()
     {
-        List list = new ArrayList();
+        List<Entry> list = new ArrayList<Entry>();
         Entry e = head.nextEntry;
         while( e != tail )
         {
@@ -244,7 +244,7 @@ public class IoHandlerChain implements IoHandlerCommand
 
     public List getAllReversed()
     {
-        List list = new ArrayList();
+        List<Entry> list = new ArrayList<Entry>();
         Entry e = tail.prevEntry;
         while( e != head )
         {
@@ -273,7 +273,7 @@ public class IoHandlerChain implements IoHandlerCommand
         return false;
     }
 
-    public boolean contains( Class commandType )
+    public boolean contains( Class<? extends IoHandlerCommand> commandType )
     {
         Entry e = head.nextEntry;
         while( e != tail )

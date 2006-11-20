@@ -47,7 +47,7 @@ public final class TransportType implements Serializable
 {
     private static final long serialVersionUID = 3258132470497883447L;
     
-    private static final Map name2type = new HashMap();
+    private static final Map<String, TransportType> name2type = new HashMap<String, TransportType>();
     
     private static void register( String[] names, TransportType type )
     {
@@ -101,7 +101,7 @@ public final class TransportType implements Serializable
      */
     public static TransportType getInstance( String name )
     {
-        TransportType type = (TransportType) name2type.get( name.toUpperCase() );
+        TransportType type = name2type.get( name.toUpperCase() );
         if( type != null )
         {
             return type;
@@ -114,7 +114,7 @@ public final class TransportType implements Serializable
 
     private final transient boolean connectionless;
     
-    private final transient Class envelopeType;
+    private final transient Class<? extends Object> envelopeType;
 
     /**
      * Creates a new instance.  New transport type is automatically registered
@@ -139,7 +139,7 @@ public final class TransportType implements Serializable
      * 
      * @throws IllegalArgumentException if <tt>names</tt> are already registered or empty
      */
-    public TransportType( String[] names, Class envelopeType, boolean connectionless )
+    public TransportType( String[] names, Class<? extends Object> envelopeType, boolean connectionless )
     {
         if( names == null )
         {
@@ -179,7 +179,7 @@ public final class TransportType implements Serializable
         return connectionless;
     }
     
-    public Class getEnvelopeType()
+    public Class<? extends Object> getEnvelopeType()
     {
         return envelopeType;
     }
@@ -187,9 +187,9 @@ public final class TransportType implements Serializable
     /**
      * Returns the known names of this transport type.
      */
-    public Set getNames()
+    public Set<String> getNames()
     {
-        Set result = new TreeSet();
+        Set<String> result = new TreeSet<String>();
         for( int i = names.length - 1; i >= 0; i -- )
         {
             result.add( names[ i ] );

@@ -37,7 +37,7 @@ public class DefaultIoFuture implements IoFuture
 {
     private final IoSession session;
     private final Object lock;
-    private final List listeners = new ArrayList();
+    private final List<IoFutureListener> listeners = new ArrayList<IoFutureListener>();
     private Object result;
     private boolean ready;
 

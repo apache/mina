@@ -19,11 +19,11 @@
  */
 package org.apache.mina.transport.vmpipe.support;
 
-import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.util.IdentityHashSet;
 
 /**
  * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them. 
@@ -40,7 +40,7 @@ public class VmPipeIdleStatusChecker
         return INSTANCE;
     }
 
-    private final Map sessions = new IdentityHashMap(); // will use as a set
+    private final Set<VmPipeSessionImpl> sessions = new IdentityHashSet<VmPipeSessionImpl>();
 
     private final Worker worker = new Worker();
 
@@ -53,7 +53,7 @@ public class VmPipeIdleStatusChecker
     {
         synchronized( sessions )
         {
-            sessions.put( session, session );
+            sessions.add( session );
         }
     }
 
@@ -81,10 +81,10 @@ public class VmPipeIdleStatusChecker
 
                 synchronized( sessions )
                 {
-                    Iterator it = sessions.keySet().iterator();
+                    Iterator<VmPipeSessionImpl> it = sessions.iterator();
                     while( it.hasNext() )
                     {
-                        VmPipeSessionImpl session = ( VmPipeSessionImpl ) it.next();
+                        VmPipeSessionImpl session = it.next();
                         if( !session.isConnected() )
                         {
                             it.remove();

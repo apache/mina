@@ -26,6 +26,8 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
@@ -43,7 +45,6 @@ import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
-import org.apache.mina.util.Queue;
 
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
@@ -64,10 +65,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private final Executor executor;
     private final int id = nextId ++ ;
     private Selector selector;
-    private final Queue registerQueue = new Queue();
-    private final Queue cancelQueue = new Queue();
-    private final Queue flushingSessions = new Queue();
-    private final Queue trafficControllingSessions = new Queue();
+    private final Queue<RegistrationRequest> registerQueue = new LinkedList<RegistrationRequest>();
+    private final Queue<DatagramSessionImpl> cancelQueue = new LinkedList<DatagramSessionImpl>();
+    private final Queue<DatagramSessionImpl> flushingSessions = new LinkedList<DatagramSessionImpl>();
+    private final Queue<DatagramSessionImpl> trafficControllingSessions = new LinkedList<DatagramSessionImpl>();
     private Worker worker;
 
     /**
@@ -79,7 +80,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         this.executor = executor;
     }
 
-    protected Class getAddressType()
+    protected Class<? extends SocketAddress> getAddressType()
     {
         return InetSocketAddress.class;
     }
@@ -155,7 +156,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             
             synchronized( registerQueue )
             {
-                registerQueue.push( request );
+                registerQueue.offer( request );
             }
         }
 
@@ -213,7 +214,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             synchronized( cancelQueue )
             {
-                cancelQueue.push( session );
+                cancelQueue.offer( session );
             }
         }
 
@@ -234,7 +235,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     {
         synchronized( flushingSessions )
         {
-            flushingSessions.push( session );
+            flushingSessions.offer( session );
         }
     }
 
@@ -253,7 +254,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     {
         synchronized( trafficControllingSessions )
         {
-            trafficControllingSessions.push( session );
+            trafficControllingSessions.offer( session );
         }
     }
     
@@ -268,7 +269,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             synchronized( trafficControllingSessions )
             {
-                session = ( DatagramSessionImpl ) trafficControllingSessions.pop();
+                session = trafficControllingSessions.poll();
             }
 
             if( session == null )
@@ -464,7 +465,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             synchronized( flushingSessions )
             {
-                session = ( DatagramSessionImpl ) flushingSessions.pop();
+                session = flushingSessions.poll();
             }
 
             if( session == null )
@@ -492,7 +493,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         {
             synchronized( writeRequestQueue )
             {
-                req = ( WriteRequest ) writeRequestQueue.first();
+                req = ( WriteRequest ) writeRequestQueue.peek();
             }
 
             if( req == null )
@@ -504,7 +505,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 // pop and fire event
                 synchronized( writeRequestQueue )
                 {
-                    writeRequestQueue.pop();
+                    writeRequestQueue.poll();
                 }
 
                 session.increaseWrittenMessages();
@@ -539,7 +540,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 // pop and fire event
                 synchronized( writeRequestQueue )
                 {
-                    writeRequestQueue.pop();
+                    writeRequestQueue.poll();
                 }
 
                 session.increaseWrittenBytes( writtenBytes );
@@ -560,7 +561,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             RegistrationRequest req;
             synchronized( registerQueue )
             {
-                req = ( RegistrationRequest ) registerQueue.pop();
+                req = registerQueue.poll();
             }
 
             if( req == null )
@@ -632,7 +633,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             DatagramSessionImpl session;
             synchronized( cancelQueue )
             {
-                session = ( DatagramSessionImpl ) cancelQueue.pop();
+                session = cancelQueue.poll();
             }
 
             if( session == null )

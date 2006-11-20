@@ -41,9 +41,9 @@ public class ExpiringMap implements Map
 
     private static volatile int expirerCount = 1;
 
-    private final ConcurrentHashMap delegate;
+    private final ConcurrentHashMap<Object, ExpiringObject> delegate;
 
-    private final CopyOnWriteArrayList expirationListeners;
+    private final CopyOnWriteArrayList<ExpirationListener> expirationListeners;
 
     private final Expirer expirer;
 
@@ -59,11 +59,11 @@ public class ExpiringMap implements Map
 
     public ExpiringMap( int timeToLive, int expirationInterval )
     {
-        this( new ConcurrentHashMap(), new CopyOnWriteArrayList(), timeToLive, expirationInterval );
+        this( new ConcurrentHashMap<Object, ExpiringObject>(), new CopyOnWriteArrayList<ExpirationListener>(), timeToLive, expirationInterval );
     }
 
     private ExpiringMap(
-            ConcurrentHashMap delegate, CopyOnWriteArrayList expirationListeners,
+            ConcurrentHashMap<Object, ExpiringObject> delegate, CopyOnWriteArrayList<ExpirationListener> expirationListeners,
             int timeToLive, int expirationInterval )
     {
         this.delegate = delegate;
@@ -152,7 +152,7 @@ public class ExpiringMap implements Map
 
                 if( value instanceof ExpiringObject )
                 {
-                    delegate.put( key, value );
+                    delegate.put( key, ( ExpiringObject ) value );
                 }
             }
         }

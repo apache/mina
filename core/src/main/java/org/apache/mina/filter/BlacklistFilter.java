@@ -41,7 +41,7 @@ import org.apache.mina.util.SessionLog;
  */
 public class BlacklistFilter extends IoFilterAdapter
 {
-    private final Set blacklist = new HashSet();
+    private final Set<InetAddress> blacklist = new HashSet<InetAddress>();
 
     /**
      * Sets the addresses to be blacklisted.
@@ -72,7 +72,7 @@ public class BlacklistFilter extends IoFilterAdapter
      * @throws IllegalArgumentException if the specified collections contains 
      *         non-{@link InetAddress} objects.
      */
-    public void setBlacklist( Collection addresses )
+    public void setBlacklist( Collection<InetAddress> addresses )
     {
         if( addresses == null )
             throw new NullPointerException( "addresses" );
@@ -80,7 +80,7 @@ public class BlacklistFilter extends IoFilterAdapter
         InetAddress[] inetAddresses = new InetAddress[ addresses.size() ];
         try
         {
-            setBlacklist( ( InetAddress[] ) addresses.toArray( inetAddresses ) );
+            setBlacklist( addresses.toArray( inetAddresses ) );
         }
         catch ( ArrayStoreException ase )
         {

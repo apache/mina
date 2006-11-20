@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.MessageDigest;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 import junit.framework.TestCase;
@@ -41,7 +43,6 @@ import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
-import org.apache.mina.util.Queue;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 
@@ -255,7 +256,7 @@ public class StreamWriteFilterTest extends TestCase {
     {
         StreamWriteFilter filter = new StreamWriteFilter();
         
-        Queue queue = new Queue();
+        Queue queue = new LinkedList();
         InputStream stream = new ByteArrayInputStream( new byte[ 5 ] );
         
         /*
@@ -276,7 +277,7 @@ public class StreamWriteFilterTest extends TestCase {
         WriteRequest wr = new WriteRequest( new Object(), new DummyWriteFuture() );
         filter.filterWrite( nextFilter, session, wr );
         assertEquals( 1, queue.size() );
-        assertSame( wr, queue.pop() );
+        assertSame( wr, queue.poll() );
         
         /*
          * Verify.
@@ -294,10 +295,10 @@ public class StreamWriteFilterTest extends TestCase {
                 new WriteRequest( new Object(), new DummyWriteFuture() ),
                 new WriteRequest( new Object(), new DummyWriteFuture() )
         };
-        Queue queue = new Queue();
-        queue.push( wrs[ 0 ] );
-        queue.push( wrs[ 1 ] );
-        queue.push( wrs[ 2 ] );
+        Queue<WriteRequest> queue = new LinkedList<WriteRequest>();
+        queue.offer( wrs[ 0 ] );
+        queue.offer( wrs[ 1 ] );
+        queue.offer( wrs[ 2 ] );
         InputStream stream = new ByteArrayInputStream( new byte[ 0 ] );
         
         /*

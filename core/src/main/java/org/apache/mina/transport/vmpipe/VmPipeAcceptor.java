@@ -40,7 +40,7 @@ import org.apache.mina.transport.vmpipe.support.VmPipe;
  */
 public class VmPipeAcceptor extends BaseIoAcceptor
 {
-    static final Map boundHandlers = new HashMap();
+    static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
     
     private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
 
@@ -51,7 +51,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
     {
     }
 
-    protected Class getAddressType()
+    protected Class<? extends SocketAddress> getAddressType()
     {
         return VmPipeAddress.class;
     }

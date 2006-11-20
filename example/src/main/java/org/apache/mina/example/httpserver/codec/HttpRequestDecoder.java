@@ -173,7 +173,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
 
     private Map parseRequest( Reader is )
     {
-        Map map = new HashMap();
+        Map<String, String[]> map = new HashMap<String, String[]>();
         BufferedReader rdr = new BufferedReader( is );
 
         try
@@ -198,8 +198,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
             // If method 'POST' then read Content-Length worth of data
             if( url[ 0 ].equalsIgnoreCase( "POST" ) )
             {
-                int len = Integer.parseInt( ( ( String[] ) map
-                        .get( "Content-Length" ) )[ 0 ] );
+                int len = Integer.parseInt( map.get( "Content-Length" )[ 0 ] );
                 char[] buf = new char[ len ];
                 if( rdr.read( buf ) == len )
                 {
@@ -239,7 +238,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
                         String name = "@".concat( tokens[ 0 ] );
                         if( map.containsKey( name ) )
                         {
-                            params = ( String[] ) map.get( name );
+                            params = map.get( name );
                             String[] tmp = new String[ params.length + 1 ];
                             for( int j = 0; j < params.length; j++ )
                                 tmp[ j ] = params[ j ];

@@ -44,7 +44,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
             {
                 synchronized( s.pendingDataQueue )
                 {
-                    s.pendingDataQueue.push( message );
+                    s.pendingDataQueue.offer( message );
                 }
             }
             else
@@ -74,7 +74,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                 {
                     synchronized( s.pendingDataQueue )
                     {
-                        s.pendingDataQueue.push( writeRequest );
+                        s.pendingDataQueue.offer( writeRequest );
                     }
                 }
                 else

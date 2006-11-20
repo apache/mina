@@ -21,12 +21,13 @@ package org.apache.mina.filter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.util.Queue;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -70,19 +71,20 @@ public class StreamWriteFilter extends IoFilterAdapter
 
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
     
+    @SuppressWarnings("unchecked")
     public void filterWrite( NextFilter nextFilter, IoSession session, 
                             WriteRequest writeRequest ) throws Exception 
     {
         // If we're already processing a stream we need to queue the WriteRequest.
         if( session.getAttribute( CURRENT_STREAM ) != null )
         {
-            Queue queue = ( Queue ) session.getAttribute( WRITE_REQUEST_QUEUE );
+            Queue<WriteRequest> queue = ( Queue<WriteRequest> ) session.getAttribute( WRITE_REQUEST_QUEUE );
             if( queue == null )
             {
-                queue = new Queue();
+                queue = new LinkedList<WriteRequest>();
                 session.setAttribute( WRITE_REQUEST_QUEUE, queue );
             }
-            queue.push( writeRequest );
+            queue.offer( writeRequest );
             return;
         }
         
@@ -137,11 +139,11 @@ public class StreamWriteFilter extends IoFilterAdapter
                 Queue queue = ( Queue ) session.removeAttribute( WRITE_REQUEST_QUEUE );
                 if( queue != null )
                 {
-                    WriteRequest wr = ( WriteRequest ) queue.pop();
+                    WriteRequest wr = ( WriteRequest ) queue.poll();
                     while( wr != null )
                     {
                         filterWrite( nextFilter, session, wr );
-                        wr = ( WriteRequest ) queue.pop();
+                        wr = ( WriteRequest ) queue.poll();
                     }
                 }
                 

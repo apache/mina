@@ -28,6 +28,8 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
@@ -40,7 +42,6 @@ import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
-import org.apache.mina.util.Queue;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).
@@ -65,8 +66,8 @@ public class SocketAcceptor extends BaseIoAcceptor
     private final String threadName = "SocketAcceptor-" + id;
 
     private ServerSocketChannel serverSocketChannel;
-    private final Queue registerQueue = new Queue();
-    private final Queue cancelQueue = new Queue();
+    private final Queue<RegistrationRequest> registerQueue = new LinkedList<RegistrationRequest>();
+    private final Queue<CancellationRequest> cancelQueue = new LinkedList<CancellationRequest>();
 
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
@@ -136,7 +137,7 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-    protected Class getAddressType()
+    protected Class<? extends SocketAddress> getAddressType()
     {
         return InetSocketAddress.class;
     }
@@ -196,7 +197,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         synchronized( registerQueue )
         {
-            registerQueue.push( request );
+            registerQueue.offer( request );
         }
 
         startupWorker();
@@ -277,7 +278,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
         synchronized( cancelQueue )
         {
-            cancelQueue.push( request );
+            cancelQueue.offer( request );
         }
 
         selector.wakeup();
@@ -434,7 +435,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
             synchronized( registerQueue )
             {
-                req = ( RegistrationRequest ) registerQueue.pop();
+                req = registerQueue.poll();
             }
 
             if( req == null )
@@ -505,7 +506,7 @@ public class SocketAcceptor extends BaseIoAcceptor
 
             synchronized( cancelQueue )
             {
-                request = ( CancellationRequest ) cancelQueue.pop();
+                request = cancelQueue.poll();
             }
 
             if( request == null )

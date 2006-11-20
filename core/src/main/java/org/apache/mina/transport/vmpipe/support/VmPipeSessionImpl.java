@@ -20,6 +20,8 @@
 package org.apache.mina.transport.vmpipe.support;
 
 import java.net.SocketAddress;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -31,7 +33,6 @@ import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.IoServiceListenerSupport;
-import org.apache.mina.util.Queue;
 
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
@@ -52,7 +53,7 @@ public class VmPipeSessionImpl extends BaseIoSession
     private final VmPipeFilterChain filterChain;
     private final VmPipeSessionImpl remoteSession;
     final Object lock;
-    final Queue pendingDataQueue;
+    final Queue<Object> pendingDataQueue;
 
     /**
      * Constructor for client-side session.
@@ -69,7 +70,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
         this.filterChain = new VmPipeFilterChain( this );
-        this.pendingDataQueue = new Queue();
+        this.pendingDataQueue = new LinkedList<Object>();
 
         remoteSession = new VmPipeSessionImpl( this, remoteEntry );
     }
@@ -87,7 +88,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.handler = entry.getHandler();
         this.filterChain = new VmPipeFilterChain( this );
         this.remoteSession = remoteSession;
-        this.pendingDataQueue = new Queue();
+        this.pendingDataQueue = new LinkedList<Object>();
     }
     
     public IoService getService()

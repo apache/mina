@@ -61,12 +61,12 @@ public interface IoFilterChain {
     /**
      * Returns the list of all {@link Entry}s this chain contains.
      */
-    List getAll();
+    List<Entry> getAll();
     
     /**
      * Returns the reversed list of all {@link Entry}s this chain contains.
      */
-    List getAllReversed();
+    List<Entry> getAllReversed();
     
     /**
      * Returns <tt>true</tt> if this chain contains an {@link IoFilter} with the
@@ -83,7 +83,7 @@ public interface IoFilterChain {
      * Returns <tt>true</tt> if this chain contains an {@link IoFilter} of the
      * specified <tt>filterType</tt>.
      */
-    boolean contains( Class filterType );
+    boolean contains( Class<? extends IoFilter> filterType );
     
     /**
      * Adds the specified filter with the specified name at the beginning of this chain.

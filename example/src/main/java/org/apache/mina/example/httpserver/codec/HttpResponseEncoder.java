@@ -41,11 +41,11 @@ import org.apache.mina.util.CharsetUtil;
  */
 public class HttpResponseEncoder implements MessageEncoder
 {
-    private static final Set TYPES;
+    private static final Set<Class> TYPES;
 
     static
     {
-        Set types = new HashSet();
+        Set<Class> types = new HashSet<Class>();
         types.add( HttpResponseMessage.class );
         TYPES = Collections.unmodifiableSet( types );
     }
@@ -110,7 +110,7 @@ public class HttpResponseEncoder implements MessageEncoder
         out.write( buf );
     }
 
-    public Set getMessageTypes()
+    public Set<Class> getMessageTypes()
     {
         return TYPES;
     }

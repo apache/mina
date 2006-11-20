@@ -19,11 +19,13 @@
  */
 package org.apache.mina.filter.codec.support;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.apache.mina.util.Queue;
 
 /**
  * A {@link ProtocolDecoderOutput} based on queue.
@@ -36,7 +38,7 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
 {
     private final NextFilter nextFilter;
     private final IoSession session;
-    private final Queue messageQueue = new Queue();
+    private final Queue<Object> messageQueue = new LinkedList<Object>();
     
     public SimpleProtocolDecoderOutput( IoSession session, NextFilter nextFilter )
     {
@@ -46,7 +48,7 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
     
     public void write( Object message )
     {
-        messageQueue.push( message );
+        messageQueue.offer( message );
         if( session instanceof BaseIoSession )
         {
             ( ( BaseIoSession ) session ).increaseReadMessages();
@@ -57,7 +59,7 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
     {
         while( !messageQueue.isEmpty() )
         {
-            nextFilter.messageReceived( session, messageQueue.pop() );
+            nextFilter.messageReceived( session, messageQueue.poll() );
         }
         
     }

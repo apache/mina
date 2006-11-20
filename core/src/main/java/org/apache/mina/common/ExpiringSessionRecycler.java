@@ -111,7 +111,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler
 
     private Object generateKey( SocketAddress localAddress, SocketAddress remoteAddress )
     {
-        List key = new ArrayList( 2 );
+        List<SocketAddress> key = new ArrayList<SocketAddress>( 2 );
         key.add( remoteAddress );
         key.add( localAddress );
         return key;

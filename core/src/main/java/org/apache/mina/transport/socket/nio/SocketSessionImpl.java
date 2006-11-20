@@ -23,7 +23,10 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.LinkedList;
+import java.util.Queue;
 
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -34,7 +37,6 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
-import org.apache.mina.util.Queue;
 
 /**
  * An {@link IoSession} for socket transport (TCP/IP).
@@ -49,7 +51,7 @@ class SocketSessionImpl extends BaseIoSession
     private final SocketIoProcessor ioProcessor;
     private final SocketFilterChain filterChain;
     private final SocketChannel ch;
-    private final Queue writeRequestQueue;
+    private final Queue<WriteRequest> writeRequestQueue;
     private final IoHandler handler;
     private SelectionKey key;
     private int readBufferSize;
@@ -64,7 +66,7 @@ class SocketSessionImpl extends BaseIoSession
         this.ioProcessor = ioProcessor;
         this.filterChain = new SocketFilterChain( this );
         this.ch = ch;
-        this.writeRequestQueue = new Queue();
+        this.writeRequestQueue = new LinkedList<WriteRequest>();
         this.handler = service.getHandler();
 
         // Apply the initial session settings
@@ -133,7 +135,7 @@ class SocketSessionImpl extends BaseIoSession
         filterChain.fireFilterClose( this );
     }
 
-    Queue getWriteRequestQueue()
+    Queue<WriteRequest> getWriteRequestQueue()
     {
         return writeRequestQueue;
     }
@@ -148,10 +150,19 @@ class SocketSessionImpl extends BaseIoSession
 
     public int getScheduledWriteBytes()
     {
+        int size = 0;
         synchronized( writeRequestQueue )
         {
-            return writeRequestQueue.byteSize();
+            for( Object o: writeRequestQueue )
+            {
+                if( o instanceof ByteBuffer )
+                {
+                    size += ( ( ByteBuffer ) o ).remaining();
+                }
+            }
         }
+        
+        return size;
     }
 
     protected void write0( WriteRequest writeRequest )

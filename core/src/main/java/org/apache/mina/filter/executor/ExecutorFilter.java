@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.executor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -59,7 +59,7 @@ public class ExecutorFilter extends IoFilterAdapter
      */
     public ExecutorFilter()
     {
-        this( new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() ) );
+        this( new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>() ) );
     }
     
     /**
@@ -91,7 +91,7 @@ public class ExecutorFilter extends IoFilterAdapter
 
         synchronized( buf.eventQueue )
         {
-            buf.eventQueue.add( event );
+            buf.eventQueue.offer( event );
             if( buf.processingCompleted )
             {
                 buf.processingCompleted = false;
@@ -123,7 +123,7 @@ public class ExecutorFilter extends IoFilterAdapter
         }
 
         private final IoSession session;
-        private final List eventQueue = new ArrayList();
+        private final Queue<Event> eventQueue = new LinkedList<Event>();
         private boolean processingCompleted = true;
 
         private SessionBuffer( IoSession session )
@@ -298,7 +298,7 @@ public class ExecutorFilter extends IoFilterAdapter
                         break;
                     }
 
-                    event = ( Event ) buffer.eventQueue.remove( 0 );
+                    event = buffer.eventQueue.poll();
                 }
 
                 processEvent( event.getNextFilter(), buffer.session, event.getType(), event.getData() );

@@ -27,6 +27,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
@@ -40,7 +42,6 @@ import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
-import org.apache.mina.util.Queue;
 
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
@@ -60,7 +61,7 @@ public class SocketConnector extends BaseIoConnector
     private final Object lock = new Object();
     private final int id = nextId++;
     private final String threadName = "SocketConnector-" + id;
-    private final Queue connectQueue = new Queue();
+    private final Queue<ConnectionRequest> connectQueue = new LinkedList<ConnectionRequest>();
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
     private final Executor executor;
@@ -104,7 +105,7 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
-    protected Class getAddressType()
+    protected Class<? extends SocketAddress> getAddressType()
     {
         return InetSocketAddress.class;
     }
@@ -206,7 +207,7 @@ public class SocketConnector extends BaseIoConnector
 
         synchronized( connectQueue )
         {
-            connectQueue.push( request );
+            connectQueue.offer( request );
         }
         selector.wakeup();
 
@@ -233,7 +234,7 @@ public class SocketConnector extends BaseIoConnector
             ConnectionRequest req;
             synchronized( connectQueue )
             {
-                req = ( ConnectionRequest ) connectQueue.pop();
+                req = connectQueue.poll();
             }
 
             if( req == null )

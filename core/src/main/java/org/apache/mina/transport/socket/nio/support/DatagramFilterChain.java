@@ -19,12 +19,13 @@
  */
 package org.apache.mina.transport.socket.nio.support;
 
+import java.util.Queue;
+
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
-import org.apache.mina.util.Queue;
 
 /**
  * An {@link IoFilterChain} for datagram transport (UDP/IP).
@@ -41,14 +42,14 @@ class DatagramFilterChain extends AbstractIoFilterChain {
     protected void doWrite( IoSession session, WriteRequest writeRequest )
     {
         DatagramSessionImpl s = ( DatagramSessionImpl ) session;
-        Queue writeRequestQueue = s.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = s.getWriteRequestQueue();
         
         // SocketIoProcessor.doFlush() will reset it after write is finished
         // because the buffer will be passed with messageSent event. 
         ( ( ByteBuffer ) writeRequest.getMessage() ).mark();
         synchronized( writeRequestQueue )
         {
-            writeRequestQueue.push( writeRequest );
+            writeRequestQueue.offer( writeRequest );
             if( writeRequestQueue.size() == 1 && session.getTrafficMask().isWritable() )
             {
                 // Notify DatagramService only when writeRequestQueue was empty.

@@ -19,10 +19,12 @@
  */
 package org.apache.mina.filter.codec.support;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
-import org.apache.mina.util.Queue;
 
 /**
  * A {@link ProtocolEncoderOutput} based on queue.
@@ -32,7 +34,7 @@ import org.apache.mina.util.Queue;
  */
 public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutput
 {
-    private final Queue bufferQueue = new Queue();
+    private final Queue<ByteBuffer> bufferQueue = new LinkedList<ByteBuffer>();
     
     public SimpleProtocolEncoderOutput()
     {
@@ -45,7 +47,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
     
     public void write( ByteBuffer buf )
     {
-        bufferQueue.push( buf );
+        bufferQueue.offer( buf );
     }
     
     public void mergeAll()
@@ -60,9 +62,9 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         }
         
         // Get the size of merged BB
-        for( int i = size - 1; i >= 0; i -- )
+        for( Object o: bufferQueue )
         {
-            sum += ( ( ByteBuffer ) bufferQueue.get( i ) ).remaining();
+            sum += ( ( ByteBuffer ) o ).remaining();
         }
         
         // Allocate a new BB that will contain all fragments
@@ -71,7 +73,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         // and merge all.
         for( ;; )
         {
-            ByteBuffer buf = ( ByteBuffer ) bufferQueue.pop();
+            ByteBuffer buf = bufferQueue.poll();
             if( buf == null )
             {
                 break;
@@ -83,7 +85,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         
         // Push the new buffer finally.
         newBuf.flip();
-        bufferQueue.push(newBuf);
+        bufferQueue.offer(newBuf);
     }
     
     public WriteFuture flush()
@@ -98,7 +100,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         {
             for( ;; )
             {
-                ByteBuffer buf = ( ByteBuffer ) bufferQueue.pop();
+                ByteBuffer buf = ( ByteBuffer ) bufferQueue.poll();
                 if( buf == null )
                 {
                     break;

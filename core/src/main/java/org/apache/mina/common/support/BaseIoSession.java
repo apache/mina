@@ -42,7 +42,7 @@ import org.apache.mina.common.IoFilter.WriteRequest;
  */
 public abstract class BaseIoSession implements IoSession
 {
-    private final Map attributes = new HashMap();
+    private final Map<String, Object> attributes = new HashMap<String, Object>();
     private final long creationTime;
 
     /** 
@@ -211,11 +211,11 @@ public abstract class BaseIoSession implements IoSession
         return getAttribute( key ) != null;
     }
 
-    public Set getAttributeKeys()
+    public Set<String> getAttributeKeys()
     {
         synchronized( attributes )
         {
-            return new HashSet( attributes.keySet() );
+            return new HashSet<String>( attributes.keySet() );
         }
     }
     

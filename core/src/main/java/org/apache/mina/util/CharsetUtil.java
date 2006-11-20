@@ -38,8 +38,8 @@ public class CharsetUtil
         try
         {
             Class charsetClass = Class.forName( "java.nio.charset.Charset" );
-            Object charSet = charsetClass.getMethod( "defaultCharset", null ).invoke( null, null );
-            return ( String ) charsetClass.getMethod( "name", null ).invoke( charSet, null );
+            Object charSet = charsetClass.getMethod( "defaultCharset", ( Class[] ) null ).invoke( null, ( Object[] ) null );
+            return ( String ) charsetClass.getMethod( "name", ( Class[] ) null ).invoke( charSet, ( Object[] ) null );
         }
         catch ( Exception e )
         {

@@ -54,14 +54,14 @@ public class VmPipeConnector extends BaseIoConnector
     {
     }
 
-    protected Class getAddressType()
+    protected Class<? extends SocketAddress> getAddressType()
     {
         return VmPipeAddress.class;
     }
 
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
-        VmPipe entry = ( VmPipe ) VmPipeAcceptor.boundHandlers.get( remoteAddress );
+        VmPipe entry = VmPipeAcceptor.boundHandlers.get( remoteAddress );
         if( entry == null )
         {
             return DefaultConnectFuture.newFailedFuture(

@@ -63,7 +63,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         AbstractIoFilterChain.class.getName() + ".connectFuture";
 
     private final IoSession session;
-    private final Map name2entry = new HashMap();
+    private final Map<String, Entry> name2entry = new HashMap<String, Entry>();
     private final EntryImpl head;
     private final EntryImpl tail;
 
@@ -87,7 +87,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
     public Entry getEntry( String name )
     {
-        Entry e = ( Entry ) name2entry.get( name );
+        Entry e = name2entry.get( name );
         if ( e == null )
         {
             return null;
@@ -158,10 +158,10 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
     public synchronized void clear() throws Exception
     {
-        Iterator it = new ArrayList( name2entry.keySet() ).iterator();
+        Iterator<String> it = new ArrayList<String>( name2entry.keySet() ).iterator();
         while ( it.hasNext() )
         {
-            this.remove( ( String ) it.next() );
+            this.remove( it.next() );
         }
     }
 
@@ -469,9 +469,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
     }
 
-    public List getAll()
+    public List<Entry> getAll()
     {
-        List list = new ArrayList();
+        List<Entry> list = new ArrayList<Entry>();
         EntryImpl e = head.nextEntry;
         while( e != tail )
         {
@@ -482,9 +482,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         return list;
     }
 
-    public List getAllReversed()
+    public List<Entry> getAllReversed()
     {
-        List list = new ArrayList();
+        List<Entry> list = new ArrayList<Entry>();
         EntryImpl e = tail.prevEntry;
         while( e != head )
         {
@@ -513,7 +513,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         return false;
     }
 
-    public boolean contains( Class filterType )
+    public boolean contains( Class<? extends IoFilter> filterType )
     {
         EntryImpl e = head.nextEntry;
         while( e != tail )

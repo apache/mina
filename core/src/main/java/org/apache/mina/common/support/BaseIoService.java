@@ -71,7 +71,7 @@ public abstract class BaseIoService implements IoService
     /**
      * Returns the type of {@link SocketAddress} this service uses.
      */
-    protected abstract Class getAddressType();
+    protected abstract Class<? extends SocketAddress> getAddressType();
     
     public IoFilterChainBuilder getFilterChainBuilder()
     {

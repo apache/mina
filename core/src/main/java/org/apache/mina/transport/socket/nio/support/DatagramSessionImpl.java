@@ -23,8 +23,11 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.mina.common.BroadcastIoSession;
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChain;
@@ -38,7 +41,6 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
-import org.apache.mina.util.Queue;
 
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
@@ -53,7 +55,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     private final DatagramService managerDelegate;
     private final DatagramFilterChain filterChain = new DatagramFilterChain( this );
     private final DatagramChannel ch;
-    private final Queue writeRequestQueue = new Queue();
+    private final Queue<WriteRequest> writeRequestQueue = new LinkedList<WriteRequest>();
     private final IoHandler handler;
     private final SocketAddress localAddress;
     private final SocketAddress remoteAddress;
@@ -164,7 +166,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         filterChain.fireFilterClose( this );
     }
 
-    Queue getWriteRequestQueue()
+    Queue<WriteRequest> getWriteRequestQueue()
     {
         return writeRequestQueue;
     }
@@ -194,10 +196,19 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
     public int getScheduledWriteBytes()
     {
+        int size = 0;
         synchronized( writeRequestQueue )
         {
-            return writeRequestQueue.byteSize();
+            for( Object o: writeRequestQueue )
+            {
+                if( o instanceof ByteBuffer )
+                {
+                    size += ( ( ByteBuffer ) o ).remaining();
+                }
+            }
         }
+        
+        return size;
     }
 
     public TransportType getTransportType()

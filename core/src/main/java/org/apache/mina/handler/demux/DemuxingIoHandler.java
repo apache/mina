@@ -78,8 +78,10 @@ import org.apache.mina.util.IdentityHashSet;
  */
 public class DemuxingIoHandler extends IoHandlerAdapter
 {
-    private final Map findHandlerCache = new Hashtable();
-    private final Map type2handler = new Hashtable();
+    private final Map<Class, MessageHandler> findHandlerCache =
+        new Hashtable<Class, MessageHandler>();
+    private final Map<Class, MessageHandler> type2handler =
+        new Hashtable<Class, MessageHandler>();
 
     /**
      * Creates a new instance with no registered {@link MessageHandler}s.
@@ -98,7 +100,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter
     public MessageHandler addMessageHandler( Class type, MessageHandler handler )
     {
         findHandlerCache.clear();
-        return ( MessageHandler ) type2handler.put( type, handler );
+        return type2handler.put( type, handler );
     }
 
     /**
@@ -110,7 +112,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter
     public MessageHandler removeMessageHandler( Class type )
     {
         findHandlerCache.clear();
-        return ( MessageHandler ) type2handler.remove( type );
+        return type2handler.remove( type );
     }
     
     
@@ -120,7 +122,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter
      */
     public MessageHandler getMessageHandler( Class type )
     {
-        return ( MessageHandler ) type2handler.get( type );
+        return type2handler.get( type );
     }
     
     /**
@@ -155,7 +157,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter
         return findHandler( type, null );
     }
 
-    private MessageHandler findHandler( Class type, Set triedClasses )
+    private MessageHandler findHandler( Class type, Set<Class> triedClasses )
     {
         MessageHandler handler = null;
 
@@ -165,14 +167,14 @@ public class DemuxingIoHandler extends IoHandlerAdapter
         /*
          * Try the cache first.
          */
-        handler = ( MessageHandler ) findHandlerCache.get( type );
+        handler = findHandlerCache.get( type );
         if( handler != null )
             return handler;
 
         /*
          * Try the registered handlers for an immediate match.
          */
-        handler = ( MessageHandler ) type2handler.get( type );
+        handler = type2handler.get( type );
         
         if( handler == null )
         {
@@ -181,7 +183,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter
              */
             
             if( triedClasses == null )
-                triedClasses = new IdentityHashSet();
+                triedClasses = new IdentityHashSet<Class>();
             triedClasses.add( type );
             
             Class[] interfaces = type.getInterfaces();
