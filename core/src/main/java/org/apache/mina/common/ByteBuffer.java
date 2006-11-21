@@ -477,6 +477,11 @@ public abstract class ByteBuffer implements Comparable
      * @see java.nio.ByteBuffer#asReadOnlyBuffer()
      */
     public abstract ByteBuffer asReadOnlyBuffer();
+    
+    /**
+     * @see java.nio.ByteBuffer#hasArray()
+     */
+    public abstract boolean hasArray();
 
     /**
      * @see java.nio.ByteBuffer#array()
@@ -1781,7 +1786,7 @@ public abstract class ByteBuffer implements Comparable
 
         return remaining() - prefixLength >= dataLength;
     }
-
+    
     //////////////////////////
     // Skip or fill methods //
     //////////////////////////

@@ -162,5 +162,11 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         {
             return buf.arrayOffset();
         }
+
+        @Override
+        public boolean hasArray()
+        {
+            return buf.hasArray();
+        }
     }
 }

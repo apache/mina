@@ -458,6 +458,12 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator
             this.buf = newBuf;
             oldBuf.release();
         }
+
+        @Override
+        public boolean hasArray()
+        {
+            return buf().hasArray();
+        }
     }
 
     private class UnexpandableByteBuffer

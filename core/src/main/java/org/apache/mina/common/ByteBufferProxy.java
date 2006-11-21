@@ -650,4 +650,10 @@ public class ByteBufferProxy extends ByteBuffer
     {
         return buf.markValue();
     }
+
+    @Override
+    public boolean hasArray()
+    {
+        return buf.hasArray();
+    }
 }
