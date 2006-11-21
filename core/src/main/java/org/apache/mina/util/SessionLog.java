@@ -27,13 +27,16 @@ import org.slf4j.LoggerFactory;
  * Provides utility methods to log protocol-specific messages.
  * <p>
  * Set {@link #PREFIX} and {@link #LOGGER} session attributes
- * to override prefix string and logger.
+ * to override prefix string and logger or use {@link #setPrefix(IoSession, String)}
+ * and {@link #setLogger(IoSession, Logger)}.
+ * </p>
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  *
  */
-public class SessionLog {
+public class SessionLog
+{
     /**
      * Session attribute key: prefix string
      */
@@ -51,73 +54,105 @@ public class SessionLog {
 
     public static void debug( IoSession session, String message )
     {
-        Logger log = getLogger( session );
-        if( log.isDebugEnabled() )
-        {
-            log.debug( String.valueOf( session.getAttribute( PREFIX ) ) + message );
-        }
+        debug( getLogger( session ), session, message );
     }
 
-    public static void debug( IoSession session, String message, Throwable cause )
+    public static void debug( Logger log, IoSession session, String message )
     {
-        Logger log = getLogger( session );
         if( log.isDebugEnabled() )
         {
-            log.debug( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+            log.debug( String.valueOf( getPrefix( session )  ) + message );
+        }
+    }
+    
+    public static void debug( IoSession session, String message, Throwable cause )
+    {
+    	debug( getLogger( session ), session, message, cause );
+    }
+    
+    public static void debug( Logger log, IoSession session, String message, Throwable cause )
+    {
+        if( log.isDebugEnabled() )
+        {
+            log.debug( String.valueOf( getPrefix( session ) ) + message, cause );
         }
     }
 
     public static void info( IoSession session, String message )
     {
-        Logger log = getLogger( session );
-        if( log.isInfoEnabled() )
-        {
-            log.info( String.valueOf( session.getAttribute( PREFIX ) ) + message );
-        }
+    	info( getLogger( session ), session, message );
     }
 
+    public static void info( Logger log, IoSession session, String message )
+    {
+        if( log.isInfoEnabled() )
+        {
+            log.info( String.valueOf( getPrefix( session ) ) + message );
+        }
+    }
+    
     public static void info( IoSession session, String message, Throwable cause )
     {
-        Logger log = getLogger( session );
-        if( log.isInfoEnabled() )
-        {
-            log.info( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
-        }
+    	info( getLogger( session ), session, message, cause );
     }
 
+    public static void info( Logger log, IoSession session, String message, Throwable cause )
+    {
+        if( log.isInfoEnabled() )
+        {
+            log.info( String.valueOf( getPrefix( session ) ) + message, cause );
+        }
+    }
+    
     public static void warn( IoSession session, String message )
     {
-        Logger log = getLogger( session );
+    	warn( getLogger( session ), session, message );
+    }
+    
+    public static void warn( Logger log, IoSession session, String message )
+    {
         if( log.isWarnEnabled() )
         {
-            log.warn( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+            log.warn( String.valueOf( getPrefix( session ) ) + message );
         }
     }
 
     public static void warn( IoSession session, String message, Throwable cause )
     {
-        Logger log = getLogger( session );
-        if( log.isWarnEnabled() )
-        {
-            log.warn( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
-        }
+    	warn( getLogger( session ), session, message, cause );
     }
 
+    public static void warn( Logger log, IoSession session, String message, Throwable cause )
+    {
+        if( log.isWarnEnabled() )
+        {
+            log.warn( String.valueOf( getPrefix( session ) ) + message, cause );
+        }
+    }
+    
     public static void error( IoSession session, String message )
     {
-        Logger log = getLogger( session );
+    	error( getLogger( session ), session, message );
+    }
+    
+    public static void error( Logger log, IoSession session, String message )
+    {
         if( log.isErrorEnabled() )
         {
-            log.error( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+            log.error( String.valueOf( getPrefix( session ) ) + message );
         }
     }
 
     public static void error( IoSession session, String message, Throwable cause )
     {
-        Logger log = getLogger( session );
+    	error( getLogger( session ), session, message, cause );
+    }
+    
+    public static void error( Logger log, IoSession session, String message, Throwable cause )
+    {
         if( log.isErrorEnabled() )
         {
-            log.error( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+            log.error( String.valueOf( getPrefix( session ) ) + message, cause );
         }
     }
     
@@ -141,22 +176,35 @@ public class SessionLog {
         return getLogger( session ).isErrorEnabled();
     }
 
-    private static Logger getLogger( IoSession session )
+    public static String getPrefix( IoSession session )
+    {
+        String prefix = ( String ) session.getAttribute( PREFIX );
+        if( prefix == null )
+        {
+            prefix = "[" + session.getRemoteAddress() + "] ";
+            setPrefix( session, prefix );
+        }
+        return prefix;
+    }
+    
+    public static void setPrefix( IoSession session, String prefix )
+    {
+    	session.setAttribute( PREFIX, prefix );
+    }
+    
+    public static Logger getLogger( IoSession session )
     {
         Logger log = ( Logger ) session.getAttribute( LOGGER );
         if( log == null )
         {
             log = LoggerFactory.getLogger( getClass( session ) );
-            String prefix = ( String ) session.getAttribute( PREFIX );
-            if( prefix == null )
-            {
-                prefix = "[" + session.getRemoteAddress() + "] ";
-                session.setAttribute( PREFIX, prefix );
-            }
-
-            session.setAttribute( LOGGER, log );
+            setLogger( session, log );
         }
-
         return log;
+    }
+    
+    public static void setLogger( IoSession session, Logger log )
+    {
+        session.setAttribute( LOGGER, log );
     }
 }
