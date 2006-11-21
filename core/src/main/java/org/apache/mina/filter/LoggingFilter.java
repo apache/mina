@@ -83,7 +83,7 @@ public class LoggingFilter extends IoFilterAdapter
     {
         if( SessionLog.isInfoEnabled( session ) )
         {
-            SessionLog.error( session, "EXCEPTION:", cause );
+            SessionLog.info( session, "EXCEPTION:", cause );
         }
         nextFilter.exceptionCaught( session, cause );
     }
