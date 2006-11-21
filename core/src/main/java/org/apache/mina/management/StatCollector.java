@@ -195,7 +195,10 @@ public class StatCollector
     	{
     	    totalProcessedSessions += 1;
     	    polledSessions.add( session );
-    	    session.setAttribute( KEY, new IoSessionStat() );
+
+    	    IoSessionStat sessionStats = new IoSessionStat();
+    	    sessionStats.lastPollingTime = System.currentTimeMillis();
+    	    session.setAttribute( KEY, sessionStats );
     	}
     }
 
@@ -291,10 +294,10 @@ public class StatCollector
                 }
                 
                 
-                msgWrittenThroughput = 0f;
-                msgReadThroughput = 0f;
-                bytesWrittenThroughput = 0f;
-                bytesReadThroughput = 0f;
+                float tmpMsgWrittenThroughput = 0f;
+                float tmpMsgReadThroughput = 0f;
+                float tmpBytesWrittenThroughput = 0f;
+                float tmpBytesReadThroughput = 0f;
                 
                 for ( Iterator iter = polledSessions.iterator(); iter.hasNext(); )
                 {
@@ -305,19 +308,24 @@ public class StatCollector
 
                     sessStat.byteReadThroughput = ( session.getReadBytes() - sessStat.lastByteRead )
                         / ( pollingInterval / 1000f );
-                    bytesReadThroughput += sessStat.byteReadThroughput;
+                    tmpBytesReadThroughput += sessStat.byteReadThroughput;
                     
                     sessStat.byteWrittenThroughput = ( session.getWrittenBytes() - sessStat.lastByteWrite )
                         / ( pollingInterval / 1000f );
-                    bytesWrittenThroughput += sessStat.byteWrittenThroughput;
+                    tmpBytesWrittenThroughput += sessStat.byteWrittenThroughput;
 
                     sessStat.messageReadThroughput = ( session.getReadMessages() - sessStat.lastMessageRead )
                         / ( pollingInterval / 1000f );
-                    msgReadThroughput += sessStat.messageReadThroughput;
+                    tmpMsgReadThroughput += sessStat.messageReadThroughput;
                     
                     sessStat.messageWrittenThroughput = ( session.getWrittenMessages() - sessStat.lastMessageWrite )
                         / ( pollingInterval / 1000f );
-                    msgWrittenThroughput += sessStat.messageWrittenThroughput;
+                    tmpMsgWrittenThroughput += sessStat.messageWrittenThroughput;
+                    
+                    msgWrittenThroughput = tmpMsgWrittenThroughput;
+                    msgReadThroughput = tmpMsgReadThroughput;
+                    bytesWrittenThroughput = tmpBytesWrittenThroughput;
+                    bytesReadThroughput = tmpMsgWrittenThroughput;
                     
                     sessStat.lastPollingTime = System.currentTimeMillis();
                 }
