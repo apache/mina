@@ -977,16 +977,7 @@ public abstract class ByteBuffer implements Comparable
 
         if( !utf16 )
         {
-            int i;
-            for( i = oldPos; i < oldLimit; i++ )
-            {
-                if( get(i) == 0 )
-                {
-                    end = i;
-                    break;
-                }
-            }
-            
+            end = indexOf( ( byte ) 0x00 );
             if( end < 0 )
             {
                 newPos = end = oldLimit;
@@ -1128,7 +1119,7 @@ public abstract class ByteBuffer implements Comparable
         }
 
         int i;
-
+        
         if( !utf16 )
         {
             for( i = oldPos; i < end; i ++ )
