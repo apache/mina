@@ -833,4 +833,28 @@ public class ByteBufferTest extends TestCase
         buf.reset();
         Assert.assertEquals( 0xCDB3D0A4L, buf.getUnsignedInt() );
     }
+    
+    public void testIndexOf() throws Exception
+    {
+        boolean direct = false;
+        for( int i = 0; i < 2; i ++, direct = !direct )
+        {
+            ByteBuffer buf = ByteBuffer.allocate( 16, direct );
+            buf.put( ( byte ) 0x1 );
+            buf.put( ( byte ) 0x2 );
+            buf.put( ( byte ) 0x3 );
+            buf.put( ( byte ) 0x4 );
+            buf.put( ( byte ) 0x1 );
+            buf.put( ( byte ) 0x2 );
+            buf.put( ( byte ) 0x3 );
+            buf.put( ( byte ) 0x4 );
+            buf.position( 2 );
+            buf.limit( 5 );
+            
+            Assert.assertEquals( 4, buf.indexOf( ( byte ) 0x1 ) );
+            Assert.assertEquals( -1, buf.indexOf( ( byte ) 0x2 ) );
+            Assert.assertEquals( 2, buf.indexOf( ( byte ) 0x3 ) );
+            Assert.assertEquals( 3, buf.indexOf( ( byte ) 0x4 ) );
+        }
+    }
 }
