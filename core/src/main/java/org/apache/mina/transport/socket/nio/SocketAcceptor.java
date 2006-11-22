@@ -148,6 +148,21 @@ public class SocketAcceptor extends BaseIoAcceptor
     }
 
     /**
+     * Sets the {@link SocketSessionConfig} this acceptor will use for new sessions.
+     * 
+     * @param sessionConfig the config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setSessionConfig( SocketSessionConfig sessionConfig )
+    {
+        if( sessionConfig == null )
+        {
+            throw new NullPointerException( "sessionConfig" );
+        }
+        this.sessionConfig = sessionConfig;
+    }
+    
+    /**
      * @see ServerSocket#getReuseAddress()
      */
     public boolean isReuseAddress()

@@ -116,6 +116,21 @@ public class SocketConnector extends BaseIoConnector
     }
 
     /**
+     * Sets the {@link SocketSessionConfig} this connector will use for new sessions.
+     * 
+     * @param sessionConfig the config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setSessionConfig( SocketSessionConfig sessionConfig )
+    {
+        if( sessionConfig == null )
+        {
+            throw new NullPointerException( "sessionConfig" );
+        }
+        this.sessionConfig = sessionConfig;
+    }
+
+	/**
      * How many seconds to keep the connection thread alive between connection requests
      *
      * @return Number of seconds to keep connection thread alive

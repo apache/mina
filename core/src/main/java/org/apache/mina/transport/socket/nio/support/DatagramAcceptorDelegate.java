@@ -57,7 +57,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private static volatile int nextId = 0;
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
-    private final IoSessionConfig sessionConfig = new DatagramSessionConfigImpl();
+    private IoSessionConfig sessionConfig = new DatagramSessionConfigImpl();
         
     private final IoAcceptor wrapper;
     private final Executor executor;
@@ -244,6 +244,21 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         return sessionConfig;
     }
 
+    /**
+     * Sets the {@link DatagramSessionConfig} this acceptor will use for new sessions.
+     * 
+     * @param sessionConfig the config.
+     * @throws NullPointerException if the specified value is <code>null</code>.
+     */
+    public void setSessionConfig( DatagramSessionConfig sessionConfig )
+    {
+        if( sessionConfig == null )
+        {
+            throw new NullPointerException( "sessionConfig" );
+        }
+        this.sessionConfig = sessionConfig;
+    }
+    
     public IoServiceListenerSupport getListeners()
     {
         return super.getListeners();
