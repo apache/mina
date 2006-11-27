@@ -23,6 +23,7 @@ import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoSessionConfig;
 
 /**
  * A base implementation of {@link IoConnector}.
@@ -34,8 +35,9 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
 {
     private int connectTimeout = 60; // 1 minute
 
-    protected BaseIoConnector()
+    protected BaseIoConnector( IoSessionConfig sessionConfig )
     {
+        super( sessionConfig );
     }
 
     public int getConnectTimeout()

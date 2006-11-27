@@ -44,6 +44,7 @@ import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
+import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 
 /**
@@ -59,7 +60,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private static volatile int nextId = 0;
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
-    private IoSessionConfig sessionConfig = new DatagramSessionConfigImpl();
 
     private final IoConnector wrapper;
     private final Executor executor;
@@ -76,6 +76,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
      */
     public DatagramConnectorDelegate( IoConnector wrapper, Executor executor )
     {
+        super( new DefaultDatagramSessionConfig() );
         this.wrapper = wrapper;
         this.executor = executor;
     }
@@ -83,6 +84,12 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     protected Class<? extends SocketAddress> getAddressType()
     {
         return InetSocketAddress.class;
+    }
+
+    @Override
+    protected Class<? extends IoSessionConfig> getSessionConfigType()
+    {
+        return DatagramSessionConfig.class;
     }
 
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
@@ -176,26 +183,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         this.sessionRecycler = sessionRecycler;
     }
 
-    public IoSessionConfig getSessionConfig()
-    {
-        return sessionConfig;
-    }
-
-    /**
-     * Sets the {@link DatagramSessionConfig} this connector will use for new sessions.
-     * 
-     * @param sessionConfig the config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setSessionConfig( DatagramSessionConfig sessionConfig )
-    {
-        if( sessionConfig == null )
-        {
-            throw new NullPointerException( "sessionConfig" );
-        }
-        this.sessionConfig = sessionConfig;
-    }
-    
     private synchronized void startupWorker() throws IOException
     {
         if( worker == null )

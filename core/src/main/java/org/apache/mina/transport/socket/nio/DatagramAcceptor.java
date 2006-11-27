@@ -62,15 +62,4 @@ public class DatagramAcceptor extends DelegatedIoAcceptor implements DatagramSer
     {
         ( ( DatagramAcceptorDelegate ) delegate ).setSessionRecycler( sessionRecycler );
     }
-    
-    /**
-     * Sets the {@link DatagramSessionConfig} this acceptor will use for new sessions.
-     * 
-     * @param sessionConfig the config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setSessionConfig( DatagramSessionConfig sessionConfig )
-    {
-        ( ( DatagramAcceptorDelegate ) delegate ).setSessionConfig( sessionConfig );
-    }
 }

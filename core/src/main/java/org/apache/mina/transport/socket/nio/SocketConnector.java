@@ -56,8 +56,6 @@ public class SocketConnector extends BaseIoConnector
      */
     private static volatile int nextId = 0;
 
-    private IoSessionConfig sessionConfig = new SocketSessionConfigImpl();
-
     private final Object lock = new Object();
     private final int id = nextId++;
     private final String threadName = "SocketConnector-" + id;
@@ -90,6 +88,7 @@ public class SocketConnector extends BaseIoConnector
      */
     public SocketConnector( int processorCount, Executor executor )
     {
+        super( new DefaultSocketSessionConfig() );
         if( processorCount < 1 )
         {
             throw new IllegalArgumentException( "Must have at least one processor" );
@@ -110,27 +109,13 @@ public class SocketConnector extends BaseIoConnector
         return InetSocketAddress.class;
     }
 
-    public IoSessionConfig getSessionConfig()
+	@Override
+    protected Class<? extends IoSessionConfig> getSessionConfigType()
     {
-        return sessionConfig;
+        return SocketSessionConfig.class;
     }
 
     /**
-     * Sets the {@link SocketSessionConfig} this connector will use for new sessions.
-     * 
-     * @param sessionConfig the config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setSessionConfig( SocketSessionConfig sessionConfig )
-    {
-        if( sessionConfig == null )
-        {
-            throw new NullPointerException( "sessionConfig" );
-        }
-        this.sessionConfig = sessionConfig;
-    }
-
-	/**
      * How many seconds to keep the connection thread alive between connection requests
      *
      * @return Number of seconds to keep connection thread alive

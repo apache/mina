@@ -41,6 +41,7 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
+import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
 
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
@@ -236,7 +237,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         return readBufferSize;
     }
 
-    private class SessionConfigImpl extends DatagramSessionConfigImpl implements DatagramSessionConfig
+    private class SessionConfigImpl extends DefaultDatagramSessionConfig implements DatagramSessionConfig
     {
         public int getReceiveBufferSize()
         {
@@ -252,7 +253,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
         public void setReceiveBufferSize( int receiveBufferSize )
         {
-            if( DatagramSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
+            if( DefaultDatagramSessionConfig.isSetReceiveBufferSizeAvailable() )
             {
                 try
                 {
@@ -304,7 +305,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
         public void setSendBufferSize( int sendBufferSize )
         {
-            if( DatagramSessionConfigImpl.isSetSendBufferSizeAvailable() )
+            if( DefaultDatagramSessionConfig.isSetSendBufferSizeAvailable() )
             {
                 try
                 {
@@ -343,7 +344,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
         public int getTrafficClass()
         {
-            if( DatagramSessionConfigImpl.isGetTrafficClassAvailable() )
+            if( DefaultDatagramSessionConfig.isGetTrafficClassAvailable() )
             {
                 try
                 {
@@ -362,7 +363,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
         public void setTrafficClass( int trafficClass )
         {
-            if( DatagramSessionConfigImpl.isSetTrafficClassAvailable() )
+            if( DefaultDatagramSessionConfig.isSetTrafficClassAvailable() )
             {
                 try
                 {

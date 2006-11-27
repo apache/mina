@@ -19,34 +19,28 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.io.IOException;
-import java.net.Socket;
+import java.net.DatagramSocket;
 import java.net.SocketException;
 
-import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 
 /**
- * The default implementation of {@link SocketSessionConfig}.
- *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev: 439913 $, $Date: 2006-09-04 05:12:43 +0200 (mån, 04 sep 2006) $
  */
-class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
+public class DefaultDatagramSessionConfig extends BaseIoSessionConfig implements DatagramSessionConfig
 {
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
     private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
 
+    private static boolean DEFAULT_BROADCAST;
     private static boolean DEFAULT_REUSE_ADDRESS;
     private static int DEFAULT_RECEIVE_BUFFER_SIZE;
     private static int DEFAULT_SEND_BUFFER_SIZE;
     private static int DEFAULT_TRAFFIC_CLASS;
-    private static boolean DEFAULT_KEEP_ALIVE;
-    private static boolean DEFAULT_OOB_INLINE;
-    private static int DEFAULT_SO_LINGER;
-    private static boolean DEFAULT_TCP_NO_DELAY;
     
     static
     {
@@ -55,19 +49,15 @@ class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessi
     
     private static void initialize()
     {
-        Socket socket = null;
-        
-        socket = new Socket();
+        DatagramSocket socket = null;
 
         try
         {
+            socket = new DatagramSocket();
+            DEFAULT_BROADCAST = socket.getBroadcast();
             DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
             DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
             DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
-            DEFAULT_KEEP_ALIVE = socket.getKeepAlive();
-            DEFAULT_OOB_INLINE = socket.getOOBInline();
-            DEFAULT_SO_LINGER = socket.getSoLinger();
-            DEFAULT_TCP_NO_DELAY = socket.getTcpNoDelay();
             
             // Check if setReceiveBufferSize is supported.
             try
@@ -90,7 +80,7 @@ class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessi
             {
                 SET_SEND_BUFFER_SIZE_AVAILABLE = false;
             }
-
+            
             // Check if getTrafficClass is supported.
             try
             {
@@ -102,23 +92,13 @@ class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessi
                 GET_TRAFFIC_CLASS_AVAILABLE = false;
                 DEFAULT_TRAFFIC_CLASS = 0;
             }
-        }
-        catch( SocketException e )
-        {
+        } catch (SocketException e) {
             throw new ExceptionInInitializerError(e);
         }
-        finally
-        {
+        finally {
             if( socket != null )
             {
-                try
-                {
-                    socket.close();
-                }
-                catch( IOException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
+                socket.close();
             }
         }
     }
@@ -138,100 +118,120 @@ class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessi
     public static boolean isSetTrafficClassAvailable() {
         return SET_TRAFFIC_CLASS_AVAILABLE;
     }
-    
+
+    private boolean broadcast = DEFAULT_BROADCAST;
     private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
     private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
-    private boolean keepAlive = DEFAULT_KEEP_ALIVE;
-    private boolean oobInline = DEFAULT_OOB_INLINE;
-    private int soLinger = DEFAULT_SO_LINGER;
-    private boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
 
     /**
      * Creates a new instance.
+     * 
+     * @throws RuntimeIOException if failed to get the default configuration
      */
-    SocketSessionConfigImpl()
+    public DefaultDatagramSessionConfig()
     {
+        DatagramSocket s = null;
+        try
+        {
+            s = new DatagramSocket();
+            broadcast = s.getBroadcast();
+            reuseAddress = s.getReuseAddress();
+            receiveBufferSize = s.getReceiveBufferSize();
+            sendBufferSize = s.getSendBufferSize();
+            trafficClass = s.getTrafficClass();
+        }
+        catch( SocketException e )
+        {
+            throw new RuntimeIOException( "Failed to get the default configuration.", e );
+        }
+        finally
+        {
+            if( s != null )
+            {
+                s.close();
+            }
+        }
     }
 
+    /**
+     * @see DatagramSocket#getBroadcast()
+     */
+    public boolean isBroadcast()
+    {
+        return broadcast;
+    }
+    
+    /**
+     * @see DatagramSocket#setBroadcast(boolean)
+     */
+    public void setBroadcast( boolean broadcast )
+    {
+        this.broadcast = broadcast;
+    }
+    
+    /**
+     * @see DatagramSocket#getReuseAddress()
+     */
     public boolean isReuseAddress()
     {
         return reuseAddress;
     }
     
+    /**
+     * @see DatagramSocket#setReuseAddress(boolean)
+     */
     public void setReuseAddress( boolean reuseAddress )
     {
         this.reuseAddress = reuseAddress;
     }
 
+    /**
+     * @see DatagramSocket#getReceiveBufferSize()
+     */
     public int getReceiveBufferSize()
     {
         return receiveBufferSize;
     }
 
+    /**
+     * @see DatagramSocket#setReceiveBufferSize(int)
+     */
     public void setReceiveBufferSize( int receiveBufferSize )
     {
         this.receiveBufferSize = receiveBufferSize;
     }
 
+    /**
+     * @see DatagramSocket#getSendBufferSize()
+     */
     public int getSendBufferSize()
     {
         return sendBufferSize;
     }
 
+    /**
+     * @see DatagramSocket#setSendBufferSize(int)
+     */
     public void setSendBufferSize( int sendBufferSize )
     {
         this.sendBufferSize = sendBufferSize;
     }
 
+    /**
+     * @see DatagramSocket#getTrafficClass()
+     */
     public int getTrafficClass()
     {
         return trafficClass;
     }
 
+    /**
+     * @see DatagramSocket#setTrafficClass(int)
+     */
     public void setTrafficClass( int trafficClass )
     {
         this.trafficClass = trafficClass;
-    }
-
-    public boolean isKeepAlive()
-    {
-        return keepAlive;
-    }
-
-    public void setKeepAlive( boolean keepAlive )
-    {
-        this.keepAlive = keepAlive;
-    }
-
-    public boolean isOobInline()
-    {
-        return oobInline;
-    }
-
-    public void setOobInline( boolean oobInline )
-    {
-        this.oobInline = oobInline;
-    }
-
-    public int getSoLinger()
-    {
-        return soLinger;
-    }
-
-    public void setSoLinger( int soLinger )
-    {
-        this.soLinger = soLinger;
-    }
-
-    public boolean isTcpNoDelay()
-    {
-        return tcpNoDelay;
-    }
-
-    public void setTcpNoDelay( boolean tcpNoDelay )
-    {
-        this.tcpNoDelay = tcpNoDelay;
     }
 }

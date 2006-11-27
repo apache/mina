@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoSessionConfig;
 
 /**
  * A base implementation of {@link IoAcceptor}.
@@ -43,8 +44,9 @@ public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor
      */
     protected final Object bindLock = new Object();
 
-    protected BaseIoAcceptor()
+    protected BaseIoAcceptor( IoSessionConfig sessionConfig )
     {
+        super( sessionConfig );
     }
     
     public SocketAddress getLocalAddress()

@@ -62,15 +62,4 @@ public class DatagramConnector extends DelegatedIoConnector implements DatagramS
     {
         ( ( DatagramConnectorDelegate ) delegate ).setSessionRecycler( sessionRecycler );
     }
-    
-    /**
-     * Sets the {@link DatagramSessionConfig} this connector will use for new sessions.
-     * 
-     * @param sessionConfig the config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setSessionConfig( DatagramSessionConfig sessionConfig )
-    {
-        ( ( DatagramConnectorDelegate ) delegate ).setSessionConfig( sessionConfig );
-    }
 }

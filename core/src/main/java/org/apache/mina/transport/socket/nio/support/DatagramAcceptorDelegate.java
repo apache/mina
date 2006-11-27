@@ -42,6 +42,7 @@ import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
+import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 
 /**
@@ -57,7 +58,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private static volatile int nextId = 0;
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
-    private IoSessionConfig sessionConfig = new DatagramSessionConfigImpl();
         
     private final IoAcceptor wrapper;
     private final Executor executor;
@@ -74,6 +74,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
      */
     public DatagramAcceptorDelegate( IoAcceptor wrapper, Executor executor )
     {
+        super( new DefaultDatagramSessionConfig() );
         this.wrapper = wrapper;
         this.executor = executor;
     }
@@ -81,6 +82,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     protected Class<? extends SocketAddress> getAddressType()
     {
         return InetSocketAddress.class;
+    }
+
+    @Override
+    protected Class<? extends IoSessionConfig> getSessionConfigType()
+    {
+        return DatagramSessionConfig.class;
     }
 
     protected void doBind() throws IOException
@@ -238,27 +245,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
 
-
-    public IoSessionConfig getSessionConfig()
-    {
-        return sessionConfig;
-    }
-
-    /**
-     * Sets the {@link DatagramSessionConfig} this acceptor will use for new sessions.
-     * 
-     * @param sessionConfig the config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setSessionConfig( DatagramSessionConfig sessionConfig )
-    {
-        if( sessionConfig == null )
-        {
-            throw new NullPointerException( "sessionConfig" );
-        }
-        this.sessionConfig = sessionConfig;
-    }
-    
     public IoServiceListenerSupport getListeners()
     {
         return super.getListeners();

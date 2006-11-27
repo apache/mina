@@ -29,7 +29,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
-import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 import org.apache.mina.transport.vmpipe.support.VmPipeIdleStatusChecker;
@@ -45,18 +44,24 @@ import org.apache.mina.util.AnonymousSocketAddress;
  */
 public class VmPipeConnector extends BaseIoConnector
 {
-    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
 
     /**
      * Creates a new instance.
      */
     public VmPipeConnector()
     {
+        super( new DefaultVmPipeSessionConfig() );
     }
 
     protected Class<? extends SocketAddress> getAddressType()
     {
         return VmPipeAddress.class;
+    }
+
+    @Override
+    protected Class<? extends IoSessionConfig> getSessionConfigType()
+    {
+        return VmPipeSessionConfig.class;
     }
 
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
@@ -114,10 +119,5 @@ public class VmPipeConnector extends BaseIoConnector
         }
 
         return future;
-    }
-
-    public IoSessionConfig getSessionConfig()
-    {
-        return CONFIG;
     }
 }

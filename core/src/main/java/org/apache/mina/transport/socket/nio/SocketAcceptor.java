@@ -56,7 +56,6 @@ public class SocketAcceptor extends BaseIoAcceptor
      */
     private static volatile int nextId = 0;
 
-    private IoSessionConfig sessionConfig = new SocketSessionConfigImpl();
     private int backlog = 50;
     private boolean reuseAddress;
 
@@ -95,6 +94,7 @@ public class SocketAcceptor extends BaseIoAcceptor
      */
     public SocketAcceptor( int processorCount, Executor executor )
     {
+        super( new DefaultSocketSessionConfig() );
         if( processorCount < 1 )
         {
             throw new IllegalArgumentException( "Must have at least one processor" );
@@ -142,26 +142,12 @@ public class SocketAcceptor extends BaseIoAcceptor
         return InetSocketAddress.class;
     }
 
-    public IoSessionConfig getSessionConfig()
+    @Override
+    protected Class<? extends IoSessionConfig> getSessionConfigType()
     {
-        return sessionConfig;
+        return SocketSessionConfig.class;
     }
 
-    /**
-     * Sets the {@link SocketSessionConfig} this acceptor will use for new sessions.
-     * 
-     * @param sessionConfig the config.
-     * @throws NullPointerException if the specified value is <code>null</code>.
-     */
-    public void setSessionConfig( SocketSessionConfig sessionConfig )
-    {
-        if( sessionConfig == null )
-        {
-            throw new NullPointerException( "sessionConfig" );
-        }
-        this.sessionConfig = sessionConfig;
-    }
-    
     /**
      * @see ServerSocket#getReuseAddress()
      */

@@ -65,10 +65,21 @@ public interface IoService
     Set getManagedSessions();
 
     /**
-     * Resturns the default configuration of the new {@link IoSession}s
+     * Returns the default configuration of the new {@link IoSession}s
      * created by this service.
      */
     IoSessionConfig getSessionConfig();
+    
+    /**
+     * Sets the default configuration of the new {@link IoSession}s
+     * created by this service.
+     * 
+     * @param config the new default config.
+     * @throws IllegalArgumentException if the type of the specified config doesn't
+     *                match the {@link IoSessionConfig} implementation supported by
+     *                this {@link IoService}.
+     */
+    void setSessionConfig( IoSessionConfig config );
     
     /**
      * Returns the {@link IoFilterChainBuilder} which will build the

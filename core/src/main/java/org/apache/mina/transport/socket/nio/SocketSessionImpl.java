@@ -326,7 +326,7 @@ class SocketSessionImpl extends BaseIoSession
 
         public int getTrafficClass()
         {
-            if( SocketSessionConfigImpl.isGetTrafficClassAvailable() )
+            if( DefaultSocketSessionConfig.isGetTrafficClassAvailable() )
             {
                 try
                 {
@@ -335,7 +335,7 @@ class SocketSessionImpl extends BaseIoSession
                 catch( SocketException e )
                 {
                     // Throw an exception only when setTrafficClass is also available.
-                    if( SocketSessionConfigImpl.isSetTrafficClassAvailable() )
+                    if( DefaultSocketSessionConfig.isSetTrafficClassAvailable() )
                     {
                         throw new RuntimeIOException( e );
                     }
@@ -347,7 +347,7 @@ class SocketSessionImpl extends BaseIoSession
 
         public void setTrafficClass( int tc )
         {
-            if( SocketSessionConfigImpl.isSetTrafficClassAvailable() )
+            if( DefaultSocketSessionConfig.isSetTrafficClassAvailable() )
             {
                 try
                 {
@@ -374,7 +374,7 @@ class SocketSessionImpl extends BaseIoSession
 
         public void setSendBufferSize( int size )
         {
-            if( SocketSessionConfigImpl.isSetSendBufferSizeAvailable() )
+            if( DefaultSocketSessionConfig.isSetSendBufferSizeAvailable() )
             {
                 try
                 {
@@ -401,7 +401,7 @@ class SocketSessionImpl extends BaseIoSession
 
         public void setReceiveBufferSize( int size )
         {
-            if( SocketSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
+            if( DefaultSocketSessionConfig.isSetReceiveBufferSizeAvailable() )
             {
                 try
                 {

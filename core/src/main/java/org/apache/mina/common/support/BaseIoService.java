@@ -28,6 +28,7 @@ import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListener;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.ThreadModel;
 
 /**
@@ -63,15 +64,26 @@ public abstract class BaseIoService implements IoService
      */
     private final IoServiceListenerSupport listeners;
     
-    protected BaseIoService()
+    /**
+     * The default {@link IoSessionConfig} which will be used to configure new sessions.
+     */
+    private IoSessionConfig sessionConfig;
+    
+    protected BaseIoService( IoSessionConfig sessionConfig )
     {
         this.listeners = new IoServiceListenerSupport( this );
+        setSessionConfig( sessionConfig );
     }
     
     /**
      * Returns the type of {@link SocketAddress} this service uses.
      */
     protected abstract Class<? extends SocketAddress> getAddressType();
+    
+    /**
+     * Returns the type of {@link IoSessionConfig} this service uses.
+     */
+    protected abstract Class<? extends IoSessionConfig> getSessionConfigType();
     
     public IoFilterChainBuilder getFilterChainBuilder()
     {
@@ -150,4 +162,24 @@ public abstract class BaseIoService implements IoService
     {
         return listeners;
     }
+    
+    public IoSessionConfig getSessionConfig()
+    {
+        return sessionConfig;
+    }
+
+    public void setSessionConfig( IoSessionConfig sessionConfig )
+    {
+        if( sessionConfig == null )
+        {
+            throw new NullPointerException( "sessionConfig" );
+        }
+        if( ! getSessionConfigType().isAssignableFrom( sessionConfig.getClass() ) )
+        {
+            throw new IllegalArgumentException( "sessionConfig type: " 
+                    + sessionConfig.getClass() 
+                    + " (expected: " + getSessionConfigType() + ")" );
+        }
+        this.sessionConfig = sessionConfig;
+    }    
 }

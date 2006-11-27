@@ -28,7 +28,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 
 /**
@@ -42,18 +41,23 @@ public class VmPipeAcceptor extends BaseIoAcceptor
 {
     static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
     
-    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
-
     /**
      * Creates a new instance.
      */
     public VmPipeAcceptor()
     {
+        super( new DefaultVmPipeSessionConfig() );
     }
 
     protected Class<? extends SocketAddress> getAddressType()
     {
         return VmPipeAddress.class;
+    }
+
+    @Override
+    protected Class<? extends IoSessionConfig> getSessionConfigType()
+    {
+        return VmPipeSessionConfig.class;
     }
 
     protected void doBind() throws IOException
@@ -95,11 +99,6 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         }
         
         getListeners().fireServiceDeactivated();
-    }
-
-    public IoSessionConfig getSessionConfig()
-    {
-        return CONFIG;
     }
 
     public IoSession newSession( SocketAddress remoteAddress )
