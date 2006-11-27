@@ -75,15 +75,12 @@ class SocketIoProcessor
         newSessions.offer( session );
 
         startupWorker();
-
-        selector.wakeup();
     }
 
     void remove( SocketSessionImpl session ) throws IOException
     {
         scheduleRemove( session );
         startupWorker();
-        selector.wakeup();
     }
 
     private void startupWorker() throws IOException
@@ -96,6 +93,7 @@ class SocketIoProcessor
                 worker = new Worker();
                 executor.execute( new NamePreservingRunnable( worker ) );
             }
+            selector.wakeup();
         }
     }
 
