@@ -62,6 +62,15 @@ public class SingleSessionIoHandlerDelegate implements IoHandler
         }
         this.factory = factory;
     }
+    
+    /**
+     * Returns the {@link SingleSessionIoHandlerFactory} that is used to create a new
+     * {@link SingleSessionIoHandler} instance.
+     */
+    public SingleSessionIoHandlerFactory getFactory()
+    {
+        return factory;
+    }
 
     /**
      * Creates a new instance with the factory passed to the constructor of
