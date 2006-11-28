@@ -67,25 +67,29 @@ public interface IoServiceManagerMBean
     float getTotalMessageWrittenThroughput();
 
     /**
-     * average bytes read per seconds for all the managed sessions  
+     * average bytes read per seconds for all the managed sessions, be carefull 
+     * doesn't make sense for sateless servers  
      * @return bytes per seconds
      */
     float getAverageByteReadThroughput();
 
     /**
-     * average bytes written per seconds for all the managed sessions  
+     * average bytes written per seconds for all the managed sessions, be carefull 
+     * doesn't make sense for sateless servers  
      * @return bytes per seconds
      */
     float getAverageByteWrittenThroughput();
     
     /**
-     * average messages read per seconds for all the managed sessions  
+     * average messages read per seconds for all the managed sessions, be carefull 
+     * doesn't make sense for sateless servers  
      * @return messages per seconds
      */
     float getAverageMessageReadThroughput();
     
     /**
-     * average messages written per seconds for all the managed sessions  
+     * average messages written per seconds for all the managed sessions, be carefull 
+     * doesn't make sense for sateless servers  
      * @return messages per seconds
      */
     float getAverageMessageWrittenThroughput();
