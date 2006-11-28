@@ -149,9 +149,9 @@ public class ReadThrottleFilterBuilder
             if( counter < maximumConnectionBufferSize && isSuspendedReads( session ) )
             {
                 session.resumeRead();
+                session.removeAttribute( SUSPENDED_READS );
             }
-
-            session.removeAttribute( SUSPENDED_READS );
+            
         }
     }
 
