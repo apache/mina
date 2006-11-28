@@ -71,10 +71,7 @@ public class SocketAcceptor extends BaseIoAcceptor
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
 
-    /**
-     * @noinspection FieldAccessedSynchronizedAndUnsynchronized
-     */
-    private Selector selector;
+    private final Selector selector;
     private Worker worker;
     private int processorDistributor = 0;
 
@@ -126,6 +123,15 @@ public class SocketAcceptor extends BaseIoAcceptor
             }
         }
         
+        try
+        {
+            this.selector = Selector.open();
+        }
+        catch( IOException e )
+        {
+            throw new RuntimeIOException( "Failed to open a selector.", e );
+        }
+        
         // Set other properties and initialize
         this.executor = executor;
         this.processorCount = processorCount;
@@ -134,6 +140,19 @@ public class SocketAcceptor extends BaseIoAcceptor
         for( int i = 0; i < processorCount; i++ )
         {
             ioProcessors[i] = new SocketIoProcessor( "SocketAcceptorIoProcessor-" + id + "." + i, executor );
+        }
+    }
+
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        try
+        {
+            selector.close();
+        }
+        catch( IOException e )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( e );
         }
     }
 
@@ -197,9 +216,7 @@ public class SocketAcceptor extends BaseIoAcceptor
         RegistrationRequest request = new RegistrationRequest();
 
         registerQueue.offer( request );
-
         startupWorker();
-
         selector.wakeup();
 
         synchronized( request )
@@ -243,13 +260,12 @@ public class SocketAcceptor extends BaseIoAcceptor
     }
 
 
-    private synchronized void startupWorker() throws IOException
+    private synchronized void startupWorker()
     {
         synchronized( lock )
         {
             if( worker == null )
             {
-                selector = Selector.open();
                 worker = new Worker();
 
                 executor.execute( new NamePreservingRunnable( worker ) );
@@ -261,20 +277,8 @@ public class SocketAcceptor extends BaseIoAcceptor
     {
         CancellationRequest request = new CancellationRequest();
 
-        try
-        {
-            startupWorker();
-        }
-        catch( IOException e )
-        {
-            // IOException is thrown only when Worker thread is not
-            // running and failed to open a selector.  We simply throw
-            // IllegalArgumentException here because we can simply
-            // conclude that nothing is bound to the selector.
-            throw new IllegalArgumentException( "Address not bound: " + getLocalAddress() );
-        }
-
         cancelQueue.offer( request );
+        startupWorker();
         selector.wakeup();
 
         synchronized( request )
@@ -330,18 +334,6 @@ public class SocketAcceptor extends BaseIoAcceptor
                                 cancelQueue.isEmpty() )
                             {
                                 worker = null;
-                                try
-                                {
-                                    selector.close();
-                                }
-                                catch( IOException e )
-                                {
-                                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                                }
-                                finally
-                                {
-                                    selector = null;
-                                }
                                 break;
                             }
                         }

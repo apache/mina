@@ -34,6 +34,7 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteTimeoutException;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.IoServiceListenerSupport;
@@ -51,10 +52,7 @@ class SocketIoProcessor
 
     private final String threadName;
     private final Executor executor;
-    /**
-     * @noinspection FieldAccessedSynchronizedAndUnsynchronized
-     */
-    private Selector selector;
+    private final Selector selector;
 
     private final Queue<SocketSessionImpl> newSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
     private final Queue<SocketSessionImpl> removingSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
@@ -68,33 +66,53 @@ class SocketIoProcessor
     {
         this.threadName = threadName;
         this.executor = executor;
+        try
+        {
+            this.selector = Selector.open();
+        }
+        catch( IOException e )
+        {
+            throw new RuntimeIOException( "Failed to open a selector.", e );
+        }
+    }
+    
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        try
+        {
+            selector.close();
+        }
+        catch( IOException e )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( e );
+        }
     }
 
-    void addNew( SocketSessionImpl session ) throws IOException
+    void addNew( SocketSessionImpl session )
     {
         newSessions.offer( session );
 
         startupWorker();
     }
 
-    void remove( SocketSessionImpl session ) throws IOException
+    void remove( SocketSessionImpl session )
     {
         scheduleRemove( session );
         startupWorker();
     }
 
-    private void startupWorker() throws IOException
+    private void startupWorker()
     {
         synchronized( lock )
         {
             if( worker == null )
             {
-                selector = Selector.open();
                 worker = new Worker();
                 executor.execute( new NamePreservingRunnable( worker ) );
             }
-            selector.wakeup();
         }
+        selector.wakeup();
     }
 
     void flush( SocketSessionImpl session )
@@ -549,20 +567,6 @@ class SocketIoProcessor
                             if( selector.keys().isEmpty() && newSessions.isEmpty() )
                             {
                                 worker = null;
-
-                                try
-                                {
-                                    selector.close();
-                                }
-                                catch( IOException e )
-                                {
-                                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                                }
-                                finally
-                                {
-                                    selector = null;
-                                }
-
                                 break;
                             }
                         }
@@ -584,5 +588,4 @@ class SocketIoProcessor
             }
         }
     }
-
 }

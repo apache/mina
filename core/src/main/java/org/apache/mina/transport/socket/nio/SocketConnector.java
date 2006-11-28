@@ -36,6 +36,7 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
@@ -63,11 +64,8 @@ public class SocketConnector extends BaseIoConnector
     private final SocketIoProcessor[] ioProcessors;
     private final int processorCount;
     private final Executor executor;
+    private final Selector selector;
 
-    /**
-     * @noinspection FieldAccessedSynchronizedAndUnsynchronized
-     */
-    private Selector selector;
     private Worker worker;
     private int processorDistributor = 0;
     private int workerTimeout = 60;  // 1 min.
@@ -93,6 +91,15 @@ public class SocketConnector extends BaseIoConnector
         {
             throw new IllegalArgumentException( "Must have at least one processor" );
         }
+        
+        try
+        {
+            this.selector = Selector.open();
+        }
+        catch( IOException e )
+        {
+            throw new RuntimeIOException( "Failed to open a selector.", e );
+        }
 
         this.executor = executor;
         this.processorCount = processorCount;
@@ -101,6 +108,19 @@ public class SocketConnector extends BaseIoConnector
         for( int i = 0; i < processorCount; i++ )
         {
             ioProcessors[i] = new SocketIoProcessor( "SocketConnectorIoProcessor-" + id + "." + i, executor );
+        }
+    }
+
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        try
+        {
+            selector.close();
+        }
+        catch( IOException e )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( e );
         }
     }
 
@@ -184,26 +204,7 @@ public class SocketConnector extends BaseIoConnector
         }
 
         ConnectionRequest request = new ConnectionRequest( ch );
-        synchronized( lock )
-        {
-            try
-            {
-                startupWorker();
-            }
-            catch( IOException e )
-            {
-                try
-                {
-                    ch.close();
-                }
-                catch( IOException e2 )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e2 );
-                }
-
-                return DefaultConnectFuture.newFailedFuture( e );
-            }
-        }
+        startupWorker();
 
         connectQueue.offer( request );
         selector.wakeup();
@@ -211,13 +212,15 @@ public class SocketConnector extends BaseIoConnector
         return request;
     }
     
-    private synchronized void startupWorker() throws IOException
+    private void startupWorker()
     {
-        if( worker == null )
+        synchronized( lock )
         {
-            selector = Selector.open();
-            worker = new Worker();
-            executor.execute( new NamePreservingRunnable( worker ) );
+            if( worker == null )
+            {
+                worker = new Worker();
+                executor.execute( new NamePreservingRunnable( worker ) );
+            }
         }
     }
 
@@ -381,18 +384,6 @@ public class SocketConnector extends BaseIoConnector
                                     connectQueue.isEmpty() )
                                 {
                                     worker = null;
-                                    try
-                                    {
-                                        selector.close();
-                                    }
-                                    catch( IOException e )
-                                    {
-                                        ExceptionMonitor.getInstance().exceptionCaught( e );
-                                    }
-                                    finally
-                                    {
-                                        selector = null;
-                                    }
                                     break;
                                 }
                             }
