@@ -38,6 +38,7 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoSessionRecycler;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
@@ -62,7 +63,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private final IoAcceptor wrapper;
     private final Executor executor;
     private final int id = nextId ++ ;
-    private Selector selector;
+    private final Selector selector;
     private DatagramChannel channel;
     private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
     private final Queue<CancellationRequest> cancelQueue = new ConcurrentLinkedQueue<CancellationRequest>();
@@ -75,8 +76,31 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     public DatagramAcceptorDelegate( IoAcceptor wrapper, Executor executor )
     {
         super( new DefaultDatagramSessionConfig() );
+
+        try
+        {
+            this.selector = Selector.open();
+        }
+        catch( IOException e )
+        {
+            throw new RuntimeIOException( "Failed to open a selector.", e );
+        }
+        
         this.wrapper = wrapper;
         this.executor = executor;
+    }
+
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        try
+        {
+            selector.close();
+        }
+        catch( IOException e )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( e );
+        }
     }
 
     protected Class<? extends SocketAddress> getAddressType()
@@ -93,11 +117,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     protected void doBind() throws IOException
     {
         RegistrationRequest request = new RegistrationRequest();
-        synchronized( this )
-        {
-            registerQueue.offer( request );
-            startupWorker();
-        }
+
+        registerQueue.offer( request );
+        startupWorker();
         selector.wakeup();
         
         synchronized( request )
@@ -127,23 +149,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     protected void doUnbind()
     {
         CancellationRequest request = new CancellationRequest();
-        synchronized( this )
-        {
-            try
-            {
-                startupWorker();
-            }
-            catch( IOException e )
-            {
-                // IOException is thrown only when Worker thread is not
-                // running and failed to open a selector.  We simply throw
-                // IllegalArgumentException here because we can simply
-                // conclude that nothing is bound to the selector.
-                throw new IllegalArgumentException( "Address not bound: " + getLocalAddress() );
-            }
 
-            cancelQueue.offer( request );
-        }
+        cancelQueue.offer( request );
+        startupWorker();
         selector.wakeup();
         
         synchronized( request )
@@ -256,11 +264,10 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         this.getThreadModel().buildFilterChain( session.getFilterChain() );
     }
     
-    private synchronized void startupWorker() throws IOException
+    private synchronized void startupWorker()
     {
         if( worker == null )
         {
-            selector = Selector.open();
             worker = new Worker();
             executor.execute( new NamePreservingRunnable( worker ) );
         }
@@ -316,18 +323,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                                 cancelQueue.isEmpty() )
                             {
                                 worker = null;
-                                try
-                                {
-                                    selector.close();
-                                }
-                                catch( IOException e )
-                                {
-                                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                                }
-                                finally
-                                {
-                                    selector = null;
-                                }
                                 break;
                             }
                         }

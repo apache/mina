@@ -39,6 +39,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoSessionRecycler;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
@@ -64,7 +65,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private final IoConnector wrapper;
     private final Executor executor;
     private final int id = nextId ++ ;
-    private Selector selector;
+    private final Selector selector;
     private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
     private final Queue<DatagramSessionImpl> cancelQueue = new ConcurrentLinkedQueue<DatagramSessionImpl>();
     private final Queue<DatagramSessionImpl> flushingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
@@ -77,8 +78,31 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     public DatagramConnectorDelegate( IoConnector wrapper, Executor executor )
     {
         super( new DefaultDatagramSessionConfig() );
+
+        try
+        {
+            this.selector = Selector.open();
+        }
+        catch( IOException e )
+        {
+            throw new RuntimeIOException( "Failed to open a selector.", e );
+        }
+
         this.wrapper = wrapper;
         this.executor = executor;
+    }
+
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        try
+        {
+            selector.close();
+        }
+        catch( IOException e )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( e );
+        }
     }
 
     protected Class<? extends SocketAddress> getAddressType()
@@ -140,31 +164,11 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
 
         RegistrationRequest request = new RegistrationRequest( ch );
-        synchronized( this )
-        {
-            try
-            {
-                startupWorker();
-            }
-            catch( IOException e )
-            {
-                try
-                {
-                    ch.disconnect();
-                    ch.close();
-                }
-                catch( IOException e2 )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e2 );
-                }
 
-                return DefaultConnectFuture.newFailedFuture( e );
-            }
-            
-            registerQueue.offer( request );
-        }
-
+        registerQueue.offer( request );
+        startupWorker();
         selector.wakeup();
+
         return request;
     }
     
@@ -183,11 +187,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         this.sessionRecycler = sessionRecycler;
     }
 
-    private synchronized void startupWorker() throws IOException
+    private synchronized void startupWorker() 
     {
         if( worker == null )
         {
-            selector = Selector.open();
             worker = new Worker();
             executor.execute( new NamePreservingRunnable( worker ) );
         }
@@ -195,25 +198,8 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
     public void closeSession( DatagramSessionImpl session )
     {
-        synchronized( this )
-        {
-            try
-            {
-                startupWorker();
-            }
-            catch( IOException e )
-            {
-                // IOException is thrown only when Worker thread is not
-                // running and failed to open a selector.  We simply return
-                // silently here because it we can simply conclude that
-                // this session is not managed by this connector or
-                // already closed.
-                return;
-            }
-
-            cancelQueue.offer( session );
-        }
-
+        cancelQueue.offer( session );
+        startupWorker();
         selector.wakeup();
     }
 
@@ -321,18 +307,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                                 cancelQueue.isEmpty() )
                             {
                                 worker = null;
-                                try
-                                {
-                                    selector.close();
-                                }
-                                catch( IOException e )
-                                {
-                                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                                }
-                                finally
-                                {
-                                    selector = null;
-                                }
                                 break;
                             }
                         }
