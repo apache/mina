@@ -1,2 +1,33 @@
-This product includes software developed by
+Apache MINA
+Copyright 2006 The Apache Software Foundation.
+
+This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
+
+Message logging is provided by the SLF4J library package,
+which is open source software, written by Ceki Gülcü, and
+copyright by SLF4J.ORG and QOS.ch.  The original software is
+available from
+
+   http://www.slf4j.org/
+
+Concurrency utlitity classes are provided by the backport-util-concurrent
+library package, which is open source software, written by
+Dawid Kurzyniec, and copyright by Distributed Computing Laboratory,
+Emory University.  The original software is available from
+
+   http://dcl.mathcs.emory.edu/util/backport-util-concurrent/
+
+Data compression support is provided by the JZLib library package,
+which is open source software, written by JCraft, and copyright
+by JCraft.  The original software is available from
+
+   http://www.jcraft.com/jzlib/
+
+Spring framework is provided by the Spring framework library
+package, which is open source software, written by Rod Johnson
+et al, and copyright by Springframework.org.  The original
+software is available from
+
+   http://www.springframework.org/
+
