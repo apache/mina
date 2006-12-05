@@ -171,41 +171,6 @@ Use JDK 1.5 to make sure these modules build.
         </executions>
       </plugin>
       <plugin>
-        <inherited>false</inherited>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>site</phase>
-            <configuration>
-              <tasks>
-                <javadoc destdir="target/site/apidocs" author="true" use="true" windowtitle="Apache MINA API Documentation" encoding="UTF-8" docencoding="UTF-8" locale="en_US">
-                  <package name="org.apache.mina.*"/>
-                  <excludepackage name="**.support"/>
-
-                  <sourcepath>
-                    <dirset dir=".">
-                      <include name="*/src/main/java" />
-                      <exclude name="example/**" />
-                    </dirset>
-                  </sourcepath>
-
-                  <classpath refid="maven.dependency.classpath" />
-
-                  <link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
-                  <link href="http://static.springframework.org/spring/docs/1.2.x/api/" />
-                  <link href="http://www.slf4j.org/api/" />
-                  <link href="http://gleamynode.net/dev/tl-netty2/docs/apidocs/" />
-                </javadoc>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.0.1</version>
         <configuration>
