@@ -22,7 +22,6 @@ package org.apache.mina.transport.socket.nio;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.support.DelegatedIoConnector;
 import org.apache.mina.transport.socket.nio.support.DatagramConnectorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
@@ -33,7 +32,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends DelegatedIoConnector implements DatagramService
+public class DatagramConnector extends DelegatedIoConnector
 {
     /**
      * Creates a new instance using a NewThreadExecutor 
@@ -51,15 +50,5 @@ public class DatagramConnector extends DelegatedIoConnector implements DatagramS
     public DatagramConnector( Executor executor )
     {
         init( new DatagramConnectorDelegate( this, executor ) );
-    }
-    
-    public IoSessionRecycler getSessionRecycler()
-    {
-        return ( ( DatagramConnectorDelegate ) delegate ).getSessionRecycler();
-    }
-
-    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
-    {
-        ( ( DatagramConnectorDelegate ) delegate ).setSessionRecycler( sessionRecycler );
     }
 }

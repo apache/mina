@@ -34,11 +34,9 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
@@ -56,11 +54,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  */
 public class DatagramConnectorDelegate extends BaseIoConnector implements DatagramService
 {
-    private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
-
     private static volatile int nextId = 0;
-
-    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
 
     private final IoConnector wrapper;
     private final Executor executor;
@@ -172,21 +166,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         return request;
     }
     
-    public IoSessionRecycler getSessionRecycler()
-    {
-        return sessionRecycler;
-    }
-
-    // FIXME There can be a problem if a user changes the recycler after the service is activated.
-    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
-    {
-        if( sessionRecycler == null )
-        {
-            sessionRecycler = DEFAULT_RECYCLER;
-        }
-        this.sessionRecycler = sessionRecycler;
-    }
-
     private synchronized void startupWorker() 
     {
         if( worker == null )
@@ -338,13 +317,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             DatagramSessionImpl session = ( DatagramSessionImpl ) key.attachment();
 
-            DatagramSessionImpl replaceSession = getRecycledSession(session);
-
-            if(replaceSession != null)
-            {
-                session = replaceSession;
-            }
-
             if( key.isReadable() && session.getTrafficMask().isReadable() )
             {
                 readSession( session );
@@ -355,30 +327,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 scheduleFlush( session );
             }
         }
-    }
-    
-    private DatagramSessionImpl getRecycledSession( IoSession session )
-    {
-        IoSessionRecycler sessionRecycler = getSessionRecycler();
-        DatagramSessionImpl replaceSession = null;
-
-        if ( sessionRecycler != null )
-        {
-            synchronized ( sessionRecycler )
-            {
-                replaceSession = ( DatagramSessionImpl ) sessionRecycler.recycle( session.getLocalAddress(), session
-                        .getRemoteAddress() );
-
-                if ( replaceSession != null )
-                {
-                    return replaceSession;
-                }
-
-                sessionRecycler.put( session );
-            }
-        }
-
-        return null;
     }
     
     private void readSession( DatagramSessionImpl session )
@@ -514,22 +462,13 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             boolean success = false;
             try
             {
-                DatagramSessionImpl replaceSession = getRecycledSession( session );
+                SelectionKey key = req.channel.register( selector,
+                        SelectionKey.OP_READ, session );
 
-                if ( replaceSession != null )
-                {
-                    session = replaceSession;
-                }
-                else
-                {
-                    SelectionKey key = req.channel.register( selector,
-                            SelectionKey.OP_READ, session );
-
-                    session.setSelectionKey( key );
-                    buildFilterChain( session );
-                    // The CONNECT_FUTURE attribute is cleared and notified here.
-                    getListeners().fireSessionCreated( session );
-                }
+                session.setSelectionKey( key );
+                buildFilterChain( session );
+                // The CONNECT_FUTURE attribute is cleared and notified here.
+                getListeners().fireSessionCreated( session );
                 success = true;
             }
             catch( Throwable t )

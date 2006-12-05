@@ -33,7 +33,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptor extends DelegatedIoAcceptor implements DatagramService
+public class DatagramAcceptor extends DelegatedIoAcceptor
 {
     /**
      * Creates a new instance using a NewThreadExecutor
@@ -53,11 +53,19 @@ public class DatagramAcceptor extends DelegatedIoAcceptor implements DatagramSer
         init( new DatagramAcceptorDelegate( this, executor ) );
     }
 
+    /**
+     * Returns the {@link IoSessionRecycler} for this service.
+     */
     public IoSessionRecycler getSessionRecycler()
     {
         return ( ( DatagramAcceptorDelegate ) delegate ).getSessionRecycler();
     }
 
+    /**
+     * Sets the {@link IoSessionRecycler} for this service.
+     * 
+     * @param sessionRecycler <tt>null</tt> to use the default recycler
+     */
     public void setSessionRecycler( IoSessionRecycler sessionRecycler )
     {
         ( ( DatagramAcceptorDelegate ) delegate ).setSessionRecycler( sessionRecycler );

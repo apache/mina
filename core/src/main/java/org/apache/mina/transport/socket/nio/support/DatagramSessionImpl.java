@@ -163,7 +163,10 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     
     protected void close0()
     {
-        managerDelegate.getSessionRecycler().remove( this );
+        if( managerDelegate instanceof IoAcceptor )
+        {
+            ( ( DatagramAcceptorDelegate ) managerDelegate ).getSessionRecycler().remove( this );
+        }
         filterChain.fireFilterClose( this );
     }
 
