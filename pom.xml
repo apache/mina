@@ -69,6 +69,7 @@
     <profile>
       <id>jdk1.5</id>
       <activation>
+        <activeByDefault>true</activeByDefault>
         <jdk>1.5</jdk>
       </activation>
       <modules>
