@@ -11,7 +11,7 @@
     <url>http://mina.apace.org/</url>
   </organization>
   <groupId>org.apache.mina</groupId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <artifactId>build</artifactId>
   <name>Apache MINA Root Build POM</name>
   <packaging>pom</packaging>
