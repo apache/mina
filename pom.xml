@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache</groupId>
@@ -11,7 +11,7 @@
     <url>http://mina.apace.org/</url>
   </organization>
   <groupId>org.apache.mina</groupId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <artifactId>build</artifactId>
   <name>Apache MINA Root Build POM</name>
   <packaging>pom</packaging>
@@ -25,9 +25,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/branches/1.0</connection>
-    <url>http://svn.apache.org/viewvc/directory/mina/branches/1.0</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/1.0</developerConnection>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/1.0.1</connection>
+    <url>https://svn.apache.org/repos/asf/mina/tags/1.0.1</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/1.0.1</developerConnection>
   </scm>
 
   <ciManagement>
@@ -69,6 +69,7 @@
     <profile>
       <id>jdk1.5</id>
       <activation>
+        <activeByDefault>true</activeByDefault>
         <jdk>1.5</jdk>
       </activation>
       <modules>
@@ -166,41 +167,6 @@ Use JDK 1.5 to make sure these modules build.
             <id>attach-sources</id>
             <goals>
               <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <inherited>false</inherited>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>site</phase>
-            <configuration>
-              <tasks>
-                <javadoc destdir="target/site/apidocs" author="true" use="true" windowtitle="Apache MINA API Documentation" encoding="UTF-8" docencoding="UTF-8" locale="en_US">
-                  <package name="org.apache.mina.*"/>
-                  <excludepackage name="**.support"/>
-
-                  <sourcepath>
-                    <dirset dir=".">
-                      <include name="*/src/main/java" />
-                      <exclude name="example/**" />
-                    </dirset>
-                  </sourcepath>
-
-                  <classpath refid="maven.dependency.classpath" />
-
-                  <link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
-                  <link href="http://static.springframework.org/spring/docs/1.2.x/api/" />
-                  <link href="http://www.slf4j.org/api/" />
-                  <link href="http://gleamynode.net/dev/tl-netty2/docs/apidocs/" />
-                </javadoc>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
             </goals>
           </execution>
         </executions>
