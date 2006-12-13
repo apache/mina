@@ -24,6 +24,16 @@
       </excludes>
     </fileSet>
 
+    <!-- Reports -->
+    <fileSet>
+      <directory>target/site</directory>
+      <outputDirectory>docs</outputDirectory>
+      <includes>
+        <include>apidocs*/**</include>
+        <include>xref*/**</include>
+      </includes>
+    </fileSet>
+
     <!-- JARs -->
     <fileSet>
       <directory>core/target</directory>

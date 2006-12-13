@@ -116,11 +116,13 @@
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.0.1</version>
         <configuration>
-          <descriptor>release.xml</descriptor>
+          <descriptors>
+            <descriptor>release.xml</descriptor>
+          </descriptors>
           <finalName>mina-${pom.version}</finalName>
-          <includeSite>false</includeSite>
+          <appendAssemblyId>false</appendAssemblyId>
+          <tarLongFileMode>gnu</tarLongFileMode>
         </configuration>
       </plugin>
       <plugin>
@@ -133,4 +135,39 @@
       </plugin>
     </plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+          <aggregate>true</aggregate>
+          <breakiterator>true</breakiterator>
+          <charset>UTF-8</charset>
+          <docencoding>UTF-8</docencoding>
+          <doctitle>Apache MINA ${project.version} API Documentation</doctitle>
+          <encoding>UTF-8</encoding>
+          <excludePackageNames>*.support:*.example.*</excludePackageNames>
+          <links>
+            <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+            <link>http://www.slf4j.org/api/</link>
+            <link>http://static.springframework.org/spring/docs/2.0.x/api/</link>
+          </links>
+          <locale>en_US</locale>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+          <aggregate>true</aggregate>
+          <inputEncoding>UTF-8</inputEncoding>
+          <outputEncoding>UTF-8</outputEncoding>
+          <docTitle>Apache MINA ${project.version} Cross Reference</docTitle>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
