@@ -120,7 +120,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
         buf.putInt( objectSize );
         in.readFully( buf.array(), 4, objectSize );
         buf.position( 0 );
-        buf.limit( objectSize );
+        buf.limit( objectSize + 4 );
         
         Object answer = buf.getObject( classLoader );
         buf.release();
