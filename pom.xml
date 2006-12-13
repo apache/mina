@@ -30,6 +30,13 @@
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/trunk</developerConnection>
   </scm>
 
+  <distributionManagement>
+    <site>
+      <id>apache.websites</id>
+      <url>scp://people.apache.org/www/mina.apache.org/report/trunk/</url>
+    </site>
+  </distributionManagement>
+
   <ciManagement>
     <notifiers>
       <notifier>
