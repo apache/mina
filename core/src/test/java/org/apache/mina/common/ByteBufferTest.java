@@ -573,14 +573,24 @@ public class ByteBufferTest extends TestCase
         Assert.assertSame( original.buf().array(), duplicate.buf().array() );
 
         // Try to expand.
+        original = ByteBuffer.allocate( 16 );
+        original.setAutoExpand( true );
+        duplicate = original.duplicate();
+        Assert.assertFalse( original.isAutoExpand() );
+        
         try
         {
-            original = ByteBuffer.allocate( 16 );
-            duplicate = original.duplicate();
+            original.setAutoExpand( true );
+            Assert.fail();
+        }
+        catch( IllegalStateException e )
+        {
+            // OK
+        }
+
+        try
+        {
             duplicate.setAutoExpand( true );
-            duplicate.putString(
-                    "A very very very very looooooong string",
-                    Charset.forName( "ISO-8859-1" ).newEncoder() );
             Assert.fail();
         }
         catch( IllegalStateException e )

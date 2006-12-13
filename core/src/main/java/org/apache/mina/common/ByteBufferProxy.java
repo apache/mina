@@ -68,7 +68,7 @@ public class ByteBufferProxy extends ByteBuffer
     {
         return buf.isDirect();
     }
-
+    
     public java.nio.ByteBuffer buf()
     {
         return buf.buf();

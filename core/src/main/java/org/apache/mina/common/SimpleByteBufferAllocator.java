@@ -49,12 +49,12 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         {
             nioBuffer = java.nio.ByteBuffer.allocate( capacity );            
         }
-        return new SimpleByteBuffer( nioBuffer, false );
+        return new SimpleByteBuffer( nioBuffer, true );
     }
     
     public ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
-        return new SimpleByteBuffer( nioBuffer, false );
+        return new SimpleByteBuffer( nioBuffer, true );
     }
 
     public void dispose()
@@ -64,12 +64,11 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
     private static class SimpleByteBuffer extends BaseByteBuffer
     {
         private java.nio.ByteBuffer buf;
-        private boolean derived;
 
-        protected SimpleByteBuffer( java.nio.ByteBuffer buf, boolean derived )
+        protected SimpleByteBuffer( java.nio.ByteBuffer buf, boolean autoExpandAllowed )
         {
+            super( autoExpandAllowed );
             this.buf = buf;
-            this.derived = derived;
             buf.order( ByteOrder.BIG_ENDIAN );
         }
 
@@ -80,11 +79,6 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         
         protected void capacity0( int requestedCapacity )
         {
-            if( derived )
-            {
-                throw new IllegalStateException( "Derived buffers cannot be expanded." );
-            }
-
             int newCapacity = MINIMUM_CAPACITY;
             while( newCapacity < requestedCapacity )
             {
@@ -108,16 +102,19 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
             this.buf = newBuf;
         }
 
-        public ByteBuffer duplicate() {
-            return new SimpleByteBuffer( this.buf.duplicate(), true );
+        protected ByteBuffer duplicate0()
+        {
+            return new SimpleByteBuffer( this.buf.duplicate(), false );
         }
 
-        public ByteBuffer slice() {
-            return new SimpleByteBuffer( this.buf.slice(), true );
+        protected ByteBuffer slice0()
+        {
+            return new SimpleByteBuffer( this.buf.slice(), false );
         }
 
-        public ByteBuffer asReadOnlyBuffer() {
-            return new SimpleByteBuffer( this.buf.asReadOnlyBuffer(), true );
+        protected ByteBuffer asReadOnlyBuffer0()
+        {
+            return new SimpleByteBuffer( this.buf.asReadOnlyBuffer(), false );
         }
 
         public byte[] array()

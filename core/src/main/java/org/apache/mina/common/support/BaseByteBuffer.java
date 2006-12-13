@@ -44,6 +44,7 @@ import org.apache.mina.common.ByteBufferAllocator;
 public abstract class BaseByteBuffer extends ByteBuffer
 {
     private boolean autoExpand;
+    private boolean autoExpandAllowed = true;
     
     /**
      * We don't have any access to Buffer.markValue(), so we need to track it down,
@@ -53,6 +54,11 @@ public abstract class BaseByteBuffer extends ByteBuffer
 
     protected BaseByteBuffer()
     {
+        this( true );
+    }
+    protected BaseByteBuffer( boolean autoExpandAllowed )
+    {
+        this.autoExpandAllowed = autoExpandAllowed;
     }
 
     public boolean isDirect()
@@ -101,11 +107,16 @@ public abstract class BaseByteBuffer extends ByteBuffer
 
     public boolean isAutoExpand()
     {
-        return autoExpand;
+        return autoExpand && autoExpandAllowed;
     }
 
     public ByteBuffer setAutoExpand( boolean autoExpand )
     {
+        if( !autoExpandAllowed )
+        {
+            throw new IllegalStateException(
+                    "Derived buffers can't be auto-expandable." );
+        }
         this.autoExpand = autoExpand;
         return this;
     }
@@ -433,4 +444,43 @@ public abstract class BaseByteBuffer extends ByteBuffer
     {
         return buf().asDoubleBuffer();
     }
+
+    @Override
+    public final ByteBuffer asReadOnlyBuffer()
+    {
+        autoExpandAllowed = false;
+        return asReadOnlyBuffer0();
+    }
+    
+    /**
+     * Implement this method to return the unexpandable read only version of
+     * this buffer.
+     */
+    protected abstract ByteBuffer asReadOnlyBuffer0();
+
+    @Override
+    public final ByteBuffer duplicate()
+    {
+        autoExpandAllowed = false;
+        return duplicate0();
+    }
+    
+    /**
+     * Implement this method to return the unexpandable duplicate of this
+     * buffer.
+     */
+    protected abstract ByteBuffer duplicate0();
+
+    @Override
+    public final ByteBuffer slice()
+    {
+        autoExpandAllowed = false;
+        return slice0();
+    }
+    
+    /**
+     * Implement this method to return the unexpandable slice of this
+     * buffer.
+     */
+    protected abstract ByteBuffer slice0();
 }

@@ -108,9 +108,10 @@ import org.apache.mina.common.support.ByteBufferHexDumper;
  * Derived buffers are the buffers which were created by
  * {@link #duplicate()}, {@link #slice()}, or {@link #asReadOnlyBuffer()}.
  * They are useful especially when you broadcast the same messages to
- * multiple {@link IoSession}s.  Please note that the derived buffers are
- * not auto-expandable.  Trying to expand a derived buffer will raise
- * {@link IllegalStateException}.
+ * multiple {@link IoSession}s.  Please note that the buffer derived from and
+ * its derived buffers are not both auto-expandable.  Trying to call
+ * {@link #setAutoExpand(boolean)} with <tt>true</tt> parameter will
+ * raise an {@link IllegalStateException}.
  * </p>
  *
  * <h2>Changing Buffer Allocation Policy</h2>
