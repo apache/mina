@@ -138,12 +138,12 @@ public class SSLHandler
         initialHandshakeStatus = sslEngine.getHandshakeStatus();//SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
         initialHandshakeComplete = false;
         
-        SSLByteBufferPool.initiate( sslEngine );
+        SSLByteBufferUtil.initiate( sslEngine );
 
-        appBuffer = SSLByteBufferPool.getApplicationBuffer();
+        appBuffer = SSLByteBufferUtil.getApplicationBuffer();
 
-        inNetBuffer = SSLByteBufferPool.getPacketBuffer();
-        outNetBuffer = SSLByteBufferPool.getPacketBuffer();
+        inNetBuffer = SSLByteBufferUtil.getPacketBuffer();
+        outNetBuffer = SSLByteBufferUtil.getPacketBuffer();
         outNetBuffer.position( 0 );
         outNetBuffer.limit( 0 );
         
@@ -190,10 +190,6 @@ public class SSLHandler
         }
         sslEngine.closeOutbound();
         sslEngine = null;
-        
-        SSLByteBufferPool.release( appBuffer );
-        SSLByteBufferPool.release( inNetBuffer );
-        SSLByteBufferPool.release( outNetBuffer );
         scheduledWrites.clear();
     }
 
@@ -272,10 +268,10 @@ public class SSLHandler
     {
         if ( buf.limit() > inNetBuffer.remaining() ) {
             // We have to expand inNetBuffer
-            inNetBuffer = SSLByteBufferPool.expandBuffer( inNetBuffer,
+            inNetBuffer = SSLByteBufferUtil.expandBuffer( inNetBuffer,
                 inNetBuffer.capacity() + ( buf.limit() * 2 ) );
             // We also expand app. buffer (twice the size of in net. buffer)
-            appBuffer = SSLByteBufferPool.expandBuffer( appBuffer, inNetBuffer.capacity() * 2);
+            appBuffer = SSLByteBufferUtil.expandBuffer( appBuffer, inNetBuffer.capacity() * 2);
             appBuffer.position( 0 );
             appBuffer.limit( 0 );
             if( SessionLog.isDebugEnabled( session ) )
@@ -352,7 +348,7 @@ public class SSLHandler
                 // We have to expand outNetBuffer
                 // Note: there is no way to know the exact size required, but enrypted data
                 // shouln't need to be larger than twice the source data size?
-                outNetBuffer = SSLByteBufferPool.expandBuffer( outNetBuffer, src.capacity() * 2 );
+                outNetBuffer = SSLByteBufferUtil.expandBuffer( outNetBuffer, src.capacity() * 2 );
                 if ( SessionLog.isDebugEnabled( session ) ) {
                     SessionLog.debug( session, " expanded outNetBuffer:" + outNetBuffer );
                 }

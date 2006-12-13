@@ -88,8 +88,7 @@ public class Zlib
      * @param inBuffer the {@link ByteBuffer} to be decompressed. The contents
      * of the buffer are transferred into a local byte array and the buffer is
      * flipped and returned intact.
-     * @return the decompressed data. If not passed to the MINA methods that 
-     * release the buffer automatically, the buffer has to be manually released 
+     * @return the decompressed data 
      * @throws IOException if the decompression of the data failed for some reason.
      */
     public ByteBuffer inflate( ByteBuffer inBuffer ) throws IOException
@@ -144,9 +143,7 @@ public class Zlib
     /**
      * @param inBuffer the buffer to be compressed. The contents are transferred
      * into a local byte array and the buffer is flipped and returned intact.
-     * @return the buffer with the compressed data. If not passed to any of the
-     * MINA methods that automatically release the buffer, the buffer has to be
-     * released manually.
+     * @return the buffer with the compressed data
      * @throws IOException if the compression of teh buffer failed for some reason
      */
     public ByteBuffer deflate( ByteBuffer inBuffer ) throws IOException

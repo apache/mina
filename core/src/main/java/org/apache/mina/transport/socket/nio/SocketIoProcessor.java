@@ -228,7 +228,7 @@ class SocketIoProcessor
             }
             finally
             {
-                releaseWriteBuffers( session );
+                clearWriteRequestQueue( session );
                 getServiceListeners( session ).fireSessionDestroyed( session );
             }
         }
@@ -383,7 +383,7 @@ class SocketIoProcessor
 
             if( !session.isConnected() )
             {
-                releaseWriteBuffers( session );
+                clearWriteRequestQueue( session );
                 continue;
             }
 
@@ -414,7 +414,7 @@ class SocketIoProcessor
         }
     }
 
-    private void releaseWriteBuffers( SocketSessionImpl session )
+    private void clearWriteRequestQueue( SocketSessionImpl session )
     {
         Queue writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;

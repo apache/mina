@@ -23,8 +23,6 @@ import java.nio.ByteBuffer;
 
 import javax.net.ssl.SSLEngine;
 
-import org.apache.mina.util.Stack;
-
 /**
  * Simple ByteBuffer pool used by SSLHandler.
  * ByteBuffers are by default allocated as direct byte buffers. To use non-direct
@@ -33,26 +31,14 @@ import org.apache.mina.util.Stack;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-class SSLByteBufferPool
+class SSLByteBufferUtil
 {
     private static final int PACKET_BUFFER_INDEX = 0;
-
     private static final int APPLICATION_BUFFER_INDEX = 1;
 
     private static boolean initiated = false;
-
-    private static final String DIRECT_MEMORY_PROP = "mina.sslfilter.directbuffer";
-
-    private static boolean useDirectAllocatedBuffers = true;
-
     private static int packetBufferSize;
-
     private static int appBufferSize;
-
-    private static int[] bufferStackSizes;
-
-    private static final Stack[] bufferStacks = new Stack[] { new Stack(),
-                                                             new Stack(), };
 
     /**
      * Initiate buffer pool and buffer sizes from SSLEngine session.
@@ -63,14 +49,6 @@ class SSLByteBufferPool
     {
         if( !initiated )
         {
-            // Use direct allocated memory or not?
-            String prop = System.getProperty( DIRECT_MEMORY_PROP );
-            if( prop != null )
-            {
-                useDirectAllocatedBuffers = Boolean
-                        .getBoolean( DIRECT_MEMORY_PROP );
-            }
-            
             // init buffer sizes from SSLEngine
             packetBufferSize = sslEngine.getSession().getPacketBufferSize();
 
@@ -78,7 +56,6 @@ class SSLByteBufferPool
             // returns BUFFER_OVERFLOW even if there is enough room for the buffer.
             // So for now we use a size double the packet size as a workaround.
             appBufferSize = packetBufferSize * 2;
-            initiateBufferStacks();
             initiated = true;
         }
     }
@@ -114,36 +91,14 @@ class SSLByteBufferPool
      */
     private static ByteBuffer allocate( int idx )
     {
-        Stack stack = bufferStacks[ idx ];
-
-        ByteBuffer buf;
-        synchronized( stack )
+        switch( idx )
         {
-            buf = ( ByteBuffer ) stack.pop();
-            if( buf == null )
-            {
-                buf = createBuffer( bufferStackSizes[ idx ] );
-            }
-        }
-
-        buf.clear();
-        return buf;
-    }
-
-    /**
-     * Releases the specified buffer to buffer pool.
-     */
-    public static void release( ByteBuffer buf )
-    {
-        // Sweep buffer for security.
-        org.apache.mina.common.ByteBuffer.wrap( buf ).sweep();
-
-        int stackIndex =getBufferStackIndex( buf.capacity() );
-        if ( stackIndex >= PACKET_BUFFER_INDEX ) {
-            Stack stack = bufferStacks[getBufferStackIndex( buf.capacity() )];
-            synchronized ( stack ) {
-                stack.push( buf );
-            }
+        case PACKET_BUFFER_INDEX:
+            return createBuffer( packetBufferSize );
+        case APPLICATION_BUFFER_INDEX:
+            return createBuffer( appBufferSize );
+        default:
+            throw new IllegalStateException();
         }
     }
 
@@ -157,29 +112,12 @@ class SSLByteBufferPool
         ByteBuffer newBuf = createBuffer( newCapacity );
         buf.flip();
         newBuf.put( buf );
-        release(buf);
         return newBuf;
-    }
-
-    private static void initiateBufferStacks()
-    {
-        bufferStackSizes = new int[ 2 ];
-        bufferStackSizes[ PACKET_BUFFER_INDEX ] = packetBufferSize;
-        bufferStackSizes[ APPLICATION_BUFFER_INDEX ] = appBufferSize;
-    }
-
-    private static int getBufferStackIndex( int size )
-    {
-        if( size == packetBufferSize )
-            return PACKET_BUFFER_INDEX;
-        if( size == appBufferSize )
-            return APPLICATION_BUFFER_INDEX;
-        return -1;  // not reused
     }
 
     private static ByteBuffer createBuffer( int capacity )
     {
-        if( useDirectAllocatedBuffers )
+        if( org.apache.mina.common.ByteBuffer.isPreferDirectBuffers() )
         {
             try
             {
@@ -187,12 +125,20 @@ class SSLByteBufferPool
             }
             catch( OutOfMemoryError e )
             {
-                useDirectAllocatedBuffers = false;
-                System.err
-                        .println( "OutOfMemoryError: No more direct buffers available; trying heap buffer instead" );
+                return ByteBuffer.allocate( capacity );
             }
         }
-        return ByteBuffer.allocate( capacity );
+        else
+        {
+            try
+            {
+                return ByteBuffer.allocate( capacity );
+            }
+            catch( OutOfMemoryError e )
+            {
+                return ByteBuffer.allocateDirect( capacity );
+            }
+        }
     }
 
 }
