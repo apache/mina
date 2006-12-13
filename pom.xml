@@ -25,10 +25,17 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/1.0.1</connection>
-    <url>https://svn.apache.org/repos/asf/mina/tags/1.0.1</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/1.0.1</developerConnection>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/1.0</connection>
+    <url>https://svn.apache.org/repos/asf/mina/brchanes/1.0</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/1.0</developerConnection>
   </scm>
+
+  <distributionManagement>
+    <site>
+      <id>apache.websites</id>
+      <url>scp://people.apache.org/www/mina.apache.org/report/1.0/</url>
+    </site>
+  </distributionManagement>
 
   <ciManagement>
     <notifiers>
