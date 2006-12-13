@@ -167,7 +167,6 @@ public class IoSessionInputStream extends InputStream
         }
 
         released = true;
-        buf.release();
     }
 
     public void write( ByteBuffer src )

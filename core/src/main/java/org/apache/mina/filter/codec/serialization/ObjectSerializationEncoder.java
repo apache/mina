@@ -87,7 +87,6 @@ public class ObjectSerializationEncoder extends ProtocolEncoderAdapter
         int objectSize = buf.position() - 4;
         if( objectSize > maxObjectSize )
         {
-            buf.release();
             throw new IllegalArgumentException( "The encoded object is too big: " + objectSize + " (> " + maxObjectSize + ')' );
         }
         

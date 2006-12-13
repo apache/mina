@@ -69,10 +69,6 @@ public class NettyEncoder implements ProtocolEncoder
                 {
                     out.write( buf );
                 }
-                else
-                {
-                    buf.release();
-                }
             }
         }                
     }

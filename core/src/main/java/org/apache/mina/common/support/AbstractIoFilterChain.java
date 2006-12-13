@@ -35,7 +35,6 @@ import org.apache.mina.common.IoFilterLifeCycleException;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.util.ByteBufferUtil;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -698,27 +697,13 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         public void messageReceived( NextFilter nextFilter, IoSession session,
                                      Object message ) throws Exception
         {
-            try
-            {
-                session.getHandler().messageReceived( session, message );
-            }
-            finally
-            {
-                ByteBufferUtil.releaseIfPossible( message );
-            }
+            session.getHandler().messageReceived( session, message );
         }
 
         public void messageSent( NextFilter nextFilter, IoSession session,
                                  Object message ) throws Exception
         {
-            try
-            {
-                session.getHandler().messageSent( session, message );
-            }
-            finally
-            {
-                ByteBufferUtil.releaseIfPossible( message );
-            }
+            session.getHandler().messageSent( session, message );
         }
 
         public void filterWrite( NextFilter nextFilter,

@@ -299,11 +299,6 @@ class SocketIoProcessor
                 scheduleRemove( session );
             session.getFilterChain().fireExceptionCaught( session, e );
         }
-        finally
-        {
-            if( buf != null )
-                buf.release();
-        }
     }
 
     private void notifyIdleness()
@@ -426,18 +421,7 @@ class SocketIoProcessor
 
         while( ( req = ( WriteRequest ) writeRequestQueue.poll() ) != null )
         {
-            try
-            {
-                ( ( ByteBuffer ) req.getMessage() ).release();
-            }
-            catch( IllegalStateException e )
-            {
-                session.getFilterChain().fireExceptionCaught( session, e );
-            }
-            finally
-            {
-                req.getFuture().setWritten( false );
-            }
+            req.getFuture().setWritten( false );
         }
     }
 

@@ -194,7 +194,6 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         ByteBuffer buf = ( ByteBuffer ) session.getAttribute( BUFFER );
         if( buf != null )
         {
-            buf.release();
             session.removeAttribute( BUFFER );
         }
     }

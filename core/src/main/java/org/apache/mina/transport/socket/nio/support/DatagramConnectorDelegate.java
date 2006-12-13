@@ -351,10 +351,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         {
             session.getFilterChain().fireExceptionCaught( session, e );
         }
-        finally
-        {
-            readBuf.release();
-        }
     }
 
     private void flushSessions()

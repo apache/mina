@@ -116,12 +116,10 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
         int objectSize = buf.position() - 4;
         if( objectSize > maxObjectSize )
         {
-            buf.release();
             throw new IllegalArgumentException( "The encoded object is too big: " + objectSize + " (> " + maxObjectSize + ')' );
         }
         
         out.write( buf.array(), 0, buf.position() );
-        buf.release();
     }
 
     public void writeBoolean( boolean v ) throws IOException

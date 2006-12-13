@@ -67,54 +67,6 @@ public class ByteBufferTest extends TestCase
         }
     }
 
-    public void testRelease() throws Exception
-    {
-        for( int i = 10; i < 1048576 * 2; i = i * 11 / 10 ) // increase by 10%
-        {
-            ByteBuffer buf = ByteBuffer.allocate( i );
-            Assert.assertEquals( 0, buf.position() );
-            Assert.assertEquals( buf.capacity(), buf.remaining() );
-            Assert.assertTrue( buf.capacity() >= i );
-            Assert.assertTrue( buf.capacity() < i * 2 );
-            buf.release();
-        }
-    }
-
-    public void testLeakageDetection() throws Exception
-    {
-        ByteBuffer buf = ByteBuffer.allocate( 1024 );
-        buf.release();
-        try
-        {
-            buf.release();
-            Assert.fail( "Releasing a buffer twice should fail." );
-        }
-        catch( IllegalStateException e )
-        {
-
-        }
-    }
-
-    public void testAcquireRelease() throws Exception
-    {
-        ByteBuffer buf = ByteBuffer.allocate( 1024 );
-        buf.acquire();
-        buf.release();
-        buf.acquire();
-        buf.acquire();
-        buf.release();
-        buf.release();
-        buf.release();
-        try
-        {
-            buf.release();
-            Assert.fail( "Releasing a buffer twice should fail." );
-        }
-        catch( IllegalStateException e )
-        {
-        }
-    }
-
     public void testAutoExpand() throws Exception
     {
         ByteBuffer buf = ByteBuffer.allocate( 1 );
@@ -174,19 +126,6 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 3, buf.position() );
     }
     
-    public void testPooledProperty() throws Exception
-    {
-        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
-        ByteBuffer buf = ByteBuffer.allocate( 16 );
-        java.nio.ByteBuffer nioBuf = buf.buf();
-        buf.release();
-        buf = ByteBuffer.allocate( 16 );
-        Assert.assertSame( nioBuf, buf.buf() );
-        buf.setPooled( false );
-        buf.release();
-        Assert.assertNotSame( nioBuf, ByteBuffer.allocate( 16 ).buf() );
-    }
-
     public void testGetString() throws Exception
     {
         ByteBuffer buf = ByteBuffer.allocate( 16 );
@@ -609,79 +548,13 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 10, buf.capacity() );
     }
 
-    public void testPoolExpiration() throws Exception
-    {
-        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
-        PooledByteBufferAllocator allocator =
-            ( PooledByteBufferAllocator ) ByteBuffer.getAllocator();
-
-        // Make a buffer pooled.
-        ByteBuffer buf = ByteBuffer.allocate( 16 );
-        buf.release();
-
-        // Let everything flushed.
-        allocator.setTimeout( 1 );
-        Thread.sleep( 2000 );
-
-        // Make sure old buffers are flushed.
-        Assert.assertNotSame( buf, ByteBuffer.allocate( 16 ) );
-
-        // Make sure new buffers are not flushed.
-        allocator.setTimeout( 10 );
-        buf = ByteBuffer.allocate( 16 );
-        buf.release();
-        Thread.sleep( 2000 );
-        Assert.assertSame( buf.buf(), ByteBuffer.allocate( 16 ).buf() );
-
-        // Return to the default settings
-        allocator.setTimeout( 60 );
-    }
-
-    public void testAllocatorDisposal() throws Exception
-    {
-        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
-        PooledByteBufferAllocator allocator =
-            ( PooledByteBufferAllocator ) ByteBuffer.getAllocator();
-
-        // dispose() should fail because the allocator is in use.
-        try
-        {
-            allocator.dispose();
-            Assert.fail();
-        }
-        catch( IllegalStateException e )
-        {
-            // OK
-        }
-
-        // Change the allocator.
-        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
-
-        // Dispose the old allocator.
-        allocator.dispose();
-
-        // Allocation request to the disposed allocator should fail.
-        try
-        {
-            allocator.allocate( 16, true );
-            Assert.fail();
-        }
-        catch( IllegalStateException e )
-        {
-            // OK
-        }
-    }
-
     public void testDuplicate() throws Exception
     {
-        ByteBuffer.setAllocator( new PooledByteBufferAllocator() );
-        java.nio.ByteBuffer nioBuf;
         ByteBuffer original;
         ByteBuffer duplicate;
 
         // Test if the buffer is duplicated correctly.
         original = ByteBuffer.allocate( 16 ).sweep();
-        nioBuf = original.buf();
         original.position( 4 );
         original.limit( 10 );
         duplicate = original.duplicate();
@@ -690,58 +563,14 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 10, duplicate.limit() );
         Assert.assertEquals( 16, duplicate.capacity() );
         Assert.assertNotSame( original.buf(), duplicate.buf() );
+        Assert.assertSame( original.buf().array(), duplicate.buf().array() );
         Assert.assertEquals( 127, duplicate.get( 4 ) );
-        original.release();
-        duplicate.release();
-
-        //// Check if pooled correctly.
-        original = ByteBuffer.allocate( 16 );
-        Assert.assertSame( nioBuf, original.buf() );
-        original.release();
-
-        // Try to release duplicate first.
-        original = ByteBuffer.allocate( 16 );
-        duplicate = original.duplicate();
-        duplicate.release();
-        original.release();
-
-        //// Check if pooled correctly.
-        original = ByteBuffer.allocate( 16 );
-        Assert.assertSame( nioBuf, original.buf() );
-        original.release();
 
         // Test a duplicate of a duplicate.
         original = ByteBuffer.allocate( 16 );
-        duplicate = original.duplicate();
-        ByteBuffer anotherDuplicate = duplicate.duplicate();
-        anotherDuplicate.release();
-        original.release();
-        duplicate.release();
-        try
-        {
-            duplicate.release();
-            Assert.fail();
-        }
-        catch( IllegalStateException e )
-        {
-            // OK
-        }
-        try
-        {
-            anotherDuplicate.release();
-            Assert.fail();
-        }
-        catch( IllegalStateException e )
-        {
-            // OK
-        }
-
-        //// Check if pooled correctly.
-        original = ByteBuffer.allocate( 16 );
-        Assert.assertSame( nioBuf, original.buf() );
-        original.release();
-
-
+        duplicate = original.duplicate().duplicate();
+        Assert.assertNotSame( original.buf(), duplicate.buf() );
+        Assert.assertSame( original.buf().array(), duplicate.buf().array() );
 
         // Try to expand.
         try
@@ -776,8 +605,6 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 6, slice.capacity() );
         Assert.assertNotSame( original.buf(), slice.buf() );
         Assert.assertEquals( 127, slice.get( 0 ) );
-        original.release();
-        slice.release();
     }
 
     public void testReadOnlyBuffer() throws Exception
@@ -796,8 +623,6 @@ public class ByteBufferTest extends TestCase
         Assert.assertEquals( 16, duplicate.capacity() );
         Assert.assertNotSame( original.buf(), duplicate.buf() );
         Assert.assertEquals( 127, duplicate.get( 4 ) );
-        original.release();
-        duplicate.release();
 
         // Try to expand.
         try

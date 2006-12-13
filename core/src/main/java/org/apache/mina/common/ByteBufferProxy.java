@@ -64,16 +64,6 @@ public class ByteBufferProxy extends ByteBuffer
         this.buf = buf;
     }
 
-    public void acquire()
-    {
-        buf.acquire();
-    }
-
-    public void release()
-    {
-        buf.release();
-    }
-
     public boolean isDirect()
     {
         return buf.isDirect();
@@ -574,16 +564,6 @@ public class ByteBufferProxy extends ByteBuffer
         return this;
     }
 
-    public boolean isPooled()
-    {
-        return buf.isPooled();
-    }
-    
-    public void setPooled( boolean pooled )
-    {
-        buf.setPooled( pooled );
-    }
-    
     public Object getObject() throws ClassNotFoundException
     {
         return buf.getObject();

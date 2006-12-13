@@ -129,7 +129,6 @@ public class Zlib
                 break;
             default:
                 // unknown error
-                outBuffer.release();
                 outBuffer = null;
                 if( zStream.msg == null )
                     throw new IOException( "Unknown error. Error code : " + retval );

@@ -136,7 +136,7 @@ class SSLByteBufferPool
     public static void release( ByteBuffer buf )
     {
         // Sweep buffer for security.
-        org.apache.mina.common.ByteBuffer.wrap( buf ).sweep().release();
+        org.apache.mina.common.ByteBuffer.wrap( buf ).sweep();
 
         int stackIndex =getBufferStackIndex( buf.capacity() );
         if ( stackIndex >= PACKET_BUFFER_INDEX ) {

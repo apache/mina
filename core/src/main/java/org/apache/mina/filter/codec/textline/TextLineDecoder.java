@@ -157,7 +157,6 @@ public class TextLineDecoder implements ProtocolDecoder
         Context ctx = ( Context ) session.getAttribute( CONTEXT );
         if( ctx != null )
         {
-            ctx.getBuffer().release();
             session.removeAttribute( CONTEXT );
         }
     }

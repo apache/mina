@@ -438,7 +438,6 @@ public class SSLFilter extends IoFilterAdapter
         if( message instanceof EncryptedBuffer )
         {
             EncryptedBuffer buf = ( EncryptedBuffer ) message;
-            buf.release();
             nextFilter.messageSent( session, buf.originalBuffer );
         }
         else

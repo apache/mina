@@ -380,28 +380,21 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     {
         ByteBuffer readBuf = ByteBuffer.allocate(
                 ( ( DatagramSessionConfig ) getSessionConfig() ).getReceiveBufferSize() );
-        try
+
+        SocketAddress remoteAddress = channel.receive( readBuf.buf() );
+        if( remoteAddress != null )
         {
-            SocketAddress remoteAddress = channel.receive(
-                readBuf.buf() );
-            if( remoteAddress != null )
-            {
-                DatagramSessionImpl session =
-                    ( DatagramSessionImpl ) newSessionWithoutLock( remoteAddress );
+            DatagramSessionImpl session =
+                ( DatagramSessionImpl ) newSessionWithoutLock( remoteAddress );
 
-                readBuf.flip();
+            readBuf.flip();
 
-                ByteBuffer newBuf = ByteBuffer.allocate( readBuf.limit() );
-                newBuf.put( readBuf );
-                newBuf.flip();
+            ByteBuffer newBuf = ByteBuffer.allocate( readBuf.limit() );
+            newBuf.put( readBuf );
+            newBuf.flip();
 
-                session.increaseReadBytes( newBuf.remaining() );
-                session.getFilterChain().fireMessageReceived( session, newBuf );
-            }
-        }
-        finally
-        {
-            readBuf.release();
+            session.increaseReadBytes( newBuf.remaining() );
+            session.getFilterChain().fireMessageReceived( session, newBuf );
         }
     }
 

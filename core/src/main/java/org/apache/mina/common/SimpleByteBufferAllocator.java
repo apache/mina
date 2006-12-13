@@ -49,12 +49,12 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         {
             nioBuffer = java.nio.ByteBuffer.allocate( capacity );            
         }
-        return new SimpleByteBuffer( nioBuffer );
+        return new SimpleByteBuffer( nioBuffer, false );
     }
     
     public ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
     {
-        return new SimpleByteBuffer( nioBuffer );
+        return new SimpleByteBuffer( nioBuffer, false );
     }
 
     public void dispose()
@@ -64,42 +64,13 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
     private static class SimpleByteBuffer extends BaseByteBuffer
     {
         private java.nio.ByteBuffer buf;
-        private int refCount = 1;
+        private boolean derived;
 
-        protected SimpleByteBuffer( java.nio.ByteBuffer buf )
+        protected SimpleByteBuffer( java.nio.ByteBuffer buf, boolean derived )
         {
             this.buf = buf;
+            this.derived = derived;
             buf.order( ByteOrder.BIG_ENDIAN );
-            refCount = 1;
-        }
-
-        public synchronized void acquire()
-        {
-            if( refCount <= 0 )
-            {
-                throw new IllegalStateException( "Already released buffer." );
-            }
-
-            refCount ++;
-        }
-
-        public void release()
-        {
-            synchronized( this )
-            {
-                if( refCount <= 0 )
-                {
-                    refCount = 0;
-                    throw new IllegalStateException(
-                            "Already released buffer.  You released the buffer too many times." );
-                }
-
-                refCount --;
-                if( refCount > 0)
-                {
-                    return;
-                }
-            }
         }
 
         public java.nio.ByteBuffer buf()
@@ -107,17 +78,13 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
             return buf;
         }
         
-        public boolean isPooled()
-        {
-            return false;
-        }
-        
-        public void setPooled( boolean pooled )
-        {
-        }
-
         protected void capacity0( int requestedCapacity )
         {
+            if( derived )
+            {
+                throw new IllegalStateException( "Derived buffers cannot be expanded." );
+            }
+
             int newCapacity = MINIMUM_CAPACITY;
             while( newCapacity < requestedCapacity )
             {
@@ -142,15 +109,15 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
         }
 
         public ByteBuffer duplicate() {
-            return new SimpleByteBuffer( this.buf.duplicate() );
+            return new SimpleByteBuffer( this.buf.duplicate(), true );
         }
 
         public ByteBuffer slice() {
-            return new SimpleByteBuffer( this.buf.slice() );
+            return new SimpleByteBuffer( this.buf.slice(), true );
         }
 
         public ByteBuffer asReadOnlyBuffer() {
-            return new SimpleByteBuffer( this.buf.asReadOnlyBuffer() );
+            return new SimpleByteBuffer( this.buf.asReadOnlyBuffer(), true );
         }
 
         public byte[] array()

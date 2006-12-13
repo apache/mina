@@ -40,7 +40,6 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
 import org.apache.mina.common.support.ByteBufferHexDumper;
-import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
  * A byte buffer used by MINA applications.
@@ -53,8 +52,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * <li>It doesn't provide useful getters and putters such as
  * <code>fill</code>, <code>get/putString</code>, and
  * <code>get/putAsciiInt()</code> enough.</li>
- * <li>It is hard to distinguish if the buffer is created from MINA buffer
- * pool or not.  MINA have to return used buffers back to pool.</li>
  * <li>It is difficult to write variable-length data due to its fixed
  * capacity</li>
  * </ul>
@@ -62,51 +59,28 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  *
  * <h2>Allocation</h2>
  * <p>
- * You can get a heap buffer from buffer pool:
+ * You can allocate a new heap buffer.
  * <pre>
  * ByteBuffer buf = ByteBuffer.allocate(1024, false);
  * </pre>
- * you can also get a direct buffer from buffer pool:
+ * you can also allocate a new direct buffer:
  * <pre>
  * ByteBuffer buf = ByteBuffer.allocate(1024, true);
  * </pre>
  * or you can set your preference.
  * <pre>
  * // Prefer heap buffers to direct buffers.
- * ByteBuffer.setUseDirectBuffer(false);
+ * ByteBuffer.setPreferDirectBuffer(false);
  * 
  * // Try to allocate a heap buffer first, and then a direct buffer.
  * ByteBuffer buf = ByteBuffer.allocate(1024);
  * </pre>
  * </p>
  *
- * <h2>Acquire/Release</h2>
- * <p>
- * <b>Please note that you never need to release the allocated buffer</b>
- * because MINA will release it automatically when:
- * <ul>
- * <li>You pass the buffer by calling {@link IoSession#write(Object)}.</li>
- * <li>You pass the buffer by calling {@link IoFilter.NextFilter#filterWrite(IoSession,IoFilter.WriteRequest)}.</li>
- * <li>You pass the buffer by calling {@link ProtocolEncoderOutput#write(ByteBuffer)}.</li>
- * </ul>
- * And, you don't need to release any {@link ByteBuffer} which is passed as a parameter
- * of {@link IoHandler#messageReceived(IoSession, Object)} method.  They are released
- * automatically when the method returns.
- * <p>
- * You have to release buffers manually by calling {@link #release()} when:
- * <ul>
- * <li>You allocated a buffer, but didn't pass the buffer to any of two methods above.</li>
- * <li>You called {@link #acquire()} to prevent the buffer from being released.</li>
- * </ul>
- * </p>
- *
  * <h2>Wrapping existing NIO buffers and arrays</h2>
  * <p>
  * This class provides a few <tt>wrap(...)</tt> methods that wraps
- * any NIO buffers and byte arrays.  Wrapped MINA buffers are not returned
- * to the buffer pool by default to prevent unexpected memory leakage by default.
- * In case you want to make it pooled, you can call {@link #setPooled(boolean)}
- * with <tt>true</tt> flag to enable pooling.
+ * any NIO buffers and byte arrays.
  *
  * <h2>AutoExpand</h2>
  * <p>
@@ -135,20 +109,20 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * {@link #duplicate()}, {@link #slice()}, or {@link #asReadOnlyBuffer()}.
  * They are useful especially when you broadcast the same messages to
  * multiple {@link IoSession}s.  Please note that the derived buffers are
- * neither pooled nor auto-expandable.  Trying to expand a derived buffer will
- * raise {@link IllegalStateException}.
+ * not auto-expandable.  Trying to expand a derived buffer will raise
+ * {@link IllegalStateException}.
  * </p>
  *
- * <h2>Changing Buffer Allocation and Management Policy</h2>
+ * <h2>Changing Buffer Allocation Policy</h2>
  * <p>
  * MINA provides a {@link ByteBufferAllocator} interface to let you override
- * the default buffer management behavior.  There are two allocators provided
- * out-of-the-box:
+ * the default buffer management behavior.  There's only one allocator
+ * provided out-of-the-box:
  * <ul>
- * <li>{@link PooledByteBufferAllocator} (Default)</li>
  * <li>{@link SimpleByteBufferAllocator}</li>
  * </ul>
- * You can change the allocator by calling {@link #setAllocator(ByteBufferAllocator)}.
+ * You can implement your own allocator and use it by calling
+ * {@link #setAllocator(ByteBufferAllocator)}.
  * </p>
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
@@ -267,9 +241,6 @@ public abstract class ByteBuffer implements Comparable
 
     /**
      * Wraps the specified byte array into MINA heap buffer.
-     * Please note that MINA buffers are going to be pooled, and
-     * therefore there can be waste of memory if you wrap
-     * your byte array specifying <tt>offset</tt> and <tt>length</tt>.
      */
     public static ByteBuffer wrap( byte[] byteArray, int offset, int length )
     {
@@ -279,24 +250,6 @@ public abstract class ByteBuffer implements Comparable
     protected ByteBuffer()
     {
     }
-
-    /**
-     * Increases the internal reference count of this buffer to defer
-     * automatic release.  You have to invoke {@link #release()} as many
-     * as you invoked this method to release this buffer.
-     *
-     * @throws IllegalStateException if you attempt to acquire already
-     *                               released buffer.
-     */
-    public abstract void acquire();
-
-    /**
-     * Releases the specified buffer to buffer pool.
-     *
-     * @throws IllegalStateException if you attempt to release already
-     *                               released buffer.
-     */
-    public abstract void release();
 
     /**
      * Returns the underlying NIO buffer instance.
@@ -352,27 +305,6 @@ public abstract class ByteBuffer implements Comparable
      * <tt>true</tt>.
      */
     public abstract ByteBuffer expand( int pos, int expectedRemaining );
-
-    /**
-     * Returns <tt>true</tt> if and only if this buffer is returned back
-     * to the buffer pool when released.
-     * <p>
-     * The default value of this property is <tt>true</tt> if and only if you
-     * allocated this buffer using {@link #allocate(int)} or {@link #allocate(int, boolean)},
-     * or <tt>false</tt> otherwise. (i.e. {@link #wrap(byte[])}, {@link #wrap(byte[], int, int)},
-     * and {@link #wrap(java.nio.ByteBuffer)})
-     */
-    public abstract boolean isPooled();
-
-    /**
-     * Sets whether this buffer is returned back to the buffer pool when released.
-     * <p>
-     * The default value of this property is <tt>true</tt> if and only if you
-     * allocated this buffer using {@link #allocate(int)} or {@link #allocate(int, boolean)},
-     * or <tt>false</tt> otherwise. (i.e. {@link #wrap(byte[])}, {@link #wrap(byte[], int, int)},
-     * and {@link #wrap(java.nio.ByteBuffer)})
-     */
-    public abstract void setPooled( boolean pooled );
 
     /**
      * @see java.nio.Buffer#position()

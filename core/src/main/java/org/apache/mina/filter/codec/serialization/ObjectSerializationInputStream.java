@@ -122,9 +122,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
         buf.position( 0 );
         buf.limit( objectSize + 4 );
         
-        Object answer = buf.getObject( classLoader );
-        buf.release();
-        return answer;
+        return buf.getObject( classLoader );
     }
 
     public boolean readBoolean() throws IOException

@@ -80,7 +80,6 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
             }
     
             newBuf.put( buf );
-            buf.release();
         }
         
         // Push the new buffer finally.

@@ -178,9 +178,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter
                 disposeDecoder( session );
             }
 
-            // Release the read buffer.
-            in.release();
-
             decoderOut.flush();
         }
     }

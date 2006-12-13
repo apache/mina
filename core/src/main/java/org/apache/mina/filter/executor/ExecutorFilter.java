@@ -30,7 +30,6 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.util.ByteBufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,14 +220,12 @@ public class ExecutorFilter extends IoFilterAdapter
     public void messageReceived( NextFilter nextFilter,
                                  IoSession session, Object message )
     {
-        ByteBufferUtil.acquireIfPossible( message );
         fireEvent( nextFilter, session, EventType.RECEIVED, message );
     }
 
     public void messageSent( NextFilter nextFilter,
                              IoSession session, Object message )
     {
-        ByteBufferUtil.acquireIfPossible( message );
         fireEvent( nextFilter, session, EventType.SENT, message );
     }
 
@@ -237,12 +234,10 @@ public class ExecutorFilter extends IoFilterAdapter
         if( type == EventType.RECEIVED )
         {
             nextFilter.messageReceived( session, data );
-            ByteBufferUtil.releaseIfPossible( data );
         }
         else if( type == EventType.SENT )
         {
             nextFilter.messageSent( session, data );
-            ByteBufferUtil.releaseIfPossible( data );
         }
         else if( type == EventType.EXCEPTION )
         {
