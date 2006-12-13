@@ -171,7 +171,7 @@ public class ObjectSerializationTest extends TestCase
     
     private static class MockProtocolDecoderOutput implements ProtocolDecoderOutput
     {
-        private List result = new ArrayList();
+        private List<Object> result = new ArrayList<Object>();
 
         public void flush()
         {
