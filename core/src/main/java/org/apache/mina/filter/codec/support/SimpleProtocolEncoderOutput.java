@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.codec.support;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.WriteFuture;
@@ -34,13 +34,13 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  */
 public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutput
 {
-    private final List<ByteBuffer> bufferQueue = new ArrayList<ByteBuffer>();
+    private final Queue<ByteBuffer> bufferQueue = new LinkedList<ByteBuffer>();
 
     public SimpleProtocolEncoderOutput()
     {
     }
 
-    public List<ByteBuffer> getBufferQueue()
+    public Queue<ByteBuffer> getBufferQueue()
     {
         return bufferQueue;
     }
@@ -52,53 +52,68 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
 
     public void mergeAll()
     {
+        int sum = 0;
         final int size = bufferQueue.size();
-
+        
         if( size < 2 )
         {
             // no need to merge!
             return;
         }
-
+        
         // Get the size of merged BB
-        int sum = 0;
-        for( int i = size - 1; i >= 0; i -- )
+        for( Object o: bufferQueue )
         {
-            sum += bufferQueue.get( i ).remaining();
+            sum += ( ( ByteBuffer ) o ).remaining();
         }
-
+        
         // Allocate a new BB that will contain all fragments
         ByteBuffer newBuf = ByteBuffer.allocate( sum );
-
+        
         // and merge all.
-        for( ; !bufferQueue.isEmpty(); )
+        for( ;; )
         {
-            ByteBuffer buf = bufferQueue.remove( 0 );
-
+            ByteBuffer buf = bufferQueue.poll();
+            if( buf == null )
+            {
+                break;
+            }
+    
             newBuf.put( buf );
             buf.release();
         }
-
+        
         // Push the new buffer finally.
         newBuf.flip();
-        bufferQueue.add( newBuf );
+        bufferQueue.offer(newBuf);
     }
 
     public WriteFuture flush()
     {
+        Queue bufferQueue = this.bufferQueue;
         WriteFuture future = null;
-
-        for( ; !bufferQueue.isEmpty(); )
+        if( bufferQueue.isEmpty() )
         {
-            ByteBuffer buf = bufferQueue.remove( 0 );
-
-            // Flush only when the buffer has remaining.
-            if( buf.hasRemaining() )
+            return null;
+        }
+        else
+        {
+            for( ;; )
             {
-                future = doFlush( buf );
+                ByteBuffer buf = ( ByteBuffer ) bufferQueue.poll();
+                if( buf == null )
+                {
+                    break;
+                }
+                
+                // Flush only when the buffer has remaining.
+                if( buf.hasRemaining() )
+                {
+                    future = doFlush( buf );
+                }
             }
         }
-
+        
         return future;
     }
 

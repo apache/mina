@@ -67,7 +67,7 @@ public class TextLineEncoderTest extends TestCase
 
         encoder.encode( session, "ABC", out );
         Assert.assertEquals( 1, out.getBufferQueue().size() );
-        ByteBuffer buf = out.getBufferQueue().remove(0);
+        ByteBuffer buf = out.getBufferQueue().poll();
         Assert.assertEquals( 5, buf.remaining() );
         Assert.assertEquals( 'A', buf.get() );
         Assert.assertEquals( 'B', buf.get() );
