@@ -109,24 +109,4 @@ public interface IoService
      *                               not a {@link DefaultIoFilterChainBuilder}
      */
     DefaultIoFilterChainBuilder getFilterChain();
-    
-    /**
-     * Returns the default {@link ThreadModel} of the {@link IoService}.
-     * The default value is an {@link ExecutorThreadModel} whose service name is
-     * <tt>'AnonymousIoService'</tt> and which has 16 maximum active threads.
-     * It is strongly recommended to set a new {@link ExecutorThreadModel} by calling
-     * {@link ExecutorThreadModel#getInstance(String)}.
-     */
-    ThreadModel getThreadModel();
-    
-    /**
-     * Sets the default {@link ThreadModel} of the {@link IoService}.
-     * If you specify <tt>null</tt>, this property will be set to the
-     * default value.
-     * The default value is an {@link ExecutorThreadModel} whose service name is
-     * <tt>'AnonymousIoService'</tt> with 16 threads.
-     * It is strongly recommended to set a new {@link ExecutorThreadModel} by calling
-     * {@link ExecutorThreadModel#getInstance(String)}.
-     */
-    void setThreadModel( ThreadModel threadModel );
 }

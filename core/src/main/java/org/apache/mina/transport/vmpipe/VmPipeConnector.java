@@ -88,7 +88,6 @@ public class VmPipeConnector extends BaseIoConnector
         {
             IoFilterChain filterChain = localSession.getFilterChain();
             this.getFilterChainBuilder().buildFilterChain( filterChain );
-            this.getThreadModel().buildFilterChain( filterChain );
 
             // The following sentences don't throw any exceptions.
             localSession.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, future );
@@ -106,7 +105,6 @@ public class VmPipeConnector extends BaseIoConnector
         {
             IoFilterChain filterChain = remoteSession.getFilterChain();
             entry.getAcceptor().getFilterChainBuilder().buildFilterChain( filterChain );
-            entry.getAcceptor().getThreadModel().buildFilterChain( filterChain );
             
             // The following sentences don't throw any exceptions.
             entry.getListeners().fireSessionCreated( remoteSession );

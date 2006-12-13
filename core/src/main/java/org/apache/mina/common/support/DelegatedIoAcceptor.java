@@ -30,7 +30,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.ThreadModel;
 
 /**
  * A delegated {@link IoAcceptor} that wraps the other {@link IoAcceptor}.
@@ -138,19 +137,9 @@ public class DelegatedIoAcceptor implements IoAcceptor
         delegate.setSessionConfig( config );
     }
 
-    public ThreadModel getThreadModel()
-    {
-        return delegate.getThreadModel();
-    }
-
     public void setHandler( IoHandler handler )
     {
         delegate.setHandler( handler );
-    }
-
-    public void setThreadModel( ThreadModel threadModel )
-    {
-        delegate.setThreadModel( threadModel );
     }
 
     public boolean isBound()

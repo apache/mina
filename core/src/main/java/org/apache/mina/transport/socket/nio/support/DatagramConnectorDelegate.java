@@ -497,7 +497,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     private void buildFilterChain( IoSession session ) throws Exception
     {
         getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-        getThreadModel().buildFilterChain( session.getFilterChain() );
     }
 
     private void cancelKeys()

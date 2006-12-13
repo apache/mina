@@ -29,7 +29,6 @@ import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.ThreadModel;
 
 /**
  * A delegated {@link IoConnector} that wraps the other {@link IoConnector}.
@@ -127,18 +126,8 @@ public class DelegatedIoConnector implements IoConnector
         delegate.setSessionConfig( config );
     }
     
-    public ThreadModel getThreadModel()
-    {
-        return delegate.getThreadModel();
-    }
-
     public void setHandler( IoHandler handler )
     {
         delegate.setHandler( handler );
-    }
-
-    public void setThreadModel( ThreadModel threadModel )
-    {
-        delegate.setThreadModel( threadModel );
     }
 }

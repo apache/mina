@@ -331,7 +331,6 @@ public class SocketConnector extends BaseIoConnector
         try
         {
             getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-            getThreadModel().buildFilterChain( session.getFilterChain() );
         }
         catch( Throwable e )
         {

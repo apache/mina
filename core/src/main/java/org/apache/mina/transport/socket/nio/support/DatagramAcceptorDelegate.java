@@ -261,7 +261,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private void buildFilterChain( IoSession session ) throws Exception
     {
         this.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-        this.getThreadModel().buildFilterChain( session.getFilterChain() );
     }
     
     private synchronized void startupWorker()

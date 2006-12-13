@@ -384,7 +384,6 @@ public class SocketAcceptor extends BaseIoAcceptor
                     SocketSessionImpl session = new SocketSessionImpl(
                             SocketAcceptor.this, nextProcessor(), ch );
                     getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-                    getThreadModel().buildFilterChain( session.getFilterChain() );
                     session.getIoProcessor().addNew( session );
                     success = true;
                 }

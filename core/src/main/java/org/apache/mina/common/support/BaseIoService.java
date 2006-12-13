@@ -23,13 +23,11 @@ import java.net.SocketAddress;
 import java.util.Set;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
-import org.apache.mina.common.ExecutorThreadModel;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.ThreadModel;
 
 /**
  * Base implementation of {@link IoService}s.
@@ -40,20 +38,10 @@ import org.apache.mina.common.ThreadModel;
 public abstract class BaseIoService implements IoService
 {
     /**
-     * The default thread model.
-     */
-    private final ThreadModel defaultThreadModel = ExecutorThreadModel.getInstance("AnonymousIoService");
-    
-    /**
      * Current filter chain builder.
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
 
-    /**
-     * Current thread model.
-     */
-    private ThreadModel threadModel = defaultThreadModel;
-    
     /**
      * Current handler.
      */    
@@ -112,22 +100,6 @@ public abstract class BaseIoService implements IoService
         }
     }
     
-    public ThreadModel getThreadModel()
-    {
-        return threadModel;
-    }
-
-    public void setThreadModel( ThreadModel threadModel )
-    {
-        if( threadModel == null )
-        {
-            // We reuse the previous default model to prevent too much
-            // daemon threads are created.
-            threadModel = defaultThreadModel;
-        }
-        this.threadModel = threadModel;
-    }
-
     public void addListener( IoServiceListener listener )
     {
         getListeners().add( listener );

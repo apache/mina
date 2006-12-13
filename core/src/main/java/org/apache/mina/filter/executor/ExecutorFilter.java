@@ -30,7 +30,6 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.ThreadModel;
 import org.apache.mina.util.ByteBufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +38,6 @@ import org.slf4j.LoggerFactory;
  * A filter that forward events to {@link Executor} in
  * <a href="http://dcl.mathcs.emory.edu/util/backport-util-concurrent/">backport-util-concurrent</a>.
  * You can apply various thread model by inserting this filter to the {@link IoFilterChain}.
- * This filter is usually inserted by {@link ThreadModel} automatically, so you don't need
- * to add this filter in most cases.
  * <p>
  * Please note that this filter doesn't manage the life cycle of the underlying
  * {@link Executor}.  You have to destroy or stop it by yourself.
