@@ -231,6 +231,7 @@ Use JDK 1.5 to make sure these modules build.
           <aggregate>true</aggregate>
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
+          <windowTitle>Apache MINA ${project.version} Cross Reference</windowTitle>
           <docTitle>Apache MINA ${project.version} Cross Reference</docTitle>
         </configuration>
       </plugin>
