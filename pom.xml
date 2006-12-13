@@ -210,6 +210,7 @@ Use JDK 1.5 to make sure these modules build.
           <breakiterator>true</breakiterator>
           <charset>UTF-8</charset>
           <docencoding>UTF-8</docencoding>
+          <windowtitle>Apache MINA ${project.version} API Documentation</windowtitle>
           <doctitle>Apache MINA ${project.version} API Documentation</doctitle>
           <encoding>UTF-8</encoding>
           <excludePackageNames>*.support:*.example.*</excludePackageNames>
