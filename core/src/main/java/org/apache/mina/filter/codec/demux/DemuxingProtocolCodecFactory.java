@@ -178,7 +178,13 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
             for( int i = encoderFactories.length - 1; i >= 0; i-- )
             {
                 MessageEncoder encoder = encoderFactories[ i ].getEncoder();
-                Iterator it = encoder.getMessageTypes().iterator();
+                Set messageTypes = encoder.getMessageTypes();
+                if (messageTypes == null) {
+                    throw new IllegalStateException(
+                            encoder.getClass().getName() + "#getMessageTypes() may not return null.");
+                }
+                
+                Iterator it = messageTypes.iterator();
                 while( it.hasNext() )
                 {
                     Class type = ( Class ) it.next();
