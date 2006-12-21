@@ -39,7 +39,7 @@ public interface MessageEncoder
     /**
      * Returns the set of message classes this encoder can encode.
      */
-    Set getMessageTypes();
+    Set<Class> getMessageTypes();
 
     /**
      * Encodes higher-level message objects into binary or protocol-specific data.

@@ -170,7 +170,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
     
     private class ProtocolEncoderImpl implements ProtocolEncoder
     {
-        private final Map encoders = new IdentityHashMap();
+        private final Map<Class, MessageEncoder> encoders = new IdentityHashMap<Class, MessageEncoder>();
         
         private ProtocolEncoderImpl() throws Exception
         {
@@ -178,7 +178,13 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
             for( int i = encoderFactories.length - 1; i >= 0; i-- )
             {
                 MessageEncoder encoder = encoderFactories[ i ].getEncoder();
-                Iterator it = encoder.getMessageTypes().iterator();
+                Set<Class> messageTypes = encoder.getMessageTypes();
+                if (messageTypes == null) {
+                    throw new IllegalStateException(
+                            encoder.getClass().getName() + "#getMessageTypes() may not return null.");
+                }
+                
+                Iterator it = messageTypes.iterator();
                 while( it.hasNext() )
                 {
                     Class type = ( Class ) it.next();
@@ -202,16 +208,16 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
         
         private MessageEncoder findEncoder( Class type )
         {
-            MessageEncoder encoder = ( MessageEncoder ) encoders.get( type );
+            MessageEncoder encoder = encoders.get( type );
             if( encoder == null )
             {
-                encoder = findEncoder( type, new IdentityHashSet() );
+                encoder = findEncoder( type, new IdentityHashSet<Class>() );
             }
 
             return encoder;
         }
 
-        private MessageEncoder findEncoder( Class type, Set triedClasses )
+        private MessageEncoder findEncoder( Class type, Set<Class> triedClasses )
         {
             MessageEncoder encoder;
 
@@ -219,7 +225,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
                 return null;
             triedClasses.add( type );
 
-            encoder = ( MessageEncoder ) encoders.get( type );
+            encoder = encoders.get( type );
             if( encoder == null )
             {
                 encoder = findEncoder( type, triedClasses );
