@@ -27,12 +27,12 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 
 /**
- * The default implementation of {@link SocketSessionConfig}.
+ * A default implementation of {@link SocketSessionConfig}.
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-class DefaultSocketSessionConfig extends BaseIoSessionConfig implements SocketSessionConfig
+public class DefaultSocketSessionConfig extends BaseIoSessionConfig implements SocketSessionConfig
 {
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
@@ -151,7 +151,7 @@ class DefaultSocketSessionConfig extends BaseIoSessionConfig implements SocketSe
     /**
      * Creates a new instance.
      */
-    DefaultSocketSessionConfig()
+    public DefaultSocketSessionConfig()
     {
     }
 

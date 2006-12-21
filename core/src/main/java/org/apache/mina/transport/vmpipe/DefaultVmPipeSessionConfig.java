@@ -22,6 +22,8 @@ package org.apache.mina.transport.vmpipe;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 
 /**
+ * A default implementation of {@link VmPipeSessionConfig}.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */

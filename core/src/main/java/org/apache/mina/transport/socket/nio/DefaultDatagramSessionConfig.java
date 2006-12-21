@@ -26,6 +26,8 @@ import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 
 /**
+ * A default implementation of {@link DatagramSessionConfig}.
+ * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 439913 $, $Date: 2006-09-04 05:12:43 +0200 (mån, 04 sep 2006) $
  */
