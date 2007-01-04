@@ -56,16 +56,23 @@ import org.apache.mina.common.IoFilterChain.Entry;
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Cloneable
 {
-    private List entries = new ArrayList();
-    private final Map entriesByName = new HashMap();
+    private List entries;
+    private Map entriesByName;
     
     /**
      * Creates a new instance with an empty filter list.
      */
     public DefaultIoFilterChainBuilder()
     {
+        init();
     }
 
+    private void init()
+    {
+        entries = new ArrayList();
+        entriesByName = new HashMap();
+    }
+    
     /**
      * @see IoFilterChain#getEntry(String)
      */
@@ -230,8 +237,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
      */
     public synchronized void clear() throws Exception
     {
-        entries = new ArrayList();
-        entriesByName.clear();
+        init();
     }
     
     public void buildFilterChain( IoFilterChain chain ) throws Exception
@@ -281,7 +287,18 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     
     public Object clone()
     {
-        DefaultIoFilterChainBuilder ret = new DefaultIoFilterChainBuilder();
+        DefaultIoFilterChainBuilder ret;
+        try
+        {
+            ret = ( DefaultIoFilterChainBuilder ) super.clone();
+        }
+        catch( CloneNotSupportedException e )
+        {
+            throw ( InternalError ) new InternalError().initCause(e);
+        }
+        
+        ret.init();
+        
         for( Iterator i = entries.iterator(); i.hasNext(); )
         {
             Entry e = ( Entry ) i.next();
