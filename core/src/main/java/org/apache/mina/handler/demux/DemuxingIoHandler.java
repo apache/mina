@@ -152,7 +152,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter
         }
     }
     
-    private MessageHandler findHandler( Class type )
+    protected MessageHandler findHandler( Class type )
     {
         return findHandler( type, null );
     }
