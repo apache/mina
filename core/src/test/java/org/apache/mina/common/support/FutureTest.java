@@ -64,6 +64,7 @@ public class FutureTest extends TestCase
         assertFalse( future.isReady() );
         assertFalse( future.isConnected() );
         assertNull( future.getSession() );
+        assertNull( future.getException() );
 
         TestThread thread = new TestThread( future );
         thread.start();
@@ -137,6 +138,7 @@ public class FutureTest extends TestCase
         assertTrue( future.isReady() );
         assertTrue( future.isConnected() );
         assertEquals( session, future.getSession() );
+        assertNull( future.getException() );
         
         future = new DefaultConnectFuture();
         thread = new TestThread( future );
@@ -147,7 +149,8 @@ public class FutureTest extends TestCase
         assertTrue( thread.success );
         assertTrue( future.isReady() );
         assertFalse( future.isConnected() );
-        
+        assertTrue( future.getException() instanceof IOException );
+
         try
         {
             future.getSession();

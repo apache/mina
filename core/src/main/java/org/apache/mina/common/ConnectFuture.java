@@ -43,6 +43,14 @@ public interface ConnectFuture extends IoFuture
      * @throws RuntimeIOException if connection attempt failed by an exception
      */
     IoSession getSession() throws RuntimeIOException;
+    
+    /**
+     * Returns the cause of the connection failure.
+     * 
+     * @return <tt>null</tt> if the connect operation is not finished yet,
+     *         or if the connection attempt is successful. 
+     */
+    Throwable getException();
 
     /**
      * Returns <tt>true</tt> if the connect operation is finished successfully.

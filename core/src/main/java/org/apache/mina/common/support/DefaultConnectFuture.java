@@ -65,6 +65,19 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
             return ( IoSession ) v;
         }
     }
+    
+    public Throwable getException()
+    {
+        Object v = getValue();
+        if( v instanceof Throwable )
+        {
+            return ( Throwable ) v;
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     public boolean isConnected()
     {
