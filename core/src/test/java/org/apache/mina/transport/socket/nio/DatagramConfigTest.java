@@ -39,7 +39,7 @@ import org.apache.mina.util.AvailablePortFinder;
 /**
  * Tests if {@link DatagramAcceptor} session is configured properly.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 
  */
 public class DatagramConfigTest extends TestCase

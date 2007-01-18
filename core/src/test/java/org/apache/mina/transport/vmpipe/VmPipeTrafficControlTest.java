@@ -30,7 +30,7 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
  * Tests suspending and resuming reads and writes for the
  * {@link org.apache.mina.common.TransportType#VM_PIPE} transport type. 
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Id$
  */
 public class VmPipeTrafficControlTest extends AbstractTrafficControlTest

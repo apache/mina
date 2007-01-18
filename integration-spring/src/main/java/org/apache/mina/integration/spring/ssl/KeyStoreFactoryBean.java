@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  * which makes it possible to configure {@link java.security.KeyStore} instances
  * using Spring.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class KeyStoreFactoryBean extends AbstractFactoryBean

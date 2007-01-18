@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 /**
  * Tests {@link ByteBuffer}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ByteBufferTest extends TestCase

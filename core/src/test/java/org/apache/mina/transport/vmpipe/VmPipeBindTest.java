@@ -33,7 +33,7 @@ import org.apache.mina.transport.AbstractBindTest;
 /**
  * Tests {@link VmPipeAcceptor} bind and unbind.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 
  */
 public class VmPipeBindTest extends AbstractBindTest

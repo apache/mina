@@ -24,7 +24,7 @@ import java.net.SocketAddress;
 /**
  * A {@link SocketAddress} which represents anonymous address.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class AnonymousSocketAddress extends SocketAddress implements Comparable

@@ -29,7 +29,7 @@ import org.apache.mina.common.IoSession;
  * {@link IoHandler} implementation for NetCat client.  This class extended
  * {@link IoHandlerAdapter} for convenience. 
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
 public class NetCatProtocolHandler extends IoHandlerAdapter

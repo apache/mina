@@ -30,7 +30,7 @@ import org.apache.mina.common.IoSession;
  * An {@link InputStream} that buffers data read from
  * {@link IoHandler#messageReceived(IoSession, Object)} events.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class IoSessionInputStream extends InputStream

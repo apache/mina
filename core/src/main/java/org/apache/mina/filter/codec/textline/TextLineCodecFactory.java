@@ -32,7 +32,7 @@ import org.apache.mina.util.CharsetUtil;
  * a text line data and a Java string object.  This codec is useful especially
  * when you work with a text-based protocols such as SMTP and IMAP.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class TextLineCodecFactory implements ProtocolCodecFactory

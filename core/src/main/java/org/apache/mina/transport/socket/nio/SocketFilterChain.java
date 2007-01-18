@@ -31,7 +31,7 @@ import org.apache.mina.common.support.AbstractIoFilterChain;
 /**
  * An {@link IoFilterChain} for socket transport (TCP/IP).
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  */
 class SocketFilterChain extends AbstractIoFilterChain {
 

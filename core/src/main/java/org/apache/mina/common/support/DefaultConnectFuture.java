@@ -26,7 +26,7 @@ import org.apache.mina.common.RuntimeIOException;
 /**
  * A default implementation of {@link ConnectFuture}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFuture

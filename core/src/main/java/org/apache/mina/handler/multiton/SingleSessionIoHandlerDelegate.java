@@ -29,7 +29,7 @@ import org.apache.mina.common.IoSession;
  * is used to create a new {@link SingleSessionIoHandler} for each newly
  * created session.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class SingleSessionIoHandlerDelegate implements IoHandler

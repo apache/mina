@@ -32,7 +32,7 @@ import org.apache.mina.common.TrafficMask;
 /**
  * Handles the client to proxy part of the proxied connection.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
  */

@@ -22,7 +22,7 @@ package org.apache.mina.util;
  * A Runnable wrapper that preserves the name of the thread after the runnable is complete (for Runnables
  * that change the name of the Thread they use)
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 446581 $, $Date: 2006-09-15 11:36:12Z $,
  */
 public class NamePreservingRunnable implements Runnable

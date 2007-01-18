@@ -36,7 +36,7 @@ import org.apache.mina.common.ByteBufferAllocator;
  * {@link java.nio.ByteBuffer} instance.  Most implementations could
  * extend this class and implement their own buffer management mechanism.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * @noinspection StaticNonFinalField
  * @see ByteBufferAllocator

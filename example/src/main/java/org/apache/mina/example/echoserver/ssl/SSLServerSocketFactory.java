@@ -30,7 +30,7 @@ import javax.net.ServerSocketFactory;
  * Simple Server Socket factory to create sockets with or without SSL enabled.
  * If SSL enabled a "bougus" SSL Context is used (suitable for test purposes)
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class SSLServerSocketFactory extends javax.net.ServerSocketFactory

@@ -33,7 +33,7 @@ import org.apache.mina.common.ByteBuffer;
  * An {@link ObjectInput} and {@link InputStream} that can read the objects encoded
  * by {@link ObjectSerializationEncoder}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ObjectSerializationInputStream extends InputStream implements ObjectInput {

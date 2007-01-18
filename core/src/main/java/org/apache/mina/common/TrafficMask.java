@@ -25,7 +25,7 @@ import java.nio.channels.SelectionKey;
  * A type-safe mask that is used to control the traffic of {@link IoSession}
  * with {@link IoSession#setTrafficMask(TrafficMask)}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class TrafficMask

@@ -31,7 +31,7 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
  * Tests suspending and resuming reads and writes for the
  * {@link org.apache.mina.common.TransportType#SOCKET} transport type. 
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Id$
  */
 public class SocketTrafficControlTest extends AbstractTrafficControlTest

@@ -37,7 +37,7 @@ import org.apache.mina.common.IoFilter.WriteRequest;
 /**
  * Base implementation of {@link IoSession}.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class BaseIoSession implements IoSession

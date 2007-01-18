@@ -37,7 +37,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
  * has been copied from the <code>ThreadPoolTaskExecutor</code> class
  * available in Spring 2.0. 
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean

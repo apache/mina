@@ -51,7 +51,7 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * ...
  * </pre>
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Cloneable

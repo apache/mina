@@ -40,7 +40,7 @@ import java.util.TreeSet;
  * You can also create your own transport type.  Please refer to
  * {@link #TransportType(String[], boolean)}.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public final class TransportType implements Serializable

@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 /**
  * Tests {@link org.apache.mina.integration.spring.InetAddressEditor}.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class InetAddressEditorTest extends TestCase

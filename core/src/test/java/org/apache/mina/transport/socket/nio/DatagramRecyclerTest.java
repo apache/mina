@@ -35,7 +35,7 @@ import org.apache.mina.util.AvailablePortFinder;
 /**
  * Tests if datagram sessions are recycled properly.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 436993 $, $Date: 2006-08-26 07:36:56 +0900 (토, 26  8월 2006) $ 
  */
 public class DatagramRecyclerTest extends TestCase

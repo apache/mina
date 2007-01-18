@@ -38,7 +38,7 @@ import org.apache.mina.util.CharsetUtil;
 /**
  * A {@link MessageDecoder} that decodes {@link HttpRequest}.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpRequestDecoder extends MessageDecoderAdapter

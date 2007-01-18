@@ -30,7 +30,7 @@ import org.apache.mina.common.IoSession;
 /**
  * A default implementation of {@link IoFuture}.
  *  
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultIoFuture implements IoFuture

@@ -37,7 +37,7 @@ import java.net.SocketAddress;
  * Threads accept incoming connections start automatically when
  * {@link #bind()} is invoked, and stop when {@link #unbind()} is invoked.
  *  
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoAcceptor extends IoService

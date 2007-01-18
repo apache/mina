@@ -25,7 +25,7 @@ import java.util.Date;
 
 /**
  * MBean interface for the session manager, it's used for instrumenting IoSession 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoSessionManagerMBean

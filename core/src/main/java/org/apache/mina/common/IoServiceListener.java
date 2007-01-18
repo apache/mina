@@ -25,7 +25,7 @@ import java.util.EventListener;
  * Something interested in being notified when the result
  * of an {@link IoFuture} becomes available.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoServiceListener extends EventListener

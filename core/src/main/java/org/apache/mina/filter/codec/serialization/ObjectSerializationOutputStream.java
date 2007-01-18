@@ -30,7 +30,7 @@ import org.apache.mina.common.ByteBuffer;
  * An {@link ObjectOutput} and {@link OutputStream} that can write the objects as
  * the serialized form that {@link ObjectSerializationDecoder} can decode.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ObjectSerializationOutputStream extends OutputStream implements ObjectOutput {

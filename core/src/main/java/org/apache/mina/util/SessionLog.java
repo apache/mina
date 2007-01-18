@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * and {@link #setLogger(IoSession, Logger)}.
  * </p>
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
  */

@@ -49,7 +49,7 @@ import org.apache.mina.util.NamePreservingRunnable;
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAcceptor, DatagramService

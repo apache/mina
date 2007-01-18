@@ -46,7 +46,7 @@ import org.apache.mina.util.NewThreadExecutor;
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
 public class SocketAcceptor extends BaseIoAcceptor

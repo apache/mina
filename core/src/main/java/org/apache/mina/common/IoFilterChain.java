@@ -29,7 +29,7 @@ import org.apache.mina.common.IoFilter.WriteRequest;
  * to the consisting filters and terminal {@link IoHandler} sequentially.
  * Every {@link IoSession} has its own {@link IoFilterChain} (1-to-1 relationship). 
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoFilterChain {
@@ -199,7 +199,7 @@ public interface IoFilterChain {
     /**
      * Represents a name-filter pair that an {@link IoFilterChain} contains.
      *
-     * @author The Apache Directory Project (mina-dev@directory.apache.org)
+     * @author The Apache MINA Project (dev@mina.apache.org)
      * @version $Rev$, $Date$
      */
     public interface Entry

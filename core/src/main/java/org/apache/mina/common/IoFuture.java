@@ -23,7 +23,7 @@ package org.apache.mina.common;
 /**
  * Represents the result of an ashynchronous I/O operation.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoFuture

@@ -70,7 +70,7 @@ import org.apache.mina.filter.ReferenceCountingIoFilter;
  *       the removed filter was the last one.</li>
  * </ol>      
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * 
  * @see IoFilterAdapter

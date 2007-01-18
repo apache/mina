@@ -30,7 +30,7 @@ import org.apache.mina.common.WriteFuture;
  * An {@link OutputStream} that forwards all write operations to
  * the associated {@link IoSession}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
  */

@@ -23,7 +23,7 @@ package org.apache.mina.filter.codec;
  * An exception that is thrown when {@link ProtocolEncoder}
  * cannot understand or failed to validate the specified message object.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ProtocolEncoderException extends ProtocolCodecException

@@ -25,7 +25,7 @@ import org.apache.mina.common.WriteFuture;
 /**
  * A default implementation of {@link WriteFuture}.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture

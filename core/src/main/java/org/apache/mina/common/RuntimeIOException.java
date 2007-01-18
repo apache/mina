@@ -22,7 +22,7 @@ package org.apache.mina.common;
 /**
  * A unchecked version of {@link java.io.IOException}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class RuntimeIOException extends RuntimeException

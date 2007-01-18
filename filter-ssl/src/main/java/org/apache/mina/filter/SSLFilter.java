@@ -69,7 +69,7 @@ import org.apache.mina.util.SessionLog;
  * }
  * </pre>
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class SSLFilter extends IoFilterAdapter
@@ -643,7 +643,7 @@ public class SSLFilter extends IoFilterAdapter
      * A message that is sent from {@link SSLFilter} when the connection became
      * secure or is not secure anymore. 
      *
-     * @author The Apache Directory Project (mina-dev@directory.apache.org)
+     * @author The Apache MINA Project (dev@mina.apache.org)
      * @version $Rev$, $Date$
      */
     public static class SSLFilterMessage

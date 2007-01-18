@@ -27,7 +27,7 @@ import org.easymock.MockControl;
 /**
  * Tests {@link org.apache.mina.handler.demux.DemuxingIoHandler}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DemuxingIoHandlerTest extends TestCase

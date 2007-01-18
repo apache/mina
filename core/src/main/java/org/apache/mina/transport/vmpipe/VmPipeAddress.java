@@ -24,7 +24,7 @@ import java.net.SocketAddress;
 /**
  * A {@link SocketAddress} which represents in-VM pipe port number.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeAddress extends SocketAddress implements Comparable

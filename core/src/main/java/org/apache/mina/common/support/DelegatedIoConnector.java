@@ -33,7 +33,7 @@ import org.apache.mina.common.IoSessionConfig;
 /**
  * A delegated {@link IoConnector} that wraps the other {@link IoConnector}.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DelegatedIoConnector implements IoConnector

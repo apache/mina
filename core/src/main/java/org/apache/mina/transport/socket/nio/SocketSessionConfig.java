@@ -26,7 +26,7 @@ import org.apache.mina.common.IoSessionConfig;
 /**
  * An {@link IoSessionConfig} for socket transport type.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface SocketSessionConfig extends IoSessionConfig

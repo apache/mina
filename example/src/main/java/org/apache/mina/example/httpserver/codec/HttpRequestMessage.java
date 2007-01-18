@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 /**
  * A HTTP request message.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpRequestMessage

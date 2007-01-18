@@ -26,7 +26,7 @@ import org.apache.mina.common.IoSession;
  * {@link ProtocolDecoder#finishDecode(IoSession, ProtocolDecoderOutput)} nor
  * {@link ProtocolDecoder#dispose(IoSession)} method.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class ProtocolDecoderAdapter implements ProtocolDecoder

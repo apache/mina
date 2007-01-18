@@ -27,7 +27,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * implement {@link MessageDecoder#finishDecode(IoSession, ProtocolDecoderOutput)}
  * method.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  */
 public abstract class MessageDecoderAdapter implements MessageDecoder
 {

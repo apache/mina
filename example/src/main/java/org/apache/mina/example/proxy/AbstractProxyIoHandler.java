@@ -31,7 +31,7 @@ import org.apache.mina.util.SessionLog;
  * Base class of {@link org.apache.mina.common.IoHandler} classes which handle
  * proxied connections.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
  */

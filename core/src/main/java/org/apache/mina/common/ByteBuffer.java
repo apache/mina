@@ -126,7 +126,7 @@ import org.apache.mina.common.support.ByteBufferHexDumper;
  * {@link #setAllocator(ByteBufferAllocator)}.
  * </p>
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * @noinspection StaticNonFinalField
  * @see ByteBufferAllocator

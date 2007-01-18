@@ -23,7 +23,7 @@ package org.apache.mina.example.chat;
  * Encapsulates a chat command. Use {@link #valueOf(String)} to create an
  * instance given a command string.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ChatCommand

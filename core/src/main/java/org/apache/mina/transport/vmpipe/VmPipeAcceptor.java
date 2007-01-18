@@ -34,7 +34,7 @@ import org.apache.mina.transport.vmpipe.support.VmPipe;
  * Binds the specified {@link IoHandler} to the specified
  * {@link VmPipeAddress}.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeAcceptor extends BaseIoAcceptor

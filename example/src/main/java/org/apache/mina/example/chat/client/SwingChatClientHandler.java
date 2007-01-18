@@ -31,7 +31,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 /**
  * {@link IoHandler} implementation of the client side of the simple chat protocol.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class SwingChatClientHandler extends IoHandlerAdapter

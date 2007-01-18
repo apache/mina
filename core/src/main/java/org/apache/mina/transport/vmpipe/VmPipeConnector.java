@@ -39,7 +39,7 @@ import org.apache.mina.util.AnonymousSocketAddress;
  * Connects to {@link IoHandler}s which is bound on the specified
  * {@link VmPipeAddress}.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeConnector extends BaseIoConnector

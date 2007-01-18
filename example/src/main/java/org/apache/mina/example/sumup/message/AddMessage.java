@@ -22,7 +22,7 @@ package org.apache.mina.example.sumup.message;
 /**
  * <code>ADD</code> message in SumUp protocol.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class AddMessage extends AbstractMessage

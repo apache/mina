@@ -34,7 +34,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * A MINA {@link ProtocolDecoder} that decodes byte buffers into
  * Netty2 {@link Message}s using specified {@link MessageRecognizer}s. 
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
 public class NettyDecoder extends ProtocolDecoderAdapter

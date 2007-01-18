@@ -46,7 +46,7 @@ import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession

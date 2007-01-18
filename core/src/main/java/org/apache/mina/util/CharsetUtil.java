@@ -27,7 +27,7 @@ import java.nio.charset.Charset;
 /**
  * Utilities for dealing with Charsets.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$
  */
 public class CharsetUtil

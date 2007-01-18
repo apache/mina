@@ -28,7 +28,7 @@ import javax.net.ssl.SSLEngine;
  * ByteBuffers are by default allocated as direct byte buffers. To use non-direct
  * ByteBuffers, set system property mina.sslfilter.directbuffer to false.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 class SSLByteBufferUtil

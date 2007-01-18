@@ -33,7 +33,7 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
 /**
  * (<strong>Entry Point</strong>) Starts SumUp client.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class Client

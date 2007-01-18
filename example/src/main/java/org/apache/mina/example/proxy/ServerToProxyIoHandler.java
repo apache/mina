@@ -22,7 +22,7 @@ package org.apache.mina.example.proxy;
 /**
  * Handles the server to proxy part of the proxied connection.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
  */

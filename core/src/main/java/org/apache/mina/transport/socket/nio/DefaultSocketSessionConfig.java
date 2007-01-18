@@ -29,7 +29,7 @@ import org.apache.mina.common.support.BaseIoSessionConfig;
 /**
  * A default implementation of {@link SocketSessionConfig}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultSocketSessionConfig extends BaseIoSessionConfig implements SocketSessionConfig

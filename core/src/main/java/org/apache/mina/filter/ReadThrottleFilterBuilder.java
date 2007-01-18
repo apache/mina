@@ -55,7 +55,7 @@ import org.apache.mina.filter.executor.ExecutorFilter;
  * filter.attach( chain );
  * </code></pre>
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 406554 $, $Date: 2006-05-15 06:46:02Z $
  */
 public class ReadThrottleFilterBuilder

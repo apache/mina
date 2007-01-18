@@ -36,7 +36,7 @@ import java.net.UnknownHostException;
  * for more info.
  * </p>
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$
  * 
  * @see java.net.InetAddress

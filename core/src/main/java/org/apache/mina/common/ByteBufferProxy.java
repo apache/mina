@@ -40,7 +40,7 @@ import java.nio.charset.CharsetEncoder;
  * are proxied by default so that you can extend this class and override existing
  * operations selectively.  You can introduce new operations, too.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ByteBufferProxy extends ByteBuffer

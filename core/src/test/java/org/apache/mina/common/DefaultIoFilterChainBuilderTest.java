@@ -29,7 +29,7 @@ import org.apache.mina.common.IoFilterChain.Entry;
 /**
  * Tests {@link DefaultIoFilterChainBuilder}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultIoFilterChainBuilderTest extends TestCase

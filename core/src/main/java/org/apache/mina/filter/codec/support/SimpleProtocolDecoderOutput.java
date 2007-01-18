@@ -30,7 +30,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 /**
  * A {@link ProtocolDecoderOutput} based on queue.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
  */

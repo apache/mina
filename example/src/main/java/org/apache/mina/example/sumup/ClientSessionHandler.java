@@ -29,7 +29,7 @@ import org.apache.mina.util.SessionLog;
 /**
  * {@link IoHandler} for SumUp client.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ClientSessionHandler extends IoHandlerAdapter

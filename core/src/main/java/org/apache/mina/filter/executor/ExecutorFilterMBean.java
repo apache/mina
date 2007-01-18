@@ -19,6 +19,10 @@
  */
 package org.apache.mina.filter.executor;
 
+/**
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public interface ExecutorFilterMBean
 {
     String getThreadNamePrefix();

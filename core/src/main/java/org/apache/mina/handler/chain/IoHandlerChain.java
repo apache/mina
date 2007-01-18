@@ -328,7 +328,7 @@ public class IoHandlerChain implements IoHandlerCommand
     /**
      * Represents a name-command pair that an {@link IoHandlerChain} contains.
      *
-     * @author The Apache Directory Project (mina-dev@directory.apache.org)
+     * @author The Apache MINA Project (dev@mina.apache.org)
      * @version $Rev$, $Date$
      */
     public class Entry

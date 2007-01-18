@@ -43,7 +43,7 @@ import org.apache.mina.util.NamePreservingRunnable;
 /**
  * Performs all I/O operations for sockets which is connected or bound. This class is used by MINA internally.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
 class SocketIoProcessor

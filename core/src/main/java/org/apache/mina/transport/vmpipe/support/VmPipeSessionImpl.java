@@ -37,7 +37,7 @@ import org.apache.mina.common.support.IoServiceListenerSupport;
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class VmPipeSessionImpl extends BaseIoSession

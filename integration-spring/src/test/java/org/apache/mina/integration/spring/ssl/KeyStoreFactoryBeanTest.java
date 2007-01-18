@@ -32,7 +32,7 @@ import org.springframework.core.io.ClassPathResource;
 /**
  * Tests {@link org.apache.mina.integration.spring.ssl.KeyStoreFactoryBean}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class KeyStoreFactoryBeanTest extends TestCase

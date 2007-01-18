@@ -31,7 +31,7 @@ import javax.net.ssl.SSLContext;
 /**
  * Factory to create a bougus SSLContext.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class BogusSSLContextFactory

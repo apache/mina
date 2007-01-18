@@ -33,7 +33,7 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
 /**
  * A simple chat client for a given user.
  * 
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ChatClientSupport
