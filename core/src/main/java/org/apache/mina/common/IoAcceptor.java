@@ -35,9 +35,8 @@ import java.net.SocketAddress;
  * the specified default {@link IoHandler}.
  * <p>
  * Threads accept incoming connections start automatically when
- * {@link #bind(SocketAddress, IoHandler)} is invoked, and stop when all
- * addresses are unbound.
- * 
+ * {@link #bind()} is invoked, and stop when {@link #unbind()} is invoked.
+ *  
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

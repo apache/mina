@@ -23,7 +23,7 @@ import java.net.SocketAddress;
 
 /**
  * A connectionless transport can recycle existing sessions by assigning an
- * IoSessionRecyler to its {@link IoServiceConfig}.
+ * {@link IoSessionRecycler} to an {@link IoService}.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * TODO More documentation

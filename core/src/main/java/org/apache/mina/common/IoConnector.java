@@ -34,7 +34,7 @@ import java.net.SocketAddress;
  * default {@link IoHandler}.
  * <p>
  * Threads connect to endpoint start automatically when
- * {@link #connect(SocketAddress, IoHandler)} is invoked, and stop when all
+ * {@link #connect(SocketAddress)} is invoked, and stop when all
  * connection attempts are finished.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)

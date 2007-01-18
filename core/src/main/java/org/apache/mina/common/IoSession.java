@@ -143,7 +143,7 @@ public interface IoSession {
     /**
      * Returns the set of keys of all user-defined attributes.
      */
-    Set getAttributeKeys();
+    Set<String> getAttributeKeys();
     
     /**
      * Returns transport type of this session.
@@ -182,8 +182,8 @@ public interface IoSession {
      * Returns the socket address of the {@link IoService} listens to to manage
      * this session.  If this session is managed by {@link IoAcceptor}, it
      * returns the {@link SocketAddress} which is specified as a parameter of
-     * {@link IoAcceptor#bind(SocketAddress, IoHandler)}.  If this session is
-     * managed by {@link IoConnector}, this method returns the same address with
+     * {@link IoAcceptor#bind()}.  If this session is managed by
+     * {@link IoConnector}, this method returns the same address with
      * that of {@link #getRemoteAddress()}.  
      */
     SocketAddress getServiceAddress();
