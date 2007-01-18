@@ -20,7 +20,6 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
@@ -36,8 +35,8 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.NamePreservingRunnable;
@@ -156,15 +155,8 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-    protected Class<? extends SocketAddress> getAddressType()
-    {
-        return InetSocketAddress.class;
-    }
-
-    @Override
-    protected Class<? extends IoSessionConfig> getSessionConfigType()
-    {
-        return SocketSessionConfig.class;
+    public TransportType getTransportType() {
+        return TransportType.SOCKET;
     }
 
     /**

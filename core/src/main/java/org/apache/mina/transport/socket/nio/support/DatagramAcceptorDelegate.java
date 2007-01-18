@@ -20,7 +20,6 @@
 package org.apache.mina.transport.socket.nio.support;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -36,9 +35,9 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
@@ -102,16 +101,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             ExceptionMonitor.getInstance().exceptionCaught( e );
         }
     }
-
-    protected Class<? extends SocketAddress> getAddressType()
-    {
-        return InetSocketAddress.class;
-    }
-
-    @Override
-    protected Class<? extends IoSessionConfig> getSessionConfigType()
-    {
-        return DatagramSessionConfig.class;
+    
+    public TransportType getTransportType() {
+        return TransportType.DATAGRAM;
     }
 
     protected void doBind() throws IOException

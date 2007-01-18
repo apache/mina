@@ -26,7 +26,7 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
@@ -53,15 +53,8 @@ public class VmPipeConnector extends BaseIoConnector
         super( new DefaultVmPipeSessionConfig() );
     }
 
-    protected Class<? extends SocketAddress> getAddressType()
-    {
-        return VmPipeAddress.class;
-    }
-
-    @Override
-    protected Class<? extends IoSessionConfig> getSessionConfigType()
-    {
-        return VmPipeSessionConfig.class;
+    public TransportType getTransportType() {
+        return TransportType.VM_PIPE;
     }
 
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )

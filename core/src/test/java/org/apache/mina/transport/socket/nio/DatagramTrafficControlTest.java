@@ -28,8 +28,8 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.transport.AbstractTrafficControlTest;
 
 /**
- * Tests suspending and resuming reads and writes for the
- * {@link org.apache.mina.common.TransportType#DATAGRAM} transport type. 
+ * Tests suspending and resuming reads and writes for the datagram
+ * transport type. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Id$

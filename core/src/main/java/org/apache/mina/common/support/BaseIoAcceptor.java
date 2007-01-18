@@ -56,11 +56,13 @@ public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor
     
     public void setLocalAddress( SocketAddress localAddress )
     {
-        if( localAddress != null && !getAddressType().isAssignableFrom( localAddress.getClass() ) )
+        if( localAddress != null &&
+            !getTransportType().getAddressType().isAssignableFrom(
+                    localAddress.getClass() ) )
         {
             throw new IllegalArgumentException(
                     "localAddress type: " + localAddress.getClass() + 
-                    " (expected: " + getAddressType() + ")");
+                    " (expected: " + getTransportType().getAddressType() + ")");
         }
         
         synchronized( bindLock )

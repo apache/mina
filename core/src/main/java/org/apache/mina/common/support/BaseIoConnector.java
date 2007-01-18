@@ -69,18 +69,21 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
         if( remoteAddress == null )
             throw new NullPointerException( "remoteAddress" );
         
-        if( !getAddressType().isAssignableFrom( remoteAddress.getClass() ) )
+        if( !getTransportType().getAddressType().isAssignableFrom(
+                remoteAddress.getClass() ) )
         {
             throw new IllegalArgumentException(
                     "remoteAddress type: " + remoteAddress.getClass() + 
-                    " (expected: " + getAddressType() + ")");
+                    " (expected: " + getTransportType().getAddressType() + ")");
         }
 
-        if( localAddress != null && !getAddressType().isAssignableFrom( localAddress.getClass() ) )
+        if( localAddress != null &&
+            !getTransportType().getAddressType().isAssignableFrom(
+                    localAddress.getClass() ) )
         {
             throw new IllegalArgumentException(
                     "localAddress type: " + localAddress.getClass() + 
-                    " (expected: " + getAddressType() + ")");
+                    " (expected: " + getTransportType().getAddressType() + ")");
         }
         
         if( getHandler() == null )

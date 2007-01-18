@@ -32,6 +32,11 @@ import java.util.Set;
 public interface IoService
 {
     /**
+     * Returns the {@link TransportType} that this service runs on.
+     */
+    TransportType getTransportType();
+    
+    /**
      * Adds an {@link IoServiceListener} that listens any events related with
      * this service.
      */

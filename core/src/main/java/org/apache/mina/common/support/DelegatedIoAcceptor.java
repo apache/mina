@@ -30,6 +30,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportType;
 
 /**
  * A delegated {@link IoAcceptor} that wraps the other {@link IoAcceptor}.
@@ -145,5 +146,9 @@ public class DelegatedIoAcceptor implements IoAcceptor
     public boolean isBound()
     {
         return delegate.isBound();
+    }
+
+    public TransportType getTransportType() {
+        return delegate.getTransportType();
     }
 }

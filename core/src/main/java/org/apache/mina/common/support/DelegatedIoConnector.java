@@ -29,6 +29,7 @@ import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportType;
 
 /**
  * A delegated {@link IoConnector} that wraps the other {@link IoConnector}.
@@ -129,5 +130,9 @@ public class DelegatedIoConnector implements IoConnector
     public void setHandler( IoHandler handler )
     {
         delegate.setHandler( handler );
+    }
+
+    public TransportType getTransportType() {
+        return delegate.getTransportType();
     }
 }

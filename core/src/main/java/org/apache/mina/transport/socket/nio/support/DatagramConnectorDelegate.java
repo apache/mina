@@ -20,7 +20,6 @@
 package org.apache.mina.transport.socket.nio.support;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -36,8 +35,8 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
@@ -99,15 +98,8 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
     }
 
-    protected Class<? extends SocketAddress> getAddressType()
-    {
-        return InetSocketAddress.class;
-    }
-
-    @Override
-    protected Class<? extends IoSessionConfig> getSessionConfigType()
-    {
-        return DatagramSessionConfig.class;
+    public TransportType getTransportType() {
+        return TransportType.DATAGRAM;
     }
 
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )

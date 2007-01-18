@@ -19,7 +19,6 @@
  */
 package org.apache.mina.common.support;
 
-import java.net.SocketAddress;
 import java.util.Set;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
@@ -62,16 +61,6 @@ public abstract class BaseIoService implements IoService
         this.listeners = new IoServiceListenerSupport( this );
         setSessionConfig( sessionConfig );
     }
-    
-    /**
-     * Returns the type of {@link SocketAddress} this service uses.
-     */
-    protected abstract Class<? extends SocketAddress> getAddressType();
-    
-    /**
-     * Returns the type of {@link IoSessionConfig} this service uses.
-     */
-    protected abstract Class<? extends IoSessionConfig> getSessionConfigType();
     
     public IoFilterChainBuilder getFilterChainBuilder()
     {
@@ -146,11 +135,11 @@ public abstract class BaseIoService implements IoService
         {
             throw new NullPointerException( "sessionConfig" );
         }
-        if( ! getSessionConfigType().isAssignableFrom( sessionConfig.getClass() ) )
+        if( ! getTransportType().getSessionConfigType().isAssignableFrom( sessionConfig.getClass() ) )
         {
             throw new IllegalArgumentException( "sessionConfig type: " 
                     + sessionConfig.getClass() 
-                    + " (expected: " + getSessionConfigType() + ")" );
+                    + " (expected: " + getTransportType().getSessionConfigType() + ")" );
         }
         this.sessionConfig = sessionConfig;
     }    

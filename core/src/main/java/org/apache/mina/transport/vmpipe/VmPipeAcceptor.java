@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 
@@ -49,15 +49,8 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         super( new DefaultVmPipeSessionConfig() );
     }
 
-    protected Class<? extends SocketAddress> getAddressType()
-    {
-        return VmPipeAddress.class;
-    }
-
-    @Override
-    protected Class<? extends IoSessionConfig> getSessionConfigType()
-    {
-        return VmPipeSessionConfig.class;
+    public TransportType getTransportType() {
+        return TransportType.VM_PIPE;
     }
 
     protected void doBind() throws IOException
