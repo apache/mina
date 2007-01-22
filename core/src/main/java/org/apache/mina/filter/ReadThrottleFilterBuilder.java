@@ -187,7 +187,7 @@ public class ReadThrottleFilterBuilder
         {
             if( message instanceof ByteBuffer )
             {
-                release( session, ( (ByteBuffer)message ).capacity() );
+                release( session, ( (ByteBuffer)message ).remaining() );
             }
 
             nextFilter.messageReceived( session, message );
