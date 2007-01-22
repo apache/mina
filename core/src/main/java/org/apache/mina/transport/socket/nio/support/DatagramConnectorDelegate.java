@@ -274,7 +274,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         {
             selector.wakeup();
         }
-        selector.wakeup();
     }
     
     private void scheduleTrafficControl( DatagramSessionImpl session )
@@ -409,13 +408,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             it.remove();
 
             DatagramSessionImpl session = ( DatagramSessionImpl ) key.attachment();
-
-            DatagramSessionImpl replaceSession = getRecycledSession(session);
-
-            if(replaceSession != null)
-            {
-                session = replaceSession;
-            }
+            
+            // Let the recycler know that the session is still active. 
+            getSessionRecycler( session ).recycle(
+                    session.getLocalAddress(), session.getRemoteAddress() );
 
             if( key.isReadable() && session.getTrafficMask().isReadable() )
             {
@@ -427,30 +423,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 scheduleFlush( session );
             }
         }
-    }
-    
-    private DatagramSessionImpl getRecycledSession( IoSession session )
-    {
-        IoSessionRecycler sessionRecycler = getSessionRecycler( session );
-        DatagramSessionImpl replaceSession = null;
-
-        if ( sessionRecycler != null )
-        {
-            synchronized ( sessionRecycler )
-            {
-                replaceSession = ( DatagramSessionImpl ) sessionRecycler.recycle( session.getLocalAddress(), session
-                        .getRemoteAddress() );
-
-                if ( replaceSession != null )
-                {
-                    return replaceSession;
-                }
-
-                sessionRecycler.put( session );
-            }
-        }
-
-        return null;
     }
     
     private IoSessionRecycler getSessionRecycler( IoSession session )
@@ -621,22 +593,15 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             boolean success = false;
             try
             {
-                DatagramSessionImpl replaceSession = getRecycledSession( session );
+                SelectionKey key = req.channel.register( selector,
+                        SelectionKey.OP_READ, session );
 
-                if ( replaceSession != null )
-                {
-                    session = replaceSession;
-                }
-                else
-                {
-                    SelectionKey key = req.channel.register( selector,
-                            SelectionKey.OP_READ, session );
+                session.setSelectionKey( key );
+                buildFilterChain( req, session );
+                getSessionRecycler( session ).put( session );
 
-                    session.setSelectionKey( key );
-                    buildFilterChain( req, session );
-                    // The CONNECT_FUTURE attribute is cleared and notified here.
-                    getListeners().fireSessionCreated( session );
-                }
+                // The CONNECT_FUTURE attribute is cleared and notified here.
+                getListeners().fireSessionCreated( session );
                 success = true;
             }
             catch( Throwable t )
