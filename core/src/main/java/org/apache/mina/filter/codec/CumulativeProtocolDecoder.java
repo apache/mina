@@ -116,9 +116,10 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     public void decode( IoSession session, ByteBuffer in,
                         ProtocolDecoderOutput out ) throws Exception
     {
+        boolean usingSessionBuffer = true;
         ByteBuffer buf = ( ByteBuffer ) session.getAttribute( BUFFER );
-        // if we have a session buffer, append data to that otherwise
-        // use the buffer read from the network directly
+        // If we have a session buffer, append data to that; otherwise
+        // use the buffer read from the network directly.
         if( buf != null )
         {
             buf.put( in );
@@ -127,6 +128,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         else
         {
             buf = in;
+            usingSessionBuffer = false;
         }
         
         for( ;; )
@@ -157,12 +159,16 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         // invoked the session buffer gets appended to
         if ( buf.hasRemaining() )
         {
-            storeRemainingInSession( buf, session );
+            if ( usingSessionBuffer )
+                buf.compact();
+            else
+                storeRemainingInSession( buf, session );
         }
         else
         {
-            removeSessionBuffer( session );
-        }        
+            if ( usingSessionBuffer )
+                removeSessionBuffer( session );
+        }
     }
     
     /**
@@ -189,19 +195,18 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         removeSessionBuffer( session );
     }
     
-    private void removeSessionBuffer(IoSession session)
+    private void removeSessionBuffer( IoSession session )
     {        
-        ByteBuffer buf = ( ByteBuffer ) session.getAttribute( BUFFER );
+        ByteBuffer buf = ( ByteBuffer ) session.removeAttribute( BUFFER );
         if( buf != null )
         {
             buf.release();
-            session.removeAttribute( BUFFER );
         }
     }
     
-    private void storeRemainingInSession(ByteBuffer buf, IoSession session)
+    private void storeRemainingInSession( ByteBuffer buf, IoSession session )
     {
-        ByteBuffer remainingBuf = ByteBuffer.allocate( buf.remaining() );
+        ByteBuffer remainingBuf = ByteBuffer.allocate( buf.capacity() );
         remainingBuf.setAutoExpand( true );
         remainingBuf.put( buf );
         session.setAttribute( BUFFER, remainingBuf );
