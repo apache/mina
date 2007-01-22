@@ -36,11 +36,11 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
@@ -388,12 +388,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
 
             DatagramSessionImpl session = ( DatagramSessionImpl ) key.attachment();
 
-            DatagramSessionImpl replaceSession = getRecycledSession( session );
-
-            if( replaceSession != null )
-            {
-                session = replaceSession;
-            }
+            // Let the recycler know that the session is still active. 
+            getSessionRecycler( session ).recycle(
+                    session.getLocalAddress(), session.getRemoteAddress() );
 
             if( key.isReadable() && session.getTrafficMask().isReadable() )
             {
@@ -405,30 +402,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 scheduleFlush( session );
             }
         }
-    }
-
-    private DatagramSessionImpl getRecycledSession( IoSession session )
-    {
-        IoSessionRecycler sessionRecycler = getSessionRecycler( session );
-
-        if( sessionRecycler != null )
-        {
-            synchronized( sessionRecycler )
-            {
-                DatagramSessionImpl replaceSession =
-                    ( DatagramSessionImpl ) sessionRecycler.recycle( session.getLocalAddress(),
-                        session.getRemoteAddress() );
-
-                if( replaceSession != null )
-                {
-                    return replaceSession;
-                }
-
-                sessionRecycler.put( session );
-            }
-        }
-
-        return null;
     }
 
     private IoSessionRecycler getSessionRecycler( IoSession session )
@@ -580,22 +553,15 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             boolean success = false;
             try
             {
-                DatagramSessionImpl replaceSession = getRecycledSession( session );
+                SelectionKey key = req.channel.register( selector,
+                    SelectionKey.OP_READ, session );
 
-                if( replaceSession != null )
-                {
-                    session = replaceSession;
-                }
-                else
-                {
-                    SelectionKey key = req.channel.register( selector,
-                        SelectionKey.OP_READ, session );
+                session.setSelectionKey( key );
+                buildFilterChain( req, session );
+                getSessionRecycler( session ).put( session );
 
-                    session.setSelectionKey( key );
-                    buildFilterChain( req, session );
-                    // The CONNECT_FUTURE attribute is cleared and notified here.
-                    getListeners().fireSessionCreated( session );
-                }
+                // The CONNECT_FUTURE attribute is cleared and notified here.
+                getListeners().fireSessionCreated( session );
                 success = true;
             }
             catch( Throwable t )
