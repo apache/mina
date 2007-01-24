@@ -39,6 +39,7 @@
   <bean id="filterChainBuilder" class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean">
     <property name="filters">
       <list>
+        <bean class="org.apache.mina.filter.executor.ExecutorFilter"/>
         <bean class="org.apache.mina.filter.codec.ProtocolCodecFilter">
           <constructor-arg>
             <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
@@ -53,6 +54,7 @@
   <bean id="sslFilterChainBuilder" class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean">
     <property name="filters">
       <list>
+        <bean class="org.apache.mina.filter.executor.ExecutorFilter"/>
         <bean class="org.apache.mina.filter.SSLFilter">
           <constructor-arg ref="sslContext"/>
         </bean>      

@@ -78,6 +78,7 @@ public class ChatClientSupport
                 return false;
             }
             session = future1.getSession();
+            login();
             
             return true;
         }
