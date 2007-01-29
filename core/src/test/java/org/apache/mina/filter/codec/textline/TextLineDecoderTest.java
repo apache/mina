@@ -111,6 +111,50 @@ public class TextLineDecoderTest extends TestCase
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
         Assert.assertEquals( "PQR", out.getMessageQueue().pop() );
+        
+        // Test splitted long delimiter which produces two output
+        decoder = new TextLineDecoder(
+                Charset.forName( "UTF-8" ),
+                new LineDelimiter( "\n\n\n" ) );
+        in.clear();
+        in.putString( "PQR\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\nSTU\n\n\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 2, out.getMessageQueue().size() );
+        Assert.assertEquals( "PQR", out.getMessageQueue().pop() );
+        Assert.assertEquals( "STU", out.getMessageQueue().pop() );
+        
+        // Test splitted long delimiter mixed with partial non-delimiter.
+        decoder = new TextLineDecoder(
+                Charset.forName( "UTF-8" ),
+                new LineDelimiter( "\n\n\n" ) );
+        in.clear();
+        in.putString( "PQR\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "X\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\n\nSTU\n\n\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 2, out.getMessageQueue().size() );
+        Assert.assertEquals( "PQR\nX", out.getMessageQueue().pop() );
+        Assert.assertEquals( "STU", out.getMessageQueue().pop() );
     }
     
     public void testAutoDecode() throws Exception
@@ -180,6 +224,44 @@ public class TextLineDecoderTest extends TestCase
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
         Assert.assertEquals( "PQR", out.getMessageQueue().pop() );
+
+        // Test splitted long delimiter (\r\r\n) which produces two output
+        in.clear();
+        in.putString( "PQR\r", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\r", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\nSTU\r\r\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 2, out.getMessageQueue().size() );
+        Assert.assertEquals( "PQR", out.getMessageQueue().pop() );
+        Assert.assertEquals( "STU", out.getMessageQueue().pop() );
+
+        // Test splitted long delimiter mixed with partial non-delimiter.
+        in.clear();
+        in.putString( "PQR\r", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "X\r", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\r\nSTU\r\r\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 2, out.getMessageQueue().size() );
+        Assert.assertEquals( "PQR\rX", out.getMessageQueue().pop() );
+        Assert.assertEquals( "STU", out.getMessageQueue().pop() );
     }
     
     private static class DummySession extends BaseIoSession
