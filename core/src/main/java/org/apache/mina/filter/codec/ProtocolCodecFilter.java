@@ -140,6 +140,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             throw new IllegalStateException( "A filter chain cannot contain more than one ProtocolCodecFilter." );
         }
     }
+    
+    public void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
+    {
+        disposeEncoder( parent.getSession() );
+        disposeDecoder( parent.getSession() ); 
+    }
 
     @Override
     public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
