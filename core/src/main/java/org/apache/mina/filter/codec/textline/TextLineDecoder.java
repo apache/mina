@@ -164,7 +164,6 @@ public class TextLineDecoder implements ProtocolDecoder
     private int decodeAuto( ByteBuffer in, ByteBuffer buf, int matchCount, CharsetDecoder decoder, ProtocolDecoderOutput out ) throws CharacterCodingException
     {
         // Try to find a match
-        int oldMatchCount = matchCount;
         int oldPos = in.position();
         int oldLimit = in.limit();
         while( in.hasRemaining() )
@@ -191,7 +190,7 @@ public class TextLineDecoder implements ProtocolDecoder
             {
                 // Found a match.
                 int pos = in.position();
-                in.limit( pos - matchCount + oldMatchCount );
+                in.limit( pos );
                 in.position( oldPos );
                 
                 buf.put( in );
@@ -200,6 +199,7 @@ public class TextLineDecoder implements ProtocolDecoder
                     throw new BufferDataException( "Line is too long: " + buf.position() );
                 }
                 buf.flip();
+                buf.limit( buf.limit() - matchCount );
                 out.write( buf.getString( decoder ) );
                 buf.clear();
                 
@@ -212,7 +212,6 @@ public class TextLineDecoder implements ProtocolDecoder
         
         // Put remainder to buf.
         in.position( oldPos );
-        in.limit( in.limit() - matchCount + oldMatchCount );
         buf.put( in );
         
         return matchCount;
@@ -230,7 +229,6 @@ public class TextLineDecoder implements ProtocolDecoder
         }
         
         // Try to find a match
-        int oldMatchCount = matchCount;
         int oldPos = in.position();
         int oldLimit = in.limit();
         while( in.hasRemaining() )
@@ -243,7 +241,7 @@ public class TextLineDecoder implements ProtocolDecoder
                 {
                     // Found a match.
                     int pos = in.position();
-                    in.limit( pos - matchCount + oldMatchCount );
+                    in.limit( pos );
                     in.position( oldPos );
                     
                     buf.put( in );
@@ -252,6 +250,7 @@ public class TextLineDecoder implements ProtocolDecoder
                         throw new BufferDataException( "Line is too long: " + buf.position() );
                     }
                     buf.flip();
+                    buf.limit( buf.limit() - matchCount );
                     out.write( buf.getString( decoder ) );
                     buf.clear();
                     
@@ -269,7 +268,6 @@ public class TextLineDecoder implements ProtocolDecoder
         
         // Put remainder to buf.
         in.position( oldPos );
-        in.limit( in.limit() - matchCount + oldMatchCount );
         buf.put( in );
         
         return matchCount;
