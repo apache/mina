@@ -56,19 +56,19 @@ public class TextLineDecoderTest extends TestCase
         TextLineDecoder decoder =
             new TextLineDecoder(
                     Charset.forName( "UTF-8" ), LineDelimiter.WINDOWS );
-
+        
         CharsetEncoder encoder = Charset.forName( "UTF-8" ).newEncoder();
         IoSession session = new DummySession();
         TestDecoderOutput out = new TestDecoderOutput();
         ByteBuffer in = ByteBuffer.allocate( 16 );
-
+     
         // Test one decode and one output
         in.putString( "ABC\r\n", encoder );
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
         Assert.assertEquals( "ABC", out.getMessageQueue().poll() );
-
+        
         // Test two decode and one output
         in.clear();
         in.putString( "DEF", encoder );
@@ -81,7 +81,7 @@ public class TextLineDecoderTest extends TestCase
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
         Assert.assertEquals( "DEFGHI", out.getMessageQueue().poll() );
-
+        
         // Test one decode and two output
         in.clear();
         in.putString( "JKL\r\nMNO\r\n", encoder );
@@ -90,7 +90,7 @@ public class TextLineDecoderTest extends TestCase
         Assert.assertEquals( 2, out.getMessageQueue().size() );
         Assert.assertEquals( "JKL", out.getMessageQueue().poll() );
         Assert.assertEquals( "MNO", out.getMessageQueue().poll() );
-
+        
         // Test splitted long delimiter
         decoder = new TextLineDecoder(
                 Charset.forName( "UTF-8" ),
@@ -111,26 +111,70 @@ public class TextLineDecoderTest extends TestCase
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
         Assert.assertEquals( "PQR", out.getMessageQueue().poll() );
-    }
 
+        // Test splitted long delimiter which produces two output
+        decoder = new TextLineDecoder(
+                Charset.forName( "UTF-8" ),
+                new LineDelimiter( "\n\n\n" ) );
+        in.clear();
+        in.putString( "PQR\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\nSTU\n\n\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 2, out.getMessageQueue().size() );
+        Assert.assertEquals( "PQR", out.getMessageQueue().poll() );
+        Assert.assertEquals( "STU", out.getMessageQueue().poll() );
+        
+        // Test splitted long delimiter mixed with partial non-delimiter.
+        decoder = new TextLineDecoder(
+                Charset.forName( "UTF-8" ),
+                new LineDelimiter( "\n\n\n" ) );
+        in.clear();
+        in.putString( "PQR\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "X\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\n\nSTU\n\n\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 2, out.getMessageQueue().size() );
+        Assert.assertEquals( "PQR\nX", out.getMessageQueue().poll() );
+        Assert.assertEquals( "STU", out.getMessageQueue().poll() );
+    }
+    
     public void testAutoDecode() throws Exception
     {
         TextLineDecoder decoder =
             new TextLineDecoder(
                     Charset.forName( "UTF-8" ), LineDelimiter.AUTO );
-
+        
         CharsetEncoder encoder = Charset.forName( "UTF-8" ).newEncoder();
         IoSession session = new DummySession();
         TestDecoderOutput out = new TestDecoderOutput();
         ByteBuffer in = ByteBuffer.allocate( 16 );
-
+     
         // Test one decode and one output
         in.putString( "ABC\r\n", encoder );
         in.flip();
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
         Assert.assertEquals( "ABC", out.getMessageQueue().poll() );
-
+        
         // Test two decode and one output
         in.clear();
         in.putString( "DEF", encoder );
@@ -143,7 +187,7 @@ public class TextLineDecoderTest extends TestCase
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
         Assert.assertEquals( "DEFGHI", out.getMessageQueue().poll() );
-
+        
         // Test one decode and two output
         in.clear();
         in.putString( "JKL\r\nMNO\r\n", encoder );
@@ -152,7 +196,7 @@ public class TextLineDecoderTest extends TestCase
         Assert.assertEquals( 2, out.getMessageQueue().size() );
         Assert.assertEquals( "JKL", out.getMessageQueue().poll() );
         Assert.assertEquals( "MNO", out.getMessageQueue().poll() );
-
+        
         // Test multiple '\n's
         in.clear();
         in.putString( "\n\n\n", encoder );
@@ -162,7 +206,7 @@ public class TextLineDecoderTest extends TestCase
         Assert.assertEquals( "", out.getMessageQueue().poll() );
         Assert.assertEquals( "", out.getMessageQueue().poll() );
         Assert.assertEquals( "", out.getMessageQueue().poll() );
-
+        
         // Test splitted long delimiter (\r\r\n)
         in.clear();
         in.putString( "PQR\r", encoder );
@@ -180,8 +224,46 @@ public class TextLineDecoderTest extends TestCase
         decoder.decode( session, in, out );
         Assert.assertEquals( 1, out.getMessageQueue().size() );
         Assert.assertEquals( "PQR", out.getMessageQueue().poll() );
-    }
 
+        // Test splitted long delimiter (\r\r\n) which produces two output
+        in.clear();
+        in.putString( "PQR\r", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\r", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\nSTU\r\r\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 2, out.getMessageQueue().size() );
+        Assert.assertEquals( "PQR", out.getMessageQueue().poll() );
+        Assert.assertEquals( "STU", out.getMessageQueue().poll() );
+
+        // Test splitted long delimiter mixed with partial non-delimiter.
+        in.clear();
+        in.putString( "PQR\r", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "X\r", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 0, out.getMessageQueue().size() );
+        in.clear();
+        in.putString( "\r\nSTU\r\r\n", encoder );
+        in.flip();
+        decoder.decode( session, in, out );
+        Assert.assertEquals( 2, out.getMessageQueue().size() );
+        Assert.assertEquals( "PQR\rX", out.getMessageQueue().poll() );
+        Assert.assertEquals( "STU", out.getMessageQueue().poll() );    
+    }
+    
     private static class DummySession extends BaseIoSession
     {
         @Override
