@@ -20,9 +20,13 @@
 package org.apache.mina.transport.vmpipe.support;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
+
+import edu.emory.mathcs.backport.java.util.Queue;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
@@ -30,36 +34,137 @@ import org.apache.mina.common.support.AbstractIoFilterChain;
  */
 public class VmPipeFilterChain extends AbstractIoFilterChain {
 
+    private final Queue eventQueue = new ConcurrentLinkedQueue();
+    
     public VmPipeFilterChain( IoSession session )
     {
         super( session );
     }
+    
+    private void pushEvent( Event e )
+    {
+        eventQueue.offer( e );
+        flushEvents();
+    }
+    
+    private void flushEvents()
+    {
+        Event e;
+        while( ( e = ( Event ) eventQueue.poll() ) != null )
+        {
+            fireEvent( e );
+        }
+    }
+    
+    private void fireEvent( Event e )
+    {
+        IoSession session = getSession();
+        EventType type = e.getType();
+        Object data = e.getData();
+
+        if( type == EventType.RECEIVED )
+        {
+            VmPipeSessionImpl s = ( VmPipeSessionImpl ) session;
+            synchronized( s.lock )
+            {
+                if( !s.getTrafficMask().isReadable() )
+                {
+                    synchronized( s.pendingDataQueue )
+                    {
+                        s.pendingDataQueue.push( data );
+                    }
+                }
+                else
+                {
+                    int byteCount = 1;
+                    if( data instanceof ByteBuffer )
+                    {
+                        byteCount = ( ( ByteBuffer ) data ).remaining();
+                    }
+                    
+                    s.increaseReadBytes( byteCount );
+                    
+                    super.fireMessageReceived( s, data );
+                }
+            }
+        }
+        else if( type == EventType.WRITE )
+        {
+            super.fireFilterWrite( session, ( WriteRequest ) data );
+        }
+        else if( type == EventType.SENT )
+        {
+            super.fireMessageSent( session, ( WriteRequest ) data );
+        }
+        else if( type == EventType.EXCEPTION )
+        {
+            super.fireExceptionCaught( session, ( Throwable ) data );
+        }
+        else if( type == EventType.IDLE )
+        {
+            super.fireSessionIdle( session, ( IdleStatus ) data );
+        }
+        else if( type == EventType.OPENED )
+        {
+            super.fireSessionOpened( session );
+        }
+        else if( type == EventType.CREATED )
+        {
+            super.fireSessionCreated( session );
+        }
+        else if( type == EventType.CLOSED )
+        {
+            super.fireSessionClosed( session );
+        }
+        else if( type == EventType.CLOSE )
+        {
+            super.fireFilterClose( session );
+        }
+    }
+
+    public void fireFilterClose( IoSession session )
+    {
+        pushEvent( new Event( EventType.CLOSE, null ) );
+    }
+
+    public void fireFilterWrite( IoSession session, WriteRequest writeRequest )
+    {
+        pushEvent( new Event( EventType.WRITE, writeRequest ) );
+    }
+
+    public void fireExceptionCaught( IoSession session, Throwable cause )
+    {
+        pushEvent( new Event( EventType.EXCEPTION, cause ) );
+    }
+
+    public void fireMessageSent( IoSession session, WriteRequest request )
+    {
+        pushEvent( new Event( EventType.SENT, request ) );
+    }
+
+    public void fireSessionClosed( IoSession session )
+    {
+        pushEvent( new Event( EventType.CLOSED, null ) );
+    }
+
+    public void fireSessionCreated( IoSession session )
+    {
+        pushEvent( new Event( EventType.CREATED, null ) );
+    }
+
+    public void fireSessionIdle( IoSession session, IdleStatus status )
+    {
+        pushEvent( new Event( EventType.IDLE, status ) );
+    }
+
+    public void fireSessionOpened( IoSession session )
+    {
+        pushEvent( new Event( EventType.OPENED, null ) );
+    }
 
     public void fireMessageReceived( IoSession session, Object message )
     {
-        VmPipeSessionImpl s = ( VmPipeSessionImpl ) session;
-        synchronized( s.lock )
-        {
-            if( !s.getTrafficMask().isReadable() )
-            {
-                synchronized( s.pendingDataQueue )
-                {
-                    s.pendingDataQueue.push( message );
-                }
-            }
-            else
-            {
-                int byteCount = 1;
-                if( message instanceof ByteBuffer )
-                {
-                    byteCount = ( ( ByteBuffer ) message ).remaining();
-                }
-                
-                s.increaseReadBytes( byteCount );
-                
-                super.fireMessageReceived( s, message );
-            }
-        }
+        pushEvent( new Event( EventType.RECEIVED, message ) );
     }
 
     protected void doWrite( IoSession session, WriteRequest writeRequest )
@@ -79,7 +184,6 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                 }
                 else
                 {
-                
                     Object message = writeRequest.getMessage();
                     
                     int byteCount = 1;
@@ -99,9 +203,9 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                     s.increaseWrittenBytes( byteCount );
                     s.increaseWrittenMessages();
     
-                    s.getFilterChain().fireMessageSent( s, writeRequest );
                     s.getRemoteSession().getFilterChain()
-                                .fireMessageReceived( s.getRemoteSession(), messageCopy );
+                            .fireMessageReceived( s.getRemoteSession(), messageCopy );
+                    s.getFilterChain().fireMessageSent( s, writeRequest );
                 }
             }
             else 
@@ -124,4 +228,52 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
         }
     }
     
+    // FIXME Copied and pasted from {@link ExecutorFilter}.
+    private static class EventType
+    {
+        public static final EventType CREATED = new EventType( "CREATED" );
+        public static final EventType OPENED = new EventType( "OPENED" );
+        public static final EventType CLOSED = new EventType( "CLOSED" );
+        public static final EventType RECEIVED = new EventType( "RECEIVED" );
+        public static final EventType SENT = new EventType( "SENT" );
+        public static final EventType IDLE = new EventType( "IDLE" );
+        public static final EventType EXCEPTION = new EventType( "EXCEPTION" );
+        
+        public static final EventType WRITE = new EventType( "WRITE" );
+        public static final EventType CLOSE = new EventType( "CLOSE" );
+
+        private final String value;
+
+        private EventType( String value )
+        {
+            this.value = value;
+        }
+
+        public String toString()
+        {
+            return value;
+        }
+    }
+
+    private static class Event
+    {
+        private final EventType type;
+        private final Object data;
+
+        public Event( EventType type, Object data )
+        {
+            this.type = type;
+            this.data = data;
+        }
+
+        public Object getData()
+        {
+            return data;
+        }
+
+        public EventType getType()
+        {
+            return type;
+        }
+    }
 }
