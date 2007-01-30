@@ -93,7 +93,7 @@ public class IoServiceListenerSupport
         }
     }
     
-    public Set getManagedSessions()
+    public Set<IoSession> getManagedSessions()
     {
         synchronized( managedSessions )
         {

@@ -28,6 +28,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceListener;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 
@@ -112,7 +113,7 @@ public class DelegatedIoConnector implements IoConnector
         return delegate.getHandler();
     }
 
-    public Set getManagedSessions()
+    public Set<IoSession> getManagedSessions()
     {
         return delegate.getManagedSessions();
     }

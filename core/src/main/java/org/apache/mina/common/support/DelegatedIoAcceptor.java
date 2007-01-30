@@ -123,7 +123,7 @@ public class DelegatedIoAcceptor implements IoAcceptor
         return delegate.getHandler();
     }
 
-    public Set getManagedSessions()
+    public Set<IoSession> getManagedSessions()
     {
         return delegate.getManagedSessions();
     }

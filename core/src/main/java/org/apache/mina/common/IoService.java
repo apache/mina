@@ -67,7 +67,7 @@ public interface IoService
      * @throws UnsupportedOperationException if this operation isn't supported
      *         for the particular transport type implemented by this {@link IoService}.
      */
-    Set getManagedSessions();
+    Set<IoSession> getManagedSessions();
 
     /**
      * Returns the default configuration of the new {@link IoSession}s

@@ -26,6 +26,7 @@ import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListener;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 
 /**
@@ -99,7 +100,7 @@ public abstract class BaseIoService implements IoService
         getListeners().remove( listener );
     }
     
-    public Set getManagedSessions()
+    public Set<IoSession> getManagedSessions()
     {
         return getListeners().getManagedSessions();
     }
