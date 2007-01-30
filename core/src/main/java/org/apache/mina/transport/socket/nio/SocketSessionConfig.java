@@ -92,14 +92,22 @@ public interface SocketSessionConfig extends IoSessionConfig
     void setOobInline( boolean oobInline );
 
     /**
+     * Please note that enabling <tt>SO_LINGER</tt> in Java NIO can result
+     * in platform-dependent behavior and unexpected blocking of I/O thread.
+     * 
      * @see Socket#getSoLinger()
+     * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6179351">Sun Bug Database</a>
      */
     int getSoLinger();
 
     /**
+     * Please note that enabling <tt>SO_LINGER</tt> in Java NIO can result
+     * in platform-dependent behavior and unexpected blocking of I/O thread.
+     * 
      * @param soLinger Please specify a negative value to disable <tt>SO_LINGER</tt>.
      * 
      * @see Socket#setSoLinger(boolean, int)
+     * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6179351">Sun Bug Database</a>
      */
     void setSoLinger( int soLinger );
 
