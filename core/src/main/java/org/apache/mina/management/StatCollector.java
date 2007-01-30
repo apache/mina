@@ -66,7 +66,7 @@ public class StatCollector
     private final IoService service;
     private Worker worker;
     private int pollingInterval = 5000;
-    private List polledSessions;
+    private List<IoSession> polledSessions;
 
     // resume of session stats, for simplifying acces to the statistics 
     private long totalProcessedSessions = 0L;
@@ -131,15 +131,15 @@ public class StatCollector
     
             // add all current sessions
     
-            polledSessions = new ArrayList();
+            polledSessions = new ArrayList<IoSession>();
     
-            for ( Iterator iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
+            for ( Iterator<SocketAddress> iter = service.getManagedServiceAddresses().iterator(); iter.hasNext(); )
             {
-                SocketAddress element = ( SocketAddress ) iter.next();
+                SocketAddress element = iter.next();
     
-                for ( Iterator iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
+                for ( Iterator<IoSession> iter2 = service.getManagedSessions( element ).iterator(); iter2.hasNext(); )
                 {
-                    addSession( ( IoSession ) iter2.next() );
+                    addSession( iter2.next() );
     
                 }
             }
