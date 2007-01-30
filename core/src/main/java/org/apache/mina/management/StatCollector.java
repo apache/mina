@@ -202,37 +202,36 @@ public class StatCollector
 
     private void addSession( IoSession session )
     {
-    	synchronized (this) 
-    	{
-        	totalProcessedSessions += 1;
-        	polledSessions.add( session );
-        	IoSessionStat sessionStats = new IoSessionStat();
-        	sessionStats.lastPollingTime = System.currentTimeMillis();
+        synchronized (this) 
+        {
+            totalProcessedSessions += 1;
+            polledSessions.add( session );
+            IoSessionStat sessionStats = new IoSessionStat();
+            sessionStats.lastPollingTime = System.currentTimeMillis();
             session.setAttribute( KEY, sessionStats );
-		}
+        }
     }
 
     private void removeSession( IoSession session )
     {
-    	synchronized (this)
-    	{
-
-    		// remove the session from the list of polled sessions
-    		polledSessions.remove( session );
-
-    		// add the bytes processed between last polling and session closing
-    		// prevent non seen byte with non-connected protocols like HTTP and datagrams
-    		IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
-    		
-    		// computing with time between polling and closing
-        	bytesReadThroughput += ( (float) (session.getReadBytes() - sessStat.lastByteRead) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
-        	bytesWrittenThroughput += ( (float) (session.getWrittenBytes() - sessStat.lastByteWrite) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
-        	msgReadThroughput += ( (float) (session.getReadMessages() - sessStat.lastMessageRead) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
-        	msgWrittenThroughput += ( (float) (session.getWrittenMessages() - sessStat.lastMessageWrite) ) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
-        	        	        	
+        synchronized (this)
+        {
+            // remove the session from the list of polled sessions
+            polledSessions.remove( session );
+            
+            // add the bytes processed between last polling and session closing
+            // prevent non seen byte with non-connected protocols like HTTP and datagrams
+            IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
+            
+            // computing with time between polling and closing
+            bytesReadThroughput += (session.getReadBytes() - sessStat.lastByteRead) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+            bytesWrittenThroughput += (session.getWrittenBytes() - sessStat.lastByteWrite) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+            msgReadThroughput += (session.getReadMessages() - sessStat.lastMessageRead) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+            msgWrittenThroughput += (session.getWrittenMessages() - sessStat.lastMessageWrite) /  ( ( System.currentTimeMillis() - sessStat.lastPollingTime ) /1000f ) ;
+                        
             session.removeAttribute( KEY );
-			
-		}
+        
+        }
     }
 
 
@@ -242,34 +241,34 @@ public class StatCollector
      */
     public long getTotalProcessedSessions()
     {
-    	return totalProcessedSessions;
+        return totalProcessedSessions;
     }
     
-	public float getBytesReadThroughput()
-	{
-		return bytesReadThroughput;
-	}
+    public float getBytesReadThroughput()
+    {
+        return bytesReadThroughput;
+    }
+    
+    public float getBytesWrittenThroughput()
+    {
+        return bytesWrittenThroughput;
+    }
+    
+    public float getMsgReadThroughput()
+    {
+        return msgReadThroughput;
+    }
+    
+    public float getMsgWrittenThroughput() 
+    {
+        return msgWrittenThroughput;
+    }
+    
+    public long getSessionCount() 
+    {
+        return polledSessions.size();
+    }
 
-	public float getBytesWrittenThroughput()
-	{
-		return bytesWrittenThroughput;
-	}
-
-	public float getMsgReadThroughput()
-	{
-		return msgReadThroughput;
-	}
-
-	public float getMsgWrittenThroughput() 
-	{
-		return msgWrittenThroughput;
-	}
-	
-	public long getSessionCount() 
-	{
-		return polledSessions.size();
-	}
-	
     private class Worker extends Thread
     {
 
@@ -277,7 +276,7 @@ public class StatCollector
 
         private Worker()
         {
-            super( "StatCollectorWorker-"+id );
+            super( "StatCollectorWorker-" + id );
         }
 
         public void run()
@@ -311,8 +310,8 @@ public class StatCollector
                 
                 for ( Iterator iter = polledSessions.iterator(); iter.hasNext(); )
                 {
-                	
-                	// upadating individual session statistics
+                
+                    // upadating individual session statistics
                     IoSession session = ( IoSession ) iter.next();
                     IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
 
@@ -335,7 +334,7 @@ public class StatCollector
                     msgWrittenThroughput = tmpMsgWrittenThroughput;
                     msgReadThroughput = tmpMsgReadThroughput;
                     bytesWrittenThroughput = tmpBytesWrittenThroughput;
-                    bytesReadThroughput = tmpMsgWrittenThroughput;
+                    bytesReadThroughput = tmpBytesReadThroughput;
                     
                     sessStat.lastPollingTime = System.currentTimeMillis();
                 }
