@@ -34,6 +34,7 @@ import org.apache.mina.common.support.BaseIoConnectorConfig;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.DefaultConnectFuture;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
+import org.apache.mina.transport.vmpipe.support.VmPipeFilterChain;
 import org.apache.mina.transport.vmpipe.support.VmPipeIdleStatusChecker;
 import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
 import org.apache.mina.util.AnonymousSocketAddress;
@@ -138,6 +139,9 @@ public class VmPipeConnector extends BaseIoConnector
             ExceptionMonitor.getInstance().exceptionCaught( t );
             remoteSession.close();
         }
+        
+        ( ( VmPipeFilterChain ) localSession.getFilterChain() ).start();
+        ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).start();
 
         return future;
     }
