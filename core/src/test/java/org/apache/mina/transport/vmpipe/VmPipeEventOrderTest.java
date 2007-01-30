@@ -27,7 +27,6 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.LoggingFilter;
 
 /**
  * Makes sure if the order of event is correct.
