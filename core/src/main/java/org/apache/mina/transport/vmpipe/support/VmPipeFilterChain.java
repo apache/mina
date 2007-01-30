@@ -35,16 +35,26 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
 public class VmPipeFilterChain extends AbstractIoFilterChain {
 
     private final Queue eventQueue = new ConcurrentLinkedQueue();
+    private boolean flushEnabled;
     
     public VmPipeFilterChain( IoSession session )
     {
         super( session );
     }
     
+    public void start()
+    {
+        flushEnabled = true;
+        flushEvents();
+    }
+    
     private void pushEvent( Event e )
     {
         eventQueue.offer( e );
-        flushEvents();
+        if( flushEnabled )
+        {
+            flushEvents();
+        }
     }
     
     private void flushEvents()
