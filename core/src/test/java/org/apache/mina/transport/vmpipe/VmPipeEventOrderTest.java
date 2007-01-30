@@ -101,10 +101,10 @@ public class VmPipeEventOrderTest extends TestCase
     public void testClientToServer() throws Exception
     {
         IoAcceptor acceptor = new VmPipeAcceptor();
-        acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+        //acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
 
         IoConnector connector = new VmPipeConnector();
-        connector.getFilterChain().addLast( "logger", new LoggingFilter() );
+        //connector.getFilterChain().addLast( "logger", new LoggingFilter() );
         
         final StringBuffer actual = new StringBuffer();
         
