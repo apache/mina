@@ -47,7 +47,7 @@ public class IoSessionStat
     float messageReadThroughput = 0;
     
     // last time the session was polled
-    long lastPollingTime;
+    long lastPollingTime = System.currentTimeMillis();
     
     /**
      * Bytes read per second  
