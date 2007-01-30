@@ -189,11 +189,17 @@ public class VmPipeSessionImpl extends BaseIoSession
             {
                 if( aData instanceof WriteRequest )
                 {
+                    // TODO Optimize unefficient data transfer.
+                    // Data will be returned to pendingDataQueue
+                    // if getTraffic().isWritable() is false.
                     WriteRequest wr = ( WriteRequest ) aData;
                     filterChain.doWrite( this, wr );
                 }
                 else
                 {
+                    // TODO Optimize unefficient data transfer.
+                    // Data will be returned to pendingDataQueue
+                    // if getTraffic().isReadable() is false.
                     filterChain.fireMessageReceived( this, aData );
                 }
             }

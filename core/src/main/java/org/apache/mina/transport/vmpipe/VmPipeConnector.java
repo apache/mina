@@ -117,6 +117,7 @@ public class VmPipeConnector extends BaseIoConnector
         catch( Throwable t )
         {
             future.setException( t );
+            return future;
         }
 
         // initialize acceptor session
