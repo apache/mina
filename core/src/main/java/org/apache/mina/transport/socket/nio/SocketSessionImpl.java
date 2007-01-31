@@ -92,7 +92,6 @@ class SocketSessionImpl extends BaseIoSession
             this.config.setKeepAlive( cfg.isKeepAlive() );
             this.config.setOobInline( cfg.isOobInline() );
             this.config.setReceiveBufferSize( cfg.getReceiveBufferSize() );
-            this.readBufferSize = cfg.getReceiveBufferSize();
             this.config.setReuseAddress( cfg.isReuseAddress() );
             this.config.setSendBufferSize( cfg.getSendBufferSize() );
             this.config.setSoLinger( cfg.getSoLinger() );
@@ -427,6 +426,8 @@ class SocketSessionImpl extends BaseIoSession
                 try
                 {
                     ch.socket().setReceiveBufferSize( size );
+                    // Re-retrieve the effective receive buffer size.
+                    size = ch.socket().getReceiveBufferSize();
                     SocketSessionImpl.this.readBufferSize = size;
                 }
                 catch( SocketException e )

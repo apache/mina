@@ -92,7 +92,6 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
             DatagramSessionConfig cfg = ( DatagramSessionConfig ) sessionConfig;
             this.config.setBroadcast( cfg.isBroadcast() );
             this.config.setReceiveBufferSize( cfg.getReceiveBufferSize() );
-            this.readBufferSize = cfg.getReceiveBufferSize();
             this.config.setReuseAddress( cfg.isReuseAddress() );
             this.config.setSendBufferSize( cfg.getSendBufferSize() );
 
@@ -250,6 +249,8 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
                 try
                 {
                     ch.socket().setReceiveBufferSize( receiveBufferSize );
+                    // Re-retrieve the effective receive buffer size.
+                    receiveBufferSize = ch.socket().getReceiveBufferSize();
                     DatagramSessionImpl.this.readBufferSize = receiveBufferSize;
                 }
                 catch( SocketException e )
