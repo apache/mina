@@ -8,6 +8,12 @@
   </parent>
   <artifactId>mina-core</artifactId>
   <name>Apache MINA Core API</name>
+  <packaging>jar</packaging>
+  <!--
+    OSGi Bundle plugin has been disabled because it breaks the build
+    when building from an empty local m2 repository.
+  -->
+  <!--
   <packaging>bundle</packaging>
 
   <build>
@@ -24,6 +30,7 @@
   		</plugin>
   	</plugins>
   </build>
+  -->
   <dependencies>
 
     <dependency>
