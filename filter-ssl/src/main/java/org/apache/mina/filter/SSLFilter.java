@@ -316,10 +316,7 @@ public class SSLFilter extends IoFilterAdapter
         {
             throw new IllegalStateException( "A filter chain cannot contain more than one SSLFilter." );
         }
-    }
-    
-    public void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws SSLException
-    {
+
         IoSession session = parent.getSession();
         session.setAttribute( NEXT_FILTER, nextFilter );
         
@@ -327,7 +324,11 @@ public class SSLFilter extends IoFilterAdapter
         SSLHandler handler =
             new SSLHandler( this, sslContext, session );
         session.setAttribute( SSL_HANDLER, handler );
-        handler.handshake( nextFilter );
+    }
+    
+    public void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws SSLException
+    {
+        getSSLSessionHandler( parent.getSession() ).handshake( nextFilter );
     }
     
     public void onPreRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws SSLException
