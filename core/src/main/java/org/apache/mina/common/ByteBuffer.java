@@ -979,7 +979,9 @@ public abstract class ByteBuffer implements Comparable
         {
             while( remaining() >= 2 )
             {
-                if( ( get() == 0 ) && ( get() == 0 ) )
+            	boolean highZero = ( get() == 0 );
+            	boolean lowZero = ( get() == 0 );
+            	if( highZero && lowZero )
                 {
                     break;
                 }
@@ -1102,7 +1104,9 @@ public abstract class ByteBuffer implements Comparable
         {
             for( i = 0; i < fieldSize; i += 2 )
             {
-                if( ( get() == 0 ) && ( get() == 0 ) )
+            	boolean highZero = ( get() == 0 );
+            	boolean lowZero = ( get() == 0 );
+            	if( highZero && lowZero )
                 {
                     break;
                 }
