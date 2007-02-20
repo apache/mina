@@ -19,7 +19,7 @@
   			<extensions>true</extensions>
   			<configuration>
   				<instructions>
-  					<Export-Package>*</Export-Package>
+  					<Export-Package>org.apache.mina.*</Export-Package>
   				</instructions>
   			</configuration>
   		</plugin>
