@@ -116,6 +116,23 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
         session.setAttribute( KEY_OUT, out );
         processStreamIo( session, in, out );
     }
+
+    /**
+     * Closes streams
+     */
+    public void sessionClosed( IoSession session ) throws Exception
+    {
+        final InputStream in = ( InputStream ) session.getAttribute( KEY_IN );
+        final OutputStream out = ( OutputStream ) session.getAttribute( KEY_OUT );
+        try
+        {
+            in.close();
+        }
+        finally
+        {
+            out.close();
+        }
+    }
     
     /**
      * Forwards read data to input stream.
