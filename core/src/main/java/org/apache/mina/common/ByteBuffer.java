@@ -1035,7 +1035,13 @@ public abstract class ByteBuffer implements Comparable
                 continue;
             }
 
-            cr.throwException();
+            if( cr.isError() )
+            {
+            	// Revert the buffer back to the previous state.
+            	limit( oldLimit );
+            	position( oldPos );
+            	cr.throwException();
+            }
         }
 
         limit( oldLimit );
@@ -1159,7 +1165,13 @@ public abstract class ByteBuffer implements Comparable
                 continue;
             }
 
-            cr.throwException();
+            if( cr.isError() )
+            {
+            	// Revert the buffer back to the previous state.
+            	limit( oldLimit );
+            	position( oldPos );
+            	cr.throwException();
+            }
         }
 
         limit( oldLimit );
