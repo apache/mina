@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>build</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
   </parent>
   <artifactId>mina-filter-codec-netty</artifactId>
   <name>Apache MINA Netty Codec Filter</name>
