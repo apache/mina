@@ -85,18 +85,29 @@ public class ExecutorFilter extends IoFilterAdapter
         Event event = new Event( type, nextFilter, data );
         SessionBuffer buf = SessionBuffer.getSessionBuffer( session );
 
+        boolean execute;
         synchronized( buf.eventQueue )
         {
             buf.eventQueue.offer( event );
             if( buf.processingCompleted )
             {
                 buf.processingCompleted = false;
-                if ( logger.isDebugEnabled() ) {
-                    logger.debug( "Launching thread for " + session.getRemoteAddress() );
-                }
-
-                executor.execute( new ProcessEventsRunnable( buf ) );
+                execute = true;
             }
+            else
+            {
+            	execute = false;
+            }
+        }
+        
+        if( execute )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Launching thread for " + session.getRemoteAddress() );
+            }
+
+            executor.execute( new ProcessEventsRunnable( buf ) );
         }
     }
 
