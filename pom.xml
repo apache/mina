@@ -145,6 +145,7 @@ Use JDK 1.5 to make sure these modules build.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
+          <encoding>UTF-8</encoding>
           <source>1.4</source>
           <target>1.4</target>
           <debug>true</debug>
