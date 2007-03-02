@@ -524,7 +524,7 @@ public abstract class ByteBuffer implements Comparable
         buf.append( " cap=" );
         buf.append( capacity() );
         buf.append( ": " );
-        buf.append( getHexDump() );
+        buf.append( getHexDump( 16 ) );
         buf.append( ']' );
         return buf.toString();
     }
