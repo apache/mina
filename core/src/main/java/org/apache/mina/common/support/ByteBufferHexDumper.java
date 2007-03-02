@@ -54,9 +54,21 @@ public class ByteBufferHexDumper
         lowDigits = low;
     }
 
-    public static String getHexdump( ByteBuffer in )
+    public static String getHexdump( ByteBuffer in, int lengthLimit )
     {
-        int size = in.remaining();
+        if( lengthLimit == 0 )
+        {
+            throw new IllegalArgumentException(
+                    "lengthLimit: " + lengthLimit + " (expected: 1+)");
+        }
+
+        boolean truncate = in.remaining() > lengthLimit;
+        int size;
+        if (truncate) {
+            size = lengthLimit;
+        } else {
+            size = in.remaining();
+        }
 
         if( size == 0 )
         {
@@ -83,6 +95,10 @@ public class ByteBufferHexDumper
         }
 
         in.position( mark );
+        
+        if (truncate) {
+            out.append("...");
+        }
 
         return out.toString();
     }

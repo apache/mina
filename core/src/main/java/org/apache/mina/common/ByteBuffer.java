@@ -882,7 +882,17 @@ public abstract class ByteBuffer implements Comparable
      */
     public String getHexDump()
     {
-        return ByteBufferHexDumper.getHexdump( this );
+        return this.getHexDump(Integer.MAX_VALUE);
+    }
+    
+    /**
+     * Return hexdump of this buffer with limited length.
+     * 
+     * @param lengthLimit The maximum number of bytes to dump from 
+     *                    the current buffer position.
+     */
+    public String getHexDump(int lengthLimit) {
+        return ByteBufferHexDumper.getHexdump(this, lengthLimit);
     }
 
     ////////////////////////////////
