@@ -63,6 +63,7 @@ public class StatCollector
      */
     private static volatile int nextId = 0;
     private final int id = nextId ++;
+    private final Object calcLock = new Object();
     
     private final IoService service;
     private Worker worker;
@@ -164,6 +165,10 @@ public class StatCollector
     {
         synchronized (this) 
         {
+            if (worker == null) {
+                return;
+            }
+
             service.removeListener( serviceListener );
 
             // stop worker
@@ -186,6 +191,8 @@ public class StatCollector
                 session.removeAttribute(KEY);
             }
             polledSessions.clear();
+            
+            worker = null;
         }
     }
 
@@ -220,7 +227,7 @@ public class StatCollector
         
         // computing with time between polling and closing
         long currentTime = System.currentTimeMillis();
-        synchronized( this )
+        synchronized( calcLock )
         {
             bytesReadThroughput += (session.getReadBytes() - sessStat.lastByteRead) /  ( ( currentTime - sessStat.lastPollingTime ) /1000f ) ;
             bytesWrittenThroughput += (session.getWrittenBytes() - sessStat.lastByteWrite) /  ( ( currentTime - sessStat.lastPollingTime ) /1000f ) ;
@@ -328,7 +335,7 @@ public class StatCollector
                         / ( pollingInterval / 1000f );
                     tmpMsgWrittenThroughput += sessStat.messageWrittenThroughput;
 
-                    synchronized( StatCollector.this )
+                    synchronized( calcLock )
                     {
                         msgWrittenThroughput = tmpMsgWrittenThroughput;
                         msgReadThroughput = tmpMsgReadThroughput;
