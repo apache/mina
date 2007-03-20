@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common;
 
+import org.apache.mina.util.SessionLog;
 import org.apache.mina.util.SessionUtil;
 
 /**
@@ -50,6 +51,15 @@ public class IoHandlerAdapter implements IoHandler
 
     public void exceptionCaught( IoSession session, Throwable cause ) throws Exception
     {
+        if( SessionLog.isWarnEnabled( session ) )
+        {
+            SessionLog.warn(
+                    session,
+                    "EXCEPTION, please override " +
+                    IoHandlerAdapter.class.getSimpleName() +
+                    ".exceptionCaught() for proper handling:",
+                    cause );
+        }
     }
 
     public void messageReceived( IoSession session, Object message ) throws Exception
