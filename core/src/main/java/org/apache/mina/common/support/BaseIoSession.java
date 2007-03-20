@@ -181,7 +181,14 @@ public abstract class BaseIoSession implements IoSession
 
     public Object setAttribute( String key, Object value )
     {
-        return attributes.put( key, value );
+        if( value == null )
+        {
+            return removeAttribute( key );
+        }
+        else
+        {
+            return attributes.put( key, value );
+        }
     }
 
     public Object setAttribute( String key )
