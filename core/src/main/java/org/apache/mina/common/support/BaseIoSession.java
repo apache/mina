@@ -20,10 +20,10 @@
 package org.apache.mina.common.support;
 
 import java.net.SocketAddress;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
@@ -42,7 +42,8 @@ import org.apache.mina.common.IoFilter.WriteRequest;
  */
 public abstract class BaseIoSession implements IoSession
 {
-    private final Map<String, Object> attributes = new HashMap<String, Object>();
+    private final Object lock = new Object();
+    private final Map<String,Object> attributes = new ConcurrentHashMap<String, Object>( );
     private final long creationTime;
 
     /** 
@@ -89,9 +90,12 @@ public abstract class BaseIoSession implements IoSession
         return !closeFuture.isClosed();
     }
     
-    public synchronized boolean isClosing()
+    public boolean isClosing()
     {
-        return closing || closeFuture.isClosed();
+        synchronized( lock )
+        {
+            return closing || closeFuture.isClosed();
+        }
     }
     
     public CloseFuture getCloseFuture()
@@ -101,7 +105,7 @@ public abstract class BaseIoSession implements IoSession
     
     public CloseFuture close()
     {
-        synchronized( this )
+        synchronized( lock )
         {
             if( isClosing() )
             {
@@ -134,7 +138,7 @@ public abstract class BaseIoSession implements IoSession
     
     public WriteFuture write( Object message, SocketAddress remoteAddress )
     {
-        synchronized( this )
+        synchronized( lock )
         {
             if( isClosing() || !isConnected() )
             {
@@ -163,31 +167,26 @@ public abstract class BaseIoSession implements IoSession
     
     public Object getAttachment()
     {
-        synchronized( attributes )
-        {
-            return attributes.get( "" );
-        }
+        return attributes.get( "" );
     }
 
     public Object setAttachment( Object attachment )
     {
-        synchronized( attributes )
-        {
-            return attributes.put( "", attachment );
-        }
+        return attributes.put( "", attachment );
     }
 
     public Object getAttribute( String key )
     {
-        synchronized( attributes )
-        {
-            return attributes.get( key );
-        }
+        return attributes.get( key );
     }
 
     public Object setAttribute( String key, Object value )
     {
-        synchronized( attributes )
+        if( value == null )
+        {
+            return removeAttribute( key );
+        }
+        else
         {
             return attributes.put( key, value );
         }
@@ -200,10 +199,7 @@ public abstract class BaseIoSession implements IoSession
     
     public Object removeAttribute( String key )
     {
-        synchronized( attributes )
-        {
-            return attributes.remove( key );
-        }
+        return attributes.remove( key );
     }
     
     public boolean containsAttribute( String key )
@@ -213,10 +209,7 @@ public abstract class BaseIoSession implements IoSession
 
     public Set<String> getAttributeKeys()
     {
-        synchronized( attributes )
-        {
-            return new HashSet<String>( attributes.keySet() );
-        }
+        return new HashSet<String>( attributes.keySet() );
     }
     
     public int getIdleTime( IdleStatus status )
