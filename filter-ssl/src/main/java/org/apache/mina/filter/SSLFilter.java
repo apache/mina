@@ -187,7 +187,12 @@ public class SSLFilter extends IoFilterAdapter
      */
     public boolean isSSLStarted( IoSession session )
     {
-        SSLHandler handler = getSSLSessionHandler( session );
+        SSLHandler handler = getSSLSessionHandler0( session );
+        if( handler == null )
+        {
+            return false;
+        }
+
         synchronized( handler )
         {
             return !handler.isOutboundDone();
@@ -629,7 +634,7 @@ public class SSLFilter extends IoFilterAdapter
 
     private SSLHandler getSSLSessionHandler( IoSession session )
     {
-        SSLHandler handler = ( SSLHandler ) session.getAttribute( SSL_HANDLER );
+        SSLHandler handler = getSSLSessionHandler0( session );
         if( handler == null )
         {
             throw new IllegalStateException();
@@ -639,6 +644,11 @@ public class SSLFilter extends IoFilterAdapter
             throw new IllegalArgumentException( "Not managed by this filter." );
         }
         return handler;
+    }
+
+    private SSLHandler getSSLSessionHandler0( IoSession session )
+    {
+        return ( SSLHandler ) session.getAttribute( SSL_HANDLER );
     }
     
     /**
