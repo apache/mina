@@ -98,7 +98,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     /**
      * @see IoFilterChain#getAll()
      */
-    public List getAll()
+    public List<Entry> getAll()
     {
         return new ArrayList<Entry>( entries );
     }
@@ -106,9 +106,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     /**
      * @see IoFilterChain#getAllReversed()
      */
-    public List getAllReversed()
+    public List<Entry> getAllReversed()
     {
-        List result = getAll();
+        List<Entry> result = getAll();
         Collections.reverse( result );
         return result;
     }
