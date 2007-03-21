@@ -68,13 +68,7 @@ public class ServerHandler extends IoHandlerAdapter
 
         if( response != null )
         {
-            try
-            {
-                session.write( response ).join();
-            } catch( InterruptedException e )
-            {
-                throw new RuntimeIOException( e );
-            }
+            session.write( response ).join();
         }
     }
 

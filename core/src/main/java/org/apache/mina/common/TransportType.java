@@ -114,7 +114,7 @@ public final class TransportType implements Serializable
 
     private final transient boolean connectionless;
 
-    private final transient Class envelopeType;
+    private final transient Class<? extends Object> envelopeType;
 
     /**
      * Creates a new instance.  New transport type is automatically registered
@@ -139,7 +139,7 @@ public final class TransportType implements Serializable
      *
      * @throws IllegalArgumentException if <tt>names</tt> are already registered or empty
      */
-    public TransportType( String[] names, Class envelopeType, boolean connectionless )
+    public TransportType( String[] names, Class<? extends Object> envelopeType, boolean connectionless )
     {
         if( names == null )
         {
@@ -179,7 +179,7 @@ public final class TransportType implements Serializable
         return connectionless;
     }
 
-    public Class getEnvelopeType()
+    public Class<? extends Object> getEnvelopeType()
     {
         return envelopeType;
     }

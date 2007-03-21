@@ -107,13 +107,7 @@ public class ChatClientSupport
             {
                 session.write( "QUIT" );
                 // Wait until the chat ends.
-                try
-                {
-                    session.getCloseFuture().join();
-                } catch( InterruptedException e )
-                {
-                    throw new RuntimeIOException( e );
-                }
+                session.getCloseFuture().join();
             }
             session.close();
         }
