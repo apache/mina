@@ -36,14 +36,14 @@ public interface IoFuture
     /**
      * Wait for the asynchronous operation to end.
      */
-    void join() throws InterruptedException;
+    void join();
 
     /**
      * Wait for the asynchronous operation to end with the specified timeout.
      *
      * @return <tt>true</tt> if the operation is finished.
      */
-    boolean join( long timeoutInMillis ) throws InterruptedException;
+    boolean join( long timeoutInMillis );
 
     /**
      * Returns if the asynchronous operation is finished.

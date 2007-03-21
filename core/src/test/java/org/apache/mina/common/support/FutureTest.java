@@ -207,14 +207,7 @@ public class FutureTest extends TestCase
         @Override
         public void run()
         {
-            try
-            {
-                success = future.join( 10000 );
-            } catch( InterruptedException e )
-            {
-                // propagate
-                Thread.currentThread().interrupt();
-            }
+            success = future.join( 10000 );
         }
     }
 }

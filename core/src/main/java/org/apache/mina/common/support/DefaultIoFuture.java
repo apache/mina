@@ -59,14 +59,48 @@ public class DefaultIoFuture implements IoFuture
         return session;
     }
 
-    public void join() throws InterruptedException
+    public void join()
     {
-        completionLatch.await();
+        for( ;; )
+        {
+            try
+            {
+                completionLatch.await();
+            }
+            catch( InterruptedException e )
+            {
+            }
+        }
     }
 
-    public boolean join( long timeoutInMillis ) throws InterruptedException
+    public boolean join( long timeoutInMillis )
     {
-        return completionLatch.await( timeoutInMillis, TimeUnit.MILLISECONDS );
+        long startTime = ( timeoutInMillis <= 0 ) ? 0 : System
+                .currentTimeMillis();
+        long waitTime = timeoutInMillis;
+        
+        for( ;; )
+        {
+            boolean ready = false;
+            try
+            {
+                ready = completionLatch.await( waitTime, TimeUnit.MILLISECONDS );
+            }
+            catch( InterruptedException e )
+            {
+            }
+
+            if( ready )
+                return true;
+            else
+            {
+                waitTime = timeoutInMillis - ( System.currentTimeMillis() - startTime );
+                if( waitTime <= 0 )
+                {
+                    return ready;
+                }
+            }
+        }
     }
 
     public boolean isReady()

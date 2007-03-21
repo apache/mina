@@ -24,7 +24,6 @@ import java.io.OutputStream;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteFuture;
 
 /**
@@ -47,13 +46,7 @@ public class IoSessionOutputStream extends OutputStream
     @Override
     public void close()
     {
-        try
-        {
-            session.close().join();
-        } catch( InterruptedException e )
-        {
-            throw new RuntimeIOException( e );
-        }
+        session.close().join();
     }
 
     private void checkClosed() throws IOException
@@ -93,14 +86,7 @@ public class IoSessionOutputStream extends OutputStream
             return;
         }
 
-        try
-        {
-            lastWriteFuture.join();
-        } catch( InterruptedException e )
-        {
-            throw new RuntimeIOException( e );
-        }
-
+        lastWriteFuture.join();
         if( !lastWriteFuture.isWritten() )
         {
             throw new IOException( "The bytes could not be written to the session" );
