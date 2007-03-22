@@ -27,7 +27,6 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
-import org.apache.mina.util.CharsetUtil;
 
 /**
  * A {@link ProtocolEncoder} which encodes a string into a text line
@@ -46,12 +45,12 @@ public class TextLineEncoder extends ProtocolEncoderAdapter
 
     public TextLineEncoder()
     {
-        this( CharsetUtil.getDefaultCharset(), LineDelimiter.UNIX );
+        this( Charset.defaultCharset(), LineDelimiter.UNIX );
     }
     
     public TextLineEncoder( LineDelimiter delimiter )
     {
-        this( CharsetUtil.getDefaultCharset(), delimiter );
+        this( Charset.defaultCharset(), delimiter );
     }
     
     public TextLineEncoder( Charset charset )

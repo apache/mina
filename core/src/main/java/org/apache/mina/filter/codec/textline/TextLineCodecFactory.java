@@ -25,7 +25,6 @@ import org.apache.mina.common.BufferDataException;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.util.CharsetUtil;
 
 /**
  * A {@link ProtocolCodecFactory} that performs encoding and decoding between
@@ -45,7 +44,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
      */
     public TextLineCodecFactory()
     {
-        this( Charset.forName( CharsetUtil.getDefaultCharsetName() ) );
+        this( Charset.defaultCharset() );
     }
     
     /**
