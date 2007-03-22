@@ -83,7 +83,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         };
     }
     
-    public ProtocolCodecFilter( final Class encoderClass, final Class decoderClass )
+    public ProtocolCodecFilter(
+            final Class<? extends ProtocolEncoder> encoderClass,
+            final Class<? extends ProtocolDecoder> decoderClass )
     {
         if( encoderClass == null )
         {
@@ -122,12 +124,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         {
             public ProtocolEncoder getEncoder() throws Exception
             {
-                return ( ProtocolEncoder ) encoderClass.newInstance();
+                return encoderClass.newInstance();
             }
 
             public ProtocolDecoder getDecoder() throws Exception
             {
-                return ( ProtocolDecoder ) decoderClass.newInstance();
+                return decoderClass.newInstance();
             }
         };
     }

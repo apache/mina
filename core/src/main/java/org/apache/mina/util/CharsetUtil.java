@@ -37,7 +37,7 @@ public class CharsetUtil
         // Use reflection here to be able to compile mina with jdk 1.4.
         try
         {
-            Class charsetClass = Class.forName( "java.nio.charset.Charset" );
+            Class<?> charsetClass = Class.forName( "java.nio.charset.Charset" );
             Object charSet = charsetClass.getMethod( "defaultCharset", ( Class[] ) null ).invoke( null, ( Object[] ) null );
             return ( String ) charsetClass.getMethod( "name", ( Class[] ) null ).invoke( charSet, ( Object[] ) null );
         }
