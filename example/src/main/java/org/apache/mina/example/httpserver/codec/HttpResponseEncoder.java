@@ -20,18 +20,18 @@
 package org.apache.mina.example.httpserver.codec;
 
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
-import org.apache.mina.util.CharsetUtil;
 
 /**
  * A {@link MessageEncoder} that encodes {@link HttpResponseMessage}.
@@ -67,8 +67,7 @@ public class HttpResponseEncoder implements MessageEncoder
         try
         {
             // output all headers except the content length
-            CharsetEncoder encoder = CharsetUtil.getDefaultCharset()
-                    .newEncoder();
+            CharsetEncoder encoder = Charset.defaultCharset().newEncoder();
             buf.putString( "HTTP/1.1 ", encoder );
             buf.putString( String.valueOf( msg.getResponseCode() ), encoder );
             switch( msg.getResponseCode() )

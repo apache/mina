@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +32,9 @@ import java.util.Map;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.demux.MessageDecoder;
 import org.apache.mina.filter.codec.demux.MessageDecoderAdapter;
 import org.apache.mina.filter.codec.demux.MessageDecoderResult;
-import org.apache.mina.util.CharsetUtil;
 
 /**
  * A {@link MessageDecoder} that decodes {@link HttpRequest}.
@@ -46,8 +47,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
     private static final byte[] CONTENT_LENGTH = new String( "Content-Length:" )
             .getBytes();
 
-    private CharsetDecoder decoder = CharsetUtil.getDefaultCharset()
-            .newDecoder();
+    private CharsetDecoder decoder = Charset.defaultCharset().newDecoder();
 
     private HttpRequestMessage request = null;
 
