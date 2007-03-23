@@ -66,6 +66,7 @@ public class DefaultIoFuture implements IoFuture
             try
             {
                 completionLatch.await();
+                return;
             }
             catch( InterruptedException e )
             {
