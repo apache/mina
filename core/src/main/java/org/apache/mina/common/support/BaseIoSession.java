@@ -166,12 +166,12 @@ public abstract class BaseIoSession implements IoSession
 
     public Object getAttachment()
     {
-        return attributes.get( "" );
+        return getAttribute( "" );
     }
 
     public Object setAttachment( Object attachment )
     {
-        return attributes.put( "", attachment );
+        return setAttribute( "", attachment );
     }
 
     public Object getAttribute( String key )
