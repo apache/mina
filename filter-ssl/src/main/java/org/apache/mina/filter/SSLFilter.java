@@ -19,6 +19,8 @@
  */
 package org.apache.mina.filter;
 
+import java.net.InetSocketAddress;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
@@ -101,6 +103,21 @@ public class SSLFilter extends IoFilterAdapter
      * doesn't emit any events related with SSL session flow control.
      */
     public static final String USE_NOTIFICATION = SSLFilter.class.getName() + ".UseNotification";
+    
+    /**
+     * A session attribute key that should be set to an {@link InetSocketAddress}. 
+     * Setting this attribute causes  
+     * {@link SSLContext#createSSLEngine(String, int)} to be called passing the 
+     * hostname and port of the {@link InetSocketAddress} to get an 
+     * {@link SSLEngine} instance. If not set {@link SSLContext#createSSLEngine()}
+     * will be called.
+     * .
+     * Using this feature {@link SSLSession} objects may be cached and reused 
+     * when in client mode. 
+     * 
+     * @see SSLContext#createSSLEngine(String, int)
+     */
+    public static final String PEER_ADDRESS = SSLFilter.class.getName() + ".PeerAddress";
     
     /**
      * A special message object which is emitted with a {@link IoHandler#messageReceived(IoSession, Object)}

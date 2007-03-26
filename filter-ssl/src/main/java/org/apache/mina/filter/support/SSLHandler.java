@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filter.support;
 
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -111,7 +112,12 @@ public class SSLHandler
             return;
         }
 
-        sslEngine = ctx.createSSLEngine();
+        InetSocketAddress peer = (InetSocketAddress) session.getAttribute(SSLFilter.PEER_ADDRESS);
+        if (peer == null) {
+            sslEngine = ctx.createSSLEngine();
+        } else {
+            sslEngine = ctx.createSSLEngine(peer.getHostName(), peer.getPort());
+        } 
         sslEngine.setUseClientMode( parent.isUseClientMode() );
 
         if ( parent.isWantClientAuth() )
