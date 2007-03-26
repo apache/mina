@@ -67,7 +67,7 @@ public class SessionLog
     
     public static void debug( IoSession session, String message, Throwable cause )
     {
-    	debug( getLogger( session ), session, message, cause );
+        debug( getLogger( session ), session, message, cause );
     }
     
     public static void debug( Logger log, IoSession session, String message, Throwable cause )
@@ -80,7 +80,7 @@ public class SessionLog
 
     public static void info( IoSession session, String message )
     {
-    	info( getLogger( session ), session, message );
+        info( getLogger( session ), session, message );
     }
 
     public static void info( Logger log, IoSession session, String message )
@@ -93,7 +93,7 @@ public class SessionLog
     
     public static void info( IoSession session, String message, Throwable cause )
     {
-    	info( getLogger( session ), session, message, cause );
+        info( getLogger( session ), session, message, cause );
     }
 
     public static void info( Logger log, IoSession session, String message, Throwable cause )
@@ -106,7 +106,7 @@ public class SessionLog
     
     public static void warn( IoSession session, String message )
     {
-    	warn( getLogger( session ), session, message );
+        warn( getLogger( session ), session, message );
     }
     
     public static void warn( Logger log, IoSession session, String message )
@@ -119,7 +119,7 @@ public class SessionLog
 
     public static void warn( IoSession session, String message, Throwable cause )
     {
-    	warn( getLogger( session ), session, message, cause );
+        warn( getLogger( session ), session, message, cause );
     }
 
     public static void warn( Logger log, IoSession session, String message, Throwable cause )
@@ -132,7 +132,7 @@ public class SessionLog
     
     public static void error( IoSession session, String message )
     {
-    	error( getLogger( session ), session, message );
+        error( getLogger( session ), session, message );
     }
     
     public static void error( Logger log, IoSession session, String message )
@@ -145,7 +145,7 @@ public class SessionLog
 
     public static void error( IoSession session, String message, Throwable cause )
     {
-    	error( getLogger( session ), session, message, cause );
+        error( getLogger( session ), session, message, cause );
     }
     
     public static void error( Logger log, IoSession session, String message, Throwable cause )
@@ -189,7 +189,7 @@ public class SessionLog
     
     public static void setPrefix( IoSession session, String prefix )
     {
-    	session.setAttribute( PREFIX, prefix );
+        session.setAttribute( PREFIX, prefix );
     }
     
     public static Logger getLogger( IoSession session )
@@ -197,7 +197,7 @@ public class SessionLog
         Logger log = ( Logger ) session.getAttribute( LOGGER );
         if( log == null )
         {
-            log = LoggerFactory.getLogger( getClass( session ) );
+            log = LoggerFactory.getLogger( getClass( session ).getName() + "." + SessionLog.class.getSimpleName() );
             setLogger( session, log );
         }
         return log;
