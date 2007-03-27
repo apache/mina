@@ -398,7 +398,8 @@ class SocketIoProcessor
                 scheduleFlush( session );
                 break;
             }
-            // skip if channel is already closed
+
+            // Skip if the channel is already closed.
             if( !key.isValid() )
             {
                 continue;
@@ -474,10 +475,13 @@ class SocketIoProcessor
                 continue;
             }
 
-            int writtenBytes = ch.write( buf.buf() );
-            if( writtenBytes > 0 )
+            if( key.isWritable() )
             {
-                session.increaseWrittenBytes( writtenBytes );
+                int writtenBytes = ch.write( buf.buf() );
+                if( writtenBytes > 0 )
+                {
+                    session.increaseWrittenBytes( writtenBytes );
+                }
             }
 
             if( buf.hasRemaining() )
