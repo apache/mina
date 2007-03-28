@@ -44,6 +44,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter
     public static final String ENCODER = ProtocolCodecFilter.class.getName() + ".encoder";
     public static final String DECODER = ProtocolCodecFilter.class.getName() + ".decoder";
     
+    private static final String DECODER_LOCK = ProtocolCodecFilter.class.getName() + ".decoderLock";
+    
     private static final Class[] EMPTY_PARAMS = new Class[0];
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap( new byte[0] );
 
@@ -158,11 +160,15 @@ public class ProtocolCodecFilter extends IoFilterAdapter
 
         ByteBuffer in = ( ByteBuffer ) message;
         ProtocolDecoder decoder = getDecoder( session );
+        Object decoderLock = getDecoderLock( session );
         ProtocolDecoderOutput decoderOut = getDecoderOut( session, nextFilter );
         
         try
         {
-            decoder.decode( session, in, decoderOut );
+            synchronized( decoderLock )
+            {
+                decoder.decode( session, in, decoderOut );
+            }
         }
         catch( Throwable t )
         {
@@ -310,6 +316,18 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             session.setAttribute( DECODER, decoder );
         }
         return decoder;
+    }
+    
+    private Object getDecoderLock( IoSession session )
+    {
+        Object lock = session.getAttribute( DECODER_LOCK );
+        if( lock == null )
+        {
+            lock = new Object();
+            session.setAttribute( DECODER_LOCK, lock );
+        }
+
+        return lock;
     }
     
     private ProtocolDecoderOutput getDecoderOut( IoSession session, NextFilter nextFilter )

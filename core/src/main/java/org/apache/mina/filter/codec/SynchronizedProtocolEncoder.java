@@ -25,7 +25,9 @@ import org.apache.mina.common.IoSession;
  * A {@link ProtocolEncoder} implementation which decorates an existing encoder
  * to be thread-safe.  Please be careful if you're going to use this decorator
  * because it can be a root of performance degradation in a multi-thread
- * environment.
+ * environment.  Please use this decorator only when you need to synchronize
+ * on a per-encoder basis instead of on a per-session basis, which is not
+ * common.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
