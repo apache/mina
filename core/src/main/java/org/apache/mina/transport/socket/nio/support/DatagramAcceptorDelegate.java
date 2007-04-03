@@ -265,7 +265,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
     }
 
-    public IoServiceConfig getDefaultConfig()
+    public DatagramAcceptorConfig getDefaultConfig()
     {
         return defaultConfig;
     }
@@ -555,7 +555,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 }
                 else
                 {
-                    cfg = ( DatagramSessionConfig ) getDefaultConfig().getSessionConfig();
+                    cfg = getDefaultConfig().getSessionConfig();
                 }
 
                 ch.socket().setReuseAddress( cfg.isReuseAddress() );

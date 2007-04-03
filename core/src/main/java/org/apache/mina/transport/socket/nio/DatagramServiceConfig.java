@@ -30,6 +30,8 @@ import org.apache.mina.common.IoSessionRecycler;
  */
 public interface DatagramServiceConfig extends IoServiceConfig
 {
+    DatagramSessionConfig getSessionConfig();
+    
     /**
      * Returns the {@link IoSessionRecycler} for this service.
      */

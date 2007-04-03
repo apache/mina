@@ -120,7 +120,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             }
             else
             {
-                cfg = ( DatagramSessionConfig ) getDefaultConfig().getSessionConfig();
+                cfg = getDefaultConfig().getSessionConfig();
             }
 
             ch.socket().setReuseAddress( cfg.isReuseAddress() );
@@ -187,7 +187,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         return request;
     }
 
-    public IoServiceConfig getDefaultConfig()
+    public DatagramConnectorConfig getDefaultConfig()
     {
         return defaultConfig;
     }

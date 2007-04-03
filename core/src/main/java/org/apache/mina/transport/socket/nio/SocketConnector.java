@@ -219,7 +219,7 @@ public class SocketConnector extends BaseIoConnector
         return request;
     }
 
-    public IoServiceConfig getDefaultConfig()
+    public SocketConnectorConfig getDefaultConfig()
     {
         return defaultConfig;
     }

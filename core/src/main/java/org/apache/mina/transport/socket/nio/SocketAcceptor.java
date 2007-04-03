@@ -336,7 +336,7 @@ public class SocketAcceptor extends BaseIoAcceptor
         return ioProcessors[processorDistributor++ % processorCount];
     }
 
-    public IoServiceConfig getDefaultConfig()
+    public SocketAcceptorConfig getDefaultConfig()
     {
         return defaultConfig;
     }
@@ -387,7 +387,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                 }
                 else
                 {
-                    cfg = ( SocketAcceptorConfig ) getDefaultConfig();
+                    cfg = getDefaultConfig();
                 }
 
                 ssc.socket().setReuseAddress( cfg.isReuseAddress() );

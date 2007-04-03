@@ -19,11 +19,12 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.util.concurrent.Executor;
+
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.support.DelegatedIoConnector;
 import org.apache.mina.transport.socket.nio.support.DatagramConnectorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
-import java.util.concurrent.Executor;
 
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
@@ -49,6 +50,12 @@ public class DatagramConnector extends DelegatedIoConnector
     public DatagramConnector( Executor executor )
     {
         init( new DatagramConnectorDelegate( this, executor ) );
+    }
+
+    @Override
+    public DatagramConnectorConfig getDefaultConfig()
+    {
+        return ( DatagramConnectorConfig ) super.getDefaultConfig();
     }
 
     /**
