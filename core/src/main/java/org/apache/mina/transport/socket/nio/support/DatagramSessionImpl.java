@@ -235,7 +235,6 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         return readBufferSize;
     }
 
-    @SuppressWarnings({"CloneableClassWithoutClone"})
     private class SessionConfigImpl extends DatagramSessionConfigImpl implements DatagramSessionConfig
     {
         @Override

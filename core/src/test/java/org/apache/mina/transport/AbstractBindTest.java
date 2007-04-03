@@ -127,7 +127,7 @@ public abstract class AbstractBindTest extends TestCase
         acceptor.bind( createSocketAddress( 0 ), new IoHandlerAdapter() );
         Assert.assertEquals( 1, acceptor.getManagedServiceAddresses().size() );
         SocketAddress address =
-                ( SocketAddress ) acceptor.getManagedServiceAddresses().iterator().next();
+                acceptor.getManagedServiceAddresses().iterator().next();
         Assert.assertTrue( getPort( address ) != 0 );
         acceptor.unbind( address );
     }

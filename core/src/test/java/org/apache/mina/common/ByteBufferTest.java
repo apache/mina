@@ -567,7 +567,7 @@ public class ByteBufferTest extends TestCase
     {
         ByteBuffer buf = ByteBuffer.allocate( 16 );
         buf.setAutoExpand( true );
-        List o = new ArrayList();
+        List<Object> o = new ArrayList<Object>();
         o.add( new Date() );
 
         // Test writing an object.

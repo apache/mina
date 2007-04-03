@@ -78,7 +78,7 @@ public class StreamWriteFilter extends IoFilterAdapter
         // If we're already processing a stream we need to queue the WriteRequest.
         if( session.getAttribute( CURRENT_STREAM ) != null )
         {
-            Queue<WriteRequest> queue = ( Queue<WriteRequest> ) session.getAttribute( WRITE_REQUEST_QUEUE );
+            Queue<WriteRequest> queue = getWriteRequestQueue( session );
             if( queue == null )
             {
                 queue = new ConcurrentLinkedQueue<WriteRequest>( );
@@ -115,6 +115,11 @@ public class StreamWriteFilter extends IoFilterAdapter
         {
             nextFilter.filterWrite( session, writeRequest );
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Queue<WriteRequest> getWriteRequestQueue(IoSession session) {
+        return ( Queue<WriteRequest> ) session.getAttribute( WRITE_REQUEST_QUEUE );
     }
 
     @Override

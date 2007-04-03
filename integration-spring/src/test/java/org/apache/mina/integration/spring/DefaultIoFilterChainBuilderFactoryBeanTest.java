@@ -73,6 +73,7 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
         mockChain.verify();
     }
     
+    @SuppressWarnings("unchecked")
     public void testIllegalObjectsInFilterList() throws Exception
     {
         LinkedList mappings = new LinkedList();
@@ -90,6 +91,7 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
         }
     }
     
+    @SuppressWarnings("unchecked")
     public void testNamedAndUnnamedFilters() throws Exception
     {
         LinkedList mappings = new LinkedList();

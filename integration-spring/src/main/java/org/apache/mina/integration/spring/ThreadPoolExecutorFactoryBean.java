@@ -122,14 +122,14 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
 
     protected Object createInstance() throws Exception
     {
-        BlockingQueue queue = null;
+        BlockingQueue<Runnable> queue = null;
         if( queueCapacity > 0 )
         {
-            queue = new LinkedBlockingQueue( queueCapacity );
+            queue = new LinkedBlockingQueue<Runnable>( queueCapacity );
         }
         else
         {
-            queue = new SynchronousQueue();
+            queue = new SynchronousQueue<Runnable>();
         }
         return new ThreadPoolExecutor(
                 corePoolSize, maxPoolSize, keepAliveSeconds, TimeUnit.SECONDS,

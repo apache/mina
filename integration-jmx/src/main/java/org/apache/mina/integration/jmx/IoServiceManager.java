@@ -25,7 +25,6 @@ import java.util.Iterator;
 
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.management.IoSessionStat;
 import org.apache.mina.management.StatCollector;
 
 
@@ -107,25 +106,25 @@ public class IoServiceManager implements IoServiceManagerMBean
 
     public float getAverageByteReadThroughput()
     {
-        return collector.getBytesReadThroughput() / (float) collector.getSessionCount();
+        return collector.getBytesReadThroughput() / collector.getSessionCount();
     }
 
 
     public float getAverageByteWrittenThroughput()
     {
-        return collector.getBytesWrittenThroughput() / (float) collector.getSessionCount();    
+        return collector.getBytesWrittenThroughput() / collector.getSessionCount();    
     }
 
 
     public float getAverageMessageReadThroughput()
     {
-        return collector.getMsgReadThroughput() / (float) collector.getSessionCount();
+        return collector.getMsgReadThroughput() / collector.getSessionCount();
     }
 
 
     public float getAverageMessageWrittenThroughput()
     {
-        return collector.getMsgWrittenThroughput() / (float) collector.getSessionCount();    
+        return collector.getMsgWrittenThroughput() / collector.getSessionCount();    
     }
 
 

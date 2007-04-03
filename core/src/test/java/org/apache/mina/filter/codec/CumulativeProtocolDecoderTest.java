@@ -100,7 +100,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
         Assert.assertEquals( 4, output.getValues().size() );
         Assert.assertEquals( buf.limit(), buf.position() );
         
-        List expected = new ArrayList();
+        List<Integer> expected = new ArrayList<Integer>();
         for( int i = 0; i < 4; i ++ )
         {
             expected.add( new Integer( i ) );
@@ -142,7 +142,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
     
     private static class IntegerDecoderOutput implements ProtocolDecoderOutput
     {
-        private List values = new ArrayList();
+        private List<Object> values = new ArrayList<Object>();
 
         public void write( Object message )
         {

@@ -98,7 +98,6 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
         this.threadModel = threadModel;
     }
 
-    @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException"})
     @Override
     public Object clone()
     {

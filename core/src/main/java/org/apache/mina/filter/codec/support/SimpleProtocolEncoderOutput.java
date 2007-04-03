@@ -90,7 +90,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
 
     public WriteFuture flush()
     {
-        Queue bufferQueue = this.bufferQueue;
+        Queue<ByteBuffer> bufferQueue = this.bufferQueue;
         WriteFuture future = null;
         if( bufferQueue.isEmpty() )
         {
@@ -100,7 +100,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         {
             for( ;; )
             {
-                ByteBuffer buf = ( ByteBuffer ) bufferQueue.poll();
+                ByteBuffer buf = bufferQueue.poll();
                 if( buf == null )
                 {
                     break;

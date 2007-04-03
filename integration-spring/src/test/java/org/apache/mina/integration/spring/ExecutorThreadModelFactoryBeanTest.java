@@ -38,7 +38,7 @@ public class ExecutorThreadModelFactoryBeanTest extends TestCase
 {
     public void testSuccessfulCreationWithExecutor() throws Exception
     {
-        Executor executor = new ThreadPoolExecutor( 1, 10, 3600, TimeUnit.SECONDS, new SynchronousQueue() );
+        Executor executor = new ThreadPoolExecutor( 1, 10, 3600, TimeUnit.SECONDS, new SynchronousQueue<Runnable>() );
         ExecutorThreadModelFactoryBean factory = new  ExecutorThreadModelFactoryBean();
         factory.setServiceName( "foo" );
         factory.setExecutor( executor );

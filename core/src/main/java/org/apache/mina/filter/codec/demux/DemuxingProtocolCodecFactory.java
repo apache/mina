@@ -71,7 +71,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
     {
     }
     
-    public void register( Class encoderOrDecoderClass )
+    public void register( Class<?> encoderOrDecoderClass )
     {
         if( encoderOrDecoderClass == null )
         {

@@ -46,6 +46,7 @@ public class DemuxingIoHandlerTest extends TestCase
     
     Object[] msg;
 
+    @SuppressWarnings("unchecked")
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -78,6 +79,7 @@ public class DemuxingIoHandlerTest extends TestCase
         session = ( IoSession ) MockControl.createControl( IoSession.class ).getMock();    
     }
 
+    @SuppressWarnings("unchecked")
     public void testFindHandlerByClass() throws Exception
     {
         /*
@@ -136,6 +138,7 @@ public class DemuxingIoHandlerTest extends TestCase
         mockHandler3.verify();        
     }
     
+    @SuppressWarnings("unchecked")
     public void testFindHandlerByInterface() throws Exception
     {
         /*

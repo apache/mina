@@ -84,6 +84,5 @@ public interface IoServiceConfig extends Cloneable
     /**
      * Returns a deep clone of this configuration.
      */
-    @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException", "override"})
     Object clone();
 }

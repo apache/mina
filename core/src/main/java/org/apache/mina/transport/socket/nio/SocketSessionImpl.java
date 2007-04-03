@@ -227,7 +227,6 @@ class SocketSessionImpl extends BaseIoSession
         return readBufferSize;
     }
 
-    @SuppressWarnings( {"CloneableClassWithoutClone"} )
     private class SessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
     {
         public boolean isKeepAlive()
