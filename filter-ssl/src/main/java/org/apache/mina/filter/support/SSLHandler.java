@@ -34,8 +34,11 @@ import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.SSLFilter;
-import org.apache.mina.util.Queue;
 import org.apache.mina.util.SessionLog;
+
+import edu.emory.mathcs.backport.java.util.LinkedList;
+import edu.emory.mathcs.backport.java.util.Queue;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A helper class using the SSLEngine API to decrypt/encrypt data.
@@ -53,7 +56,8 @@ public class SSLHandler
     private final SSLFilter parent;
     private final SSLContext ctx;
     private final IoSession session;
-    private final Queue scheduledWrites = new Queue();
+    private final Queue preHandshakeEventQueue = new LinkedList();
+    private final Queue postHandshakeEventQueue = new ConcurrentLinkedQueue();
 
     private SSLEngine sslEngine;
 
@@ -193,7 +197,8 @@ public class SSLHandler
         SSLByteBufferPool.release( appBuffer );
         SSLByteBufferPool.release( inNetBuffer );
         SSLByteBufferPool.release( outNetBuffer );
-        scheduledWrites.clear();
+        preHandshakeEventQueue.clear();
+        //postHandshakeEventQueue.clear();
     }
 
     public SSLFilter getParent()
@@ -240,22 +245,55 @@ public class SSLHandler
         return ( initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone() );
     }
     
-    public void scheduleWrite( NextFilter nextFilter, WriteRequest writeRequest )
+    public void schedulePreHandshakeWriteRequest( NextFilter nextFilter, WriteRequest writeRequest )
     {
-        scheduledWrites.push( new ScheduledWrite( nextFilter, writeRequest ) );
+        preHandshakeEventQueue.offer( new Event( EventType.FILTER_WRITE, nextFilter, writeRequest ) );
     }
     
-    public void flushScheduledWrites() throws SSLException
+    public void flushPreHandshakeEvents() throws SSLException
     {
-        ScheduledWrite scheduledWrite;
+        Event scheduledWrite;
         
-        while( ( scheduledWrite = ( ScheduledWrite ) scheduledWrites.pop() ) != null )
+        while( ( scheduledWrite = ( Event ) preHandshakeEventQueue.poll() ) != null )
         {
             if( SessionLog.isDebugEnabled( session ) )
             {
-                SessionLog.debug( session, " Flushing buffered write request: " + scheduledWrite.writeRequest );
+                SessionLog.debug( session, " Flushing buffered write request: " + scheduledWrite.data );
             }
-            parent.filterWrite( scheduledWrite.nextFilter, session, scheduledWrite.writeRequest );
+            parent.filterWrite( scheduledWrite.nextFilter, session, ( WriteRequest ) scheduledWrite.data );
+        }
+    }
+    
+    public void schedulePostHandshakeWriteRequest( NextFilter nextFilter, WriteRequest writeRequest )
+    {
+        postHandshakeEventQueue.offer( new Event( EventType.FILTER_WRITE, nextFilter, writeRequest ) );
+    }
+    
+    public void schedulePostHandshakeMessage( NextFilter nextFilter, Object message )
+    {
+        postHandshakeEventQueue.offer( new Event( EventType.RECEIVED, nextFilter, message ) );
+    }
+
+    public void flushPostHandshakeEvents()
+    {
+        // Fire events only when no lock is hold for this handler.
+        if( Thread.holdsLock( this ) )
+        {
+            return;
+        }
+        
+        Event e;
+        
+        while( ( e = ( Event ) postHandshakeEventQueue.poll() ) != null )
+        {
+            if( EventType.RECEIVED == e.type )
+            {
+                e.nextFilter.messageReceived( session, e.data );
+            }
+            else
+            {
+                e.nextFilter.filterWrite( session, ( WriteRequest ) e.data );
+            }
         }
     }
 
@@ -472,7 +510,7 @@ public class SSLHandler
                 initialHandshakeComplete = true;
                 if( session.containsAttribute( SSLFilter.USE_NOTIFICATION ) )
                 {
-                    nextFilter.messageReceived( session, SSLFilter.SESSION_SECURED );
+                    schedulePostHandshakeMessage( nextFilter, SSLFilter.SESSION_SECURED );
                 }
                 break;
             }
@@ -754,18 +792,6 @@ public class SSLHandler
         return sslEngine.getHandshakeStatus();
     }
 
-    private static class ScheduledWrite
-    {
-        private final NextFilter nextFilter;
-        private final WriteRequest writeRequest;
-        
-        public ScheduledWrite( NextFilter nextFilter, WriteRequest writeRequest )
-        {
-            this.nextFilter = nextFilter;
-            this.writeRequest = writeRequest;
-        }
-    }
-    
     /**
      * Creates a new Mina byte buffer that is a deep copy of the remaining bytes
      * in the given buffer (between index buf.position() and buf.limit())
@@ -779,5 +805,52 @@ public class SSLHandler
         copy.put( src );
         copy.flip();
         return copy;
+    }
+
+    private static class EventType
+    {
+        public static final EventType RECEIVED = new EventType( "RECEIVED" );
+        public static final EventType FILTER_WRITE = new EventType( "FILTER_WRITE" );
+
+        private final String value;
+
+        private EventType( String value )
+        {
+            this.value = value;
+        }
+
+        public String toString()
+        {
+            return value;
+        }
+    }
+
+    private static class Event
+    {
+        private final EventType type;
+        private final NextFilter nextFilter;
+        private final Object data;
+
+        Event( EventType type, NextFilter nextFilter, Object data )
+        {
+            this.type = type;
+            this.nextFilter = nextFilter;
+            this.data = data;
+        }
+
+        public Object getData()
+        {
+            return data;
+        }
+
+        public NextFilter getNextFilter()
+        {
+            return nextFilter;
+        }
+
+        public EventType getType()
+        {
+            return type;
+        }
     }
 }
