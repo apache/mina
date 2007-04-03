@@ -52,6 +52,10 @@ public class VmPipeAcceptor extends BaseIoAcceptor
     public TransportType getTransportType() {
         return TransportType.VM_PIPE;
     }
+    
+    public VmPipeSessionConfig getSessionConfig() {
+        return (VmPipeSessionConfig) super.getSessionConfig();
+    }
 
     protected void doBind() throws IOException
     {

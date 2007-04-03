@@ -29,12 +29,13 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.IoServiceListenerSupport;
+import org.apache.mina.transport.vmpipe.DefaultVmPipeSessionConfig;
+import org.apache.mina.transport.vmpipe.VmPipeSession;
+import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
 
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
@@ -42,11 +43,9 @@ import org.apache.mina.common.support.IoServiceListenerSupport;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeSessionImpl extends BaseIoSession
+public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
 {
-    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig()
-    {
-    };
+    private static final VmPipeSessionConfig CONFIG = new DefaultVmPipeSessionConfig();
 
     private final IoService service;
     private final IoServiceListenerSupport serviceListeners;
@@ -105,7 +104,7 @@ public class VmPipeSessionImpl extends BaseIoSession
         return serviceListeners;
     }
 
-    public IoSessionConfig getConfig()
+    public VmPipeSessionConfig getConfig()
     {
         return CONFIG;
     }

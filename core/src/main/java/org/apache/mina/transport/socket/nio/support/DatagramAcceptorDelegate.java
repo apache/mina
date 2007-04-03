@@ -20,6 +20,7 @@
 package org.apache.mina.transport.socket.nio.support;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -105,7 +106,15 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     public TransportType getTransportType() {
         return TransportType.DATAGRAM;
     }
-
+    
+    public DatagramSessionConfig getSessionConfig() {
+        return (DatagramSessionConfig) super.getSessionConfig();
+    }
+    
+    public InetSocketAddress getLocalAddress() {
+        return (InetSocketAddress) super.getLocalAddress();
+    }
+    
     protected void doBind() throws IOException
     {
         RegistrationRequest request = new RegistrationRequest();
@@ -202,7 +211,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
             // If a new session needs to be created.
             DatagramSessionImpl datagramSession = new DatagramSessionImpl(
-                    wrapper, this, ch, getHandler(), remoteAddress );
+                    wrapper, this, ch, getHandler(), (InetSocketAddress) remoteAddress );
             datagramSession.setSelectionKey( key );
             
             getSessionRecycler().put( datagramSession );
@@ -371,7 +380,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     private void readSession( DatagramChannel channel ) throws Exception
     {
         ByteBuffer readBuf = ByteBuffer.allocate(
-                ( ( DatagramSessionConfig ) getSessionConfig() ).getReceiveBufferSize() );
+                getSessionConfig().getReceiveBufferSize() );
 
         SocketAddress remoteAddress = channel.receive( readBuf.buf() );
         if( remoteAddress != null )
@@ -499,7 +508,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             try
             {
                 ch = DatagramChannel.open();
-                DatagramSessionConfig cfg = ( DatagramSessionConfig ) getSessionConfig();
+                DatagramSessionConfig cfg = getSessionConfig();
                 ch.socket().setReuseAddress( cfg.isReuseAddress() );
                 ch.socket().setBroadcast( cfg.isBroadcast() );
                 ch.socket().setReceiveBufferSize( cfg.getReceiveBufferSize() );

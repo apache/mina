@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.support.DelegatedIoConnector;
+import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
 import org.apache.mina.transport.socket.nio.support.DatagramConnectorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
 
@@ -50,5 +51,9 @@ public class DatagramConnector extends DelegatedIoConnector
     public DatagramConnector( Executor executor )
     {
         init( new DatagramConnectorDelegate( this, executor ) );
+    }
+
+    public DatagramSessionConfig getSessionConfig() {
+        return ( ( DatagramAcceptorDelegate ) delegate ).getSessionConfig();
     }
 }

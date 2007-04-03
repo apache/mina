@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -44,7 +44,7 @@ import org.apache.mina.common.support.BaseIoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class SocketSessionImpl extends BaseIoSession
+class SocketSessionImpl extends BaseIoSession implements SocketSession
 {
     private final IoService service;
     private final SocketSessionConfig config = new SessionConfigImpl();
@@ -94,7 +94,7 @@ class SocketSessionImpl extends BaseIoSession
         return service;
     }
     
-    public IoSessionConfig getConfig()
+    public SocketSessionConfig getConfig()
     {
         return config;
     }
@@ -174,14 +174,18 @@ class SocketSessionImpl extends BaseIoSession
         return TransportType.SOCKET;
     }
 
-    public SocketAddress getRemoteAddress()
+    public InetSocketAddress getRemoteAddress()
     {
-        return ch.socket().getRemoteSocketAddress();
+        return (InetSocketAddress) ch.socket().getRemoteSocketAddress();
     }
 
-    public SocketAddress getLocalAddress()
+    public InetSocketAddress getLocalAddress()
     {
-        return ch.socket().getLocalSocketAddress();
+        return (InetSocketAddress) ch.socket().getLocalSocketAddress();
+    }
+    
+    public InetSocketAddress getServiceAddress() {
+        return (InetSocketAddress) super.getServiceAddress();
     }
 
     protected void updateTrafficMask()

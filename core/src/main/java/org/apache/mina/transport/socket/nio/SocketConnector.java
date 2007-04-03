@@ -126,6 +126,10 @@ public class SocketConnector extends BaseIoConnector
     public TransportType getTransportType() {
         return TransportType.SOCKET;
     }
+    
+    public SocketSessionConfig getSessionConfig() {
+        return (SocketSessionConfig) super.getSessionConfig();
+    }
 
     /**
      * How many seconds to keep the connection thread alive between connection requests

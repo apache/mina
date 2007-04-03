@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.IoAcceptor;
@@ -52,7 +53,15 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
     {
         init( new DatagramAcceptorDelegate( this, executor ) );
     }
+    
+    public DatagramSessionConfig getSessionConfig() {
+        return ( ( DatagramAcceptorDelegate ) delegate ).getSessionConfig();
+    }
 
+    public InetSocketAddress getLocalAddress() {
+        return ( ( DatagramAcceptorDelegate ) delegate ).getLocalAddress();
+    }
+    
     /**
      * Returns the {@link IoSessionRecycler} for this service.
      */

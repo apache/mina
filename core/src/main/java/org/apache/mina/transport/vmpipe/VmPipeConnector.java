@@ -57,6 +57,10 @@ public class VmPipeConnector extends BaseIoConnector
     public TransportType getTransportType() {
         return TransportType.VM_PIPE;
     }
+    
+    public VmPipeSessionConfig getSessionConfig() {
+        return (VmPipeSessionConfig) super.getSessionConfig();
+    }
 
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
@@ -86,7 +90,7 @@ public class VmPipeConnector extends BaseIoConnector
             // The following sentences don't throw any exceptions.
             localSession.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, future );
             getListeners().fireSessionCreated( localSession );
-            VmPipeIdleStatusChecker.getInstance().addSession( localSession);
+            VmPipeIdleStatusChecker.getInstance().addSession( localSession );
         }
         catch( Throwable t )
         {

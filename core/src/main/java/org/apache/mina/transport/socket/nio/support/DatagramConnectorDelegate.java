@@ -101,6 +101,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     public TransportType getTransportType() {
         return TransportType.DATAGRAM;
     }
+    
+    public DatagramSessionConfig getSessionConfig() {
+        return (DatagramSessionConfig) super.getSessionConfig();
+    }
 
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
@@ -109,7 +113,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         try
         {
             ch = DatagramChannel.open();
-            DatagramSessionConfig cfg = ( DatagramSessionConfig ) getSessionConfig();
+            DatagramSessionConfig cfg = getSessionConfig();
             
             ch.socket().setReuseAddress( cfg.isReuseAddress() );
             ch.socket().setBroadcast( cfg.isBroadcast() );

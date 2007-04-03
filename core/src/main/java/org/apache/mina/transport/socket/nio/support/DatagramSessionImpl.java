@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.socket.nio.support;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
@@ -26,7 +27,6 @@ import java.nio.channels.SelectionKey;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.apache.mina.common.BroadcastIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
@@ -40,6 +40,7 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.transport.socket.nio.DatagramSession;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
 
@@ -49,7 +50,7 @@ import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
+class DatagramSessionImpl extends BaseIoSession implements DatagramSession
 {
     private final IoService service;
     private final DatagramSessionConfig config = new SessionConfigImpl();
@@ -58,8 +59,8 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     private final DatagramChannel ch;
     private final Queue<WriteRequest> writeRequestQueue = new LinkedList<WriteRequest>();
     private final IoHandler handler;
-    private final SocketAddress localAddress;
-    private final SocketAddress remoteAddress;
+    private final InetSocketAddress localAddress;
+    private final InetSocketAddress remoteAddress;
     private SelectionKey key;
     private int readBufferSize;
 
@@ -69,7 +70,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
     DatagramSessionImpl( IoAcceptor service,
                          DatagramService managerDelegate,
                          DatagramChannel ch, IoHandler defaultHandler,
-                         SocketAddress remoteAddress )
+                         InetSocketAddress remoteAddress )
     {
         this.service = service;
         this.managerDelegate = managerDelegate;
@@ -80,7 +81,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         // We didn't set the localAddress by calling getLocalSocketAddress() to avoid
         // the case that getLocalSocketAddress() returns IPv6 address while
         // serviceAddress represents the same address in IPv4.
-        this.localAddress = service.getLocalAddress();
+        this.localAddress = (InetSocketAddress) service.getLocalAddress();
 
         applySettings();
     }
@@ -96,8 +97,8 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         this.managerDelegate = managerDelegate;
         this.ch = ch;
         this.handler = defaultHandler;
-        this.remoteAddress = ch.socket().getRemoteSocketAddress();
-        this.localAddress = ch.socket().getLocalSocketAddress();
+        this.remoteAddress = (InetSocketAddress) ch.socket().getRemoteSocketAddress();
+        this.localAddress = (InetSocketAddress) ch.socket().getLocalSocketAddress();
 
         applySettings();
     }
@@ -125,7 +126,7 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         return service;
     }
 
-    public IoSessionConfig getConfig()
+    public DatagramSessionConfig getConfig()
     {
         return config;
     }
@@ -219,14 +220,19 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         return TransportType.DATAGRAM;
     }
 
-    public SocketAddress getRemoteAddress()
+    public InetSocketAddress getRemoteAddress()
     {
         return remoteAddress;
     }
 
-    public SocketAddress getLocalAddress()
+    public InetSocketAddress getLocalAddress()
     {
         return localAddress;
+    }
+    
+    public InetSocketAddress getServiceAddress()
+    {
+        return (InetSocketAddress) super.getServiceAddress();
     }
 
     protected void updateTrafficMask()

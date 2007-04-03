@@ -20,6 +20,7 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
@@ -157,6 +158,15 @@ public class SocketAcceptor extends BaseIoAcceptor
 
     public TransportType getTransportType() {
         return TransportType.SOCKET;
+    }
+    
+    public SocketSessionConfig getSessionConfig() {
+        return (SocketSessionConfig) super.getSessionConfig();
+    }
+    
+    @Override
+    public InetSocketAddress getLocalAddress() {
+        return (InetSocketAddress) super.getLocalAddress();
     }
 
     /**
@@ -419,7 +429,7 @@ public class SocketAcceptor extends BaseIoAcceptor
                 // Configure the server socket,
                 ssc.socket().setReuseAddress( isReuseAddress() );
                 ssc.socket().setReceiveBufferSize(
-                    ( ( SocketSessionConfig ) getSessionConfig() ).getReceiveBufferSize() );
+                    getSessionConfig().getReceiveBufferSize() );
 
                 // and bind.
                 ssc.socket().bind( getLocalAddress(), getBacklog() );
