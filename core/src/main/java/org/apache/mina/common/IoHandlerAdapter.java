@@ -55,8 +55,8 @@ public class IoHandlerAdapter implements IoHandler
         {
             SessionLog.warn(
                     session,
-                    "EXCEPTION, please override " +
-                    IoHandlerAdapter.class.getName() +
+                    "EXCEPTION, please implement " +
+                    getClass().getName() +
                     ".exceptionCaught() for proper handling:",
                     cause );
         }
