@@ -22,10 +22,10 @@ package org.apache.mina.util;
 /**
  * A listener for expired object events.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * TODO Make this a inner interface of ExpiringMap
  */
-public interface ExpirationListener
+public interface ExpirationListener<E>
 {
-    void expired(Object expiredObject);
+    void expired(E expiredObject);
 }

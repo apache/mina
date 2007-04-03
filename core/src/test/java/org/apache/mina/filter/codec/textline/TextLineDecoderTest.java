@@ -330,7 +330,7 @@ public class TextLineDecoderTest extends TestCase
             messageQueue.offer( message );
         }
         
-        public Queue getMessageQueue()
+        public Queue<Object> getMessageQueue()
         {
             return messageQueue;
         }

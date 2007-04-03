@@ -236,13 +236,13 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
-    private void processSessions( Set keys )
+    private void processSessions( Set<SelectionKey> keys )
     {
-        Iterator it = keys.iterator();
+        Iterator<SelectionKey> it = keys.iterator();
 
         while( it.hasNext() )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
+            SelectionKey key = it.next();
 
             if( !key.isConnectable() )
                 continue;
@@ -281,14 +281,14 @@ public class SocketConnector extends BaseIoConnector
         keys.clear();
     }
 
-    private void processTimedOutSessions( Set keys )
+    private void processTimedOutSessions( Set<SelectionKey> keys )
     {
         long currentTime = System.currentTimeMillis();
-        Iterator it = keys.iterator();
+        Iterator<SelectionKey> it = keys.iterator();
 
         while( it.hasNext() )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
+            SelectionKey key = it.next();
 
             if( !key.isValid() )
                 continue;

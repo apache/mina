@@ -60,7 +60,7 @@ public class AvailablePortFinder
      *
      * WARNING: this can take a very long time.
      */
-    public static Set getAvailablePorts()
+    public static Set<Integer> getAvailablePorts()
     {
         return getAvailablePorts(MIN_PORT_NUMBER, MAX_PORT_NUMBER);
     }

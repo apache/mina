@@ -335,12 +335,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
 
-    private void processReadySessions( Set keys )
+    private void processReadySessions( Set<SelectionKey> keys )
     {
-        Iterator it = keys.iterator();
+        Iterator<SelectionKey> it = keys.iterator();
         while( it.hasNext() )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
+            SelectionKey key = it.next();
             it.remove();
 
             DatagramChannel ch = ( DatagramChannel ) key.channel();
@@ -413,14 +413,14 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     {
         DatagramChannel ch = session.getChannel();
 
-        Queue writeRequestQueue = session.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
         WriteRequest req;
         for( ;; )
         {
             synchronized( writeRequestQueue )
             {
-                req = ( WriteRequest ) writeRequestQueue.peek();
+                req = writeRequestQueue.peek();
             }
 
             if( req == null )

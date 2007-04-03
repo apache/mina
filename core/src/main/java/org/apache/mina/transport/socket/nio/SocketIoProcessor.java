@@ -234,13 +234,13 @@ class SocketIoProcessor
         }
     }
 
-    private void process( Set selectedKeys )
+    private void process( Set<SelectionKey> selectedKeys )
     {
-        Iterator it = selectedKeys.iterator();
+        Iterator<SelectionKey> it = selectedKeys.iterator();
 
         while( it.hasNext() )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
+            SelectionKey key = it.next();
             SocketSessionImpl session = ( SocketSessionImpl ) key.attachment();
 
             if( key.isReadable() && session.getTrafficMask().isReadable() )
@@ -308,12 +308,12 @@ class SocketIoProcessor
         if( ( currentTime - lastIdleCheckTime ) >= 1000 )
         {
             lastIdleCheckTime = currentTime;
-            Set keys = selector.keys();
+            Set<SelectionKey> keys = selector.keys();
             if( keys != null )
             {
-                for( Iterator it = keys.iterator(); it.hasNext(); )
+                for( Iterator<SelectionKey> it = keys.iterator(); it.hasNext(); )
                 {
-                    SelectionKey key = ( SelectionKey ) it.next();
+                    SelectionKey key = it.next();
                     SocketSessionImpl session = ( SocketSessionImpl ) key.attachment();
                     notifyIdleness( session, currentTime );
                 }
@@ -417,10 +417,10 @@ class SocketIoProcessor
 
     private void clearWriteRequestQueue( SocketSessionImpl session )
     {
-        Queue writeRequestQueue = session.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
 
-        while( ( req = ( WriteRequest ) writeRequestQueue.poll() ) != null )
+        while( ( req = writeRequestQueue.poll() ) != null )
         {
             req.getFuture().setWritten( false );
         }
@@ -433,7 +433,7 @@ class SocketIoProcessor
         key.interestOps( key.interestOps() & ( ~SelectionKey.OP_WRITE ) );
 
         SocketChannel ch = session.getChannel();
-        Queue writeRequestQueue = session.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
         for( ; ; )
         {
@@ -441,7 +441,7 @@ class SocketIoProcessor
 
             synchronized( writeRequestQueue )
             {
-                req = ( WriteRequest ) writeRequestQueue.peek();
+                req = writeRequestQueue.peek();
             }
 
             if( req == null )
@@ -509,7 +509,7 @@ class SocketIoProcessor
             // The normal is OP_READ and, if there are write requests in the
             // session's write queue, set OP_WRITE to trigger flushing.
             int ops = SelectionKey.OP_READ;
-            Queue writeRequestQueue = session.getWriteRequestQueue();
+            Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
             synchronized( writeRequestQueue )
             {
                 if( !writeRequestQueue.isEmpty() )

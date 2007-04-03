@@ -66,7 +66,7 @@ public class ObjectSerializationTest extends TestCase
         encoder.encode( session, expected, out );
         
         Assert.assertEquals( 1, out.getBufferQueue().size() );
-        ByteBuffer buf = ( ByteBuffer ) out.getBufferQueue().poll();
+        ByteBuffer buf = out.getBufferQueue().poll();
         
         testDecoderAndInputStream( expected, buf );
     }

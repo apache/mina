@@ -71,14 +71,13 @@ public class StreamWriteFilter extends IoFilterAdapter
 
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
     
-    @SuppressWarnings("unchecked")
     public void filterWrite( NextFilter nextFilter, IoSession session, 
                             WriteRequest writeRequest ) throws Exception 
     {
         // If we're already processing a stream we need to queue the WriteRequest.
         if( session.getAttribute( CURRENT_STREAM ) != null )
         {
-            Queue<WriteRequest> queue = ( Queue<WriteRequest> ) session.getAttribute( WRITE_REQUEST_QUEUE );
+            Queue<WriteRequest> queue = getWriteRequestQueue( session );
             if( queue == null )
             {
                 queue = new LinkedList<WriteRequest>();
@@ -117,6 +116,11 @@ public class StreamWriteFilter extends IoFilterAdapter
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private Queue<WriteRequest> getWriteRequestQueue(IoSession session) {
+        return ( Queue<WriteRequest> ) session.getAttribute( WRITE_REQUEST_QUEUE );
+    }
+
     public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
     {
         InputStream inputStream = ( InputStream ) session.getAttribute( CURRENT_STREAM );
@@ -136,14 +140,14 @@ public class StreamWriteFilter extends IoFilterAdapter
                 WriteFuture writeFuture = ( WriteFuture ) session.removeAttribute( INITIAL_WRITE_FUTURE );
                 
                 // Write queued WriteRequests.
-                Queue queue = ( Queue ) session.removeAttribute( WRITE_REQUEST_QUEUE );
+                Queue<? extends WriteRequest> queue = ( Queue<? extends WriteRequest> ) session.removeAttribute( WRITE_REQUEST_QUEUE );
                 if( queue != null )
                 {
-                    WriteRequest wr = ( WriteRequest ) queue.poll();
+                    WriteRequest wr = queue.poll();
                     while( wr != null )
                     {
                         filterWrite( nextFilter, session, wr );
-                        wr = ( WriteRequest ) queue.poll();
+                        wr = queue.poll();
                     }
                 }
                 

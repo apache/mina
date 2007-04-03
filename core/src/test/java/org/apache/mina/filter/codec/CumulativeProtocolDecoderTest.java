@@ -148,7 +148,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
             values.add( message );
         }
         
-        public List getValues()
+        public List<Object> getValues()
         {
             return values;
         }

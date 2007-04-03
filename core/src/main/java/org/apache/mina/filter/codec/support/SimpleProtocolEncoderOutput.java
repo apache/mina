@@ -40,7 +40,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
     {
     }
     
-    public Queue getBufferQueue()
+    public Queue<ByteBuffer> getBufferQueue()
     {
         return bufferQueue;
     }
@@ -89,7 +89,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
     
     public WriteFuture flush()
     {
-        Queue bufferQueue = this.bufferQueue;
+        Queue<ByteBuffer> bufferQueue = this.bufferQueue;
         WriteFuture future = null;
         if( bufferQueue.isEmpty() )
         {
@@ -99,7 +99,7 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         {
             for( ;; )
             {
-                ByteBuffer buf = ( ByteBuffer ) bufferQueue.poll();
+                ByteBuffer buf = bufferQueue.poll();
                 if( buf == null )
                 {
                     break;

@@ -260,7 +260,7 @@ public class IoServiceListenerSupport
         }
 
         final Object lock = new Object();
-        Set sessionsCopy;
+        Set<IoSession> sessionsCopy;
         synchronized( managedSessions )
         {
             sessionsCopy = new IdentityHashSet<IoSession>( managedSessions );

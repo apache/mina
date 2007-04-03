@@ -27,16 +27,16 @@ import org.apache.mina.common.IoSession;
  * handler with the type of message you want to get notified using
  * {@link DemuxingIoHandler#addMessageHandler(Class, MessageHandler)}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface MessageHandler
+public interface MessageHandler<E>
 {
     /**
      * A {@link MessageHandler} that does nothing.  This is usefule when
      * you want to ignore messages of the specific type silently.
      */
-    static MessageHandler NOOP = new MessageHandler()
+    static MessageHandler<Object> NOOP = new MessageHandler<Object>()
     {
         public void messageReceived( IoSession session, Object message )
         {
@@ -47,5 +47,5 @@ public interface MessageHandler
      * Invoked when the specific type of message is received from the
      * specified <code>session</code>.
      */
-    void messageReceived( IoSession session, Object message ) throws Exception;
+    void messageReceived( IoSession session, E message ) throws Exception;
 }

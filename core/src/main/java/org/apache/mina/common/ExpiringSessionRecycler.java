@@ -36,7 +36,7 @@ import org.apache.mina.util.ExpiringMap;
  */
 public class ExpiringSessionRecycler implements IoSessionRecycler
 {
-    private ExpiringMap sessionMap;
+    private ExpiringMap<Object, IoSession> sessionMap;
     
     private ExpiringMap.Expirer mapExpirer;
     
@@ -52,7 +52,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler
     
     public ExpiringSessionRecycler( int timeToLive, int expirationInterval )
     {
-        sessionMap = new ExpiringMap( timeToLive, expirationInterval );
+        sessionMap = new ExpiringMap<Object, IoSession>( timeToLive, expirationInterval );
         mapExpirer = sessionMap.getExpirer();
         sessionMap.addExpirationListener( new DefaultExpirationListener() );
     }
@@ -71,7 +71,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler
 
     public IoSession recycle( SocketAddress localAddress, SocketAddress remoteAddress )
     {
-        return ( IoSession ) sessionMap.get( generateKey( localAddress, remoteAddress ) );
+        return sessionMap.get( generateKey( localAddress, remoteAddress ) );
     }
 
     public void remove( IoSession session )
@@ -117,12 +117,10 @@ public class ExpiringSessionRecycler implements IoSessionRecycler
         return key;
     }
     
-    private class DefaultExpirationListener implements ExpirationListener
+    private class DefaultExpirationListener implements ExpirationListener<IoSession>
     {
-        public void expired( Object expiredObject )
+        public void expired( IoSession expiredSession )
         {
-            IoSession expiredSession = ( IoSession ) expiredObject;
-            
             expiredSession.close();
         }
     }

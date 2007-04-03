@@ -256,7 +256,7 @@ public class StreamWriteFilterTest extends TestCase {
     {
         StreamWriteFilter filter = new StreamWriteFilter();
         
-        Queue queue = new LinkedList();
+        Queue<WriteRequest> queue = new LinkedList<WriteRequest>();
         InputStream stream = new ByteArrayInputStream( new byte[ 5 ] );
         
         /*

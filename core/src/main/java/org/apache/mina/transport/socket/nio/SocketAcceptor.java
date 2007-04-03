@@ -347,12 +347,12 @@ public class SocketAcceptor extends BaseIoAcceptor
             }
         }
 
-        private void processSessions( Set keys ) throws IOException
+        private void processSessions( Set<SelectionKey> keys ) throws IOException
         {
-            Iterator it = keys.iterator();
+            Iterator<SelectionKey> it = keys.iterator();
             while( it.hasNext() )
             {
-                SelectionKey key = ( SelectionKey ) it.next();
+                SelectionKey key = it.next();
 
                 it.remove();
 

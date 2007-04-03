@@ -27,6 +27,7 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoFilterChain.Entry;
 import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
@@ -105,13 +106,13 @@ public class ReadThrottleFilterBuilder
         builder.addAfter( name, getClass().getName() + ".release", new Release() );
     }
 
-    private String getThreadPoolFilterEntryName( List entries )
+    private String getThreadPoolFilterEntryName( List<Entry> entries )
     {
-        Iterator i = entries.iterator();
+        Iterator<Entry> i = entries.iterator();
 
         while( i.hasNext() )
         {
-            IoFilterChain.Entry entry = ( IoFilterChain.Entry ) i.next();
+            Entry entry = i.next();
 
             if( entry.getFilter().getClass().isAssignableFrom( ExecutorFilter.class ) )
             {

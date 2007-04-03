@@ -74,7 +74,7 @@ public class SocketBindTest extends AbstractBindTest
         // Wait for the server side sessions to be created.
         Thread.sleep( 500 );
         
-        Collection managedSessions = acceptor.getManagedSessions();
+        Collection<IoSession> managedSessions = acceptor.getManagedSessions();
         Assert.assertEquals( 5, managedSessions.size() );
         
         acceptor.unbind();

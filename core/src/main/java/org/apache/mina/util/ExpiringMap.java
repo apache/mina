@@ -6,21 +6,20 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.util;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,10 +29,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A map with expiration.
- * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ *
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  */
-public class ExpiringMap implements Map
+public class ExpiringMap<K, V> implements Map<K, V>
 {
     public static final int DEFAULT_TIME_TO_LIVE = 60;
 
@@ -41,7 +40,7 @@ public class ExpiringMap implements Map
 
     private static volatile int expirerCount = 1;
 
-    private final ConcurrentHashMap<Object, ExpiringObject> delegate;
+    private final ConcurrentHashMap<K, ExpiringObject> delegate;
 
     private final CopyOnWriteArrayList<ExpirationListener> expirationListeners;
 
@@ -59,11 +58,11 @@ public class ExpiringMap implements Map
 
     public ExpiringMap( int timeToLive, int expirationInterval )
     {
-        this( new ConcurrentHashMap<Object, ExpiringObject>(), new CopyOnWriteArrayList<ExpirationListener>(), timeToLive, expirationInterval );
+        this( new ConcurrentHashMap<K, ExpiringObject>(), new CopyOnWriteArrayList<ExpirationListener>(), timeToLive, expirationInterval );
     }
 
     private ExpiringMap(
-            ConcurrentHashMap<Object, ExpiringObject> delegate, CopyOnWriteArrayList<ExpirationListener> expirationListeners,
+            ConcurrentHashMap<K, ExpiringObject> delegate, CopyOnWriteArrayList<ExpirationListener> expirationListeners,
             int timeToLive, int expirationInterval )
     {
         this.delegate = delegate;
@@ -74,29 +73,41 @@ public class ExpiringMap implements Map
         expirer.setExpirationInterval( expirationInterval );
     }
 
-    public Object put( Object key, Object value )
+    public V put( K key, V value )
     {
-        return delegate.put( key, new ExpiringObject( key, value, System.currentTimeMillis() ) );
+        ExpiringObject answer = delegate.put(
+                key, new ExpiringObject( key, value, System.currentTimeMillis() ) );
+        if( answer == null )
+        {
+            return null;
+        }
+        
+        return answer.getValue();
     }
 
-    public Object get( Object key )
+    public V get( Object key )
     {
-        Object object = delegate.get( key );
+        ExpiringObject object = delegate.get( key );
 
         if( object != null )
         {
-            ExpiringObject expObject = ( ExpiringObject ) object;
-            expObject.setLastAccessTime( System.currentTimeMillis() );
+            object.setLastAccessTime( System.currentTimeMillis() );
 
-            return expObject.getValue();
+            return object.getValue();
         }
 
-        return object;
+        return null;
     }
 
-    public Object remove( Object key )
+    public V remove( Object key )
     {
-        return delegate.remove( key );
+        ExpiringObject answer = delegate.remove( key );
+        if( answer == null )
+        {
+            return null;
+        }
+        
+        return answer.getValue();
     }
 
     public boolean containsKey( Object key )
@@ -124,60 +135,51 @@ public class ExpiringMap implements Map
         delegate.clear();
     }
 
-    public int hashCode()
+    @Override
+        public int hashCode()
     {
         return delegate.hashCode();
     }
 
-    public Set keySet()
+    public Set<K> keySet()
     {
         return delegate.keySet();
     }
 
+    @Override
     public boolean equals( Object obj )
     {
         return delegate.equals( obj );
     }
 
-    public void putAll( Map inMap )
+    public void putAll( Map<? extends K, ? extends V> inMap )
     {
-        synchronized( inMap )
+        for( Entry<? extends K, ? extends V> e: inMap.entrySet() )
         {
-            Iterator inMapKeysIt = inMap.keySet().iterator();
-
-            while( inMapKeysIt.hasNext() )
-            {
-                Object key = inMapKeysIt.next();
-                Object value = inMap.get( key );
-
-                if( value instanceof ExpiringObject )
-                {
-                    delegate.put( key, ( ExpiringObject ) value );
-                }
-            }
+            this.put( e.getKey(), e.getValue() );
         }
     }
 
-    public Collection values()
+    public Collection<V> values()
     {
-        return delegate.values();
+        throw new UnsupportedOperationException();
     }
 
-    public Set entrySet()
+    public Set<Map.Entry<K, V>> entrySet()
     {
-        return delegate.entrySet();
+        throw new UnsupportedOperationException();
     }
 
-    public void addExpirationListener( ExpirationListener listener )
+    public void addExpirationListener( ExpirationListener<? extends V> listener )
     {
         expirationListeners.add( listener );
     }
 
-    public void removeExpirationListener( ExpirationListener listener )
+    public void removeExpirationListener( ExpirationListener<? extends V> listener )
     {
         expirationListeners.remove( listener );
     }
-    
+
     public Expirer getExpirer()
     {
         return expirer;
@@ -205,15 +207,15 @@ public class ExpiringMap implements Map
 
     private class ExpiringObject
     {
-        private Object key;
+        private K key;
 
-        private Object value;
+        private V value;
 
         private long lastAccessTime;
 
         private ReadWriteLock lastAccessTimeLock = new ReentrantReadWriteLock();
 
-        public ExpiringObject( Object key, Object value, long lastAccessTime )
+        ExpiringObject( K key, V value, long lastAccessTime )
         {
             if( value == null )
             {
@@ -253,21 +255,23 @@ public class ExpiringMap implements Map
             }
         }
 
-        public Object getKey()
+        public K getKey()
         {
             return key;
         }
 
-        public Object getValue()
+        public V getValue()
         {
             return value;
         }
 
+        @Override
         public boolean equals( Object obj )
         {
             return value.equals( obj );
         }
 
+        @Override
         public int hashCode()
         {
             return value.hashCode();
@@ -312,28 +316,18 @@ public class ExpiringMap implements Map
         {
             long timeNow = System.currentTimeMillis();
 
-            Iterator expiringObjectsIterator = delegate.values().iterator();
+            for (ExpiringObject o : delegate.values()) {
 
-            while( expiringObjectsIterator.hasNext() )
-            {
-                ExpiringObject expObject = ( ExpiringObject ) expiringObjectsIterator.next();
-
-                if( timeToLiveMillis <= 0 )
+                if (timeToLiveMillis <= 0)
                     continue;
 
-                long timeIdle = timeNow - expObject.getLastAccessTime();
+                long timeIdle = timeNow - o.getLastAccessTime();
 
-                if( timeIdle >= timeToLiveMillis )
-                {
-                    delegate.remove( expObject.getKey() );
+                if (timeIdle >= timeToLiveMillis) {
+                    delegate.remove(o.getKey());
 
-                    Iterator listenerIterator = expirationListeners.iterator();
-
-                    while( listenerIterator.hasNext() )
-                    {
-                        ExpirationListener listener = ( ExpirationListener ) listenerIterator.next();
-
-                        listener.expired( expObject.getValue() );
+                    for (ExpirationListener<V> listener : expirationListeners) {
+                        listener.expired(o.getValue());
                     }
                 }
             }

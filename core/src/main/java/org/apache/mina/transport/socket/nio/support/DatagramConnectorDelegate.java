@@ -231,7 +231,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             // The normal is OP_READ and, if there are write requests in the
             // session's write queue, set OP_WRITE to trigger flushing.
             int ops = SelectionKey.OP_READ;
-            Queue writeRequestQueue = session.getWriteRequestQueue();
+            Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
             synchronized( writeRequestQueue )
             {
                 if( !writeRequestQueue.isEmpty() )
@@ -299,12 +299,12 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
     }
 
-    private void processReadySessions( Set keys )
+    private void processReadySessions( Set<SelectionKey> keys )
     {
-        Iterator it = keys.iterator();
+        Iterator<SelectionKey> it = keys.iterator();
         while( it.hasNext() )
         {
-            SelectionKey key = ( SelectionKey ) it.next();
+            SelectionKey key = it.next();
             it.remove();
 
             DatagramSessionImpl session = ( DatagramSessionImpl ) key.attachment();
@@ -368,14 +368,14 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
     {
         DatagramChannel ch = session.getChannel();
 
-        Queue writeRequestQueue = session.getWriteRequestQueue();
+        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
         WriteRequest req;
         for( ;; )
         {
             synchronized( writeRequestQueue )
             {
-                req = ( WriteRequest ) writeRequestQueue.peek();
+                req = writeRequestQueue.peek();
             }
 
             if( req == null )

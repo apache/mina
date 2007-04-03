@@ -229,7 +229,7 @@ public class IoHandlerChain implements IoHandlerCommand
         entry.getCommand().execute( entry.getNextCommand(), session, message );
     }
     
-    public List getAll()
+    public List<Entry> getAll()
     {
         List<Entry> list = new ArrayList<Entry>();
         Entry e = head.nextEntry;
@@ -242,7 +242,7 @@ public class IoHandlerChain implements IoHandlerCommand
         return list;
     }
 
-    public List getAllReversed()
+    public List<Entry> getAllReversed()
     {
         List<Entry> list = new ArrayList<Entry>();
         Entry e = tail.prevEntry;
