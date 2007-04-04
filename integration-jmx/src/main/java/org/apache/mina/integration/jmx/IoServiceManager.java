@@ -47,19 +47,19 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     
     public IoServiceManager( IoService service , int milliSecondsPolling, boolean autoStartCollecting)
     {
-    	this.autoStartCollecting = autoStartCollecting;
+        this.autoStartCollecting = autoStartCollecting;
         this.service = service;
         this.milliSecondsPolling = milliSecondsPolling;
     }
 
     public IoServiceManager( IoService service, int milliSecondsPolling ) 
     {
-    	this( service, milliSecondsPolling, false );
+        this( service, milliSecondsPolling, false );
     }
 
     public IoServiceManager( IoService service ) 
     {
-    	this( service, 5000, false );
+        this( service, 5000, false );
     }
 
 
@@ -82,12 +82,12 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
     
     public int getStatsPollingInterval()
     {
-    	return milliSecondsPolling;
+        return milliSecondsPolling;
     }
     
     public void setStatsPollingInterval( int millisecondsPolling ) 
     {
-    	this.milliSecondsPolling = millisecondsPolling;
+        this.milliSecondsPolling = millisecondsPolling;
     }
 
     public void stopCollectingStats()
@@ -99,25 +99,25 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
 
     public float getTotalByteReadThroughput()
     {
-    	return collector.getBytesReadThroughput();
+        return collector.getBytesReadThroughput();
     }
 
 
     public float getTotalByteWrittenThroughput()
     {
-    	return collector.getBytesWrittenThroughput();
+        return collector.getBytesWrittenThroughput();
     }
 
 
     public float getTotalMessageReadThroughput()
     {
-    	return collector.getMsgReadThroughput();
+        return collector.getMsgReadThroughput();
     }
 
 
     public float getTotalMessageWrittenThroughput()
     {
-    	return collector.getMsgWrittenThroughput();
+        return collector.getMsgWrittenThroughput();
     }
 
 
