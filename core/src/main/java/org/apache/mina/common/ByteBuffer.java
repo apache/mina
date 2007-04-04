@@ -1031,10 +1031,10 @@ public abstract class ByteBuffer implements Comparable
 
             if( cr.isError() )
             {
-            	// Revert the buffer back to the previous state.
-            	limit( oldLimit );
-            	position( oldPos );
-            	cr.throwException();
+                // Revert the buffer back to the previous state.
+                limit( oldLimit );
+                position( oldPos );
+                cr.throwException();
             }
         }
 
@@ -1158,10 +1158,10 @@ public abstract class ByteBuffer implements Comparable
 
             if( cr.isError() )
             {
-            	// Revert the buffer back to the previous state.
-            	limit( oldLimit );
-            	position( oldPos );
-            	cr.throwException();
+                // Revert the buffer back to the previous state.
+                limit( oldLimit );
+                position( oldPos );
+                cr.throwException();
             }
         }
 

@@ -247,33 +247,33 @@ public class ByteBufferTest extends TestCase
     
     public void testGetStringWithFailure() throws Exception
     {
-		String test = "\u30b3\u30e1\u30f3\u30c8\u7de8\u96c6";
-		ByteBuffer buffer = ByteBuffer.wrap( test.getBytes( "Shift_JIS" ) );
-		
-		// Make sure the limit doesn't change when an exception arose.
-		int oldLimit = buffer.limit();
-		int oldPos = buffer.position();
-		try
-		{
-			buffer.getString( 3, Charset.forName( "ASCII" ).newDecoder() );
-			Assert.fail();
-		}
-		catch( Exception e )
-		{
-			Assert.assertEquals( oldLimit, buffer.limit() );
-			Assert.assertEquals( oldPos, buffer.position() );
-		}
+        String test = "\u30b3\u30e1\u30f3\u30c8\u7de8\u96c6";
+        ByteBuffer buffer = ByteBuffer.wrap( test.getBytes( "Shift_JIS" ) );
+        
+        // Make sure the limit doesn't change when an exception arose.
+        int oldLimit = buffer.limit();
+        int oldPos = buffer.position();
+        try
+        {
+            buffer.getString( 3, Charset.forName( "ASCII" ).newDecoder() );
+            Assert.fail();
+        }
+        catch( Exception e )
+        {
+            Assert.assertEquals( oldLimit, buffer.limit() );
+            Assert.assertEquals( oldPos, buffer.position() );
+        }
 
-		try
-		{
-			buffer.getString( Charset.forName( "ASCII" ).newDecoder() );
-			Assert.fail();
-		}
-		catch( Exception e )
-		{
-			Assert.assertEquals( oldLimit, buffer.limit() );
-			Assert.assertEquals( oldPos, buffer.position() );
-		}
+        try
+        {
+            buffer.getString( Charset.forName( "ASCII" ).newDecoder() );
+            Assert.fail();
+        }
+        catch( Exception e )
+        {
+            Assert.assertEquals( oldLimit, buffer.limit() );
+            Assert.assertEquals( oldPos, buffer.position() );
+        }
     }
 
     public void testPutString() throws Exception
