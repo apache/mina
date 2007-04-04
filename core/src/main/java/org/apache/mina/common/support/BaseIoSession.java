@@ -213,14 +213,17 @@ public abstract class BaseIoSession implements IoSession
     
     public int getIdleTime( IdleStatus status )
     {
-        if( status == IdleStatus.BOTH_IDLE )
+        if( status == IdleStatus.BOTH_IDLE ) {
             return idleTimeForBoth;
+        }
 
-        if( status == IdleStatus.READER_IDLE )
+        if( status == IdleStatus.READER_IDLE ) {
             return idleTimeForRead;
+        }
 
-        if( status == IdleStatus.WRITER_IDLE )
+        if( status == IdleStatus.WRITER_IDLE ) {
             return idleTimeForWrite;
+        }
 
         throw new IllegalArgumentException( "Unknown idle status: " + status );
     }
@@ -232,19 +235,21 @@ public abstract class BaseIoSession implements IoSession
 
     public void setIdleTime( IdleStatus status, int idleTime )
     {
-        if( idleTime < 0 )
+        if( idleTime < 0 ) {
             throw new IllegalArgumentException( "Illegal idle time: "
                                                 + idleTime );
+        }
 
-        if( status == IdleStatus.BOTH_IDLE )
+        if( status == IdleStatus.BOTH_IDLE ) {
             idleTimeForBoth = idleTime;
-        else if( status == IdleStatus.READER_IDLE )
+        } else if( status == IdleStatus.READER_IDLE ) {
             idleTimeForRead = idleTime;
-        else if( status == IdleStatus.WRITER_IDLE )
+        } else if( status == IdleStatus.WRITER_IDLE ) {
             idleTimeForWrite = idleTime;
-        else
+        } else {
             throw new IllegalArgumentException( "Unknown idle status: "
                                                 + status );
+        }
     }
 
     public int getWriteTimeout()
@@ -259,9 +264,10 @@ public abstract class BaseIoSession implements IoSession
 
     public void setWriteTimeout( int writeTimeout )
     {
-        if( writeTimeout < 0 )
+        if( writeTimeout < 0 ) {
             throw new IllegalArgumentException( "Illegal write timeout: "
                                                 + writeTimeout );
+        }
         this.writeTimeout = writeTimeout;
     }
 
@@ -380,42 +386,51 @@ public abstract class BaseIoSession implements IoSession
 
     public boolean isIdle( IdleStatus status )
     {
-        if( status == IdleStatus.BOTH_IDLE )
+        if( status == IdleStatus.BOTH_IDLE ) {
             return idleCountForBoth > 0;
+        }
 
-        if( status == IdleStatus.READER_IDLE )
+        if( status == IdleStatus.READER_IDLE ) {
             return idleCountForRead > 0;
+        }
 
-        if( status == IdleStatus.WRITER_IDLE )
+        if( status == IdleStatus.WRITER_IDLE ) {
             return idleCountForWrite > 0;
+        }
 
         throw new IllegalArgumentException( "Unknown idle status: " + status );
     }
 
     public int getIdleCount( IdleStatus status )
     {
-        if( status == IdleStatus.BOTH_IDLE )
+        if( status == IdleStatus.BOTH_IDLE ) {
             return idleCountForBoth;
+        }
 
-        if( status == IdleStatus.READER_IDLE )
+        if( status == IdleStatus.READER_IDLE ) {
             return idleCountForRead;
+        }
 
-        if( status == IdleStatus.WRITER_IDLE )
+        if( status == IdleStatus.WRITER_IDLE ) {
             return idleCountForWrite;
+        }
 
         throw new IllegalArgumentException( "Unknown idle status: " + status );
     }
     
     public long getLastIdleTime( IdleStatus status )
     {
-        if( status == IdleStatus.BOTH_IDLE )
+        if( status == IdleStatus.BOTH_IDLE ) {
             return lastIdleTimeForBoth;
+        }
 
-        if( status == IdleStatus.READER_IDLE )
+        if( status == IdleStatus.READER_IDLE ) {
             return lastIdleTimeForRead;
+        }
 
-        if( status == IdleStatus.WRITER_IDLE )
+        if( status == IdleStatus.WRITER_IDLE ) {
             return lastIdleTimeForWrite;
+        }
 
         throw new IllegalArgumentException( "Unknown idle status: " + status );
     }
@@ -436,10 +451,10 @@ public abstract class BaseIoSession implements IoSession
         {
             idleCountForWrite ++;
             lastIdleTimeForWrite = System.currentTimeMillis();
-        }
-        else
+        } else {
             throw new IllegalArgumentException( "Unknown idle status: "
                                                 + status );
+        }
     }
     
     public SocketAddress getServiceAddress()
@@ -455,6 +470,7 @@ public abstract class BaseIoSession implements IoSession
         }
     }
     
+    @Override
     public String toString()
     {
         return "(" + getTransportType() +

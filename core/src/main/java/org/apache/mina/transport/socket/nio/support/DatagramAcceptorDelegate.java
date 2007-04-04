@@ -90,6 +90,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         this.executor = executor;
     }
 
+    @Override
     protected void finalize() throws Throwable
     {
         super.finalize();
@@ -107,14 +108,17 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         return TransportType.DATAGRAM;
     }
     
+    @Override
     public DatagramSessionConfig getSessionConfig() {
         return (DatagramSessionConfig) super.getSessionConfig();
     }
     
+    @Override
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
     
+    @Override
     protected void doBind() throws IOException
     {
         RegistrationRequest request = new RegistrationRequest();
@@ -147,6 +151,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
 
+    @Override
     protected void doUnbind()
     {
         CancellationRequest request = new CancellationRequest();
@@ -254,6 +259,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         }
     }
 
+    @Override
     public IoServiceListenerSupport getListeners()
     {
         return super.getListeners();
@@ -363,10 +369,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
                 if( key.isWritable() )
                 {
-                    for( Iterator i = getManagedSessions().iterator();
-                         i.hasNext(); )
-                    {
-                        scheduleFlush( ( DatagramSessionImpl ) i.next() );
+                    for (IoSession session : getManagedSessions()) {
+                        scheduleFlush( ( DatagramSessionImpl ) session );
                     }
                 }
             }
@@ -404,8 +408,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
         for( ;; )
         {
             DatagramSessionImpl session = flushingSessions.poll();
-            if( session == null )
+            if( session == null ) {
                 break;
+            }
 
             try
             {
@@ -432,8 +437,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
                 req = writeRequestQueue.peek();
             }
 
-            if( req == null )
+            if( req == null ) {
                 break;
+            }
 
             ByteBuffer buf = ( ByteBuffer ) req.getMessage();
             if( buf.remaining() == 0 )
@@ -495,14 +501,16 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
 
     private void registerNew()
     {
-        if( registerQueue.isEmpty() )
+        if( registerQueue.isEmpty() ) {
             return;
+        }
 
         for( ;; )
         {
             RegistrationRequest req = registerQueue.poll();
-            if( req == null )
+            if( req == null ) {
                 break;
+            }
 
             DatagramChannel ch = null;
             try

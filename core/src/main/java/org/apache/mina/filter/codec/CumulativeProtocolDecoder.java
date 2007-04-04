@@ -159,15 +159,17 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         // invoked the session buffer gets appended to
         if ( buf.hasRemaining() )
         {
-            if ( usingSessionBuffer )
+            if ( usingSessionBuffer ) {
                 buf.compact();
-            else
+            } else {
                 storeRemainingInSession( buf, session );
+            }
         }
         else
         {
-            if ( usingSessionBuffer )
+            if ( usingSessionBuffer ) {
                 removeSessionBuffer( session );
+            }
         }
     }
     
@@ -190,6 +192,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      * Please don't forget to call <tt>super.dispose( session )</tt> when
      * you override this method.
      */
+    @Override
     public void dispose( IoSession session ) throws Exception
     {
         removeSessionBuffer( session );

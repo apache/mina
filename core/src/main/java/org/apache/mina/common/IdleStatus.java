@@ -71,6 +71,7 @@ public class IdleStatus
      *   <li>{@link #BOTH_IDLE} - <tt>"both idle"</tt></li>
      * </ul>
      */
+    @Override
     public String toString()
     {
         return strValue;

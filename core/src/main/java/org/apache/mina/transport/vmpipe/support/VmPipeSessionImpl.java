@@ -161,6 +161,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         return localAddress;
     }
 
+    @Override
     public SocketAddress getServiceAddress()
     {
         return serviceAddress;

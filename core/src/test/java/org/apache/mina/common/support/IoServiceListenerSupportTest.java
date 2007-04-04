@@ -178,6 +178,7 @@ public class IoServiceListenerSupportTest extends TestCase
         new Thread()
         {
             // Emulate I/O service
+            @Override
             public void run()
             {
                 try
@@ -269,6 +270,7 @@ public class IoServiceListenerSupportTest extends TestCase
             this.serviceAddress = serviceAddress;
         }
 
+        @Override
         protected void updateTrafficMask()
         {
         }
@@ -318,6 +320,7 @@ public class IoServiceListenerSupportTest extends TestCase
             return service;
         }
 
+        @Override
         public SocketAddress getServiceAddress()
         {
             return serviceAddress;

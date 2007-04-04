@@ -76,6 +76,7 @@ class SocketIoProcessor
         }
     }
     
+    @Override
     protected void finalize() throws Throwable
     {
         super.finalize();
@@ -156,8 +157,9 @@ class SocketIoProcessor
         {
             SocketSessionImpl session = newSessions.poll();
 
-            if( session == null )
+            if( session == null ) {
                 break;
+            }
 
             SocketChannel ch = session.getChannel();
             try
@@ -199,8 +201,9 @@ class SocketIoProcessor
         {
             SocketSessionImpl session = removingSessions.poll();
 
-            if( session == null )
+            if( session == null ) {
                 break;
+            }
 
             SocketChannel ch = session.getChannel();
             SelectionKey key = session.getSelectionKey();
@@ -295,8 +298,9 @@ class SocketIoProcessor
         }
         catch( Throwable e )
         {
-            if( e instanceof IOException )
+            if( e instanceof IOException ) {
                 scheduleRemove( session );
+            }
             session.getFilterChain().fireExceptionCaught( session, e );
         }
     }
@@ -311,9 +315,7 @@ class SocketIoProcessor
             Set<SelectionKey> keys = selector.keys();
             if( keys != null )
             {
-                for( Iterator<SelectionKey> it = keys.iterator(); it.hasNext(); )
-                {
-                    SelectionKey key = it.next();
+                for (SelectionKey key : keys) {
                     SocketSessionImpl session = ( SocketSessionImpl ) key.attachment();
                     notifyIdleness( session, currentTime );
                 }
@@ -371,15 +373,17 @@ class SocketIoProcessor
 
     private void doFlush()
     {
-        if( flushingSessions.size() == 0 )
+        if( flushingSessions.size() == 0 ) {
             return;
+        }
 
         for( ; ; )
         {
             SocketSessionImpl session = flushingSessions.poll();
 
-            if( session == null )
+            if( session == null ) {
                 break;
+            }
 
             if( !session.isConnected() )
             {
@@ -444,8 +448,9 @@ class SocketIoProcessor
                 req = writeRequestQueue.peek();
             }
 
-            if( req == null )
+            if( req == null ) {
                 break;
+            }
 
             ByteBuffer buf = ( ByteBuffer ) req.getMessage();
             if( buf.remaining() == 0 )
@@ -488,8 +493,9 @@ class SocketIoProcessor
 
             session = trafficControllingSessions.poll();
 
-            if( session == null )
+            if( session == null ) {
                 break;
+            }
 
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.

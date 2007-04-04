@@ -56,6 +56,7 @@ public class ObjectSerializationTest extends TestCase
         IoSession session = new MockIoSession();
         SimpleProtocolEncoderOutput out = new SimpleProtocolEncoderOutput()
         {
+            @Override
             protected WriteFuture doFlush( ByteBuffer buf )
             {
                 return null;
@@ -160,7 +161,7 @@ public class ObjectSerializationTest extends TestCase
     
     private static class MockProtocolDecoderOutput implements ProtocolDecoderOutput
     {
-        private List<Object> result = new ArrayList<Object>();
+        private final List<Object> result = new ArrayList<Object>();
 
         public void flush()
         {

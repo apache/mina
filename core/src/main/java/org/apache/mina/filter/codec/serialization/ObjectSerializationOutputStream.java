@@ -82,26 +82,31 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
         this.maxObjectSize = maxObjectSize;
     }
 
+    @Override
     public void close() throws IOException
     {
         out.close();
     }
 
+    @Override
     public void flush() throws IOException
     {
         out.flush();
     }
 
+    @Override
     public void write( int b ) throws IOException
     {
         out.write( b );
     }
 
+    @Override
     public void write( byte[] b ) throws IOException
     {
         out.write( b );
     }
 
+    @Override
     public void write( byte[] b, int off, int len ) throws IOException
     {
         out.write( b, off, len );

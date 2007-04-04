@@ -36,6 +36,7 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoAcceptor;
@@ -143,6 +144,7 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
+    @Override
     protected void finalize() throws Throwable
     {
         super.finalize();
@@ -160,6 +162,7 @@ public class SocketAcceptor extends BaseIoAcceptor
         return TransportType.SOCKET;
     }
     
+    @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
@@ -167,6 +170,19 @@ public class SocketAcceptor extends BaseIoAcceptor
     @Override
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
+    }
+
+    // These two methods are overriden to work around a problem with
+    // bean property access mechanism.
+
+    @Override
+    public void setSessionConfig(IoSessionConfig sessionConfig) {
+        super.setSessionConfig(sessionConfig);
+    }
+    
+    @Override
+    public void setLocalAddress(SocketAddress localAddress) {
+        super.setLocalAddress(localAddress);
     }
 
     /**
@@ -213,6 +229,7 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
     
+    @Override
     protected void doBind() throws IOException
     {
         RegistrationRequest request = new RegistrationRequest();
@@ -275,6 +292,7 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
+    @Override
     protected void doUnbind()
     {
         CancellationRequest request = new CancellationRequest();
@@ -528,6 +546,7 @@ public class SocketAcceptor extends BaseIoAcceptor
         throw new UnsupportedOperationException();
     }
     
+    @Override
     protected IoServiceListenerSupport getListeners()
     {
         return super.getListeners();

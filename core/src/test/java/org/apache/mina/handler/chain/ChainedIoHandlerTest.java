@@ -56,6 +56,7 @@ public class ChainedIoHandlerTest extends TestCase
         new ChainedIoHandler( chain ).messageReceived(
                 new BaseIoSession()
                 {
+                    @Override
                     protected void updateTrafficMask()
                     {
                     }
@@ -100,6 +101,7 @@ public class ChainedIoHandlerTest extends TestCase
                         return null;
                     }
 
+                    @Override
                     public SocketAddress getServiceAddress()
                     {
                         return null;

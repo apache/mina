@@ -49,17 +49,21 @@ public class VmPipeAddress extends SocketAddress implements Comparable
         return port;
     }
 
+    @Override
     public int hashCode()
     {
         return port;
     }
 
+    @Override
     public boolean equals( Object o )
     {
-        if( o == null )
+        if( o == null ) {
             return false;
-        if( this == o )
+        }
+        if( this == o ) {
             return true;
+        }
         if( o instanceof VmPipeAddress )
         {
             VmPipeAddress that = ( VmPipeAddress ) o;
@@ -74,6 +78,7 @@ public class VmPipeAddress extends SocketAddress implements Comparable
         return this.port - ( ( VmPipeAddress ) o ).port;
     }
 
+    @Override
     public String toString()
     {
         return "vm:" + port;

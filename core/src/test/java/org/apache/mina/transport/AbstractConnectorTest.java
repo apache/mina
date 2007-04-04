@@ -57,16 +57,19 @@ public abstract class AbstractConnectorTest extends TestCase {
             IoConnector connector = createConnector();
             connector.setHandler( new IoHandlerAdapter()
             {
+                @Override
                 public void sessionCreated( IoSession session )
                 {
                     buf.append( "1" );
                 }
                 
+                @Override
                 public void sessionOpened( IoSession session )
                 {
                     buf.append( "2" );
                 }
                 
+                @Override
                 public void exceptionCaught( IoSession session, Throwable cause )
                 {
                     buf.append( "X" );
@@ -92,16 +95,19 @@ public abstract class AbstractConnectorTest extends TestCase {
         IoConnector connector = createConnector();
         connector.setHandler( new IoHandlerAdapter()
         {
+            @Override
             public void sessionCreated( IoSession session )
             {
                 buf.append( "X" );
             }
             
+            @Override
             public void sessionOpened( IoSession session )
             {
                 buf.append( "Y" );
             }
             
+            @Override
             public void exceptionCaught( IoSession session, Throwable cause )
             {
                 buf.append( "Z" );

@@ -37,7 +37,7 @@ public class DefaultSocketSessionConfig extends BaseIoSessionConfig implements S
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
-    private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
+    private static final boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
 
     private static boolean DEFAULT_REUSE_ADDRESS;
     private static int DEFAULT_RECEIVE_BUFFER_SIZE;

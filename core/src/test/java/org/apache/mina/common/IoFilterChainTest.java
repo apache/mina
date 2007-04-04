@@ -20,7 +20,6 @@
 package org.apache.mina.common;
 
 import java.net.SocketAddress;
-import java.util.Iterator;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -42,6 +41,7 @@ public class IoFilterChainTest extends TestCase
     private IoSession session;
     private String result;
 
+    @Override
     public void setUp()
     {
         chain = new IoFilterChainImpl();
@@ -49,6 +49,7 @@ public class IoFilterChainTest extends TestCase
         result = "";
     }
     
+    @Override
     public void tearDown()
     {
     }
@@ -65,9 +66,7 @@ public class IoFilterChainTest extends TestCase
         chain.addAfter( "D", "H", new EventOrderTestFilter( 'A' ) );
         
         String actual = "";
-        for( Iterator i = chain.getAll().iterator(); i.hasNext(); ) 
-        {
-            Entry e = ( Entry ) i.next();
+        for (Entry e : chain.getAll()) {
             actual += e.getName();
         }
         
@@ -130,6 +129,7 @@ public class IoFilterChainTest extends TestCase
         // When there's one filter
         chain.addLast( "A", new IoFilterAdapter()
         {
+            @Override
             public String toString()
             {
                 return "B";
@@ -140,6 +140,7 @@ public class IoFilterChainTest extends TestCase
         // When there are two
         chain.addLast( "C", new IoFilterAdapter()
         {
+            @Override
             public String toString()
             {
                 return "D";
@@ -213,24 +214,29 @@ public class IoFilterChainTest extends TestCase
 
     private class TestSession extends BaseIoSession implements IoSession
     {
-        private IoHandler handler = new IoHandlerAdapter()
+        private final IoHandler handler = new IoHandlerAdapter()
         {
+            @Override
             public void sessionCreated(IoSession session) {
                 result += "HS0";
             }
 
+            @Override
             public void sessionOpened(IoSession session) {
                 result += "HSO";
             }
 
+            @Override
             public void sessionClosed(IoSession session) {
                 result += "HSC";
             }
 
+            @Override
             public void sessionIdle(IoSession session, IdleStatus status) {
                 result += "HSI";
             }
 
+            @Override
             public void exceptionCaught(IoSession session, Throwable cause) {
                 result += "HEC";
                 if( cause.getClass() != Exception.class )
@@ -239,10 +245,12 @@ public class IoFilterChainTest extends TestCase
                 }
             }
 
+            @Override
             public void messageReceived(IoSession session, Object message) {
                 result += "HMR";
             }
 
+            @Override
             public void messageSent(IoSession session, Object message) {
                 result += "HMS";
             }
@@ -252,6 +260,7 @@ public class IoFilterChainTest extends TestCase
             return handler;
         }
 
+        @Override
         public CloseFuture close() {
             return null;
         }
@@ -272,10 +281,12 @@ public class IoFilterChainTest extends TestCase
         {
             return new AbstractIoFilterChain( this )
             {
+                @Override
                 protected void doWrite( IoSession session, WriteRequest writeRequest )
                 {
                 }
 
+                @Override
                 protected void doClose( IoSession session )
                 {
                 }
@@ -287,10 +298,12 @@ public class IoFilterChainTest extends TestCase
             return 0;
         }
 
+        @Override
         protected void updateTrafficMask()
         {
         }
 
+        @Override
         public boolean isClosing()
         {
             return false;
@@ -306,6 +319,7 @@ public class IoFilterChainTest extends TestCase
             return null;
         }
 
+        @Override
         public SocketAddress getServiceAddress() {
             return null;
         }
@@ -324,6 +338,7 @@ public class IoFilterChainTest extends TestCase
             this.id = id;
         }
         
+        @Override
         public void sessionCreated( NextFilter nextFilter, IoSession session )
         {
             result += id + "S0";

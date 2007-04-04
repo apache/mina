@@ -103,6 +103,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
     /**
      * Initializes streams and timeout settings.
      */
+    @Override
     public void sessionOpened( IoSession session )
     {
         // Set timeouts
@@ -120,6 +121,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
     /**
      * Closes streams
      */
+    @Override
     public void sessionClosed( IoSession session ) throws Exception
     {
         final InputStream in = ( InputStream ) session.getAttribute( KEY_IN );
@@ -137,6 +139,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
     /**
      * Forwards read data to input stream.
      */
+    @Override
     public void messageReceived( IoSession session, Object buf )
     {
         final IoSessionInputStream in = ( IoSessionInputStream ) session.getAttribute( KEY_IN );
@@ -146,6 +149,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
     /**
      * Forwards caught exceptions to input stream.
      */
+    @Override
     public void exceptionCaught( IoSession session, Throwable cause )
     {
         final IoSessionInputStream in = ( IoSessionInputStream ) session.getAttribute( KEY_IN );
@@ -174,6 +178,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
     /**
      * Handles read timeout.
      */
+    @Override
     public void sessionIdle( IoSession session, IdleStatus status )
     {
         if( status == IdleStatus.READER_IDLE )

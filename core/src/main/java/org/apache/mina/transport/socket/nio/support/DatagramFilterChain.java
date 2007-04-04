@@ -39,6 +39,7 @@ class DatagramFilterChain extends AbstractIoFilterChain {
         super( parent );
     }
     
+    @Override
     protected void doWrite( IoSession session, WriteRequest writeRequest )
     {
         DatagramSessionImpl s = ( DatagramSessionImpl ) session;
@@ -58,6 +59,7 @@ class DatagramFilterChain extends AbstractIoFilterChain {
         }
     }
 
+    @Override
     protected void doClose( IoSession session )
     {
         DatagramSessionImpl s = ( DatagramSessionImpl ) session;

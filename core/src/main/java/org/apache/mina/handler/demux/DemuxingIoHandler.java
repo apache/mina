@@ -139,6 +139,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter
      * Forwards the received events into the appropriate {@link MessageHandler}
      * which is registered by {@link #addMessageHandler(Class, MessageHandler)}.
      */
+    @Override
     public void messageReceived( IoSession session, Object message ) throws Exception
     {
         MessageHandler<Object> handler = findHandler( message.getClass() );
@@ -163,15 +164,17 @@ public class DemuxingIoHandler extends IoHandlerAdapter
     {
         MessageHandler handler = null;
 
-        if( triedClasses != null && triedClasses.contains( type ) )
+        if( triedClasses != null && triedClasses.contains( type ) ) {
             return null;
+        }
 
         /*
          * Try the cache first.
          */
         handler = findHandlerCache.get( type );
-        if( handler != null )
+        if( handler != null ) {
             return handler;
+        }
 
         /*
          * Try the registered handlers for an immediate match.
@@ -184,16 +187,17 @@ public class DemuxingIoHandler extends IoHandlerAdapter
              * No immediate match could be found. Search the type's interfaces.
              */
             
-            if( triedClasses == null )
+            if( triedClasses == null ) {
                 triedClasses = new IdentityHashSet<Class>();
+            }
             triedClasses.add( type );
             
             Class[] interfaces = type.getInterfaces();
-            for( int i = 0; i < interfaces.length; i ++ )
-            {
-                handler = findHandler( interfaces[ i ], triedClasses );
-                if( handler != null )
+            for (Class element : interfaces) {
+                handler = findHandler( element, triedClasses );
+                if( handler != null ) {
                     break;
+                }
             }
         }
         
@@ -205,8 +209,9 @@ public class DemuxingIoHandler extends IoHandlerAdapter
              */
             
             Class superclass = type.getSuperclass();
-            if( superclass != null )
+            if( superclass != null ) {
                 handler = findHandler( superclass );
+            }
         }
         
         /*
@@ -214,8 +219,9 @@ public class DemuxingIoHandler extends IoHandlerAdapter
          * here all the types (superclasses and interfaces) in the path which 
          * led to a match will be cached along with the immediate message type.
          */
-        if( handler != null )
+        if( handler != null ) {
             findHandlerCache.put( type, handler );
+        }
         
         return handler;
     }

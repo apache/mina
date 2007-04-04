@@ -129,6 +129,7 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession
         return handler;
     }
 
+    @Override
     protected void close0()
     {
         filterChain.fireFilterClose( this );
@@ -164,6 +165,7 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession
         return size;
     }
 
+    @Override
     protected void write0( WriteRequest writeRequest )
     {
         filterChain.fireFilterWrite( this, writeRequest );
@@ -184,10 +186,12 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession
         return (InetSocketAddress) ch.socket().getLocalSocketAddress();
     }
     
+    @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
+    @Override
     protected void updateTrafficMask()
     {
         this.ioProcessor.updateTrafficMask( this );

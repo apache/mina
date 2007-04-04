@@ -36,7 +36,7 @@ public class DefaultDatagramSessionConfig extends BaseIoSessionConfig implements
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
-    private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
+    private static final boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
 
     private static boolean DEFAULT_BROADCAST;
     private static boolean DEFAULT_REUSE_ADDRESS;

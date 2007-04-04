@@ -213,7 +213,7 @@ public class ExpiringMap<K, V> implements Map<K, V>
 
         private long lastAccessTime;
 
-        private ReadWriteLock lastAccessTimeLock = new ReentrantReadWriteLock();
+        private final ReadWriteLock lastAccessTimeLock = new ReentrantReadWriteLock();
 
         ExpiringObject( K key, V value, long lastAccessTime )
         {
@@ -280,7 +280,7 @@ public class ExpiringMap<K, V> implements Map<K, V>
 
     public class Expirer implements Runnable
     {
-        private ReadWriteLock stateLock = new ReentrantReadWriteLock();
+        private final ReadWriteLock stateLock = new ReentrantReadWriteLock();
 
         private long timeToLiveMillis;
 
@@ -318,8 +318,9 @@ public class ExpiringMap<K, V> implements Map<K, V>
 
             for (ExpiringObject o : delegate.values()) {
 
-                if (timeToLiveMillis <= 0)
+                if (timeToLiveMillis <= 0) {
                     continue;
+                }
 
                 long timeIdle = timeNow - o.getLastAccessTime();
 

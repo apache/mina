@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.support.DelegatedIoConnector;
 import org.apache.mina.transport.socket.nio.support.DatagramConnectorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
@@ -52,7 +53,16 @@ public class DatagramConnector extends DelegatedIoConnector
         init( new DatagramConnectorDelegate( this, executor ) );
     }
 
+    @Override
     public DatagramSessionConfig getSessionConfig() {
         return ( ( DatagramConnectorDelegate ) delegate ).getSessionConfig();
+    }
+
+    // This method is overriden to work around a problem with
+    // bean property access mechanism.
+
+    @Override
+    public void setSessionConfig(IoSessionConfig sessionConfig) {
+        super.setSessionConfig(sessionConfig);
     }
 }

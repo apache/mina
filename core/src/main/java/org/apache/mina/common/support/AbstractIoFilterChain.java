@@ -526,6 +526,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         return false;
     }
 
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
@@ -565,6 +566,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     }
 
 
+    @Override
     protected void finalize() throws Throwable
     {
         try
@@ -583,45 +585,53 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
     private class HeadFilter extends IoFilterAdapter
     {
+        @Override
         public void sessionCreated( NextFilter nextFilter, IoSession session )
         {
             nextFilter.sessionCreated( session );
         }
 
+        @Override
         public void sessionOpened( NextFilter nextFilter, IoSession session )
         {
             nextFilter.sessionOpened( session );
         }
 
+        @Override
         public void sessionClosed( NextFilter nextFilter, IoSession session )
         {
             nextFilter.sessionClosed( session );
         }
 
+        @Override
         public void sessionIdle( NextFilter nextFilter, IoSession session,
                                 IdleStatus status )
         {
             nextFilter.sessionIdle( session, status );
         }
 
+        @Override
         public void exceptionCaught( NextFilter nextFilter,
                                     IoSession session, Throwable cause )
         {
             nextFilter.exceptionCaught( session, cause );
         }
 
+        @Override
         public void messageReceived( NextFilter nextFilter, IoSession session,
                                      Object message )
         {
             nextFilter.messageReceived( session, message );
         }
 
+        @Override
         public void messageSent( NextFilter nextFilter, IoSession session,
                                  Object message )
         {
             nextFilter.messageSent( session, message );
         }
 
+        @Override
         public void filterWrite( NextFilter nextFilter, IoSession session,
                                  WriteRequest writeRequest ) throws Exception
         {
@@ -638,6 +648,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             }
         }
 
+        @Override
         public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
         {
             doClose( session );
@@ -646,11 +657,13 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
     private static class TailFilter extends IoFilterAdapter
     {
+        @Override
         public void sessionCreated( NextFilter nextFilter, IoSession session ) throws Exception
         {
             session.getHandler().sessionCreated( session );
         }
 
+        @Override
         public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
         {
             try
@@ -669,6 +682,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             }
         }
 
+        @Override
         public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
         {
             try
@@ -682,36 +696,42 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             }
         }
 
+        @Override
         public void sessionIdle( NextFilter nextFilter, IoSession session,
                                 IdleStatus status ) throws Exception
         {
             session.getHandler().sessionIdle( session, status );
         }
 
+        @Override
         public void exceptionCaught( NextFilter nextFilter,
                                     IoSession session, Throwable cause ) throws Exception
         {
             session.getHandler().exceptionCaught( session, cause );
         }
 
+        @Override
         public void messageReceived( NextFilter nextFilter, IoSession session,
                                      Object message ) throws Exception
         {
             session.getHandler().messageReceived( session, message );
         }
 
+        @Override
         public void messageSent( NextFilter nextFilter, IoSession session,
                                  Object message ) throws Exception
         {
             session.getHandler().messageSent( session, message );
         }
 
+        @Override
         public void filterWrite( NextFilter nextFilter,
                                  IoSession session, WriteRequest writeRequest ) throws Exception
         {
             nextFilter.filterWrite( session, writeRequest );
         }
 
+        @Override
         public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
         {
             nextFilter.filterClose( session );
@@ -832,6 +852,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
             return nextFilter;
         }
         
+        @Override
         public String toString()
         {
             return "(" + getName() + ':' + filter + ')';

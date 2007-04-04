@@ -71,6 +71,7 @@ public class StreamWriteFilter extends IoFilterAdapter
 
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
     
+    @Override
     public void filterWrite( NextFilter nextFilter, IoSession session, 
                             WriteRequest writeRequest ) throws Exception 
     {
@@ -121,6 +122,7 @@ public class StreamWriteFilter extends IoFilterAdapter
         return ( Queue<WriteRequest> ) session.getAttribute( WRITE_REQUEST_QUEUE );
     }
 
+    @Override
     public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
     {
         InputStream inputStream = ( InputStream ) session.getAttribute( CURRENT_STREAM );

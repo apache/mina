@@ -105,6 +105,7 @@ public abstract class AbstractBindTest extends TestCase
         }
     }
     
+    @Override
     public void tearDown()
     {
         try
@@ -194,6 +195,7 @@ public abstract class AbstractBindTest extends TestCase
     {
         private static final Logger log = LoggerFactory.getLogger( EchoProtocolHandler.class );
 
+        @Override
         public void sessionCreated( IoSession session )
         {
             if( session.getConfig() instanceof SocketSessionConfig )
@@ -204,17 +206,20 @@ public abstract class AbstractBindTest extends TestCase
             session.setIdleTime( IdleStatus.BOTH_IDLE, 10 );
         }
 
+        @Override
         public void sessionIdle( IoSession session, IdleStatus status )
         {
             log.info( "*** IDLE #" + session.getIdleCount( IdleStatus.BOTH_IDLE ) + " ***" );
         }
 
+        @Override
         public void exceptionCaught( IoSession session, Throwable cause )
         {
             cause.printStackTrace();
             session.close();
         }
 
+        @Override
         public void messageReceived( IoSession session, Object message ) throws Exception
         {
             if( !( message instanceof ByteBuffer ) )

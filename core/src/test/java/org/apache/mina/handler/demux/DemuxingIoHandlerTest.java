@@ -44,6 +44,7 @@ public class DemuxingIoHandlerTest extends TestCase
     
     Object[] msg;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

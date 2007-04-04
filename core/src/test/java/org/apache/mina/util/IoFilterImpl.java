@@ -39,20 +39,25 @@ public class IoFilterImpl extends IoFilterAdapter
         this.c = c;
     }
 
+    @Override
     public int hashCode()
     {
         return c;
     }
 
+    @Override
     public boolean equals( Object o )
     {
-        if( o == null )
+        if( o == null ) {
             return false;
-        if( ! ( o instanceof IoFilterImpl ) )
+        }
+        if( ! ( o instanceof IoFilterImpl ) ) {
             return false;
+        }
         return this.c == ( ( IoFilterImpl ) o ).c;
     }
 
+    @Override
     public String toString()
     {
         return "" + c;

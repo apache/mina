@@ -54,6 +54,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
         junit.textui.TestRunner.run(CumulativeProtocolDecoderTest.class);
     }
 
+    @Override
     protected void setUp() throws Exception
     {
         buf = ByteBuffer.allocate( 16 );
@@ -61,6 +62,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
         output = new IntegerDecoderOutput();
     }
 
+    @Override
     protected void tearDown() throws Exception
     {
         decoder.dispose( session );
@@ -122,12 +124,14 @@ public class CumulativeProtocolDecoderTest extends TestCase
     private static class IntegerDecoder extends CumulativeProtocolDecoder
     {
 
+        @Override
         protected boolean doDecode( IoSession session, ByteBuffer in,
                                     ProtocolDecoderOutput out ) throws Exception
         {
             Assert.assertTrue( in.hasRemaining() );
-            if( in.remaining() < 4 )
+            if( in.remaining() < 4 ) {
                 return false;
+            }
             
             out.write( new Integer( in.getInt() ) );
             return true;
@@ -141,7 +145,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
     
     private static class IntegerDecoderOutput implements ProtocolDecoderOutput
     {
-        private List<Object> values = new ArrayList<Object>();
+        private final List<Object> values = new ArrayList<Object>();
 
         public void write( Object message )
         {
@@ -166,6 +170,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
     private static class WrongDecoder extends CumulativeProtocolDecoder
     {
 
+        @Override
         protected boolean doDecode( IoSession session, ByteBuffer in,
                                     ProtocolDecoderOutput out ) throws Exception {
             return true;
@@ -191,6 +196,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
             return null;
         }
 
+        @Override
         public CloseFuture close() {
             return null;
         }
@@ -217,10 +223,12 @@ public class CumulativeProtocolDecoderTest extends TestCase
             return 0;
         }
 
+        @Override
         protected void updateTrafficMask()
         {
         }
 
+        @Override
         public boolean isClosing()
         {
             return false;
@@ -236,6 +244,7 @@ public class CumulativeProtocolDecoderTest extends TestCase
             return null;
         }
 
+        @Override
         public SocketAddress getServiceAddress()
         {
             return null;

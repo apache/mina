@@ -38,11 +38,13 @@ public class DatagramBindTest extends AbstractBindTest
         super( new DatagramAcceptor() );
     }
 
+    @Override
     protected SocketAddress createSocketAddress( int port )
     {
         return new InetSocketAddress( port );
     }
     
+    @Override
     protected int getPort( SocketAddress address )
     {
         return ( ( InetSocketAddress ) address ).getPort();

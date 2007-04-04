@@ -45,31 +45,37 @@ public class IdentityHashSet<E> extends AbstractSet<E>
         addAll( c );
     }
 
+    @Override
     public int size()
     {
         return delegate.size();
     }
 
+    @Override
     public boolean contains( Object o )
     {
         return delegate.containsKey( o );
     }
 
+    @Override
     public Iterator<E> iterator()
     {
         return delegate.keySet().iterator();
     }
 
+    @Override
     public boolean add( E arg0 )
     {
         return delegate.put( arg0, Boolean.TRUE ) == null;
     }
 
+    @Override
     public boolean remove( Object arg0 )
     {
         return delegate.remove( arg0 ) != null;
     }
 
+    @Override
     public void clear()
     {
         delegate.clear();

@@ -61,6 +61,7 @@ public class MessageDecoderResult
         this.name = name;
     }
     
+    @Override
     public String toString()
     {
         return name;

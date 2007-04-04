@@ -42,6 +42,7 @@ public class DatagramTrafficControlTest extends AbstractTrafficControlTest
         super( new DatagramAcceptor() );
     }
 
+    @Override
     protected ConnectFuture connect( int port, IoHandler handler )
             throws Exception
     {
@@ -50,6 +51,7 @@ public class DatagramTrafficControlTest extends AbstractTrafficControlTest
         return connector.connect( new InetSocketAddress( "localhost", port ) );
     }
 
+    @Override
     protected SocketAddress createServerSocketAddress( int port )
     {
         return new InetSocketAddress( port );

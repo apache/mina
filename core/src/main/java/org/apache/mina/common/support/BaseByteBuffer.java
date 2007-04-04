@@ -61,21 +61,25 @@ public abstract class BaseByteBuffer extends ByteBuffer
         this.autoExpandAllowed = autoExpandAllowed;
     }
 
+    @Override
     public boolean isDirect()
     {
         return buf().isDirect();
     }
     
+    @Override
     public boolean isReadOnly()
     {
         return buf().isReadOnly();
     }
 
+    @Override
     public int capacity()
     {
         return buf().capacity();
     }
     
+    @Override
     public ByteBuffer capacity( int newCapacity )
     {
         if( newCapacity > capacity() )
@@ -105,11 +109,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
      */
     protected abstract void capacity0( int newCapacity );
 
+    @Override
     public boolean isAutoExpand()
     {
         return autoExpand && autoExpandAllowed;
     }
 
+    @Override
     public ByteBuffer setAutoExpand( boolean autoExpand )
     {
         if( !autoExpandAllowed )
@@ -121,6 +127,7 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public ByteBuffer expand( int pos, int expectedRemaining )
     {
         int end = pos + expectedRemaining;
@@ -138,11 +145,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public int position()
     {
         return buf().position();
     }
 
+    @Override
     public ByteBuffer position( int newPosition )
     {
         autoExpand( newPosition, 0 );
@@ -154,11 +163,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
     
+    @Override
     public int limit()
     {
         return buf().limit();
     }
 
+    @Override
     public ByteBuffer limit( int newLimit )
     {
         autoExpand( newLimit, 0 );
@@ -170,6 +181,7 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
     
+    @Override
     public ByteBuffer mark()
     {
         buf().mark();
@@ -177,17 +189,20 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
     
+    @Override
     public int markValue()
     {
         return mark;
     }
 
+    @Override
     public ByteBuffer reset()
     {
         buf().reset();
         return this;
     }
     
+    @Override
     public ByteBuffer clear()
     {
         buf().clear();
@@ -195,6 +210,7 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
     
+    @Override
     public ByteBuffer flip()
     {
         buf().flip();
@@ -202,6 +218,7 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
     
+    @Override
     public ByteBuffer rewind()
     {
         buf().rewind();
@@ -209,11 +226,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
     
+    @Override
     public byte get()
     {
         return buf().get();
     }
 
+    @Override
     public ByteBuffer put( byte b )
     {
         autoExpand( 1 );
@@ -221,11 +240,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public byte get( int index )
     {
         return buf().get( index );
     }
 
+    @Override
     public ByteBuffer put( int index, byte b )
     {
         autoExpand( index, 1 );
@@ -233,12 +254,14 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public ByteBuffer get( byte[] dst, int offset, int length )
     {
         buf().get( dst, offset, length );
         return this;
     }
 
+    @Override
     public ByteBuffer put( java.nio.ByteBuffer src )
     {
         autoExpand( src.remaining() );
@@ -246,6 +269,7 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public ByteBuffer put( byte[] src, int offset, int length )
     {
         autoExpand( length );
@@ -253,6 +277,7 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public ByteBuffer compact()
     {
         buf().compact();
@@ -260,22 +285,26 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public ByteOrder order()
     {
         return buf().order();
     }
 
+    @Override
     public ByteBuffer order( ByteOrder bo )
     {
         buf().order( bo );
         return this;
     }
 
+    @Override
     public char getChar()
     {
         return buf().getChar();
     }
 
+    @Override
     public ByteBuffer putChar( char value )
     {
         autoExpand( 2 );
@@ -283,11 +312,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public char getChar( int index )
     {
         return buf().getChar( index );
     }
 
+    @Override
     public ByteBuffer putChar( int index, char value )
     {
         autoExpand( index, 2 );
@@ -295,16 +326,19 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public CharBuffer asCharBuffer()
     {
         return buf().asCharBuffer();
     }
 
+    @Override
     public short getShort()
     {
         return buf().getShort();
     }
 
+    @Override
     public ByteBuffer putShort( short value )
     {
         autoExpand( 2 );
@@ -312,11 +346,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public short getShort( int index )
     {
         return buf().getShort( index );
     }
 
+    @Override
     public ByteBuffer putShort( int index, short value )
     {
         autoExpand( index, 2 );
@@ -324,16 +360,19 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public ShortBuffer asShortBuffer()
     {
         return buf().asShortBuffer();
     }
 
+    @Override
     public int getInt()
     {
         return buf().getInt();
     }
 
+    @Override
     public ByteBuffer putInt( int value )
     {
         autoExpand( 4 );
@@ -341,11 +380,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public int getInt( int index )
     {
         return buf().getInt( index );
     }
 
+    @Override
     public ByteBuffer putInt( int index, int value )
     {
         autoExpand( index, 4 );
@@ -353,16 +394,19 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public IntBuffer asIntBuffer()
     {
         return buf().asIntBuffer();
     }
 
+    @Override
     public long getLong()
     {
         return buf().getLong();
     }
 
+    @Override
     public ByteBuffer putLong( long value )
     {
         autoExpand( 8 );
@@ -370,11 +414,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public long getLong( int index )
     {
         return buf().getLong( index );
     }
 
+    @Override
     public ByteBuffer putLong( int index, long value )
     {
         autoExpand( index, 8 );
@@ -382,16 +428,19 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public LongBuffer asLongBuffer()
     {
         return buf().asLongBuffer();
     }
 
+    @Override
     public float getFloat()
     {
         return buf().getFloat();
     }
 
+    @Override
     public ByteBuffer putFloat( float value )
     {
         autoExpand( 4 );
@@ -399,11 +448,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public float getFloat( int index )
     {
         return buf().getFloat( index );
     }
 
+    @Override
     public ByteBuffer putFloat( int index, float value )
     {
         autoExpand( index, 4 );
@@ -411,16 +462,19 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public FloatBuffer asFloatBuffer()
     {
         return buf().asFloatBuffer();
     }
 
+    @Override
     public double getDouble()
     {
         return buf().getDouble();
     }
 
+    @Override
     public ByteBuffer putDouble( double value )
     {
         autoExpand( 8 );
@@ -428,11 +482,13 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public double getDouble( int index )
     {
         return buf().getDouble( index );
     }
 
+    @Override
     public ByteBuffer putDouble( int index, double value )
     {
         autoExpand( index, 8 );
@@ -440,6 +496,7 @@ public abstract class BaseByteBuffer extends ByteBuffer
         return this;
     }
 
+    @Override
     public DoubleBuffer asDoubleBuffer()
     {
         return buf().asDoubleBuffer();

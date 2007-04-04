@@ -506,6 +506,7 @@ public abstract class ByteBuffer implements Comparable
      */
     public abstract ByteBuffer compact();
 
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
@@ -529,6 +530,7 @@ public abstract class ByteBuffer implements Comparable
         return buf.toString();
     }
 
+    @Override
     public int hashCode()
     {
         int h = 1;
@@ -540,6 +542,7 @@ public abstract class ByteBuffer implements Comparable
         return h;
     }
 
+    @Override
     public boolean equals( Object o )
     {
         if( !( o instanceof ByteBuffer ) )
@@ -789,21 +792,25 @@ public abstract class ByteBuffer implements Comparable
     {
         return new InputStream()
         {
+            @Override
             public int available()
             {
                 return ByteBuffer.this.remaining();
             }
 
+            @Override
             public synchronized void mark( int readlimit )
             {
                 ByteBuffer.this.mark();
             }
 
+            @Override
             public boolean markSupported()
             {
                 return true;
             }
 
+            @Override
             public int read()
             {
                 if( ByteBuffer.this.hasRemaining() )
@@ -816,6 +823,7 @@ public abstract class ByteBuffer implements Comparable
                 }
             }
 
+            @Override
             public int read( byte[] b, int off, int len )
             {
                 int remaining = ByteBuffer.this.remaining();
@@ -831,11 +839,13 @@ public abstract class ByteBuffer implements Comparable
                 }
             }
 
+            @Override
             public synchronized void reset()
             {
                 ByteBuffer.this.reset();
             }
 
+            @Override
             public long skip( long n )
             {
                 int bytes;
@@ -865,11 +875,13 @@ public abstract class ByteBuffer implements Comparable
     {
         return new OutputStream()
         {
+            @Override
             public void write( byte[] b, int off, int len )
             {
                 ByteBuffer.this.put( b, off, len );
             }
 
+            @Override
             public void write( int b )
             {
                 ByteBuffer.this.put( (byte)b );
@@ -1244,8 +1256,9 @@ public abstract class ByteBuffer implements Comparable
     {
         checkFieldSize( fieldSize );
 
-        if( fieldSize == 0 )
+        if( fieldSize == 0 ) {
             return this;
+        }
 
         autoExpand( fieldSize );
 
@@ -1620,6 +1633,7 @@ public abstract class ByteBuffer implements Comparable
         {
             ObjectInputStream in = new ObjectInputStream( asInputStream() )
             {
+                @Override
                 protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException
                 {
                     String className = readUTF();
@@ -1650,6 +1664,7 @@ public abstract class ByteBuffer implements Comparable
         {
             ObjectOutputStream out = new ObjectOutputStream( asOutputStream() )
             {
+                @Override
                 protected void writeClassDescriptor( ObjectStreamClass desc ) throws IOException
                 {
                     writeUTF( desc.getName() );

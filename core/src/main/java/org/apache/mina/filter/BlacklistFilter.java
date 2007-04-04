@@ -52,8 +52,9 @@ public class BlacklistFilter extends IoFilterAdapter
      */
     public void setBlacklist( InetAddress[] addresses )
     {
-        if( addresses == null )
+        if( addresses == null ) {
             throw new NullPointerException( "addresses" );
+        }
         blacklist.clear();
         for( int i = 0; i < addresses.length; i++ )
         {
@@ -74,8 +75,9 @@ public class BlacklistFilter extends IoFilterAdapter
      */
     public void setBlacklist( Collection<InetAddress> addresses )
     {
-        if( addresses == null )
+        if( addresses == null ) {
             throw new NullPointerException( "addresses" );
+        }
 
         InetAddress[] inetAddresses = new InetAddress[ addresses.size() ];
         try
@@ -96,8 +98,9 @@ public class BlacklistFilter extends IoFilterAdapter
      */
     public synchronized void block( InetAddress address , String error_string )
     {
-        if( address == null )
+        if( address == null ) {
             throw new NullPointerException( error_string );
+        }
         blacklist.add( address );
     }
 
@@ -114,11 +117,13 @@ public class BlacklistFilter extends IoFilterAdapter
      */
     public synchronized void unblock( InetAddress address )
     {
-        if( address == null )
+        if( address == null ) {
             throw new NullPointerException( "address" );
+        }
         blacklist.remove( address );
     }
     
+    @Override
     public void sessionCreated( NextFilter nextFilter, IoSession session )
     {
         if( !isBlocked( session ) )
@@ -132,6 +137,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
     
+    @Override
     public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
     {
         if( !isBlocked( session ) )
@@ -145,6 +151,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
     {
         if( !isBlocked( session ) )
@@ -158,6 +165,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status ) throws Exception
     {
         if( !isBlocked( session ) )
@@ -171,6 +179,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void messageReceived( NextFilter nextFilter, IoSession session, Object message )
     {
         if( !isBlocked( session ) )
@@ -184,6 +193,7 @@ public class BlacklistFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
     {
         if( !isBlocked( session ) )

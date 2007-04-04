@@ -44,6 +44,7 @@ public class IoSessionOutputStream extends OutputStream
         this.session = session;
     }
     
+    @Override
     public void close()
     {
         session.close().join();
@@ -64,11 +65,13 @@ public class IoSessionOutputStream extends OutputStream
         lastWriteFuture = future;
     }
     
+    @Override
     public void write( byte[] b, int off, int len ) throws IOException
     {
         write( ByteBuffer.wrap( b, off, len ) );
     }
 
+    @Override
     public void write( int b ) throws IOException
     {
         ByteBuffer buf = ByteBuffer.allocate( 1 );
@@ -77,6 +80,7 @@ public class IoSessionOutputStream extends OutputStream
         write( buf );
     }
     
+    @Override
     public synchronized void flush() throws IOException
     {
         if( lastWriteFuture == null )

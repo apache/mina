@@ -94,6 +94,7 @@ public class DefaultTransportType implements TransportType {
         return connectionless;
     }
     
+    @Override
     public String toString() {
         return name;
     }

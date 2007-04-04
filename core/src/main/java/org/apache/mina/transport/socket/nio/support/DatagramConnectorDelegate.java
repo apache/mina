@@ -85,6 +85,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         this.executor = executor;
     }
 
+    @Override
     protected void finalize() throws Throwable
     {
         super.finalize();
@@ -102,10 +103,12 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         return TransportType.DATAGRAM;
     }
     
+    @Override
     public DatagramSessionConfig getSessionConfig() {
         return (DatagramSessionConfig) super.getSessionConfig();
     }
 
+    @Override
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
         DatagramChannel ch = null;
@@ -214,8 +217,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         for( ;; )
         {
             DatagramSessionImpl session = trafficControllingSessions.poll();
-            if( session == null )
+            if( session == null ) {
                 break;
+            }
 
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
@@ -354,8 +358,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         for( ;; )
         {
             DatagramSessionImpl session = flushingSessions.poll();
-            if( session == null )
+            if( session == null ) {
                 break;
+            }
 
             try
             {
@@ -382,8 +387,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 req = writeRequestQueue.peek();
             }
 
-            if( req == null )
+            if( req == null ) {
                 break;
+            }
 
             ByteBuffer buf = ( ByteBuffer ) req.getMessage();
             if( buf.remaining() == 0 )
@@ -442,8 +448,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         for( ;; )
         {
             RegistrationRequest req = registerQueue.poll();
-            if( req == null )
+            if( req == null ) {
                 break;
+            }
 
             DatagramSessionImpl session = new DatagramSessionImpl(
                     wrapper, this, req.channel, getHandler() );
@@ -496,9 +503,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         for( ;; )
         {
             DatagramSessionImpl session = cancelQueue.poll();
-            if( session == null )
+            if( session == null ) {
                 break;
-            else
+            } else
             {
                 SelectionKey key = session.getSelectionKey();
                 DatagramChannel ch = ( DatagramChannel ) key.channel();

@@ -101,10 +101,12 @@ public class FutureTest extends TestCase
                 return 0;
             }
 
+            @Override
             protected void updateTrafficMask()
             {
             }
 
+            @Override
             public boolean isClosing()
             {
                 return false;
@@ -120,6 +122,7 @@ public class FutureTest extends TestCase
                 return null;
             }
 
+            @Override
             public SocketAddress getServiceAddress()
             {
                 return null;
@@ -199,6 +202,7 @@ public class FutureTest extends TestCase
             this.future = future;
         }
         
+        @Override
         public void run()
         {
             success = future.join( 10000 );

@@ -22,7 +22,6 @@ package org.apache.mina.common;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -126,9 +125,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
      */
     public boolean contains( IoFilter filter )
     {
-        for( Iterator i = entries.iterator(); i.hasNext(); )
-        {
-            Entry e = ( Entry ) i.next();
+        for (Entry e : entries) {
             if( e.getFilter() == filter )
             {
                 return true;
@@ -143,9 +140,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
      */
     public boolean contains( Class<? extends IoFilter> filterType )
     {
-        for( Iterator i = entries.iterator(); i.hasNext(); )
-        {
-            Entry e = ( Entry ) i.next();
+        for (Entry e : entries) {
             if( filterType.isAssignableFrom( e.getFilter().getClass() ) )
             {
                 return true;
@@ -243,13 +238,12 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     
     public void buildFilterChain( IoFilterChain chain ) throws Exception
     {
-        for( Iterator<Entry> i = entries.iterator(); i.hasNext(); )
-        {
-            Entry e = i.next();
+        for (Entry e : entries) {
             chain.addLast( e.getName(), e.getFilter() );
         }
     }
     
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
@@ -257,9 +251,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
         
         boolean empty = true;
         
-        for( Iterator<Entry> i = entries.iterator(); i.hasNext(); )
-        {
-            Entry e = i.next();
+        for (Entry e : entries) {
             if( !empty )
             {
                 buf.append( ", " );
@@ -286,6 +278,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
         return buf.toString();
     }
     
+    @Override
     public Object clone()
     {
         DefaultIoFilterChainBuilder ret;
@@ -300,9 +293,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
         
         ret.init();
         
-        for( Iterator i = entries.iterator(); i.hasNext(); )
-        {
-            Entry e = ( Entry ) i.next();
+        for (Entry e : entries) {
             ret.addLast( e.getName(), e.getFilter() );
         }
         return ret;
@@ -376,6 +367,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
             throw new IllegalStateException();
         }
         
+        @Override
         public String toString()
         {
             return "(" + getName() + ':' + filter + ')';

@@ -266,6 +266,7 @@ public class TextLineDecoderTest extends TestCase
     
     private static class DummySession extends BaseIoSession
     {
+        @Override
         protected void updateTrafficMask()
         {
         }
@@ -310,6 +311,7 @@ public class TextLineDecoderTest extends TestCase
             return null;
         }
 
+        @Override
         public SocketAddress getServiceAddress()
         {
             return null;
@@ -323,7 +325,7 @@ public class TextLineDecoderTest extends TestCase
     
     private static class TestDecoderOutput implements ProtocolDecoderOutput
     {
-        private Queue<Object> messageQueue = new LinkedList<Object>();
+        private final Queue<Object> messageQueue = new LinkedList<Object>();
 
         public void write( Object message )
         {

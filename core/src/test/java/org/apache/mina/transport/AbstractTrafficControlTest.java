@@ -50,6 +50,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
         this.acceptor = acceptor;
     }
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -60,6 +61,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
         acceptor.bind();
     }
 
+    @Override
     protected void tearDown() throws Exception
     {
         super.tearDown();
@@ -187,6 +189,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
     
     public static class ClientIoHandler extends IoHandlerAdapter
     {
+        @Override
         public void sessionCreated( IoSession session ) throws Exception
         {
             super.sessionCreated( session );
@@ -196,6 +199,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
             session.setAttribute( "lock", new Object() );
         }
 
+        @Override
         public void messageReceived( IoSession session, Object message ) throws Exception
         {
             ByteBuffer buffer = ( ByteBuffer ) message;
@@ -210,6 +214,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
             }
         }
 
+        @Override
         public void messageSent( IoSession session, Object message ) throws Exception
         {
             ByteBuffer buffer = ( ByteBuffer ) message;
@@ -224,6 +229,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
     
     private static class ServerIoHandler extends IoHandlerAdapter
     {
+        @Override
         public void messageReceived( IoSession session, Object message )
                 throws Exception
         {

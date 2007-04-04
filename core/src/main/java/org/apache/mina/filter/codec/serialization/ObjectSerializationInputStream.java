@@ -97,6 +97,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
         this.maxObjectSize = maxObjectSize;
     }
 
+    @Override
     public int read() throws IOException
     {
         return in.read();
@@ -169,6 +170,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
      * @see DataInput#readLine()
      * @deprecated
      */
+    @Deprecated
     public String readLine() throws IOException
     {
         return in.readLine();

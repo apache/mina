@@ -70,6 +70,7 @@ public class ProtocolDecoderException extends ProtocolCodecException
     /**
      * Returns the message and the hexdump of the unknown part.
      */
+    @Override
     public String getMessage()
     {
         String message = super.getMessage();

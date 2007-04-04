@@ -38,11 +38,13 @@ public class AnonymousSocketAddress extends SocketAddress implements Comparable
     {
     }
 
+    @Override
     public int hashCode()
     {
         return System.identityHashCode( this );
     }
 
+    @Override
     public boolean equals( Object o )
     {
         return this == o;
@@ -53,6 +55,7 @@ public class AnonymousSocketAddress extends SocketAddress implements Comparable
         return this.hashCode() - ( ( AnonymousSocketAddress ) o ).hashCode();
     }
 
+    @Override
     public String toString()
     {
         return "anonymous(" + hashCode() + ')';

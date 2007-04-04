@@ -45,11 +45,13 @@ public class SocketBindTest extends AbstractBindTest
         super( new SocketAcceptor() );
     }
     
+    @Override
     protected SocketAddress createSocketAddress( int port )
     {
         return new InetSocketAddress( port );
     }
     
+    @Override
     protected int getPort( SocketAddress address )
     {
         return ( ( InetSocketAddress ) address ).getPort();
@@ -82,9 +84,8 @@ public class SocketBindTest extends AbstractBindTest
         // Wait for the client side sessions to close.
         Thread.sleep( 500 );
              
-        for( int i = 0; i < sessions.length; i++ )
-        {
-            Assert.assertFalse( sessions[ i ].isConnected() );
+        for (IoSession element : sessions) {
+            Assert.assertFalse( element.isConnected() );
         }
     }
 }

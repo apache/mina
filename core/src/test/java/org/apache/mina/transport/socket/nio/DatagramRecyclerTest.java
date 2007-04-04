@@ -102,36 +102,43 @@ public class DatagramRecyclerTest extends TestCase
         public IoSession session;
         public String result = "";
 
+        @Override
         public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
             this.session = session;
             result += "CA";
         }
 
+        @Override
         public void messageReceived(IoSession session, Object message) throws Exception {
             this.session = session;
             result += "RE";
         }
 
+        @Override
         public void messageSent(IoSession session, Object message) throws Exception {
             this.session = session;
             result += "SE";
         }
 
+        @Override
         public void sessionClosed(IoSession session) throws Exception {
             this.session = session;
             result += "CL";
         }
 
+        @Override
         public void sessionCreated(IoSession session) throws Exception {
             this.session = session;
             result += "CR";
         }
 
+        @Override
         public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
             this.session = session;
             result += "ID";
         }
 
+        @Override
         public void sessionOpened(IoSession session) throws Exception {
             this.session = session;
             result += "OP";

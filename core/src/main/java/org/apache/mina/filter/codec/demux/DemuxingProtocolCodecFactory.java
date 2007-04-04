@@ -221,29 +221,31 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
         {
             MessageEncoder encoder;
 
-            if( triedClasses.contains( type ) )
+            if( triedClasses.contains( type ) ) {
                 return null;
+            }
             triedClasses.add( type );
 
             encoder = encoders.get( type );
             if( encoder == null )
             {
                 encoder = findEncoder( type, triedClasses );
-                if( encoder != null )
+                if( encoder != null ) {
                     return encoder;
+                }
 
                 Class[] interfaces = type.getInterfaces();
-                for( int i = 0; i < interfaces.length; i ++ )
-                {
-                    encoder = findEncoder( interfaces[ i ], triedClasses );
-                    if( encoder != null )
+                for (Class element : interfaces) {
+                    encoder = findEncoder( element, triedClasses );
+                    if( encoder != null ) {
                         return encoder;
+                    }
                 }
 
                 return null;
-            }
-            else
+            } else {
                 return encoder;
+            }
         }
 
         public void dispose( IoSession session ) throws Exception
@@ -267,6 +269,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
             }
         }
 
+        @Override
         protected boolean doDecode( IoSession session, ByteBuffer in,
                                     ProtocolDecoderOutput out ) throws Exception
         {
@@ -342,6 +345,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
             }
         }
 
+        @Override
         public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
         {
             if( currentDecoder == null )
@@ -352,6 +356,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
             currentDecoder.finishDecode( session, out ); 
         }
 
+        @Override
         public void dispose( IoSession session ) throws Exception
         {
             super.dispose( session );

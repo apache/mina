@@ -54,6 +54,7 @@ public class DatagramConfigTest extends TestCase
     {
     }
 
+    @Override
     protected void setUp() throws Exception
     {
         result = "";
@@ -102,6 +103,7 @@ public class DatagramConfigTest extends TestCase
     private class MockFilter extends IoFilterAdapter
     {
 
+        @Override
         public void messageReceived( NextFilter nextFilter, IoSession session,
                 Object message ) throws Exception
         {
@@ -113,6 +115,7 @@ public class DatagramConfigTest extends TestCase
 
     private class MockHandler extends IoHandlerAdapter
     {
+        @Override
         public void messageReceived( IoSession session, Object message )
                 throws Exception
         {

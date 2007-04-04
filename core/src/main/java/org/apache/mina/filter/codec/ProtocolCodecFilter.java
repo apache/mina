@@ -136,6 +136,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         };
     }
 
+    @Override
     public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
     {
         if( parent.contains( ProtocolCodecFilter.class ) )
@@ -144,12 +145,14 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         }
     }
     
+    @Override
     public void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
     {
         disposeEncoder( parent.getSession() );
         disposeDecoder( parent.getSession() ); 
     }
 
+    @Override
     public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
     {
         if( !( message instanceof ByteBuffer ) )
@@ -196,6 +199,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         }
     }
 
+    @Override
     public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
     {
         if( message instanceof HiddenByteBuffer )
@@ -212,6 +216,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         nextFilter.messageSent( session, ( ( MessageByteBuffer ) message ).message );
     }
     
+    @Override
     public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
     {
         Object message = writeRequest.getMessage();
@@ -257,6 +262,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         }
     }
     
+    @Override
     public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
     {
         // Call finishDecode() first when a connection is closed.
@@ -409,6 +415,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             this.writeRequest = writeRequest;
         }
 
+        @Override
         protected WriteFuture doFlush( ByteBuffer buf )
         {
             WriteFuture future = new DefaultWriteFuture( session );

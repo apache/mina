@@ -19,12 +19,12 @@
  */
 package org.apache.mina.common;
 
-import java.util.Iterator;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.IoFilterChain.Entry;
+
 
 /**
  * Tests {@link DefaultIoFilterChainBuilder}.
@@ -39,10 +39,12 @@ public class DefaultIoFilterChainBuilderTest extends TestCase
         junit.textui.TestRunner.run( DefaultIoFilterChainBuilderTest.class );
     }
 
+    @Override
     protected void setUp() throws Exception
     {
     }
 
+    @Override
     protected void tearDown() throws Exception
     {
     }
@@ -61,9 +63,7 @@ public class DefaultIoFilterChainBuilderTest extends TestCase
         builder.addAfter( "D", "H", new IoFilterAdapter() );
         
         String actual = "";
-        for( Iterator i = builder.getAll().iterator(); i.hasNext(); ) 
-        {
-            Entry e = ( Entry ) i.next();
+        for (Entry e : builder.getAll()) {
             actual += e.getName();
         }
         
@@ -134,6 +134,7 @@ public class DefaultIoFilterChainBuilderTest extends TestCase
         // When there's one filter
         builder.addLast( "A", new IoFilterAdapter()
         {
+            @Override
             public String toString()
             {
                 return "B";
@@ -144,6 +145,7 @@ public class DefaultIoFilterChainBuilderTest extends TestCase
         // When there are two
         builder.addLast( "C", new IoFilterAdapter()
         {
+            @Override
             public String toString()
             {
                 return "D";

@@ -89,11 +89,13 @@ public class LineDelimiter
         return value;
     }
     
+    @Override
     public int hashCode()
     {
         return value.hashCode();
     }
     
+    @Override
     public boolean equals( Object o )
     {
         if( !( o instanceof LineDelimiter ) )
@@ -105,6 +107,7 @@ public class LineDelimiter
         return this.value.equals( that.value );
     }
     
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer();

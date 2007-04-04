@@ -58,6 +58,7 @@ public class StreamWriteFilterTest extends TestCase {
     IoSession session;
     NextFilter nextFilter;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -432,10 +433,12 @@ public class StreamWriteFilterTest extends TestCase {
             digest = MessageDigest.getInstance( "MD5" );
         }
 
+        @Override
         public int read() throws IOException
         {
-            if ( isAllWritten() )
+            if ( isAllWritten() ) {
                 return -1;
+            }
             bytesRead++;
             byte b = ( byte ) random.nextInt( 255 );
             digest.update( b );
@@ -469,15 +472,18 @@ public class StreamWriteFilterTest extends TestCase {
             this.inputStream = inputStream;
         }
 
+        @Override
         public void sessionCreated( IoSession session ) throws Exception {
             super.sessionCreated( session );
             session.getFilterChain().addLast( "codec", streamWriteFilter );
         }
 
+        @Override
         public void sessionOpened( IoSession session ) throws Exception {
             session.write( inputStream );
         }
 
+        @Override
         public void exceptionCaught( IoSession session, Throwable cause ) throws Exception
         {
             synchronized( lock )
@@ -486,6 +492,7 @@ public class StreamWriteFilterTest extends TestCase {
             }
         }
 
+        @Override
         public void sessionClosed( IoSession session ) throws Exception
         {
             synchronized( lock )
@@ -494,6 +501,7 @@ public class StreamWriteFilterTest extends TestCase {
             }
         }
 
+        @Override
         public void sessionIdle( IoSession session, IdleStatus status ) throws Exception
         {
             synchronized( lock )
@@ -502,6 +510,7 @@ public class StreamWriteFilterTest extends TestCase {
             }
         }
 
+        @Override
         public void messageSent( IoSession session, Object message ) throws Exception
         {
             if( message == inputStream )
@@ -527,6 +536,7 @@ public class StreamWriteFilterTest extends TestCase {
             digest = MessageDigest.getInstance( "MD5" );
         }
 
+        @Override
         public void sessionCreated( IoSession session ) throws Exception
         {
             super.sessionCreated(session);
@@ -534,11 +544,13 @@ public class StreamWriteFilterTest extends TestCase {
             session.setIdleTime( IdleStatus.READER_IDLE, 5 );
         }
 
+        @Override
         public void sessionIdle( IoSession session, IdleStatus status ) throws Exception
         {
             session.close();
         }
 
+        @Override
         public void exceptionCaught( IoSession session, Throwable cause ) throws Exception
         {
             synchronized( lock )
@@ -547,6 +559,7 @@ public class StreamWriteFilterTest extends TestCase {
             }
         }
         
+        @Override
         public void sessionClosed( IoSession session ) throws Exception
         {
             synchronized( lock )
@@ -555,6 +568,7 @@ public class StreamWriteFilterTest extends TestCase {
             }
         }
 
+        @Override
         public void messageReceived( IoSession session, Object message ) throws Exception
         {
             ByteBuffer buf = ( ByteBuffer ) message;
@@ -572,6 +586,7 @@ public class StreamWriteFilterTest extends TestCase {
     
     public static class WriteRequestMatcher extends AbstractMatcher
     {
+        @Override
         protected boolean argumentMatches( Object expected, Object actual )
         {
             if( expected instanceof WriteRequest && expected instanceof WriteRequest )

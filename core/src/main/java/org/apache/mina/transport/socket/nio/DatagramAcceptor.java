@@ -20,9 +20,11 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.support.DelegatedIoAcceptor;
 import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
@@ -54,14 +56,29 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
         init( new DatagramAcceptorDelegate( this, executor ) );
     }
     
+    @Override
     public DatagramSessionConfig getSessionConfig() {
         return ( ( DatagramAcceptorDelegate ) delegate ).getSessionConfig();
     }
 
+    @Override
     public InetSocketAddress getLocalAddress() {
         return ( ( DatagramAcceptorDelegate ) delegate ).getLocalAddress();
     }
     
+    // These two methods are overriden to work around a problem with
+    // bean property access mechanism.
+
+    @Override
+    public void setSessionConfig(IoSessionConfig sessionConfig) {
+        super.setSessionConfig(sessionConfig);
+    }
+    
+    @Override
+    public void setLocalAddress(SocketAddress localAddress) {
+        super.setLocalAddress(localAddress);
+    }
+
     /**
      * Returns the {@link IoSessionRecycler} for this service.
      */

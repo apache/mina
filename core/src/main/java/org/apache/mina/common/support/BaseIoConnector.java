@@ -66,8 +66,9 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
     
     public final ConnectFuture connect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
-        if( remoteAddress == null )
+        if( remoteAddress == null ) {
             throw new NullPointerException( "remoteAddress" );
+        }
         
         if( !getTransportType().getAddressType().isAssignableFrom(
                 remoteAddress.getClass() ) )
@@ -86,8 +87,9 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
                     " (expected: " + getTransportType().getAddressType() + ")");
         }
         
-        if( getHandler() == null )
+        if( getHandler() == null ) {
             throw new IllegalStateException( "handler is not set." );
+        }
         
         return doConnect( remoteAddress, localAddress );
     }

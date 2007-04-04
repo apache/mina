@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
@@ -53,10 +54,25 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         return TransportType.VM_PIPE;
     }
     
+    @Override
     public VmPipeSessionConfig getSessionConfig() {
         return (VmPipeSessionConfig) super.getSessionConfig();
     }
 
+    // These two methods are overriden to work around a problem with
+    // bean property access mechanism.
+
+    @Override
+    public void setSessionConfig(IoSessionConfig sessionConfig) {
+        super.setSessionConfig(sessionConfig);
+    }
+    
+    @Override
+    public void setLocalAddress(SocketAddress localAddress) {
+        super.setLocalAddress(localAddress);
+    }
+
+    @Override
     protected void doBind() throws IOException
     {
         VmPipeAddress localAddress = ( VmPipeAddress ) getLocalAddress();
@@ -88,6 +104,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         getListeners().fireServiceActivated();
     }
     
+    @Override
     protected void doUnbind()
     {
         synchronized( boundHandlers )

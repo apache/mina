@@ -78,14 +78,17 @@ public class LoggingFilter extends IoFilterAdapter
      * {@link LogLevel} which logs messages on the DEBUG level.
      */
     public static final LogLevel DEBUG = new LogLevel() {
+        @Override
         public boolean isEnabled(Logger log) {
             return log.isDebugEnabled();
         }
 
+        @Override
         public void log(Logger log, IoSession session, String message) {
             SessionLog.debug(log, session, message);
         }
 
+        @Override
         public void log(Logger log, IoSession session, String message,
                 Throwable cause) {
             SessionLog.debug(log, session, message, cause);
@@ -96,14 +99,17 @@ public class LoggingFilter extends IoFilterAdapter
      * {@link LogLevel} which logs messages on the INFO level.
      */
     public static final LogLevel INFO = new LogLevel() {
+        @Override
         public boolean isEnabled(Logger log) {
             return log.isInfoEnabled();
         }
 
+        @Override
         public void log(Logger log, IoSession session, String message) {
             SessionLog.info(log, session, message);
         }
 
+        @Override
         public void log(Logger log, IoSession session, String message,
                 Throwable cause) {
             SessionLog.info(log, session, message, cause);
@@ -114,14 +120,17 @@ public class LoggingFilter extends IoFilterAdapter
      * {@link LogLevel} which logs messages on the WARN level.
      */
     public static final LogLevel WARN = new LogLevel() {
+        @Override
         public boolean isEnabled(Logger log) {
             return log.isWarnEnabled();
         }
 
+        @Override
         public void log(Logger log, IoSession session, String message) {
             SessionLog.warn(log, session, message);
         }
 
+        @Override
         public void log(Logger log, IoSession session, String message,
                 Throwable cause) {
             SessionLog.warn(log, session, message, cause);
@@ -132,14 +141,17 @@ public class LoggingFilter extends IoFilterAdapter
      * {@link LogLevel} which logs messages on the ERROR level.
      */
     public static final LogLevel ERROR = new LogLevel() {
+        @Override
         public boolean isEnabled(Logger log) {
             return log.isErrorEnabled();
         }
 
+        @Override
         public void log(Logger log, IoSession session, String message) {
             SessionLog.error(log, session, message);
         }
 
+        @Override
         public void log(Logger log, IoSession session, String message,
                 Throwable cause) {
             SessionLog.error(log, session, message, cause);
@@ -246,21 +258,25 @@ public class LoggingFilter extends IoFilterAdapter
         this.exceptionCaughtLogLevel = logLevel;
     }
 
+    @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) {
         defaultLogLevel.log(getLogger(session, SESSION_CREATED_LOGGER, "sessionCreated"), session, "CREATED");
         nextFilter.sessionCreated(session);
     }
 
+    @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session) {
         defaultLogLevel.log(getLogger(session, SESSION_OPENED_LOGGER, "sessionOpened"), session, "OPENED");
         nextFilter.sessionOpened(session);
     }
 
+    @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session) {
         defaultLogLevel.log(getLogger(session, SESSION_CLOSED_LOGGER, "sessionClosed"), session, "CLOSED");
         nextFilter.sessionClosed(session);
     }
 
+    @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session,
             IdleStatus status) {
         Logger log = getLogger(session, SESSION_IDLE_LOGGER, "sessionIdle");
@@ -270,6 +286,7 @@ public class LoggingFilter extends IoFilterAdapter
         nextFilter.sessionIdle(session, status);
     }
 
+    @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) {
         Logger log = getLogger(session, EXCEPTION_CAUGHT_LOGGER, "exceptionCaught");
@@ -279,6 +296,7 @@ public class LoggingFilter extends IoFilterAdapter
         nextFilter.exceptionCaught(session, cause);
     }
 
+    @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) {
         Logger log = getLogger(session, MESSAGE_RECEIVED_LOGGER, "messageReceived");
@@ -288,6 +306,7 @@ public class LoggingFilter extends IoFilterAdapter
         nextFilter.messageReceived(session, message);
     }
 
+    @Override
     public void messageSent(NextFilter nextFilter, IoSession session,
             Object message) {
         Logger log = getLogger(session, MESSAGE_SENT_LOGGER, "messageSent");
@@ -297,6 +316,7 @@ public class LoggingFilter extends IoFilterAdapter
         nextFilter.messageSent(session, message);
     }
 
+    @Override
     public void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) {
         Logger log = getLogger(session, WRITE_LOGGER, "write");
@@ -306,6 +326,7 @@ public class LoggingFilter extends IoFilterAdapter
         nextFilter.filterWrite(session, writeRequest);
     }
 
+    @Override
     public void filterClose(NextFilter nextFilter, IoSession session)
             throws Exception {
         defaultLogLevel.log(getLogger(session, CLOSE_LOGGER, "close"), session, "CLOSE");

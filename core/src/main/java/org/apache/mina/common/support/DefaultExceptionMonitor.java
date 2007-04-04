@@ -38,6 +38,7 @@ public class DefaultExceptionMonitor extends ExceptionMonitor
 {
     private final Logger log = LoggerFactory.getLogger( DefaultExceptionMonitor.class );
 
+    @Override
     public void exceptionCaught( Throwable cause )
     {
         if( log.isWarnEnabled() )

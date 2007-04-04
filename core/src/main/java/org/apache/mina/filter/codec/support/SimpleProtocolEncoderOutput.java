@@ -62,9 +62,9 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
         }
         
         // Get the size of merged BB
-        for( Object o: bufferQueue )
+        for( ByteBuffer b: bufferQueue )
         {
-            sum += ( ( ByteBuffer ) o ).remaining();
+            sum += b.remaining();
         }
         
         // Allocate a new BB that will contain all fragments

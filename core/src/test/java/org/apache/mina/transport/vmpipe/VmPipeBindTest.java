@@ -44,11 +44,13 @@ public class VmPipeBindTest extends AbstractBindTest
         super( new VmPipeAcceptor() );
     }
 
+    @Override
     protected SocketAddress createSocketAddress( int port )
     {
         return new VmPipeAddress( port );
     }
     
+    @Override
     protected int getPort( SocketAddress address )
     {
         return ( ( VmPipeAddress ) address ).getPort();
@@ -77,10 +79,8 @@ public class VmPipeBindTest extends AbstractBindTest
         
         Collection<IoSession> managedSessions = acceptor.getManagedSessions();
         Assert.assertEquals( 5, managedSessions.size() );
-        // Make sure it's the server side sessions we get when calling getManagedSessions()
-        for( int i = 0; i < sessions.length; i++ )
-        {
-            Assert.assertFalse( managedSessions.contains( sessions[ i ] ) );
+        for (IoSession element : sessions) {
+            Assert.assertFalse( managedSessions.contains( element ) );
         }
         
         acceptor.unbind();
@@ -88,9 +88,8 @@ public class VmPipeBindTest extends AbstractBindTest
         // Wait for the client side sessions to close.
         Thread.sleep( 500 );
              
-        for( int i = 0; i < sessions.length; i++ )
-        {
-            Assert.assertFalse( sessions[ i ].isConnected() );
+        for (IoSession element : sessions) {
+            Assert.assertFalse( element.isConnected() );
         }
     }
 }

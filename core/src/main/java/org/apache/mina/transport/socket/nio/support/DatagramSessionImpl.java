@@ -161,6 +161,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
         return handler;
     }
     
+    @Override
     protected void close0()
     {
         if( managerDelegate instanceof IoAcceptor )
@@ -175,6 +176,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
         return writeRequestQueue;
     }
     
+    @Override
     public WriteFuture write( Object message, SocketAddress destination )
     {
         if( !this.config.isBroadcast() )
@@ -185,6 +187,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
         return super.write( message, destination );
     }
 
+    @Override
     protected void write0( WriteRequest writeRequest )
     {
         filterChain.fireFilterWrite( this, writeRequest );
@@ -230,11 +233,13 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
         return localAddress;
     }
     
+    @Override
     public InetSocketAddress getServiceAddress()
     {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
+    @Override
     protected void updateTrafficMask()
     {
         managerDelegate.updateTrafficMask( this );
@@ -247,6 +252,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
 
     private class SessionConfigImpl extends DefaultDatagramSessionConfig implements DatagramSessionConfig
     {
+        @Override
         public int getReceiveBufferSize()
         {
             try
@@ -259,6 +265,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public void setReceiveBufferSize( int receiveBufferSize )
         {
             if( DefaultDatagramSessionConfig.isSetReceiveBufferSizeAvailable() )
@@ -277,6 +284,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public boolean isBroadcast()
         {
             try
@@ -289,6 +297,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public void setBroadcast( boolean broadcast )
         {
             try
@@ -301,6 +310,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public int getSendBufferSize()
         {
             try
@@ -313,6 +323,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public void setSendBufferSize( int sendBufferSize )
         {
             if( DefaultDatagramSessionConfig.isSetSendBufferSizeAvailable() )
@@ -328,6 +339,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public boolean isReuseAddress()
         {
             try
@@ -340,6 +352,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public void setReuseAddress( boolean reuseAddress )
         {
             try
@@ -352,6 +365,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public int getTrafficClass()
         {
             if( DefaultDatagramSessionConfig.isGetTrafficClassAvailable() )
@@ -371,6 +385,7 @@ class DatagramSessionImpl extends BaseIoSession implements DatagramSession
             }
         }
 
+        @Override
         public void setTrafficClass( int trafficClass )
         {
             if( DefaultDatagramSessionConfig.isSetTrafficClassAvailable() )

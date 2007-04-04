@@ -20,7 +20,6 @@
 package org.apache.mina.common.support;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -116,9 +115,8 @@ public class IoServiceListenerSupport
             
             try
             {
-                for( Iterator i = listeners.iterator(); i.hasNext(); )
-                {
-                    ( ( IoServiceListener ) i.next() ).serviceActivated( service );
+                for (IoServiceListener l : listeners) {
+                    l.serviceActivated( service );
                 }
             }
             finally
@@ -148,9 +146,8 @@ public class IoServiceListenerSupport
 
                 try
                 {
-                    for( Iterator i = listeners.iterator(); i.hasNext(); )
-                    {
-                        ( ( IoServiceListener ) i.next() ).serviceDeactivated( service );
+                    for (IoServiceListener l : listeners) {
+                        l.serviceDeactivated( service );
                     }
                 }
                 finally
@@ -199,9 +196,8 @@ public class IoServiceListenerSupport
         // Fire listener events.
         synchronized( listeners )
         {
-            for( Iterator i = listeners.iterator(); i.hasNext(); )
-            {
-                ( ( IoServiceListener ) i.next() ).sessionCreated( session );
+            for (IoServiceListener l : listeners) {
+                l.sessionCreated( session );
             }
         }
     }
@@ -231,9 +227,8 @@ public class IoServiceListenerSupport
         {
             synchronized( listeners )
             {
-                for( Iterator i = listeners.iterator(); i.hasNext(); )
-                {
-                    ( ( IoServiceListener ) i.next() ).sessionDestroyed( session );
+                for (IoServiceListener l : listeners) {
+                    l.sessionDestroyed( session );
                 }
             }
         }
@@ -266,9 +261,8 @@ public class IoServiceListenerSupport
             sessionsCopy = new IdentityHashSet<IoSession>( managedSessions );
         }
         
-        for( Iterator i = sessionsCopy.iterator(); i.hasNext(); )
-        {
-            ( ( IoSession ) i.next() ).close().addListener( new IoFutureListener()
+        for (IoSession s : sessionsCopy) {
+            s.close().addListener( new IoFutureListener()
             {
                 public void operationComplete( IoFuture future )
                 {

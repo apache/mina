@@ -20,7 +20,6 @@
 package org.apache.mina.common.support;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.mina.common.IoFuture;
@@ -101,9 +100,9 @@ public class DefaultIoFuture implements IoFuture
                 {
                 }
 
-                if( ready )
+                if( ready ) {
                     return true;
-                else
+                } else
                 {
                     waitTime = timeoutInMillis - ( System.currentTimeMillis() - startTime );
                     if( waitTime <= 0 )
@@ -189,8 +188,8 @@ public class DefaultIoFuture implements IoFuture
     {
         synchronized( lock )
         {
-            for( Iterator i = listeners.iterator(); i.hasNext(); ) {
-                ( ( IoFutureListener ) i.next() ).operationComplete( this );
+            for (IoFutureListener l : listeners) {
+                l.operationComplete( this );
             }
         }
     }

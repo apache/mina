@@ -20,7 +20,6 @@
 package org.apache.mina.management;
 
 
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -68,7 +67,7 @@ public class StatCollector
     private Queue<IoSession> polledSessions;
 
     // resume of session stats, for simplifying acces to the statistics 
-    private AtomicLong totalProcessedSessions = new AtomicLong();
+    private final AtomicLong totalProcessedSessions = new AtomicLong();
     private float msgWrittenThroughput = 0f;
     private float msgReadThroughput = 0f;
     private float bytesWrittenThroughput = 0f;
@@ -123,16 +122,16 @@ public class StatCollector
     {
         synchronized (this) 
         {
-            if ( worker != null && worker.isAlive() )
+            if ( worker != null && worker.isAlive() ) {
                 throw new RuntimeException( "Stat collecting already started" );
+            }
     
             // add all current sessions
     
             polledSessions = new ConcurrentLinkedQueue<IoSession>();
             
-            for ( Iterator<IoSession> iter = service.getManagedSessions().iterator(); iter.hasNext(); )
-            {
-                addSession( iter.next() );
+            for (IoSession ioSession : service.getManagedSessions()) {
+                addSession( ioSession );
             }
 
             // listen for new ones
@@ -175,8 +174,7 @@ public class StatCollector
                 }
             }
 
-            for (Iterator iter = polledSessions.iterator(); iter.hasNext();) {
-                IoSession session = (IoSession) iter.next();
+            for (IoSession session : polledSessions) {
                 session.removeAttribute(KEY);
             }
             polledSessions.clear();
@@ -272,13 +270,12 @@ public class StatCollector
             super( "StatCollectorWorker-" + id );
         }
 
+        @Override
         public void run()
         {
             while ( !stop )
             {
-                for ( Iterator iter = polledSessions.iterator(); iter.hasNext(); )
-                {
-                    IoSession session = ( IoSession ) iter.next();
+                for (IoSession session : polledSessions) {
                     IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
 
                     sessStat.lastByteRead = session.getReadBytes();
@@ -301,11 +298,9 @@ public class StatCollector
                 float tmpBytesWrittenThroughput = 0f;
                 float tmpBytesReadThroughput = 0f;
                 
-                for ( Iterator iter = polledSessions.iterator(); iter.hasNext(); )
-                {
+                for (IoSession session : polledSessions) {
                 
                     // upadating individual session statistics
-                    IoSession session = ( IoSession ) iter.next();
                     IoSessionStat sessStat = ( IoSessionStat ) session.getAttribute( KEY );
 
                     sessStat.byteReadThroughput = ( session.getReadBytes() - sessStat.lastByteRead )

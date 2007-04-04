@@ -49,6 +49,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
         super( null );
     }
     
+    @Override
     public IoSession getSession() throws RuntimeIOException
     {
         Object v = getValue();

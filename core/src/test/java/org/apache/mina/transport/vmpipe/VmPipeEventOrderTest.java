@@ -47,11 +47,13 @@ public class VmPipeEventOrderTest extends TestCase
         acceptor.setLocalAddress( new VmPipeAddress( 1 ) );
         acceptor.setHandler(
                 new IoHandlerAdapter() {
+                    @Override
                     public void sessionOpened( IoSession session ) throws Exception
                     {
                         session.write("B");
                     }
                     
+                    @Override
                     public void messageSent( IoSession session, Object message ) throws Exception
                     {
                         session.close();
@@ -65,16 +67,19 @@ public class VmPipeEventOrderTest extends TestCase
         connector.setHandler(
                 new IoHandlerAdapter() {
 
+                    @Override
                     public void messageReceived( IoSession session, Object message ) throws Exception
                     {
                         actual.append( message );
                     }
 
+                    @Override
                     public void sessionClosed( IoSession session ) throws Exception
                     {
                         actual.append( "C" );
                     }
 
+                    @Override
                     public void sessionOpened( IoSession session ) throws Exception {
                         actual.append( "A" );
                     }
@@ -111,16 +116,19 @@ public class VmPipeEventOrderTest extends TestCase
         acceptor.setHandler(
                 new IoHandlerAdapter() {
 
+                    @Override
                     public void messageReceived( IoSession session, Object message ) throws Exception
                     {
                         actual.append( message );
                     }
 
+                    @Override
                     public void sessionClosed( IoSession session ) throws Exception
                     {
                         actual.append( "C" );
                     }
 
+                    @Override
                     public void sessionOpened( IoSession session ) throws Exception {
                         actual.append( "A" );
                     }
@@ -131,11 +139,13 @@ public class VmPipeEventOrderTest extends TestCase
         
         connector.setHandler(
                 new IoHandlerAdapter() {
+                    @Override
                     public void sessionOpened( IoSession session ) throws Exception
                     {
                         session.write("B");
                     }
                     
+                    @Override
                     public void messageSent( IoSession session, Object message ) throws Exception
                     {
                         session.close();

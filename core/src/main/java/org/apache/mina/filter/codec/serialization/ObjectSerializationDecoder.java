@@ -88,6 +88,7 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder
         this.maxObjectSize = maxObjectSize;
     }
 
+    @Override
     protected boolean doDecode( IoSession session, ByteBuffer in, ProtocolDecoderOutput out ) throws Exception
     {
         if( !in.prefixedDataAvailable( 4, maxObjectSize ) )

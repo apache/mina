@@ -34,6 +34,7 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.AbstractIoFilterChain;
@@ -110,6 +111,7 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
+    @Override
     protected void finalize() throws Throwable
     {
         super.finalize();
@@ -127,10 +129,19 @@ public class SocketConnector extends BaseIoConnector
         return TransportType.SOCKET;
     }
     
+    @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
 
+    // This method is overriden to work around a problem with
+    // bean property access mechanism.
+
+    @Override
+    public void setSessionConfig(IoSessionConfig sessionConfig) {
+        super.setSessionConfig(sessionConfig);
+    }
+    
     /**
      * How many seconds to keep the connection thread alive between connection requests
      *
@@ -155,6 +166,7 @@ public class SocketConnector extends BaseIoConnector
         this.workerTimeout = workerTimeout;
     }
 
+    @Override
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {
         SocketChannel ch = null;
@@ -225,8 +237,9 @@ public class SocketConnector extends BaseIoConnector
         for( ; ; )
         {
             ConnectionRequest req = connectQueue.poll();
-            if( req == null )
+            if( req == null ) {
                 break;
+            }
 
             SocketChannel ch = req.channel;
             try
@@ -248,8 +261,9 @@ public class SocketConnector extends BaseIoConnector
         {
             SelectionKey key = it.next();
 
-            if( !key.isConnectable() )
+            if( !key.isConnectable() ) {
                 continue;
+            }
 
             SocketChannel ch = ( SocketChannel ) key.channel();
             ConnectionRequest entry = ( ConnectionRequest ) key.attachment();
@@ -294,8 +308,9 @@ public class SocketConnector extends BaseIoConnector
         {
             SelectionKey key = it.next();
 
-            if( !key.isValid() )
+            if( !key.isValid() ) {
                 continue;
+            }
 
             ConnectionRequest entry = ( ConnectionRequest ) key.attachment();
 
@@ -418,6 +433,7 @@ public class SocketConnector extends BaseIoConnector
         }
     }
 
+    @Override
     protected IoServiceListenerSupport getListeners()
     {
         return super.getListeners();

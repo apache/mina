@@ -171,6 +171,7 @@ public class ReadThrottleFilterBuilder
 
     private class Add extends IoFilterAdapter
     {
+        @Override
         public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
         {
             if( message instanceof ByteBuffer )
@@ -184,6 +185,7 @@ public class ReadThrottleFilterBuilder
 
     private class Release extends IoFilterAdapter
     {
+        @Override
         public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
         {
             if( message instanceof ByteBuffer )

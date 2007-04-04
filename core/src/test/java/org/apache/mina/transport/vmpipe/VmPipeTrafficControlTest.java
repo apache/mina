@@ -41,6 +41,7 @@ public class VmPipeTrafficControlTest extends AbstractTrafficControlTest
         super( new VmPipeAcceptor() );
     }
 
+    @Override
     protected ConnectFuture connect( int port, IoHandler handler )
             throws Exception
     {
@@ -49,6 +50,7 @@ public class VmPipeTrafficControlTest extends AbstractTrafficControlTest
         return connector.connect( new VmPipeAddress( port ) );
     }
 
+    @Override
     protected SocketAddress createServerSocketAddress( int port )
     {
         return new VmPipeAddress( port );

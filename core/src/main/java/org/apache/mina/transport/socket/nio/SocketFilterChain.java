@@ -40,6 +40,7 @@ class SocketFilterChain extends AbstractIoFilterChain {
         super( parent );
     }
 
+    @Override
     protected void doWrite( IoSession session, WriteRequest writeRequest )
     {
         SocketSessionImpl s = ( SocketSessionImpl ) session;
@@ -59,6 +60,7 @@ class SocketFilterChain extends AbstractIoFilterChain {
         }
     }
 
+    @Override
     protected void doClose( IoSession session ) throws IOException
     {
         SocketSessionImpl s = ( SocketSessionImpl ) session;

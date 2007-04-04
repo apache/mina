@@ -33,6 +33,7 @@ public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable
     {
     }
 
+    @Override
     public Object clone()
     {
         BaseIoSessionConfig ret;

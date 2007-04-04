@@ -47,10 +47,12 @@ public class ByteBufferTest extends TestCase
         junit.textui.TestRunner.run( ByteBufferTest.class );
     }
 
+    @Override
     protected void setUp() throws Exception
     {
     }
 
+    @Override
     protected void tearDown() throws Exception
     {
     }

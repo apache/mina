@@ -72,11 +72,13 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
             buf.order( ByteOrder.BIG_ENDIAN );
         }
 
+        @Override
         public java.nio.ByteBuffer buf()
         {
             return buf;
         }
         
+        @Override
         protected void capacity0( int requestedCapacity )
         {
             int newCapacity = MINIMUM_CAPACITY;
@@ -102,26 +104,31 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator
             this.buf = newBuf;
         }
 
+        @Override
         protected ByteBuffer duplicate0()
         {
             return new SimpleByteBuffer( this.buf.duplicate(), false );
         }
 
+        @Override
         protected ByteBuffer slice0()
         {
             return new SimpleByteBuffer( this.buf.slice(), false );
         }
 
+        @Override
         protected ByteBuffer asReadOnlyBuffer0()
         {
             return new SimpleByteBuffer( this.buf.asReadOnlyBuffer(), false );
         }
 
+        @Override
         public byte[] array()
         {
             return buf.array();
         }
         
+        @Override
         public int arrayOffset()
         {
             return buf.arrayOffset();

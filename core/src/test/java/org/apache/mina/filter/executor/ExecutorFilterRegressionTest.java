@@ -46,11 +46,13 @@ public class ExecutorFilterRegressionTest extends TestCase
     {
     }
     
+    @Override
     public void setUp() throws Exception
     {
         filter = new ExecutorFilter();
     }
     
+    @Override
     public void tearDown() throws Exception
     {
         ( ( ThreadPoolExecutor ) filter.getExecutor() ).shutdown();
@@ -125,6 +127,7 @@ public class ExecutorFilterRegressionTest extends TestCase
             return null;
         }
 
+        @Override
         public CloseFuture close()
         {
             return null;
@@ -150,10 +153,12 @@ public class ExecutorFilterRegressionTest extends TestCase
             return 0;
         }
 
+        @Override
         protected void updateTrafficMask()
         {
         }
 
+        @Override
         public boolean isClosing()
         {
             return false;
@@ -169,6 +174,7 @@ public class ExecutorFilterRegressionTest extends TestCase
             return null;
         }
 
+        @Override
         public SocketAddress getServiceAddress()
         {
             return null;

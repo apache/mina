@@ -57,6 +57,7 @@ public class TextLineEncoderTest extends TestCase
         SimpleProtocolEncoderOutput out =
             new SimpleProtocolEncoderOutput()
             {
+                @Override
                 protected WriteFuture doFlush( ByteBuffer buf )
                 {
                     return null;
@@ -76,6 +77,7 @@ public class TextLineEncoderTest extends TestCase
 
     private static class DummySession extends BaseIoSession
     {
+        @Override
         protected void updateTrafficMask()
         {
         }
@@ -120,6 +122,7 @@ public class TextLineEncoderTest extends TestCase
             return null;
         }
 
+        @Override
         public SocketAddress getServiceAddress()
         {
             return null;
