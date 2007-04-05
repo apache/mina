@@ -53,8 +53,6 @@ public class DefaultSocketSessionConfig extends BaseIoSessionConfig implements S
     static
     {
         initialize();
-        System.out.println(DEFAULT_REUSE_ADDRESS);
-        System.out.println(DEFAULT_SEND_BUFFER_SIZE);
     }
     
     private static void initialize()
