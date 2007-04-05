@@ -59,6 +59,11 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         return (VmPipeSessionConfig) super.getSessionConfig();
     }
 
+    @Override
+    public VmPipeAddress getLocalAddress() {
+        return (VmPipeAddress) super.getLocalAddress();
+    }
+    
     // These two methods are overriden to work around a problem with
     // bean property access mechanism.
 
@@ -75,7 +80,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
     @Override
     protected void doBind() throws IOException
     {
-        VmPipeAddress localAddress = ( VmPipeAddress ) getLocalAddress();
+        VmPipeAddress localAddress = getLocalAddress();
         
         synchronized( boundHandlers )
         {
