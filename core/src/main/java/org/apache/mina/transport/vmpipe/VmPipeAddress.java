@@ -81,6 +81,10 @@ public class VmPipeAddress extends SocketAddress implements Comparable
     @Override
     public String toString()
     {
-        return "vm:" + port;
+        if (port >= 0) {
+            return "vm:server:" + port;
+        } else {
+            return "vm:client:" + (-port);
+        }
     }
 }

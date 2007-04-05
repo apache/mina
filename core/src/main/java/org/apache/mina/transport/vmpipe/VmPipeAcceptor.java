@@ -79,7 +79,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         
         synchronized( boundHandlers )
         {
-            if( localAddress == null || localAddress.getPort() <= 0 )
+            if( localAddress == null || localAddress.getPort() == 0 )
             {
                 localAddress = null;
                 for( int i = 1; i < Integer.MAX_VALUE; i++ )
@@ -96,8 +96,9 @@ public class VmPipeAcceptor extends BaseIoAcceptor
                     throw new IOException("No port available.");
                 }
             }
-            else if( boundHandlers.containsKey( localAddress ) )
-            {
+            else if( localAddress.getPort() < 0) {
+                throw new IOException("Bind port number must be 0 or above.");
+            } else if( boundHandlers.containsKey( localAddress ) ) {
                 throw new IOException( "Address already bound: " + localAddress );
             }
 
