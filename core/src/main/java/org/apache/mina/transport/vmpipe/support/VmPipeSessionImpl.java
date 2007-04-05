@@ -19,7 +19,6 @@
  */
 package org.apache.mina.transport.vmpipe.support;
 
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -34,6 +33,7 @@ import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.vmpipe.DefaultVmPipeSessionConfig;
+import org.apache.mina.transport.vmpipe.VmPipeAddress;
 import org.apache.mina.transport.vmpipe.VmPipeSession;
 import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
 
@@ -49,9 +49,9 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
 
     private final IoService service;
     private final IoServiceListenerSupport serviceListeners;
-    private final SocketAddress localAddress;
-    private final SocketAddress remoteAddress;
-    private final SocketAddress serviceAddress;
+    private final VmPipeAddress localAddress;
+    private final VmPipeAddress remoteAddress;
+    private final VmPipeAddress serviceAddress;
     private final IoHandler handler;
     private final VmPipeFilterChain filterChain;
     private final VmPipeSessionImpl remoteSession;
@@ -63,7 +63,7 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
      */
     public VmPipeSessionImpl(
             IoService service,
-            IoServiceListenerSupport serviceListeners, Object lock, SocketAddress localAddress,
+            IoServiceListenerSupport serviceListeners, Object lock, VmPipeAddress localAddress,
             IoHandler handler, VmPipe remoteEntry )
     {
         this.service = service;
@@ -151,18 +151,18 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
         return TransportType.VM_PIPE;
     }
 
-    public SocketAddress getRemoteAddress()
+    public VmPipeAddress getRemoteAddress()
     {
         return remoteAddress;
     }
 
-    public SocketAddress getLocalAddress()
+    public VmPipeAddress getLocalAddress()
     {
         return localAddress;
     }
 
     @Override
-    public SocketAddress getServiceAddress()
+    public VmPipeAddress getServiceAddress()
     {
         return serviceAddress;
     }

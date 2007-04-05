@@ -21,10 +21,14 @@ package org.apache.mina.transport.vmpipe;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
@@ -35,7 +39,6 @@ import org.apache.mina.transport.vmpipe.support.VmPipe;
 import org.apache.mina.transport.vmpipe.support.VmPipeFilterChain;
 import org.apache.mina.transport.vmpipe.support.VmPipeIdleStatusChecker;
 import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
-import org.apache.mina.util.AnonymousSocketAddress;
 
 /**
  * Connects to {@link IoHandler}s which is bound on the specified
@@ -88,9 +91,12 @@ public class VmPipeConnector extends BaseIoConnector
                     this,
                     getListeners(),
                     new Object(), // lock
-                    new AnonymousSocketAddress(),
+                    nextAnonymousAddress(),  // Assign the local address dynamically,
                     getHandler(),
                     entry );
+        
+        // and reclaim the address when the connection is closed.
+        localSession.getCloseFuture().addListener(ANON_ADDRESS_RECLAIMER);
         
         // initialize connector session
         try
@@ -130,5 +136,32 @@ public class VmPipeConnector extends BaseIoConnector
         ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).start();
 
         return future;
+    }
+    
+    private static final Set<VmPipeAddress> TAKEN_ANON_ADDRESSES =
+        new HashSet<VmPipeAddress>();
+    private static int nextAnonymousAddress = -1;
+    
+    private static final IoFutureListener ANON_ADDRESS_RECLAIMER = 
+        new AnonymousAddressReclaimer();
+
+    private static VmPipeAddress nextAnonymousAddress() {
+        synchronized (TAKEN_ANON_ADDRESSES) {
+            for (;;) {
+                VmPipeAddress answer = new VmPipeAddress(nextAnonymousAddress --);
+                if (!TAKEN_ANON_ADDRESSES.contains(answer)) {
+                    TAKEN_ANON_ADDRESSES.add(answer);
+                    return answer;
+                }
+            }
+        }
+    }
+    
+    private static class AnonymousAddressReclaimer implements IoFutureListener {
+        public void operationComplete(IoFuture future) {
+            synchronized (TAKEN_ANON_ADDRESSES) {
+                TAKEN_ANON_ADDRESSES.remove(future.getSession().getLocalAddress());
+            }
+        }
     }
 }

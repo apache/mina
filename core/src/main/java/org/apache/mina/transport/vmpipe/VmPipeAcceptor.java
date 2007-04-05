@@ -79,15 +79,21 @@ public class VmPipeAcceptor extends BaseIoAcceptor
         
         synchronized( boundHandlers )
         {
-            if( localAddress == null || localAddress.getPort() == 0 )
+            if( localAddress == null || localAddress.getPort() <= 0 )
             {
+                localAddress = null;
                 for( int i = 1; i < Integer.MAX_VALUE; i++ )
                 {
-                    localAddress = new VmPipeAddress( i );
-                    if( !boundHandlers.containsKey( localAddress ) )
+                    VmPipeAddress newLocalAddress = new VmPipeAddress( i );
+                    if( !boundHandlers.containsKey( newLocalAddress ) )
                     {
+                        localAddress = newLocalAddress;
                         break;
                     }
+                }
+                
+                if (localAddress == null) {
+                    throw new IOException("No port available.");
                 }
             }
             else if( boundHandlers.containsKey( localAddress ) )
