@@ -86,17 +86,25 @@ public class VmPipeConnector extends BaseIoConnector
         }
 
         DefaultConnectFuture future = new DefaultConnectFuture();
+        
+        // Assign the local address dynamically,
+        VmPipeAddress actualLocalAddress;
+        try {
+            actualLocalAddress = nextLocalAddress();
+        } catch (IOException e) {
+            return DefaultConnectFuture.newFailedFuture(e);
+        }
+        
         VmPipeSessionImpl localSession =
             new VmPipeSessionImpl(
                     this,
                     getListeners(),
-                    new Object(), // lock
-                    nextAnonymousAddress(),  // Assign the local address dynamically,
+                    actualLocalAddress,
                     getHandler(),
                     entry );
         
-        // and reclaim the address when the connection is closed.
-        localSession.getCloseFuture().addListener(ANON_ADDRESS_RECLAIMER);
+        // and reclaim the local address when the connection is closed.
+        localSession.getCloseFuture().addListener(LOCAL_ADDRESS_RECLAIMER);
         
         // initialize connector session
         try
@@ -138,29 +146,34 @@ public class VmPipeConnector extends BaseIoConnector
         return future;
     }
     
-    private static final Set<VmPipeAddress> TAKEN_ANON_ADDRESSES =
+    private static final Set<VmPipeAddress> TAKEN_LOCAL_ADDRESSES =
         new HashSet<VmPipeAddress>();
-    private static int nextAnonymousAddress = -1;
+    private static int nextLocalPort = -1;
     
-    private static final IoFutureListener ANON_ADDRESS_RECLAIMER = 
-        new AnonymousAddressReclaimer();
+    private static final IoFutureListener LOCAL_ADDRESS_RECLAIMER = 
+        new LocalAddressReclaimer();
 
-    private static VmPipeAddress nextAnonymousAddress() {
-        synchronized (TAKEN_ANON_ADDRESSES) {
-            for (;;) {
-                VmPipeAddress answer = new VmPipeAddress(nextAnonymousAddress --);
-                if (!TAKEN_ANON_ADDRESSES.contains(answer)) {
-                    TAKEN_ANON_ADDRESSES.add(answer);
+    private static VmPipeAddress nextLocalAddress() throws IOException {
+        synchronized (TAKEN_LOCAL_ADDRESSES) {
+            if (nextLocalPort >= 0) {
+                nextLocalPort = -1;
+            }
+            for (int i = 0; i < Integer.MAX_VALUE; i ++) {
+                VmPipeAddress answer = new VmPipeAddress(nextLocalPort --);
+                if (!TAKEN_LOCAL_ADDRESSES.contains(answer)) {
+                    TAKEN_LOCAL_ADDRESSES.add(answer);
                     return answer;
                 }
             }
         }
+        
+        throw new IOException("Can't assign a local VM pipe port.");
     }
     
-    private static class AnonymousAddressReclaimer implements IoFutureListener {
+    private static class LocalAddressReclaimer implements IoFutureListener {
         public void operationComplete(IoFuture future) {
-            synchronized (TAKEN_ANON_ADDRESSES) {
-                TAKEN_ANON_ADDRESSES.remove(future.getSession().getLocalAddress());
+            synchronized (TAKEN_LOCAL_ADDRESSES) {
+                TAKEN_LOCAL_ADDRESSES.remove(future.getSession().getLocalAddress());
             }
         }
     }

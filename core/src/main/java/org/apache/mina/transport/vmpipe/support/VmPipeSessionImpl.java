@@ -63,12 +63,12 @@ public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession
      */
     public VmPipeSessionImpl(
             IoService service,
-            IoServiceListenerSupport serviceListeners, Object lock, VmPipeAddress localAddress,
+            IoServiceListenerSupport serviceListeners, VmPipeAddress localAddress,
             IoHandler handler, VmPipe remoteEntry )
     {
         this.service = service;
         this.serviceListeners = serviceListeners;
-        this.lock = lock;
+        this.lock = new Object();
         this.localAddress = localAddress;
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
