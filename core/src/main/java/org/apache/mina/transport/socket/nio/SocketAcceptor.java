@@ -38,9 +38,10 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.BaseIoAcceptor;
-import org.apache.mina.util.Queue;
-import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.NamePreservingRunnable;
+import org.apache.mina.util.NewThreadExecutor;
+import org.apache.mina.util.Queue;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -96,6 +97,9 @@ public class SocketAcceptor extends BaseIoAcceptor
         {
             throw new IllegalArgumentException( "Must have at least one processor" );
         }
+
+        // The default reuseAddress of an accepted socket should be 'true'.
+        ( ( SocketSessionConfig ) defaultConfig.getSessionConfig() ).setReuseAddress(true);
 
         this.executor = executor;
         this.processorCount = processorCount;

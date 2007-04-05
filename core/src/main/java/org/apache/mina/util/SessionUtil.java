@@ -21,7 +21,6 @@ package org.apache.mina.util;
 
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 
 /**
@@ -38,13 +37,7 @@ public class SessionUtil
         if( cfg instanceof SocketSessionConfig )
         {
             SocketSessionConfig sCfg = ( SocketSessionConfig ) cfg;
-            sCfg.setReuseAddress( true );
             sCfg.setKeepAlive( true );
-        }
-        else if( cfg instanceof DatagramSessionConfig )
-        {
-            DatagramSessionConfig dCfg = ( DatagramSessionConfig ) cfg;
-            dCfg.setReuseAddress( true );
         }
     }
 
