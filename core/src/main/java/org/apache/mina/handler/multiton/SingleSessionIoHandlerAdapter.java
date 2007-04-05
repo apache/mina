@@ -21,7 +21,6 @@ package org.apache.mina.handler.multiton;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.util.SessionUtil;
 
 /**
  * Adapter class for implementors of the {@link SingleSessionIoHandler}
@@ -81,7 +80,6 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler
 
     public void sessionCreated() throws Exception
     {
-        SessionUtil.initialize( getSession() );
     }
 
     public void sessionIdle(IdleStatus status) throws Exception

@@ -22,7 +22,6 @@ package org.apache.mina.transport.socket.nio;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 
 /**
@@ -129,32 +128,9 @@ public class DefaultDatagramSessionConfig extends BaseIoSessionConfig implements
 
     /**
      * Creates a new instance.
-     * 
-     * @throws RuntimeIOException if failed to get the default configuration
      */
     public DefaultDatagramSessionConfig()
     {
-        DatagramSocket s = null;
-        try
-        {
-            s = new DatagramSocket();
-            broadcast = s.getBroadcast();
-            reuseAddress = s.getReuseAddress();
-            receiveBufferSize = s.getReceiveBufferSize();
-            sendBufferSize = s.getSendBufferSize();
-            trafficClass = s.getTrafficClass();
-        }
-        catch( SocketException e )
-        {
-            throw new RuntimeIOException( "Failed to get the default configuration.", e );
-        }
-        finally
-        {
-            if( s != null )
-            {
-                s.close();
-            }
-        }
     }
 
     /**

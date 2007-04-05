@@ -20,7 +20,6 @@
 package org.apache.mina.common;
 
 import org.apache.mina.util.SessionLog;
-import org.apache.mina.util.SessionUtil;
 
 /**
  * An abstract adapter class for {@link IoHandler}.  You can extend this
@@ -34,7 +33,6 @@ public class IoHandlerAdapter implements IoHandler
 {
     public void sessionCreated( IoSession session ) throws Exception
     {
-        SessionUtil.initialize( session );
     }
 
     public void sessionOpened( IoSession session ) throws Exception
