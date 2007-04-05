@@ -94,6 +94,9 @@ public class SocketAcceptor extends BaseIoAcceptor
             throw new IllegalArgumentException( "Must have at least one processor" );
         }
 
+        // The default reuseAddress of an accepted socket should be 'true'.
+        defaultConfig.getSessionConfig().setReuseAddress(true);
+
         this.executor = executor;
         this.processorCount = processorCount;
         ioProcessors = new SocketIoProcessor[processorCount];

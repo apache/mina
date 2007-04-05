@@ -81,6 +81,9 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
     {
         this.wrapper = wrapper;
         this.executor = executor;
+        
+        // The default reuseAddress of an accepted socket should be 'true'.
+        defaultConfig.getSessionConfig().setReuseAddress(true);
     }
 
     public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config )
