@@ -24,6 +24,8 @@ import org.apache.mina.common.IoConnectorConfig;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -56,12 +58,24 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
     
     private static void initialize()
     {
+        ServerSocket ss = null;
         Socket socket = null;
         
-        socket = new Socket();
+        try {
+            ss = new ServerSocket();
+            ss.bind(new InetSocketAddress("localhost", 0));
+            socket = new Socket();
+            try {
+                // Timeout is set to 10 seconds in case of infinite blocking
+                // on some platform.
+                socket.connect(
+                        new InetSocketAddress("localhost", ss.getLocalPort()), 10000);
+            } catch (IOException e) {
+                // We can retrieve the values even if the connection
+                // attempt fails, although it might be somewhat incorrect
+                // on some platform.
+            }
 
-        try
-        {
             DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
             DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
             DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
@@ -104,7 +118,7 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
                 DEFAULT_TRAFFIC_CLASS = 0;
             }
         }
-        catch( SocketException e )
+        catch( Exception e )
         {
             throw new ExceptionInInitializerError(e);
         }
@@ -118,6 +132,14 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
                 }
                 catch( IOException e )
                 {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
+            }
+
+            if (ss != null) {
+                try {
+                    ss.close();
+                } catch (IOException e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
