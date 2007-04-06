@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.vmpipe.support;
+package org.apache.mina.common.support;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -29,27 +29,27 @@ import org.apache.mina.util.IdentityHashSet;
  * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them. 
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev: 525369 $, $Date: 2007-04-04 05:05:11 +0200 (mer., 04 avr. 2007) $
  */
-public class VmPipeIdleStatusChecker
+public class SessionIdleStatusChecker
 {
-    private static final VmPipeIdleStatusChecker INSTANCE = new VmPipeIdleStatusChecker();
+    private static final SessionIdleStatusChecker INSTANCE = new SessionIdleStatusChecker();
     
-    public static VmPipeIdleStatusChecker getInstance()
+    public static SessionIdleStatusChecker getInstance()
     {
         return INSTANCE;
     }
 
-    private final Set<VmPipeSessionImpl> sessions = new IdentityHashSet<VmPipeSessionImpl>();
+    private final Set<BaseIoSession> sessions = new IdentityHashSet<BaseIoSession>();
 
     private final Worker worker = new Worker();
 
-    private VmPipeIdleStatusChecker()
+    private SessionIdleStatusChecker()
     {
         worker.start();
     }
 
-    public void addSession( VmPipeSessionImpl session )
+    public void addSession( BaseIoSession session )
     {
         synchronized( sessions )
         {
@@ -82,10 +82,10 @@ public class VmPipeIdleStatusChecker
 
                 synchronized( sessions )
                 {
-                    Iterator<VmPipeSessionImpl> it = sessions.iterator();
+                    Iterator<BaseIoSession> it = sessions.iterator();
                     while( it.hasNext() )
                     {
-                        VmPipeSessionImpl session = it.next();
+                        BaseIoSession session = it.next();
                         if( !session.isConnected() )
                         {
                             it.remove();
@@ -100,7 +100,7 @@ public class VmPipeIdleStatusChecker
         }
     }
     
-    private void notifyIdleSession( VmPipeSessionImpl session, long currentTime )
+    private void notifyIdleSession( BaseIoSession session, long currentTime )
     {
         notifyIdleSession0(
                 session, currentTime,
@@ -119,7 +119,7 @@ public class VmPipeIdleStatusChecker
                 Math.max( session.getLastWriteTime(), session.getLastIdleTime( IdleStatus.WRITER_IDLE ) ) );
     }
 
-    private void notifyIdleSession0( VmPipeSessionImpl session, long currentTime,
+    private void notifyIdleSession0( BaseIoSession session, long currentTime,
                                     long idleTime, IdleStatus status,
                                     long lastIoTime )
     {

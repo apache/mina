@@ -35,9 +35,9 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
+import org.apache.mina.common.support.SessionIdleStatusChecker;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 import org.apache.mina.transport.vmpipe.support.VmPipeFilterChain;
-import org.apache.mina.transport.vmpipe.support.VmPipeIdleStatusChecker;
 import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
 
 /**
@@ -115,7 +115,7 @@ public class VmPipeConnector extends BaseIoConnector
             // The following sentences don't throw any exceptions.
             localSession.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, future );
             getListeners().fireSessionCreated( localSession );
-            VmPipeIdleStatusChecker.getInstance().addSession( localSession );
+            SessionIdleStatusChecker.getInstance().addSession( localSession );
         }
         catch( Throwable t )
         {
@@ -132,7 +132,7 @@ public class VmPipeConnector extends BaseIoConnector
             
             // The following sentences don't throw any exceptions.
             entry.getListeners().fireSessionCreated( remoteSession );
-            VmPipeIdleStatusChecker.getInstance().addSession( remoteSession );
+            SessionIdleStatusChecker.getInstance().addSession( remoteSession );
         }
         catch( Throwable t )
         {
