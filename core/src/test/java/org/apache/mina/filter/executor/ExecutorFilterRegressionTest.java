@@ -34,8 +34,8 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 
 public class ExecutorFilterRegressionTest extends TestCase
@@ -221,7 +221,7 @@ public class ExecutorFilterRegressionTest extends TestCase
             }
         }
 
-        public void messageSent( IoSession session, Object message )
+        public void messageSent( IoSession session, WriteRequest writeRequest )
         {
         }
 

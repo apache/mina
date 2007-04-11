@@ -33,8 +33,8 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterLifeCycleException;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -378,16 +378,16 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         }
         
         Entry head = this.head;
-        callNextMessageSent( head, session, request.getMessage() );
+        callNextMessageSent( head, session, request );
     }
 
     private void callNextMessageSent( Entry entry,
                                       IoSession session,
-                                      Object message )
+                                      WriteRequest writeRequest )
     {
         try
         {
-            entry.getFilter().messageSent( entry.getNextFilter(), session, message );
+            entry.getFilter().messageSent( entry.getNextFilter(), session, writeRequest );
         }
         catch( Throwable e )
         {
@@ -626,9 +626,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
         @Override
         public void messageSent( NextFilter nextFilter, IoSession session,
-                                 Object message )
+                                 WriteRequest writeRequest )
         {
-            nextFilter.messageSent( session, message );
+            nextFilter.messageSent( session, writeRequest );
         }
 
         @Override
@@ -719,9 +719,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
 
         @Override
         public void messageSent( NextFilter nextFilter, IoSession session,
-                                 Object message ) throws Exception
+                                 WriteRequest writeRequest ) throws Exception
         {
-            session.getHandler().messageSent( session, message );
+            session.getHandler().messageSent( session, writeRequest.getMessage() );
         }
 
         @Override
@@ -805,10 +805,10 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                     callNextMessageReceived( nextEntry, session, message );
                 }
 
-                public void messageSent( IoSession session, Object message )
+                public void messageSent( IoSession session, WriteRequest writeRequest )
                 {
                     Entry nextEntry = EntryImpl.this.nextEntry;
-                    callNextMessageSent( nextEntry, session, message );
+                    callNextMessageSent( nextEntry, session, writeRequest );
                 }
 
                 public void filterWrite( IoSession session, WriteRequest writeRequest )

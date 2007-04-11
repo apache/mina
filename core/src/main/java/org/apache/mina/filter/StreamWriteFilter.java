@@ -25,9 +25,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.WriteRequest;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -35,10 +36,10 @@ import org.apache.mina.common.WriteFuture;
  * {@link InputStream} is written to a session this filter will read the bytes
  * from the stream into {@link ByteBuffer} objects and write those buffers
  * to the next filter. When end of stream has been reached this filter will
- * call {@link NextFilter#messageSent(IoSession, Object)} using the original
+ * call {@link NextFilter#messageSent(IoSession, WriteRequest)} using the original
  * {@link InputStream} written to the session and notifies 
  * {@link org.apache.mina.common.WriteFuture} on the 
- * original {@link org.apache.mina.common.IoFilter.WriteRequest}.
+ * original {@link org.apache.mina.common.WriteRequest}.
  * <p>
  * This filter will ignore written messages which aren't {@link InputStream}
  * instances. Such messages will be passed to the next filter directly.
@@ -67,7 +68,7 @@ public class StreamWriteFilter extends IoFilterAdapter
     public static final String CURRENT_STREAM = StreamWriteFilter.class.getName() + ".stream";
 
     protected static final String WRITE_REQUEST_QUEUE = StreamWriteFilter.class.getName() + ".queue";
-    protected static final String INITIAL_WRITE_FUTURE = StreamWriteFilter.class.getName() + ".future";
+    protected static final String CURRENT_WRITE_REQUEST = StreamWriteFilter.class.getName() + ".writeRequest";
 
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
     
@@ -100,14 +101,14 @@ public class StreamWriteFilter extends IoFilterAdapter
             {
                 // End of stream reached.
                 writeRequest.getFuture().setWritten( true );
-                nextFilter.messageSent( session, message );
+                nextFilter.messageSent( session, writeRequest );
             }
             else
             {
                 session.setAttribute( CURRENT_STREAM, inputStream );
-                session.setAttribute( INITIAL_WRITE_FUTURE, writeRequest.getFuture() );
+                session.setAttribute( CURRENT_WRITE_REQUEST, writeRequest );
                 
-                nextFilter.filterWrite( session, new WriteRequest( byteBuffer ) );
+                nextFilter.filterWrite( session, new DefaultWriteRequest( byteBuffer ) );
             }
 
         }
@@ -123,13 +124,13 @@ public class StreamWriteFilter extends IoFilterAdapter
     }
 
     @Override
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
+    public void messageSent( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
     {
         InputStream inputStream = ( InputStream ) session.getAttribute( CURRENT_STREAM );
         
         if( inputStream == null )
         {
-            nextFilter.messageSent( session, message );
+            nextFilter.messageSent( session, writeRequest );
         }
         else
         {
@@ -139,7 +140,7 @@ public class StreamWriteFilter extends IoFilterAdapter
             {
                 // End of stream reached.
                 session.removeAttribute( CURRENT_STREAM );
-                WriteFuture writeFuture = ( WriteFuture ) session.removeAttribute( INITIAL_WRITE_FUTURE );
+                WriteRequest currentWriteRequest = ( WriteRequest ) session.removeAttribute(CURRENT_WRITE_REQUEST);
                 
                 // Write queued WriteRequests.
                 Queue<? extends WriteRequest> queue = ( Queue<? extends WriteRequest> ) session.removeAttribute( WRITE_REQUEST_QUEUE );
@@ -153,12 +154,12 @@ public class StreamWriteFilter extends IoFilterAdapter
                     }
                 }
                 
-                writeFuture.setWritten( true );
-                nextFilter.messageSent( session, inputStream );
+                currentWriteRequest.getFuture().setWritten( true );
+                nextFilter.messageSent( session, currentWriteRequest );
             }
             else
             {
-                nextFilter.filterWrite( session, new WriteRequest( byteBuffer ) );
+                nextFilter.filterWrite( session, new DefaultWriteRequest( byteBuffer ) );
             }
         }
     }

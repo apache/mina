@@ -23,6 +23,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
 
 
 /**
@@ -96,9 +97,9 @@ public class ReferenceCountingIoFilter implements IoFilter
         filter.messageReceived( nextFilter, session, message );
     }
 
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
+    public void messageSent( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
     {
-        filter.messageSent( nextFilter, session, message );
+        filter.messageSent( nextFilter, session, writeRequest );
     }
 
     public void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 
 /**

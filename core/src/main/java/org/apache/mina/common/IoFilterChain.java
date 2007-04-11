@@ -22,7 +22,6 @@ package org.apache.mina.common;
 import java.util.List;
 
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.IoFilter.WriteRequest;
 
 /**
  * A container of {@link IoFilter}s that forwards {@link IoHandler} events

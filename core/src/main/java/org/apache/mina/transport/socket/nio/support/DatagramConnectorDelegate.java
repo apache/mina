@@ -37,7 +37,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;

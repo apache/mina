@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common;
 
+
 /**
  * An abstract adapter class for {@link IoFilter}.  You can extend
  * this class and selectively override required event filter methods only.  All
@@ -83,9 +84,9 @@ public class IoFilterAdapter implements IoFilter
         nextFilter.messageReceived( session, message );
     }
 
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
+    public void messageSent( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
     {
-        nextFilter.messageSent( session, message );
+        nextFilter.messageSent( session, writeRequest );
     }
 
     public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception

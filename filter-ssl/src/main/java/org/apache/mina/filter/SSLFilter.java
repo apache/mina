@@ -28,7 +28,6 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.ByteBufferProxy;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
@@ -36,6 +35,8 @@ import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.WriteRequestWrapper;
 import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.support.SSLHandler;
 import org.apache.mina.util.SessionLog;
@@ -475,12 +476,12 @@ public class SSLFilter extends IoFilterAdapter
 
     @Override
     public void messageSent( NextFilter nextFilter, IoSession session,
-                             Object message )
+                             WriteRequest writeRequest )
     {
-        if( message instanceof EncryptedBuffer )
+        if( writeRequest instanceof EncryptedWriteRequest )
         {
-            EncryptedBuffer buf = ( EncryptedBuffer ) message;
-            nextFilter.messageSent( session, buf.originalBuffer );
+            EncryptedWriteRequest wrappedRequest = ( EncryptedWriteRequest ) writeRequest;
+            nextFilter.messageSent( session, wrappedRequest.getWriteRequest() );
         }
         else
         {
@@ -535,14 +536,14 @@ public class SSLFilter extends IoFilterAdapter
                     int pos = buf.position();
                     handler.encrypt( buf.buf() );
                     buf.position( pos );
-                    ByteBuffer encryptedBuffer = new EncryptedBuffer(
-                            SSLHandler.copy( handler.getOutNetBuffer() ), buf );
+                    ByteBuffer encryptedBuffer = SSLHandler.copy( handler.getOutNetBuffer() );
     
                     if( SessionLog.isDebugEnabled( session ) )
                     {
                         SessionLog.debug( session, " encrypted buf: " + encryptedBuffer);
                     }
-                    handler.schedulePostHandshakeWriteRequest( nextFilter, new WriteRequest( encryptedBuffer, writeRequest.getFuture() ) );
+                    handler.schedulePostHandshakeWriteRequest(
+                            nextFilter, new EncryptedWriteRequest(writeRequest, encryptedBuffer));
                 }
                 else
                 {
@@ -712,14 +713,18 @@ public class SSLFilter extends IoFilterAdapter
         }
     }
     
-    private static class EncryptedBuffer extends ByteBufferProxy
+    private static class EncryptedWriteRequest extends WriteRequestWrapper
     {
-        private final ByteBuffer originalBuffer;
+        private final ByteBuffer encryptedMessage;
         
-        private EncryptedBuffer( ByteBuffer buf, ByteBuffer originalBuffer )
-        {
-            super( buf );
-            this.originalBuffer = originalBuffer;
+        private EncryptedWriteRequest(WriteRequest writeRequest, ByteBuffer encryptedMessage) {
+            super(writeRequest);
+            this.encryptedMessage = encryptedMessage;
+        }
+        
+        @Override
+        public Object getMessage() {
+            return encryptedMessage;
         }
     }
 }

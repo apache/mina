@@ -22,10 +22,12 @@ package org.apache.mina.filter;
 import java.io.IOException;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.filter.support.Zlib;
 
 /**
@@ -197,8 +199,9 @@ public class CompressionFilter extends IoFilterAdapter
 
         ByteBuffer inBuffer = ( ByteBuffer ) writeRequest.getMessage();
         ByteBuffer outBuf = deflater.deflate( inBuffer );
-        nextFilter.filterWrite( session, new WriteRequest( outBuf, writeRequest
-                .getFuture() ) );
+        nextFilter.filterWrite(
+                session,
+                new DefaultWriteRequest(outBuf, writeRequest.getFuture(), writeRequest.getDestination()));
     }
 
     @Override

@@ -32,10 +32,11 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
+import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.util.SessionLog;
@@ -603,7 +604,7 @@ public class SSLHandler
             //debug("outNetBuffer (after copy): {0}", sslHandler.getOutNetBuffer());
 
             writeFuture = new DefaultWriteFuture( session );
-            parent.filterWrite( nextFilter, session, new WriteRequest( writeBuffer, writeFuture ) );
+            parent.filterWrite( nextFilter, session, new DefaultWriteRequest( writeBuffer, writeFuture ) );
 
             // loop while more writes required to complete handshake
             while( needToCompleteInitialHandshake() )
@@ -627,7 +628,7 @@ public class SSLHandler
                     }
                     org.apache.mina.common.ByteBuffer writeBuffer2 = copy( getOutNetBuffer() );
                     writeFuture = new DefaultWriteFuture( session );
-                    parent.filterWrite( nextFilter, session, new WriteRequest( writeBuffer2, writeFuture ) );
+                    parent.filterWrite( nextFilter, session, new DefaultWriteRequest( writeBuffer2, writeFuture ) );
                 }
             }
         }

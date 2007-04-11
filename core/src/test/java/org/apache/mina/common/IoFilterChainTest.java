@@ -24,7 +24,6 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain.Entry;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoSession;
@@ -183,7 +182,7 @@ public class IoFilterChainTest extends TestCase
         chain.fireSessionCreated( session );
         chain.fireSessionOpened( session );
         chain.fireMessageReceived( session, new Object() );
-        chain.fireFilterWrite( session, new WriteRequest( new Object() ) );
+        chain.fireFilterWrite( session, new DefaultWriteRequest( new Object() ) );
         chain.fireSessionIdle( session, IdleStatus.READER_IDLE );
         chain.fireExceptionCaught( session, new Exception() );
         chain.fireSessionClosed( session );
@@ -383,9 +382,9 @@ public class IoFilterChainTest extends TestCase
         }
 
         @Override
-        public void messageSent(NextFilter nextFilter, IoSession session, Object message) {
+        public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) {
             result += id + "MS";
-            nextFilter.messageSent( session, message );
+            nextFilter.messageSent( session, writeRequest );
         }
 
         @Override

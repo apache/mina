@@ -19,16 +19,17 @@
  */
 package org.apache.mina.filter;
 
+import junit.framework.TestCase;
+
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.filter.support.Zlib;
-import org.apache.mina.common.IoFilter.WriteRequest;
-import org.easymock.MockControl;
 import org.easymock.AbstractMatcher;
-
-import junit.framework.TestCase;
+import org.easymock.MockControl;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -108,7 +109,7 @@ public class CompressionFilterTest extends TestCase
         // prepare the input data
         ByteBuffer buf = ByteBuffer.wrap( strCompress.getBytes( "UTF8" ) );
         ByteBuffer actualOutput = actualDeflater.deflate( buf );
-        WriteRequest writeRequest = new WriteRequest( buf );
+        WriteRequest writeRequest = new DefaultWriteRequest( buf );
 
         // record all the mock calls
         ioFilterChain.contains( CompressionFilter.class );
@@ -130,7 +131,7 @@ public class CompressionFilterTest extends TestCase
         session.getAttribute( CompressionFilter.class.getName() + ".Deflater" );
         mockSession.setReturnValue( deflater );
 
-        nextFilter.filterWrite( session, new WriteRequest( actualOutput ) );
+        nextFilter.filterWrite( session, new DefaultWriteRequest( actualOutput ) );
 
         // switch to playback mode
         mockSession.replay();

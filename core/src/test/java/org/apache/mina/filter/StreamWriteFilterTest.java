@@ -32,14 +32,20 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFutureListener;
+import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.IoFilter.WriteRequest;
-import org.apache.mina.common.support.DefaultWriteFuture;
+import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
@@ -53,10 +59,9 @@ import org.easymock.MockControl;
  * @version $Rev$, $Date$
  */
 public class StreamWriteFilterTest extends TestCase {
-    MockControl mockSession;
-    MockControl mockNextFilter;
-    IoSession session;
-    NextFilter nextFilter;
+    private MockControl mockNextFilter;
+    private IoSession session;
+    private NextFilter nextFilter;
 
     @Override
     protected void setUp() throws Exception
@@ -66,13 +71,17 @@ public class StreamWriteFilterTest extends TestCase {
         /*
          * Create the mocks.
          */
-        mockSession = MockControl.createControl( IoSession.class );
+        session = new DummySession();
         mockNextFilter = MockControl.createControl( NextFilter.class );
-        session = ( IoSession ) mockSession.getMock();
         nextFilter = ( NextFilter ) mockNextFilter.getMock();
-        
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( null );
+    }
+    
+    @Override
+    protected void tearDown() throws Exception
+    {
+        assertFalse(session.containsAttribute(StreamWriteFilter.CURRENT_STREAM));
+        assertFalse(session.containsAttribute(StreamWriteFilter.CURRENT_WRITE_REQUEST));
+        assertFalse(session.containsAttribute(StreamWriteFilter.WRITE_REQUEST_QUEUE));
     }
 
     public void testWriteEmptyStream() throws Exception
@@ -80,18 +89,17 @@ public class StreamWriteFilterTest extends TestCase {
         StreamWriteFilter filter = new StreamWriteFilter();
         
         InputStream stream = new ByteArrayInputStream( new byte[ 0 ] );
-        WriteRequest writeRequest = new WriteRequest( stream, new DummyWriteFuture() );
+        WriteRequest writeRequest = new DefaultWriteRequest( stream, new DummyWriteFuture() );
         
         /*
          * Record expectations
          */
-        nextFilter.messageSent( session, stream );
+        nextFilter.messageSent( session, writeRequest );
         
         /*
          * Replay.
          */
         mockNextFilter.replay();
-        mockSession.replay();
         
         filter.filterWrite( nextFilter, session, writeRequest );
         
@@ -99,7 +107,6 @@ public class StreamWriteFilterTest extends TestCase {
          * Verify.
          */
         mockNextFilter.verify();
-        mockSession.verify();
         
         assertTrue( writeRequest.getFuture().isWritten() );
     }
@@ -113,30 +120,26 @@ public class StreamWriteFilterTest extends TestCase {
         StreamWriteFilter filter = new StreamWriteFilter();
         
         Object message = new Object();
-        WriteRequest writeRequest = new WriteRequest( message, new DummyWriteFuture() );
+        WriteRequest writeRequest = new DefaultWriteRequest( message, new DummyWriteFuture() );
         
         /*
          * Record expectations
          */
         nextFilter.filterWrite( session, writeRequest );
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( null );
-        nextFilter.messageSent( session, message );
+        nextFilter.messageSent( session, writeRequest );
         
         /*
          * Replay.
          */
         mockNextFilter.replay();
-        mockSession.replay();
         
         filter.filterWrite( nextFilter, session, writeRequest );
-        filter.messageSent( nextFilter, session, message );
+        filter.messageSent( nextFilter, session, writeRequest );
         
         /*
          * Verify.
          */
         mockNextFilter.verify();
-        mockSession.verify();
     }
     
     /**
@@ -149,46 +152,31 @@ public class StreamWriteFilterTest extends TestCase {
         byte[] data = new byte[] { 1, 2, 3, 4 };
         
         InputStream stream = new ByteArrayInputStream( data );
-        WriteRequest writeRequest = new WriteRequest( stream, new DummyWriteFuture() );
+        WriteRequest writeRequest = new DefaultWriteRequest( stream, new DummyWriteFuture() );
         
         /*
          * Record expectations
          */
-        session.setAttribute( StreamWriteFilter.CURRENT_STREAM, stream );
-        mockSession.setReturnValue(null);
-        session.setAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE, writeRequest.getFuture() );
-        mockSession.setReturnValue(null);
-        nextFilter.filterWrite( session, new WriteRequest( ByteBuffer.wrap( data ) ) );
+        nextFilter.filterWrite( session, new DefaultWriteRequest( ByteBuffer.wrap( data ) ) );
         mockNextFilter.setMatcher( new WriteRequestMatcher() );
-        
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        session.removeAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        session.removeAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE );
-        mockSession.setReturnValue( writeRequest.getFuture() );
-        session.removeAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
-        mockSession.setReturnValue( null );
-        nextFilter.messageSent( session, stream );
+        nextFilter.messageSent( session, writeRequest );
         
         /*
          * Replay.
          */
         mockNextFilter.replay();
-        mockSession.replay();
         
         filter.filterWrite( nextFilter, session, writeRequest );
-        filter.messageSent( nextFilter, session, data );
+        filter.messageSent( nextFilter, session, writeRequest );
         
         /*
          * Verify.
          */
         mockNextFilter.verify();
-        mockSession.verify();
         
         assertTrue( writeRequest.getFuture().isWritten() );
     }
-    
+
     /**
      * Tests when the contents of the stream doesn't fit into one write buffer.
      */
@@ -203,52 +191,35 @@ public class StreamWriteFilterTest extends TestCase {
         byte[] chunk3 = new byte[] { 9, 10 };
         
         InputStream stream = new ByteArrayInputStream( data );
-        WriteRequest writeRequest = new WriteRequest( stream, new DummyWriteFuture() );
+        WriteRequest writeRequest = new DefaultWriteRequest( stream, new DummyWriteFuture() );
         
+        WriteRequest chunk1Request = new DefaultWriteRequest( ByteBuffer.wrap( chunk1 ) );
+        WriteRequest chunk2Request = new DefaultWriteRequest( ByteBuffer.wrap( chunk2 ) );
+        WriteRequest chunk3Request = new DefaultWriteRequest( ByteBuffer.wrap( chunk3 ) );
+
         /*
          * Record expectations
          */
-        session.setAttribute( StreamWriteFilter.CURRENT_STREAM, stream );
-        mockSession.setReturnValue(null);
-        session.setAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE, writeRequest.getFuture() );
-        mockSession.setReturnValue(null);
-        nextFilter.filterWrite( session, new WriteRequest( ByteBuffer.wrap( chunk1 ) ) );
+        nextFilter.filterWrite( session, chunk1Request );
         mockNextFilter.setMatcher( new WriteRequestMatcher() );
-        
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        nextFilter.filterWrite( session, new WriteRequest( ByteBuffer.wrap( chunk2 ) ) );
-        
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        nextFilter.filterWrite( session, new WriteRequest( ByteBuffer.wrap( chunk3 ) ) );
-        
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        session.removeAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        session.removeAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE );
-        mockSession.setReturnValue( writeRequest.getFuture() );
-        session.removeAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
-        mockSession.setReturnValue( null );
-        nextFilter.messageSent( session, stream );
+        nextFilter.filterWrite( session, chunk2Request );
+        nextFilter.filterWrite( session, chunk3Request );
+        nextFilter.messageSent( session, writeRequest );
         
         /*
          * Replay.
          */
         mockNextFilter.replay();
-        mockSession.replay();
         
         filter.filterWrite( nextFilter, session, writeRequest );
-        filter.messageSent( nextFilter, session, chunk1 );
-        filter.messageSent( nextFilter, session, chunk2 );
-        filter.messageSent( nextFilter, session, chunk3 );
+        filter.messageSent( nextFilter, session, chunk1Request );
+        filter.messageSent( nextFilter, session, chunk2Request );
+        filter.messageSent( nextFilter, session, chunk3Request );
         
         /*
          * Verify.
          */
         mockNextFilter.verify();
-        mockSession.verify();
         
         assertTrue( writeRequest.getFuture().isWritten() );
     }
@@ -259,23 +230,19 @@ public class StreamWriteFilterTest extends TestCase {
         
         Queue<WriteRequest> queue = new LinkedList<WriteRequest>();
         InputStream stream = new ByteArrayInputStream( new byte[ 5 ] );
-        
+
         /*
-         * Record expectations
+         * Make up the situation.
          */
-        mockSession.reset();
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        session.getAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
-        mockSession.setReturnValue( queue );
-        
+        session.setAttribute( StreamWriteFilter.CURRENT_STREAM, stream );
+        session.setAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE, queue );
+
         /*
-         * Replay.
+         * Replay.  (We recorded *nothing* because nothing should occur.)
          */
         mockNextFilter.replay();
-        mockSession.replay();
 
-        WriteRequest wr = new WriteRequest( new Object(), new DummyWriteFuture() );
+        WriteRequest wr = new DefaultWriteRequest( new Object(), new DummyWriteFuture() );
         filter.filterWrite( nextFilter, session, wr );
         assertEquals( 1, queue.size() );
         assertSame( wr, queue.poll() );
@@ -284,7 +251,9 @@ public class StreamWriteFilterTest extends TestCase {
          * Verify.
          */
         mockNextFilter.verify();
-        mockSession.verify();
+        
+        session.removeAttribute(StreamWriteFilter.CURRENT_STREAM);
+        session.removeAttribute(StreamWriteFilter.WRITE_REQUEST_QUEUE);
     }
     
     public void testWritesWriteRequestQueueWhenFinished() throws Exception
@@ -292,9 +261,9 @@ public class StreamWriteFilterTest extends TestCase {
         StreamWriteFilter filter = new StreamWriteFilter();
 
         WriteRequest wrs[] = new WriteRequest[] { 
-                new WriteRequest( new Object(), new DummyWriteFuture() ),
-                new WriteRequest( new Object(), new DummyWriteFuture() ),
-                new WriteRequest( new Object(), new DummyWriteFuture() )
+                new DefaultWriteRequest( new Object(), new DummyWriteFuture() ),
+                new DefaultWriteRequest( new Object(), new DummyWriteFuture() ),
+                new DefaultWriteRequest( new Object(), new DummyWriteFuture() )
         };
         Queue<WriteRequest> queue = new LinkedList<WriteRequest>();
         queue.offer( wrs[ 0 ] );
@@ -303,45 +272,33 @@ public class StreamWriteFilterTest extends TestCase {
         InputStream stream = new ByteArrayInputStream( new byte[ 0 ] );
         
         /*
+         * Make up the situation.
+         */
+        session.setAttribute( StreamWriteFilter.CURRENT_STREAM, stream );
+        session.setAttribute( StreamWriteFilter.CURRENT_WRITE_REQUEST, new DefaultWriteRequest(stream));
+        session.setAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE, queue );
+
+        /*
          * Record expectations
          */
-        mockSession.reset();
-        
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        session.removeAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( stream );
-        session.removeAttribute( StreamWriteFilter.INITIAL_WRITE_FUTURE );
-        mockSession.setReturnValue( new DefaultWriteFuture( session ) );
-        session.removeAttribute( StreamWriteFilter.WRITE_REQUEST_QUEUE );
-        mockSession.setReturnValue( queue );
-        
         nextFilter.filterWrite( session, wrs[ 0 ] );
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( null );
         nextFilter.filterWrite( session, wrs[ 1 ] );
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( null );
         nextFilter.filterWrite( session, wrs[ 2 ] );
-        session.getAttribute( StreamWriteFilter.CURRENT_STREAM );
-        mockSession.setReturnValue( null );
-        
-        nextFilter.messageSent( session, stream );
+        nextFilter.messageSent( session, new DefaultWriteRequest(stream) );
+        mockNextFilter.setMatcher(new WriteRequestMatcher());
         
         /*
          * Replay.
          */
         mockNextFilter.replay();
-        mockSession.replay();
 
-        filter.messageSent( nextFilter, session, new Object() );
+        filter.messageSent( nextFilter, session, new DefaultWriteRequest(new Object()) );
         assertEquals( 0, queue.size() );
         
         /*
          * Verify.
          */
         mockNextFilter.verify();
-        mockSession.verify();
     }    
     
     /**
@@ -598,6 +555,49 @@ public class StreamWriteFilterTest extends TestCase {
                     && w1.getFuture().isWritten() == w2.getFuture().isWritten();
             }
             return super.argumentMatches( expected, actual );
+        }
+    }
+    
+    private static class DummySession extends BaseIoSession {
+
+        @Override
+        protected void updateTrafficMask() {
+        }
+
+        public IoSessionConfig getConfig() {
+            return null;
+        }
+
+        public IoFilterChain getFilterChain() {
+            return null;
+        }
+
+        public IoHandler getHandler() {
+            return null;
+        }
+
+        public SocketAddress getLocalAddress() {
+            return null;
+        }
+
+        public SocketAddress getRemoteAddress() {
+            return null;
+        }
+
+        public int getScheduledWriteBytes() {
+            return 0;
+        }
+
+        public int getScheduledWriteMessages() {
+            return 0;
+        }
+
+        public IoService getService() {
+            return null;
+        }
+
+        public TransportType getTransportType() {
+            return null;
         }
     }
     

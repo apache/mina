@@ -30,6 +30,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -194,12 +195,12 @@ public class BlacklistFilter extends IoFilterAdapter
     }
 
     @Override
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
+    public void messageSent( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
     {
         if( !isBlocked( session ) )
         {
             // forward if not blocked
-            nextFilter.messageSent( session, message );
+            nextFilter.messageSent( session, writeRequest );
         }
         else
         {

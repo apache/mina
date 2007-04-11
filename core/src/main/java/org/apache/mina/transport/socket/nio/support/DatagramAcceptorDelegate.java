@@ -39,7 +39,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;

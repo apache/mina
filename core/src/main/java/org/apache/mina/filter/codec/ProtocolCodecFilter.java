@@ -19,13 +19,17 @@
  */
 package org.apache.mina.filter.codec;
 
+import java.net.SocketAddress;
+
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.ByteBufferProxy;
+import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.WriteRequestWrapper;
 import org.apache.mina.common.support.DefaultWriteFuture;
 import org.apache.mina.filter.codec.support.SimpleProtocolDecoderOutput;
 import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
@@ -200,20 +204,19 @@ public class ProtocolCodecFilter extends IoFilterAdapter
     }
 
     @Override
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
+    public void messageSent( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
     {
-        if( message instanceof HiddenByteBuffer )
-        {
+        if (writeRequest instanceof EncodedWriteRequest) {
             return;
         }
-
-        if( !( message instanceof MessageByteBuffer ) )
-        {
-            nextFilter.messageSent( session, message );
+        
+        if (!(writeRequest instanceof MessageWriteRequest)) {
+            nextFilter.messageSent(session, writeRequest);
             return;
         }
-
-        nextFilter.messageSent( session, ( ( MessageByteBuffer ) message ).message );
+        
+        MessageWriteRequest wrappedRequest = (MessageWriteRequest) writeRequest;
+        nextFilter.messageSent( session, wrappedRequest.getWriteRequest() );
     }
     
     @Override
@@ -235,9 +238,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             encoderOut.flush();
             nextFilter.filterWrite(
                     session,
-                    new WriteRequest(
-                            new MessageByteBuffer( writeRequest.getMessage() ),
-                            writeRequest.getFuture(), writeRequest.getDestination() ) );
+                    new MessageWriteRequest(writeRequest));
         }
         catch( Throwable t )
         {
@@ -382,23 +383,23 @@ public class ProtocolCodecFilter extends IoFilterAdapter
                     " (" + decoder + ')' );
         }
     }
-
-    private static class HiddenByteBuffer extends ByteBufferProxy
-    {
-        private HiddenByteBuffer( ByteBuffer buf )
-        {
-            super( buf );
+    
+    private static class EncodedWriteRequest extends DefaultWriteRequest {
+        private EncodedWriteRequest(
+                ByteBuffer encodedMessage, WriteFuture future, SocketAddress destination) {
+            super(encodedMessage, future, destination);
         }
     }
     
-    private static class MessageByteBuffer extends ByteBufferProxy
+    private static class MessageWriteRequest extends WriteRequestWrapper
     {
-        private final Object message;
+        private MessageWriteRequest(WriteRequest writeRequest) {
+            super(writeRequest);
+        }
         
-        private MessageByteBuffer( Object message )
-        {
-            super( EMPTY_BUFFER );
-            this.message = message;
+        @Override
+        public Object getMessage() {
+            return EMPTY_BUFFER;
         }
     }
     
@@ -421,9 +422,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter
             WriteFuture future = new DefaultWriteFuture( session );
             nextFilter.filterWrite(
                     session,
-                    new WriteRequest(
-                            new HiddenByteBuffer( buf ),
-                            future, writeRequest.getDestination() ) );
+                    new EncodedWriteRequest(
+                            buf, future, writeRequest.getDestination()));
             return future;
         }
     }

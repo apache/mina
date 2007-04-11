@@ -23,6 +23,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.SessionLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -308,12 +309,12 @@ public class LoggingFilter extends IoFilterAdapter
 
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session,
-            Object message) {
+            WriteRequest writeRequest) {
         Logger log = getLogger(session, MESSAGE_SENT_LOGGER, "messageSent");
         if (defaultLogLevel.isEnabled(log)) {
-            defaultLogLevel.log(log, session, "SENT: " + message);
+            defaultLogLevel.log(log, session, "SENT: " + writeRequest);
         }
-        nextFilter.messageSent(session, message);
+        nextFilter.messageSent(session, writeRequest);
     }
 
     @Override

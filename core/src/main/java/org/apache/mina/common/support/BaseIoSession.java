@@ -26,13 +26,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.CloseFuture;
+import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.common.IoFilter.WriteRequest;
+import org.apache.mina.common.WriteRequest;
 
 /**
  * Base implementation of {@link IoSession}.
@@ -147,7 +148,7 @@ public abstract class BaseIoSession implements IoSession
         }
 
         WriteFuture future = new DefaultWriteFuture( this );
-        write0( new WriteRequest( message, future, remoteAddress ) );
+        write0( new DefaultWriteRequest( message, future, remoteAddress ) );
         
         return future;
     }

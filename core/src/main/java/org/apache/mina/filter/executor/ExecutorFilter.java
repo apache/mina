@@ -30,6 +30,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -243,9 +244,9 @@ public class ExecutorFilter extends IoFilterAdapter
 
     @Override
     public void messageSent( NextFilter nextFilter,
-                             IoSession session, Object message )
+                             IoSession session, WriteRequest writeRequest )
     {
-        fireEvent( nextFilter, session, EventType.SENT, message );
+        fireEvent( nextFilter, session, EventType.SENT, writeRequest );
     }
 
     protected void processEvent( NextFilter nextFilter, IoSession session, EventType type, Object data )
@@ -256,15 +257,15 @@ public class ExecutorFilter extends IoFilterAdapter
         }
         else if( type == EventType.SENT )
         {
-            nextFilter.messageSent( session, data );
+            nextFilter.messageSent( session, (WriteRequest) data );
         }
         else if( type == EventType.EXCEPTION )
         {
-            nextFilter.exceptionCaught( session, (Throwable)data );
+            nextFilter.exceptionCaught( session, (Throwable) data );
         }
         else if( type == EventType.IDLE )
         {
-            nextFilter.sessionIdle( session, (IdleStatus)data );
+            nextFilter.sessionIdle( session, (IdleStatus) data );
         }
         else if( type == EventType.OPENED )
         {
