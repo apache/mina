@@ -322,7 +322,7 @@ public class LoggingFilter extends IoFilterAdapter
             WriteRequest writeRequest) {
         Logger log = getLogger(session, WRITE_LOGGER, "write");
         if (defaultLogLevel.isEnabled(log)) {
-            defaultLogLevel.log(log, session, "WRITE: " + writeRequest);
+            defaultLogLevel.log(log, session, "WRITE: " + writeRequest.getMessage());
         }
         nextFilter.filterWrite(session, writeRequest);
     }
