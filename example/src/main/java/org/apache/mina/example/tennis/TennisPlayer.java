@@ -36,16 +36,19 @@ public class TennisPlayer extends IoHandlerAdapter
     /** Player ID **/
     private final int id = nextId++;
 
+    @Override
     public void sessionOpened( IoSession session )
     {
         System.out.println( "Player-" + id + ": READY" );
     }
 
+    @Override
     public void sessionClosed( IoSession session )
     {
         System.out.println( "Player-" + id + ": QUIT" );
     }
 
+    @Override
     public void messageReceived( IoSession session, Object message )
     {
         System.out.println( "Player-" + id + ": RCVD " + message );
@@ -68,11 +71,13 @@ public class TennisPlayer extends IoHandlerAdapter
         }
     }
 
+    @Override
     public void messageSent( IoSession session, Object message )
     {
         System.out.println( "Player-" + id + ": SENT " + message );
     }
     
+    @Override
     public void exceptionCaught( IoSession session, Throwable cause )
     {
         cause.printStackTrace();

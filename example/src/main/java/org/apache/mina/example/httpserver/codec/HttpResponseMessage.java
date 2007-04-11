@@ -42,10 +42,10 @@ public class HttpResponseMessage
     public static final int HTTP_STATUS_NOT_FOUND = 404;
 
     /** Map<String, String> */
-    private Map<String, String> headers = new HashMap<String, String>();
+    private final Map<String, String> headers = new HashMap<String, String>();
 
     /** Storage for body of HTTP response. */
-    private ByteArrayOutputStream body = new ByteArrayOutputStream( 1024 );
+    private final ByteArrayOutputStream body = new ByteArrayOutputStream( 1024 );
 
     private int responseCode = HTTP_STATUS_SUCCESS;
 

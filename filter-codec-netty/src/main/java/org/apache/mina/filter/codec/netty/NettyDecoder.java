@@ -50,8 +50,9 @@ public class NettyDecoder extends ProtocolDecoderAdapter
      */
     public NettyDecoder( MessageRecognizer recognizer )
     {
-        if( recognizer == null )
+        if( recognizer == null ) {
             throw new NullPointerException();
+        }
 
         this.recognizer = recognizer;
     }
@@ -60,8 +61,9 @@ public class NettyDecoder extends ProtocolDecoderAdapter
     private void put( ByteBuffer in )
     {
         // copy to read buffer
-        if( in.remaining() > readBuf.remaining() )
+        if( in.remaining() > readBuf.remaining() ) {
             expand( ( readBuf.position() + in.remaining() ) * 3 / 2 );
+        }
         readBuf.put( in.buf() );
     }
 

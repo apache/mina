@@ -45,6 +45,7 @@ public class AddMessage extends AbstractMessage
         this.value = value;
     }
 
+    @Override
     public String toString()
     {
         // it is a good practice to create toString() method on message classes.

@@ -129,11 +129,12 @@ public class Zlib
             default:
                 // unknown error
                 outBuffer = null;
-                if( zStream.msg == null )
+                if( zStream.msg == null ) {
                     throw new IOException( "Unknown error. Error code : " + retval );
-                else
+                } else {
                     throw new IOException( "Unknown error. Error code : " + retval
                             + " and message : " + zStream.msg );
+                }
             }
         } while( zStream.avail_in > 0 );
 
@@ -187,7 +188,8 @@ public class Zlib
      */
     public void cleanUp()
     {
-        if( zStream != null )
+        if( zStream != null ) {
             zStream.free();
+        }
     }
 }

@@ -31,6 +31,7 @@ import org.apache.mina.common.IoSession;
  */
 public class ReverseProtocolHandler extends IoHandlerAdapter
 {
+    @Override
     public void exceptionCaught( IoSession session, Throwable cause )
     {
         cause.printStackTrace();
@@ -38,6 +39,7 @@ public class ReverseProtocolHandler extends IoHandlerAdapter
         session.close();
     }
 
+    @Override
     public void messageReceived( IoSession session, Object message )
     {
         // Reverse reveiced string

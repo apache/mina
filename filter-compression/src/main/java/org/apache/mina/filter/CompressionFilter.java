@@ -147,6 +147,7 @@ public class CompressionFilter extends IoFilterAdapter
         this.compressOutbound = compressOutbound;
     }
 
+    @Override
     public void messageReceived( NextFilter nextFilter,
             IoSession session, Object message ) throws Exception
     {
@@ -170,6 +171,7 @@ public class CompressionFilter extends IoFilterAdapter
     /*
      * @see org.apache.mina.common.IoFilter#filterWrite(org.apache.mina.common.IoFilter.NextFilter, org.apache.mina.common.IoSession, org.apache.mina.common.IoFilter.WriteRequest)
      */
+    @Override
     public void filterWrite( NextFilter nextFilter,
             IoSession session, WriteRequest writeRequest ) throws IOException
     {
@@ -199,6 +201,7 @@ public class CompressionFilter extends IoFilterAdapter
                 .getFuture() ) );
     }
 
+    @Override
     public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
     {
         if( parent.contains( CompressionFilter.class ) )
@@ -248,6 +251,7 @@ public class CompressionFilter extends IoFilterAdapter
         this.compressOutbound = compressOutbound;
     }
 
+    @Override
     public void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
     {
         super.onPostRemove( parent, name, nextFilter );

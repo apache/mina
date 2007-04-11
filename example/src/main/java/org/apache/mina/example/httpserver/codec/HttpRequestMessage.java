@@ -67,6 +67,7 @@ public class HttpRequestMessage
         return ( String[] ) headers.get( name );
     }
 
+    @Override
     public String toString()
     {
         StringBuilder str = new StringBuilder();
@@ -83,15 +84,17 @@ public class HttpRequestMessage
 
     public static String arrayToString( String[] s, char sep )
     {
-        if( s == null || s.length == 0 )
+        if( s == null || s.length == 0 ) {
             return "";
+        }
         StringBuffer buf = new StringBuffer();
         if( s != null )
         {
             for( int i = 0; i < s.length; i++ )
             {
-                if( i > 0 )
+                if( i > 0 ) {
                     buf.append( sep );
+                }
                 buf.append( s[ i ] );
             }
         }

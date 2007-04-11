@@ -59,7 +59,7 @@ import org.springframework.util.Assert;
  */
 public class SSLContextFactoryBean extends AbstractFactoryBean {
     private String protocol = "TLS";
-    private String provider = null;
+    private final String provider = null;
     private SecureRandom secureRandom = null;
     
     private KeyStore keyManagerFactoryKeyStore = null;
@@ -81,6 +81,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     private int serverSessionCacheSize = -1;
     private int serverSessionTimeout = -1; 
     
+    @Override
     protected Object createInstance() throws Exception {
         KeyManagerFactory kmf = this.keyManagerFactory;
         TrustManagerFactory tmf = this.trustManagerFactory;

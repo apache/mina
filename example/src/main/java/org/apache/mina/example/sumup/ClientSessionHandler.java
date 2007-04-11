@@ -47,6 +47,7 @@ public class ClientSessionHandler extends IoHandlerAdapter
         return finished;
     }
 
+    @Override
     public void sessionOpened( IoSession session )
     {
         // send summation requests
@@ -59,6 +60,7 @@ public class ClientSessionHandler extends IoHandlerAdapter
         }
     }
 
+    @Override
     public void messageReceived( IoSession session, Object message )
     {
         // server only sends ResultMessage. otherwise, we will have to identify
@@ -87,6 +89,7 @@ public class ClientSessionHandler extends IoHandlerAdapter
         }
     }
 
+    @Override
     public void exceptionCaught( IoSession session, Throwable cause )
     {
         session.close();

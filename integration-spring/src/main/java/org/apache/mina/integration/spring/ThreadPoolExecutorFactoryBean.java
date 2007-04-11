@@ -120,6 +120,7 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
                 : new ThreadPoolExecutor.AbortPolicy() );
     }
     
+    @Override
     protected Object createInstance() throws Exception
     {
         BlockingQueue<Runnable> queue = null;
@@ -136,6 +137,7 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
                 queue, threadFactory, rejectedExecutionHandler );
     }
 
+    @Override
     protected void destroyInstance( Object o ) throws Exception
     {
         ThreadPoolExecutor executor = ( ThreadPoolExecutor ) o;

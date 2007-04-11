@@ -44,6 +44,7 @@ import org.springframework.util.Assert;
  */
 public class InetSocketAddressEditor extends PropertyEditorSupport
 {
+    @Override
     public void setAsText( String text ) throws IllegalArgumentException
     {
         setValue( parseSocketAddress( text ) );

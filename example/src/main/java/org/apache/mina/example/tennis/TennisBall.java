@@ -70,6 +70,7 @@ public class TennisBall
      * Returns string representation of this message (<code>[PING|PONG]
      * (TTL)</code>).
      */
+    @Override
     public String toString()
     {
         if( ping )

@@ -33,12 +33,14 @@ import org.apache.mina.util.SessionLog;
  */
 public class ServerHandler extends IoHandlerAdapter
 {
+    @Override
     public void sessionOpened( IoSession session )
     {
         // set idle time to 60 seconds
         session.setIdleTime( IdleStatus.BOTH_IDLE, 60 );
     }
 
+    @Override
     public void messageReceived( IoSession session, Object message )
     {
         // Check that we can service the request context
@@ -63,16 +65,19 @@ public class ServerHandler extends IoHandlerAdapter
         // "<html><body><h1>UNKNOWN REQUEST %d</h1></body></html>",
         // HttpResponseMessage.HTTP_STATUS_NOT_FOUND));
 
-        if( response != null )
+        if( response != null ) {
             session.write( response ).join();
+        }
     }
 
+    @Override
     public void sessionIdle( IoSession session, IdleStatus status )
     {
         SessionLog.info( session, "Disconnecting the idle." );
         session.close();
     }
 
+    @Override
     public void exceptionCaught( IoSession session, Throwable cause )
     {
         session.close();

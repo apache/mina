@@ -37,13 +37,15 @@ import org.apache.mina.util.SessionLog;
  */
 public abstract class AbstractProxyIoHandler extends IoHandlerAdapter
 {
-    private static Charset CHARSET = Charset.forName( "iso8859-1" );
+    private static final Charset CHARSET = Charset.forName( "iso8859-1" );
     
+    @Override
     public void sessionCreated( IoSession session ) throws Exception
     {
         session.setTrafficMask( TrafficMask.NONE );
     }
 
+    @Override
     public void sessionClosed( IoSession session ) throws Exception 
     {
         if( session.getAttachment() != null )
@@ -54,6 +56,7 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter
         }
     }
     
+    @Override
     public void messageReceived( IoSession session, Object message ) throws Exception
     {
         ByteBuffer rb = ( ByteBuffer ) message;

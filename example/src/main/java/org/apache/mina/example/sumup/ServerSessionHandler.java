@@ -35,6 +35,7 @@ import org.apache.mina.util.SessionLog;
  */
 public class ServerSessionHandler extends IoHandlerAdapter
 {
+    @Override
     public void sessionOpened( IoSession session )
     {
         // set idle time to 60 seconds
@@ -44,6 +45,7 @@ public class ServerSessionHandler extends IoHandlerAdapter
         session.setAttachment( new Integer( 0 ) );
     }
 
+    @Override
     public void messageReceived( IoSession session, Object message )
     {
         // client only sends AddMessage. otherwise, we will have to identify
@@ -77,6 +79,7 @@ public class ServerSessionHandler extends IoHandlerAdapter
         }
     }
 
+    @Override
     public void sessionIdle( IoSession session, IdleStatus status )
     {
         SessionLog.info( session, "Disconnecting the idle." );
@@ -84,6 +87,7 @@ public class ServerSessionHandler extends IoHandlerAdapter
         session.close();
     }
 
+    @Override
     public void exceptionCaught( IoSession session, Throwable cause )
     {
         // close the connection on exceptional situation

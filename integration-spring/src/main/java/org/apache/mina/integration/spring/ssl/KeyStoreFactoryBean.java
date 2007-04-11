@@ -52,6 +52,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean
      * 
      * @return the {@link KeyStore} instance.
      */
+    @Override
     protected Object createInstance() throws Exception
     {
         if( file == null && resource == null )

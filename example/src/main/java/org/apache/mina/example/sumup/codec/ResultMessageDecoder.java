@@ -42,6 +42,7 @@ public class ResultMessageDecoder extends AbstractMessageDecoder
         super( Constants.RESULT );
     }
 
+    @Override
     protected AbstractMessage decodeBody( IoSession session, ByteBuffer in )
     {
         if( !readCode )

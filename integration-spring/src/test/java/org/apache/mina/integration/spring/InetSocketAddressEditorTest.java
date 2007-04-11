@@ -33,6 +33,7 @@ public class InetSocketAddressEditorTest extends TestCase
 {
     InetSocketAddressEditor editor;
 
+    @Override
     protected void setUp() throws Exception
     {
         editor = new InetSocketAddressEditor();

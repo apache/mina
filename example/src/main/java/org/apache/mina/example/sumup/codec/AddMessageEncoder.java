@@ -51,6 +51,7 @@ public class AddMessageEncoder extends AbstractMessageEncoder
         super( Constants.ADD );
     }
 
+    @Override
     protected void encodeBody( IoSession session, AbstractMessage message, ByteBuffer out )
     {
         AddMessage m = ( AddMessage ) message;

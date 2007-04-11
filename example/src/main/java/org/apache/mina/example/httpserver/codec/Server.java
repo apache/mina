@@ -34,7 +34,7 @@ import org.apache.mina.transport.socket.nio.SocketAcceptor;
 public class Server
 {
     /** Default HTTP port */
-    private static int DEFAULT_PORT = 8080;
+    private static final int DEFAULT_PORT = 8080;
 
     /** Tile server revision number */
     public static final String VERSION_STRING = "$Revision$ $Date$";

@@ -34,6 +34,7 @@ public class InetAddressEditorTest extends TestCase
 {
     InetAddressEditor editor;
 
+    @Override
     protected void setUp() throws Exception
     {
         editor = new InetAddressEditor();

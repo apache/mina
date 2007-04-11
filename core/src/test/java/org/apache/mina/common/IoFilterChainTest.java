@@ -345,42 +345,50 @@ public class IoFilterChainTest extends TestCase
             nextFilter.sessionCreated( session );
         }
 
+        @Override
         public void sessionOpened( NextFilter nextFilter, IoSession session )
         {
             result += id + "SO";
             nextFilter.sessionOpened( session );
         }
 
+        @Override
         public void sessionClosed(NextFilter nextFilter, IoSession session) {
             result += id + "SC";
             nextFilter.sessionClosed( session );
         }
 
+        @Override
         public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) {
             result += id + "SI";
             nextFilter.sessionIdle( session, status );
         }
 
+        @Override
         public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) {
             result += id + "EC";
             nextFilter.exceptionCaught( session, cause );
         }
 
+        @Override
         public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) {
             result += id + "FW";
             nextFilter.filterWrite( session, writeRequest );
         }
 
+        @Override
         public void messageReceived(NextFilter nextFilter, IoSession session, Object message) {
             result += id + "MR";
             nextFilter.messageReceived( session, message );
         }
 
+        @Override
         public void messageSent(NextFilter nextFilter, IoSession session, Object message) {
             result += id + "MS";
             nextFilter.messageSent( session, message );
         }
 
+        @Override
         public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
         {
             nextFilter.filterClose( session );
@@ -389,11 +397,13 @@ public class IoFilterChainTest extends TestCase
 
     private class AddRemoveTestFilter extends IoFilterAdapter
     {
+        @Override
         public void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter )
         {
             result += "ADDED";
         }
         
+        @Override
         public void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter )
         {
             result += "REMOVED";
@@ -406,6 +416,7 @@ public class IoFilterChainTest extends TestCase
         {
             super( new BaseIoSession()
             {
+                @Override
                 protected void updateTrafficMask()
                 {
                 }
@@ -450,6 +461,7 @@ public class IoFilterChainTest extends TestCase
                     return null;
                 }
 
+                @Override
                 public SocketAddress getServiceAddress()
                 {
                     return null;
@@ -462,11 +474,13 @@ public class IoFilterChainTest extends TestCase
             } );
         }
 
+        @Override
         protected void doWrite( IoSession session, WriteRequest writeRequest )
         {
             fireMessageSent( session, writeRequest );
         }
 
+        @Override
         protected void doClose( IoSession session )
         {
         }

@@ -72,16 +72,19 @@ public class BogusTrustManagerFactory extends TrustManagerFactory
     private static class BogusTrustManagerFactorySpi extends TrustManagerFactorySpi
     {
     
+        @Override
         protected TrustManager[] engineGetTrustManagers()
         {
             return X509_MANAGERS;
         }
     
+        @Override
         protected void engineInit( KeyStore keystore ) throws KeyStoreException
         {
             // noop
         }
     
+        @Override
         protected void engineInit(
                                   ManagerFactoryParameters managerFactoryParameters )
                 throws InvalidAlgorithmParameterException

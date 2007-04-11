@@ -47,8 +47,8 @@ public class SwingChatClientHandler extends IoHandlerAdapter
         void error( String message );
     }
     
-    private static IoFilter LOGGING_FILTER = new LoggingFilter();
-    private static IoFilter CODEC_FILTER = new ProtocolCodecFilter(
+    private static final IoFilter LOGGING_FILTER = new LoggingFilter();
+    private static final IoFilter CODEC_FILTER = new ProtocolCodecFilter(
             new TextLineCodecFactory() );
 
     private final Callback callback;
@@ -58,17 +58,20 @@ public class SwingChatClientHandler extends IoHandlerAdapter
         this.callback = callback;
     }
 
+    @Override
     public void sessionCreated( IoSession session ) throws Exception
     {
         session.getFilterChain().addLast( "codec", CODEC_FILTER );
         session.getFilterChain().addLast( "logger", LOGGING_FILTER );
     }
 
+    @Override
     public void sessionOpened( IoSession session ) throws Exception
     {
         callback.connected();
     }
 
+    @Override
     public void messageReceived( IoSession session, Object message )
             throws Exception
     {
@@ -109,6 +112,7 @@ public class SwingChatClientHandler extends IoHandlerAdapter
         }
     }
 
+    @Override
     public void sessionClosed( IoSession session ) throws Exception
     {
         callback.disconnected();

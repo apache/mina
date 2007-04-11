@@ -51,6 +51,7 @@ public class ResultMessageEncoder extends AbstractMessageEncoder
         super( Constants.RESULT );
     }
 
+    @Override
     protected void encodeBody( IoSession session, AbstractMessage message, ByteBuffer out )
     {
         ResultMessage m = ( ResultMessage ) message;

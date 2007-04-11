@@ -44,6 +44,7 @@ import org.apache.mina.handler.StreamIoHandler;
  */
 public class HttpProtocolHandler extends StreamIoHandler
 {
+    @Override
     protected void processStreamIo( IoSession session, InputStream in,
                                     OutputStream out )
     {
@@ -63,6 +64,7 @@ public class HttpProtocolHandler extends StreamIoHandler
             this.out = out;
         }
         
+        @Override
         public void run()
         {
             String url;

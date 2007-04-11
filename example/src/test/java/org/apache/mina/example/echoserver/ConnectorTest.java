@@ -54,6 +54,7 @@ public class ConnectorTest extends AbstractTest
     {
     }
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -245,22 +246,25 @@ public class ConnectorTest extends AbstractTest
     
     private static class EchoConnectorHandler extends IoHandlerAdapter
     {
-        private ByteBuffer readBuf = ByteBuffer.allocate( 1024 );
+        private final ByteBuffer readBuf = ByteBuffer.allocate( 1024 );
         
         private EchoConnectorHandler()
         {
             readBuf.setAutoExpand( true );
         }
 
+        @Override
         public void messageReceived( IoSession session, Object message )
         {
             readBuf.put( ( ByteBuffer ) message );
         }
         
+        @Override
         public void messageSent( IoSession session, Object message )
         {
         }
 
+        @Override
         public void exceptionCaught( IoSession session, Throwable cause )
         {
             cause.printStackTrace();

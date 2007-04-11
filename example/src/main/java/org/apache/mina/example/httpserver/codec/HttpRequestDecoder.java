@@ -47,7 +47,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
     private static final byte[] CONTENT_LENGTH = new String( "Content-Length:" )
             .getBytes();
 
-    private CharsetDecoder decoder = Charset.defaultCharset().newDecoder();
+    private final CharsetDecoder decoder = Charset.defaultCharset().newDecoder();
 
     private HttpRequestMessage request = null;
 
@@ -78,8 +78,9 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
         HttpRequestMessage m = decodeBody( in );
 
         // Return NEED_DATA if the body is not fully read.
-        if( m == null )
+        if( m == null ) {
             return MessageDecoderResult.NEED_DATA;
+        }
 
         out.write( m );
 
@@ -89,8 +90,9 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
     private boolean messageComplete( ByteBuffer in ) throws Exception
     {
         int last = in.remaining() - 1;
-        if( in.remaining() < 4 )
+        if( in.remaining() < 4 ) {
             return false;
+        }
 
         // to speed up things we check if the Http request is a GET or POST
         if( in.get( 0 ) == ( byte ) 'G' && in.get( 1 ) == ( byte ) 'E'
@@ -118,8 +120,9 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
                     break;
                 }
             }
-            if( eoh == -1 )
+            if( eoh == -1 ) {
                 return false;
+            }
             for( int i = 0; i < last; i++ )
             {
                 boolean found = false;
@@ -138,8 +141,9 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
                     StringBuilder contentLength = new StringBuilder();
                     for( int j = i + CONTENT_LENGTH.length; j < last; j++ )
                     {
-                        if( in.get( j ) == 0x0D )
+                        if( in.get( j ) == 0x0D ) {
                             break;
+                        }
                         contentLength.append( new String( new byte[] { in
                                 .get( j ) } ) );
                     }
@@ -181,8 +185,9 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
             // Get request URL.
             String line = rdr.readLine();
             String[] url = line.split( " " );
-            if( url.length < 3 )
+            if( url.length < 3 ) {
                 return map;
+            }
 
             map.put( "URI", new String[] { line } );
             map.put( "Method", new String[] { url[ 0 ].toUpperCase() } );
@@ -222,14 +227,13 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
             if( line != null )
             {
                 String[] match = line.split( "\\&" );
-                for( int i = 0; i < match.length; i++ )
-                {
+                for (String element : match) {
                     String[] params = new String[ 1 ];
-                    String[] tokens = match[ i ].split( "=" );
+                    String[] tokens = element.split( "=" );
                     switch( tokens.length )
                     {
                     case 0:
-                        map.put( "@".concat( match[ i ] ), new String[] {} );
+                        map.put( "@".concat( element ), new String[] {} );
                         break;
                     case 1:
                         map.put( "@".concat( tokens[ 0 ] ), new String[] {} );
@@ -240,8 +244,9 @@ public class HttpRequestDecoder extends MessageDecoderAdapter
                         {
                             params = map.get( name );
                             String[] tmp = new String[ params.length + 1 ];
-                            for( int j = 0; j < params.length; j++ )
+                            for( int j = 0; j < params.length; j++ ) {
                                 tmp[ j ] = params[ j ];
+                            }
                             params = null;
                             params = tmp;
                         }

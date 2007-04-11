@@ -67,9 +67,8 @@ public abstract class AbstractTest extends TestCase
     protected static String toString( byte[] buf )
     {
         StringBuffer str = new StringBuffer( buf.length * 4 );
-        for( int i = 0; i < buf.length; i ++ )
-        {
-            str.append( buf[ i ] );
+        for (byte element : buf) {
+            str.append( element );
             str.append( ' ' );
         }
         return str.toString();
@@ -80,6 +79,7 @@ public abstract class AbstractTest extends TestCase
         return buf.getHexDump();
     }
 
+    @Override
     protected void setUp() throws Exception
     {
         // Disable SSL by default
@@ -117,6 +117,7 @@ public abstract class AbstractTest extends TestCase
                 socketAcceptor.setLocalAddress( address );
                 socketAcceptor.setHandler( new EchoProtocolHandler()
                 {
+                    @Override
                     public void sessionCreated( IoSession session )
                     {
                         if( useSSL )
@@ -126,6 +127,7 @@ public abstract class AbstractTest extends TestCase
                     }
 
                     // This is for TLS reentrance test
+                    @Override
                     public void messageReceived( IoSession session, Object message ) throws Exception
                     {
                         if( !( message instanceof ByteBuffer ) )
@@ -188,6 +190,7 @@ public abstract class AbstractTest extends TestCase
         System.out.println( "Using port " + port + " for testing." );
     }
 
+    @Override
     protected void tearDown() throws Exception
     {
         if( boundAddress != null )

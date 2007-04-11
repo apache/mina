@@ -41,6 +41,7 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
     IoFilterChain chain;
     IoFilter[] filters;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

@@ -50,6 +50,7 @@ public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean
     private IoFilterMapping[] filterMappings = new IoFilterMapping[ 0 ];
     private String prefix = "filter";
 
+    @Override
     protected Object createInstance() throws Exception
     {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();

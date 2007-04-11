@@ -42,6 +42,7 @@ import org.springframework.util.Assert;
  */
 public class VmPipeAddressEditor extends PropertyEditorSupport
 {
+    @Override
     public void setAsText( String text ) throws IllegalArgumentException
     {
         setValue( parseSocketAddress( text ) );

@@ -49,6 +49,7 @@ public class ClientToProxyIoHandler extends AbstractProxyIoHandler
         connector.setHandler( connectorHandler );
     }
 
+    @Override
     public void sessionOpened( final IoSession session ) throws Exception 
     {
         

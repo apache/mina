@@ -35,6 +35,7 @@ public class ZlibTest extends TestCase
     private Zlib deflater = null;
     private Zlib inflater = null;
 
+    @Override
     protected void setUp() throws Exception
     {
         deflater = new Zlib( Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER );

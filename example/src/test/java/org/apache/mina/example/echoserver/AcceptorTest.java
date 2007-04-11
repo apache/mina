@@ -133,8 +133,9 @@ public class AcceptorTest extends AbstractTest
                 int nBytes = client.getInputStream().read( readBuf,
                         readBytes, readBuf.length - readBytes );
 
-                if( nBytes < 0 )
+                if( nBytes < 0 ) {
                     fail( "Unexpected disconnection." );
+                }
 
                 readBytes += nBytes;
             }

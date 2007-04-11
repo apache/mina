@@ -33,6 +33,7 @@ public class VmPipeAddressEditorTest extends TestCase
 {
     VmPipeAddressEditor editor;
 
+    @Override
     protected void setUp() throws Exception
     {
         editor = new VmPipeAddressEditor();

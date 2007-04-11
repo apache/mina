@@ -714,17 +714,20 @@ public class ByteBufferProxy extends ByteBuffer
         return buf.arrayOffset();
     }
 
+    @Override
     public ByteBuffer capacity( int newCapacity )
     {
         buf.capacity( newCapacity );
         return this;
     }
 
+    @Override
     public boolean isReadOnly()
     {
         return buf.isReadOnly();
     }
 
+    @Override
     public int markValue()
     {
         return buf.markValue();

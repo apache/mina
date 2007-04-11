@@ -47,6 +47,7 @@ public class SSLSocketFactory extends SocketFactory
         super();
     }
 
+    @Override
     public Socket createSocket( String arg1, int arg2 ) throws IOException,
             UnknownHostException
     {
@@ -60,6 +61,7 @@ public class SSLSocketFactory extends SocketFactory
         }
     }
 
+    @Override
     public Socket createSocket( String arg1, int arg2, InetAddress arg3,
                                int arg4 ) throws IOException,
             UnknownHostException
@@ -74,6 +76,7 @@ public class SSLSocketFactory extends SocketFactory
         }
     }
 
+    @Override
     public Socket createSocket( InetAddress arg1, int arg2 )
             throws IOException
     {
@@ -87,6 +90,7 @@ public class SSLSocketFactory extends SocketFactory
         }
     }
 
+    @Override
     public Socket createSocket( InetAddress arg1, int arg2, InetAddress arg3,
                                int arg4 ) throws IOException
     {

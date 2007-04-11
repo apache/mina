@@ -76,6 +76,7 @@ public class CompressionFilterTest extends TestCase
             "The quick brown fox jumps over the lazy dog.  " +
             "The quick brown fox jumps over the lazy dog.  ";
 
+    @Override
     protected void setUp()
     {
         // create the necessary mock controls.
@@ -194,6 +195,7 @@ public class CompressionFilterTest extends TestCase
      */
     class DataMatcher extends AbstractMatcher
     {
+        @Override
         protected boolean argumentMatches( Object arg0, Object arg1 )
         {
             // we need to only verify the ByteBuffer output

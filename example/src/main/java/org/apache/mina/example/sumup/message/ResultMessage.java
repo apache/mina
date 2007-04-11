@@ -56,6 +56,7 @@ public class ResultMessage extends AbstractMessage
         this.value = value;
     }
 
+    @Override
     public String toString()
     {
         if( ok )

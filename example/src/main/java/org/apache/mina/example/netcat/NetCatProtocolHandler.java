@@ -34,6 +34,7 @@ import org.apache.mina.common.IoSession;
  */
 public class NetCatProtocolHandler extends IoHandlerAdapter
 {
+    @Override
     public void sessionOpened( IoSession session )
     {
         // Set reader idle time to 10 seconds.
@@ -42,19 +43,23 @@ public class NetCatProtocolHandler extends IoHandlerAdapter
         session.setIdleTime( IdleStatus.READER_IDLE, 10 );
     }
 
+    @Override
     public void sessionClosed( IoSession session )
     {
         // Print out total number of bytes read from the remote peer.
         System.err.println( "Total " + session.getReadBytes() + " byte(s)" );
     }
 
+    @Override
     public void sessionIdle( IoSession session, IdleStatus status )
     {
         // Close the connection if reader is idle.
-        if( status == IdleStatus.READER_IDLE )
+        if( status == IdleStatus.READER_IDLE ) {
             session.close();
+        }
     }
 
+    @Override
     public void messageReceived( IoSession session, Object message )
     {
         ByteBuffer buf = ( ByteBuffer ) message;

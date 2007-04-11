@@ -40,6 +40,7 @@ public class EchoProtocolHandler extends IoHandlerAdapter
 {
     private static final Logger log = LoggerFactory.getLogger( EchoProtocolHandler.class );
 
+    @Override
     public void sessionCreated( IoSession session )
     {
         if( session.getTransportType() == TransportType.SOCKET )
@@ -53,6 +54,7 @@ public class EchoProtocolHandler extends IoHandlerAdapter
         session.setAttribute( SSLFilter.USE_NOTIFICATION );
     }
     
+    @Override
     public void sessionIdle( IoSession session, IdleStatus status )
     {
         log.info(
@@ -61,12 +63,14 @@ public class EchoProtocolHandler extends IoHandlerAdapter
                 " ***" );
     }
 
+    @Override
     public void exceptionCaught( IoSession session, Throwable cause )
     {
         cause.printStackTrace();
         session.close();
     }
 
+    @Override
     public void messageReceived( IoSession session, Object message ) throws Exception
     {
         if( !( message instanceof ByteBuffer ) )

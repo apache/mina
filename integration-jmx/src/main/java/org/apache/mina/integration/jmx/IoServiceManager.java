@@ -19,9 +19,6 @@
  */
 package org.apache.mina.integration.jmx;
 
-
-import java.util.Iterator;
-
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -92,8 +89,9 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
 
     public void stopCollectingStats()
     {
-        if ( collector != null && collector.isRunning() )
+        if ( collector != null && collector.isRunning() ) {
             collector.stop();
+        }
 
     }
 
@@ -147,9 +145,8 @@ public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistratio
 
     public void closeAllSessions()
     {
-        for ( Iterator iter = service.getManagedSessions().iterator(); iter.hasNext(); )
-        {
-            IoSession session = ( IoSession ) iter.next();
+        for (Object element : service.getManagedSessions()) {
+            IoSession session = ( IoSession ) element;
             session.close();
         }
     }

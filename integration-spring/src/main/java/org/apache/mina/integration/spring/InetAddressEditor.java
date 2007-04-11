@@ -43,6 +43,7 @@ import java.net.UnknownHostException;
  */
 public class InetAddressEditor extends PropertyEditorSupport
 {
+    @Override
     public void setAsText( String text ) throws IllegalArgumentException
     {
         try

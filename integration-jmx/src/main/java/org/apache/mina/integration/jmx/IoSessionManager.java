@@ -220,39 +220,43 @@ public class IoSessionManager implements IoSessionManagerMBean
     public float getByteReadThroughtput()
     {
         IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
-        if(stats==null)
+        if(stats==null) {
             return Float.NaN;
-        else
+        } else {
             return stats.getByteReadThroughput();
+        }
     }
 
 
     public float getByteWrittenThroughtput()
     {
         IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
-        if(stats==null)
+        if(stats==null) {
             return Float.NaN;
-        else
+        } else {
             return stats.getByteWrittenThroughput();
+        }
     }
 
 
     public float getMessageReadThroughtput()
     {
         IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
-        if(stats==null)
+        if(stats==null) {
             return Float.NaN;
-        else
+        } else {
             return stats.getMessageReadThroughput();
+        }
     }
 
 
     public float getMessageWrittenThroughtput()
     {
         IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
-        if(stats==null)
+        if(stats==null) {
             return Float.NaN;
-        else
+        } else {
             return stats.getMessageWrittenThroughput();
+        }
     }
 }
