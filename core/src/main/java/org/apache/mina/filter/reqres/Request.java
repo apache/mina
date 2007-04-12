@@ -31,7 +31,7 @@ public class Request {
     private final Object id;
     private final Object message;
     private final long timeoutMillis;
-    private TimerTask timerTask;
+    private volatile TimerTask timerTask;
     
     public Request(Object id, Object message, long timeoutMillis) {
         this(id, message, timeoutMillis, TimeUnit.MILLISECONDS);
