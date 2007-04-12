@@ -546,7 +546,7 @@ public class StreamWriteFilterTest extends TestCase {
         @Override
         protected boolean argumentMatches( Object expected, Object actual )
         {
-            if( expected instanceof WriteRequest && expected instanceof WriteRequest )
+            if( expected instanceof WriteRequest && actual instanceof WriteRequest )
             {
                 WriteRequest w1 = ( WriteRequest ) expected;
                 WriteRequest w2 = ( WriteRequest ) actual;

@@ -1,0 +1,348 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *  
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License. 
+ *  
+ */
+package org.apache.mina.filter.reqres;
+
+import java.net.SocketAddress;
+
+import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoHandlerAdapter;
+import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportType;
+import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.IoFilter.NextFilter;
+import org.apache.mina.common.support.AbstractIoFilterChain;
+import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.util.SessionLog;
+import org.easymock.AbstractMatcher;
+import org.easymock.MockControl;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * Tests {@link RequestResponseFilter}.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
+public class RequestResponseFilterTest {
+    
+    private RequestResponseFilter filter;
+    private IoSession session;
+    
+    private IoFilterChain chain;
+    private NextFilter nextFilter;
+    private MockControl nextFilterControl;
+    
+    private final WriteRequestMatcher matcher = new WriteRequestMatcher();
+    
+    @Before
+    public void setUp() throws Exception {
+        session = new DummySession();
+        filter = new RequestResponseFilter(new MessageInspector());
+        
+        // Set up mock objects.
+        chain = new AbstractIoFilterChain(session) {
+            @Override
+            protected void doClose(IoSession session) throws Exception {
+            }
+
+            @Override
+            protected void doWrite(IoSession session, WriteRequest writeRequest) throws Exception {
+            }
+        };
+        nextFilterControl = MockControl.createControl(NextFilter.class);
+        nextFilter = (NextFilter) nextFilterControl.getMock();
+        
+        // Initialize the filter.
+        filter.onPreAdd(chain, "reqres", nextFilter);
+        filter.onPostAdd(chain, "reqres", nextFilter);
+        Assert.assertFalse(session.getAttributeKeys().isEmpty());
+    }
+    
+    @After
+    public void tearDown() throws Exception {
+        // Destroy the filter.
+        filter.onPreRemove(chain, "reqres", nextFilter);
+        filter.onPostRemove(chain, "reqres", nextFilter);
+        session.removeAttribute(SessionLog.LOGGER);
+        Assert.assertTrue(session.getAttributeKeys().isEmpty());
+
+        filter.destroy();
+        filter = null;
+    }
+    
+    @Test
+    public void testWholeResponse() throws Exception {
+        Request req = new Request(1, new Object(), Long.MAX_VALUE);
+        Response res = new Response(req, new Message(1, ResponseType.WHOLE), ResponseType.WHOLE);
+        WriteRequest rwr = new DefaultWriteRequest(req);
+        
+        // Record
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req.getMessage()));
+        nextFilterControl.setMatcher(matcher);
+        nextFilter.messageSent(session, rwr);
+        nextFilter.messageReceived(session, res);
+        
+        // Replay
+        nextFilterControl.replay();
+        filter.filterWrite(nextFilter, session, rwr);
+        filter.messageSent(nextFilter, session, matcher.getLastWriteRequest());
+        filter.messageReceived(nextFilter, session, res.getMessage());
+        filter.messageReceived(nextFilter, session, res.getMessage()); // Ignored
+        
+        // Verify
+        nextFilterControl.verify();
+    }
+    
+    @Test
+    public void testPartialResponse() throws Exception {
+        Request req = new Request(1, new Object(), Long.MAX_VALUE);
+        Response res1 = new Response(req, new Message(1, ResponseType.PARTIAL), ResponseType.PARTIAL);
+        Response res2 = new Response(req, new Message(1, ResponseType.PARTIAL_LAST), ResponseType.PARTIAL_LAST);
+        WriteRequest rwr = new DefaultWriteRequest(req);
+        
+        // Record
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req.getMessage()));
+        nextFilterControl.setMatcher(matcher);
+        nextFilter.messageSent(session, rwr);
+        nextFilter.messageReceived(session, res1);
+        nextFilter.messageReceived(session, res2);
+        
+        // Replay
+        nextFilterControl.replay();
+        filter.filterWrite(nextFilter, session, rwr);
+        filter.messageSent(nextFilter, session, matcher.getLastWriteRequest());
+        filter.messageReceived(nextFilter, session, res1.getMessage());
+        filter.messageReceived(nextFilter, session, res2.getMessage());
+        filter.messageReceived(nextFilter, session, res1.getMessage()); // Ignored
+        filter.messageReceived(nextFilter, session, res2.getMessage()); // Ignored
+        
+        // Verify
+        nextFilterControl.verify();
+    }
+    
+    @Test
+    public void testWholeResponseTimeout() throws Exception {
+        Request req = new Request(1, new Object(), 10);  // 10ms timeout
+        Response res = new Response(req, new Message(1, ResponseType.WHOLE), ResponseType.WHOLE);
+        WriteRequest rwr = new DefaultWriteRequest(req);
+        
+        // Record
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req.getMessage()));
+        nextFilterControl.setMatcher(matcher);
+        nextFilter.messageSent(session, rwr);
+        nextFilter.exceptionCaught(session, new RequestTimeoutException(req));
+        nextFilterControl.setMatcher(new ExceptionMatcher());
+        
+        // Replay
+        nextFilterControl.replay();
+        filter.filterWrite(nextFilter, session, rwr);
+        filter.messageSent(nextFilter, session, matcher.getLastWriteRequest());
+        Thread.sleep(300);  // Wait until the request times out.
+        filter.messageReceived(nextFilter, session, res.getMessage()); // Ignored
+        
+        // Verify
+        nextFilterControl.verify();
+    }
+    
+    @Test
+    public void testPartialResponseTimeout() throws Exception {
+        Request req = new Request(1, new Object(), 10);  // 10ms timeout
+        Response res1 = new Response(req, new Message(1, ResponseType.PARTIAL), ResponseType.PARTIAL);
+        Response res2 = new Response(req, new Message(1, ResponseType.PARTIAL_LAST), ResponseType.PARTIAL_LAST);
+        WriteRequest rwr = new DefaultWriteRequest(req);
+        
+        // Record
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req.getMessage()));
+        nextFilterControl.setMatcher(matcher);
+        nextFilter.messageSent(session, rwr);
+        nextFilter.messageReceived(session, res1);
+        nextFilter.exceptionCaught(session, new RequestTimeoutException(req));
+        nextFilterControl.setMatcher(new ExceptionMatcher());
+        
+        // Replay
+        nextFilterControl.replay();
+        filter.filterWrite(nextFilter, session, rwr);
+        filter.messageSent(nextFilter, session, matcher.getLastWriteRequest());
+        filter.messageReceived(nextFilter, session, res1.getMessage());
+        Thread.sleep(300);  // Wait until the request times out.
+        filter.messageReceived(nextFilter, session, res2.getMessage()); // Ignored
+        filter.messageReceived(nextFilter, session, res1.getMessage()); // Ignored
+        
+        // Verify
+        nextFilterControl.verify();
+    }
+    
+    @Test
+    public void testTimeoutByDisconnection() throws Exception {
+        // We run a test case that doesn't raise a timeout to make sure
+        // the timeout is not raised again by disconnection.
+        testWholeResponse();
+        nextFilterControl.reset();
+        
+        Request req1 = new Request(1, new Object(), Long.MAX_VALUE);
+        Request req2 = new Request(2, new Object(), Long.MAX_VALUE);
+        WriteRequest rwr1 = new DefaultWriteRequest(req1);
+        WriteRequest rwr2 = new DefaultWriteRequest(req2);
+        
+        // Record
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req1.getMessage()));
+        nextFilterControl.setMatcher(matcher);
+        nextFilter.messageSent(session, rwr1);
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req2.getMessage()));
+        nextFilter.messageSent(session, rwr2);
+        nextFilter.exceptionCaught(session, new RequestTimeoutException(req1));
+        nextFilterControl.setMatcher(new ExceptionMatcher());
+        nextFilter.exceptionCaught(session, new RequestTimeoutException(req2));
+        nextFilter.sessionClosed(session);
+        
+        // Replay
+        nextFilterControl.replay();
+        filter.filterWrite(nextFilter, session, rwr1);
+        filter.messageSent(nextFilter, session, matcher.getLastWriteRequest());
+        filter.filterWrite(nextFilter, session, rwr2);
+        filter.messageSent(nextFilter, session, matcher.getLastWriteRequest());
+        filter.sessionClosed(nextFilter, session);
+        
+        // Verify
+        nextFilterControl.verify();
+    }
+    
+    private static class Message {
+        private final int id;
+        private final ResponseType type;
+        
+        private Message(int id, ResponseType type) {
+            this.id = id;
+            this.type = type;
+        }
+        
+        public int getId() {
+            return id;
+        }
+        
+        public ResponseType getType() {
+            return type;
+        }
+    }
+    
+    private static class MessageInspector implements ResponseInspector {
+
+        public Object getRequestId(Object message) {
+            if (!(message instanceof Message)) {
+                return null;
+            }
+            
+            return ((Message) message).getId();
+        }
+
+        public ResponseType getResponseType(Object message) {
+            if (!(message instanceof Message)) {
+                return null;
+            }
+            
+            return ((Message) message).getType();
+        }
+    }
+    
+    private static class DummySession extends BaseIoSession {
+
+        @Override
+        protected void updateTrafficMask() {
+        }
+
+        public IoSessionConfig getConfig() {
+            return null;
+        }
+
+        public IoFilterChain getFilterChain() {
+            return null;
+        }
+
+        public IoHandler getHandler() {
+            return new IoHandlerAdapter();
+        }
+
+        public SocketAddress getLocalAddress() {
+            return null;
+        }
+
+        public SocketAddress getRemoteAddress() {
+            return null;
+        }
+
+        public int getScheduledWriteBytes() {
+            return 0;
+        }
+
+        public int getScheduledWriteMessages() {
+            return 0;
+        }
+
+        public IoService getService() {
+            return null;
+        }
+
+        public TransportType getTransportType() {
+            return null;
+        }
+    }
+    
+    private static class WriteRequestMatcher extends AbstractMatcher
+    {
+        private WriteRequest lastWriteRequest;
+        
+        public WriteRequest getLastWriteRequest() {
+            return lastWriteRequest;
+        }
+
+        @Override
+        protected boolean argumentMatches( Object expected, Object actual )
+        {
+            if( actual instanceof WriteRequest && expected instanceof WriteRequest )
+            {
+                boolean answer = ((WriteRequest) expected).getMessage().equals(((WriteRequest) actual).getMessage());
+                lastWriteRequest = (WriteRequest) actual;
+                return answer;
+            }
+            return super.argumentMatches( expected, actual );
+        }
+    }
+    
+    private static class ExceptionMatcher extends AbstractMatcher
+    {
+        @Override
+        protected boolean argumentMatches( Object expected, Object actual )
+        {
+            if( actual instanceof RequestTimeoutException && expected instanceof RequestTimeoutException )
+            {
+                return ((RequestTimeoutException) expected).getRequest().equals(
+                        ((RequestTimeoutException) actual).getRequest());
+            }
+            return super.argumentMatches( expected, actual );
+        }
+    }
+}
