@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>build</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
   </parent>
   <artifactId>mina-java5</artifactId>
   <name>Apache MINA Java5 Extensions</name>
