@@ -14,37 +14,48 @@
       <groupId>org.apache.mina</groupId>
       <artifactId>mina-filter-ssl</artifactId>
       <version>${pom.version}</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.mina</groupId>
       <artifactId>mina-integration-spring</artifactId>
       <version>${pom.version}</version>
+      <scope>compile</scope>
     </dependency>
     
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>nlog4j</artifactId>
-      <version>1.2.25</version>
-      <scope>provided</scope>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.3.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>1.2.8</version>
+      <version>2.0.4</version>
+      <scope>compile</scope>
     </dependency>
     
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-support</artifactId>
-      <version>1.2.8</version>
+      <version>2.0.4</version>
+      <scope>compile</scope>
     </dependency>
     
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
-      <version>1.3.0</version>
+      <version>1.4.1</version>
       <scope>test</scope>
     </dependency>
     
