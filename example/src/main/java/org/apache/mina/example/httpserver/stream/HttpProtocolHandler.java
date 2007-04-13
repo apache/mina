@@ -94,17 +94,22 @@ public class HttpProtocolHandler extends StreamIoHandler
                 // Write content
                 out.println( "<html><head></head><body>" );
                 out.println( "<h3>Request Summary for: " + url + "</h3>" );
-                out.println( "<table border=\"1\"><tr><th>Key</th><th>Value</th></tr>" );
-                
+                out.println("<table border=\"1\"><tr><th>Key</th><th>Value</th></tr>");
+
                 Iterator it = headers.entrySet().iterator();
-                while( it.hasNext() )
-                {
-                    Entry e = ( Entry ) it.next();
-                    out.println( "<tr><td>" + e.getKey() + "</td><td>" + e.getValue() + "</td></tr>" );
+                while (it.hasNext()) {
+                    Entry e = (Entry) it.next();
+                    out.println("<tr><td>" + e.getKey() + "</td><td>"
+                            + e.getValue() + "</td></tr>");
                 }
-                
-                out.println( "</table>" );
-                out.println( "</body></html>" );
+
+                out.println("</table>");
+
+                for (int i = 0; i < 1024; i++) {
+                    out.println("this is line: " + i + "<br/>");
+                }
+
+                out.println("</body></html>");
             }
             catch( Exception e )
             {

@@ -28,6 +28,7 @@ import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
+import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 
 /**
  * (<b>Entry point</b>) HTTP server
@@ -48,6 +49,7 @@ public class Main
         IoAcceptorConfig config = new SocketAcceptorConfig();
         DefaultIoFilterChainBuilder chain = config.getFilterChain();
 
+        ((SocketSessionConfig) config.getSessionConfig()).setReuseAddress(true);
         // Add SSL filter if SSL is enabled.
         if( USE_SSL )
         {
