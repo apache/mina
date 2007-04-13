@@ -19,7 +19,10 @@
  */
 package org.apache.mina.filter.reqres;
 
+import java.util.NoSuchElementException;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,10 +31,14 @@ import java.util.concurrent.TimeUnit;
  * @version $Rev$, $Date$
  */
 public class Request {
+    private static final Object END = new Object();
+
     private final Object id;
     private final Object message;
     private final long timeoutMillis;
     private volatile TimerTask timerTask;
+
+    private final BlockingQueue<Object> responses = new LinkedBlockingQueue<Object>();
     
     public Request(Object id, Object message, long timeoutMillis) {
         this(id, message, timeoutMillis, TimeUnit.MILLISECONDS);
@@ -70,6 +77,56 @@ public class Request {
 
     public long getTimeoutMillis() {
         return timeoutMillis;
+    }
+    
+    public Response awaitResponse() throws RequestTimeoutException, InterruptedException {
+        return convertToResponse(responses.take());
+    }
+    
+    public Response awaitResponse(long timeout, TimeUnit unit) throws RequestTimeoutException, InterruptedException {
+        return convertToResponse(responses.poll(timeout, unit));
+    }
+
+    private Response convertToResponse(Object o) {
+        if (o instanceof Response) {
+            return (Response) o;
+        }
+        
+        if (o == null) {
+            return null;
+        }
+        
+        if (o == END) {
+            throw new NoSuchElementException(
+                    "All responses has been retrieved already.");
+        }
+        
+        throw (RequestTimeoutException) o;
+    }
+
+    public Response awaitResponseUninterruptibly() throws RequestTimeoutException {
+        for (;;) {
+            try {
+                return awaitResponse();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+    
+    void signal(Response response) {
+        signal0(response);
+        if (response.getType() != ResponseType.PARTIAL) {
+            signal0(END);
+        }
+    }
+    
+    void signal(RequestTimeoutException e) {
+        signal0(e);
+        signal0(END);
+    }
+    
+    private void signal0(Object answer) {
+        responses.offer(answer);
     }
     
     @Override

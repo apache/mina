@@ -19,15 +19,15 @@
  */
 package org.apache.mina.filter.reqres;
 
-import java.io.IOException;
+import org.apache.mina.common.RuntimeIOException;
 
 /**
- * An {@link IOException} which is thrown when a {@link Request} is timed out.
+ * An {@link RuntimeIOException} which is thrown when a {@link Request} is timed out.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$, 
  */
-public class RequestTimeoutException extends IOException {
+public class RequestTimeoutException extends RuntimeIOException {
     private static final long serialVersionUID = 5546784978950631652L;
 
     private final Request request;

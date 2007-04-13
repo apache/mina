@@ -20,6 +20,7 @@
 package org.apache.mina.filter.reqres;
 
 import java.net.SocketAddress;
+import java.util.NoSuchElementException;
 
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterChain;
@@ -115,6 +116,18 @@ public class RequestResponseFilterTest {
         
         // Verify
         nextFilterControl.verify();
+        Assert.assertEquals(res, req.awaitResponse());
+        assertNoSuchElementException(req);
+    }
+
+    private void assertNoSuchElementException(Request req) throws InterruptedException {
+        // Make sure if an exception is thrown if a user waits one more time.
+        try {
+            req.awaitResponse();
+            Assert.fail();
+        } catch (NoSuchElementException e) {
+            // OK
+        }
     }
     
     @Test
@@ -142,6 +155,9 @@ public class RequestResponseFilterTest {
         
         // Verify
         nextFilterControl.verify();
+        Assert.assertEquals(res1, req.awaitResponse());
+        Assert.assertEquals(res2, req.awaitResponse());
+        assertNoSuchElementException(req);
     }
     
     @Test
@@ -166,6 +182,17 @@ public class RequestResponseFilterTest {
         
         // Verify
         nextFilterControl.verify();
+        assertRequestTimeoutException(req);
+        assertNoSuchElementException(req);
+    }
+
+    private void assertRequestTimeoutException(Request req) throws InterruptedException {
+        try {
+            req.awaitResponse();
+            Assert.fail();
+        } catch (RequestTimeoutException e) {
+            // OK
+        }
     }
     
     @Test
@@ -194,6 +221,9 @@ public class RequestResponseFilterTest {
         
         // Verify
         nextFilterControl.verify();
+        Assert.assertEquals(res1, req.awaitResponse());
+        assertRequestTimeoutException(req);
+        assertNoSuchElementException(req);
     }
     
     @Test
@@ -229,6 +259,8 @@ public class RequestResponseFilterTest {
         
         // Verify
         nextFilterControl.verify();
+        assertRequestTimeoutException(req1);
+        assertRequestTimeoutException(req2);
     }
     
     private static class Message {

@@ -135,7 +135,9 @@ public class RequestResponseFilter extends IoFilterAdapter {
             }
 
             // And forward the event.
-            nextFilter.messageReceived(session, new Response(request, message, type));
+            Response response = new Response(request, message, type);
+            request.signal(response);
+            nextFilter.messageReceived(session, response);
         }
     }
 
@@ -148,6 +150,12 @@ public class RequestResponseFilter extends IoFilterAdapter {
         }
         
         Request request = (Request) message;
+        if (request.getTimerTask() != null) {
+            nextFilter.exceptionCaught(
+                    session,
+                    new IllegalArgumentException("Request can not be reused."));
+        }
+        
         ConcurrentMap<Object, Request> requestStore = getRequestStore(session);
         Object oldValue = requestStore.putIfAbsent(request.getId(), request);
         if (oldValue != null) {
@@ -252,7 +260,9 @@ public class RequestResponseFilter extends IoFilterAdapter {
             ConcurrentMap<Object, Request> requestStore = getRequestStore(session);
             if (requestStore.remove(request.getId(), request)) {
                 // Throw the exception only when it's really timed out.
-                filter.exceptionCaught(session, new RequestTimeoutException(request));
+                RequestTimeoutException e = new RequestTimeoutException(request);
+                request.signal(e);
+                filter.exceptionCaught(session, e);
             }
         }
     }
