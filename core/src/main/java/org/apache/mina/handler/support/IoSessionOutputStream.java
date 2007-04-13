@@ -45,9 +45,13 @@ public class IoSessionOutputStream extends OutputStream
     }
     
     @Override
-    public void close()
+    public void close() throws IOException
     {
-        session.close().join();
+         try {
+             flush();
+         } finally {
+             session.close().join();
+         }
     }
 
     private void checkClosed() throws IOException
@@ -68,7 +72,7 @@ public class IoSessionOutputStream extends OutputStream
     @Override
     public void write( byte[] b, int off, int len ) throws IOException
     {
-        write( ByteBuffer.wrap( b, off, len ) );
+        write( ByteBuffer.wrap( b.clone(), off, len ) );
     }
 
     @Override
