@@ -57,7 +57,8 @@ public class RequestTimeoutException extends IOException {
      * Creates a new exception.
      */
     public RequestTimeoutException(Request request, String message, Throwable cause) {
-        super(message, cause);
+        super(message);
+        initCause(cause);
         if (request == null) {
             throw new NullPointerException("request");
         }
@@ -68,7 +69,7 @@ public class RequestTimeoutException extends IOException {
      * Creates a new exception.
      */
     public RequestTimeoutException(Request request, Throwable cause) {
-        super(cause);
+        initCause(cause);
         if (request == null) {
             throw new NullPointerException("request");
         }
