@@ -27,7 +27,7 @@ import org.apache.mina.common.RuntimeIOException;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$, 
  */
-public class RequestTimeoutException extends RuntimeIOException {
+public class RequestTimeoutException extends RuntimeException {
     private static final long serialVersionUID = 5546784978950631652L;
 
     private final Request request;
