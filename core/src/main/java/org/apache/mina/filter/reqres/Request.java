@@ -41,8 +41,16 @@ public class Request {
 
     private final BlockingQueue<Object> responses = new LinkedBlockingQueue<Object>();
     
+    public Request(Object id, Object message, long timeoutMillis) {
+        this(id, message, true, timeoutMillis);
+    }
+    
     public Request(Object id, Object message, boolean useResponseQueue, long timeoutMillis) {
         this(id, message, useResponseQueue, timeoutMillis, TimeUnit.MILLISECONDS);
+    }
+    
+    public Request(Object id, Object message, long timeout, TimeUnit unit) {
+        this(id, message, true, timeout, unit);
     }
     
     public Request(Object id, Object message, boolean useResponseQueue, long timeout, TimeUnit unit) {
