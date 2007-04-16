@@ -35,16 +35,17 @@ public class Request {
 
     private final Object id;
     private final Object message;
+    private final boolean useResponseQueue;
     private final long timeoutMillis;
     private volatile TimerTask timerTask;
 
     private final BlockingQueue<Object> responses = new LinkedBlockingQueue<Object>();
     
-    public Request(Object id, Object message, long timeoutMillis) {
-        this(id, message, timeoutMillis, TimeUnit.MILLISECONDS);
+    public Request(Object id, Object message, boolean useResponseQueue, long timeoutMillis) {
+        this(id, message, useResponseQueue, timeoutMillis, TimeUnit.MILLISECONDS);
     }
     
-    public Request(Object id, Object message, long timeout, TimeUnit unit) {
+    public Request(Object id, Object message, boolean useResponseQueue, long timeout, TimeUnit unit) {
         if (id == null) {
             throw new NullPointerException("id");
         }
@@ -64,6 +65,7 @@ public class Request {
         
         this.id = id;
         this.message = message;
+        this.useResponseQueue = useResponseQueue;
         this.timeoutMillis = unit.toMillis(timeout);
     }
     
@@ -79,11 +81,17 @@ public class Request {
         return timeoutMillis;
     }
     
+    public boolean isUseResponseQueue() {
+        return useResponseQueue;
+    }
+    
     public Response awaitResponse() throws RequestTimeoutException, InterruptedException {
+        checkUseResponseQueue();
         return convertToResponse(responses.take());
     }
     
     public Response awaitResponse(long timeout, TimeUnit unit) throws RequestTimeoutException, InterruptedException {
+        checkUseResponseQueue();
         return convertToResponse(responses.poll(timeout, unit));
     }
 
@@ -105,11 +113,19 @@ public class Request {
     }
 
     public Response awaitResponseUninterruptibly() throws RequestTimeoutException {
+        checkUseResponseQueue();
         for (;;) {
             try {
                 return awaitResponse();
             } catch (InterruptedException e) {
             }
+        }
+    }
+    
+    private void checkUseResponseQueue() {
+        if (!useResponseQueue) {
+            throw new IllegalStateException(
+                    "Response queue is not available; useResponseQueue is false.");
         }
     }
     
@@ -126,7 +142,9 @@ public class Request {
     }
     
     private void signal0(Object answer) {
-        responses.offer(answer);
+        if (useResponseQueue) {
+            responses.offer(answer);
+        }
     }
     
     @Override
