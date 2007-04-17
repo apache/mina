@@ -59,8 +59,19 @@ public abstract class BaseIoService implements IoService
     
     protected BaseIoService( IoSessionConfig sessionConfig )
     {
-        this.listeners = new IoServiceListenerSupport( this );
-        setSessionConfig( sessionConfig );
+        if (sessionConfig == null) {
+            throw new NullPointerException("sessionConfig");
+        }
+        
+        if (!getTransportType().getSessionConfigType().isAssignableFrom(
+                sessionConfig.getClass())) {
+            throw new IllegalArgumentException(
+                    "sessionConfig type: " + sessionConfig.getClass() +
+                    " (expected: " + getTransportType().getSessionConfigType() + ")");
+        }
+
+        this.listeners = new IoServiceListenerSupport(this);
+        this.sessionConfig = sessionConfig;
     }
     
     public IoFilterChainBuilder getFilterChainBuilder()
@@ -129,19 +140,4 @@ public abstract class BaseIoService implements IoService
     {
         return sessionConfig;
     }
-
-    public void setSessionConfig( IoSessionConfig sessionConfig )
-    {
-        if( sessionConfig == null )
-        {
-            throw new NullPointerException( "sessionConfig" );
-        }
-        if( ! getTransportType().getSessionConfigType().isAssignableFrom( sessionConfig.getClass() ) )
-        {
-            throw new IllegalArgumentException( "sessionConfig type: " 
-                    + sessionConfig.getClass() 
-                    + " (expected: " + getTransportType().getSessionConfigType() + ")" );
-        }
-        this.sessionConfig = sessionConfig;
-    }    
 }

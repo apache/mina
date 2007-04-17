@@ -30,7 +30,6 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
@@ -67,14 +66,6 @@ public class VmPipeConnector extends BaseIoConnector
         return (VmPipeSessionConfig) super.getSessionConfig();
     }
 
-    // This method is overriden to work around a problem with
-    // bean property access mechanism.
-
-    @Override
-    public void setSessionConfig(IoSessionConfig sessionConfig) {
-        super.setSessionConfig(sessionConfig);
-    }
-    
     @Override
     protected ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress )
     {

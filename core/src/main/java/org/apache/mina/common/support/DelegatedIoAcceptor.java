@@ -133,11 +133,6 @@ public class DelegatedIoAcceptor implements IoAcceptor
         return delegate.getSessionConfig();
     }
 
-    public void setSessionConfig( IoSessionConfig config )
-    {
-        delegate.setSessionConfig( config );
-    }
-
     public void setHandler( IoHandler handler )
     {
         delegate.setHandler( handler );

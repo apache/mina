@@ -123,11 +123,6 @@ public class DelegatedIoConnector implements IoConnector
         return delegate.getSessionConfig();
     }
     
-    public void setSessionConfig( IoSessionConfig config )
-    {
-        delegate.setSessionConfig( config );
-    }
-    
     public void setHandler( IoHandler handler )
     {
         delegate.setHandler( handler );
