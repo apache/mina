@@ -16,6 +16,13 @@
       <version>${pom.version}</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>gnu.io.rxtx</groupId>
+      <artifactId>rxtx</artifactId>
+      <version>2.1-7</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/RXTXcomm.jar</systemPath>
+    </dependency>
   </dependencies>
   
 </project>
