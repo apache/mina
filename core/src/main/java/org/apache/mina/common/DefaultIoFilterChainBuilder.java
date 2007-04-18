@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilterChain.Entry;
@@ -68,7 +69,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     
     private void init()
     {
-        entries = new ArrayList<Entry>();
+        entries = new CopyOnWriteArrayList<Entry>();
         entriesByName = new HashMap<String, Entry>();
     }
 
@@ -227,6 +228,35 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
         throw new IllegalArgumentException( "Unknown filter name: " + name );
     }
 
+    public synchronized IoFilter replace( String name, IoFilter newFilter ) {
+        checkBaseName(name);
+        EntryImpl e = (EntryImpl) get(name);
+        IoFilter oldFilter = e.getFilter();
+        e.setFilter(newFilter);
+        return oldFilter;
+    }
+
+    public synchronized void replace( IoFilter oldFilter, IoFilter newFilter ) {
+        for (Entry e: entries) {
+            if (e.getFilter() == oldFilter) {
+                ((EntryImpl) e).setFilter(newFilter);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Filter not found: " + oldFilter.getClass().getName());
+    }
+
+    public synchronized void replace( Class<? extends IoFilter> oldFilterType, IoFilter newFilter ) {
+        for (Entry e: entries) {
+            if( oldFilterType.isAssignableFrom( e.getFilter().getClass() ) )
+            {
+                ((EntryImpl) e).setFilter(newFilter);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Filter not found: " + oldFilterType.getName());
+    }
+
     /**
      * @see IoFilterChain#clear()
      */
@@ -335,7 +365,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     private static class EntryImpl implements Entry
     {
         private final String name;
-        private final IoFilter filter;
+        private IoFilter filter;
         
         private EntryImpl( String name, IoFilter filter )
         {
@@ -360,6 +390,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
         public IoFilter getFilter()
         {
             return filter;
+        }
+        
+        private void setFilter(IoFilter filter) {
+            this.filter = filter;
         }
 
         public NextFilter getNextFilter()
