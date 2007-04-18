@@ -330,7 +330,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         Object lock = session.getAttribute( DECODER_LOCK );
         if( lock == null )
         {
-            lock = session.setAttributeIfAbsent( DECODER_LOCK, new Object() );
+            session.setAttributeIfAbsent( DECODER_LOCK, new Object() );
+            lock = session.getAttribute( DECODER_LOCK );
         }
 
         return lock;
