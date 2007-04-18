@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IdleStatus;
@@ -139,6 +140,14 @@ public abstract class BaseIoSession implements IoSession
     
     public WriteFuture write( Object message, SocketAddress remoteAddress )
     {
+        if (message == null) {
+            throw new NullPointerException("message");
+        }
+        
+        if (message instanceof ByteBuffer && !((ByteBuffer) message).hasRemaining()) {
+            throw new IllegalArgumentException("message is empty. Forgot to call flip()?");
+        }
+
         synchronized( lock )
         {
             if( isClosing() || !isConnected() )

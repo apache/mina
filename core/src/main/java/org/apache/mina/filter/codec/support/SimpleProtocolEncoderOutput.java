@@ -47,7 +47,11 @@ public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutp
     
     public void write( ByteBuffer buf )
     {
-        bufferQueue.offer( buf );
+        if (buf.hasRemaining()) {
+            bufferQueue.offer( buf );
+        } else {
+            throw new IllegalArgumentException("buf is empty. Forgot to call flip()?");
+        }
     }
     
     public void mergeAll()

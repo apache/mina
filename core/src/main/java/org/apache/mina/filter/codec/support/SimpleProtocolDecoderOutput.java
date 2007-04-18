@@ -48,6 +48,10 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
     
     public void write( Object message )
     {
+        if (message == null) {
+            throw new NullPointerException("message");
+        }
+
         messageQueue.offer( message );
         if( session instanceof BaseIoSession )
         {
