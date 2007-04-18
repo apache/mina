@@ -92,10 +92,28 @@
     <module>filter-codec-netty</module>
     <module>filter-compression</module>
     <module>integration-spring</module>
-	  <module>integration-jmx</module>
+    <module>integration-jmx</module>
     <module>example</module>
   </modules>
   
+  <profiles>
+    <profile>
+      <id>default-profile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>with-serial</id>
+      <activation>
+         <property><name>with-serial</name></property>
+      </activation>
+      <modules>
+         <module>transport-serial</module>
+      </modules>
+    </profile>
+  </profiles>
+
   <build>
     <plugins>
       <plugin>
