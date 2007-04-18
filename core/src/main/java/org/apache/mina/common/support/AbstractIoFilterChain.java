@@ -154,6 +154,41 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         deregister( entry );
         return entry.getFilter();
     }
+    
+    public synchronized IoFilter replace( String name, IoFilter newFilter ) {
+        EntryImpl entry = checkOldName( name );
+        IoFilter oldFilter = entry.getFilter();
+        entry.setFilter(newFilter);
+        return oldFilter;
+    }
+
+    public synchronized void replace( IoFilter oldFilter, IoFilter newFilter ) {
+        EntryImpl e = head.nextEntry;
+        while( e != tail )
+        {
+            if( e.getFilter() == oldFilter )
+            {
+                e.setFilter(newFilter);
+                return;
+            }
+            e = e.nextEntry;
+        }
+        throw new IllegalArgumentException("Filter not found: " + oldFilter.getClass().getName());
+    }
+
+    public synchronized void replace( Class<? extends IoFilter> oldFilterType, IoFilter newFilter ) {
+        EntryImpl e = head.nextEntry;
+        while( e != tail )
+        {
+            if( oldFilterType.isAssignableFrom( e.getFilter().getClass() ) )
+            {
+                e.setFilter(newFilter);
+                return;
+            }
+            e = e.nextEntry;
+        }
+        throw new IllegalArgumentException("Filter not found: " + oldFilterType.getName());
+    }
 
     public synchronized void clear() throws Exception
     {
@@ -167,7 +202,6 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     private void register( EntryImpl prevEntry, String name, IoFilter filter )
     {
         EntryImpl newEntry = new EntryImpl( prevEntry, prevEntry.nextEntry, name, filter );
-
 
         try
         {
@@ -240,7 +274,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         EntryImpl e = ( EntryImpl ) name2entry.get( baseName );
         if ( e == null )
         {
-            throw new IllegalArgumentException( "Unknown filter name:" +
+            throw new IllegalArgumentException( "Filter not found:" +
                     baseName );
         }
         return e;
@@ -741,13 +775,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
     private class EntryImpl implements Entry
     {
         private EntryImpl prevEntry;
-
         private EntryImpl nextEntry;
-
         private final String name;
-
-        private final IoFilter filter;
-
+        private IoFilter filter;
         private final NextFilter nextFilter;
 
         private EntryImpl( EntryImpl prevEntry, EntryImpl nextEntry,
@@ -845,6 +875,14 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         public IoFilter getFilter()
         {
             return filter;
+        }
+        
+        private void setFilter(IoFilter filter) {
+            if (filter == null) {
+                throw new NullPointerException("filter");
+            }
+            
+            this.filter = filter;
         }
         
         public NextFilter getNextFilter()

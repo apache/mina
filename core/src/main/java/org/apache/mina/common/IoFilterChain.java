@@ -80,7 +80,7 @@ public interface IoFilterChain {
     
     /**
      * Returns <tt>true</tt> if this chain contains an {@link IoFilter} of the
-     * specified <tt>filterType</tt>.
+     * specified <tt>filterType</tt>.  
      */
     boolean contains( Class<? extends IoFilter> filterType );
     
@@ -118,6 +118,32 @@ public interface IoFilterChain {
      */
     void addAfter( String baseName, String name, IoFilter filter );
 
+    /**
+     * Replace the filter with the specified name with the specified new
+     * filter.
+     * 
+     * @return the old filter
+     * @throws IllegalArgumentException if there's no such filter
+     */
+    IoFilter replace( String name, IoFilter newFilter );
+    
+    /**
+     * Replace the filter with the specified name with the specified new
+     * filter.
+     * 
+     * @throws IllegalArgumentException if there's no such filter
+     */
+    void replace( IoFilter oldFilter, IoFilter newFilter );
+    
+    /**
+     * Replace the filter of the specified type with the specified new
+     * filter.  If there's more than one filter with the specified type,
+     * the first match will be replaced.
+     * 
+     * @throws IllegalArgumentException if there's no such filter
+     */
+    void replace( Class<? extends IoFilter> oldFilterType, IoFilter newFilter );
+    
     /**
      * Removes the filter with the specified name from this chain.
      * @throws IoFilterLifeCycleException
