@@ -128,11 +128,57 @@ public interface IoSession {
     Object setAttribute( String key );
     
     /**
+     * Sets a user defined attribute if the attribute with the specified key
+     * is not set yet.  This method is same with the following code except
+     * that the operation is performed atomically.
+     * <pre>
+     * if (containsAttribute(key)) {
+     *     return getAttribute(key);
+     * } else {
+     *     return setAttribute(key, value);
+     * }
+     * </pre>
+     */
+    Object setAttributeIfAbsent( String key, Object value );
+
+    /**
      * Removes a user-defined attribute with the specified key.
      * 
      * @return The old value of the attribute.  <tt>null</tt> if not found.
      */
     Object removeAttribute( String key );
+    
+    /**
+     * Removes a user defined attribute with the specified key if the current
+     * attribute value is equal to the specified value.  This method is same
+     * with the following code except that the operation is performed
+     * atomically.
+     * <pre>
+     * if (containsAttribute(key) && getAttribute(key).equals(value)) {
+     *     removeAttribute(key);
+     *     return true;
+     * } else {
+     *     return false;
+     * }
+     * </pre>
+     */
+    boolean removeAttribute(String key, Object value);
+    
+    /**
+     * Replaces a user defined attribute with the specified key if the
+     * value of the attribute is equals to the specified old value.
+     * This method is same with the following code except that the operation
+     * is performed atomically.
+     * <pre>
+     * if (containsAttribute(key) && getAttribute(key).equals(oldValue)) {
+     *     setAttribute(key, newValue);
+     *     return true;
+     * } else {
+     *     return false;
+     * }
+     * </pre>
+     */
+    boolean replaceAttribute(String key, Object oldValue, Object newValue);
     
     /**
      * Returns <tt>true</tt> if this session contains the attribute with

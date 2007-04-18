@@ -21,9 +21,9 @@ package org.apache.mina.common.support;
 
 import java.net.SocketAddress;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.DefaultWriteRequest;
@@ -44,7 +44,7 @@ import org.apache.mina.common.WriteRequest;
 public abstract class BaseIoSession implements IoSession
 {
     private final Object lock = new Object();
-    private final Map<String,Object> attributes = new ConcurrentHashMap<String, Object>( );
+    private final ConcurrentMap<String,Object> attributes = new ConcurrentHashMap<String, Object>( );
     private final long creationTime;
 
     /** 
@@ -177,14 +177,22 @@ public abstract class BaseIoSession implements IoSession
 
     public Object getAttribute( String key )
     {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        
         return attributes.get( key );
     }
 
     public Object setAttribute( String key, Object value )
     {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        
         if( value == null )
         {
-            return removeAttribute( key );
+            return attributes.remove( key );
         }
         else
         {
@@ -197,9 +205,42 @@ public abstract class BaseIoSession implements IoSession
         return setAttribute( key, Boolean.TRUE );
     }
     
+    public Object setAttributeIfAbsent( String key, Object value )
+    {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        
+        if (value == null) {
+            return null;
+        }
+
+        return attributes.putIfAbsent( key, value );
+    }
+    
     public Object removeAttribute( String key )
     {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        
         return attributes.remove( key );
+    }
+    
+    public boolean removeAttribute(String key, Object value) {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        
+        if (value == null) {
+            return false;
+        }
+
+        return attributes.remove(key, value);
+    }
+    
+    public boolean replaceAttribute(String key, Object oldValue, Object newValue) {
+        return attributes.replace(key, oldValue, newValue);
     }
     
     public boolean containsAttribute( String key )
