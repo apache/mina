@@ -822,7 +822,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
                         ByteBuffer message = ( ByteBuffer ) writeRequest.getMessage();
                         if( message.remaining() == 0 )
                         {
-                            callPreviousFilterWrite( head.nextEntry, session, writeRequest );
+                            callPreviousFilterWrite( head, session, writeRequest );
                             return;
                         }
                     }
