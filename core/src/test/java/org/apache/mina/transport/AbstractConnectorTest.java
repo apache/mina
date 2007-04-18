@@ -76,7 +76,7 @@ public abstract class AbstractConnectorTest extends TestCase {
                 }
             });
             ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
-            future.join();
+            future.awaitUninterruptibly();
             buf.append("3");
             future.getSession().close();
             Assert.assertEquals( "123", buf.toString() );
@@ -114,7 +114,7 @@ public abstract class AbstractConnectorTest extends TestCase {
             }
         });
         ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
-        future.join();
+        future.awaitUninterruptibly();
         buf.append("1");
         try
         {

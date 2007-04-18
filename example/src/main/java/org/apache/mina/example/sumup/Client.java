@@ -90,7 +90,7 @@ public class Client
             {
                 ConnectFuture future = connector.connect(
                         new InetSocketAddress( HOSTNAME, PORT ) );
-                future.join();
+                future.awaitUninterruptibly();
                 session = future.getSession();
                 break;
             }
@@ -103,6 +103,6 @@ public class Client
         }
 
         // wait until the summation is done
-        session.getCloseFuture().join();
+        session.getCloseFuture().awaitUninterruptibly();
     }
 }

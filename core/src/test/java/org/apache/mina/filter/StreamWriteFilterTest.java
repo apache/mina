@@ -28,6 +28,7 @@ import java.security.MessageDigest;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -645,6 +646,29 @@ public class StreamWriteFilterTest extends TestCase {
 
         public void removeListener( IoFutureListener listener )
         {
+        }
+
+        public void await() throws InterruptedException {
+            
+        }
+
+        public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
+            return true;
+        }
+
+        public boolean await(long timeoutMillis) throws InterruptedException {
+            return true;
+        }
+
+        public void awaitUninterruptibly() {
+        }
+
+        public boolean awaitUninterruptibly(long timeout, TimeUnit unit) {
+            return true;
+        }
+
+        public boolean awaitUninterruptibly(long timeoutMillis) {
+            return true;
         }
     }
 }

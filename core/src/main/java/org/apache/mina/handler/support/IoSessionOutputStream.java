@@ -50,7 +50,7 @@ public class IoSessionOutputStream extends OutputStream
          try {
              flush();
          } finally {
-             session.close().join();
+             session.close().awaitUninterruptibly();
          }
     }
 
@@ -92,7 +92,7 @@ public class IoSessionOutputStream extends OutputStream
             return;
         }
         
-        lastWriteFuture.join();
+        lastWriteFuture.awaitUninterruptibly();
         if( !lastWriteFuture.isWritten() )
         {
             throw new IOException( "The bytes could not be written to the session" );

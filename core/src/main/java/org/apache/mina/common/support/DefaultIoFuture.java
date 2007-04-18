@@ -21,6 +21,7 @@ package org.apache.mina.common.support;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
@@ -56,7 +57,40 @@ public class DefaultIoFuture implements IoFuture
         return session;
     }
     
-    public void join()
+    public void join() {
+        awaitUninterruptibly();
+    }
+    
+    public boolean join(long timeoutMillis) {
+        return awaitUninterruptibly(timeoutMillis);
+    }
+    
+    public void await() throws InterruptedException {
+        synchronized( lock )
+        {
+            while( !ready )
+            {
+                lock.wait();
+            }
+        }
+    }
+    
+    public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
+        return await(unit.toMillis(timeout));
+    }
+    
+    public boolean await(long timeoutMillis) throws InterruptedException {
+        synchronized( lock )
+        {
+            if( !ready )
+            {
+                lock.wait(timeoutMillis);
+            }
+            return ready;
+        }
+    }
+    
+    public void awaitUninterruptibly()
     {
         synchronized( lock )
         {
@@ -72,12 +106,16 @@ public class DefaultIoFuture implements IoFuture
             }
         }
     }
+    
+    public boolean awaitUninterruptibly( long timeout, TimeUnit unit) {
+        return awaitUninterruptibly(unit.toMillis(timeout));
+    }
 
-    public boolean join( long timeoutInMillis )
+    public boolean awaitUninterruptibly( long timeoutMillis )
     {
-        long startTime = ( timeoutInMillis <= 0 ) ? 0 : System
+        long startTime = ( timeoutMillis <= 0 ) ? 0 : System
                 .currentTimeMillis();
-        long waitTime = timeoutInMillis;
+        long waitTime = timeoutMillis;
         
         synchronized( lock )
         {
@@ -104,7 +142,7 @@ public class DefaultIoFuture implements IoFuture
                     return true;
                 } else
                 {
-                    waitTime = timeoutInMillis - ( System.currentTimeMillis() - startTime );
+                    waitTime = timeoutMillis - ( System.currentTimeMillis() - startTime );
                     if( waitTime <= 0 )
                     {
                         return ready;

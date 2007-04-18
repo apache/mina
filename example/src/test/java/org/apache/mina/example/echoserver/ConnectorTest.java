@@ -106,7 +106,7 @@ public class ConnectorTest extends AbstractTest
             connector.setHandler( handler );
             ConnectFuture future = connector.connect(
                     new InetSocketAddress( "localhost", port ) );
-            future.join();
+            future.awaitUninterruptibly();
             session = future.getSession();
         }
         else
@@ -121,7 +121,7 @@ public class ConnectorTest extends AbstractTest
                     ConnectFuture future = connector.connect(
                             new InetSocketAddress( "localhost", port ),
                             new InetSocketAddress( clientPort ) );
-                    future.join();
+                    future.awaitUninterruptibly();
                     session = future.getSession();
                     break;
                 }
@@ -143,7 +143,7 @@ public class ConnectorTest extends AbstractTest
         // Send closeNotify to test TLS closure if it is TLS connection.
         if( useSSL )
         {
-            connectorSSLFilter.stopSSL( session ).join();
+            connectorSSLFilter.stopSSL( session ).awaitUninterruptibly();
             
             System.out.println( "-------------------------------------------------------------------------------" );
             // Test again after we finished TLS session.
@@ -157,7 +157,7 @@ public class ConnectorTest extends AbstractTest
             ByteBuffer buf = ByteBuffer.allocate( 1 );
             buf.put( ( byte ) '.' );
             buf.flip();
-            session.write( buf ).join();
+            session.write( buf ).awaitUninterruptibly();
             
             //// Wait for StartTLS response.
             waitForResponse( handler, 1 );
@@ -171,7 +171,7 @@ public class ConnectorTest extends AbstractTest
             testConnector0( session );
         }
         
-        session.close().join();
+        session.close().awaitUninterruptibly();
     }
 
     private void testConnector0( IoSession session ) throws InterruptedException
@@ -196,7 +196,7 @@ public class ConnectorTest extends AbstractTest
             }
         }
         
-        writeFuture.join();
+        writeFuture.awaitUninterruptibly();
 
         waitForResponse( handler, DATA_SIZE * COUNT );
 

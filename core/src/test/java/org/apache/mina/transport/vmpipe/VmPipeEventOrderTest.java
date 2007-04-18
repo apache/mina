@@ -88,8 +88,8 @@ public class VmPipeEventOrderTest extends TestCase
 
         ConnectFuture future = connector.connect( new VmPipeAddress( 1 ) );
 
-        future.join();
-        future.getSession().getCloseFuture().join();
+        future.awaitUninterruptibly();
+        future.getSession().getCloseFuture().awaitUninterruptibly();
         acceptor.unbind();
         
         // sessionClosed() might not be invoked yet
@@ -154,8 +154,8 @@ public class VmPipeEventOrderTest extends TestCase
 
         ConnectFuture future = connector.connect( new VmPipeAddress( 1 ) );
 
-        future.join();
-        future.getSession().getCloseFuture().join();
+        future.awaitUninterruptibly();
+        future.getSession().getCloseFuture().awaitUninterruptibly();
         acceptor.unbind();
         
         // sessionClosed() might not be invoked yet

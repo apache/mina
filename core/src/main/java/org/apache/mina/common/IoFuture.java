@@ -19,6 +19,8 @@
  */
 package org.apache.mina.common;
 
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Represents the result of an ashynchronous I/O operation.
@@ -36,14 +38,54 @@ public interface IoFuture
     /**
      * Wait for the asynchronous operation to end.
      */
-    void join();
+    void await() throws InterruptedException;
 
     /**
      * Wait for the asynchronous operation to end with the specified timeout.
      * 
      * @return <tt>true</tt> if the operation is finished.
      */
-    boolean join( long timeoutInMillis );
+    boolean await( long timeout, TimeUnit unit ) throws InterruptedException;
+
+    /**
+     * Wait for the asynchronous operation to end with the specified timeout.
+     * 
+     * @return <tt>true</tt> if the operation is finished.
+     */
+    boolean await( long timeoutMillis ) throws InterruptedException;
+
+    /**
+     * Wait for the asynchronous operation to end uninterruptibly.
+     */
+    void awaitUninterruptibly();
+
+    /**
+     * Wait for the asynchronous operation to end with the specified timeout
+     * uninterruptibly.
+     * 
+     * @return <tt>true</tt> if the operation is finished.
+     */
+    boolean awaitUninterruptibly( long timeout, TimeUnit unit );
+
+    /**
+     * Wait for the asynchronous operation to end with the specified timeout
+     * uninterruptibly.
+     * 
+     * @return <tt>true</tt> if the operation is finished.
+     */
+    boolean awaitUninterruptibly( long timeoutMillis );
+    
+    /**
+     * @deprecated Replaced with {@link #awaitUninterruptibly()}.
+     */
+    @Deprecated
+    void join();
+    
+    /**
+     * @deprecated Replaced with {@link #awaitUninterruptibly(long)}.
+     */
+    @Deprecated
+    boolean join(long timeoutMillis);
 
     /**
      * Returns if the asynchronous operation is finished.

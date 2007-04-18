@@ -66,7 +66,7 @@ public class ServerHandler extends IoHandlerAdapter
         // HttpResponseMessage.HTTP_STATUS_NOT_FOUND));
 
         if( response != null ) {
-            session.write( response ).join();
+            session.write( response ).awaitUninterruptibly();
         }
     }
 

@@ -97,7 +97,7 @@ public class IoSessionManager implements IoSessionManagerMBean
      */
     public void close()
     {
-        session.close().join();
+        session.close().awaitUninterruptibly();
     }
 
 

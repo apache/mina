@@ -72,7 +72,7 @@ public class ChatClientSupport
      
             connector.setHandler( handler );
             ConnectFuture future1 = connector.connect( address );
-            future1.join();
+            future1.awaitUninterruptibly();
             if( ! future1.isConnected() )
             {
                 return false;
@@ -106,7 +106,7 @@ public class ChatClientSupport
             {
                 session.write( "QUIT" );
                 // Wait until the chat ends.
-                session.getCloseFuture().join();
+                session.getCloseFuture().awaitUninterruptibly();
             }
             session.close();
         }

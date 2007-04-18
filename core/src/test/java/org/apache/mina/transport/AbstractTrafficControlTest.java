@@ -75,7 +75,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
     public void testSuspendResumeReadWrite() throws Exception
     {
         ConnectFuture future = connect( port, new ClientIoHandler() );
-        future.join();
+        future.awaitUninterruptibly();
         IoSession session = future.getSession();
         
         // We wait for the sessionCreated() event is fired becayse we cannot guarentee that
@@ -148,7 +148,7 @@ public abstract class AbstractTrafficControlTest extends TestCase
         
         }
             
-        session.close().join();
+        session.close().awaitUninterruptibly();
     }
 
     private void write( IoSession session, String s ) throws Exception

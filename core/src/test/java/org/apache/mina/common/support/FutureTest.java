@@ -205,7 +205,7 @@ public class FutureTest extends TestCase
         @Override
         public void run()
         {
-            success = future.join( 10000 );
+            success = future.awaitUninterruptibly( 10000 );
         }
     }
 }

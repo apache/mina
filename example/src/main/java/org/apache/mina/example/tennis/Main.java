@@ -57,14 +57,14 @@ public class Main
         VmPipeConnector connector = new VmPipeConnector();
         connector.setHandler( new TennisPlayer() );
         ConnectFuture future = connector.connect( address );
-        future.join();
+        future.awaitUninterruptibly();
         IoSession session = future.getSession();
 
         // Send the first ping message
         session.write( new TennisBall( 10 ) );
 
         // Wait until the match ends.
-        session.getCloseFuture().join();
+        session.getCloseFuture().awaitUninterruptibly();
         
         acceptor.unbind();
     }

@@ -64,16 +64,16 @@ public class DatagramRecyclerTest extends TestCase
         {
             connector.setHandler( connectorHandler );
             ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
-            future.join();
+            future.awaitUninterruptibly();
             
             // Write whatever to trigger the acceptor.
-            future.getSession().write( ByteBuffer.allocate(1) ).join();
+            future.getSession().write( ByteBuffer.allocate(1) ).awaitUninterruptibly();
 
             // Close the client-side connection.
             // This doesn't mean that the acceptor-side connection is also closed.
             // The lifecycle of the acceptor-side connection is managed by the recycler.
             future.getSession().close();
-            future.getSession().getCloseFuture().join();
+            future.getSession().getCloseFuture().awaitUninterruptibly();
             Assert.assertTrue( future.getSession().getCloseFuture().isClosed() );
             
             // Wait until the acceptor-side connection is closed.
@@ -81,7 +81,7 @@ public class DatagramRecyclerTest extends TestCase
             {
                 Thread.yield();
             }
-            acceptorHandler.session.getCloseFuture().join( 3000 );
+            acceptorHandler.session.getCloseFuture().awaitUninterruptibly( 3000 );
             
             // Is it closed?
             Assert.assertTrue( acceptorHandler.session.getCloseFuture().isClosed() );

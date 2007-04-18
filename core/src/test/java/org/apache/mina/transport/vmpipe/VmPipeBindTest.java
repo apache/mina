@@ -69,7 +69,7 @@ public class VmPipeBindTest extends AbstractBindTest
         for( int i = 0; i < sessions.length; i++ )
         {
             ConnectFuture future = connector.connect( addr );
-            future.join();
+            future.awaitUninterruptibly();
             sessions[ i ] = future.getSession();
             Assert.assertTrue( sessions[ i ].isConnected() );
         }

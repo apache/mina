@@ -20,6 +20,7 @@
 package org.apache.mina.common;
 
 import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The default implementation of {@link WriteRequest}.
@@ -67,6 +68,28 @@ public class DefaultWriteRequest implements WriteRequest
         public void removeListener( IoFutureListener listener )
         {
             throw new IllegalStateException( "You can't add a listener to a dummy future." );
+        }
+
+        public void await() throws InterruptedException {
+        }
+
+        public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
+            return true;
+        }
+
+        public boolean await(long timeoutMillis) throws InterruptedException {
+            return true;
+        }
+
+        public void awaitUninterruptibly() {
+        }
+
+        public boolean awaitUninterruptibly(long timeout, TimeUnit unit) {
+            return true;
+        }
+
+        public boolean awaitUninterruptibly(long timeoutMillis) {
+            return true;
         }
     };
     

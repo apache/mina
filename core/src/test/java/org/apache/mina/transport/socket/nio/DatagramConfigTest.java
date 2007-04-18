@@ -75,10 +75,10 @@ public class DatagramConfigTest extends TestCase
         {
             connector.setHandler( new IoHandlerAdapter() );
             ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
-            future.join();
+            future.awaitUninterruptibly();
             
             WriteFuture writeFuture = future.getSession().write( ByteBuffer.allocate( 16 ).putInt( 0 ).flip() );
-            writeFuture.join();
+            writeFuture.awaitUninterruptibly();
             Assert.assertTrue( writeFuture.isWritten() );
             
             future.getSession().close();
