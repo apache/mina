@@ -192,6 +192,22 @@ public abstract class BaseIoSession implements IoSession
         
         return attributes.get( key );
     }
+    
+    public Object getAttribute(String key, Object defaultValue) {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        if (defaultValue == null) {
+            return attributes.get(key);
+        }
+        
+        Object answer = attributes.putIfAbsent(key, defaultValue);
+        if (answer == null) {
+            return defaultValue;
+        } else {
+            return answer;
+        }
+    }
 
     public Object setAttribute( String key, Object value )
     {

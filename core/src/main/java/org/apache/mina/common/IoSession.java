@@ -109,6 +109,23 @@ public interface IoSession {
     Object getAttribute( String key );
     
     /**
+     * Returns the value of user defined attribute associated with the
+     * specified key.  If there's no such attribute, the specified defalut
+     * value is associated with the specified key, and the default value is
+     * returned.  This method is same with the following code except that the
+     * operation is performed atomically.
+     * <pre>
+     * if (containsAttribute(key)) {
+     *     return getAttribute(key);
+     * } else {
+     *     setAttribute(key, defaultValue);
+     *     return defaultValue;
+     * }
+     * </pre>
+     */
+    Object getAttribute(String key, Object defaultValue);
+
+    /**
      * Sets a user-defined attribute.
      * 
      * @param key the key of the attribute
