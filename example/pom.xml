@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mina-example</artifactId>
   <name>Apache MINA Examples</name>
-  <packaging>jar</packaging>  
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -24,7 +24,7 @@
       <version>${pom.version}</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
@@ -45,21 +45,28 @@
       <version>2.0.4</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-support</artifactId>
       <version>2.0.4</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
       <version>1.4.1</version>
       <scope>test</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.2.0</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>
