@@ -79,18 +79,14 @@ public class ChatClientSupport
                 return false;
             }
             session = future1.getSession();
-            
+            session.write( "LOGIN " + name );
             return true;
         }
         catch ( Exception e)
         {
+            e.printStackTrace();
             return false;
         }
-    }
-
-    public void login()
-    {
-        session.write( "LOGIN " + name );
     }
 
     public void broadcast( String message )

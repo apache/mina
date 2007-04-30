@@ -280,7 +280,6 @@ public class SwingChatClient extends JFrame implements Callback
 
     public void connected()
     {
-        client.login();
     }
 
     public void disconnected()
