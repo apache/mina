@@ -20,15 +20,6 @@
       <url>http://maven.safehaus.org/</url>
       <layout>legacy</layout>
     </repository>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>gleamynode-m1-repository</id>
-      <name>gleamynode.net Maven 1.x Repository</name>
-      <url>http://gleamynode.net/dev</url>
-      <layout>legacy</layout>
-    </repository>
   </repositories>
 
   <dependencies>
