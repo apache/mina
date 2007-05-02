@@ -85,6 +85,7 @@ public class SerialSession extends BaseIoSession implements
         this.filterChain = new SerialFilterChain(this);
         this.writeRequestQueue = new LinkedList<WriteRequest>();
         this.port = port;
+        this.address = address;
 
         log = LoggerFactory.getLogger(SerialSession.class);
     }
@@ -195,7 +196,7 @@ public class SerialSession extends BaseIoSession implements
             WriteRequest req;
 
             synchronized (writeRequestQueue) {
-                req = (WriteRequest) writeRequestQueue.peek();
+                req = writeRequestQueue.peek();
             }
 
             if (req == null)
