@@ -123,6 +123,7 @@ public class SerialConnector extends BaseIoConnector {
         return SerialSession.serialTransportType;
     }
 
+    // FIXME Is user and timeout used somewhere?
     private SerialPort initalizePort(String user, int timeout,
             CommPortIdentifier portId, SerialAddress portAddress)
             throws UnsupportedCommOperationException, PortInUseException {

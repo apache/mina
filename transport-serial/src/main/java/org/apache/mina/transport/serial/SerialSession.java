@@ -55,6 +55,8 @@ import org.slf4j.LoggerFactory;
 public class SerialSession extends BaseIoSession implements
         SerialPortEventListener {
 
+    // TODO make immutable fields 'final'.
+
     private SerialSessionConfig config;
 
     private IoHandler ioHandler;
