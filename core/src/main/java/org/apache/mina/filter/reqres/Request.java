@@ -31,8 +31,6 @@ import java.util.concurrent.TimeUnit;
  * @version $Rev$, $Date$
  */
 public class Request {
-    private static final Object END = new Object();
-
     private final Object id;
     private final Object message;
     private final boolean useResponseQueue;
@@ -40,6 +38,7 @@ public class Request {
     private volatile TimerTask timerTask;
 
     private final BlockingQueue<Object> responses = new LinkedBlockingQueue<Object>();
+    private volatile boolean endOfResponses;
     
     public Request(Object id, Object message, long timeoutMillis) {
         this(id, message, true, timeoutMillis);
@@ -95,11 +94,13 @@ public class Request {
     
     public Response awaitResponse() throws RequestTimeoutException, InterruptedException {
         checkUseResponseQueue();
+        chechEndOfResponses();
         return convertToResponse(responses.take());
     }
     
     public Response awaitResponse(long timeout, TimeUnit unit) throws RequestTimeoutException, InterruptedException {
         checkUseResponseQueue();
+        chechEndOfResponses();
         return convertToResponse(responses.poll(timeout, unit));
     }
 
@@ -112,16 +113,10 @@ public class Request {
             return null;
         }
         
-        if (o == END) {
-            throw new NoSuchElementException(
-                    "All responses has been retrieved already.");
-        }
-        
         throw (RequestTimeoutException) o;
     }
 
     public Response awaitResponseUninterruptibly() throws RequestTimeoutException {
-        checkUseResponseQueue();
         for (;;) {
             try {
                 return awaitResponse();
@@ -130,6 +125,13 @@ public class Request {
         }
     }
     
+    private void chechEndOfResponses() {
+        if (endOfResponses && responses.isEmpty() && useResponseQueue) {
+            throw new NoSuchElementException(
+                    "All responses has been retrieved already.");
+        }
+    }
+
     private void checkUseResponseQueue() {
         if (!useResponseQueue) {
             throw new IllegalStateException(
@@ -140,13 +142,13 @@ public class Request {
     void signal(Response response) {
         signal0(response);
         if (response.getType() != ResponseType.PARTIAL) {
-            signal0(END);
+            endOfResponses = true;
         }
     }
     
     void signal(RequestTimeoutException e) {
         signal0(e);
-        signal0(END);
+        endOfResponses = true;
     }
     
     private void signal0(Object answer) {
