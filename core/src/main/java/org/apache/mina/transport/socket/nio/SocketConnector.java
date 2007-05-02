@@ -349,7 +349,12 @@ public class SocketConnector extends BaseIoConnector
 
     private SocketIoProcessor nextProcessor()
     {
-        return ioProcessors[processorDistributor++ % processorCount];
+        if ( processorDistributor++ < 0 ) 
+        { 
+            processorDistributor = 0; 
+        } 
+
+        return ioProcessors[processorDistributor % processorCount];
     }
 
     private class Worker implements Runnable
