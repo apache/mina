@@ -23,6 +23,8 @@ package org.apache.mina.example.haiku;
  * @version $Rev: $, $Date:  $
  */
 public class InvalidHaikuException extends Exception {
+    private static final long serialVersionUID = 34877739006797894L;
+
     private final int position;
     private final String phrase;
     private final int syllableCount;
