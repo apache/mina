@@ -363,7 +363,12 @@ public class SocketAcceptor extends BaseIoAcceptor
 
     private SocketIoProcessor nextProcessor()
     {
-        return ioProcessors[processorDistributor++ % processorCount];
+        if ( processorDistributor++ < 0 ) 
+        { 
+            processorDistributor = 0; 
+        } 
+
+        return ioProcessors[processorDistributor % processorCount];
     }
 
     public IoServiceConfig getDefaultConfig()
