@@ -85,8 +85,8 @@ public class SerialConnector extends BaseIoConnector {
                                             + portId.getName());
                         }
 
-                        SerialPort serialPort = initalizePort("Apache MINA",
-                                2000, portId, portAddress);
+                        SerialPort serialPort = initializePort("Apache MINA",
+                                portId, portAddress);
 
                         ConnectFuture future = new DefaultConnectFuture();
                         SerialSession session = new SerialSession(this,
@@ -123,11 +123,13 @@ public class SerialConnector extends BaseIoConnector {
         return SerialSession.serialTransportType;
     }
 
-    // FIXME Is user and timeout used somewhere?
-    private SerialPort initalizePort(String user, int timeout,
+    private SerialPort initializePort(String user, 
             CommPortIdentifier portId, SerialAddress portAddress)
             throws UnsupportedCommOperationException, PortInUseException {
-        SerialPort serialPort = (SerialPort) portId.open("Apache MINA", 2000); // TODO:  need a parameter for millisec. timeout
+	
+	SerialSessionConfig config = (SerialSessionConfig) getSessionConfig();
+
+        SerialPort serialPort = (SerialPort) portId.open(user, config.getTimeout()); 
 
         serialPort.setSerialPortParams(portAddress.getBauds(), portAddress
                 .getDataBitsForRXTX(), portAddress.getStopBitsForRXTX(),
@@ -136,7 +138,6 @@ public class SerialConnector extends BaseIoConnector {
         serialPort.setFlowControlMode(portAddress.getFLowControlForRXTX());
 
         serialPort.notifyOnDataAvailable(true);
-        SerialSessionConfig config = (SerialSessionConfig) getSessionConfig();
 
         if (config.isLowLantecy())
             serialPort.setLowLatency();
@@ -147,13 +148,6 @@ public class SerialConnector extends BaseIoConnector {
             serialPort.enableReceiveThreshold(config.getReceiveThreshold());
         } else
             serialPort.disableReceiveThreshold();
-
-        if (config.getReceiveTimeout() >= 0) {
-            serialPort.enableReceiveTimeout(config.getReceiveTimeout());
-        } else
-            serialPort.disableReceiveTimeout();
-
-        serialPort.enableReceiveThreshold(8);
 
         return serialPort;
     }

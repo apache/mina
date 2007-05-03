@@ -31,6 +31,18 @@ import org.apache.mina.common.IoSessionConfig;
 public interface SerialSessionConfig extends IoSessionConfig {
 
     /**
+     * Gets the timeout for port opening in milliseconds.
+     * @return timeout for port opening in milliseconds
+     */
+    int getTimeout();
+
+    /**
+     * Sets the timeout for opening the port. Value in milliseconds.
+     * @param timeout the timeout value in millseconds
+     */
+    public void setTimeout(int timeout);
+
+    /**
      * Gets the input buffer size. Note that this method is advisory and the underlying OS 
      * may choose not to report correct values for the buffer size.
      * @return input buffer size in bytes
@@ -57,26 +69,17 @@ public interface SerialSessionConfig extends IoSessionConfig {
     void setLowLatency(boolean lowLatency);
 
     /**
-     * TODO : to test if it's usefull for MINA
-     * @return
+     * The current receive threshold (-1 if not enabled). Give the value of the current buffer 
+     * needed for generate a new frame.
+     * @return the receive thresold in bytes or -1 if disabled
      */
     int getReceiveThreshold();
 
     /**
-     * TODO : to test if it's usefull for MINA
-     * @param bytes
+     * Set the receive threshold in byte (set it to -1 for disable). The serial port will try to 
+     * provide frame of the given minimal byte count. Be carefull some devices doesn't support it.
+     * @param bytes minimal amount of byte before producing a new frame, or -1 if disabled
      */
     void setReceiveThreshold(int bytes);
 
-    /**
-     * TODO : to test if it's usefull for MINA
-     * @param bytes
-     */
-    int getReceiveTimeout();
-
-    /**
-     * TODO : to test if it's usefull for MINA
-     * @param bytes
-     */
-    void setReceiveTimeout(int milliseconds);
 }

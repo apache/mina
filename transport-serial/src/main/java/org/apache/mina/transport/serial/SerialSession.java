@@ -55,17 +55,15 @@ import org.slf4j.LoggerFactory;
 public class SerialSession extends BaseIoSession implements
         SerialPortEventListener {
 
-    // TODO make immutable fields 'final'.
-
     private SerialSessionConfig config;
 
-    private IoHandler ioHandler;
+    private final IoHandler ioHandler;
 
-    private IoFilterChain filterChain;
+    private final IoFilterChain filterChain;
 
-    private IoService service;
+    private final IoService service;
 
-    private SerialAddress address;
+    private final SerialAddress address;
 
     private final Queue<WriteRequest> writeRequestQueue;
 
@@ -73,9 +71,9 @@ public class SerialSession extends BaseIoSession implements
 
     private OutputStream outputStream;
 
-    private SerialPort port;
+    private final SerialPort port;
 
-    private Logger log;
+    private final Logger log;
 
     public static final TransportType serialTransportType = new DefaultTransportType(
             "serial communication", false, SerialAddress.class,
@@ -261,8 +259,7 @@ public class SerialSession extends BaseIoSession implements
 
                         if (readBytes > 0) {
                             increaseReadBytes(readBytes);
-                            // TODO : check if it's the good allocation way
-                            ByteBuffer buf = ByteBuffer.allocate(readBytes);
+                            ByteBuffer buf = ByteBuffer.wrap(data,0,readBytes);
                             buf.put(data, 0, readBytes);
                             buf.flip();
                             getFilterChain().fireMessageReceived(
