@@ -41,6 +41,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import junit.framework.TestCase;
 
 /**
  * Tests {@link RequestResponseFilter}.
@@ -48,7 +49,7 @@ import org.junit.Test;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class RequestResponseFilterTest {
+public class RequestResponseFilterTest extends TestCase {
     
     private RequestResponseFilter filter;
     private IoSession session;
