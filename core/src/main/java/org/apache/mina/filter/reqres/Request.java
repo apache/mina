@@ -92,6 +92,11 @@ public class Request {
         return useResponseQueue;
     }
     
+    public boolean hasResponse() {
+        checkUseResponseQueue();
+        return !responses.isEmpty();
+    }
+    
     public Response awaitResponse() throws RequestTimeoutException, InterruptedException {
         checkUseResponseQueue();
         chechEndOfResponses();
@@ -134,7 +139,7 @@ public class Request {
 
     private void checkUseResponseQueue() {
         if (!useResponseQueue) {
-            throw new IllegalStateException(
+            throw new UnsupportedOperationException(
                     "Response queue is not available; useResponseQueue is false.");
         }
     }
