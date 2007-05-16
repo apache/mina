@@ -83,6 +83,11 @@ public class SocketAcceptor extends BaseIoAcceptor
         this( 1, new NewThreadExecutor() );
     }
 
+    public SocketAcceptor(Executor executor) 
+    {
+        this(Runtime.getRuntime().availableProcessors(), executor);
+    } 
+    
     /**
      * Create an acceptor with the desired number of processing threads
      *
