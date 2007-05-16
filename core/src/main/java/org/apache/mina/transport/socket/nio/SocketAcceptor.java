@@ -80,7 +80,7 @@ public class SocketAcceptor extends BaseIoAcceptor
      */
     public SocketAcceptor()
     {
-        this( 1, new NewThreadExecutor() );
+        this( new NewThreadExecutor() );
     }
 
     public SocketAcceptor(Executor executor) 
