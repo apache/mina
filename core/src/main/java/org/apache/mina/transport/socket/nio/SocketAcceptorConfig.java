@@ -70,6 +70,8 @@ public class SocketAcceptorConfig extends BaseIoAcceptorConfig
                 }
             }
         }
+        
+        sessionConfig.setReuseAddress(true);
     }
 
     public SocketSessionConfig getSessionConfig()
