@@ -36,7 +36,7 @@ import java.net.ServerSocket;
  */
 public class SocketAcceptorConfig extends BaseIoAcceptorConfig
 {
-    private IoSessionConfig sessionConfig = new SocketSessionConfigImpl();
+    private SocketSessionConfig sessionConfig = new SocketSessionConfigImpl();
     private int backlog = 50;
     private boolean reuseAddress;
 
@@ -71,6 +71,8 @@ public class SocketAcceptorConfig extends BaseIoAcceptorConfig
                 }
             }
         }
+
+        sessionConfig.setReuseAddress(true);
     }
 
     public IoSessionConfig getSessionConfig()

@@ -53,6 +53,7 @@ public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements Data
     public DatagramAcceptorConfig()
     {
         super();
+        sessionConfig.setReuseAddress(true);
     }
 
     public IoSessionConfig getSessionConfig()
