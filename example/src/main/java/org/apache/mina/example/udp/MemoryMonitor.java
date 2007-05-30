@@ -60,13 +60,10 @@ public class MemoryMonitor {
 		acceptor.setLocalAddress(new InetSocketAddress(PORT));
 		acceptor.setHandler(new MemoryMonitorHandler(this));
 
-		acceptor.setSessionRecycler(new SimpleSessionRecycler());
-
 		DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
 		chain.addLast("logger", new LoggingFilter());
 
 		DatagramSessionConfig dcfg = acceptor.getSessionConfig();
-		dcfg.setTrafficClass(0x10);  /** IPTOS_LOWDELAY */
 		dcfg.setReuseAddress(true);
 
 		frame = new JFrame( "Memory monitor" );
