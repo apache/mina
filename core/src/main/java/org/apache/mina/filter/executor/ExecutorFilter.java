@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecutorFilter extends IoFilterAdapter
 {
-    private static final Logger logger = LoggerFactory.getLogger( ExecutorFilter.class.getName() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Executor executor;
 
     /**
