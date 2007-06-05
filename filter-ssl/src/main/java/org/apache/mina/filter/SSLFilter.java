@@ -363,7 +363,9 @@ public class SSLFilter extends IoFilterAdapter
     public void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws SSLException
     {
         SSLHandler handler = getSSLSessionHandler( parent.getSession() );
-        handler.handshake( nextFilter );
+        synchronized (handler) {
+            handler.handshake( nextFilter );
+        }
         handler.flushPostHandshakeEvents();
     }
     
