@@ -37,7 +37,8 @@ public class DefaultIoFuture implements IoFuture
 {
     private final IoSession session;
     private final Object lock;
-    private final List<IoFutureListener> listeners = new ArrayList<IoFutureListener>();
+    private IoFutureListener firstListener;
+    private List<IoFutureListener> otherListeners;
     private Object result;
     private boolean ready;
 
@@ -179,9 +180,9 @@ public class DefaultIoFuture implements IoFuture
             result = newValue;
             ready = true;
             lock.notifyAll();
-    
-            notifyListeners();
         }
+
+        notifyListeners();
     }
 
     /**
@@ -202,15 +203,25 @@ public class DefaultIoFuture implements IoFuture
             throw new NullPointerException( "listener" );
         }
 
-        synchronized( lock )
-        {
-            listeners.add( listener );
-            if( ready )
-            {
-                listener.operationComplete( this );
+        boolean notifyNow = false;
+        synchronized (lock) {
+            if (ready) {
+                notifyNow = true;
+            } else {
+                if (firstListener == null) {
+                    firstListener = listener;
+                } else {
+                    if (otherListeners == null) {
+                        otherListeners = new ArrayList<IoFutureListener>(1);
+                    }
+                    otherListeners.add(listener);
+                }
             }
         }
         
+        if (notifyNow) {
+            listener.operationComplete( this );
+        }
         return this;
     }
     
@@ -223,7 +234,15 @@ public class DefaultIoFuture implements IoFuture
 
         synchronized( lock )
         {
-            listeners.remove( listener );
+            if (!ready) {
+                if (listener == firstListener) {
+                    if (otherListeners != null && !otherListeners.isEmpty()) {
+                        firstListener = otherListeners.remove(0);
+                    }
+                } else if (otherListeners != null) {
+                    otherListeners.remove(listener);
+                }
+            }
         }
         
         return this;
@@ -231,10 +250,18 @@ public class DefaultIoFuture implements IoFuture
 
     private void notifyListeners()
     {
-        synchronized( lock )
-        {
-            for (IoFutureListener l : listeners) {
-                l.operationComplete( this );
+        // There won't be any visibility problem or concurrent modification
+        // because 'ready' flag will be checked against both addListener and
+        // removeListener calls.
+        if (firstListener != null) {
+            firstListener.operationComplete(this);
+            firstListener = null;
+
+            if (otherListeners != null) {
+                for (IoFutureListener l : otherListeners) {
+                    l.operationComplete( this );
+                }
+                otherListeners = null;
             }
         }
     }
