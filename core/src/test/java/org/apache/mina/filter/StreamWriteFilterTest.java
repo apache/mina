@@ -640,16 +640,18 @@ public class StreamWriteFilterTest extends TestCase {
             return true;
         }
 
-        public void addListener( IoFutureListener listener )
+        public WriteFuture addListener( IoFutureListener listener )
         {
+            return this;
         }
 
-        public void removeListener( IoFutureListener listener )
+        public WriteFuture removeListener( IoFutureListener listener )
         {
+            return this;
         }
 
-        public void await() throws InterruptedException {
-            
+        public WriteFuture await() throws InterruptedException {
+            return this;
         }
 
         public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
@@ -660,7 +662,8 @@ public class StreamWriteFilterTest extends TestCase {
             return true;
         }
 
-        public void awaitUninterruptibly() {
+        public WriteFuture awaitUninterruptibly() {
+            return this;
         }
 
         public boolean awaitUninterruptibly(long timeout, TimeUnit unit) {

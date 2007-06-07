@@ -20,6 +20,7 @@
 package org.apache.mina.common.support;
 
 import org.apache.mina.common.CloseFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
 
 /**
@@ -53,5 +54,25 @@ public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture
     public void setClosed()
     {
         setValue( Boolean.TRUE );
+    }
+
+    @Override
+    public CloseFuture await() throws InterruptedException {
+        return (CloseFuture) super.await();
+    }
+    
+    @Override
+    public CloseFuture awaitUninterruptibly() {
+        return (CloseFuture) super.awaitUninterruptibly();
+    }
+    
+    @Override
+    public CloseFuture addListener(IoFutureListener listener) {
+        return (CloseFuture) super.addListener(listener);
+    }
+    
+    @Override
+    public CloseFuture removeListener(IoFutureListener listener) {
+        return (CloseFuture) super.removeListener(listener);
     }
 }

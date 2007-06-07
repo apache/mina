@@ -60,17 +60,18 @@ public class DefaultWriteRequest implements WriteRequest
             return true;
         }
 
-        public void addListener( IoFutureListener listener )
+        public WriteFuture addListener( IoFutureListener listener )
         {
             throw new IllegalStateException( "You can't add a listener to a dummy future." );
         }
 
-        public void removeListener( IoFutureListener listener )
+        public WriteFuture removeListener( IoFutureListener listener )
         {
             throw new IllegalStateException( "You can't add a listener to a dummy future." );
         }
 
-        public void await() throws InterruptedException {
+        public WriteFuture await() throws InterruptedException {
+            return this;
         }
 
         public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
@@ -81,7 +82,8 @@ public class DefaultWriteRequest implements WriteRequest
             return true;
         }
 
-        public void awaitUninterruptibly() {
+        public WriteFuture awaitUninterruptibly() {
+            return this;
         }
 
         public boolean awaitUninterruptibly(long timeout, TimeUnit unit) {

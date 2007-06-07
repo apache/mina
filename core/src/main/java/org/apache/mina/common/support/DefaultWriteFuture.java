@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common.support;
 
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
 
@@ -73,5 +74,25 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture
     public void setWritten( boolean written )
     {
         setValue( written? Boolean.TRUE : Boolean.FALSE );
+    }
+
+    @Override
+    public WriteFuture await() throws InterruptedException {
+        return (WriteFuture) super.await();
+    }
+    
+    @Override
+    public WriteFuture awaitUninterruptibly() {
+        return (WriteFuture) super.awaitUninterruptibly();
+    }
+    
+    @Override
+    public WriteFuture addListener(IoFutureListener listener) {
+        return (WriteFuture) super.addListener(listener);
+    }
+    
+    @Override
+    public WriteFuture removeListener(IoFutureListener listener) {
+        return (WriteFuture) super.removeListener(listener);
     }
 }

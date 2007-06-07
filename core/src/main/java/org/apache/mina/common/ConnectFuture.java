@@ -70,4 +70,9 @@ public interface ConnectFuture extends IoFuture
      * internally.  Please do not call this method directly.
      */
     void setException( Throwable exception );
+
+    ConnectFuture await() throws InterruptedException;
+    ConnectFuture awaitUninterruptibly();
+    ConnectFuture addListener( IoFutureListener listener );
+    ConnectFuture removeListener( IoFutureListener listener );
 }

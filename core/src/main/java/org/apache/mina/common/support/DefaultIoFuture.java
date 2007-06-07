@@ -65,7 +65,7 @@ public class DefaultIoFuture implements IoFuture
         return awaitUninterruptibly(timeoutMillis);
     }
     
-    public void await() throws InterruptedException {
+    public IoFuture await() throws InterruptedException {
         synchronized( lock )
         {
             while( !ready )
@@ -73,6 +73,7 @@ public class DefaultIoFuture implements IoFuture
                 lock.wait();
             }
         }
+        return this;
     }
     
     public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
@@ -90,7 +91,7 @@ public class DefaultIoFuture implements IoFuture
         }
     }
     
-    public void awaitUninterruptibly()
+    public IoFuture awaitUninterruptibly()
     {
         synchronized( lock )
         {
@@ -105,6 +106,8 @@ public class DefaultIoFuture implements IoFuture
                 }
             }
         }
+        
+        return this;
     }
     
     public boolean awaitUninterruptibly( long timeout, TimeUnit unit) {
@@ -192,7 +195,7 @@ public class DefaultIoFuture implements IoFuture
         }
     }
     
-    public void addListener( IoFutureListener listener )
+    public IoFuture addListener( IoFutureListener listener )
     {
         if( listener == null )
         {
@@ -207,9 +210,11 @@ public class DefaultIoFuture implements IoFuture
                 listener.operationComplete( this );
             }
         }
+        
+        return this;
     }
     
-    public void removeListener( IoFutureListener listener )
+    public IoFuture removeListener( IoFutureListener listener )
     {
         if( listener == null )
         {
@@ -220,6 +225,8 @@ public class DefaultIoFuture implements IoFuture
         {
             listeners.remove( listener );
         }
+        
+        return this;
     }
 
     private void notifyListeners()

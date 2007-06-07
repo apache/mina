@@ -38,7 +38,7 @@ public interface IoFuture
     /**
      * Wait for the asynchronous operation to end.
      */
-    void await() throws InterruptedException;
+    IoFuture await() throws InterruptedException;
 
     /**
      * Wait for the asynchronous operation to end with the specified timeout.
@@ -57,7 +57,7 @@ public interface IoFuture
     /**
      * Wait for the asynchronous operation to end uninterruptibly.
      */
-    void awaitUninterruptibly();
+    IoFuture awaitUninterruptibly();
 
     /**
      * Wait for the asynchronous operation to end with the specified timeout
@@ -96,11 +96,11 @@ public interface IoFuture
      * Adds an event <tt>listener</tt> which is notified when
      * the state of this future changes.
      */
-    void addListener( IoFutureListener listener );
+    IoFuture addListener( IoFutureListener listener );
     
     /**
      * Removes an existing event <tt>listener</tt> which is notified when
      * the state of this future changes.
      */
-    void removeListener( IoFutureListener listener );
+    IoFuture removeListener( IoFutureListener listener );
 }

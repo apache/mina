@@ -20,6 +20,7 @@
 package org.apache.mina.common.support;
 
 import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 
@@ -93,5 +94,25 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
     public void setException( Throwable exception )
     {
         setValue( exception );
+    }
+
+    @Override
+    public ConnectFuture await() throws InterruptedException {
+        return (ConnectFuture) super.await();
+    }
+    
+    @Override
+    public ConnectFuture awaitUninterruptibly() {
+        return (ConnectFuture) super.awaitUninterruptibly();
+    }
+    
+    @Override
+    public ConnectFuture addListener(IoFutureListener listener) {
+        return (ConnectFuture) super.addListener(listener);
+    }
+    
+    @Override
+    public ConnectFuture removeListener(IoFutureListener listener) {
+        return (ConnectFuture) super.removeListener(listener);
     }
 }

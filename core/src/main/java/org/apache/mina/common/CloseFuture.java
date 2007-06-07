@@ -48,4 +48,9 @@ public interface CloseFuture extends IoFuture
      * this method directly.
      */
     void setClosed();
+    
+    CloseFuture await() throws InterruptedException;
+    CloseFuture awaitUninterruptibly();
+    CloseFuture addListener( IoFutureListener listener );
+    CloseFuture removeListener( IoFutureListener listener );
 }

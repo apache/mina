@@ -55,4 +55,9 @@ public interface WriteFuture extends IoFuture
      * Please do not call this method directly.
      */
     void setWritten( boolean written );
+
+    WriteFuture await() throws InterruptedException;
+    WriteFuture awaitUninterruptibly();
+    WriteFuture addListener( IoFutureListener listener );
+    WriteFuture removeListener( IoFutureListener listener );
 }
