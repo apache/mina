@@ -36,7 +36,8 @@ public class DefaultIoFuture implements IoFuture
 {
     private final IoSession session;
     private final Object lock;
-    private final List<IoFutureListener> listeners = new ArrayList<IoFutureListener>();
+    private IoFutureListener firstListener;
+    private List<IoFutureListener> otherListeners;
     private Object result;
     private boolean ready;
 
@@ -160,7 +161,14 @@ public class DefaultIoFuture implements IoFuture
 
         synchronized( lock )
         {
-            listeners.add( listener );
+            if (firstListener == null) {
+                firstListener = listener;
+            } else {
+                if (otherListeners == null) {
+                    otherListeners = new ArrayList<IoFutureListener>(1);
+                }
+                otherListeners.add(listener);
+            }
             if( ready )
             {
                 listener.operationComplete( this );
@@ -177,7 +185,13 @@ public class DefaultIoFuture implements IoFuture
 
         synchronized( lock )
         {
-            listeners.remove( listener );
+            if (listener == firstListener) {
+                if (otherListeners != null && !otherListeners.isEmpty()) {
+                    firstListener = otherListeners.remove(0);
+                }
+            } else if (otherListeners != null) {
+                otherListeners.remove(listener);
+            }
         }
     }
 
@@ -185,8 +199,13 @@ public class DefaultIoFuture implements IoFuture
     {
         synchronized( lock )
         {
-            for (IoFutureListener l : listeners) {
-                l.operationComplete( this );
+            if (firstListener != null) {
+                firstListener.operationComplete(this);
+                if (otherListeners != null) {
+                    for (IoFutureListener l : otherListeners) {
+                        l.operationComplete( this );
+                    }
+                }
             }
         }
     }

@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceConfig;
@@ -194,6 +195,100 @@ public class FutureTest extends TestCase
         assertFalse( future.isWritten() );
     }
 
+    public void testAddListener() throws Exception {
+        DefaultCloseFuture future = new DefaultCloseFuture( null );
+        assertFalse( future.isReady() );
+        assertFalse( future.isClosed() );
+        
+        TestListener listener1 = new TestListener();
+        TestListener listener2 = new TestListener();
+        future.addListener(listener1);
+        future.addListener(listener2);
+        
+        TestThread thread = new TestThread( future );
+        thread.start();
+        
+        future.setClosed();
+        thread.join();
+        
+        assertTrue( thread.success );
+        assertTrue( future.isReady() );
+        assertTrue( future.isClosed() );
+
+        assertSame( future, listener1.notifiedFuture );
+        assertSame( future, listener2.notifiedFuture );
+    }
+    
+    public void testLateAddListener() throws Exception {
+        DefaultCloseFuture future = new DefaultCloseFuture( null );
+        assertFalse( future.isReady() );
+        assertFalse( future.isClosed() );
+        
+        TestThread thread = new TestThread( future );
+        thread.start();
+        
+        future.setClosed();
+        thread.join();
+        
+        assertTrue( thread.success );
+        assertTrue( future.isReady() );
+        assertTrue( future.isClosed() );
+
+        TestListener listener = new TestListener();
+        future.addListener(listener);
+        assertSame( future, listener.notifiedFuture );
+    }
+    
+    public void testRemoveListener1() throws Exception {
+        DefaultCloseFuture future = new DefaultCloseFuture( null );
+        assertFalse( future.isReady() );
+        assertFalse( future.isClosed() );
+        
+        TestListener listener1 = new TestListener();
+        TestListener listener2 = new TestListener();
+        future.addListener(listener1);
+        future.addListener(listener2);
+        future.removeListener(listener1);
+        
+        TestThread thread = new TestThread( future );
+        thread.start();
+        
+        future.setClosed();
+        thread.join();
+        
+        assertTrue( thread.success );
+        assertTrue( future.isReady() );
+        assertTrue( future.isClosed() );
+
+        assertSame( null, listener1.notifiedFuture );
+        assertSame( future, listener2.notifiedFuture );
+    }
+    
+    public void testRemoveListener2() throws Exception {
+        DefaultCloseFuture future = new DefaultCloseFuture( null );
+        assertFalse( future.isReady() );
+        assertFalse( future.isClosed() );
+        
+        TestListener listener1 = new TestListener();
+        TestListener listener2 = new TestListener();
+        future.addListener(listener1);
+        future.addListener(listener2);
+        future.removeListener(listener2);
+        
+        TestThread thread = new TestThread( future );
+        thread.start();
+        
+        future.setClosed();
+        thread.join();
+        
+        assertTrue( thread.success );
+        assertTrue( future.isReady() );
+        assertTrue( future.isClosed() );
+
+        assertSame( future, listener1.notifiedFuture );
+        assertSame( null, listener2.notifiedFuture );
+    }
+    
     private static class TestThread extends Thread
     {
         private final IoFuture future;
@@ -208,6 +303,14 @@ public class FutureTest extends TestCase
         public void run()
         {
             success = future.join( 10000 );
+        }
+    }
+
+    private static class TestListener implements IoFutureListener {
+        private IoFuture notifiedFuture;
+        
+        public void operationComplete(IoFuture future) {
+            this.notifiedFuture = future;
         }
     }
 }
