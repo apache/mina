@@ -6,24 +6,21 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *
+ *  
  *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License.
- *
+ *  under the License. 
+ *  
  */
 package org.apache.mina.common.support;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
@@ -31,74 +28,84 @@ import org.apache.mina.common.IoSession;
 
 /**
  * A default implementation of {@link IoFuture}.
- *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ *  
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultIoFuture implements IoFuture
 {
     private final IoSession session;
-    private final CountDownLatch completionLatch = new CountDownLatch( 1 );
-    private final List<IoFutureListener> listeners = new CopyOnWriteArrayList<IoFutureListener>();
-    private final AtomicBoolean ready = new AtomicBoolean( false );
-
-    private volatile Object result;
+    private final Object lock;
+    private final List<IoFutureListener> listeners = new ArrayList<IoFutureListener>();
+    private Object result;
+    private boolean ready;
 
     /**
      * Creates a new instance.
-     *
+     * 
      * @param session an {@link IoSession} which is associated with this future
      */
     public DefaultIoFuture( IoSession session )
     {
         this.session = session;
+        this.lock = this;
     }
-
+    
     public IoSession getSession()
     {
         return session;
     }
-
-    public void join()
-    {
-        for( ;; )
+    
+    public void join() {
+        synchronized( lock )
         {
-            try
+            while( !ready )
             {
-                completionLatch.await();
-                return;
-            }
-            catch( InterruptedException e )
-            {
+                try
+                {
+                    lock.wait();
+                }
+                catch( InterruptedException e )
+                {
+                }
             }
         }
     }
-
-    public boolean join( long timeoutInMillis )
-    {
-        long startTime = ( timeoutInMillis <= 0 ) ? 0 : System
-                .currentTimeMillis();
-        long waitTime = timeoutInMillis;
+    
+    public boolean join(long timeoutMillis) {
+        long startTime = ( timeoutMillis <= 0 ) ? 0 : System.currentTimeMillis();
+        long waitTime = timeoutMillis;
         
-        for( ;; )
+        synchronized( lock )
         {
-            boolean ready = false;
-            try
+            if( ready )
             {
-                ready = completionLatch.await( waitTime, TimeUnit.MILLISECONDS );
+                return ready;
             }
-            catch( InterruptedException e )
+            else if( waitTime <= 0 )
             {
+                return ready;
             }
 
-            if( ready )
-                return true;
-            else
+            for( ;; )
             {
-                waitTime = timeoutInMillis - ( System.currentTimeMillis() - startTime );
-                if( waitTime <= 0 )
+                try
                 {
-                    return ready;
+                    lock.wait( waitTime );
+                }
+                catch( InterruptedException e )
+                {
+                }
+
+                if( ready ) {
+                    return true;
+                } else
+                {
+                    waitTime = timeoutMillis - ( System.currentTimeMillis() - startTime );
+                    if( waitTime <= 0 )
+                    {
+                        return ready;
+                    }
                 }
             }
         }
@@ -106,7 +113,10 @@ public class DefaultIoFuture implements IoFuture
 
     public boolean isReady()
     {
-        return ready.get();
+        synchronized( lock )
+        {
+            return ready;
+        }
     }
 
     /**
@@ -114,10 +124,18 @@ public class DefaultIoFuture implements IoFuture
      */
     protected void setValue( Object newValue )
     {
-        if( ready.compareAndSet( false, true ) )
+        synchronized( lock )
         {
+            // Allow only once.
+            if( ready )
+            {
+                return;
+            }
+
             result = newValue;
-            completionLatch.countDown();
+            ready = true;
+            lock.notifyAll();
+    
             notifyListeners();
         }
     }
@@ -127,9 +145,12 @@ public class DefaultIoFuture implements IoFuture
      */
     protected Object getValue()
     {
-        return result;
+        synchronized( lock )
+        {
+            return result;
+        }
     }
-
+    
     public void addListener( IoFutureListener listener )
     {
         if( listener == null )
@@ -137,14 +158,16 @@ public class DefaultIoFuture implements IoFuture
             throw new NullPointerException( "listener" );
         }
 
-        listeners.add( listener );
-
-        if( ready.get() )
+        synchronized( lock )
         {
-            listener.operationComplete( this );
+            listeners.add( listener );
+            if( ready )
+            {
+                listener.operationComplete( this );
+            }
         }
     }
-
+    
     public void removeListener( IoFutureListener listener )
     {
         if( listener == null )
@@ -152,14 +175,19 @@ public class DefaultIoFuture implements IoFuture
             throw new NullPointerException( "listener" );
         }
 
-        listeners.remove( listener );
+        synchronized( lock )
+        {
+            listeners.remove( listener );
+        }
     }
 
     private void notifyListeners()
     {
-        for( IoFutureListener listener : listeners )
+        synchronized( lock )
         {
-            listener.operationComplete( this );
+            for (IoFutureListener l : listeners) {
+                l.operationComplete( this );
+            }
         }
     }
 }
