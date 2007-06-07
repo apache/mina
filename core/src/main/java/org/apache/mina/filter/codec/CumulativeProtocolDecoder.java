@@ -208,6 +208,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     {
         ByteBuffer remainingBuf = ByteBuffer.allocate( buf.capacity() );
         remainingBuf.setAutoExpand( true );
+        remainingBuf.order( buf.order() );
         remainingBuf.put( buf );
         session.setAttribute( BUFFER, remainingBuf );
     }    
