@@ -28,6 +28,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -724,5 +725,189 @@ public class ByteBufferTest extends TestCase
             Assert.assertEquals( 2, buf.indexOf( ( byte ) 0x3 ) );
             Assert.assertEquals( 3, buf.indexOf( ( byte ) 0x4 ) );
         }
+    }
+    
+    // We need an enum with 64 values
+    private static enum TestEnum {
+        E1, E2, E3, E4, E5, E6, E7, E8, E9, E10, E11, E12, E13, E14, E15, E16,
+        E17, E18, E19, E20, E21, E22, E23, E24, E25, E26, E27, E28, E29, E30, E31, E32,
+        E33, E34, E35, E36, E37, E38, E39, E40, E41, E42, E43, E44, E45, E46, E77, E48,
+        E49, E50, E51, E52, E53, E54, E55, E56, E57, E58, E59, E60, E61, E62, E63, E64
+    }
+    
+    public void testPutEnumSet() {
+        ByteBuffer buf = ByteBuffer.allocate(8);
+        
+        // Test empty set
+        buf.putEnumSet(EnumSet.noneOf(TestEnum.class));
+        buf.flip();
+        assertEquals(0, buf.get());
+        
+        buf.clear();
+        buf.putEnumSetShort(EnumSet.noneOf(TestEnum.class));
+        buf.flip();
+        assertEquals(0, buf.getShort());
+        
+        buf.clear();
+        buf.putEnumSetInt(EnumSet.noneOf(TestEnum.class));
+        buf.flip();
+        assertEquals(0, buf.getInt());
+        
+        buf.clear();
+        buf.putEnumSetLong(EnumSet.noneOf(TestEnum.class));
+        buf.flip();
+        assertEquals(0, buf.getLong());
+        
+        // Test complete set
+        buf.clear();
+        buf.putEnumSet(EnumSet.range(TestEnum.E1, TestEnum.E8));
+        buf.flip();
+        assertEquals((byte)-1, buf.get());
+        
+        buf.clear();
+        buf.putEnumSetShort(EnumSet.range(TestEnum.E1, TestEnum.E16));
+        buf.flip();
+        assertEquals((short)-1, buf.getShort());
+        
+        buf.clear();
+        buf.putEnumSetInt(EnumSet.range(TestEnum.E1, TestEnum.E32));
+        buf.flip();
+        assertEquals(-1, buf.getInt());
+        
+        buf.clear();
+        buf.putEnumSetLong(EnumSet.allOf(TestEnum.class));
+        buf.flip();
+        assertEquals(-1L, buf.getLong());
+        
+        // Test high bit set
+        buf.clear();
+        buf.putEnumSet(EnumSet.of(TestEnum.E8));
+        buf.flip();
+        assertEquals(Byte.MIN_VALUE, buf.get());
+        
+        buf.clear();
+        buf.putEnumSetShort(EnumSet.of(TestEnum.E16));
+        buf.flip();
+        assertEquals(Short.MIN_VALUE, buf.getShort());
+        
+        buf.clear();
+        buf.putEnumSetInt(EnumSet.of(TestEnum.E32));
+        buf.flip();
+        assertEquals(Integer.MIN_VALUE, buf.getInt());
+        
+        buf.clear();
+        buf.putEnumSetLong(EnumSet.of(TestEnum.E64));
+        buf.flip();
+        assertEquals(Long.MIN_VALUE, buf.getLong());
+
+        // Test high low bits set
+        buf.clear();
+        buf.putEnumSet(EnumSet.of(TestEnum.E1, TestEnum.E8));
+        buf.flip();
+        assertEquals(Byte.MIN_VALUE + 1, buf.get());
+        
+        buf.clear();
+        buf.putEnumSetShort(EnumSet.of(TestEnum.E1, TestEnum.E16));
+        buf.flip();
+        assertEquals(Short.MIN_VALUE + 1, buf.getShort());
+        
+        buf.clear();
+        buf.putEnumSetInt(EnumSet.of(TestEnum.E1, TestEnum.E32));
+        buf.flip();
+        assertEquals(Integer.MIN_VALUE + 1, buf.getInt());
+        
+        buf.clear();
+        buf.putEnumSetLong(EnumSet.of(TestEnum.E1, TestEnum.E64));
+        buf.flip();
+        assertEquals(Long.MIN_VALUE + 1, buf.getLong());
+    }
+    
+    public void testGetEnumSet() {
+        ByteBuffer buf = ByteBuffer.allocate(8);
+        
+        // Test empty set
+        buf.put((byte)0);
+        buf.flip();
+        assertEquals(EnumSet.noneOf(TestEnum.class), buf.getEnumSet(TestEnum.class));
+        
+        buf.clear();
+        buf.putShort((short)0);
+        buf.flip();
+        assertEquals(EnumSet.noneOf(TestEnum.class), buf.getEnumSet(TestEnum.class));
+        
+        buf.clear();
+        buf.putInt(0);
+        buf.flip();
+        assertEquals(EnumSet.noneOf(TestEnum.class), buf.getEnumSet(TestEnum.class));
+        
+        buf.clear();
+        buf.putLong(0L);
+        buf.flip();
+        assertEquals(EnumSet.noneOf(TestEnum.class), buf.getEnumSet(TestEnum.class));
+        
+        // Test complete set
+        buf.clear();
+        buf.put((byte)-1);
+        buf.flip();
+        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E8), buf.getEnumSet(TestEnum.class));
+        
+        buf.clear();
+        buf.putShort((short)-1);
+        buf.flip();
+        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E16), buf.getEnumSetShort(TestEnum.class));
+        
+        buf.clear();
+        buf.putInt(-1);
+        buf.flip();
+        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E32), buf.getEnumSetInt(TestEnum.class));
+        
+        buf.clear();
+        buf.putLong(-1L);
+        buf.flip();
+        assertEquals(EnumSet.allOf(TestEnum.class), buf.getEnumSetLong(TestEnum.class));
+
+        // Test high bit set
+        buf.clear();
+        buf.put(Byte.MIN_VALUE);
+        buf.flip();
+        assertEquals(EnumSet.of(TestEnum.E8), buf.getEnumSet(TestEnum.class));
+        
+        buf.clear();
+        buf.putShort(Short.MIN_VALUE);
+        buf.flip();
+        assertEquals(EnumSet.of(TestEnum.E16), buf.getEnumSetShort(TestEnum.class));
+        
+        buf.clear();
+        buf.putInt(Integer.MIN_VALUE);
+        buf.flip();
+        assertEquals(EnumSet.of(TestEnum.E32), buf.getEnumSetInt(TestEnum.class));
+        
+        buf.clear();
+        buf.putLong(Long.MIN_VALUE);
+        buf.flip();
+        assertEquals(EnumSet.of(TestEnum.E64), buf.getEnumSetLong(TestEnum.class));
+
+        // Test high low bits set
+        buf.clear();
+        byte b = Byte.MIN_VALUE + 1;
+        buf.put(b);
+        buf.flip();
+        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E8), buf.getEnumSet(TestEnum.class));
+        
+        buf.clear();
+        short s = Short.MIN_VALUE + 1;
+        buf.putShort(s);
+        buf.flip();
+        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E16), buf.getEnumSetShort(TestEnum.class));
+        
+        buf.clear();
+        buf.putInt(Integer.MIN_VALUE + 1);
+        buf.flip();
+        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E32), buf.getEnumSetInt(TestEnum.class));
+        
+        buf.clear();
+        buf.putLong(Long.MIN_VALUE + 1);
+        buf.flip();
+        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E64), buf.getEnumSetLong(TestEnum.class));
     }
 }

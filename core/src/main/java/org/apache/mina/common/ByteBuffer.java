@@ -38,6 +38,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import java.util.EnumSet;
 
 import org.apache.mina.common.support.ByteBufferHexDumper;
 
@@ -1933,6 +1934,123 @@ public abstract class ByteBuffer implements Comparable
         }
 
         return this;
+    }
+
+    /**
+     * Reads a byte sized bit vector and converts it to an {@link EnumSet}.
+     * 
+     * <p>Each bit is mapped to a value in the specified enum.  The least significant
+     * bit maps to the first entry in the specified enum and each subsequent bit maps
+     * to each subsequent bit as mapped to the subsequent enum value.</p>
+     * 
+     * @param <E>  the enum type
+     * @param enumClass  the enum class used to create the EnumSet
+     * @return the EnumSet representation of the bit vector
+     */
+    public <E extends Enum<E>> EnumSet<E> getEnumSet(Class<E> enumClass) {
+        return toEnumSet(enumClass, (long) get() & 0xFFL);
+    }
+
+    /**
+     * Reads a short sized bit vector and converts it to an {@link EnumSet}.
+     * 
+     * @see #getEnumSet(Class)
+     * @param <E>  the enum type
+     * @param enumClass  the enum class used to create the EnumSet
+     * @return the EnumSet representation of the bit vector
+     */
+    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(Class<E> enumClass) {
+        return toEnumSet(enumClass, ((long) getShort()) & 0xFFFFL);
+    }
+
+    /**
+     * Reads an int sized bit vector and converts it to an {@link EnumSet}.
+     * 
+     * @see #getEnumSet(Class)
+     * @param <E>  the enum type
+     * @param enumClass  the enum class used to create the EnumSet
+     * @return the EnumSet representation of the bit vector
+     */
+    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(Class<E> enumClass) {
+        return toEnumSet(enumClass, (long) getInt() & 0xFFFFFFFFL);
+    }
+
+    /**
+     * Reads a long sized bit vector and converts it to an {@link EnumSet}.
+     * 
+     * @see #getEnumSet(Class)
+     * @param <E>  the enum type
+     * @param enumClass  the enum class used to create the EnumSet
+     * @return the EnumSet representation of the bit vector
+     */
+    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(Class<E> enumClass) {
+        return toEnumSet(enumClass, getLong());
+    }
+
+    /**
+     * Utility method for converting a bit vector to an EnumSet. 
+     */
+    private <E extends Enum<E>> EnumSet<E> toEnumSet(Class<E> clazz, long vector) {
+        EnumSet<E> set = EnumSet.noneOf(clazz);
+        long mask = 1;
+        for (E e : clazz.getEnumConstants()) {
+            if ((mask & vector) == mask) {
+                set.add(e);
+            }
+            mask <<= 1;
+        }
+        return set;
+    }
+
+    /**
+     * Writes the specified {@link EnumSet} to the buffer as a byte sized bit vector. 
+     * 
+     * @param <E> the enum type of the EnumSet
+     * @param set  the enum set to write to the buffer
+     */
+    public <E extends Enum<E>> void putEnumSet(EnumSet<E> set) {
+        put((byte) toLong(set));
+    }
+
+    /**
+     * Writes the specified {@link EnumSet} to the buffer as a short sized bit vector. 
+     * 
+     * @param <E> the enum type of the EnumSet
+     * @param set  the enum set to write to the buffer
+     */
+    public <E extends Enum<E>> void putEnumSetShort(EnumSet<E> set) {
+        putShort((short) toLong(set));
+    }
+
+    /**
+     * Writes the specified {@link EnumSet} to the buffer as an int sized bit vector. 
+     * 
+     * @param <E> the enum type of the EnumSet
+     * @param set  the enum set to write to the buffer
+     */
+    public <E extends Enum<E>> void putEnumSetInt(EnumSet<E> set) {
+        putInt((int) toLong(set));
+    }
+
+    /**
+     * Writes the specified {@link EnumSet} to the buffer as a long sized bit vector. 
+     * 
+     * @param <E> the enum type of the EnumSet
+     * @param set  the enum set to write to the buffer
+     */
+    public <E extends Enum<E>> void putEnumSetLong(EnumSet<E> set) {
+        putLong(toLong(set));
+    }
+
+    /**
+     * Utility method for converting an EnumSet to a bit vector. 
+     */
+    private <E extends Enum<E>> long toLong(EnumSet<E> s) {
+        long vector = 0;
+        for (E e : s) {
+            vector |= 1L << e.ordinal();
+        }
+        return vector;
     }
 
     /**
