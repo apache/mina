@@ -2008,8 +2008,9 @@ public abstract class ByteBuffer implements Comparable
      * @param <E> the enum type of the EnumSet
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> void putEnumSet(EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSet(EnumSet<E> set) {
         put((byte) toLong(set));
+        return this;
     }
 
     /**
@@ -2018,8 +2019,9 @@ public abstract class ByteBuffer implements Comparable
      * @param <E> the enum type of the EnumSet
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> void putEnumSetShort(EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetShort(EnumSet<E> set) {
         putShort((short) toLong(set));
+        return this;
     }
 
     /**
@@ -2028,8 +2030,9 @@ public abstract class ByteBuffer implements Comparable
      * @param <E> the enum type of the EnumSet
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> void putEnumSetInt(EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetInt(EnumSet<E> set) {
         putInt((int) toLong(set));
+        return this;
     }
 
     /**
@@ -2038,8 +2041,9 @@ public abstract class ByteBuffer implements Comparable
      * @param <E> the enum type of the EnumSet
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> void putEnumSetLong(EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetLong(EnumSet<E> set) {
         putLong(toLong(set));
+        return this;
     }
 
     /**
