@@ -494,6 +494,7 @@ public class SSLFilter extends IoFilterAdapter
     @Override
     public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws SSLException
     {
+        boolean needsFlush = true;
         SSLHandler handler = getSSLSessionHandler( session );
         synchronized( handler )
         {
@@ -564,11 +565,14 @@ public class SSLFilter extends IoFilterAdapter
                         }
                         handler.schedulePreHandshakeWriteRequest( nextFilter, writeRequest );
                     }
+                    needsFlush = false;
                 }
             }
         }
         
-        handler.flushPostHandshakeEvents();
+        if (needsFlush) {
+            handler.flushPostHandshakeEvents();
+        }
     }
     
     @Override
