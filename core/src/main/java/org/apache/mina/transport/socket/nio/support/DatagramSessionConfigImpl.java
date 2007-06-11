@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio.support;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 
@@ -36,11 +37,11 @@ public class DatagramSessionConfigImpl extends BaseIoSessionConfig implements Da
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
     private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
 
-    private static boolean DEFAULT_BROADCAST;
-    private static boolean DEFAULT_REUSE_ADDRESS;
-    private static int DEFAULT_RECEIVE_BUFFER_SIZE;
-    private static int DEFAULT_SEND_BUFFER_SIZE;
-    private static int DEFAULT_TRAFFIC_CLASS;
+    private static boolean DEFAULT_BROADCAST = false;
+    private static boolean DEFAULT_REUSE_ADDRESS = false;
+    private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
+    private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
+    private static int DEFAULT_TRAFFIC_CLASS = 0;
     
     static
     {
@@ -93,7 +94,7 @@ public class DatagramSessionConfigImpl extends BaseIoSessionConfig implements Da
                 DEFAULT_TRAFFIC_CLASS = 0;
             }
         } catch (SocketException e) {
-            throw new ExceptionInInitializerError(e);
+            ExceptionMonitor.getInstance().exceptionCaught(e);
         }
         finally {
             if( socket != null )
