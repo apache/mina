@@ -84,13 +84,12 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
         try {
             initializeDefaultSocketParameters(unconnectedSocket);
         } catch (SocketException se) {
+            ExceptionMonitor.getInstance().exceptionCaught(se);
             try {
                 unconnectedSocket.close();
             } catch (IOException ioe) {
                 ExceptionMonitor.getInstance().exceptionCaught(ioe);
             }
-            
-            throw new ExceptionInInitializerError(se);
         }
     }
     
