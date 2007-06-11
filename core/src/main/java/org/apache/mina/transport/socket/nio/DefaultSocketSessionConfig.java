@@ -20,10 +20,15 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.support.BaseIoSessionConfig;
@@ -36,90 +41,118 @@ import org.apache.mina.common.support.BaseIoSessionConfig;
  */
 public class DefaultSocketSessionConfig extends BaseIoSessionConfig implements SocketSessionConfig
 {
+    private static Map<InetSocketAddress, InetAddress> TEST_ADDRESSES =
+        new LinkedHashMap<InetSocketAddress, InetAddress>();
+    
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
-    private static final boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
+    private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
 
-    private static boolean DEFAULT_REUSE_ADDRESS;
-    private static int DEFAULT_RECEIVE_BUFFER_SIZE;
-    private static int DEFAULT_SEND_BUFFER_SIZE;
-    private static int DEFAULT_TRAFFIC_CLASS;
-    private static boolean DEFAULT_KEEP_ALIVE;
-    private static boolean DEFAULT_OOB_INLINE;
-    private static int DEFAULT_SO_LINGER;
-    private static boolean DEFAULT_TCP_NO_DELAY;
+    private static boolean DEFAULT_REUSE_ADDRESS = false;
+    private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
+    private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
+    private static int DEFAULT_TRAFFIC_CLASS = 0;
+    private static boolean DEFAULT_KEEP_ALIVE = false;
+    private static boolean DEFAULT_OOB_INLINE = false;
+    private static int DEFAULT_SO_LINGER = -1;
+    private static boolean DEFAULT_TCP_NO_DELAY = false;
     
     static
     {
-        initialize();
+        initializeTestAddresses();
+        
+        boolean success = false;
+        for (Entry<InetSocketAddress, InetAddress> e: TEST_ADDRESSES.entrySet()) {
+            success = initializeDefaultSocketParameters(e.getKey(), e.getValue());
+            if (success) {
+                break;
+            }
+        }
+        
+        if (!success) {
+            initializeFallbackDefaultSocketParameters();
+        }
+    }
+
+    private static void initializeFallbackDefaultSocketParameters() {
+        Socket unconnectedSocket = new Socket(); // Use a unconnected socket.
+        try {
+            initializeDefaultSocketParameters(unconnectedSocket);
+        } catch (SocketException se) {
+            try {
+                unconnectedSocket.close();
+            } catch (IOException ioe) {
+                ExceptionMonitor.getInstance().exceptionCaught(ioe);
+            }
+            
+            throw new ExceptionInInitializerError(se);
+        }
     }
     
-    private static void initialize()
+    private static void initializeTestAddresses() {
+        try {
+            // IPv6 localhost
+            TEST_ADDRESSES.put(
+                    new InetSocketAddress(
+                            InetAddress.getByAddress(
+                                    new byte[] {
+                                            0, 0, 0, 0, 0, 0, 0, 0,
+                                            0, 0, 0, 0, 0, 0, 0, 1 }), 0),
+                    InetAddress.getByAddress(
+                            new byte[] {
+                                    0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 1 }));
+            
+            // IPv4 localhost
+            TEST_ADDRESSES.put(
+                    new InetSocketAddress(
+                            InetAddress.getByAddress(
+                                    new byte[] { 127, 0, 0, 1 }), 0),
+                    InetAddress.getByAddress(
+                            new byte[] { 127, 0, 0, 1 }));
+            
+            // Bind to wildcard interface and connect to IPv6 localhost
+            TEST_ADDRESSES.put(
+                    new InetSocketAddress(0),
+                    InetAddress.getByAddress(
+                            new byte[] {
+                                    0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 1 }));
+
+            // Bind to wildcard interface and connect to IPv4 localhost
+            TEST_ADDRESSES.put(
+                    new InetSocketAddress(0),
+                    InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
+
+        } catch (UnknownHostException e) {
+            ExceptionMonitor.getInstance().exceptionCaught(e);
+        }
+    }
+    
+    private static boolean initializeDefaultSocketParameters(
+            InetSocketAddress bindAddress, InetAddress connectAddress)
     {
         ServerSocket ss = null;
         Socket socket = null;
         
         try {
             ss = new ServerSocket();
-            ss.bind(new InetSocketAddress("localhost", 0));
+            ss.bind(bindAddress);
             socket = new Socket();
-            try {
-                // Timeout is set to 10 seconds in case of infinite blocking
-                // on some platform.
-                socket.connect(
-                        new InetSocketAddress("localhost", ss.getLocalPort()), 10000);
-            } catch (IOException e) {
-                // We can retrieve the values even if the connection
-                // attempt fails, although it might be somewhat incorrect
-                // on some platform.
-            }
 
-            DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
-            DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
-            DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
-            DEFAULT_KEEP_ALIVE = socket.getKeepAlive();
-            DEFAULT_OOB_INLINE = socket.getOOBInline();
-            DEFAULT_SO_LINGER = socket.getSoLinger();
-            DEFAULT_TCP_NO_DELAY = socket.getTcpNoDelay();
-            
-            // Check if setReceiveBufferSize is supported.
-            try
-            {
-                socket.setReceiveBufferSize(DEFAULT_RECEIVE_BUFFER_SIZE);
-                SET_RECEIVE_BUFFER_SIZE_AVAILABLE = true;
-            }
-            catch( SocketException e )
-            {
-                SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
-            }
-            
-            // Check if setSendBufferSize is supported.
-            try
-            {
-                socket.setSendBufferSize(DEFAULT_SEND_BUFFER_SIZE);
-                SET_SEND_BUFFER_SIZE_AVAILABLE = true;
-            }
-            catch( SocketException e )
-            {
-                SET_SEND_BUFFER_SIZE_AVAILABLE = false;
-            }
+            // Timeout is set to 10 seconds in case of infinite blocking
+            // on some platform.
+            socket.connect(
+                    new InetSocketAddress(
+                            connectAddress, ss.getLocalPort()), 10000);
 
-            // Check if getTrafficClass is supported.
-            try
-            {
-                DEFAULT_TRAFFIC_CLASS = socket.getTrafficClass();
-                GET_TRAFFIC_CLASS_AVAILABLE = true;
-            }
-            catch( SocketException e )
-            {
-                GET_TRAFFIC_CLASS_AVAILABLE = false;
-                DEFAULT_TRAFFIC_CLASS = 0;
-            }
+            initializeDefaultSocketParameters(socket);
+            return true;
         }
-        catch( Exception e )
+        catch( IOException e )
         {
-            throw new ExceptionInInitializerError(e);
+            return false;
         }
         finally
         {
@@ -142,6 +175,50 @@ public class DefaultSocketSessionConfig extends BaseIoSessionConfig implements S
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
+        }
+    }
+
+    private static void initializeDefaultSocketParameters(Socket socket) throws SocketException {
+        DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
+        DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
+        DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
+        DEFAULT_KEEP_ALIVE = socket.getKeepAlive();
+        DEFAULT_OOB_INLINE = socket.getOOBInline();
+        DEFAULT_SO_LINGER = socket.getSoLinger();
+        DEFAULT_TCP_NO_DELAY = socket.getTcpNoDelay();
+        
+        // Check if setReceiveBufferSize is supported.
+        try
+        {
+            socket.setReceiveBufferSize(DEFAULT_RECEIVE_BUFFER_SIZE);
+            SET_RECEIVE_BUFFER_SIZE_AVAILABLE = true;
+        }
+        catch( SocketException e )
+        {
+            SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
+        }
+        
+        // Check if setSendBufferSize is supported.
+        try
+        {
+            socket.setSendBufferSize(DEFAULT_SEND_BUFFER_SIZE);
+            SET_SEND_BUFFER_SIZE_AVAILABLE = true;
+        }
+        catch( SocketException e )
+        {
+            SET_SEND_BUFFER_SIZE_AVAILABLE = false;
+        }
+
+        // Check if getTrafficClass is supported.
+        try
+        {
+            DEFAULT_TRAFFIC_CLASS = socket.getTrafficClass();
+            GET_TRAFFIC_CLASS_AVAILABLE = true;
+        }
+        catch( SocketException e )
+        {
+            GET_TRAFFIC_CLASS_AVAILABLE = false;
+            DEFAULT_TRAFFIC_CLASS = 0;
         }
     }
     
