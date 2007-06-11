@@ -80,13 +80,13 @@ public class DefaultSocketSessionConfig extends BaseIoSessionConfig implements S
         try {
             initializeDefaultSocketParameters(unconnectedSocket);
         } catch (SocketException se) {
+            ExceptionMonitor.getInstance().exceptionCaught(se);
+            
             try {
                 unconnectedSocket.close();
             } catch (IOException ioe) {
                 ExceptionMonitor.getInstance().exceptionCaught(ioe);
             }
-            
-            throw new ExceptionInInitializerError(se);
         }
     }
     
