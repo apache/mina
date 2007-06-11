@@ -1936,6 +1936,99 @@ public abstract class ByteBuffer implements Comparable
         return this;
     }
 
+    //////////////////////////
+    // Enum methods         //
+    //////////////////////////
+    
+    /**
+     * Reads a byte from the buffer and returns the correlating enum constant defined
+     * by the specified enum type.
+     * 
+     * @param <E> The enum type to return
+     * @param enumClass  The enum's class object
+     * @return  
+     */
+    public <E extends Enum<E>> E getEnum(Class<E> enumClass) {
+        return toEnum(enumClass, get());
+    }
+
+    /**
+     * Reads a short from the buffer and returns the correlating enum constant defined
+     * by the specified enum type.
+     * 
+     * @param <E> The enum type to return
+     * @param enumClass  The enum's class object
+     * @return  
+     */
+    public <E extends Enum<E>> E getEnumShort(Class<E> enumClass) {
+        return toEnum(enumClass, getShort());
+    }
+
+    /**
+     * Reads an int from the buffer and returns the correlating enum constant defined
+     * by the specified enum type.
+     * 
+     * @param <E> The enum type to return
+     * @param enumClass  The enum's class object
+     * @return  
+     */
+    public <E extends Enum<E>> E getEnumInt(Class<E> enumClass) {
+        return toEnum(enumClass, getInt());
+    }
+    
+    /**
+     * Writes an enum's ordinal value to the buffer as a byte.
+     * 
+     * @param e  The enum to write to the buffer
+     */
+    public void putEnum(Enum e) {
+        if (e.ordinal() > Byte.MAX_VALUE) {
+            throw new IllegalArgumentException(enumConversionErrorMessage(e, "byte"));
+        }
+        put((byte)e.ordinal());
+    }
+
+    /**
+     * Writes an enum's ordinal value to the buffer as a short.
+     * 
+     * @param e  The enum to write to the buffer
+     */
+    public void putEnumShort(Enum e) {
+        if (e.ordinal() > Short.MAX_VALUE) {
+            throw new IllegalArgumentException(enumConversionErrorMessage(e, "short"));
+        }
+        putShort((short)e.ordinal());
+    }
+    
+    /**
+     * Writes an enum's ordinal value to the buffer as an integer.
+     * 
+     * @param e  The enum to write to the buffer
+     */
+    public void putEnumInt(Enum e) {
+        putInt(e.ordinal());
+    }
+
+    private <E> E toEnum(Class<E> enumClass, int i) {
+        E[] enumConstants = enumClass.getEnumConstants();
+        if (i > enumConstants.length) {
+            throw new IndexOutOfBoundsException(String.format("%d is too large of an ordinal to convert to the enum %s", i, enumClass.getName()));
+        }
+        return enumConstants[i];
+    }
+    
+    private String enumConversionErrorMessage(Enum e, String type) {
+        return String.format("%s.%s has an ordinal value too large for a %s", e.getClass().getName(), e.name(), type);
+    }
+    
+    //////////////////////////
+    // EnumSet methods      //
+    //////////////////////////
+
+    private static final long BYTE_MASK = 0xFFL;
+    private static final long SHORT_MASK = 0xFFFFL;
+    private static final long INT_MASK = 0xFFFFFFFFL;
+    
     /**
      * Reads a byte sized bit vector and converts it to an {@link EnumSet}.
      * 
@@ -1948,7 +2041,7 @@ public abstract class ByteBuffer implements Comparable
      * @return the EnumSet representation of the bit vector
      */
     public <E extends Enum<E>> EnumSet<E> getEnumSet(Class<E> enumClass) {
-        return toEnumSet(enumClass, (long) get() & 0xFFL);
+        return toEnumSet(enumClass, (long) get() & BYTE_MASK);
     }
 
     /**
@@ -1960,7 +2053,7 @@ public abstract class ByteBuffer implements Comparable
      * @return the EnumSet representation of the bit vector
      */
     public <E extends Enum<E>> EnumSet<E> getEnumSetShort(Class<E> enumClass) {
-        return toEnumSet(enumClass, ((long) getShort()) & 0xFFFFL);
+        return toEnumSet(enumClass, ((long) getShort()) & SHORT_MASK);
     }
 
     /**
@@ -1972,7 +2065,7 @@ public abstract class ByteBuffer implements Comparable
      * @return the EnumSet representation of the bit vector
      */
     public <E extends Enum<E>> EnumSet<E> getEnumSetInt(Class<E> enumClass) {
-        return toEnumSet(enumClass, (long) getInt() & 0xFFFFFFFFL);
+        return toEnumSet(enumClass, (long) getInt() & INT_MASK);
     }
 
     /**
@@ -2009,7 +2102,11 @@ public abstract class ByteBuffer implements Comparable
      * @param set  the enum set to write to the buffer
      */
     public <E extends Enum<E>> ByteBuffer putEnumSet(EnumSet<E> set) {
-        put((byte) toLong(set));
+        long vector = toLong(set);
+        if ((vector & ~BYTE_MASK) != 0) {
+            throw new IllegalArgumentException("The enum set is too large to fit in a byte: " + set);
+        }
+        put((byte) vector);
         return this;
     }
 
@@ -2020,7 +2117,11 @@ public abstract class ByteBuffer implements Comparable
      * @param set  the enum set to write to the buffer
      */
     public <E extends Enum<E>> ByteBuffer putEnumSetShort(EnumSet<E> set) {
-        putShort((short) toLong(set));
+        long vector = toLong(set);
+        if ((vector & ~SHORT_MASK) != 0) {
+            throw new IllegalArgumentException("The enum set is too large to fit in a short: " + set);
+        }
+        putShort((short) vector);
         return this;
     }
 
@@ -2031,7 +2132,11 @@ public abstract class ByteBuffer implements Comparable
      * @param set  the enum set to write to the buffer
      */
     public <E extends Enum<E>> ByteBuffer putEnumSetInt(EnumSet<E> set) {
-        putInt((int) toLong(set));
+        long vector = toLong(set);
+        if ((vector & ~INT_MASK) != 0) {
+            throw new IllegalArgumentException("The enum set is too large to fit in an int: " + set);
+        }
+        putInt((int) vector);
         return this;
     }
 
@@ -2049,9 +2154,12 @@ public abstract class ByteBuffer implements Comparable
     /**
      * Utility method for converting an EnumSet to a bit vector. 
      */
-    private <E extends Enum<E>> long toLong(EnumSet<E> s) {
+    private <E extends Enum<E>> long toLong(EnumSet<E> set) {
         long vector = 0;
-        for (E e : s) {
+        for (E e : set) {
+            if (e.ordinal() >= Long.SIZE) {
+                throw new IllegalArgumentException("The enum set is too large to fit in a bit vector: " + set);
+            }
             vector |= 1L << e.ordinal();
         }
         return vector;

@@ -735,6 +735,14 @@ public class ByteBufferTest extends TestCase
         E49, E50, E51, E52, E53, E54, E55, E56, E57, E58, E59, E60, E61, E62, E63, E64
     }
     
+    private static enum TooBigEnum {
+        E1, E2, E3, E4, E5, E6, E7, E8, E9, E10, E11, E12, E13, E14, E15, E16,
+        E17, E18, E19, E20, E21, E22, E23, E24, E25, E26, E27, E28, E29, E30, E31, E32,
+        E33, E34, E35, E36, E37, E38, E39, E40, E41, E42, E43, E44, E45, E46, E77, E48,
+        E49, E50, E51, E52, E53, E54, E55, E56, E57, E58, E59, E60, E61, E62, E63, E64,
+        E65
+    }
+    
     public void testPutEnumSet() {
         ByteBuffer buf = ByteBuffer.allocate(8);
         
@@ -909,5 +917,54 @@ public class ByteBufferTest extends TestCase
         buf.putLong(Long.MIN_VALUE + 1);
         buf.flip();
         assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E64), buf.getEnumSetLong(TestEnum.class));
+    }
+    
+    public void testBitVectorOverFlow() {
+        ByteBuffer buf = ByteBuffer.allocate(8);
+        try {
+            buf.putEnumSet(EnumSet.of(TestEnum.E9));
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // pass
+        }
+        
+        try {
+            buf.putEnumSetShort(EnumSet.of(TestEnum.E17));
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // pass
+        }
+        
+        try {
+            buf.putEnumSetInt(EnumSet.of(TestEnum.E33));
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // pass
+        }
+        
+        try {
+            buf.putEnumSetLong(EnumSet.of(TooBigEnum.E65));
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // pass
+        }
+    }
+    
+    public void testGetPutEnum() {
+        ByteBuffer buf = ByteBuffer.allocate(4);
+        
+        buf.putEnum(TestEnum.E64);
+        buf.flip();
+        assertEquals(TestEnum.E64, buf.getEnum(TestEnum.class));
+        
+        buf.clear();
+        buf.putEnumShort(TestEnum.E64);
+        buf.flip();
+        assertEquals(TestEnum.E64, buf.getEnumShort(TestEnum.class));
+
+        buf.clear();
+        buf.putEnumInt(TestEnum.E64);
+        buf.flip();
+        assertEquals(TestEnum.E64, buf.getEnumInt(TestEnum.class));
     }
 }
