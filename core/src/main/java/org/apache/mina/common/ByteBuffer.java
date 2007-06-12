@@ -2041,7 +2041,7 @@ public abstract class ByteBuffer implements Comparable
      * @return the EnumSet representation of the bit vector
      */
     public <E extends Enum<E>> EnumSet<E> getEnumSet(Class<E> enumClass) {
-        return toEnumSet(enumClass, (long) get() & BYTE_MASK);
+        return toEnumSet(enumClass, get() & BYTE_MASK);
     }
 
     /**
@@ -2053,7 +2053,7 @@ public abstract class ByteBuffer implements Comparable
      * @return the EnumSet representation of the bit vector
      */
     public <E extends Enum<E>> EnumSet<E> getEnumSetShort(Class<E> enumClass) {
-        return toEnumSet(enumClass, ((long) getShort()) & SHORT_MASK);
+        return toEnumSet(enumClass, getShort() & SHORT_MASK);
     }
 
     /**
@@ -2065,7 +2065,7 @@ public abstract class ByteBuffer implements Comparable
      * @return the EnumSet representation of the bit vector
      */
     public <E extends Enum<E>> EnumSet<E> getEnumSetInt(Class<E> enumClass) {
-        return toEnumSet(enumClass, (long) getInt() & INT_MASK);
+        return toEnumSet(enumClass, getInt() & INT_MASK);
     }
 
     /**
