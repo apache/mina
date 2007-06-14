@@ -116,6 +116,10 @@ public class SessionLog
             log.warn( String.valueOf( getPrefix( session ) ) + message );
         }
     }
+    
+    public static void warn(IoSession session, Throwable cause) {
+        warn(session, "Unexpected exception.", cause);
+    }
 
     public static void warn( IoSession session, String message, Throwable cause )
     {
@@ -141,6 +145,10 @@ public class SessionLog
         {
             log.error( String.valueOf( getPrefix( session ) ) + message );
         }
+    }
+
+    public static void error(IoSession session, Throwable cause) {
+        error(session, "Unexpected exception.", cause);
     }
 
     public static void error( IoSession session, String message, Throwable cause )
