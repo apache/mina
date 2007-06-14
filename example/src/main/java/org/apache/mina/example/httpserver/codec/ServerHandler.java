@@ -20,6 +20,7 @@
 package org.apache.mina.example.httpserver.codec;
 
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -66,7 +67,7 @@ public class ServerHandler extends IoHandlerAdapter
         // HttpResponseMessage.HTTP_STATUS_NOT_FOUND));
 
         if( response != null ) {
-            session.write( response ).awaitUninterruptibly();
+            session.write( response ).addListener(IoFutureListener.CLOSE);
         }
     }
 
@@ -80,6 +81,7 @@ public class ServerHandler extends IoHandlerAdapter
     @Override
     public void exceptionCaught( IoSession session, Throwable cause )
     {
+        SessionLog.warn(session, cause);
         session.close();
     }
 }
