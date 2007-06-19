@@ -44,24 +44,37 @@ import org.apache.mina.util.SessionLog;
  */
 public class RequestResponseFilter extends IoFilterAdapter {
 
+    private static final String RESPONSE_INSPECTOR = RequestResponseFilter.class.getName() + ".responseInspector";
     private static final String REQUEST_STORE = RequestResponseFilter.class.getName() + ".requestStore";
     private static final String UNFINISHED_TASKS = RequestResponseFilter.class.getName() + ".unfinishedTasks";
 
     private static int timerId = 0;
     
-    private final ResponseInspector responseInspector;
+    private final ResponseInspectorFactory responseInspectorFactory;
     private final Timer timer = new Timer("RequestTimer-" + (timerId++), true);
     
-    public RequestResponseFilter(ResponseInspector responseInspector) {
+    public RequestResponseFilter(final ResponseInspector responseInspector) {
         if (responseInspector == null) {
             throw new NullPointerException("responseInspector");
         }
-        this.responseInspector = responseInspector;
+        this.responseInspectorFactory = new ResponseInspectorFactory() {
+            public ResponseInspector getResponseInspector() {
+                return responseInspector;
+            }
+        };
+    }
+    
+    public RequestResponseFilter(ResponseInspectorFactory responseInspectorFactory) {
+        if (responseInspectorFactory == null) {
+            throw new NullPointerException("responseInspectorFactory");
+        }
+        this.responseInspectorFactory = responseInspectorFactory;
     }
     
     @Override
     public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         IoSession session = parent.getSession();
+        session.setAttribute(RESPONSE_INSPECTOR, responseInspectorFactory.getResponseInspector());
         session.setAttribute(REQUEST_STORE, new ConcurrentHashMap<Object, Request>());
         session.setAttribute(UNFINISHED_TASKS, new LinkedHashSet<TimerTask>());
     }
@@ -83,6 +96,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
 
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
+        ResponseInspector responseInspector = (ResponseInspector) session.getAttribute(RESPONSE_INSPECTOR);
         Object requestId = responseInspector.getRequestId(message);
         if (requestId == null) {
             // Not a response message.  Ignore.
