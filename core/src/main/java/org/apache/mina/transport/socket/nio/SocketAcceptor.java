@@ -83,9 +83,16 @@ public class SocketAcceptor extends BaseIoAcceptor
         this( new NewThreadExecutor() );
     }
 
+    /**
+     * Creates an acceptor with a processing thread count set to the 
+     * number of available processors + 1 and the submitted executor
+     * 
+     * @param executor 
+     * 	Executor to use for launching threads
+     */
     public SocketAcceptor(Executor executor) 
     {
-        this(Runtime.getRuntime().availableProcessors(), executor);
+        this(Runtime.getRuntime().availableProcessors()+1, executor);
     } 
     
     /**
