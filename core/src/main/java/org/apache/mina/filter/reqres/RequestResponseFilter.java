@@ -84,6 +84,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
         IoSession session = parent.getSession();
         session.removeAttribute(UNFINISHED_TASKS);
         session.removeAttribute(REQUEST_STORE);
+        session.removeAttribute(RESPONSE_INSPECTOR);
     }
     
     /**
