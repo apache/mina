@@ -238,6 +238,8 @@ public class DefaultIoFuture implements IoFuture
                 if (listener == firstListener) {
                     if (otherListeners != null && !otherListeners.isEmpty()) {
                         firstListener = otherListeners.remove(0);
+                    } else {
+                        firstListener = null;
                     }
                 } else if (otherListeners != null) {
                     otherListeners.remove(listener);
