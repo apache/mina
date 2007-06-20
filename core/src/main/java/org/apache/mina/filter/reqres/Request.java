@@ -20,9 +20,9 @@
 package org.apache.mina.filter.reqres;
 
 import java.util.NoSuchElementException;
-import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,7 +35,8 @@ public class Request {
     private final Object message;
     private final boolean useResponseQueue;
     private final long timeoutMillis;
-    private volatile TimerTask timerTask;
+    private volatile Runnable timeoutTask;
+    private volatile ScheduledFuture timeoutFuture;
 
     private final BlockingQueue<Object> responses = new LinkedBlockingQueue<Object>();
     private volatile boolean endOfResponses;
@@ -194,11 +195,19 @@ public class Request {
                ", timeout=" + timeout + ", message=" + getMessage() + " }";
     }
     
-    TimerTask getTimerTask() {
-        return timerTask;
+    Runnable getTimeoutTask() {
+        return timeoutTask;
     }
     
-    void setTimerTask(TimerTask timerTask) {
-        this.timerTask = timerTask;
+    void setTimeoutTask(Runnable timeoutTask) {
+        this.timeoutTask = timeoutTask;
+    }
+    
+    ScheduledFuture getTimeoutFuture() {
+        return timeoutFuture;
+    }
+    
+    void setTimeoutFuture(ScheduledFuture timeoutFuture) {
+        this.timeoutFuture = timeoutFuture;
     }
 }

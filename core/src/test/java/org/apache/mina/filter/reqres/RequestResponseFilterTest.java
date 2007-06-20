@@ -21,6 +21,8 @@ package org.apache.mina.filter.reqres;
 
 import java.net.SocketAddress;
 import java.util.NoSuchElementException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterChain;
@@ -51,6 +53,7 @@ import junit.framework.TestCase;
  */
 public class RequestResponseFilterTest extends TestCase {
     
+    private ScheduledExecutorService scheduler;
     private RequestResponseFilter filter;
     private IoSession session;
     
@@ -62,8 +65,9 @@ public class RequestResponseFilterTest extends TestCase {
     
     @Before
     public void setUp() throws Exception {
+        scheduler = Executors.newScheduledThreadPool(1);
         session = new DummySession();
-        filter = new RequestResponseFilter(new MessageInspector());
+        filter = new RequestResponseFilter(new MessageInspector(), scheduler);
         
         // Set up mock objects.
         chain = new AbstractIoFilterChain(session) {
@@ -90,10 +94,11 @@ public class RequestResponseFilterTest extends TestCase {
         filter.onPreRemove(chain, "reqres", nextFilter);
         filter.onPostRemove(chain, "reqres", nextFilter);
         session.removeAttribute(SessionLog.LOGGER);
+        session.removeAttribute(SessionLog.PREFIX);
         Assert.assertTrue(session.getAttributeKeys().isEmpty());
-
         filter.destroy();
         filter = null;
+        scheduler.shutdown();
     }
     
     @Test
