@@ -35,7 +35,7 @@ import org.apache.mina.util.SessionLog;
  * at a rate faster than the specified interval.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev $
+ * @version $Rev$, $Date$
  */
 public class ConnectionThrottleFilter extends IoFilterAdapter {
     private static final long DEFAULT_TIME = 1000;  
