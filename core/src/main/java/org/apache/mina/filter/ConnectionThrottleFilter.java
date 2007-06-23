@@ -21,9 +21,8 @@ package org.apache.mina.filter;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
@@ -59,7 +58,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
      */
     public ConnectionThrottleFilter( long allowedInterval ){
         this.allowedInterval = allowedInterval;
-        clients = Collections.synchronizedMap( new HashMap<String,Long>());
+        clients = new ConcurrentHashMap<String,Long>();
     }
 
     /**
@@ -74,7 +73,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
         this.allowedInterval = allowedInterval;
     }
 
-    private synchronized boolean isConnectionOk( IoSession session ){
+    private boolean isConnectionOk( IoSession session ){
         SocketAddress remoteAddress = session.getRemoteAddress();
         if( remoteAddress instanceof InetSocketAddress )
         {
