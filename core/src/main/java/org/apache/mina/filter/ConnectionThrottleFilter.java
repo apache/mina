@@ -86,16 +86,16 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
         SocketAddress remoteAddress = session.getRemoteAddress();
         if( remoteAddress instanceof InetSocketAddress )
         {
-            long now = System.currentTimeMillis();
             InetSocketAddress addr = (InetSocketAddress)remoteAddress;
+            long now = System.currentTimeMillis();
             
             if( clients.containsKey(addr.getAddress().getHostAddress())){
-                Long time = clients.get(addr.getAddress().getHostAddress());
+                Long lastConnTime = clients.get(addr.getAddress().getHostAddress());
                 clients.put(addr.getAddress().getHostAddress(), now);
 
                 // if the interval between now and the last connection is 
                 // less than the allowed interval, return false
-                if( (now-time) < allowedInterval ){
+                if( (now-lastConnTime) < allowedInterval ){
                     return false;
                 } else {
                 	return true;
