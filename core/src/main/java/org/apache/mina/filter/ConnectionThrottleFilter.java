@@ -73,16 +73,32 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
         this.allowedInterval = allowedInterval;
     }
 
-    private boolean isConnectionOk( IoSession session ){
+    /**
+     * Method responsible for deciding if a connection is OK
+     * to continue
+     * 
+     * @param session
+     * 	The new session that will be verified
+     * @return
+     * 	True if the session meets the criteria, otherwise false
+     */
+    protected boolean isConnectionOk( IoSession session ){
         SocketAddress remoteAddress = session.getRemoteAddress();
         if( remoteAddress instanceof InetSocketAddress )
         {
             long now = System.currentTimeMillis();
             InetSocketAddress addr = (InetSocketAddress)remoteAddress;
+            
             if( clients.containsKey(addr.getAddress().getHostAddress())){
                 Long time = clients.get(addr.getAddress().getHostAddress());
-                if( (now-time) > allowedInterval ){
+                clients.put(addr.getAddress().getHostAddress(), now);
+
+                // if the interval between now and the last connection is 
+                // less than the allowed interval, return false
+                if( (now-time) < allowedInterval ){
                     return false;
+                } else {
+                	return true;
                 }
             } else {
                 clients.put( addr.getAddress().getHostAddress(), now );
