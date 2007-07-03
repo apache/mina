@@ -53,7 +53,7 @@ public interface MessageDecoder {
      * refer to each method's documentation for detailed explanation.
      */
     static MessageDecoderResult NOT_OK = MessageDecoderResult.NOT_OK;
-    
+
     /**
      * Checks the specified buffer is decodable by this decoder.
      * 
@@ -63,8 +63,8 @@ public interface MessageDecoder {
      *         specified buffer is decodable ({@link #OK}) or not decodable
      *         {@link #NOT_OK}.
      */
-    MessageDecoderResult decodable( IoSession session, ByteBuffer in );
-    
+    MessageDecoderResult decodable(IoSession session, ByteBuffer in);
+
     /**
      * Decodes binary or protocol-specific content into higher-level message objects.
      * MINA invokes {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
@@ -77,9 +77,8 @@ public interface MessageDecoder {
      *         
      * @throws Exception if the read data violated protocol specification 
      */
-    MessageDecoderResult decode( IoSession session, ByteBuffer in,
-                                 ProtocolDecoderOutput out ) throws Exception;
-    
+    MessageDecoderResult decode(IoSession session, ByteBuffer in, ProtocolDecoderOutput out) throws Exception;
+
     /**
      * Invoked when the specified <tt>session</tt> is closed while this decoder was
      * parsing the data.  This method is useful when you deal with the protocol which doesn't
@@ -90,5 +89,5 @@ public interface MessageDecoder {
      * 
      * @throws Exception if the read data violated protocol specification
      */
-    void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception;
+    void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception;
 }
