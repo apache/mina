@@ -669,17 +669,9 @@ public abstract class AbstractIoFilterChain implements IoFilterChain
         public void filterWrite( NextFilter nextFilter, IoSession session,
                                  WriteRequest writeRequest ) throws Exception
         {
-            if( session.getTransportType().getEnvelopeType().isAssignableFrom( writeRequest.getMessage().getClass() ) )
-            {
-                doWrite( session, writeRequest );
-            }
-            else
-            {
-                throw new IllegalStateException(
-                        "Write requests must be transformed to " +
-                        session.getTransportType().getEnvelopeType() +
-                        ": " + writeRequest );
-            }
+            // I used assertion here because isAssignableFrom takes a lot of CPU.
+            assert session.getTransportType().getEnvelopeType().isAssignableFrom( writeRequest.getMessage().getClass() );
+            doWrite( session, writeRequest );
         }
 
         @Override
