@@ -41,11 +41,11 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  */
 public class HttpResponseEncoder implements MessageEncoder
 {
-    private static final Set<Class> TYPES;
+    private static final Set<Class<?>> TYPES;
 
     static
     {
-        Set<Class> types = new HashSet<Class>();
+        Set<Class<?>> types = new HashSet<Class<?>>();
         types.add( HttpResponseMessage.class );
         TYPES = Collections.unmodifiableSet( types );
     }
@@ -110,7 +110,7 @@ public class HttpResponseEncoder implements MessageEncoder
         out.write( buf );
     }
 
-    public Set<Class> getMessageTypes()
+    public Set<Class<?>> getMessageTypes()
     {
         return TYPES;
     }

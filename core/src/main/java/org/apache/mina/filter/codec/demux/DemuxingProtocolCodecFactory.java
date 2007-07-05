@@ -65,7 +65,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
     private MessageDecoderFactory[] decoderFactories = new MessageDecoderFactory[0];
     private MessageEncoderFactory[] encoderFactories = new MessageEncoderFactory[0];
     
-    private static final Class[] EMPTY_PARAMS = new Class[0];
+    private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
     public DemuxingProtocolCodecFactory()
     {
@@ -170,7 +170,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
     
     private class ProtocolEncoderImpl implements ProtocolEncoder
     {
-        private final Map<Class, MessageEncoder> encoders = new IdentityHashMap<Class, MessageEncoder>();
+        private final Map<Class<?>, MessageEncoder> encoders = new IdentityHashMap<Class<?>, MessageEncoder>();
         
         private ProtocolEncoderImpl() throws Exception
         {
@@ -178,16 +178,16 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
             for( int i = encoderFactories.length - 1; i >= 0; i-- )
             {
                 MessageEncoder encoder = encoderFactories[ i ].getEncoder();
-                Set<Class> messageTypes = encoder.getMessageTypes();
+                Set<Class<?>> messageTypes = encoder.getMessageTypes();
                 if (messageTypes == null) {
                     throw new IllegalStateException(
                             encoder.getClass().getName() + "#getMessageTypes() may not return null.");
                 }
                 
-                Iterator it = messageTypes.iterator();
+                Iterator<Class<?>> it = messageTypes.iterator();
                 while( it.hasNext() )
                 {
-                    Class type = ( Class ) it.next();
+                    Class<?> type = it.next();
                     encoders.put( type, encoder );
                 }
             }
@@ -196,7 +196,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
         public void encode( IoSession session, Object message,
                             ProtocolEncoderOutput out ) throws Exception
         {
-            Class type = message.getClass();
+            Class<?> type = message.getClass();
             MessageEncoder encoder = findEncoder( type );
             if( encoder == null )
             {
@@ -206,18 +206,18 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
             encoder.encode( session, message, out );
         }
         
-        private MessageEncoder findEncoder( Class type )
+        private MessageEncoder findEncoder( Class<?> type )
         {
             MessageEncoder encoder = encoders.get( type );
             if( encoder == null )
             {
-                encoder = findEncoder( type, new IdentityHashSet<Class>() );
+                encoder = findEncoder( type, new IdentityHashSet<Class<?>>() );
             }
 
             return encoder;
         }
 
-        private MessageEncoder findEncoder( Class type, Set<Class> triedClasses )
+        private MessageEncoder findEncoder( Class<?> type, Set<Class<?>> triedClasses )
         {
             MessageEncoder encoder;
 
@@ -232,7 +232,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
                 if( encoder != null )
                     return encoder;
 
-                Class[] interfaces = type.getInterfaces();
+                Class<?>[] interfaces = type.getInterfaces();
                 for( int i = 0; i < interfaces.length; i ++ )
                 {
                     encoder = findEncoder( interfaces[ i ], triedClasses );
@@ -402,9 +402,9 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
     
     private static class DefaultConstructorMessageEncoderFactory implements MessageEncoderFactory
     {
-        private final Class encoderClass;
+        private final Class<?> encoderClass;
         
-        private DefaultConstructorMessageEncoderFactory( Class encoderClass )
+        private DefaultConstructorMessageEncoderFactory( Class<?> encoderClass )
         {
             if( encoderClass == null )
             {
@@ -426,9 +426,9 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory
 
     private static class DefaultConstructorMessageDecoderFactory implements MessageDecoderFactory
     {
-        private final Class decoderClass;
+        private final Class<?> decoderClass;
         
-        private DefaultConstructorMessageDecoderFactory( Class decoderClass )
+        private DefaultConstructorMessageDecoderFactory( Class<?> decoderClass )
         {
             if( decoderClass == null )
             {
