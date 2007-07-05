@@ -434,12 +434,12 @@ public class SocketAcceptor extends BaseIoAcceptor
 
     private SocketIoProcessor nextProcessor()
     {
-        if ( processorDistributor++ < 0 ) 
-        { 
-            processorDistributor = 0; 
-        } 
-
-        return ioProcessors[processorDistributor % processorCount];
+        if ( this.processorDistributor == Integer.MAX_VALUE )
+        {
+            this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
+        }
+        
+        return ioProcessors[processorDistributor++ % processorCount];
     }
 
     private void registerNew()
