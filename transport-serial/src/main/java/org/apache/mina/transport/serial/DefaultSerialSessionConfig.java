@@ -34,8 +34,6 @@ public class DefaultSerialSessionConfig implements SerialSessionConfig {
 
     private int inputBufferSize = 8;
 
-    private int receiveTimeout = -1;
-
     private boolean lowLatency = false;
 
     public DefaultSerialSessionConfig() {
