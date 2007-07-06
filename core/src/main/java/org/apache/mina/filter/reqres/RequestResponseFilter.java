@@ -21,12 +21,11 @@ package org.apache.mina.filter.reqres;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -82,7 +81,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
     public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         IoSession session = parent.getSession();
         session.setAttribute(RESPONSE_INSPECTOR, responseInspectorFactory.getResponseInspector());
-        session.setAttribute(REQUEST_STORE, new ConcurrentHashMap<Object, Request>());
+        session.setAttribute(REQUEST_STORE, new HashMap<Object, Request>());
         session.setAttribute(UNRESPONDED_REQUESTS, new LinkedHashSet<Request>());
     }
     
@@ -120,10 +119,14 @@ public class RequestResponseFilter extends IoFilterAdapter {
         switch (type) {
         case WHOLE:
         case PARTIAL_LAST:
-            request = requestStore.remove(requestId);
+            synchronized (requestStore) {
+                request = requestStore.remove(requestId);
+            }
             break;
         case PARTIAL:
-            request = requestStore.get(requestId);
+            synchronized (requestStore) {
+                request = requestStore.get(requestId);
+            }
             break;
         default:
             throw new InternalError();
@@ -142,7 +145,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
             // Found a matching request.
             // Cancel the timeout task if needed.
             if (type != ResponseType.PARTIAL) {
-                ScheduledFuture scheduledFuture = request.getTimeoutFuture();
+                ScheduledFuture<?> scheduledFuture = request.getTimeoutFuture();
                 if (scheduledFuture != null) {
                     scheduledFuture.cancel(false);
                     Set<Request> unrespondedRequests = getUnrespondedRequests(session);
@@ -174,8 +177,15 @@ public class RequestResponseFilter extends IoFilterAdapter {
                     new IllegalArgumentException("Request can not be reused."));
         }
         
-        ConcurrentMap<Object, Request> requestStore = getRequestStore(session);
-        Object oldValue = requestStore.putIfAbsent(request.getId(), request);
+        Map<Object, Request> requestStore = getRequestStore(session);
+        Object oldValue = null;
+        Object requestId = request.getId();
+        synchronized (requestStore) {
+            oldValue = requestStore.get(requestId);
+            if (oldValue == null) {
+                requestStore.put(requestId, request);
+            }
+        }
         if (oldValue != null) {
             nextFilter.exceptionCaught(
                     session,
@@ -241,15 +251,18 @@ public class RequestResponseFilter extends IoFilterAdapter {
         }
 
         // Clear the request store just in case we missed something, though it's unlikely.
-        getRequestStore(session).clear();
+        Map<Object, Request> requestStore = getRequestStore(session);
+        synchronized (requestStore) {
+            requestStore.clear();
+        }
         
         // Now tell the main subject.
         nextFilter.sessionClosed(session);
     }
 
     @SuppressWarnings("unchecked")
-    private ConcurrentMap<Object, Request> getRequestStore(IoSession session) {
-        return (ConcurrentMap<Object, Request>) session.getAttribute(REQUEST_STORE);
+    private Map<Object, Request> getRequestStore(IoSession session) {
+        return (Map<Object, Request>) session.getAttribute(REQUEST_STORE);
     }
     
     @SuppressWarnings("unchecked")
@@ -276,8 +289,19 @@ public class RequestResponseFilter extends IoFilterAdapter {
                 }
             }
         
-            ConcurrentMap<Object, Request> requestStore = getRequestStore(session);
-            if (requestStore.remove(request.getId(), request)) {
+            Map<Object, Request> requestStore = getRequestStore(session);
+            Object requestId = request.getId();
+            boolean timedOut;
+            synchronized (requestStore) {
+                if (requestStore.get(requestId) == request) {
+                    requestStore.remove(requestId);
+                    timedOut = true;
+                } else {
+                    timedOut = false;
+                }
+            }
+
+            if (timedOut) {
                 // Throw the exception only when it's really timed out.
                 RequestTimeoutException e = new RequestTimeoutException(request);
                 request.signal(e);
