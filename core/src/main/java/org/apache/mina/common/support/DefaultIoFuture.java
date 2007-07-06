@@ -41,6 +41,7 @@ public class DefaultIoFuture implements IoFuture
     private List<IoFutureListener> otherListeners;
     private Object result;
     private boolean ready;
+    private int waiters;
 
     /**
      * Creates a new instance.
@@ -71,7 +72,12 @@ public class DefaultIoFuture implements IoFuture
         {
             while( !ready )
             {
-                lock.wait();
+                waiters ++;
+                try {
+                    lock.wait();
+                } finally {
+                    waiters --;
+                }
             }
         }
         return this;
@@ -86,7 +92,12 @@ public class DefaultIoFuture implements IoFuture
         {
             if( !ready )
             {
-                lock.wait(timeoutMillis);
+                waiters ++;
+                try {
+                    lock.wait(timeoutMillis);
+                } finally {
+                    waiters --;
+                }
             }
             return ready;
         }
@@ -98,12 +109,15 @@ public class DefaultIoFuture implements IoFuture
         {
             while( !ready )
             {
+                waiters ++;
                 try
                 {
                     lock.wait();
                 }
                 catch( InterruptedException e )
                 {
+                } finally {
+                    waiters --;
                 }
             }
         }
@@ -132,26 +146,31 @@ public class DefaultIoFuture implements IoFuture
                 return ready;
             }
 
-            for( ;; )
-            {
-                try
+            waiters ++;
+            try {
+                for( ;; )
                 {
-                    lock.wait( waitTime );
-                }
-                catch( InterruptedException e )
-                {
-                }
-
-                if( ready ) {
-                    return true;
-                } else
-                {
-                    waitTime = timeoutMillis - ( System.currentTimeMillis() - startTime );
-                    if( waitTime <= 0 )
+                    try
                     {
-                        return ready;
+                        lock.wait( waitTime );
+                    }
+                    catch( InterruptedException e )
+                    {
+                    }
+    
+                    if( ready ) {
+                        return true;
+                    } else
+                    {
+                        waitTime = timeoutMillis - ( System.currentTimeMillis() - startTime );
+                        if( waitTime <= 0 )
+                        {
+                            return ready;
+                        }
                     }
                 }
+            } finally {
+                waiters --;
             }
         }
     }
@@ -179,7 +198,9 @@ public class DefaultIoFuture implements IoFuture
 
             result = newValue;
             ready = true;
-            lock.notifyAll();
+            if (waiters > 0) {
+                lock.notifyAll();
+            }
         }
 
         notifyListeners();
