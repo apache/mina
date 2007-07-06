@@ -20,7 +20,10 @@
 package org.apache.mina.common.support;
 
 import java.net.SocketAddress;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -45,7 +48,8 @@ import org.apache.mina.common.WriteRequest;
 public abstract class BaseIoSession implements IoSession
 {
     private final Object lock = new Object();
-    private final ConcurrentMap<String,Object> attributes = new ConcurrentHashMap<String, Object>( );
+    private final Map<String,Object> attributes =
+        Collections.synchronizedMap(new HashMap<String, Object>(8));
     private final long creationTime;
 
     /** 
@@ -201,7 +205,7 @@ public abstract class BaseIoSession implements IoSession
             return attributes.get(key);
         }
         
-        Object answer = attributes.putIfAbsent(key, defaultValue);
+        Object answer = attributes.get(key);
         if (answer == null) {
             return defaultValue;
         } else {
@@ -240,7 +244,14 @@ public abstract class BaseIoSession implements IoSession
             return null;
         }
 
-        return attributes.putIfAbsent( key, value );
+        Object oldValue;
+        synchronized (attributes) {
+            oldValue = attributes.get(key);
+            if (oldValue == null) {
+                attributes.put(key, value);
+            }
+        }
+        return oldValue;
     }
     
     public Object removeAttribute( String key )
@@ -261,21 +272,42 @@ public abstract class BaseIoSession implements IoSession
             return false;
         }
 
-        return attributes.remove(key, value);
+        synchronized (attributes) {
+            if (value.equals(attributes.get(key))) {
+                attributes.remove(key);
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     public boolean replaceAttribute(String key, Object oldValue, Object newValue) {
-        return attributes.replace(key, oldValue, newValue);
+        synchronized (attributes) {
+            Object actualOldValue = attributes.get(key);
+            if (actualOldValue == null) {
+                return false;
+            }
+            
+            if (actualOldValue.equals(oldValue)) {
+                attributes.put(key, newValue);
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
     
     public boolean containsAttribute( String key )
     {
-        return getAttribute( key ) != null;
+        return attributes.containsKey(key);
     }
 
     public Set<String> getAttributeKeys()
     {
-        return new HashSet<String>( attributes.keySet() );
+        synchronized (attributes) {
+            return new HashSet<String>( attributes.keySet() );
+        }
     }
     
     public int getIdleTime( IdleStatus status )
