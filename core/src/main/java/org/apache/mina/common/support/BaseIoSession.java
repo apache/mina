@@ -210,7 +210,9 @@ public abstract class BaseIoSession implements IoSession
 
     public Set<String> getAttributeKeys()
     {
-        return new HashSet<String>( attributes.keySet() );
+        synchronized (attributes) {
+            return new HashSet<String>( attributes.keySet() );
+        }
     }
 
     public int getIdleTime( IdleStatus status )
