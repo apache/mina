@@ -20,18 +20,19 @@
 package org.apache.mina.common.support;
 
 import java.net.SocketAddress;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.IoFilter.WriteRequest;
 
 /**
  * Base implementation of {@link IoSession}.
@@ -42,7 +43,8 @@ import org.apache.mina.common.WriteFuture;
 public abstract class BaseIoSession implements IoSession
 {
     private final Object lock = new Object();
-    private final Map<String,Object> attributes = new ConcurrentHashMap<String, Object>( );
+    private final Map<String,Object> attributes =
+        Collections.synchronizedMap(new HashMap<String, Object>());
     private final long creationTime;
 
     /**
