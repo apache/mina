@@ -252,9 +252,9 @@ public class ByteBufferProxy extends ByteBuffer
         return buf.equals( ob );
     }
 
-    public int compareTo( Object o )
+    public int compareTo( ByteBuffer that )
     {
-        return buf.compareTo( o );
+        return buf.compareTo( that );
     }
 
     public ByteOrder order()

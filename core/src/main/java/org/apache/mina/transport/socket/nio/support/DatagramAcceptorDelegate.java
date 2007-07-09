@@ -217,9 +217,15 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements IoAccept
             }
 
             // If a new session needs to be created.
+            // Note that the local address is the service address in the
+            // acceptor side, and I didn't call getLocalSocketAddress().
+            // This avoids strange cases where getLocalSocketAddress() on the
+            // underlying socket would return an IPv6 address while the
+            // specified service address is an IPv4 address.
             DatagramSessionImpl datagramSession = new DatagramSessionImpl(
                 wrapper, this,
                 req.config, ch, req.handler,
+                req.address,
                 req.address );
             datagramSession.setRemoteAddress( remoteAddress );
             datagramSession.setSelectionKey( key );

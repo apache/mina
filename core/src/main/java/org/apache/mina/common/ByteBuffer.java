@@ -152,7 +152,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @noinspection StaticNonFinalField
  * @see ByteBufferAllocator
  */
-public abstract class ByteBuffer implements Comparable
+public abstract class ByteBuffer implements Comparable<ByteBuffer>
 {
     private static ByteBufferAllocator allocator = new PooledByteBufferAllocator();
 
@@ -614,9 +614,8 @@ public abstract class ByteBuffer implements Comparable
         return true;
     }
 
-    public int compareTo( Object o )
+    public int compareTo( ByteBuffer that )
     {
-        ByteBuffer that = (ByteBuffer)o;
         int n = this.position() + Math.min( this.remaining(), that.remaining() );
         for( int i = this.position(), j = that.position(); i < n; i ++, j ++ )
         {
@@ -1644,7 +1643,7 @@ public abstract class ByteBuffer implements Comparable
                 protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException
                 {
                     String className = readUTF();
-                    Class clazz = Class.forName( className, true, classLoader );
+                    Class<?> clazz = Class.forName( className, true, classLoader );
                     return ObjectStreamClass.lookup( clazz );
                 }
             };

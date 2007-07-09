@@ -545,7 +545,8 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
                 wrapper, this,
                 req.config,
                 req.channel, req.handler,
-                req.channel.socket().getRemoteSocketAddress() );
+                req.channel.socket().getRemoteSocketAddress(),
+                req.channel.socket().getLocalSocketAddress());
 
             // AbstractIoFilterChain will notify the connect future.
             session.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, req );

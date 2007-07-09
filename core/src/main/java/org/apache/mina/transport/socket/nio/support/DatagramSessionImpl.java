@@ -71,7 +71,8 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
                          DatagramService managerDelegate,
                          IoServiceConfig serviceConfig,
                          DatagramChannel ch, IoHandler defaultHandler,
-                         SocketAddress serviceAddress )
+                         SocketAddress serviceAddress,
+                         SocketAddress localAddress)
     {
         this.wrapperManager = wrapperManager;
         this.managerDelegate = managerDelegate;
@@ -81,10 +82,8 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
         this.handler = defaultHandler;
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
 
-        // We didn't set the localhost by calling getLocalSocketAddress() to avoid
-        // the case that getLocalSocketAddress() returns IPv6 address while
-        // serviceAddress represents the same address in IPv4.
-        this.localAddress = this.serviceAddress = serviceAddress;
+        this.serviceAddress = serviceAddress;
+        this.localAddress = localAddress;
         this.serviceConfig = serviceConfig;
 
         // Apply the initial session settings
