@@ -50,7 +50,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter
     
     private static final String DECODER_LOCK = ProtocolCodecFilter.class.getName() + ".decoderLock";
     
-    private static final Class[] EMPTY_PARAMS = new Class[0];
+    private static final Class<?>[] EMPTY_PARAMS = new Class[0];
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap( new byte[0] );
 
     private final ProtocolCodecFactory factory;

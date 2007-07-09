@@ -275,9 +275,9 @@ public class ByteBufferProxy extends ByteBuffer
     }
 
     @Override
-    public int compareTo( Object o )
+    public int compareTo( ByteBuffer that )
     {
-        return buf.compareTo( o );
+        return buf.compareTo( that );
     }
 
     @Override

@@ -132,7 +132,7 @@ import org.apache.mina.common.support.ByteBufferHexDumper;
  * @noinspection StaticNonFinalField
  * @see ByteBufferAllocator
  */
-public abstract class ByteBuffer implements Comparable
+public abstract class ByteBuffer implements Comparable<ByteBuffer>
 {
     private static ByteBufferAllocator allocator = new SimpleByteBufferAllocator();
 
@@ -570,9 +570,8 @@ public abstract class ByteBuffer implements Comparable
         return true;
     }
 
-    public int compareTo( Object o )
+    public int compareTo( ByteBuffer that )
     {
-        ByteBuffer that = (ByteBuffer)o;
         int n = this.position() + Math.min( this.remaining(), that.remaining() );
         for( int i = this.position(), j = that.position(); i < n; i ++, j ++ )
         {
@@ -1638,7 +1637,7 @@ public abstract class ByteBuffer implements Comparable
                 protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException
                 {
                     String className = readUTF();
-                    Class clazz = Class.forName( className, true, classLoader );
+                    Class<?> clazz = Class.forName( className, true, classLoader );
                     return ObjectStreamClass.lookup( clazz );
                 }
             };
@@ -2020,7 +2019,7 @@ public abstract class ByteBuffer implements Comparable
      * 
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnum(Enum e) {
+    public ByteBuffer putEnum(Enum<?> e) {
         if (e.ordinal() > Byte.MAX_VALUE) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e, "byte"));
         }
@@ -2033,7 +2032,7 @@ public abstract class ByteBuffer implements Comparable
      * @param index The index at which the byte will be written
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnum(int index, Enum e) {
+    public ByteBuffer putEnum(int index, Enum<?> e) {
         if (e.ordinal() > Byte.MAX_VALUE) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e, "byte"));
         }
@@ -2045,7 +2044,7 @@ public abstract class ByteBuffer implements Comparable
      * 
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnumShort(Enum e) {
+    public ByteBuffer putEnumShort(Enum<?> e) {
         if (e.ordinal() > Short.MAX_VALUE) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e, "short"));
         }
@@ -2058,7 +2057,7 @@ public abstract class ByteBuffer implements Comparable
      * @param index The index at which the bytes will be written
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnumShort(int index, Enum e) {
+    public ByteBuffer putEnumShort(int index, Enum<?> e) {
         if (e.ordinal() > Short.MAX_VALUE) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e, "short"));
         }
@@ -2070,7 +2069,7 @@ public abstract class ByteBuffer implements Comparable
      * 
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnumInt(Enum e) {
+    public ByteBuffer putEnumInt(Enum<?> e) {
         return putInt(e.ordinal());
     }
 
@@ -2080,7 +2079,7 @@ public abstract class ByteBuffer implements Comparable
      * @param index The index at which the bytes will be written
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnumInt(int index, Enum e) {
+    public ByteBuffer putEnumInt(int index, Enum<?> e) {
         return putInt(index, e.ordinal());
     }
 
@@ -2092,7 +2091,7 @@ public abstract class ByteBuffer implements Comparable
         return enumConstants[i];
     }
     
-    private String enumConversionErrorMessage(Enum e, String type) {
+    private String enumConversionErrorMessage(Enum<?> e, String type) {
         return String.format("%s.%s has an ordinal value too large for a %s", e.getClass().getName(), e.name(), type);
     }
     
