@@ -20,18 +20,14 @@
 package org.apache.mina.filter.executor;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteRequest;
 
 /**
- * A filter that forward events to {@link Executor}.
+ * A filter that forwards I/O events to {@link Executor} to enforce a certain
+ * thread model while allowing the events per session to be processed
+ * simultaneously.
  * You can apply various thread model by inserting this filter to the {@link IoFilterChain}.
  * <p>
  * Please note that this filter doesn't manage the life cycle of the underlying
@@ -54,17 +50,15 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class UnorderedExecutorFilter extends IoFilterAdapter
+public class UnorderedExecutorFilter extends AbstractExecutorFilter
 {
-    private final Executor executor;
-
     /**
      * Creates a new instance with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
     public UnorderedExecutorFilter()
     {
-        this( new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>() ) );
+        super();
     }
     
     /**
@@ -72,176 +66,14 @@ public class UnorderedExecutorFilter extends IoFilterAdapter
      */
     public UnorderedExecutorFilter( Executor executor )
     {
-        if( executor == null )
-        {
-            throw new NullPointerException( "executor" );
-        }
-
-        this.executor = executor;
+        super(executor);
     }
 
-    /**
-     * Returns the underlying {@link Executor} instance this filter uses.
-     */
-    public Executor getExecutor()
-    {
-        return executor;
-    }
-
-    private void fireEvent( NextFilter nextFilter, IoSession session,
+    protected void fireEvent( NextFilter nextFilter, IoSession session,
                             EventType type, Object data )
     {
         Event event = new Event( type, nextFilter, data );
-        executor.execute(new ProcessEventRunnable(session, event));
-    }
-
-    protected static class EventType
-    {
-        public static final EventType OPENED = new EventType( "OPENED" );
-
-        public static final EventType CLOSED = new EventType( "CLOSED" );
-
-        public static final EventType READ = new EventType( "READ" );
-
-        public static final EventType WRITTEN = new EventType( "WRITTEN" );
-
-        public static final EventType RECEIVED = new EventType( "RECEIVED" );
-
-        public static final EventType SENT = new EventType( "SENT" );
-
-        public static final EventType IDLE = new EventType( "IDLE" );
-
-        public static final EventType EXCEPTION = new EventType( "EXCEPTION" );
-
-        private final String value;
-
-        private EventType( String value )
-        {
-            this.value = value;
-        }
-
-        @Override
-        public String toString()
-        {
-            return value;
-        }
-    }
-
-    protected static class Event
-    {
-        private final EventType type;
-        private final NextFilter nextFilter;
-        private final Object data;
-
-        Event( EventType type, NextFilter nextFilter, Object data )
-        {
-            this.type = type;
-            this.nextFilter = nextFilter;
-            this.data = data;
-        }
-
-        public Object getData()
-        {
-            return data;
-        }
-
-        public NextFilter getNextFilter()
-        {
-            return nextFilter;
-        }
-
-        public EventType getType()
-        {
-            return type;
-        }
-    }
-
-    @Override
-    public void sessionCreated( NextFilter nextFilter, IoSession session )
-    {
-        nextFilter.sessionCreated( session );
-    }
-
-    @Override
-    public void sessionOpened( NextFilter nextFilter,
-                               IoSession session )
-    {
-        fireEvent( nextFilter, session, EventType.OPENED, null );
-    }
-
-    @Override
-    public void sessionClosed( NextFilter nextFilter,
-                               IoSession session )
-    {
-        fireEvent( nextFilter, session, EventType.CLOSED, null );
-    }
-
-    @Override
-    public void sessionIdle( NextFilter nextFilter,
-                             IoSession session, IdleStatus status )
-    {
-        fireEvent( nextFilter, session, EventType.IDLE, status );
-    }
-
-    @Override
-    public void exceptionCaught( NextFilter nextFilter,
-                                 IoSession session, Throwable cause )
-    {
-        fireEvent( nextFilter, session, EventType.EXCEPTION, cause );
-    }
-
-    @Override
-    public void messageReceived( NextFilter nextFilter,
-                                 IoSession session, Object message )
-    {
-        fireEvent( nextFilter, session, EventType.RECEIVED, message );
-    }
-
-    @Override
-    public void messageSent( NextFilter nextFilter,
-                             IoSession session, WriteRequest writeRequest )
-    {
-        fireEvent( nextFilter, session, EventType.SENT, writeRequest );
-    }
-
-    protected void processEvent( NextFilter nextFilter, IoSession session, EventType type, Object data )
-    {
-        if( type == EventType.RECEIVED )
-        {
-            nextFilter.messageReceived( session, data );
-        }
-        else if( type == EventType.SENT )
-        {
-            nextFilter.messageSent( session, (WriteRequest) data );
-        }
-        else if( type == EventType.EXCEPTION )
-        {
-            nextFilter.exceptionCaught( session, (Throwable) data );
-        }
-        else if( type == EventType.IDLE )
-        {
-            nextFilter.sessionIdle( session, (IdleStatus) data );
-        }
-        else if( type == EventType.OPENED )
-        {
-            nextFilter.sessionOpened( session );
-        }
-        else if( type == EventType.CLOSED )
-        {
-            nextFilter.sessionClosed( session );
-        }
-    }
-
-    @Override
-    public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest )
-    {
-        nextFilter.filterWrite( session, writeRequest );
-    }
-
-    @Override
-    public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        nextFilter.filterClose( session );
+        getExecutor().execute(new ProcessEventRunnable(session, event));
     }
 
     private class ProcessEventRunnable implements Runnable
