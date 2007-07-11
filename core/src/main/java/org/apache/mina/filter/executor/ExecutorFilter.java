@@ -51,7 +51,7 @@ public class ExecutorFilter extends IoFilterAdapter
     private final Executor executor;
 
     /**
-     * Creates a new instace with the default thread pool implementation
+     * Creates a new instance with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
     public ExecutorFilter()
