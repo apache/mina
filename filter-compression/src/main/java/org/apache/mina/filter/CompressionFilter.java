@@ -198,10 +198,15 @@ public class CompressionFilter extends IoFilterAdapter
         }
 
         ByteBuffer inBuffer = ( ByteBuffer ) writeRequest.getMessage();
-        ByteBuffer outBuf = deflater.deflate( inBuffer );
-        nextFilter.filterWrite(
-                session,
-                new DefaultWriteRequest(outBuf, writeRequest.getFuture(), writeRequest.getDestination()));
+        if (!inBuffer.hasRemaining()) {
+            // Ignore empty buffers
+            nextFilter.filterWrite(session, writeRequest);
+        } else {
+            ByteBuffer outBuf = deflater.deflate( inBuffer );
+            nextFilter.filterWrite(
+                    session,
+                    new DefaultWriteRequest(outBuf, writeRequest.getFuture(), writeRequest.getDestination()));
+        }
     }
 
     @Override

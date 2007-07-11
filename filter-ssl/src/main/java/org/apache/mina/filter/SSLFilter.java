@@ -28,6 +28,7 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
