@@ -35,12 +35,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A filter that forward events to {@link Executor} in
- * <a href="http://dcl.mathcs.emory.edu/util/backport-util-concurrent/">backport-util-concurrent</a>.
+ * A filter that forward events to {@link Executor}.
  * You can apply various thread model by inserting this filter to the {@link IoFilterChain}.
  * <p>
  * Please note that this filter doesn't manage the life cycle of the underlying
  * {@link Executor}.  You have to destroy or stop it by yourself.
+ * <p>
+ * This filter maintains the order of events per session and thus make sure
+ * only one thread per session executes the event.  For example, let's assume
+ * that messageReceived, messageSent, and sessionClosed events are fired.
+ * <ul>
+ * <li>All event handler methods are called exclusively.
+ *     (e.g. messageReceived and messageSent can't be invoked at the same time.)</li>
+ * <li>The event order is never mixed up.
+ *     (e.g. messageReceived is always invoked before sessionClosed or messageSent.)</li>
+ * </ul>
+ * If you don't need to maintain the order of events per session, please use
+ * {@link UnorderedExecutorFilter}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
