@@ -554,7 +554,13 @@ public class SSLFilter extends IoFilterAdapter
     
     public void filterClose( final NextFilter nextFilter, final IoSession session ) throws SSLException
     {
-        SSLHandler handler = getSSLSessionHandler( session );
+        SSLHandler handler = getSSLSessionHandler0( session );
+        if (handler == null) {
+            // The connection might already have closed, or
+            // SSL might have not started yet.
+            nextFilter.filterClose( session );
+            return;
+        }
 
         WriteFuture future = null;
         try
