@@ -195,10 +195,15 @@ public class CompressionFilter extends IoFilterAdapter
         }
 
         ByteBuffer inBuffer = ( ByteBuffer ) writeRequest.getMessage();
-        ByteBuffer outBuf = deflater.deflate( inBuffer );
-        inBuffer.release();
-        nextFilter.filterWrite( session, new WriteRequest( outBuf, writeRequest
-                .getFuture() ) );
+        if (!inBuffer.hasRemaining()) {
+            // Ignore empty buffers
+            nextFilter.filterWrite(session, writeRequest);
+        } else {
+            ByteBuffer outBuf = deflater.deflate( inBuffer );
+            inBuffer.release();
+            nextFilter.filterWrite( session, new WriteRequest( outBuf, writeRequest
+                    .getFuture() ) );
+        }
     }
 
     public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
