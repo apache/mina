@@ -49,15 +49,20 @@ class SocketFilterChain extends AbstractIoFilterChain {
         // SocketIoProcessor.doFlush() will reset it after write is finished
         // because the buffer will be passed with messageSent event. 
         ( ( ByteBuffer ) writeRequest.getMessage() ).mark();
+        
+        int writeRequestQueueSize;
         synchronized( writeRequestQueue )
         {
             writeRequestQueue.offer( writeRequest );
-            if( writeRequestQueue.size() == 1 && session.getTrafficMask().isWritable() )
-            {
-                // Notify SocketIoProcessor only when writeRequestQueue was empty.
-                s.getIoProcessor().flush( s );
-            }
+            writeRequestQueueSize = writeRequestQueue.size();
         }
+        
+        if( writeRequestQueueSize == 1 && session.getTrafficMask().isWritable() )
+        {
+            // Notify SocketIoProcessor only when writeRequestQueue was empty.
+            s.getIoProcessor().flush( s );
+        }
+
     }
 
     @Override

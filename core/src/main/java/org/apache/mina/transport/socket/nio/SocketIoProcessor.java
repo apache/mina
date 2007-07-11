@@ -109,10 +109,13 @@ class SocketIoProcessor {
     }
 
     void flush(SocketSessionImpl session) {
+        boolean needsWakeup = flushingSessions.isEmpty();
         scheduleFlush(session);
-        Selector selector = this.selector;
-        if (selector != null) {
-            selector.wakeup();
+        if (needsWakeup) {
+            Selector selector = this.selector;
+            if (selector != null) {
+                selector.wakeup();
+            }
         }
     }
 
