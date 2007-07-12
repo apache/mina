@@ -44,7 +44,7 @@ public abstract class BaseIoSession implements IoSession
 {
     private final Object lock = new Object();
     private final Map<String,Object> attributes =
-        Collections.synchronizedMap(new HashMap<String, Object>());
+        Collections.synchronizedMap(new HashMap<String, Object>(8));
     private final long creationTime;
 
     /**
