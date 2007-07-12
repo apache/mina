@@ -20,7 +20,6 @@
 package org.apache.mina.handler.demux;
 
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,6 +27,8 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.util.IdentityHashSet;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@link IoHandler} that demuxes <code>messageReceived</code> events
@@ -78,8 +79,8 @@ import org.apache.mina.util.IdentityHashSet;
  */
 public class DemuxingIoHandler extends IoHandlerAdapter
 {
-    private final Map findHandlerCache = new Hashtable();
-    private final Map type2handler = new Hashtable();
+    private final Map findHandlerCache = new ConcurrentHashMap();
+    private final Map type2handler = new ConcurrentHashMap();
 
     /**
      * Creates a new instance with no registered {@link MessageHandler}s.
