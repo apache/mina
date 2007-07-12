@@ -40,6 +40,11 @@ import org.apache.mina.util.SessionLog;
 
 /**
  * An SSL filter that encrypts and decrypts the data exchanged in the session.
+ * Adding this filter triggers SSL handshake procedure immediately by sending
+ * a SSL 'hello' message, so you don't need to call
+ * {@link #startSSL(IoSession)} manually unless you are implementing StartTLS
+ * (see below).
+ * <p>
  * This filter uses an {@link SSLEngine} which was introduced in Java 5, so 
  * Java version 5 or above is mandatory to use this filter. And please note that
  * this filter only works for TCP/IP connections.
