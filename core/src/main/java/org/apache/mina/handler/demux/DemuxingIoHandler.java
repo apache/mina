@@ -20,9 +20,9 @@
 package org.apache.mina.handler.demux;
 
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
@@ -78,8 +78,8 @@ import org.apache.mina.util.IdentityHashSet;
  */
 public class DemuxingIoHandler extends IoHandlerAdapter
 {
-    private final Map<Class, MessageHandler> findHandlerCache = new Hashtable<Class, MessageHandler>();
-    private final Map<Class, MessageHandler> type2handler = new Hashtable<Class, MessageHandler>();
+    private final Map<Class, MessageHandler> findHandlerCache = new ConcurrentHashMap<Class, MessageHandler>();
+    private final Map<Class, MessageHandler> type2handler = new ConcurrentHashMap<Class, MessageHandler>();
 
     /**
      * Creates a new instance with no registered {@link MessageHandler}s.
