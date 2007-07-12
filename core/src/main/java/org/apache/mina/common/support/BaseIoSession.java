@@ -41,7 +41,7 @@ import org.apache.mina.common.IoFilter.WriteRequest;
  */
 public abstract class BaseIoSession implements IoSession
 {
-    private final Map attributes = new HashMap();
+    private final Map attributes = new HashMap(8);
     private final long creationTime;
 
     /** 
