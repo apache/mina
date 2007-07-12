@@ -967,4 +967,72 @@ public class ByteBufferTest extends TestCase
         buf.flip();
         assertEquals(TestEnum.E64, buf.getEnumInt(TestEnum.class));
     }
+    
+    public void testGetMediumInt() {
+        ByteBuffer buf = ByteBuffer.allocate(3);
+        
+        buf.put((byte)0x01);
+        buf.put((byte)0x02);
+        buf.put((byte)0x03);
+        assertEquals(3, buf.position());
+
+        buf.flip();
+        assertEquals(0x010203, buf.getMediumInt());
+        assertEquals(0x010203, buf.getMediumInt(0));
+        buf.flip();
+        assertEquals(0x010203, buf.getUnsignedMediumInt());
+        assertEquals(0x010203, buf.getUnsignedMediumInt(0));
+        buf.flip();
+        assertEquals(0x010203, buf.getUnsignedMediumInt());
+        buf.flip().order(ByteOrder.LITTLE_ENDIAN);
+        assertEquals(0x030201, buf.getMediumInt());
+        assertEquals(0x030201, buf.getMediumInt(0));
+        
+        // Test max medium int
+        buf.flip().order(ByteOrder.BIG_ENDIAN);
+        buf.put((byte)0x7f);
+        buf.put((byte)0xff);
+        buf.put((byte)0xff);
+        buf.flip();
+        assertEquals(0x7fffff, buf.getMediumInt());
+        assertEquals(0x7fffff, buf.getMediumInt(0));
+        
+        // Test negative number
+        buf.flip().order(ByteOrder.BIG_ENDIAN);
+        buf.put((byte)0xff);
+        buf.put((byte)0x02);
+        buf.put((byte)0x03);
+        buf.flip();
+        
+        assertEquals(0xffff0203, buf.getMediumInt());
+        assertEquals(0xffff0203, buf.getMediumInt(0));
+        buf.flip();
+
+        assertEquals(0x00ff0203, buf.getUnsignedMediumInt());
+        assertEquals(0x00ff0203, buf.getUnsignedMediumInt(0));
+    }
+    
+    public void testPutMediumInt() {
+        ByteBuffer buf = ByteBuffer.allocate(3);
+
+        checkMediumInt(buf, 0);
+        checkMediumInt(buf, 1);
+        checkMediumInt(buf, -1);
+        checkMediumInt(buf, 0x7fffff);
+    }
+
+    private void checkMediumInt(ByteBuffer buf, int x) {
+        buf.putMediumInt(x);
+        assertEquals(3, buf.position());
+        buf.flip();
+        assertEquals(x, buf.getMediumInt());
+        assertEquals(3, buf.position());
+        
+        buf.putMediumInt(0, x);
+        assertEquals(3, buf.position());
+        assertEquals(x, buf.getMediumInt(0));
+        
+        buf.flip();
+    }
+    
 }

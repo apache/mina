@@ -33,12 +33,14 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.ReadOnlyBufferException;
 import java.nio.ShortBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.EnumSet;
+import java.util.Set;
 
 import org.apache.mina.common.support.ByteBufferHexDumper;
 
@@ -680,6 +682,175 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
         return getInt() & 0xffffffffL;
     }
 
+    /**
+     * Relative <i>get</i> method for reading a medium int value.
+     * 
+     * <p> Reads the next three bytes at this buffer's current position,
+     * composing them into an int value according to the current byte order,
+     * and then increments the position by three.</p>
+     * 
+     * @return  The medium int value at the buffer's current position
+     */
+    public int getMediumInt() {
+        byte b1 = get();
+        byte b2 = get();
+        byte b3 = get();
+        if (ByteOrder.BIG_ENDIAN.equals(order())) {
+            return getMediumInt(b1, b2, b3);
+        } else {
+            return getMediumInt(b3, b2, b1);
+        }
+    }
+    
+    /**
+     * Relative <i>get</i> method for reading an unsigned medium int value.
+     * 
+     * <p> Reads the next three bytes at this buffer's current position,
+     * composing them into an int value according to the current byte order,
+     * and then increments the position by three.</p>
+     * 
+     * @return  The unsigned medium int value at the buffer's current position
+     */
+    public int getUnsignedMediumInt() {
+        int b1 = getUnsigned();
+        int b2 = getUnsigned();
+        int b3 = getUnsigned();
+        if (ByteOrder.BIG_ENDIAN.equals(order())) {
+            return b1 << 16 | b2 << 8 | b3;
+        } else {
+            return b3 << 16 | b2 << 8 | b1;
+        }
+    }
+    
+    /**
+     * Absolute <i>get</i> method for reading a medium int value.
+     * 
+     * <p> Reads the next three bytes at this buffer's current position,
+     * composing them into an int value according to the current byte order.</p>
+     * 
+     * @param index  The index from which the medium int will be read
+     * @return  The medium int value at the given index
+     * 
+     * @throws  IndexOutOfBoundsException
+     *          If <tt>index</tt> is negative
+     *          or not smaller than the buffer's limit
+     */
+    public int getMediumInt(int index) {
+        byte b1 = get(index);
+        byte b2 = get(index + 1);
+        byte b3 = get(index + 2);
+        if (ByteOrder.BIG_ENDIAN.equals(order())) {
+            return getMediumInt(b1, b2, b3);
+        } else {
+            return getMediumInt(b3, b2, b1);
+        }
+    }
+    
+    /**
+     * Absolute <i>get</i> method for reading an unsigned medium int value.
+     * 
+     * <p> Reads the next three bytes at this buffer's current position,
+     * composing them into an int value according to the current byte order.</p>
+     * 
+     * @param index  The index from which the unsigned medium int will be read
+     * @return  The unsigned medium int value at the given index
+     * 
+     * @throws  IndexOutOfBoundsException
+     *          If <tt>index</tt> is negative
+     *          or not smaller than the buffer's limit
+     */
+    public int getUnsignedMediumInt(int index) {
+        int b1 = getUnsigned(index);
+        int b2 = getUnsigned(index + 1);
+        int b3 = getUnsigned(index + 2);
+        if (ByteOrder.BIG_ENDIAN.equals(order())) {
+            return b1 << 16 | b2 << 8 | b3;
+        } else {
+            return b3 << 16 | b2 << 8 | b1;
+        }
+    }
+    
+    private int getMediumInt(byte b1, byte b2, byte b3) {
+        int ret = (b1 << 16 & 0xff0000) | (b2 << 8 & 0xff00) | (b3 & 0xff);
+        // Check to see if the medium int is negative (high bit in b1 set)
+        if ((b1 & 0x80) == 0x80) {
+            // Make the the whole int negative
+            ret |= 0xff000000;
+        }
+        return ret;
+    }
+
+    /**
+     * Relative <i>put</i> method for writing a medium int
+     * value.
+     *
+     * <p> Writes three bytes containing the given int value, in the
+     * current byte order, into this buffer at the current position, and then
+     * increments the position by three.</p>
+     *
+     * @param  value
+     *         The medium int value to be written
+     *
+     * @return  This buffer
+     *
+     * @throws  BufferOverflowException
+     *          If there are fewer than three bytes
+     *          remaining in this buffer
+     *
+     * @throws  ReadOnlyBufferException
+     *          If this buffer is read-only
+     */
+    public ByteBuffer putMediumInt(int value) {
+        byte b1 = (byte)(value >> 16);
+        byte b2 = (byte)(value >> 8);
+        byte b3 = (byte)value;
+        
+        if (ByteOrder.BIG_ENDIAN.equals(order())) {
+            put(b1).put(b2).put(b3);
+        } else {
+            put(b3).put(b2).put(b1);
+        }
+        
+        return this;
+    }
+    
+    /**
+     * Absolute <i>put</i> method for writing a medium int
+     * value.
+     *
+     * <p> Writes three bytes containing the given int value, in the
+     * current byte order, into this buffer at the given index.</p>
+     *
+     * @param  index
+     *         The index at which the bytes will be written
+     *
+     * @param  value
+     *         The medium int value to be written
+     *
+     * @return  This buffer
+     *
+     * @throws  IndexOutOfBoundsException
+     *          If <tt>index</tt> is negative
+     *          or not smaller than the buffer's limit,
+     *          minus three
+     *
+     * @throws  ReadOnlyBufferException
+     *          If this buffer is read-only
+     */
+    public ByteBuffer putMediumInt(int index, int value) {
+        byte b1 = (byte)(value >> 16);
+        byte b2 = (byte)(value >> 8);
+        byte b3 = (byte)value;
+        
+        if (ByteOrder.BIG_ENDIAN.equals(order())) {
+            put(index, b1).put(index + 1, b2).put(index + 2, b3);
+        } else {
+            put(index, b3).put(index + 1, b2).put(index + 2, b1);
+        }
+        
+        return this;
+    }
+    
     /**
      * @see java.nio.ByteBuffer#putInt(int)
      */
@@ -2222,12 +2393,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     }
 
     /**
-     * Writes the specified {@link EnumSet} to the buffer as a byte sized bit vector. 
+     * Writes the specified {@link Set} to the buffer as a byte sized bit vector. 
      * 
-     * @param <E> the enum type of the EnumSet
+     * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSet(EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSet(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~BYTE_MASK) != 0) {
             throw new IllegalArgumentException("The enum set is too large to fit in a byte: " + set);
@@ -2236,13 +2407,13 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     }
 
     /**
-     * Writes the specified {@link EnumSet} to the buffer as a byte sized bit vector. 
+     * Writes the specified {@link Set} to the buffer as a byte sized bit vector. 
      * 
-     * @param <E> the enum type of the EnumSet
+     * @param <E> the enum type of the Set
      * @param index  the index at which the byte will be written
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSet(int index, EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSet(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~BYTE_MASK) != 0) {
             throw new IllegalArgumentException("The enum set is too large to fit in a byte: " + set);
@@ -2251,12 +2422,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     }
 
     /**
-     * Writes the specified {@link EnumSet} to the buffer as a short sized bit vector. 
+     * Writes the specified {@link Set} to the buffer as a short sized bit vector. 
      * 
-     * @param <E> the enum type of the EnumSet
+     * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetShort(EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetShort(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~SHORT_MASK) != 0) {
             throw new IllegalArgumentException("The enum set is too large to fit in a short: " + set);
@@ -2265,13 +2436,13 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     }
 
     /**
-     * Writes the specified {@link EnumSet} to the buffer as a short sized bit vector. 
+     * Writes the specified {@link Set} to the buffer as a short sized bit vector. 
      * 
-     * @param <E> the enum type of the EnumSet
+     * @param <E> the enum type of the Set
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetShort(int index, EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetShort(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~SHORT_MASK) != 0) {
             throw new IllegalArgumentException("The enum set is too large to fit in a short: " + set);
@@ -2280,12 +2451,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     }
 
     /**
-     * Writes the specified {@link EnumSet} to the buffer as an int sized bit vector. 
+     * Writes the specified {@link Set} to the buffer as an int sized bit vector. 
      * 
-     * @param <E> the enum type of the EnumSet
+     * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetInt(EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetInt(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~INT_MASK) != 0) {
             throw new IllegalArgumentException("The enum set is too large to fit in an int: " + set);
@@ -2294,13 +2465,13 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     }
 
     /**
-     * Writes the specified {@link EnumSet} to the buffer as an int sized bit vector. 
+     * Writes the specified {@link Set} to the buffer as an int sized bit vector. 
      * 
-     * @param <E> the enum type of the EnumSet
+     * @param <E> the enum type of the Set
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetInt(int index, EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetInt(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~INT_MASK) != 0) {
             throw new IllegalArgumentException("The enum set is too large to fit in an int: " + set);
@@ -2309,30 +2480,30 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     }
 
     /**
-     * Writes the specified {@link EnumSet} to the buffer as a long sized bit vector. 
+     * Writes the specified {@link Set} to the buffer as a long sized bit vector. 
      * 
-     * @param <E> the enum type of the EnumSet
+     * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetLong(EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetLong(Set<E> set) {
         return putLong(toLong(set));
     }
 
     /**
-     * Writes the specified {@link EnumSet} to the buffer as a long sized bit vector. 
+     * Writes the specified {@link Set} to the buffer as a long sized bit vector. 
      * 
-     * @param <E> the enum type of the EnumSet
+     * @param <E> the enum type of the Set
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetLong(int index, EnumSet<E> set) {
+    public <E extends Enum<E>> ByteBuffer putEnumSetLong(int index, Set<E> set) {
         return putLong(index, toLong(set));
     }
 
     /**
-     * Utility method for converting an EnumSet to a bit vector. 
+     * Utility method for converting an Set to a bit vector. 
      */
-    private <E extends Enum<E>> long toLong(EnumSet<E> set) {
+    private <E extends Enum<E>> long toLong(Set<E> set) {
         long vector = 0;
         for (E e : set) {
             if (e.ordinal() >= Long.SIZE) {
