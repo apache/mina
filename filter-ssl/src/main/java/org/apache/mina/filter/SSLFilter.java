@@ -28,7 +28,6 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
@@ -44,6 +43,11 @@ import org.apache.mina.util.SessionLog;
 
 /**
  * An SSL filter that encrypts and decrypts the data exchanged in the session.
+ * Adding this filter triggers SSL handshake procedure immediately by sending
+ * a SSL 'hello' message, so you don't need to call
+ * {@link #startSSL(IoSession)} manually unless you are implementing StartTLS
+ * (see below).
+ * <p>
  * This filter uses an {@link SSLEngine} which was introduced in Java 5, so 
  * Java version 5 or above is mandatory to use this filter. And please note that
  * this filter only works for TCP/IP connections.
