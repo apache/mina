@@ -30,43 +30,34 @@ import org.apache.mina.util.SessionUtil;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoHandlerAdapter implements IoHandler
-{
-    public void sessionCreated( IoSession session ) throws Exception
-    {
-        SessionUtil.initialize( session );
+public class IoHandlerAdapter implements IoHandler {
+    public void sessionCreated(IoSession session) throws Exception {
+        SessionUtil.initialize(session);
     }
 
-    public void sessionOpened( IoSession session ) throws Exception
-    {
+    public void sessionOpened(IoSession session) throws Exception {
     }
 
-    public void sessionClosed( IoSession session ) throws Exception
-    {
+    public void sessionClosed(IoSession session) throws Exception {
     }
 
-    public void sessionIdle( IoSession session, IdleStatus status ) throws Exception
-    {
+    public void sessionIdle(IoSession session, IdleStatus status)
+            throws Exception {
     }
 
-    public void exceptionCaught( IoSession session, Throwable cause ) throws Exception
-    {
-        if( SessionLog.isWarnEnabled( session ) )
-        {
-            SessionLog.warn(
-                    session,
-                    "EXCEPTION, please implement " +
-                    getClass().getName() +
-                    ".exceptionCaught() for proper handling:",
-                    cause );
+    public void exceptionCaught(IoSession session, Throwable cause)
+            throws Exception {
+        if (SessionLog.isWarnEnabled(session)) {
+            SessionLog.warn(session, "EXCEPTION, please implement "
+                    + getClass().getName()
+                    + ".exceptionCaught() for proper handling:", cause);
         }
     }
 
-    public void messageReceived( IoSession session, Object message ) throws Exception
-    {
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
     }
 
-    public void messageSent( IoSession session, Object message ) throws Exception
-    {
+    public void messageSent(IoSession session, Object message) throws Exception {
     }
 }

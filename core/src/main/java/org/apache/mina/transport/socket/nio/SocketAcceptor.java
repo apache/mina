@@ -50,39 +50,46 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
-public class SocketAcceptor extends BaseIoAcceptor
-{
+public class SocketAcceptor extends BaseIoAcceptor {
     /**
      * @noinspection StaticNonFinalField
      */
     private static volatile int nextId = 0;
 
     private final Executor executor;
+
     private final Object lock = new Object();
-    private final int id = nextId ++;
+
+    private final int id = nextId++;
+
     private final String threadName = "SocketAcceptor-" + id;
+
     private SocketAcceptorConfig defaultConfig = new SocketAcceptorConfig();
+
     private final Map channels = new HashMap();
 
     private final Queue registerQueue = new Queue();
+
     private final Queue cancelQueue = new Queue();
 
     private final SocketIoProcessor[] ioProcessors;
+
     private final int processorCount;
 
     /**
      * @noinspection FieldAccessedSynchronizedAndUnsynchronized
      */
     private Selector selector;
+
     private Worker worker;
+
     private int processorDistributor = 0;
 
     /**
      * Create an acceptor with a single processing thread using a NewThreadExecutor
      */
-    public SocketAcceptor()
-    {
-        this( 1, new NewThreadExecutor() );
+    public SocketAcceptor() {
+        this(1, new NewThreadExecutor());
     }
 
     /**
@@ -91,23 +98,23 @@ public class SocketAcceptor extends BaseIoAcceptor
      * @param processorCount Number of processing threads
      * @param executor Executor to use for launching threads
      */
-    public SocketAcceptor( int processorCount, Executor executor )
-    {
-        if( processorCount < 1 )
-        {
-            throw new IllegalArgumentException( "Must have at least one processor" );
+    public SocketAcceptor(int processorCount, Executor executor) {
+        if (processorCount < 1) {
+            throw new IllegalArgumentException(
+                    "Must have at least one processor");
         }
 
         // The default reuseAddress of an accepted socket should be 'true'.
-        ( ( SocketSessionConfig ) defaultConfig.getSessionConfig() ).setReuseAddress(true);
+        ((SocketSessionConfig) defaultConfig.getSessionConfig())
+                .setReuseAddress(true);
 
         this.executor = executor;
         this.processorCount = processorCount;
         ioProcessors = new SocketIoProcessor[processorCount];
 
-        for( int i = 0; i < processorCount; i++ )
-        {
-            ioProcessors[i] = new SocketIoProcessor( "SocketAcceptorIoProcessor-" + id + "." + i, executor );
+        for (int i = 0; i < processorCount; i++) {
+            ioProcessors[i] = new SocketIoProcessor(
+                    "SocketAcceptorIoProcessor-" + id + "." + i, executor);
         }
     }
 
@@ -117,243 +124,194 @@ public class SocketAcceptor extends BaseIoAcceptor
      *
      * @throws IOException if failed to bind
      */
-    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
-    {
-        if( handler == null )
-        {
-            throw new NullPointerException( "handler" );
+    public void bind(SocketAddress address, IoHandler handler,
+            IoServiceConfig config) throws IOException {
+        if (handler == null) {
+            throw new NullPointerException("handler");
         }
 
-        if( address != null && !( address instanceof InetSocketAddress ) )
-        {
-            throw new IllegalArgumentException( "Unexpected address type: " + address.getClass() );
+        if (address != null && !(address instanceof InetSocketAddress)) {
+            throw new IllegalArgumentException("Unexpected address type: "
+                    + address.getClass());
         }
 
-        if( config == null )
-        {
+        if (config == null) {
             config = getDefaultConfig();
         }
 
-        RegistrationRequest request = new RegistrationRequest( address, handler, config );
+        RegistrationRequest request = new RegistrationRequest(address, handler,
+                config);
 
-        synchronized( registerQueue )
-        {
-            registerQueue.push( request );
+        synchronized (registerQueue) {
+            registerQueue.push(request);
         }
 
         startupWorker();
 
         selector.wakeup();
 
-        synchronized( request )
-        {
-            while( !request.done )
-            {
-                try
-                {
+        synchronized (request) {
+            while (!request.done) {
+                try {
                     request.wait();
-                }
-                catch( InterruptedException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                } catch (InterruptedException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
         }
 
-        if( request.exception != null )
-        {
+        if (request.exception != null) {
             throw request.exception;
         }
     }
 
-
-    private synchronized void startupWorker() throws IOException
-    {
-        synchronized( lock )
-        {
-            if( worker == null )
-            {
+    private synchronized void startupWorker() throws IOException {
+        synchronized (lock) {
+            if (worker == null) {
                 selector = Selector.open();
                 worker = new Worker();
 
-                executor.execute( new NamePreservingRunnable( worker ) );
+                executor.execute(new NamePreservingRunnable(worker));
             }
         }
     }
 
-    public void unbind( SocketAddress address )
-    {
-        if( address == null )
-        {
-            throw new NullPointerException( "address" );
+    public void unbind(SocketAddress address) {
+        if (address == null) {
+            throw new NullPointerException("address");
         }
 
-        CancellationRequest request = new CancellationRequest( address );
+        CancellationRequest request = new CancellationRequest(address);
 
-        try
-        {
+        try {
             startupWorker();
-        }
-        catch( IOException e )
-        {
+        } catch (IOException e) {
             // IOException is thrown only when Worker thread is not
             // running and failed to open a selector.  We simply throw
             // IllegalArgumentException here because we can simply
             // conclude that nothing is bound to the selector.
-            throw new IllegalArgumentException( "Address not bound: " + address );
+            throw new IllegalArgumentException("Address not bound: " + address);
         }
 
-        synchronized( cancelQueue )
-        {
-            cancelQueue.push( request );
+        synchronized (cancelQueue) {
+            cancelQueue.push(request);
         }
 
         selector.wakeup();
 
-        synchronized( request )
-        {
-            while( !request.done )
-            {
-                try
-                {
+        synchronized (request) {
+            while (!request.done) {
+                try {
                     request.wait();
-                }
-                catch( InterruptedException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                } catch (InterruptedException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
         }
 
-        if( request.exception != null )
-        {
+        if (request.exception != null) {
             request.exception.fillInStackTrace();
 
             throw request.exception;
         }
     }
 
-    public void unbindAll()
-    {
+    public void unbindAll() {
         List addresses;
-        synchronized( channels )
-        {
-            addresses = new ArrayList( channels.keySet() );
+        synchronized (channels) {
+            addresses = new ArrayList(channels.keySet());
         }
 
-        for( Iterator i = addresses.iterator(); i.hasNext(); )
-        {
-            unbind( ( SocketAddress ) i.next() );
+        for (Iterator i = addresses.iterator(); i.hasNext();) {
+            unbind((SocketAddress) i.next());
         }
     }
 
-    private class Worker implements Runnable
-    {
-        public void run()
-        {
-            Thread.currentThread().setName(SocketAcceptor.this.threadName );
+    private class Worker implements Runnable {
+        public void run() {
+            Thread.currentThread().setName(SocketAcceptor.this.threadName);
 
-            for( ; ; )
-            {
-                try
-                {
+            for (;;) {
+                try {
                     int nKeys = selector.select();
 
                     registerNew();
 
-                    if( nKeys > 0 )
-                    {
-                        processSessions( selector.selectedKeys() );
+                    if (nKeys > 0) {
+                        processSessions(selector.selectedKeys());
                     }
 
                     cancelKeys();
 
-                    if( selector.keys().isEmpty() )
-                    {
-                        synchronized( lock )
-                        {
-                            if( selector.keys().isEmpty() &&
-                                registerQueue.isEmpty() &&
-                                cancelQueue.isEmpty() )
-                            {
+                    if (selector.keys().isEmpty()) {
+                        synchronized (lock) {
+                            if (selector.keys().isEmpty()
+                                    && registerQueue.isEmpty()
+                                    && cancelQueue.isEmpty()) {
                                 worker = null;
-                                try
-                                {
+                                try {
                                     selector.close();
-                                }
-                                catch( IOException e )
-                                {
-                                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                                }
-                                finally
-                                {
+                                } catch (IOException e) {
+                                    ExceptionMonitor.getInstance()
+                                            .exceptionCaught(e);
+                                } finally {
                                     selector = null;
                                 }
                                 break;
                             }
                         }
                     }
-                }
-                catch( IOException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
 
-                    try
-                    {
-                        Thread.sleep( 1000 );
-                    }
-                    catch( InterruptedException e1 )
-                    {
-                        ExceptionMonitor.getInstance().exceptionCaught( e1 );
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e1);
                     }
                 }
             }
         }
 
-        private void processSessions( Set keys ) throws IOException
-        {
+        private void processSessions(Set keys) throws IOException {
             Iterator it = keys.iterator();
-            while( it.hasNext() )
-            {
-                SelectionKey key = ( SelectionKey ) it.next();
+            while (it.hasNext()) {
+                SelectionKey key = (SelectionKey) it.next();
 
                 it.remove();
 
-                if( !key.isAcceptable() )
-                {
+                if (!key.isAcceptable()) {
                     continue;
                 }
 
-                ServerSocketChannel ssc = ( ServerSocketChannel ) key.channel();
+                ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
 
                 SocketChannel ch = ssc.accept();
 
-                if( ch == null )
-                {
+                if (ch == null) {
                     continue;
                 }
 
                 boolean success = false;
-                try
-                {
-                    RegistrationRequest req = ( RegistrationRequest ) key.attachment();
+                try {
+                    RegistrationRequest req = (RegistrationRequest) key
+                            .attachment();
                     SocketSessionImpl session = new SocketSessionImpl(
-                            SocketAcceptor.this, nextProcessor(), getListeners(),
-                            req.config, ch, req.handler, req.address );
-                    getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-                    req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-                    req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
-                    session.getIoProcessor().addNew( session );
+                            SocketAcceptor.this, nextProcessor(),
+                            getListeners(), req.config, ch, req.handler,
+                            req.address);
+                    getFilterChainBuilder().buildFilterChain(
+                            session.getFilterChain());
+                    req.config.getFilterChainBuilder().buildFilterChain(
+                            session.getFilterChain());
+                    req.config.getThreadModel().buildFilterChain(
+                            session.getFilterChain());
+                    session.getIoProcessor().addNew(session);
                     success = true;
-                }
-                catch( Throwable t )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( t );
-                }
-                finally
-                {
-                    if( !success )
-                    {
+                } catch (Throwable t) {
+                    ExceptionMonitor.getInstance().exceptionCaught(t);
+                } finally {
+                    if (!success) {
                         ch.close();
                     }
                 }
@@ -361,18 +319,15 @@ public class SocketAcceptor extends BaseIoAcceptor
         }
     }
 
-    private SocketIoProcessor nextProcessor()
-    {
-        if ( this.processorDistributor == Integer.MAX_VALUE )
-        {
+    private SocketIoProcessor nextProcessor() {
+        if (this.processorDistributor == Integer.MAX_VALUE) {
             this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
         }
-        
+
         return ioProcessors[processorDistributor++ % processorCount];
     }
 
-    public IoServiceConfig getDefaultConfig()
-    {
+    public IoServiceConfig getDefaultConfig() {
         return defaultConfig;
     }
 
@@ -382,197 +337,165 @@ public class SocketAcceptor extends BaseIoAcceptor
      * @param defaultConfig the default config.
      * @throws NullPointerException if the specified value is <code>null</code>.
      */
-    public void setDefaultConfig( SocketAcceptorConfig defaultConfig )
-    {
-        if( defaultConfig == null )
-        {
-            throw new NullPointerException( "defaultConfig" );
+    public void setDefaultConfig(SocketAcceptorConfig defaultConfig) {
+        if (defaultConfig == null) {
+            throw new NullPointerException("defaultConfig");
         }
         this.defaultConfig = defaultConfig;
     }
 
-    private void registerNew()
-    {
-        if( registerQueue.isEmpty() )
-        {
+    private void registerNew() {
+        if (registerQueue.isEmpty()) {
             return;
         }
 
-        for( ; ; )
-        {
+        for (;;) {
             RegistrationRequest req;
 
-            synchronized( registerQueue )
-            {
-                req = ( RegistrationRequest ) registerQueue.pop();
+            synchronized (registerQueue) {
+                req = (RegistrationRequest) registerQueue.pop();
             }
 
-            if( req == null )
-            {
+            if (req == null) {
                 break;
             }
 
             ServerSocketChannel ssc = null;
 
-            try
-            {
+            try {
                 ssc = ServerSocketChannel.open();
-                ssc.configureBlocking( false );
+                ssc.configureBlocking(false);
 
                 // Configure the server socket,
                 SocketAcceptorConfig cfg;
-                if( req.config instanceof SocketAcceptorConfig )
-                {
-                    cfg = ( SocketAcceptorConfig ) req.config;
-                }
-                else
-                {
-                    cfg = ( SocketAcceptorConfig ) getDefaultConfig();
+                if (req.config instanceof SocketAcceptorConfig) {
+                    cfg = (SocketAcceptorConfig) req.config;
+                } else {
+                    cfg = (SocketAcceptorConfig) getDefaultConfig();
                 }
 
-                ssc.socket().setReuseAddress( cfg.isReuseAddress() );
+                ssc.socket().setReuseAddress(cfg.isReuseAddress());
                 ssc.socket().setReceiveBufferSize(
-                    ( ( SocketSessionConfig ) cfg.getSessionConfig() ).getReceiveBufferSize() );
+                        ((SocketSessionConfig) cfg.getSessionConfig())
+                                .getReceiveBufferSize());
 
                 // and bind.
-                ssc.socket().bind( req.address, cfg.getBacklog() );
-                if( req.address == null || req.address.getPort() == 0 )
-                {
-                    req.address = ( InetSocketAddress ) ssc.socket().getLocalSocketAddress();
+                ssc.socket().bind(req.address, cfg.getBacklog());
+                if (req.address == null || req.address.getPort() == 0) {
+                    req.address = (InetSocketAddress) ssc.socket()
+                            .getLocalSocketAddress();
                 }
-                ssc.register( selector, SelectionKey.OP_ACCEPT, req );
+                ssc.register(selector, SelectionKey.OP_ACCEPT, req);
 
-                synchronized( channels )
-                {
-                    channels.put( req.address, ssc );
+                synchronized (channels) {
+                    channels.put(req.address, ssc);
                 }
 
-                getListeners().fireServiceActivated(
-                        this, req.address, req.handler, req.config );
-            }
-            catch( IOException e )
-            {
+                getListeners().fireServiceActivated(this, req.address,
+                        req.handler, req.config);
+            } catch (IOException e) {
                 req.exception = e;
-            }
-            finally
-            {
-                synchronized( req )
-                {
+            } finally {
+                synchronized (req) {
                     req.done = true;
 
                     req.notifyAll();
                 }
 
-                if( ssc != null && req.exception != null )
-                {
-                    try
-                    {
+                if (ssc != null && req.exception != null) {
+                    try {
                         ssc.close();
-                    }
-                    catch( IOException e )
-                    {
-                        ExceptionMonitor.getInstance().exceptionCaught( e );
+                    } catch (IOException e) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e);
                     }
                 }
             }
         }
     }
 
-
-    private void cancelKeys()
-    {
-        if( cancelQueue.isEmpty() )
-        {
+    private void cancelKeys() {
+        if (cancelQueue.isEmpty()) {
             return;
         }
 
-        for( ; ; )
-        {
+        for (;;) {
             CancellationRequest request;
 
-            synchronized( cancelQueue )
-            {
-                request = ( CancellationRequest ) cancelQueue.pop();
+            synchronized (cancelQueue) {
+                request = (CancellationRequest) cancelQueue.pop();
             }
 
-            if( request == null )
-            {
+            if (request == null) {
                 break;
             }
 
             ServerSocketChannel ssc;
-            synchronized( channels )
-            {
-                ssc = ( ServerSocketChannel ) channels.remove( request.address );
+            synchronized (channels) {
+                ssc = (ServerSocketChannel) channels.remove(request.address);
             }
 
             // close the channel
-            try
-            {
-                if( ssc == null )
-                {
-                    request.exception = new IllegalArgumentException( "Address not bound: " + request.address );
-                }
-                else
-                {
-                    SelectionKey key = ssc.keyFor( selector );
-                    request.registrationRequest = ( RegistrationRequest ) key.attachment();
+            try {
+                if (ssc == null) {
+                    request.exception = new IllegalArgumentException(
+                            "Address not bound: " + request.address);
+                } else {
+                    SelectionKey key = ssc.keyFor(selector);
+                    request.registrationRequest = (RegistrationRequest) key
+                            .attachment();
                     key.cancel();
 
                     selector.wakeup(); // wake up again to trigger thread death
 
                     ssc.close();
                 }
-            }
-            catch( IOException e )
-            {
-                ExceptionMonitor.getInstance().exceptionCaught( e );
-            }
-            finally
-            {
-                synchronized( request )
-                {
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            } finally {
+                synchronized (request) {
                     request.done = true;
                     request.notifyAll();
                 }
 
-                if( request.exception == null )
-                {
-                    getListeners().fireServiceDeactivated(
-                            this, request.address,
+                if (request.exception == null) {
+                    getListeners().fireServiceDeactivated(this,
+                            request.address,
                             request.registrationRequest.handler,
-                            request.registrationRequest.config );
+                            request.registrationRequest.config);
                 }
             }
         }
     }
 
-    private static class RegistrationRequest
-    {
+    private static class RegistrationRequest {
         private InetSocketAddress address;
+
         private final IoHandler handler;
+
         private final IoServiceConfig config;
+
         private IOException exception;
+
         private boolean done;
 
-        private RegistrationRequest( SocketAddress address, IoHandler handler, IoServiceConfig config )
-        {
-            this.address = ( InetSocketAddress ) address;
+        private RegistrationRequest(SocketAddress address, IoHandler handler,
+                IoServiceConfig config) {
+            this.address = (InetSocketAddress) address;
             this.handler = handler;
             this.config = config;
         }
     }
 
-
-    private static class CancellationRequest
-    {
+    private static class CancellationRequest {
         private final SocketAddress address;
+
         private boolean done;
+
         private RegistrationRequest registrationRequest;
+
         private RuntimeException exception;
 
-        private CancellationRequest( SocketAddress address )
-        {
+        private CancellationRequest(SocketAddress address) {
             this.address = address;
         }
     }

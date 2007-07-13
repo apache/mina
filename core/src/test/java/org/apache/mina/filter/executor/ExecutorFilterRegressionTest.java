@@ -40,207 +40,161 @@ import org.apache.mina.common.support.BaseIoSession;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class ExecutorFilterRegressionTest extends TestCase
-{
+public class ExecutorFilterRegressionTest extends TestCase {
     private ExecutorFilter filter;
-    
-    public ExecutorFilterRegressionTest()
-    {
+
+    public ExecutorFilterRegressionTest() {
     }
-    
-    public void setUp() throws Exception
-    {
+
+    public void setUp() throws Exception {
         filter = new ExecutorFilter();
     }
-    
-    public void tearDown() throws Exception
-    {
-        ( ( ThreadPoolExecutor ) filter.getExecutor() ).shutdown();
+
+    public void tearDown() throws Exception {
+        ((ThreadPoolExecutor) filter.getExecutor()).shutdown();
         filter = null;
     }
-    
-    public void testEventOrder() throws Throwable
-    {
+
+    public void testEventOrder() throws Throwable {
         final EventOrderChecker nextFilter = new EventOrderChecker();
-        final EventOrderCounter[] sessions = new EventOrderCounter[]
-        {
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-            new EventOrderCounter(),
-        };
+        final EventOrderCounter[] sessions = new EventOrderCounter[] {
+                new EventOrderCounter(), new EventOrderCounter(),
+                new EventOrderCounter(), new EventOrderCounter(),
+                new EventOrderCounter(), new EventOrderCounter(),
+                new EventOrderCounter(), new EventOrderCounter(),
+                new EventOrderCounter(), new EventOrderCounter(), };
         final int loop = 1000000;
         final int end = sessions.length - 1;
         final ExecutorFilter filter = this.filter;
-        ( ( ThreadPoolExecutor ) filter.getExecutor() ).setKeepAliveTime( 3, TimeUnit.SECONDS );
-        
-        for( int i = 0; i < loop ; i++ )
-        {
-            Integer objI = new Integer( i );
+        ((ThreadPoolExecutor) filter.getExecutor()).setKeepAliveTime(3,
+                TimeUnit.SECONDS);
 
-            for( int j = end; j >= 0; j-- )
-            {
-                filter.messageReceived( nextFilter, sessions[ j ], objI );
+        for (int i = 0; i < loop; i++) {
+            Integer objI = new Integer(i);
+
+            for (int j = end; j >= 0; j--) {
+                filter.messageReceived(nextFilter, sessions[j], objI);
             }
 
-            if( nextFilter.throwable != null )
-            {
+            if (nextFilter.throwable != null) {
                 throw nextFilter.throwable;
             }
         }
-        
-        Thread.sleep( 1000 );
-        
-        for( int i = end; i >= 0; i-- )
-        {
-            Assert.assertEquals( loop - 1, sessions[ i ].lastCount.intValue() );
+
+        Thread.sleep(1000);
+
+        for (int i = end; i >= 0; i--) {
+            Assert.assertEquals(loop - 1, sessions[i].lastCount.intValue());
         }
     }
-    
-    private static class EventOrderCounter extends BaseIoSession
-    {
+
+    private static class EventOrderCounter extends BaseIoSession {
         private Integer lastCount = null;
 
-        public synchronized void setLastCount( Integer newCount )
-        {
-            if( lastCount != null )
-            {
-                Assert.assertEquals( lastCount.intValue() + 1, newCount.intValue() );
+        public synchronized void setLastCount(Integer newCount) {
+            if (lastCount != null) {
+                Assert.assertEquals(lastCount.intValue() + 1, newCount
+                        .intValue());
             }
-            
+
             lastCount = newCount;
         }
 
-        public IoHandler getHandler()
-        {
+        public IoHandler getHandler() {
             return null;
         }
 
-        public IoFilterChain getFilterChain()
-        {
+        public IoFilterChain getFilterChain() {
             return null;
         }
 
-        public CloseFuture close()
-        {
+        public CloseFuture close() {
             return null;
         }
 
-        public TransportType getTransportType()
-        {
+        public TransportType getTransportType() {
             return null;
         }
 
-        public SocketAddress getRemoteAddress()
-        {
+        public SocketAddress getRemoteAddress() {
             return null;
         }
 
-        public SocketAddress getLocalAddress()
-        {
+        public SocketAddress getLocalAddress() {
             return null;
         }
 
-        public int getScheduledWriteRequests()
-        {
+        public int getScheduledWriteRequests() {
             return 0;
         }
 
-        protected void updateTrafficMask()
-        {
+        protected void updateTrafficMask() {
         }
 
-        public boolean isClosing()
-        {
+        public boolean isClosing() {
             return false;
         }
 
-        public IoService getService()
-        {
+        public IoService getService() {
             return null;
         }
 
-        public IoServiceConfig getServiceConfig()
-        {
+        public IoServiceConfig getServiceConfig() {
             return null;
         }
 
-        public IoSessionConfig getConfig()
-        {
+        public IoSessionConfig getConfig() {
             return null;
         }
 
-        public SocketAddress getServiceAddress()
-        {
+        public SocketAddress getServiceAddress() {
             return null;
         }
 
-        public int getScheduledWriteBytes()
-        {
+        public int getScheduledWriteBytes() {
             return 0;
         }
     }
-    
-    private static class EventOrderChecker implements NextFilter
-    {
+
+    private static class EventOrderChecker implements NextFilter {
         private Throwable throwable;
 
-        public void sessionOpened( IoSession session )
-        {
+        public void sessionOpened(IoSession session) {
         }
 
-        public void sessionClosed( IoSession session )
-        {
+        public void sessionClosed(IoSession session) {
         }
 
-        public void sessionIdle( IoSession session, IdleStatus status )
-        {
+        public void sessionIdle(IoSession session, IdleStatus status) {
         }
 
-        public void exceptionCaught( IoSession session, Throwable cause )
-        {
+        public void exceptionCaught(IoSession session, Throwable cause) {
         }
 
-        public void messageReceived( IoSession session, Object message )
-        {
-            try
-            {
-                ( ( EventOrderCounter ) session ).setLastCount( ( Integer ) message );
-            }
-            catch( Throwable t )
-            {
-                if( this.throwable == null )
-                {
+        public void messageReceived(IoSession session, Object message) {
+            try {
+                ((EventOrderCounter) session).setLastCount((Integer) message);
+            } catch (Throwable t) {
+                if (this.throwable == null) {
                     this.throwable = t;
                 }
             }
         }
 
-        public void messageSent( IoSession session, Object message )
-        {
+        public void messageSent(IoSession session, Object message) {
         }
 
-        public void filterWrite( IoSession session, WriteRequest writeRequest )
-        {
+        public void filterWrite(IoSession session, WriteRequest writeRequest) {
         }
 
-        public void filterClose( IoSession session )
-        {
+        public void filterClose(IoSession session) {
         }
 
-        public void sessionCreated( IoSession session )
-        {
+        public void sessionCreated(IoSession session) {
         }
     }
-    
-    public static void main( String[] args )
-    {
-        junit.textui.TestRunner.run( ExecutorFilterRegressionTest.class );
+
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(ExecutorFilterRegressionTest.class);
     }
 }

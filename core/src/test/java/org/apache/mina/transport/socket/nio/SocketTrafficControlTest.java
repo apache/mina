@@ -34,25 +34,21 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Id$
  */
-public class SocketTrafficControlTest extends AbstractTrafficControlTest
-{
+public class SocketTrafficControlTest extends AbstractTrafficControlTest {
 
-    public SocketTrafficControlTest()
-    {
-        super( new SocketAcceptor() );
+    public SocketTrafficControlTest() {
+        super(new SocketAcceptor());
     }
 
-    protected ConnectFuture connect( int port, IoHandler handler )
-            throws Exception
-    {
+    protected ConnectFuture connect(int port, IoHandler handler)
+            throws Exception {
         IoConnector connector = new SocketConnector();
-        SocketAddress addr = new InetSocketAddress( "localhost", port );
-        return connector.connect( addr, handler );
+        SocketAddress addr = new InetSocketAddress("localhost", port);
+        return connector.connect(addr, handler);
     }
 
-    protected SocketAddress createServerSocketAddress( int port )
-    {
-        return new InetSocketAddress( port );
+    protected SocketAddress createServerSocketAddress(int port) {
+        return new InetSocketAddress(port);
     }
 
 }

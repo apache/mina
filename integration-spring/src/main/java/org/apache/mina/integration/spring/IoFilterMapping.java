@@ -48,18 +48,17 @@ import org.springframework.util.Assert;
  * @see org.apache.mina.integration.spring.IoAcceptorFactoryBean
  * @see org.apache.mina.integration.spring.Binding
  */
-public class IoFilterMapping implements InitializingBean
-{
+public class IoFilterMapping implements InitializingBean {
     private String name = null;
+
     private IoFilter filter = null;
 
     /**
      * Creates a new empty instance.
      */
-    public IoFilterMapping()
-    {
+    public IoFilterMapping() {
     }
-    
+
     /**
      * Creates a new instance using the specified name and filter.
      * 
@@ -68,22 +67,20 @@ public class IoFilterMapping implements InitializingBean
      * @throws IllegalArgumentException if any of the arguments are 
      *         <code>null</code>.
      */
-    public IoFilterMapping( String name, IoFilter filter )
-    {
-        Assert.notNull( name, "Argument 'name' may not be null" );
-        Assert.notNull( filter, "Argument 'filter' may not be null" );
-        
+    public IoFilterMapping(String name, IoFilter filter) {
+        Assert.notNull(name, "Argument 'name' may not be null");
+        Assert.notNull(filter, "Argument 'filter' may not be null");
+
         this.name = name;
         this.filter = filter;
     }
-    
+
     /**
      * Returns the filter of this mapping.
      * 
      * @return the filter.
      */
-    public IoFilter getFilter()
-    {
+    public IoFilter getFilter() {
         return filter;
     }
 
@@ -92,8 +89,7 @@ public class IoFilterMapping implements InitializingBean
      * 
      * @return the name.
      */
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
@@ -104,9 +100,8 @@ public class IoFilterMapping implements InitializingBean
      * @throws IllegalArgumentException if the specified value is 
      *         <code>null</code>.
      */
-    public void setFilter( IoFilter filter )
-    {
-        Assert.notNull( filter, "Argument 'filter' may not be null" );
+    public void setFilter(IoFilter filter) {
+        Assert.notNull(filter, "Argument 'filter' may not be null");
         this.filter = filter;
     }
 
@@ -117,15 +112,13 @@ public class IoFilterMapping implements InitializingBean
      * @throws IllegalArgumentException if the specified value is 
      *         <code>null</code>.
      */
-    public void setName( String name )
-    {
-        Assert.notNull( name, "Argument 'name' may not be null" );
+    public void setName(String name) {
+        Assert.notNull(name, "Argument 'name' may not be null");
         this.name = name;
     }
 
-    public void afterPropertiesSet() throws Exception
-    {
-        Assert.notNull( name, "Argument 'name' may not be null" );
-        Assert.notNull( filter, "Argument 'filter' may not be null" );
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(name, "Argument 'name' may not be null");
+        Assert.notNull(filter, "Argument 'filter' may not be null");
     }
 }

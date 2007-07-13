@@ -39,79 +39,69 @@ import org.apache.mina.util.CharsetUtil;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class HttpResponseEncoder implements MessageEncoder
-{
+public class HttpResponseEncoder implements MessageEncoder {
     private static final Set TYPES;
 
-    static
-    {
+    static {
         Set types = new HashSet();
-        types.add( HttpResponseMessage.class );
-        TYPES = Collections.unmodifiableSet( types );
+        types.add(HttpResponseMessage.class);
+        TYPES = Collections.unmodifiableSet(types);
     }
 
     private static final byte[] CRLF = new byte[] { 0x0D, 0x0A };
 
-    public HttpResponseEncoder()
-    {
+    public HttpResponseEncoder() {
     }
 
-    public void encode( IoSession session, Object message,
-            ProtocolEncoderOutput out ) throws Exception
-    {
-        HttpResponseMessage msg = ( HttpResponseMessage ) message;
-        ByteBuffer buf = ByteBuffer.allocate( 256 );
+    public void encode(IoSession session, Object message,
+            ProtocolEncoderOutput out) throws Exception {
+        HttpResponseMessage msg = (HttpResponseMessage) message;
+        ByteBuffer buf = ByteBuffer.allocate(256);
         // Enable auto-expand for easier encoding
-        buf.setAutoExpand( true );
+        buf.setAutoExpand(true);
 
-        try
-        {
+        try {
             // output all headers except the content length
             CharsetEncoder encoder = CharsetUtil.getDefaultCharset()
                     .newEncoder();
-            buf.putString( "HTTP/1.1 ", encoder );
-            buf.putString( String.valueOf( msg.getResponseCode() ), encoder );
-            switch( msg.getResponseCode() )
-            {
+            buf.putString("HTTP/1.1 ", encoder);
+            buf.putString(String.valueOf(msg.getResponseCode()), encoder);
+            switch (msg.getResponseCode()) {
             case HttpResponseMessage.HTTP_STATUS_SUCCESS:
-                buf.putString( " OK", encoder );
+                buf.putString(" OK", encoder);
                 break;
             case HttpResponseMessage.HTTP_STATUS_NOT_FOUND:
-                buf.putString( " Not Found", encoder );
+                buf.putString(" Not Found", encoder);
                 break;
             }
-            buf.put( CRLF );
-            for( Iterator it = msg.getHeaders().entrySet().iterator(); it
-                    .hasNext(); )
-            {
-                Entry entry = ( Entry ) it.next();
-                buf.putString( ( String ) entry.getKey(), encoder );
-                buf.putString( ": ", encoder );
-                buf.putString( ( String ) entry.getValue(), encoder );
-                buf.put( CRLF );
+            buf.put(CRLF);
+            for (Iterator it = msg.getHeaders().entrySet().iterator(); it
+                    .hasNext();) {
+                Entry entry = (Entry) it.next();
+                buf.putString((String) entry.getKey(), encoder);
+                buf.putString(": ", encoder);
+                buf.putString((String) entry.getValue(), encoder);
+                buf.put(CRLF);
             }
             // now the content length is the body length
-            buf.putString( "Content-Length: ", encoder );
-            buf.putString( String.valueOf( msg.getBodyLength() ), encoder );
-            buf.put( CRLF );
-            buf.put( CRLF );
+            buf.putString("Content-Length: ", encoder);
+            buf.putString(String.valueOf(msg.getBodyLength()), encoder);
+            buf.put(CRLF);
+            buf.put(CRLF);
             // add body
-            buf.put( msg.getBody() );
+            buf.put(msg.getBody());
             //System.out.println("\n+++++++");
             //for (int i=0; i<buf.position();i++)System.out.print(new String(new byte[]{buf.get(i)}));
             //System.out.println("\n+++++++");
-        }
-        catch( CharacterCodingException ex )
-        {
+        } catch (CharacterCodingException ex) {
             ex.printStackTrace();
         }
 
         buf.flip();
-        out.write( buf );
+        out.write(buf);
     }
 
-    public Set getMessageTypes()
-    {
+    public Set getMessageTypes() {
         return TYPES;
     }
 }

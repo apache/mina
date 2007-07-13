@@ -19,10 +19,8 @@
  */
 package org.apache.mina.integration.jmx;
 
-
 import java.util.Date;
 import java.util.List;
-
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterChain;
@@ -32,225 +30,181 @@ import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.management.IoSessionStat;
 import org.apache.mina.management.StatCollector;
 
-
 /**
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoSessionManager implements IoSessionManagerMBean
-{
+public class IoSessionManager implements IoSessionManagerMBean {
 
     private IoSession session;
-
 
     /**
      * create the session manager
      * @param session the MINA's session to manage
      */
-    public IoSessionManager( IoSession session )
-    {
+    public IoSessionManager(IoSession session) {
         this.session = session;
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#isConnected()
      */
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return session.isConnected();
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getReadBytes()
      */
-    public long getReadBytes()
-    {
+    public long getReadBytes() {
         return session.getReadBytes();
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getWrittenBytes()
      */
-    public long getWrittenBytes()
-    {
+    public long getWrittenBytes() {
         return session.getWrittenBytes();
     }
 
-
-    public long getReadMessages()
-    {
-        return ( ( BaseIoSession ) session ).getReadMessages();
+    public long getReadMessages() {
+        return ((BaseIoSession) session).getReadMessages();
     }
 
-
-    public long getWrittenMessages()
-    {
-        return ( ( BaseIoSession ) session ).getWrittenMessages();
+    public long getWrittenMessages() {
+        return ((BaseIoSession) session).getWrittenMessages();
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#close()
      */
-    public void close()
-    {
+    public void close() {
         session.close().join();
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getCreationTime()
      */
-    public Date getCreationTime()
-    {
-        return new Date( session.getCreationTime() );
+    public Date getCreationTime() {
+        return new Date(session.getCreationTime());
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getLastIoTime()
      */
-    public Date getLastIoTime()
-    {
-        return new Date( session.getLastIoTime() );
+    public Date getLastIoTime() {
+        return new Date(session.getLastIoTime());
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getLastReadTime()
      */
-    public Date getLastReadTime()
-    {
-        return new Date( session.getLastReadTime() );
+    public Date getLastReadTime() {
+        return new Date(session.getLastReadTime());
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getLastWriteTime()
      */
-    public Date getLastWriteTime()
-    {
-        return new Date( session.getLastWriteTime() );
+    public Date getLastWriteTime() {
+        return new Date(session.getLastWriteTime());
     }
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getInstalledFilters()
      */
-    public String[] getInstalledFilters()
-    {
+    public String[] getInstalledFilters() {
         List filters = session.getFilterChain().getAll();
         String[] res = new String[filters.size()];
-        for ( int i = 0; i < res.length; i++ )
-        {
-            res[i] = ( ( IoFilterChain.Entry ) filters.get( i ) ).getName();
+        for (int i = 0; i < res.length; i++) {
+            res[i] = ((IoFilterChain.Entry) filters.get(i)).getName();
         }
         return res;
     }
 
-
     /**
      * @see archean.util.mina.IoSessionManagerMBean#addLastLoggingFilter()
      */
-    public void addLastLoggingFilter()
-    {
+    public void addLastLoggingFilter() {
         LoggingFilter f = new LoggingFilter();
-        session.getFilterChain().addLast( "LoggerLast", f );
+        session.getFilterChain().addLast("LoggerLast", f);
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#removeLastLoggingFilter()
      */
-    public void removeLastLoggingFilter()
-    {
+    public void removeLastLoggingFilter() {
 
-        session.getFilterChain().remove( "LoggerLast" );
+        session.getFilterChain().remove("LoggerLast");
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#addFirstLoggingFilter()
      */
-    public void addFirstLoggingFilter()
-    {
+    public void addFirstLoggingFilter() {
         LoggingFilter f = new LoggingFilter();
-        session.getFilterChain().addFirst( "LoggerFirst", f );
+        session.getFilterChain().addFirst("LoggerFirst", f);
     }
 
+    public void removeFirstLoggingFilter() {
 
-    public void removeFirstLoggingFilter()
-    {
-
-        session.getFilterChain().remove( "LoggerFirst" );
+        session.getFilterChain().remove("LoggerFirst");
     }
-
 
     //  IDLE monitoring
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getReadIdleTime()
      */
-    public long getReadIdleTime()
-    {
-        return session.getIdleTimeInMillis( IdleStatus.READER_IDLE );
+    public long getReadIdleTime() {
+        return session.getIdleTimeInMillis(IdleStatus.READER_IDLE);
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getWriteIdleTime()
      */
-    public long getWriteIdleTime()
-    {
-        return session.getIdleTimeInMillis( IdleStatus.WRITER_IDLE );
+    public long getWriteIdleTime() {
+        return session.getIdleTimeInMillis(IdleStatus.WRITER_IDLE);
     }
-
 
     /**
      * @see archean.util.mina.IoSessionManagerMBean#getBothIdleTime()
      */
-    public long getBothIdleTime()
-    {
-        return session.getIdleTimeInMillis( IdleStatus.BOTH_IDLE );
+    public long getBothIdleTime() {
+        return session.getIdleTimeInMillis(IdleStatus.BOTH_IDLE);
     }
 
-
-    public float getByteReadThroughtput()
-    {
-        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
-        if(stats==null)
+    public float getByteReadThroughtput() {
+        IoSessionStat stats = (IoSessionStat) session
+                .getAttribute(StatCollector.KEY);
+        if (stats == null)
             return Float.NaN;
         else
             return stats.getByteReadThroughput();
     }
 
-
-    public float getByteWrittenThroughtput()
-    {
-        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
-        if(stats==null)
+    public float getByteWrittenThroughtput() {
+        IoSessionStat stats = (IoSessionStat) session
+                .getAttribute(StatCollector.KEY);
+        if (stats == null)
             return Float.NaN;
         else
             return stats.getByteWrittenThroughput();
     }
 
-
-    public float getMessageReadThroughtput()
-    {
-        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
-        if(stats==null)
+    public float getMessageReadThroughtput() {
+        IoSessionStat stats = (IoSessionStat) session
+                .getAttribute(StatCollector.KEY);
+        if (stats == null)
             return Float.NaN;
         else
             return stats.getMessageReadThroughput();
     }
 
-
-    public float getMessageWrittenThroughtput()
-    {
-        IoSessionStat stats=(IoSessionStat)session.getAttribute(StatCollector.KEY);
-        if(stats==null)
+    public float getMessageWrittenThroughtput() {
+        IoSessionStat stats = (IoSessionStat) session
+                .getAttribute(StatCollector.KEY);
+        if (stats == null)
             return Float.NaN;
         else
             return stats.getMessageWrittenThroughput();

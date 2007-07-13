@@ -31,19 +31,17 @@ import org.apache.mina.common.IoHandler;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoConnector extends BaseIoService implements IoConnector
-{
-    protected BaseIoConnector()
-    {
+public abstract class BaseIoConnector extends BaseIoService implements
+        IoConnector {
+    protected BaseIoConnector() {
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler )
-    {
-        return connect( address, handler, getDefaultConfig() );
+    public ConnectFuture connect(SocketAddress address, IoHandler handler) {
+        return connect(address, handler, getDefaultConfig());
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler )
-    {
-        return connect( address, localAddress, handler, getDefaultConfig() );
+    public ConnectFuture connect(SocketAddress address,
+            SocketAddress localAddress, IoHandler handler) {
+        return connect(address, localAddress, handler, getDefaultConfig());
     }
 }

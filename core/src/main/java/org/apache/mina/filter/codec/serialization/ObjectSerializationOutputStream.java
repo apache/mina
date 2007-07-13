@@ -33,149 +33,128 @@ import org.apache.mina.common.ByteBuffer;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ObjectSerializationOutputStream extends OutputStream implements ObjectOutput {
+public class ObjectSerializationOutputStream extends OutputStream implements
+        ObjectOutput {
 
     private final DataOutputStream out;
+
     private int maxObjectSize = Integer.MAX_VALUE;
-    
-    public ObjectSerializationOutputStream( OutputStream out )
-    {
-        if( out == null )
-        {
-            throw new NullPointerException( "out" );
+
+    public ObjectSerializationOutputStream(OutputStream out) {
+        if (out == null) {
+            throw new NullPointerException("out");
         }
-        
-        if( out instanceof DataOutputStream )
-        {
-            this.out = ( DataOutputStream ) out;
-        }
-        else
-        {
-            this.out = new DataOutputStream( out );
+
+        if (out instanceof DataOutputStream) {
+            this.out = (DataOutputStream) out;
+        } else {
+            this.out = new DataOutputStream(out);
         }
     }
-    
+
     /**
      * Returns the allowed maximum size of the encoded object.
      * If the size of the encoded object exceeds this value, this encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
      */
-    public int getMaxObjectSize()
-    {
+    public int getMaxObjectSize() {
         return maxObjectSize;
     }
-    
+
     /**
      * Sets the allowed maximum size of the encoded object.
      * If the size of the encoded object exceeds this value, this encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
      */
-    public void setMaxObjectSize( int maxObjectSize )
-    {
-        if( maxObjectSize <= 0 )
-        {
-            throw new IllegalArgumentException( "maxObjectSize: " + maxObjectSize );
+    public void setMaxObjectSize(int maxObjectSize) {
+        if (maxObjectSize <= 0) {
+            throw new IllegalArgumentException("maxObjectSize: "
+                    + maxObjectSize);
         }
-        
+
         this.maxObjectSize = maxObjectSize;
     }
 
-    public void close() throws IOException
-    {
+    public void close() throws IOException {
         out.close();
     }
 
-    public void flush() throws IOException
-    {
+    public void flush() throws IOException {
         out.flush();
     }
 
-    public void write( int b ) throws IOException
-    {
-        out.write( b );
+    public void write(int b) throws IOException {
+        out.write(b);
     }
 
-    public void write( byte[] b ) throws IOException
-    {
-        out.write( b );
+    public void write(byte[] b) throws IOException {
+        out.write(b);
     }
 
-    public void write( byte[] b, int off, int len ) throws IOException
-    {
-        out.write( b, off, len );
+    public void write(byte[] b, int off, int len) throws IOException {
+        out.write(b, off, len);
     }
 
-    public void writeObject( Object obj ) throws IOException
-    {
-        ByteBuffer buf = ByteBuffer.allocate( 64, false );
-        buf.setAutoExpand( true );
-        buf.putObject( obj );
-        
+    public void writeObject(Object obj) throws IOException {
+        ByteBuffer buf = ByteBuffer.allocate(64, false);
+        buf.setAutoExpand(true);
+        buf.putObject(obj);
+
         int objectSize = buf.position() - 4;
-        if( objectSize > maxObjectSize )
-        {
+        if (objectSize > maxObjectSize) {
             buf.release();
-            throw new IllegalArgumentException( "The encoded object is too big: " + objectSize + " (> " + maxObjectSize + ')' );
+            throw new IllegalArgumentException(
+                    "The encoded object is too big: " + objectSize + " (> "
+                            + maxObjectSize + ')');
         }
-        
-        out.write( buf.array(), 0, buf.position() );
+
+        out.write(buf.array(), 0, buf.position());
         buf.release();
     }
 
-    public void writeBoolean( boolean v ) throws IOException
-    {
-        out.writeBoolean( v );
+    public void writeBoolean(boolean v) throws IOException {
+        out.writeBoolean(v);
     }
 
-    public void writeByte( int v ) throws IOException
-    {
-        out.writeByte( v );
+    public void writeByte(int v) throws IOException {
+        out.writeByte(v);
     }
 
-    public void writeBytes( String s ) throws IOException
-    {
-        out.writeBytes( s );
+    public void writeBytes(String s) throws IOException {
+        out.writeBytes(s);
     }
 
-    public void writeChar( int v ) throws IOException
-    {
-        out.writeChar( v );
+    public void writeChar(int v) throws IOException {
+        out.writeChar(v);
     }
 
-    public void writeChars( String s ) throws IOException
-    {
-        out.writeChars( s );
+    public void writeChars(String s) throws IOException {
+        out.writeChars(s);
     }
 
-    public void writeDouble( double v ) throws IOException
-    {
-        out.writeDouble( v );
+    public void writeDouble(double v) throws IOException {
+        out.writeDouble(v);
     }
 
-    public void writeFloat( float v ) throws IOException
-    {
-        out.writeFloat( v );
+    public void writeFloat(float v) throws IOException {
+        out.writeFloat(v);
     }
 
-    public void writeInt( int v ) throws IOException
-    {
-        out.writeInt( v );
+    public void writeInt(int v) throws IOException {
+        out.writeInt(v);
     }
 
-    public void writeLong( long v ) throws IOException
-    {
-        out.writeLong( v );
+    public void writeLong(long v) throws IOException {
+        out.writeLong(v);
     }
 
-    public void writeShort( int v ) throws IOException
-    {
-        out.writeShort( v );
+    public void writeShort(int v) throws IOException {
+        out.writeShort(v);
     }
 
-    public void writeUTF( String str ) throws IOException
-    {
-        out.writeUTF( str );
+    public void writeUTF(String str) throws IOException {
+        out.writeUTF(str);
     }
 }

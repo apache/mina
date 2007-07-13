@@ -34,95 +34,82 @@ import org.apache.mina.util.ExpiringMap;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ExpiringSessionRecycler implements IoSessionRecycler
-{
+public class ExpiringSessionRecycler implements IoSessionRecycler {
     private ExpiringMap sessionMap;
-    
+
     private ExpiringMap.Expirer mapExpirer;
-    
-    public ExpiringSessionRecycler()
-    {
-        this( ExpiringMap.DEFAULT_TIME_TO_LIVE );
+
+    public ExpiringSessionRecycler() {
+        this(ExpiringMap.DEFAULT_TIME_TO_LIVE);
     }
-    
-    public ExpiringSessionRecycler( int timeToLive )
-    {
-        this( timeToLive, ExpiringMap.DEFAULT_EXPIRATION_INTERVAL );
+
+    public ExpiringSessionRecycler(int timeToLive) {
+        this(timeToLive, ExpiringMap.DEFAULT_EXPIRATION_INTERVAL);
     }
-    
-    public ExpiringSessionRecycler( int timeToLive, int expirationInterval )
-    {
-        sessionMap = new ExpiringMap( timeToLive, expirationInterval );
+
+    public ExpiringSessionRecycler(int timeToLive, int expirationInterval) {
+        sessionMap = new ExpiringMap(timeToLive, expirationInterval);
         mapExpirer = sessionMap.getExpirer();
-        sessionMap.addExpirationListener( new DefaultExpirationListener() );
+        sessionMap.addExpirationListener(new DefaultExpirationListener());
     }
 
-    public void put( IoSession session )
-    {
+    public void put(IoSession session) {
         mapExpirer.startExpiringIfNotStarted();
-        
-        Object key = generateKey( session );
 
-        if( !sessionMap.containsKey( key ) )
-        {
-            sessionMap.put( key, session );
+        Object key = generateKey(session);
+
+        if (!sessionMap.containsKey(key)) {
+            sessionMap.put(key, session);
         }
     }
 
-    public IoSession recycle( SocketAddress localAddress, SocketAddress remoteAddress )
-    {
-        return ( IoSession ) sessionMap.get( generateKey( localAddress, remoteAddress ) );
+    public IoSession recycle(SocketAddress localAddress,
+            SocketAddress remoteAddress) {
+        return (IoSession) sessionMap.get(generateKey(localAddress,
+                remoteAddress));
     }
 
-    public void remove( IoSession session )
-    {
-        sessionMap.remove( generateKey( session ) );
+    public void remove(IoSession session) {
+        sessionMap.remove(generateKey(session));
     }
 
-    public void stopExpiring()
-    {
+    public void stopExpiring() {
         mapExpirer.stopExpiring();
     }
 
-    public int getExpirationInterval()
-    {
+    public int getExpirationInterval() {
         return sessionMap.getExpirationInterval();
     }
 
-    public int getTimeToLive()
-    {
+    public int getTimeToLive() {
         return sessionMap.getTimeToLive();
     }
 
-    public void setExpirationInterval( int expirationInterval )
-    {
-        sessionMap.setExpirationInterval( expirationInterval );
+    public void setExpirationInterval(int expirationInterval) {
+        sessionMap.setExpirationInterval(expirationInterval);
     }
 
-    public void setTimeToLive( int timeToLive )
-    {
-        sessionMap.setTimeToLive( timeToLive );
+    public void setTimeToLive(int timeToLive) {
+        sessionMap.setTimeToLive(timeToLive);
     }
 
-    private Object generateKey( IoSession session )
-    {
-        return generateKey( session.getLocalAddress(), session.getRemoteAddress() );
+    private Object generateKey(IoSession session) {
+        return generateKey(session.getLocalAddress(), session
+                .getRemoteAddress());
     }
 
-    private Object generateKey( SocketAddress localAddress, SocketAddress remoteAddress )
-    {
-        List key = new ArrayList( 2 );
-        key.add( remoteAddress );
-        key.add( localAddress );
+    private Object generateKey(SocketAddress localAddress,
+            SocketAddress remoteAddress) {
+        List key = new ArrayList(2);
+        key.add(remoteAddress);
+        key.add(localAddress);
         return key;
     }
-    
-    private class DefaultExpirationListener implements ExpirationListener
-    {
-        public void expired( Object expiredObject )
-        {
-            IoSession expiredSession = ( IoSession ) expiredObject;
-            
+
+    private class DefaultExpirationListener implements ExpirationListener {
+        public void expired(Object expiredObject) {
+            IoSession expiredSession = (IoSession) expiredObject;
+
             expiredSession.close();
         }
     }

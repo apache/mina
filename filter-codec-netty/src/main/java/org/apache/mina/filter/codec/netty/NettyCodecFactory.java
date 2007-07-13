@@ -35,25 +35,20 @@ import org.apache.mina.filter.codec.ProtocolCodecFactory;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-public class NettyCodecFactory implements ProtocolCodecFactory
-{
+public class NettyCodecFactory implements ProtocolCodecFactory {
     private static final NettyEncoder ENCODER = new NettyEncoder();
 
     private final MessageRecognizer recognizer;
-    
-    public NettyCodecFactory(MessageRecognizer recognizer)
-    {
+
+    public NettyCodecFactory(MessageRecognizer recognizer) {
         this.recognizer = recognizer;
     }
 
-
-    public org.apache.mina.filter.codec.ProtocolEncoder getEncoder()
-    {
+    public org.apache.mina.filter.codec.ProtocolEncoder getEncoder() {
         return ENCODER;
     }
 
-    public org.apache.mina.filter.codec.ProtocolDecoder getDecoder()
-    {
+    public org.apache.mina.filter.codec.ProtocolDecoder getDecoder() {
         return new NettyDecoder(recognizer);
     }
 }

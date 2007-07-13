@@ -27,31 +27,27 @@ import org.apache.mina.common.IoConnectorConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoConnectorConfig extends BaseIoServiceConfig implements IoConnectorConfig
-{
+public abstract class BaseIoConnectorConfig extends BaseIoServiceConfig
+        implements IoConnectorConfig {
     private int connectTimeout = 60; // 1 minute
 
-    protected BaseIoConnectorConfig()
-    {
+    protected BaseIoConnectorConfig() {
         super();
     }
 
-    public int getConnectTimeout()
-    {
+    public int getConnectTimeout() {
         return connectTimeout;
     }
 
-    public long getConnectTimeoutMillis()
-    {
+    public long getConnectTimeoutMillis() {
         return connectTimeout * 1000L;
     }
 
-    public void setConnectTimeout( int connectTimeout )
-    {
-        if( connectTimeout <= 0 )
-        {
-            throw new IllegalArgumentException( "connectTimeout: " + connectTimeout );
+    public void setConnectTimeout(int connectTimeout) {
+        if (connectTimeout <= 0) {
+            throw new IllegalArgumentException("connectTimeout: "
+                    + connectTimeout);
         }
         this.connectTimeout = connectTimeout;
-    }    
+    }
 }

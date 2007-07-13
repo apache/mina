@@ -19,7 +19,6 @@
  */
 package org.apache.mina.common;
 
-
 /**
  * Represents the type of idleness of {@link IoSession} or
  * {@link IoSession}.  There are three types of idleness:
@@ -35,31 +34,29 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IdleStatus
-{
+public class IdleStatus {
     /**
      * Represents the session status that no data is coming from the remote
      * peer.
      */
-    public static final IdleStatus READER_IDLE = new IdleStatus( "reader idle" );
+    public static final IdleStatus READER_IDLE = new IdleStatus("reader idle");
 
     /**
      * Represents the session status that the session is not writing any data.
      */
-    public static final IdleStatus WRITER_IDLE = new IdleStatus( "writer idle" );
+    public static final IdleStatus WRITER_IDLE = new IdleStatus("writer idle");
 
     /**
      * Represents both {@link #READER_IDLE} and {@link #WRITER_IDLE}.
      */
-    public static final IdleStatus BOTH_IDLE = new IdleStatus( "both idle" );
+    public static final IdleStatus BOTH_IDLE = new IdleStatus("both idle");
 
     private final String strValue;
 
     /**
      * Creates a new instance.
      */
-    private IdleStatus( String strValue )
-    {
+    private IdleStatus(String strValue) {
         this.strValue = strValue;
     }
 
@@ -71,8 +68,7 @@ public class IdleStatus
      *   <li>{@link #BOTH_IDLE} - <tt>"both idle"</tt></li>
      * </ul>
      */
-    public String toString()
-    {
+    public String toString() {
         return strValue;
     }
 }

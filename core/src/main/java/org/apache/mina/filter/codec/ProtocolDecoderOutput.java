@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filter.codec;
 
-
 /**
  * Callback for {@link ProtocolDecoder} to generate decoded messages.
  * {@link ProtocolDecoder} must call {@link #write(Object)} for each decoded
@@ -28,8 +27,7 @@ package org.apache.mina.filter.codec;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ProtocolDecoderOutput
-{
+public interface ProtocolDecoderOutput {
     /**
      * Callback for {@link ProtocolDecoder} to generate decoded messages.
      * {@link ProtocolDecoder} must call {@link #write(Object)} for each
@@ -37,11 +35,11 @@ public interface ProtocolDecoderOutput
      * 
      * @param message the decoded message
      */
-    void write( Object message );
+    void write(Object message);
 
     /**
      * Flushes all messages you wrote via {@link #write(Object)} to
      * the next filter.
-     */    
+     */
     void flush();
 }

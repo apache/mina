@@ -27,12 +27,10 @@ import junit.framework.TestCase;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class CharsetUtilTest extends TestCase
-{
-    public void testGetDefaultCharsetName()
-    {
+public class CharsetUtilTest extends TestCase {
+    public void testGetDefaultCharsetName() {
         // @todo How the heck do I test this so it works on all machines running test?
         String encoding = CharsetUtil.getDefaultCharsetName();
-        assertNotNull( encoding );
+        assertNotNull(encoding);
     }
 }

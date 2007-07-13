@@ -30,136 +30,111 @@ import org.apache.mina.common.support.BaseByteBuffer;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SimpleByteBufferAllocator implements ByteBufferAllocator
-{
+public class SimpleByteBufferAllocator implements ByteBufferAllocator {
     private static final int MINIMUM_CAPACITY = 1;
 
-    public SimpleByteBufferAllocator()
-    {
+    public SimpleByteBufferAllocator() {
     }
-    
-    public ByteBuffer allocate( int capacity, boolean direct )
-    {
+
+    public ByteBuffer allocate(int capacity, boolean direct) {
         java.nio.ByteBuffer nioBuffer;
-        if( direct )
-        {
-            nioBuffer = java.nio.ByteBuffer.allocateDirect( capacity );            
+        if (direct) {
+            nioBuffer = java.nio.ByteBuffer.allocateDirect(capacity);
+        } else {
+            nioBuffer = java.nio.ByteBuffer.allocate(capacity);
         }
-        else
-        {
-            nioBuffer = java.nio.ByteBuffer.allocate( capacity );            
-        }
-        return new SimpleByteBuffer( nioBuffer );
-    }
-    
-    public ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
-    {
-        return new SimpleByteBuffer( nioBuffer );
+        return new SimpleByteBuffer(nioBuffer);
     }
 
-    public void dispose()
-    {
+    public ByteBuffer wrap(java.nio.ByteBuffer nioBuffer) {
+        return new SimpleByteBuffer(nioBuffer);
     }
 
-    private static class SimpleByteBuffer extends BaseByteBuffer
-    {
+    public void dispose() {
+    }
+
+    private static class SimpleByteBuffer extends BaseByteBuffer {
         private java.nio.ByteBuffer buf;
+
         private int refCount = 1;
 
-        protected SimpleByteBuffer( java.nio.ByteBuffer buf )
-        {
+        protected SimpleByteBuffer(java.nio.ByteBuffer buf) {
             this.buf = buf;
-            buf.order( ByteOrder.BIG_ENDIAN );
+            buf.order(ByteOrder.BIG_ENDIAN);
             refCount = 1;
         }
 
-        public synchronized void acquire()
-        {
-            if( refCount <= 0 )
-            {
-                throw new IllegalStateException( "Already released buffer." );
+        public synchronized void acquire() {
+            if (refCount <= 0) {
+                throw new IllegalStateException("Already released buffer.");
             }
 
-            refCount ++;
+            refCount++;
         }
 
-        public void release()
-        {
-            synchronized( this )
-            {
-                if( refCount <= 0 )
-                {
+        public void release() {
+            synchronized (this) {
+                if (refCount <= 0) {
                     refCount = 0;
                     throw new IllegalStateException(
-                            "Already released buffer.  You released the buffer too many times." );
+                            "Already released buffer.  You released the buffer too many times.");
                 }
 
-                refCount --;
-                if( refCount > 0)
-                {
+                refCount--;
+                if (refCount > 0) {
                     return;
                 }
             }
         }
 
-        public java.nio.ByteBuffer buf()
-        {
+        public java.nio.ByteBuffer buf() {
             return buf;
         }
-        
-        public boolean isPooled()
-        {
+
+        public boolean isPooled() {
             return false;
         }
-        
-        public void setPooled( boolean pooled )
-        {
+
+        public void setPooled(boolean pooled) {
         }
 
-        protected void capacity0( int requestedCapacity )
-        {
+        protected void capacity0(int requestedCapacity) {
             int newCapacity = MINIMUM_CAPACITY;
-            while( newCapacity < requestedCapacity )
-            {
+            while (newCapacity < requestedCapacity) {
                 newCapacity <<= 1;
             }
-            
+
             java.nio.ByteBuffer oldBuf = this.buf;
             java.nio.ByteBuffer newBuf;
-            if( isDirect() )
-            {
-                newBuf = java.nio.ByteBuffer.allocateDirect( newCapacity );
-            }
-            else
-            {
-                newBuf = java.nio.ByteBuffer.allocate( newCapacity );
+            if (isDirect()) {
+                newBuf = java.nio.ByteBuffer.allocateDirect(newCapacity);
+            } else {
+                newBuf = java.nio.ByteBuffer.allocate(newCapacity);
             }
 
             newBuf.clear();
             oldBuf.clear();
-            newBuf.put( oldBuf );
+            newBuf.put(oldBuf);
             this.buf = newBuf;
         }
 
         public ByteBuffer duplicate() {
-            return new SimpleByteBuffer( this.buf.duplicate() );
+            return new SimpleByteBuffer(this.buf.duplicate());
         }
 
         public ByteBuffer slice() {
-            return new SimpleByteBuffer( this.buf.slice() );
+            return new SimpleByteBuffer(this.buf.slice());
         }
 
         public ByteBuffer asReadOnlyBuffer() {
-            return new SimpleByteBuffer( this.buf.asReadOnlyBuffer() );
+            return new SimpleByteBuffer(this.buf.asReadOnlyBuffer());
         }
 
-        public byte[] array()
-        {
+        public byte[] array() {
             return buf.array();
         }
-        
-        public int arrayOffset()
-        {
+
+        public int arrayOffset() {
             return buf.arrayOffset();
         }
     }

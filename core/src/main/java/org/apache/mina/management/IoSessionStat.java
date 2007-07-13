@@ -33,38 +33,39 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoSessionStat
-{
+public class IoSessionStat {
     long lastByteRead = -1;
+
     long lastByteWrite = -1;
+
     long lastMessageRead = -1;
+
     long lastMessageWrite = -1;
 
     float byteWrittenThroughput = 0;
+
     float byteReadThroughput = 0;
 
     float messageWrittenThroughput = 0;
+
     float messageReadThroughput = 0;
 
     // last time the session was polled
     long lastPollingTime = System.currentTimeMillis();
-    
+
     /**
      * Bytes read per second  
      * @return bytes per second
      */
-    public float getByteReadThroughput()
-    {
+    public float getByteReadThroughput() {
         return byteReadThroughput;
     }
-
 
     /**
      * Bytes written per second  
      * @return bytes per second
      */
-    public float getByteWrittenThroughput()
-    {
+    public float getByteWrittenThroughput() {
         return byteWrittenThroughput;
     }
 
@@ -72,8 +73,7 @@ public class IoSessionStat
      * Messages read per second  
      * @return messages per second
      */
-    public float getMessageReadThroughput()
-    {
+    public float getMessageReadThroughput() {
         return messageReadThroughput;
     }
 
@@ -81,40 +81,35 @@ public class IoSessionStat
      * Messages written per second  
      * @return messages per second
      */
-    public float getMessageWrittenThroughput()
-    {
+    public float getMessageWrittenThroughput() {
         return messageWrittenThroughput;
     }
-    
+
     /**
      * used for the StatCollector, last polling value 
      */
-    long getLastByteRead()
-    {
+    long getLastByteRead() {
         return lastByteRead;
     }
 
     /**
      * used for the StatCollector, last polling value 
      */
-    long getLastByteWrite()
-    {
+    long getLastByteWrite() {
         return lastByteWrite;
     }
 
     /**
      * used for the StatCollector, last polling value 
      */
-    long getLastMessageRead()
-    {
+    long getLastMessageRead() {
         return lastMessageRead;
     }
 
     /**
      * used for the StatCollector, last polling value 
      */
-    long getLastMessageWrite()
-    {
+    long getLastMessageWrite() {
         return lastMessageWrite;
     }
 }

@@ -33,8 +33,7 @@ import org.slf4j.Logger;
  * 
  * @see SessionLog
  */
-public class LoggingFilter extends IoFilterAdapter
-{
+public class LoggingFilter extends IoFilterAdapter {
     /**
      * Session attribute key: prefix string
      */
@@ -44,80 +43,71 @@ public class LoggingFilter extends IoFilterAdapter
      * Session attribute key: {@link Logger}
      */
     public static final String LOGGER = SessionLog.LOGGER;
-    
+
     /**
      * Creates a new instance.
      */
-    public LoggingFilter()
-    {
-    }
-    
-    public void sessionCreated( NextFilter nextFilter, IoSession session )
-    {
-    	SessionLog.info( session, "CREATED" );
-    	nextFilter.sessionCreated( session );
-    }
-    
-    public void sessionOpened( NextFilter nextFilter, IoSession session )
-    {
-        SessionLog.info( session, "OPENED" );
-        nextFilter.sessionOpened( session );
+    public LoggingFilter() {
     }
 
-    public void sessionClosed( NextFilter nextFilter, IoSession session )
-    {
-        SessionLog.info( session, "CLOSED" );
-        nextFilter.sessionClosed( session );
+    public void sessionCreated(NextFilter nextFilter, IoSession session) {
+        SessionLog.info(session, "CREATED");
+        nextFilter.sessionCreated(session);
     }
 
-    public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status )
-    {
-        if( SessionLog.isInfoEnabled( session ) )
-        {
-            SessionLog.info( session, "IDLE: " + status );
+    public void sessionOpened(NextFilter nextFilter, IoSession session) {
+        SessionLog.info(session, "OPENED");
+        nextFilter.sessionOpened(session);
+    }
+
+    public void sessionClosed(NextFilter nextFilter, IoSession session) {
+        SessionLog.info(session, "CLOSED");
+        nextFilter.sessionClosed(session);
+    }
+
+    public void sessionIdle(NextFilter nextFilter, IoSession session,
+            IdleStatus status) {
+        if (SessionLog.isInfoEnabled(session)) {
+            SessionLog.info(session, "IDLE: " + status);
         }
-        nextFilter.sessionIdle( session, status );
+        nextFilter.sessionIdle(session, status);
     }
 
-    public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause )
-    {
-        if( SessionLog.isInfoEnabled( session ) )
-        {
-            SessionLog.info( session, "EXCEPTION:", cause );
+    public void exceptionCaught(NextFilter nextFilter, IoSession session,
+            Throwable cause) {
+        if (SessionLog.isInfoEnabled(session)) {
+            SessionLog.info(session, "EXCEPTION:", cause);
         }
-        nextFilter.exceptionCaught( session, cause );
+        nextFilter.exceptionCaught(session, cause);
     }
 
-    public void messageReceived( NextFilter nextFilter, IoSession session, Object message )
-    {
-        if( SessionLog.isInfoEnabled( session ) )
-        {
-            SessionLog.info( session, "RECEIVED: " + message );
+    public void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) {
+        if (SessionLog.isInfoEnabled(session)) {
+            SessionLog.info(session, "RECEIVED: " + message);
         }
-        nextFilter.messageReceived( session, message );
+        nextFilter.messageReceived(session, message);
     }
 
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message )
-    {
-        if( SessionLog.isInfoEnabled( session ) )
-        {
-            SessionLog.info( session, "SENT: " + message );
+    public void messageSent(NextFilter nextFilter, IoSession session,
+            Object message) {
+        if (SessionLog.isInfoEnabled(session)) {
+            SessionLog.info(session, "SENT: " + message);
         }
-        nextFilter.messageSent( session, message );
+        nextFilter.messageSent(session, message);
     }
 
-    public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest )
-    {
-        if( SessionLog.isInfoEnabled( session ) )
-        {
-            SessionLog.info( session, "WRITE: " + writeRequest );
+    public void filterWrite(NextFilter nextFilter, IoSession session,
+            WriteRequest writeRequest) {
+        if (SessionLog.isInfoEnabled(session)) {
+            SessionLog.info(session, "WRITE: " + writeRequest);
         }
-        nextFilter.filterWrite( session, writeRequest );
+        nextFilter.filterWrite(session, writeRequest);
     }
 
-    public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        SessionLog.info( session, "CLOSE" );
-        nextFilter.filterClose( session );
+    public void filterClose(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        SessionLog.info(session, "CLOSE");
+        nextFilter.filterClose(session);
     }
 }

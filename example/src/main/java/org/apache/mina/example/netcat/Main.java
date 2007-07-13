@@ -32,13 +32,10 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-public class Main
-{
-    public static void main( String[] args ) throws Exception
-    {
-        if( args.length != 2 )
-        {
-            System.out.println( Main.class.getName() + " <hostname> <port>" );
+public class Main {
+    public static void main(String[] args) throws Exception {
+        if (args.length != 2) {
+            System.out.println(Main.class.getName() + " <hostname> <port>");
             return;
         }
 
@@ -46,12 +43,11 @@ public class Main
         SocketConnector connector = new SocketConnector();
 
         // Set connect timeout.
-        ( ( IoConnectorConfig ) connector.getDefaultConfig()).setConnectTimeout( 30 );
-        
+        ((IoConnectorConfig) connector.getDefaultConfig())
+                .setConnectTimeout(30);
+
         // Start communication.
-        connector.connect( 
-                new InetSocketAddress( args[ 0 ],
-                Integer.parseInt( args[ 1 ] ) ),
-                new NetCatProtocolHandler() );
+        connector.connect(new InetSocketAddress(args[0], Integer
+                .parseInt(args[1])), new NetCatProtocolHandler());
     }
 }

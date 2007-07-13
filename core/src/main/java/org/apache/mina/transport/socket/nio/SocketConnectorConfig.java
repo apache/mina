@@ -30,8 +30,7 @@ import org.apache.mina.common.support.BaseIoConnectorConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketConnectorConfig extends BaseIoConnectorConfig
-{
+public class SocketConnectorConfig extends BaseIoConnectorConfig {
     private IoSessionConfig sessionConfig = new SocketSessionConfigImpl();
 
     /**
@@ -39,12 +38,10 @@ public class SocketConnectorConfig extends BaseIoConnectorConfig
      * 
      * @throws RuntimeIOException if failed to get the default configuration
      */
-    public SocketConnectorConfig()
-    {
+    public SocketConnectorConfig() {
     }
 
-    public IoSessionConfig getSessionConfig()
-    {
+    public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }
 }

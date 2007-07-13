@@ -34,10 +34,11 @@ import java.net.ServerSocket;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketAcceptorConfig extends BaseIoAcceptorConfig
-{
+public class SocketAcceptorConfig extends BaseIoAcceptorConfig {
     private SocketSessionConfig sessionConfig = new SocketSessionConfigImpl();
+
     private int backlog = 50;
+
     private boolean reuseAddress;
 
     /**
@@ -45,29 +46,20 @@ public class SocketAcceptorConfig extends BaseIoAcceptorConfig
      * 
      * @throws RuntimeIOException if failed to get the default configuration
      */
-    public SocketAcceptorConfig()
-    {
+    public SocketAcceptorConfig() {
         ServerSocket s = null;
-        try
-        {
+        try {
             s = new ServerSocket();
             reuseAddress = s.getReuseAddress();
-        }
-        catch( IOException e )
-        {
-            throw new RuntimeIOException( "Failed to get the default configuration.", e );
-        }
-        finally
-        {
-            if( s != null )
-            {
-                try
-                {
+        } catch (IOException e) {
+            throw new RuntimeIOException(
+                    "Failed to get the default configuration.", e);
+        } finally {
+            if (s != null) {
+                try {
                     s.close();
-                }
-                catch( IOException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
         }
@@ -75,34 +67,29 @@ public class SocketAcceptorConfig extends BaseIoAcceptorConfig
         sessionConfig.setReuseAddress(true);
     }
 
-    public IoSessionConfig getSessionConfig()
-    {
+    public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }
 
     /**
      * @see ServerSocket#getReuseAddress()
      */
-    public boolean isReuseAddress()
-    {
+    public boolean isReuseAddress() {
         return reuseAddress;
     }
 
     /**
      * @see ServerSocket#setReuseAddress(boolean)
      */
-    public void setReuseAddress( boolean reuseAddress )
-    {
+    public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
     }
 
-    public int getBacklog()
-    {
+    public int getBacklog() {
         return backlog;
     }
 
-    public void setBacklog( int backlog )
-    {
+    public void setBacklog(int backlog) {
         this.backlog = backlog;
     }
 }

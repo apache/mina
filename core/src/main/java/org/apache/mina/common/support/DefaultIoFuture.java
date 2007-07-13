@@ -33,13 +33,17 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoFuture implements IoFuture
-{
+public class DefaultIoFuture implements IoFuture {
     private final IoSession session;
+
     private final Object lock;
+
     private IoFutureListener firstListener;
+
     private List otherListeners;
+
     private Object result;
+
     private boolean ready;
 
     /**
@@ -47,86 +51,65 @@ public class DefaultIoFuture implements IoFuture
      * 
      * @param session an {@link IoSession} which is associated with this future
      */
-    public DefaultIoFuture( IoSession session )
-    {
+    public DefaultIoFuture(IoSession session) {
         this.session = session;
         this.lock = this;
     }
-    
+
     /**
      * Creates a new instance which uses the specified object as a lock.
      */
-    public DefaultIoFuture( IoSession session, Object lock )
-    {
-        if( lock == null )
-        {
-            throw new NullPointerException( "lock" );
+    public DefaultIoFuture(IoSession session, Object lock) {
+        if (lock == null) {
+            throw new NullPointerException("lock");
         }
         this.session = session;
         this.lock = lock;
     }
-    
-    public IoSession getSession()
-    {
+
+    public IoSession getSession() {
         return session;
     }
-    
-    public Object getLock()
-    {
+
+    public Object getLock() {
         return lock;
     }
-    
-    public void join()
-    {
-        synchronized( lock )
-        {
-            while( !ready )
-            {
-                try
-                {
+
+    public void join() {
+        synchronized (lock) {
+            while (!ready) {
+                try {
                     lock.wait();
-                }
-                catch( InterruptedException e )
-                {
+                } catch (InterruptedException e) {
                 }
             }
         }
     }
 
-    public boolean join( long timeoutInMillis )
-    {
-        long startTime = ( timeoutInMillis <= 0 ) ? 0 : System
+    public boolean join(long timeoutInMillis) {
+        long startTime = (timeoutInMillis <= 0) ? 0 : System
                 .currentTimeMillis();
         long waitTime = timeoutInMillis;
-        
-        synchronized( lock )
-        {
-            if( ready )
-            {
+
+        synchronized (lock) {
+            if (ready) {
                 return ready;
-            }
-            else if( waitTime <= 0 )
-            {
+            } else if (waitTime <= 0) {
                 return ready;
             }
 
-            for( ;; )
-            {
-                try
-                {
-                    lock.wait( waitTime );
-                }
-                catch( InterruptedException e )
-                {
+            for (;;) {
+                try {
+                    lock.wait(waitTime);
+                } catch (InterruptedException e) {
                 }
 
-                if( ready )
+                if (ready)
                     return true;
-                else
-                {
-                    waitTime = timeoutInMillis - ( System.currentTimeMillis() - startTime );
-                    if( waitTime <= 0 )
-                    {
+                else {
+                    waitTime = timeoutInMillis
+                            - (System.currentTimeMillis() - startTime);
+                    if (waitTime <= 0) {
                         return ready;
                     }
                 }
@@ -134,10 +117,8 @@ public class DefaultIoFuture implements IoFuture
         }
     }
 
-    public boolean isReady()
-    {
-        synchronized( lock )
-        {
+    public boolean isReady() {
+        synchronized (lock) {
             return ready;
         }
     }
@@ -145,20 +126,17 @@ public class DefaultIoFuture implements IoFuture
     /**
      * Sets the result of the asynchronous operation, and mark it as finished.
      */
-    protected void setValue( Object newValue )
-    {
-        synchronized( lock )
-        {
+    protected void setValue(Object newValue) {
+        synchronized (lock) {
             // Allow only once.
-            if( ready )
-            {
+            if (ready) {
                 return;
             }
 
             result = newValue;
             ready = true;
             lock.notifyAll();
-    
+
             notifyListeners();
         }
     }
@@ -166,23 +144,18 @@ public class DefaultIoFuture implements IoFuture
     /**
      * Returns the result of the asynchronous operation.
      */
-    protected Object getValue()
-    {
-        synchronized( lock )
-        {
+    protected Object getValue() {
+        synchronized (lock) {
             return result;
         }
     }
-    
-    public void addListener( IoFutureListener listener )
-    {
-        if( listener == null )
-        {
-            throw new NullPointerException( "listener" );
+
+    public void addListener(IoFutureListener listener) {
+        if (listener == null) {
+            throw new NullPointerException("listener");
         }
 
-        synchronized( lock )
-        {
+        synchronized (lock) {
             if (firstListener == null) {
                 firstListener = listener;
             } else {
@@ -191,22 +164,18 @@ public class DefaultIoFuture implements IoFuture
                 }
                 otherListeners.add(listener);
             }
-            if( ready )
-            {
-                listener.operationComplete( this );
+            if (ready) {
+                listener.operationComplete(this);
             }
         }
     }
-    
-    public void removeListener( IoFutureListener listener )
-    {
-        if( listener == null )
-        {
-            throw new NullPointerException( "listener" );
+
+    public void removeListener(IoFutureListener listener) {
+        if (listener == null) {
+            throw new NullPointerException("listener");
         }
 
-        synchronized( lock )
-        {
+        synchronized (lock) {
             if (listener == firstListener) {
                 if (otherListeners != null && !otherListeners.isEmpty()) {
                     firstListener = (IoFutureListener) otherListeners.remove(0);
@@ -219,15 +188,13 @@ public class DefaultIoFuture implements IoFuture
         }
     }
 
-    private void notifyListeners()
-    {
-        synchronized( lock )
-        {
+    private void notifyListeners() {
+        synchronized (lock) {
             if (firstListener != null) {
                 firstListener.operationComplete(this);
                 if (otherListeners != null) {
                     for (Iterator i = otherListeners.iterator(); i.hasNext();) {
-                        ((IoFutureListener) i.next()).operationComplete( this );
+                        ((IoFutureListener) i.next()).operationComplete(this);
                     }
                 }
             }

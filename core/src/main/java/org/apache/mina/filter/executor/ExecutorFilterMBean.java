@@ -19,11 +19,10 @@
  */
 package org.apache.mina.filter.executor;
 
-public interface ExecutorFilterMBean
-{
+public interface ExecutorFilterMBean {
     String getThreadNamePrefix();
 
-    void setThreadNamePrefix( String threadNamePrefix );
+    void setThreadNamePrefix(String threadNamePrefix);
 
     int getPoolSize();
 
@@ -31,7 +30,7 @@ public interface ExecutorFilterMBean
 
     int getKeepAliveTime();
 
-    void setMaximumPoolSize( int maximumPoolSize );
+    void setMaximumPoolSize(int maximumPoolSize);
 
-    void setKeepAliveTime( int keepAliveTime );
+    void setKeepAliveTime(int keepAliveTime);
 }

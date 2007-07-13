@@ -30,35 +30,28 @@ import junit.framework.TestCase;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class InetAddressEditorTest extends TestCase
-{
+public class InetAddressEditorTest extends TestCase {
     InetAddressEditor editor;
 
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
         editor = new InetAddressEditor();
     }
 
-    public void testSetAsTextWithHostName() throws Exception
-    {
-        try
-        {
-            InetAddress expected = InetAddress.getByName( "www.google.com" );
-            editor.setAsText( "www.google.com" );
-            assertEquals( expected, editor.getValue() );
-        }
-        catch( UnknownHostException uhe )
-        {
+    public void testSetAsTextWithHostName() throws Exception {
+        try {
+            InetAddress expected = InetAddress.getByName("www.google.com");
+            editor.setAsText("www.google.com");
+            assertEquals(expected, editor.getValue());
+        } catch (UnknownHostException uhe) {
             // No DNS. Skip the test.
         }
-        
-        editor.setAsText( "localhost" );
-        assertEquals( InetAddress.getByName( "localhost" ), editor.getValue() );
+
+        editor.setAsText("localhost");
+        assertEquals(InetAddress.getByName("localhost"), editor.getValue());
     }
 
-    public void testSetAsTextWithIpAddress() throws Exception
-    {
-        editor.setAsText( "127.0.0.1" );
-        assertEquals( InetAddress.getByName( "127.0.0.1" ), editor.getValue() );
+    public void testSetAsTextWithIpAddress() throws Exception {
+        editor.setAsText("127.0.0.1");
+        assertEquals(InetAddress.getByName("127.0.0.1"), editor.getValue());
     }
 }

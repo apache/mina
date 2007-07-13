@@ -29,8 +29,7 @@ import java.util.EventListener;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoServiceListener extends EventListener
-{
+public interface IoServiceListener extends EventListener {
     /**
      * Invoked when a new service is activated by an {@link IoService}.
      * 
@@ -42,8 +41,9 @@ public interface IoServiceListener extends EventListener
      * @param handler the {@link IoHandler} that serves the new service
      * @param config  the {@link IoServiceConfig} of the new service
      */
-    void serviceActivated( IoService service, SocketAddress serviceAddress, IoHandler handler, IoServiceConfig config );
-    
+    void serviceActivated(IoService service, SocketAddress serviceAddress,
+            IoHandler handler, IoServiceConfig config);
+
     /**
      * Invoked when a service is deactivated by an {@link IoService}.
      * 
@@ -55,19 +55,20 @@ public interface IoServiceListener extends EventListener
      * @param handler the {@link IoHandler} that serves the service
      * @param config  the {@link IoServiceConfig} of the service
      */
-    void serviceDeactivated( IoService service, SocketAddress serviceAddress, IoHandler handler, IoServiceConfig config );
-    
+    void serviceDeactivated(IoService service, SocketAddress serviceAddress,
+            IoHandler handler, IoServiceConfig config);
+
     /**
      * Invoked when a new session is created by an {@link IoService}.
      * 
      * @param session the new session
      */
-    void sessionCreated( IoSession session );
-    
+    void sessionCreated(IoSession session);
+
     /**
      * Invoked when a session is being destroyed by an {@link IoService}.
      * 
      * @param session the session to be destroyed
      */
-    void sessionDestroyed( IoSession session );
+    void sessionDestroyed(IoSession session);
 }

@@ -28,11 +28,9 @@ import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;
  * @version $Rev$, $Date$
  */
 public class HttpServerProtocolCodecFactory extends
-        DemuxingProtocolCodecFactory
-{
-    public HttpServerProtocolCodecFactory()
-    {
-        super.register( HttpRequestDecoder.class );
-        super.register( HttpResponseEncoder.class );
+        DemuxingProtocolCodecFactory {
+    public HttpServerProtocolCodecFactory() {
+        super.register(HttpRequestDecoder.class);
+        super.register(HttpResponseEncoder.class);
     }
 }

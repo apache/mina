@@ -26,8 +26,7 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ByteBufferAllocator
-{
+public interface ByteBufferAllocator {
     /**
      * Returns the buffer which is capable of the specified size.
      * 
@@ -35,12 +34,12 @@ public interface ByteBufferAllocator
      * @param direct <tt>true</tt> to get a direct buffer,
      *               <tt>false</tt> to get a heap buffer.
      */
-    ByteBuffer allocate( int capacity, boolean direct );
+    ByteBuffer allocate(int capacity, boolean direct);
 
     /**
      * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
      */
-    ByteBuffer wrap( java.nio.ByteBuffer nioBuffer );
+    ByteBuffer wrap(java.nio.ByteBuffer nioBuffer);
 
     /**
      * Dispose of this allocator.

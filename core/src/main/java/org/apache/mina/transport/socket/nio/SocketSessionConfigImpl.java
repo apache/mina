@@ -41,39 +41,47 @@ import org.apache.mina.common.support.BaseIoSessionConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SocketSessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
-{
+public class SocketSessionConfigImpl extends BaseIoSessionConfig implements
+        SocketSessionConfig {
     private static Map TEST_ADDRESSES = new LinkedHashMap();
-    
+
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
+
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
+
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
+
     private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
 
     private static boolean DEFAULT_REUSE_ADDRESS = false;
+
     private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
+
     private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
+
     private static int DEFAULT_TRAFFIC_CLASS = 0;
+
     private static boolean DEFAULT_KEEP_ALIVE = false;
+
     private static boolean DEFAULT_OOB_INLINE = false;
+
     private static int DEFAULT_SO_LINGER = -1;
+
     private static boolean DEFAULT_TCP_NO_DELAY = false;
-    
-    static
-    {
+
+    static {
         initializeTestAddresses();
-        
+
         boolean success = false;
         for (Iterator i = TEST_ADDRESSES.entrySet().iterator(); i.hasNext();) {
             Entry e = (Entry) i.next();
-            success = initializeDefaultSocketParameters(
-                    (InetSocketAddress) e.getKey(),
-                    (InetAddress) e.getValue());
+            success = initializeDefaultSocketParameters((InetSocketAddress) e
+                    .getKey(), (InetAddress) e.getValue());
             if (success) {
                 break;
             }
         }
-        
+
         if (!success) {
             initializeFallbackDefaultSocketParameters();
         }
@@ -92,53 +100,40 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
             }
         }
     }
-    
+
     private static void initializeTestAddresses() {
         try {
             // IPv6 localhost
-            TEST_ADDRESSES.put(
-                    new InetSocketAddress(
-                            InetAddress.getByAddress(
-                                    new byte[] {
-                                            0, 0, 0, 0, 0, 0, 0, 0,
-                                            0, 0, 0, 0, 0, 0, 0, 1 }), 0),
-                    InetAddress.getByAddress(
-                            new byte[] {
-                                    0, 0, 0, 0, 0, 0, 0, 0,
-                                    0, 0, 0, 0, 0, 0, 0, 1 }));
-            
+            TEST_ADDRESSES.put(new InetSocketAddress(InetAddress
+                    .getByAddress(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 1 }), 0), InetAddress
+                    .getByAddress(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 1 }));
+
             // IPv4 localhost
-            TEST_ADDRESSES.put(
-                    new InetSocketAddress(
-                            InetAddress.getByAddress(
-                                    new byte[] { 127, 0, 0, 1 }), 0),
-                    InetAddress.getByAddress(
-                            new byte[] { 127, 0, 0, 1 }));
-            
+            TEST_ADDRESSES.put(new InetSocketAddress(InetAddress
+                    .getByAddress(new byte[] { 127, 0, 0, 1 }), 0), InetAddress
+                    .getByAddress(new byte[] { 127, 0, 0, 1 }));
+
             // Bind to wildcard interface and connect to IPv6 localhost
-            TEST_ADDRESSES.put(
-                    new InetSocketAddress(0),
-                    InetAddress.getByAddress(
-                            new byte[] {
-                                    0, 0, 0, 0, 0, 0, 0, 0,
-                                    0, 0, 0, 0, 0, 0, 0, 1 }));
+            TEST_ADDRESSES.put(new InetSocketAddress(0), InetAddress
+                    .getByAddress(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 1 }));
 
             // Bind to wildcard interface and connect to IPv4 localhost
-            TEST_ADDRESSES.put(
-                    new InetSocketAddress(0),
-                    InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
+            TEST_ADDRESSES.put(new InetSocketAddress(0), InetAddress
+                    .getByAddress(new byte[] { 127, 0, 0, 1 }));
 
         } catch (UnknownHostException e) {
             ExceptionMonitor.getInstance().exceptionCaught(e);
         }
     }
-    
+
     private static boolean initializeDefaultSocketParameters(
-            InetSocketAddress bindAddress, InetAddress connectAddress)
-    {
+            InetSocketAddress bindAddress, InetAddress connectAddress) {
         ServerSocket ss = null;
         Socket socket = null;
-        
+
         try {
             ss = new ServerSocket();
             ss.bind(bindAddress);
@@ -146,27 +141,18 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
 
             // Timeout is set to 10 seconds in case of infinite blocking
             // on some platform.
-            socket.connect(
-                    new InetSocketAddress(
-                            connectAddress, ss.getLocalPort()), 10000);
+            socket.connect(new InetSocketAddress(connectAddress, ss
+                    .getLocalPort()), 10000);
 
             initializeDefaultSocketParameters(socket);
             return true;
-        }
-        catch( IOException e )
-        {
+        } catch (IOException e) {
             return false;
-        }
-        finally
-        {
-            if( socket != null )
-            {
-                try
-                {
+        } finally {
+            if (socket != null) {
+                try {
                     socket.close();
-                }
-                catch( IOException e )
-                {
+                } catch (IOException e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
@@ -181,7 +167,8 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
         }
     }
 
-    private static void initializeDefaultSocketParameters(Socket socket) throws SocketException {
+    private static void initializeDefaultSocketParameters(Socket socket)
+            throws SocketException {
         DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
         DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
         DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
@@ -189,151 +176,132 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements Sock
         DEFAULT_OOB_INLINE = socket.getOOBInline();
         DEFAULT_SO_LINGER = socket.getSoLinger();
         DEFAULT_TCP_NO_DELAY = socket.getTcpNoDelay();
-        
+
         // Check if setReceiveBufferSize is supported.
-        try
-        {
+        try {
             socket.setReceiveBufferSize(DEFAULT_RECEIVE_BUFFER_SIZE);
             SET_RECEIVE_BUFFER_SIZE_AVAILABLE = true;
-        }
-        catch( SocketException e )
-        {
+        } catch (SocketException e) {
             SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
         }
-        
+
         // Check if setSendBufferSize is supported.
-        try
-        {
+        try {
             socket.setSendBufferSize(DEFAULT_SEND_BUFFER_SIZE);
             SET_SEND_BUFFER_SIZE_AVAILABLE = true;
-        }
-        catch( SocketException e )
-        {
+        } catch (SocketException e) {
             SET_SEND_BUFFER_SIZE_AVAILABLE = false;
         }
 
         // Check if getTrafficClass is supported.
-        try
-        {
+        try {
             DEFAULT_TRAFFIC_CLASS = socket.getTrafficClass();
             GET_TRAFFIC_CLASS_AVAILABLE = true;
-        }
-        catch( SocketException e )
-        {
+        } catch (SocketException e) {
             GET_TRAFFIC_CLASS_AVAILABLE = false;
             DEFAULT_TRAFFIC_CLASS = 0;
         }
     }
-    
+
     public static boolean isSetReceiveBufferSizeAvailable() {
         return SET_RECEIVE_BUFFER_SIZE_AVAILABLE;
     }
-    
+
     public static boolean isSetSendBufferSizeAvailable() {
         return SET_SEND_BUFFER_SIZE_AVAILABLE;
     }
-    
+
     public static boolean isGetTrafficClassAvailable() {
         return GET_TRAFFIC_CLASS_AVAILABLE;
     }
-    
+
     public static boolean isSetTrafficClassAvailable() {
         return SET_TRAFFIC_CLASS_AVAILABLE;
     }
-    
+
     private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
+
     private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
+
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
+
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
+
     private boolean keepAlive = DEFAULT_KEEP_ALIVE;
+
     private boolean oobInline = DEFAULT_OOB_INLINE;
+
     private int soLinger = DEFAULT_SO_LINGER;
+
     private boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
 
     /**
      * Creates a new instance.
      */
-    public SocketSessionConfigImpl()
-    {
+    public SocketSessionConfigImpl() {
     }
 
-    public boolean isReuseAddress()
-    {
+    public boolean isReuseAddress() {
         return reuseAddress;
     }
-    
-    public void setReuseAddress( boolean reuseAddress )
-    {
+
+    public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
     }
 
-    public int getReceiveBufferSize()
-    {
+    public int getReceiveBufferSize() {
         return receiveBufferSize;
     }
 
-    public void setReceiveBufferSize( int receiveBufferSize )
-    {
+    public void setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
     }
 
-    public int getSendBufferSize()
-    {
+    public int getSendBufferSize() {
         return sendBufferSize;
     }
 
-    public void setSendBufferSize( int sendBufferSize )
-    {
+    public void setSendBufferSize(int sendBufferSize) {
         this.sendBufferSize = sendBufferSize;
     }
 
-    public int getTrafficClass()
-    {
+    public int getTrafficClass() {
         return trafficClass;
     }
 
-    public void setTrafficClass( int trafficClass )
-    {
+    public void setTrafficClass(int trafficClass) {
         this.trafficClass = trafficClass;
     }
 
-    public boolean isKeepAlive()
-    {
+    public boolean isKeepAlive() {
         return keepAlive;
     }
 
-    public void setKeepAlive( boolean keepAlive )
-    {
+    public void setKeepAlive(boolean keepAlive) {
         this.keepAlive = keepAlive;
     }
 
-    public boolean isOobInline()
-    {
+    public boolean isOobInline() {
         return oobInline;
     }
 
-    public void setOobInline( boolean oobInline )
-    {
+    public void setOobInline(boolean oobInline) {
         this.oobInline = oobInline;
     }
 
-    public int getSoLinger()
-    {
+    public int getSoLinger() {
         return soLinger;
     }
 
-    public void setSoLinger( int soLinger )
-    {
+    public void setSoLinger(int soLinger) {
         this.soLinger = soLinger;
     }
 
-    public boolean isTcpNoDelay()
-    {
+    public boolean isTcpNoDelay() {
         return tcpNoDelay;
     }
 
-    public void setTcpNoDelay( boolean tcpNoDelay )
-    {
+    public void setTcpNoDelay(boolean tcpNoDelay) {
         this.tcpNoDelay = tcpNoDelay;
     }
 }

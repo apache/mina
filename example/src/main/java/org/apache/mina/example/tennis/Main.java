@@ -40,30 +40,27 @@ import org.apache.mina.transport.vmpipe.VmPipeConnector;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class Main
-{
+public class Main {
 
-    public static void main( String[] args ) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         IoAcceptor acceptor = new VmPipeAcceptor();
-        VmPipeAddress address = new VmPipeAddress( 8080 );
+        VmPipeAddress address = new VmPipeAddress(8080);
 
         // Set up server
-        acceptor.bind( address, new TennisPlayer() );
+        acceptor.bind(address, new TennisPlayer());
 
         // Connect to the server.
         VmPipeConnector connector = new VmPipeConnector();
-        ConnectFuture future = connector.connect( address,
-                                                  new TennisPlayer() );
+        ConnectFuture future = connector.connect(address, new TennisPlayer());
         future.join();
         IoSession session = future.getSession();
 
         // Send the first ping message
-        session.write( new TennisBall( 10 ) );
+        session.write(new TennisBall(10));
 
         // Wait until the match ends.
         session.getCloseFuture().join();
-        
-        acceptor.unbind( address );
+
+        acceptor.unbind(address);
     }
 }

@@ -41,15 +41,14 @@ import java.net.SocketAddress;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoAcceptor extends IoService
-{
+public interface IoAcceptor extends IoService {
     /**
      * Binds to the specified <code>address</code> and handles incoming
      * connections with the specified <code>handler</code>.
      * 
      * @throws IOException if failed to bind
      */
-    void bind( SocketAddress address, IoHandler handler ) throws IOException;
+    void bind(SocketAddress address, IoHandler handler) throws IOException;
 
     /**
      * Binds to the specified <code>address</code> and handles incoming
@@ -58,19 +57,20 @@ public interface IoAcceptor extends IoService
      * @param config the configuration
      * @throws IOException if failed to bind
      */
-    void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException;
+    void bind(SocketAddress address, IoHandler handler, IoServiceConfig config)
+            throws IOException;
 
     /**
      * Unbinds from the specified <code>address</code> and disconnects all clients
      * connected there.
      */
-    void unbind( SocketAddress address );
+    void unbind(SocketAddress address);
 
     /**
      * Unbinds all addresses which were bound by this acceptor.
      */
     void unbindAll();
-    
+
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified
      * <tt>localAddress</tt> and <tt>remoteAddress</tt> which reuses
@@ -85,5 +85,5 @@ public interface IoAcceptor extends IoService
      * @throws IllegalArgumentException if the specified <tt>localAddress</tt> is
      *                                  not bound yet. (see {@link #bind(SocketAddress, IoHandler)})
      */
-    IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress );
+    IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress);
 }

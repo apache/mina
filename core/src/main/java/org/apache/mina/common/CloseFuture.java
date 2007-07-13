@@ -35,13 +35,12 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface CloseFuture extends IoFuture
-{
+public interface CloseFuture extends IoFuture {
     /**
      * Returns <tt>true</tt> if the close request is finished and the session is closed.
      */
     boolean isClosed();
-    
+
     /**
      * Marks this future as closed and notifies all threads waiting for this
      * future.  This method is invoked by MINA internally.  Please do not call

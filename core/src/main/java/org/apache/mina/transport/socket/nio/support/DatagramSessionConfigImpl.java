@@ -30,186 +30,172 @@ import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramSessionConfigImpl extends BaseIoSessionConfig implements DatagramSessionConfig
-{
+public class DatagramSessionConfigImpl extends BaseIoSessionConfig implements
+        DatagramSessionConfig {
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
+
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
+
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
+
     private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
 
     private static boolean DEFAULT_BROADCAST = false;
+
     private static boolean DEFAULT_REUSE_ADDRESS = false;
+
     private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
+
     private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
+
     private static int DEFAULT_TRAFFIC_CLASS = 0;
-    
-    static
-    {
+
+    static {
         initialize();
     }
-    
-    private static void initialize()
-    {
+
+    private static void initialize() {
         DatagramSocket socket = null;
 
-        try
-        {
+        try {
             socket = new DatagramSocket();
             DEFAULT_BROADCAST = socket.getBroadcast();
             DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
             DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
             DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
-            
+
             // Check if setReceiveBufferSize is supported.
-            try
-            {
+            try {
                 socket.setReceiveBufferSize(DEFAULT_RECEIVE_BUFFER_SIZE);
                 SET_RECEIVE_BUFFER_SIZE_AVAILABLE = true;
-            }
-            catch( SocketException e )
-            {
+            } catch (SocketException e) {
                 SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
             }
-            
+
             // Check if setSendBufferSize is supported.
-            try
-            {
+            try {
                 socket.setSendBufferSize(DEFAULT_SEND_BUFFER_SIZE);
                 SET_SEND_BUFFER_SIZE_AVAILABLE = true;
-            }
-            catch( SocketException e )
-            {
+            } catch (SocketException e) {
                 SET_SEND_BUFFER_SIZE_AVAILABLE = false;
             }
-            
+
             // Check if getTrafficClass is supported.
-            try
-            {
+            try {
                 DEFAULT_TRAFFIC_CLASS = socket.getTrafficClass();
                 GET_TRAFFIC_CLASS_AVAILABLE = true;
-            }
-            catch( SocketException e )
-            {
+            } catch (SocketException e) {
                 GET_TRAFFIC_CLASS_AVAILABLE = false;
                 DEFAULT_TRAFFIC_CLASS = 0;
             }
         } catch (SocketException e) {
             ExceptionMonitor.getInstance().exceptionCaught(e);
-        }
-        finally {
-            if( socket != null )
-            {
+        } finally {
+            if (socket != null) {
                 socket.close();
             }
         }
     }
-    
+
     public static boolean isSetReceiveBufferSizeAvailable() {
         return SET_RECEIVE_BUFFER_SIZE_AVAILABLE;
     }
-    
+
     public static boolean isSetSendBufferSizeAvailable() {
         return SET_SEND_BUFFER_SIZE_AVAILABLE;
     }
-    
+
     public static boolean isGetTrafficClassAvailable() {
         return GET_TRAFFIC_CLASS_AVAILABLE;
     }
-    
+
     public static boolean isSetTrafficClassAvailable() {
         return SET_TRAFFIC_CLASS_AVAILABLE;
     }
 
     private boolean broadcast = DEFAULT_BROADCAST;
+
     private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
+
     private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
+
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
+
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
 
     /**
      * Creates a new instance.
      */
-    public DatagramSessionConfigImpl()
-    {
+    public DatagramSessionConfigImpl() {
     }
 
     /**
      * @see DatagramSocket#getBroadcast()
      */
-    public boolean isBroadcast()
-    {
+    public boolean isBroadcast() {
         return broadcast;
     }
-    
+
     /**
      * @see DatagramSocket#setBroadcast(boolean)
      */
-    public void setBroadcast( boolean broadcast )
-    {
+    public void setBroadcast(boolean broadcast) {
         this.broadcast = broadcast;
     }
-    
+
     /**
      * @see DatagramSocket#getReuseAddress()
      */
-    public boolean isReuseAddress()
-    {
+    public boolean isReuseAddress() {
         return reuseAddress;
     }
-    
+
     /**
      * @see DatagramSocket#setReuseAddress(boolean)
      */
-    public void setReuseAddress( boolean reuseAddress )
-    {
+    public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
     }
 
     /**
      * @see DatagramSocket#getReceiveBufferSize()
      */
-    public int getReceiveBufferSize()
-    {
+    public int getReceiveBufferSize() {
         return receiveBufferSize;
     }
 
     /**
      * @see DatagramSocket#setReceiveBufferSize(int)
      */
-    public void setReceiveBufferSize( int receiveBufferSize )
-    {
+    public void setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
     }
 
     /**
      * @see DatagramSocket#getSendBufferSize()
      */
-    public int getSendBufferSize()
-    {
+    public int getSendBufferSize() {
         return sendBufferSize;
     }
 
     /**
      * @see DatagramSocket#setSendBufferSize(int)
      */
-    public void setSendBufferSize( int sendBufferSize )
-    {
+    public void setSendBufferSize(int sendBufferSize) {
         this.sendBufferSize = sendBufferSize;
     }
 
     /**
      * @see DatagramSocket#getTrafficClass()
      */
-    public int getTrafficClass()
-    {
+    public int getTrafficClass() {
         return trafficClass;
     }
 
     /**
      * @see DatagramSocket#setTrafficClass(int)
      */
-    public void setTrafficClass( int trafficClass )
-    {
+    public void setTrafficClass(int trafficClass) {
         this.trafficClass = trafficClass;
     }
 }

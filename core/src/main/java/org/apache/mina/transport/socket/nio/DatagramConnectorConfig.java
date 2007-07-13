@@ -33,10 +33,10 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnectorConfig extends BaseIoConnectorConfig implements DatagramServiceConfig
-{
+public class DatagramConnectorConfig extends BaseIoConnectorConfig implements
+        DatagramServiceConfig {
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
-    
+
     /**
      * Current session recycler
      */
@@ -49,36 +49,29 @@ public class DatagramConnectorConfig extends BaseIoConnectorConfig implements Da
      * 
      * @throws RuntimeIOException if failed to get the default configuration
      */
-    public DatagramConnectorConfig()
-    {
+    public DatagramConnectorConfig() {
         super();
     }
 
-
-    public IoSessionConfig getSessionConfig()
-    {
+    public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }
 
-    public IoSessionRecycler getSessionRecycler()
-    {
+    public IoSessionRecycler getSessionRecycler() {
         return sessionRecycler;
     }
 
     // FIXME There can be a problem if a user changes the recycler after the service is activated.
-    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
-    {
-        if( sessionRecycler == null )
-        {
+    public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
+        if (sessionRecycler == null) {
             sessionRecycler = DEFAULT_RECYCLER;
         }
         this.sessionRecycler = sessionRecycler;
     }
 
-    public Object clone()
-    {
-        DatagramConnectorConfig ret = ( DatagramConnectorConfig ) super.clone();
-        ret.sessionConfig = ( DatagramSessionConfig ) this.sessionConfig.clone();
+    public Object clone() {
+        DatagramConnectorConfig ret = (DatagramConnectorConfig) super.clone();
+        ret.sessionConfig = (DatagramSessionConfig) this.sessionConfig.clone();
         return ret;
     }
 }

@@ -29,63 +29,52 @@ import org.apache.mina.common.RuntimeIOException;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFuture
-{
+public class DefaultConnectFuture extends DefaultIoFuture implements
+        ConnectFuture {
     /**
      * Returns a new {@link ConnectFuture} which is already marked as 'failed to connect'.
      */
-    public static ConnectFuture newFailedFuture( Throwable exception )
-    {
+    public static ConnectFuture newFailedFuture(Throwable exception) {
         DefaultConnectFuture failedFuture = new DefaultConnectFuture();
-        failedFuture.setException( exception );
+        failedFuture.setException(exception);
         return failedFuture;
     }
-    
+
     /**
      * Creates a new instance.
      */
-    public DefaultConnectFuture()
-    {
-        super( null );
+    public DefaultConnectFuture() {
+        super(null);
     }
-    
+
     /**
      * Creates a new instance which uses the specified object as a lock.
      */
-    public DefaultConnectFuture( Object lock )
-    {
-        super( null, lock );
+    public DefaultConnectFuture(Object lock) {
+        super(null, lock);
     }
 
-    public IoSession getSession() throws RuntimeIOException
-    {
+    public IoSession getSession() throws RuntimeIOException {
         Object v = getValue();
-        if( v instanceof RuntimeIOException )
-        {
-            throw ( RuntimeIOException ) v;
-        }
-        else if( v instanceof Throwable )
-        {
-            throw ( RuntimeIOException ) new RuntimeIOException( "Failed to get the session." ).initCause( ( Throwable ) v );
-        }
-        else
-        {
-            return ( IoSession ) v;
+        if (v instanceof RuntimeIOException) {
+            throw (RuntimeIOException) v;
+        } else if (v instanceof Throwable) {
+            throw (RuntimeIOException) new RuntimeIOException(
+                    "Failed to get the session.").initCause((Throwable) v);
+        } else {
+            return (IoSession) v;
         }
     }
 
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return getValue() instanceof IoSession;
     }
-    
-    public void setSession( IoSession session )
-    {
-        setValue( session );
+
+    public void setSession(IoSession session) {
+        setValue(session);
     }
-    
-    public void setException( Throwable exception )
-    {
-        setValue( exception );
+
+    public void setException(Throwable exception) {
+        setValue(exception);
     }
 }

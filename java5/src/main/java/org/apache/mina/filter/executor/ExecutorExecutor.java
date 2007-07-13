@@ -28,28 +28,24 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 400068 $, $Date: 2006-05-05 12:56:58Z $
  */
-public class ExecutorExecutor implements Executor
-{
+public class ExecutorExecutor implements Executor {
     private final java.util.concurrent.Executor executor;
 
     /**
      * Creates a new instance with the specified <tt>executor</tt>.
      */
-    public ExecutorExecutor( java.util.concurrent.Executor executor )
-    {
+    public ExecutorExecutor(java.util.concurrent.Executor executor) {
         this.executor = executor;
     }
-    
+
     /**
      * Returns the underlying executor this thread pool wraps.
      */
-    public java.util.concurrent.Executor getExecutor()
-    {
+    public java.util.concurrent.Executor getExecutor() {
         return executor;
     }
 
-    public void execute( Runnable runnable )
-    {
-        executor.execute( runnable );
+    public void execute(Runnable runnable) {
+        executor.execute(runnable);
     }
 }

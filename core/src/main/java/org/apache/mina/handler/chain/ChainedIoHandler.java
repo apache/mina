@@ -30,15 +30,13 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ChainedIoHandler extends IoHandlerAdapter
-{
+public class ChainedIoHandler extends IoHandlerAdapter {
     private final IoHandlerChain chain;
 
     /**
      * Creates a new instance which contains an empty {@link IoHandlerChain}.
      */
-    public ChainedIoHandler()
-    {
+    public ChainedIoHandler() {
         chain = new IoHandlerChain();
     }
 
@@ -48,21 +46,18 @@ public class ChainedIoHandler extends IoHandlerAdapter
      * 
      * @param chain an {@link IoHandlerChain} to execute
      */
-    public ChainedIoHandler( IoHandlerChain chain )
-    {
-        if( chain == null )
-        {
-            throw new NullPointerException( "chain" );
+    public ChainedIoHandler(IoHandlerChain chain) {
+        if (chain == null) {
+            throw new NullPointerException("chain");
         }
         this.chain = chain;
     }
-    
+
     /**
      * Returns the {@link IoHandlerCommand} this handler will use to
      * handle <tt>messageReceived</tt> events.
      */
-    public IoHandlerChain getChain()
-    {
+    public IoHandlerChain getChain() {
         return chain;
     }
 
@@ -71,8 +66,8 @@ public class ChainedIoHandler extends IoHandlerAdapter
      * {@link IoHandlerCommand} or {@link IoHandlerChain} you specified
      * in the constructor.  
      */
-    public void messageReceived( IoSession session, Object message ) throws Exception
-    {
-        chain.execute( null, session, message);
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
+        chain.execute(null, session, message);
     }
 }

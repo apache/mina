@@ -30,22 +30,19 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface MessageHandler
-{
+public interface MessageHandler {
     /**
      * A {@link MessageHandler} that does nothing.  This is usefule when
      * you want to ignore messages of the specific type silently.
      */
-    static MessageHandler NOOP = new MessageHandler()
-    {
-        public void messageReceived( IoSession session, Object message )
-        {
+    static MessageHandler NOOP = new MessageHandler() {
+        public void messageReceived(IoSession session, Object message) {
         }
     };
-    
+
     /**
      * Invoked when the specific type of message is received from the
      * specified <code>session</code>.
      */
-    void messageReceived( IoSession session, Object message ) throws Exception;
+    void messageReceived(IoSession session, Object message) throws Exception;
 }

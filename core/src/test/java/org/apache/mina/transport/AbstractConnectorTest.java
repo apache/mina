@@ -41,86 +41,69 @@ import org.apache.mina.util.AvailablePortFinder;
 public abstract class AbstractConnectorTest extends TestCase {
 
     protected abstract IoAcceptor createAcceptor();
+
     protected abstract IoConnector createConnector();
-    
-    public void testConnectFutureSuccessTiming() throws Exception
-    {
-        int port = AvailablePortFinder.getNextAvailable( 1025 );
+
+    public void testConnectFutureSuccessTiming() throws Exception {
+        int port = AvailablePortFinder.getNextAvailable(1025);
         IoAcceptor acceptor = createAcceptor();
-        acceptor.bind( new InetSocketAddress( port ), new IoHandlerAdapter() );
-        
-        try
-        {
+        acceptor.bind(new InetSocketAddress(port), new IoHandlerAdapter());
+
+        try {
             final StringBuffer buf = new StringBuffer();
             IoConnector connector = createConnector();
-            ConnectFuture future = connector.connect(
-                    new InetSocketAddress( "localhost", port ),
-                    new IoHandlerAdapter()
-                    {
-                        public void sessionCreated( IoSession session )
-                        {
-                            buf.append( "1" );
-                        }
-                        
-                        public void sessionOpened( IoSession session )
-                        {
-                            buf.append( "2" );
-                        }
-                        
-                        public void exceptionCaught( IoSession session, Throwable cause )
-                        {
-                            buf.append( "X" );
-                        }
-                    });
-            
+            ConnectFuture future = connector.connect(new InetSocketAddress(
+                    "localhost", port), new IoHandlerAdapter() {
+                public void sessionCreated(IoSession session) {
+                    buf.append("1");
+                }
+
+                public void sessionOpened(IoSession session) {
+                    buf.append("2");
+                }
+
+                public void exceptionCaught(IoSession session, Throwable cause) {
+                    buf.append("X");
+                }
+            });
+
             future.join();
             buf.append("3");
             future.getSession().close();
-            Assert.assertEquals( "123", buf.toString() );
-        }
-        finally
-        {
-            acceptor.unbind( new InetSocketAddress( port ) );
+            Assert.assertEquals("123", buf.toString());
+        } finally {
+            acceptor.unbind(new InetSocketAddress(port));
         }
     }
 
-    public void testConnectFutureFailureTiming() throws Exception
-    {
-        int port = AvailablePortFinder.getNextAvailable( 1025 );
+    public void testConnectFutureFailureTiming() throws Exception {
+        int port = AvailablePortFinder.getNextAvailable(1025);
         final StringBuffer buf = new StringBuffer();
 
         IoConnector connector = createConnector();
-        ConnectFuture future = connector.connect(
-                new InetSocketAddress( "localhost", port ),
-                new IoHandlerAdapter()
-                {
-                    public void sessionCreated( IoSession session )
-                    {
-                        buf.append( "X" );
-                    }
-                    
-                    public void sessionOpened( IoSession session )
-                    {
-                        buf.append( "Y" );
-                    }
-                    
-                    public void exceptionCaught( IoSession session, Throwable cause )
-                    {
-                        buf.append( "Z" );
-                    }
-                });
-        
+        ConnectFuture future = connector.connect(new InetSocketAddress(
+                "localhost", port), new IoHandlerAdapter() {
+            public void sessionCreated(IoSession session) {
+                buf.append("X");
+            }
+
+            public void sessionOpened(IoSession session) {
+                buf.append("Y");
+            }
+
+            public void exceptionCaught(IoSession session, Throwable cause) {
+                buf.append("Z");
+            }
+        });
+
         future.join();
         buf.append("1");
-        try
-        {
+        try {
             future.getSession().close();
             fail();
-        }
-        catch( RuntimeIOException e )
-        {
+        } catch (RuntimeIOException e) {
             // OK.
         }
-        Assert.assertEquals( "1", buf.toString() );
+        Assert.assertEquals("1", buf.toString());
     }
 }

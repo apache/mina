@@ -36,90 +36,76 @@ import org.apache.mina.common.IoServiceListener;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DelegatedIoConnector implements IoConnector
-{
+public class DelegatedIoConnector implements IoConnector {
     protected IoConnector delegate;
 
     /**
      * Creates a new instance.
      */
-    protected DelegatedIoConnector()
-    {
+    protected DelegatedIoConnector() {
     }
 
     /**
      * Sets the delegate.  This method should be invoked before any operation
      * is requested.
      */
-    protected void init( IoConnector delegate )
-    {
+    protected void init(IoConnector delegate) {
         this.delegate = delegate;
     }
-    
-    public ConnectFuture connect( SocketAddress address, IoHandler handler )
-    {
-        return delegate.connect( address, handler );
+
+    public ConnectFuture connect(SocketAddress address, IoHandler handler) {
+        return delegate.connect(address, handler);
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
-    {
-        return delegate.connect( address, handler, config );
+    public ConnectFuture connect(SocketAddress address, IoHandler handler,
+            IoServiceConfig config) {
+        return delegate.connect(address, handler, config);
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler )
-    {
-        return delegate.connect( address, localAddress, handler );
+    public ConnectFuture connect(SocketAddress address,
+            SocketAddress localAddress, IoHandler handler) {
+        return delegate.connect(address, localAddress, handler);
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoServiceConfig config )
-    {
-        return delegate.connect( address, localAddress, handler, config );
+    public ConnectFuture connect(SocketAddress address,
+            SocketAddress localAddress, IoHandler handler,
+            IoServiceConfig config) {
+        return delegate.connect(address, localAddress, handler, config);
     }
 
-    public boolean isManaged( SocketAddress serviceAddress )
-    {
-        return delegate.isManaged( serviceAddress );
+    public boolean isManaged(SocketAddress serviceAddress) {
+        return delegate.isManaged(serviceAddress);
     }
-    
-    public Set getManagedServiceAddresses()
-    {
+
+    public Set getManagedServiceAddresses() {
         return delegate.getManagedServiceAddresses();
     }
 
-    public Set getManagedSessions( SocketAddress serviceAddress )
-    {
-        return delegate.getManagedSessions( serviceAddress );
+    public Set getManagedSessions(SocketAddress serviceAddress) {
+        return delegate.getManagedSessions(serviceAddress);
     }
-    
-    public IoServiceConfig getDefaultConfig()
-    {
+
+    public IoServiceConfig getDefaultConfig() {
         return delegate.getDefaultConfig();
     }
 
-    public IoFilterChainBuilder getFilterChainBuilder()
-    {
+    public IoFilterChainBuilder getFilterChainBuilder() {
         return delegate.getFilterChainBuilder();
     }
 
-    public void setFilterChainBuilder( IoFilterChainBuilder builder )
-    {
-        delegate.setFilterChainBuilder( builder );
+    public void setFilterChainBuilder(IoFilterChainBuilder builder) {
+        delegate.setFilterChainBuilder(builder);
     }
 
-    public DefaultIoFilterChainBuilder getFilterChain()
-    {
+    public DefaultIoFilterChainBuilder getFilterChain() {
         return delegate.getFilterChain();
     }
 
-    public void addListener( IoServiceListener listener )
-    {
-        delegate.addListener( listener );
+    public void addListener(IoServiceListener listener) {
+        delegate.addListener(listener);
     }
 
-    public void removeListener( IoServiceListener listener )
-    {
-        delegate.removeListener( listener );
+    public void removeListener(IoServiceListener listener) {
+        delegate.removeListener(listener);
     }
 }

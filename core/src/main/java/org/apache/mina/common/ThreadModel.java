@@ -29,15 +29,12 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ThreadModel extends IoFilterChainBuilder
-{
+public interface ThreadModel extends IoFilterChainBuilder {
     /**
      * A {@link ThreadModel} which make MINA not manage a thread model at all.
      */
-    static final ThreadModel MANUAL = new ThreadModel()
-    {
-        public void buildFilterChain( IoFilterChain chain ) throws Exception
-        {
+    static final ThreadModel MANUAL = new ThreadModel() {
+        public void buildFilterChain(IoFilterChain chain) throws Exception {
             // Do nothing.
         }
     };

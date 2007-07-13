@@ -30,8 +30,7 @@ package org.apache.mina.filter.codec;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ProtocolCodecFactory
-{
+public interface ProtocolCodecFactory {
     /**
      * Returns a new (or reusable) instance of {@link ProtocolEncoder} which
      * encodes message objects into binary or protocol-specific data.

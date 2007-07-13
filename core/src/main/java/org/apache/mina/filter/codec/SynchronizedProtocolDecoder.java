@@ -34,51 +34,43 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SynchronizedProtocolDecoder implements ProtocolDecoder
-{
+public class SynchronizedProtocolDecoder implements ProtocolDecoder {
     private final ProtocolDecoder decoder;
 
     /**
      * Creates a new instance which decorates the specified <tt>decoder</tt>.
      */
-    public SynchronizedProtocolDecoder( ProtocolDecoder decoder )
-    {
-        if( decoder == null )
-        {
-            throw new NullPointerException( "decoder" );
+    public SynchronizedProtocolDecoder(ProtocolDecoder decoder) {
+        if (decoder == null) {
+            throw new NullPointerException("decoder");
         }
         this.decoder = decoder;
     }
-    
+
     /**
      * Returns the decoder this decoder is decorating.
      */
-    public ProtocolDecoder getDecoder()
-    {
+    public ProtocolDecoder getDecoder() {
         return decoder;
     }
 
-    public void decode( IoSession session, ByteBuffer in, ProtocolDecoderOutput out ) throws Exception
-    {
-        synchronized( decoder )
-        {
-            decoder.decode( session, in, out );
+    public void decode(IoSession session, ByteBuffer in,
+            ProtocolDecoderOutput out) throws Exception {
+        synchronized (decoder) {
+            decoder.decode(session, in, out);
         }
     }
 
-    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
-    {
-        synchronized( decoder )
-        {
-            decoder.finishDecode( session, out );
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
+            throws Exception {
+        synchronized (decoder) {
+            decoder.finishDecode(session, out);
         }
     }
 
-    public void dispose( IoSession session ) throws Exception
-    {
-        synchronized( decoder )
-        {
-            decoder.dispose( session );
+    public void dispose(IoSession session) throws Exception {
+        synchronized (decoder) {
+            decoder.dispose(session);
         }
     }
 }

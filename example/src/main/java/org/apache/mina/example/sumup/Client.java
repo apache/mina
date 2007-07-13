@@ -37,70 +37,63 @@ import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class Client
-{
+public class Client {
     private static final String HOSTNAME = "localhost";
+
     private static final int PORT = 8080;
+
     private static final int CONNECT_TIMEOUT = 30; // seconds
+
     // Set this to false to use object serialization instead of custom codec.
     private static final boolean USE_CUSTOM_CODEC = true;
 
-    public static void main( String[] args ) throws Throwable
-    {
-        if( args.length == 0 )
-        {
-            System.out.println( "Please specify the list of any integers" );
+    public static void main(String[] args) throws Throwable {
+        if (args.length == 0) {
+            System.out.println("Please specify the list of any integers");
             return;
         }
 
         // prepare values to sum up
-        int[] values = new int[ args.length ];
-        for( int i = 0; i < args.length; i++ )
-        {
-            values[ i ] = Integer.parseInt( args[ i ] );
+        int[] values = new int[args.length];
+        for (int i = 0; i < args.length; i++) {
+            values[i] = Integer.parseInt(args[i]);
         }
 
         SocketConnector connector = new SocketConnector();
 
         // Change the worker timeout to 1 second to make the I/O thread quit soon
         // when there's no connection to manage.
-        connector.setWorkerTimeout( 1 );
-        
+        connector.setWorkerTimeout(1);
+
         // Configure the service.
         SocketConnectorConfig cfg = new SocketConnectorConfig();
-        cfg.setConnectTimeout( CONNECT_TIMEOUT );
-        if( USE_CUSTOM_CODEC )
-        {
+        cfg.setConnectTimeout(CONNECT_TIMEOUT);
+        if (USE_CUSTOM_CODEC) {
             cfg.getFilterChain().addLast(
                     "codec",
-                    new ProtocolCodecFilter( new SumUpProtocolCodecFactory( false ) ) );
-        }
-        else
-        {
+                    new ProtocolCodecFilter(
+                            new SumUpProtocolCodecFactory(false)));
+        } else {
             cfg.getFilterChain().addLast(
                     "codec",
-                    new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
+                    new ProtocolCodecFilter(
+                            new ObjectSerializationCodecFactory()));
         }
-        cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
-        
+        cfg.getFilterChain().addLast("logger", new LoggingFilter());
+
         IoSession session;
-        for( ;; )
-        {
-            try
-            {
-                ConnectFuture future = connector.connect(
-                        new InetSocketAddress( HOSTNAME, PORT ),
-                        new ClientSessionHandler( values ), cfg );
-                
+        for (;;) {
+            try {
+                ConnectFuture future = connector.connect(new InetSocketAddress(
+                        HOSTNAME, PORT), new ClientSessionHandler(values), cfg);
+
                 future.join();
                 session = future.getSession();
                 break;
-            }
-            catch( RuntimeIOException e )
-            {
-                System.err.println( "Failed to connect." );
+            } catch (RuntimeIOException e) {
+                System.err.println("Failed to connect.");
                 e.printStackTrace();
-                Thread.sleep( 5000 );
+                Thread.sleep(5000);
             }
         }
 

@@ -77,16 +77,15 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DemuxingIoHandler extends IoHandlerAdapter
-{
+public class DemuxingIoHandler extends IoHandlerAdapter {
     private final Map findHandlerCache = new ConcurrentHashMap();
+
     private final Map type2handler = new ConcurrentHashMap();
 
     /**
      * Creates a new instance with no registered {@link MessageHandler}s.
      */
-    public DemuxingIoHandler()
-    {
+    public DemuxingIoHandler() {
     }
 
     /**
@@ -96,10 +95,9 @@ public class DemuxingIoHandler extends IoHandlerAdapter
      * @return the old handler if there is already a registered handler for
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
-    public MessageHandler addMessageHandler( Class type, MessageHandler handler )
-    {
+    public MessageHandler addMessageHandler(Class type, MessageHandler handler) {
         findHandlerCache.clear();
-        return ( MessageHandler ) type2handler.put( type, handler );
+        return (MessageHandler) type2handler.put(type, handler);
     }
 
     /**
@@ -108,112 +106,100 @@ public class DemuxingIoHandler extends IoHandlerAdapter
      * 
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
-    public MessageHandler removeMessageHandler( Class type )
-    {
+    public MessageHandler removeMessageHandler(Class type) {
         findHandlerCache.clear();
-        return ( MessageHandler ) type2handler.remove( type );
+        return (MessageHandler) type2handler.remove(type);
     }
-    
-    
+
     /**
      * Returns the {@link MessageHandler} which is registered to process
      * the specified <code>type</code>. 
      */
-    public MessageHandler getMessageHandler( Class type )
-    {
-        return ( MessageHandler ) type2handler.get( type );
+    public MessageHandler getMessageHandler(Class type) {
+        return (MessageHandler) type2handler.get(type);
     }
-    
+
     /**
      * Returns the {@link Map} which contains all messageType-{@link MessageHandler}
      * pairs registered to this handler.
      */
-    public Map getMessageHandlerMap()
-    {
-        return Collections.unmodifiableMap( type2handler );
+    public Map getMessageHandlerMap() {
+        return Collections.unmodifiableMap(type2handler);
     }
 
     /**
      * Forwards the received events into the appropriate {@link MessageHandler}
      * which is registered by {@link #addMessageHandler(Class, MessageHandler)}.
      */
-    public void messageReceived( IoSession session, Object message ) throws Exception
-    {
-        MessageHandler handler = findHandler( message.getClass() );
-        if( handler != null )
-        {
-            handler.messageReceived( session, message );
-        }
-        else
-        {
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
+        MessageHandler handler = findHandler(message.getClass());
+        if (handler != null) {
+            handler.messageReceived(session, message);
+        } else {
             throw new UnknownMessageTypeException(
-                    "No message handler found for message: " + message );
+                    "No message handler found for message: " + message);
         }
-    }
-    
-    protected MessageHandler findHandler( Class type )
-    {
-        return findHandler( type, null );
     }
 
-    private MessageHandler findHandler( Class type, Set triedClasses )
-    {
+    protected MessageHandler findHandler(Class type) {
+        return findHandler(type, null);
+    }
+
+    private MessageHandler findHandler(Class type, Set triedClasses) {
         MessageHandler handler = null;
 
-        if( triedClasses != null && triedClasses.contains( type ) )
+        if (triedClasses != null && triedClasses.contains(type))
             return null;
 
         /*
          * Try the cache first.
          */
-        handler = ( MessageHandler ) findHandlerCache.get( type );
-        if( handler != null )
+        handler = (MessageHandler) findHandlerCache.get(type);
+        if (handler != null)
             return handler;
 
         /*
          * Try the registered handlers for an immediate match.
          */
-        handler = ( MessageHandler ) type2handler.get( type );
-        
-        if( handler == null )
-        {
+        handler = (MessageHandler) type2handler.get(type);
+
+        if (handler == null) {
             /*
              * No immediate match could be found. Search the type's interfaces.
              */
-            
-            if( triedClasses == null )
+
+            if (triedClasses == null)
                 triedClasses = new IdentityHashSet();
-            triedClasses.add( type );
-            
+            triedClasses.add(type);
+
             Class[] interfaces = type.getInterfaces();
-            for( int i = 0; i < interfaces.length; i ++ )
-            {
-                handler = findHandler( interfaces[ i ], triedClasses );
-                if( handler != null )
+            for (int i = 0; i < interfaces.length; i++) {
+                handler = findHandler(interfaces[i], triedClasses);
+                if (handler != null)
                     break;
             }
         }
-        
-        if( handler == null )
-        {
+
+        if (handler == null) {
             /*
              * No match in type's interfaces could be found. Search the 
              * superclass.
              */
-            
+
             Class superclass = type.getSuperclass();
-            if( superclass != null )
-                handler = findHandler( superclass );
+            if (superclass != null)
+                handler = findHandler(superclass);
         }
-        
+
         /*
          * Make sure the handler is added to the cache. By updating the cache
          * here all the types (superclasses and interfaces) in the path which 
          * led to a match will be cached along with the immediate message type.
          */
-        if( handler != null )
-            findHandlerCache.put( type, handler );
-        
+        if (handler != null)
+            findHandlerCache.put(type, handler);
+
         return handler;
     }
 }

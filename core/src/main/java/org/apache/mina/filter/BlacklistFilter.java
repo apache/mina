@@ -39,8 +39,7 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class BlacklistFilter extends IoFilterAdapter
-{
+public class BlacklistFilter extends IoFilterAdapter {
     private final Set blacklist = new HashSet();
 
     /**
@@ -50,18 +49,16 @@ public class BlacklistFilter extends IoFilterAdapter
      * 
      * @param addresses an array of addresses to be blacklisted.
      */
-    public void setBlacklist( InetAddress[] addresses )
-    {
-        if( addresses == null )
-            throw new NullPointerException( "addresses" );
+    public void setBlacklist(InetAddress[] addresses) {
+        if (addresses == null)
+            throw new NullPointerException("addresses");
         blacklist.clear();
-        for( int i = 0; i < addresses.length; i++ )
-        {
-            InetAddress addr = addresses[ i ];
-            block (addr, "addresses[" + i + ']' );
+        for (int i = 0; i < addresses.length; i++) {
+            InetAddress addr = addresses[i];
+            block(addr, "addresses[" + i + ']');
         }
     }
-    
+
     /**
      * Sets the addresses to be blacklisted.
      * 
@@ -72,145 +69,115 @@ public class BlacklistFilter extends IoFilterAdapter
      * @throws IllegalArgumentException if the specified collections contains 
      *         non-{@link InetAddress} objects.
      */
-    public void setBlacklist( Collection addresses )
-    {
-        if( addresses == null )
-            throw new NullPointerException( "addresses" );
+    public void setBlacklist(Collection addresses) {
+        if (addresses == null)
+            throw new NullPointerException("addresses");
 
-        InetAddress[] inetAddresses = new InetAddress[ addresses.size() ];
-        try
-        {
-            setBlacklist( ( InetAddress[] ) addresses.toArray( inetAddresses ) );
-        }
-        catch ( ArrayStoreException ase )
-        {
+        InetAddress[] inetAddresses = new InetAddress[addresses.size()];
+        try {
+            setBlacklist((InetAddress[]) addresses.toArray(inetAddresses));
+        } catch (ArrayStoreException ase) {
             IllegalArgumentException iae = new IllegalArgumentException(
-                    "Collection of addresses must contain only InetAddress instances." );
-            iae.initCause( ase );
+                    "Collection of addresses must contain only InetAddress instances.");
+            iae.initCause(ase);
             throw iae;
         }
     }
-    
+
     /**
      * Blocks the specified endpoint.
      */
-    public synchronized void block( InetAddress address , String error_string )
-    {
-        if( address == null )
-            throw new NullPointerException( error_string );
-        blacklist.add( address );
+    public synchronized void block(InetAddress address, String error_string) {
+        if (address == null)
+            throw new NullPointerException(error_string);
+        blacklist.add(address);
     }
 
     /**
      * Blocks the specified endpoint.
      */
-    public synchronized void block( InetAddress address )
-    {
-        block( address, "address" );
+    public synchronized void block(InetAddress address) {
+        block(address, "address");
     }
 
     /**
      * Unblocks the specified endpoint.
      */
-    public synchronized void unblock( InetAddress address )
-    {
-        if( address == null )
-            throw new NullPointerException( "address" );
-        blacklist.remove( address );
+    public synchronized void unblock(InetAddress address) {
+        if (address == null)
+            throw new NullPointerException("address");
+        blacklist.remove(address);
     }
-    
-    public void sessionCreated( NextFilter nextFilter, IoSession session )
-    {
-        if( !isBlocked( session ) )
-        {
+
+    public void sessionCreated(NextFilter nextFilter, IoSession session) {
+        if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.sessionCreated( session );
-        }
-        else
-        {
-            blockSession( session );
-        }
-    }
-    
-    public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        if( !isBlocked( session ) )
-        {
-            // forward if not blocked
-            nextFilter.sessionOpened( session );
-        }
-        else
-        {
-            blockSession( session );
+            nextFilter.sessionCreated(session);
+        } else {
+            blockSession(session);
         }
     }
 
-    public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        if( !isBlocked( session ) )
-        {
+    public void sessionOpened(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.sessionClosed( session );
-        }
-        else
-        {
-            blockSession( session );
+            nextFilter.sessionOpened(session);
+        } else {
+            blockSession(session);
         }
     }
 
-    public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status ) throws Exception
-    {
-        if( !isBlocked( session ) )
-        {
+    public void sessionClosed(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.sessionIdle( session, status );
-        }
-        else
-        {
-            blockSession( session );
+            nextFilter.sessionClosed(session);
+        } else {
+            blockSession(session);
         }
     }
 
-    public void messageReceived( NextFilter nextFilter, IoSession session, Object message )
-    {
-        if( !isBlocked( session ) )
-        {
+    public void sessionIdle(NextFilter nextFilter, IoSession session,
+            IdleStatus status) throws Exception {
+        if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.messageReceived( session, message );
-        }
-        else
-        {
-            blockSession( session );
+            nextFilter.sessionIdle(session, status);
+        } else {
+            blockSession(session);
         }
     }
 
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
-    {
-        if( !isBlocked( session ) )
-        {
+    public void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) {
+        if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.messageSent( session, message );
-        }
-        else
-        {
-            blockSession( session );
+            nextFilter.messageReceived(session, message);
+        } else {
+            blockSession(session);
         }
     }
 
-    private void blockSession( IoSession session )
-    {
-        SessionLog.info( session, "Remote address in the blacklist; closing." );
+    public void messageSent(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception {
+        if (!isBlocked(session)) {
+            // forward if not blocked
+            nextFilter.messageSent(session, message);
+        } else {
+            blockSession(session);
+        }
+    }
+
+    private void blockSession(IoSession session) {
+        SessionLog.info(session, "Remote address in the blacklist; closing.");
         session.close();
     }
 
-    private boolean isBlocked( IoSession session )
-    {
+    private boolean isBlocked(IoSession session) {
         SocketAddress remoteAddress = session.getRemoteAddress();
-        if( remoteAddress instanceof InetSocketAddress )
-        {
-            if( blacklist.contains( ( ( InetSocketAddress ) remoteAddress )
-                    .getAddress() ) )
-            {
+        if (remoteAddress instanceof InetSocketAddress) {
+            if (blacklist.contains(((InetSocketAddress) remoteAddress)
+                    .getAddress())) {
                 return true;
             }
         }

@@ -42,94 +42,76 @@ import org.apache.mina.transport.vmpipe.support.VmPipe;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAcceptor extends BaseIoAcceptor
-{
+public class VmPipeAcceptor extends BaseIoAcceptor {
     static final Map boundHandlers = new HashMap();
-    
-    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
-    private final IoServiceConfig defaultConfig = new BaseIoAcceptorConfig()
-    {
-        public IoSessionConfig getSessionConfig()
-        {
+
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {
+    };
+
+    private final IoServiceConfig defaultConfig = new BaseIoAcceptorConfig() {
+        public IoSessionConfig getSessionConfig() {
             return CONFIG;
         }
     };
 
-    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
-    {
-        if( handler == null )
-            throw new NullPointerException( "handler" );
-        if( address != null && !( address instanceof VmPipeAddress ) )
-            throw new IllegalArgumentException(
-                    "address must be VmPipeAddress." );
+    public void bind(SocketAddress address, IoHandler handler,
+            IoServiceConfig config) throws IOException {
+        if (handler == null)
+            throw new NullPointerException("handler");
+        if (address != null && !(address instanceof VmPipeAddress))
+            throw new IllegalArgumentException("address must be VmPipeAddress.");
 
-        if( config == null )
-        {
+        if (config == null) {
             config = getDefaultConfig();
         }
 
-        synchronized( boundHandlers )
-        {
-            if( address == null || ( ( VmPipeAddress ) address ).getPort() == 0 )
-            {
-                for( int i = 1; i < Integer.MAX_VALUE; i++ )
-                {
-                    address = new VmPipeAddress( i );
-                    if( !boundHandlers.containsKey( address ) )
-                    {
+        synchronized (boundHandlers) {
+            if (address == null || ((VmPipeAddress) address).getPort() == 0) {
+                for (int i = 1; i < Integer.MAX_VALUE; i++) {
+                    address = new VmPipeAddress(i);
+                    if (!boundHandlers.containsKey(address)) {
                         break;
                     }
                 }
-            }
-            else if( boundHandlers.containsKey( address ) )
-            {
-                throw new IOException( "Address already bound: " + address );
+            } else if (boundHandlers.containsKey(address)) {
+                throw new IOException("Address already bound: " + address);
             }
 
-            boundHandlers.put( address, 
-                               new VmPipe( this,
-                                          ( VmPipeAddress ) address,
-                                          handler, config, getListeners() ) );
+            boundHandlers.put(address, new VmPipe(this,
+                    (VmPipeAddress) address, handler, config, getListeners()));
         }
-        
-        getListeners().fireServiceActivated( this, address, handler, config );
+
+        getListeners().fireServiceActivated(this, address, handler, config);
     }
-    
-    public void unbind( SocketAddress address )
-    {
-        if( address == null )
-            throw new NullPointerException( "address" );
+
+    public void unbind(SocketAddress address) {
+        if (address == null)
+            throw new NullPointerException("address");
 
         VmPipe pipe = null;
-        synchronized( boundHandlers )
-        {
-            if( !boundHandlers.containsKey( address ) )
-            {
-                throw new IllegalArgumentException( "Address not bound: " + address );
+        synchronized (boundHandlers) {
+            if (!boundHandlers.containsKey(address)) {
+                throw new IllegalArgumentException("Address not bound: "
+                        + address);
             }
-            
-            pipe = ( VmPipe ) boundHandlers.remove( address );
+
+            pipe = (VmPipe) boundHandlers.remove(address);
         }
-        
-        getListeners().fireServiceDeactivated(
-                this, pipe.getAddress(),
-                pipe.getHandler(), pipe.getConfig() );
+
+        getListeners().fireServiceDeactivated(this, pipe.getAddress(),
+                pipe.getHandler(), pipe.getConfig());
     }
-    
-    public void unbindAll()
-    {
-        synchronized( boundHandlers )
-        {
-            List addresses = new ArrayList( boundHandlers.keySet() );
-            for( Iterator i = addresses.iterator(); i.hasNext(); )
-            {
-                unbind( ( SocketAddress ) i.next() );
+
+    public void unbindAll() {
+        synchronized (boundHandlers) {
+            List addresses = new ArrayList(boundHandlers.keySet());
+            for (Iterator i = addresses.iterator(); i.hasNext();) {
+                unbind((SocketAddress) i.next());
             }
         }
     }
-    
-    public IoServiceConfig getDefaultConfig()
-    {
+
+    public IoServiceConfig getDefaultConfig() {
         return defaultConfig;
     }
 }

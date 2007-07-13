@@ -27,24 +27,18 @@ import org.apache.mina.common.IoSessionConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable
-{
-    protected BaseIoSessionConfig()
-    {
+public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable {
+    protected BaseIoSessionConfig() {
     }
 
-    public Object clone()
-    {
+    public Object clone() {
         BaseIoSessionConfig ret;
-        try
-        {
-            ret = ( BaseIoSessionConfig ) super.clone();
+        try {
+            ret = (BaseIoSessionConfig) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw (InternalError) new InternalError().initCause(e);
         }
-        catch( CloneNotSupportedException e )
-        {
-            throw ( InternalError ) new InternalError().initCause( e );
-        }
-        
+
         return ret;
     }
 }

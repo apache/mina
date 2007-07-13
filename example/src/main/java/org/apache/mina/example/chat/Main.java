@@ -38,52 +38,46 @@ import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class Main
-{
+public class Main {
     /** Choose your favorite port number. */
     private static final int PORT = 1234;
-    
+
     /** Set this to true if you want to make the server SSL */
     private static final boolean USE_SSL = false;
-    
-    public static void main( String[] args ) throws Exception
-    {
+
+    public static void main(String[] args) throws Exception {
         IoAcceptor acceptor = new SocketAcceptor();
         IoAcceptorConfig config = new SocketAcceptorConfig();
         DefaultIoFilterChainBuilder chain = config.getFilterChain();
-        
+
         // Add SSL filter if SSL is enabled.
-        if( USE_SSL )
-        {
-            addSSLSupport( chain  );
+        if (USE_SSL) {
+            addSSLSupport(chain);
         }
-        
-        chain.addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory() ) );
-        
-        addLogger( chain );
-        
+
+        chain.addLast("codec", new ProtocolCodecFilter(
+                new TextLineCodecFactory()));
+
+        addLogger(chain);
+
         // Bind
-        acceptor.bind(
-                new InetSocketAddress( PORT ),
-                new ChatProtocolHandler(),
-                config );
+        acceptor.bind(new InetSocketAddress(PORT), new ChatProtocolHandler(),
+                config);
 
-        System.out.println( "Listening on port " + PORT );
-    }
-    
-    private static void addSSLSupport( DefaultIoFilterChainBuilder chain )
-            throws Exception
-    {
-        SSLFilter sslFilter = new SSLFilter( BogusSSLContextFactory
-                .getInstance( true ) );
-        chain.addLast( "sslFilter", sslFilter );
-        System.out.println( "SSL ON" );
+        System.out.println("Listening on port " + PORT);
     }
 
-    
-    private static void addLogger( DefaultIoFilterChainBuilder chain ) throws Exception
-    {
-        chain.addLast( "logger", new LoggingFilter() );
-        System.out.println( "Logging ON" );
+    private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
+            throws Exception {
+        SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
+                .getInstance(true));
+        chain.addLast("sslFilter", sslFilter);
+        System.out.println("SSL ON");
+    }
+
+    private static void addLogger(DefaultIoFilterChainBuilder chain)
+            throws Exception {
+        chain.addLast("logger", new LoggingFilter());
+        System.out.println("Logging ON");
     }
 }

@@ -29,27 +29,26 @@ import org.apache.mina.common.IoSessionConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface DatagramSessionConfig extends IoSessionConfig
-{
+public interface DatagramSessionConfig extends IoSessionConfig {
     /**
      * @see DatagramSocket#getBroadcast()
      */
     boolean isBroadcast();
-    
+
     /**
      * @see DatagramSocket#setBroadcast(boolean)
      */
-    void setBroadcast( boolean broadcast );
-    
+    void setBroadcast(boolean broadcast);
+
     /**
      * @see DatagramSocket#getReuseAddress()
      */
     boolean isReuseAddress();
-    
+
     /**
      * @see DatagramSocket#setReuseAddress(boolean)
      */
-    void setReuseAddress( boolean reuseAddress );
+    void setReuseAddress(boolean reuseAddress);
 
     /**
      * @see DatagramSocket#getReceiveBufferSize()
@@ -59,7 +58,7 @@ public interface DatagramSessionConfig extends IoSessionConfig
     /**
      * @see DatagramSocket#setReceiveBufferSize(int)
      */
-    void setReceiveBufferSize( int receiveBufferSize );
+    void setReceiveBufferSize(int receiveBufferSize);
 
     /**
      * @see DatagramSocket#getSendBufferSize()
@@ -69,7 +68,7 @@ public interface DatagramSessionConfig extends IoSessionConfig
     /**
      * @see DatagramSocket#setSendBufferSize(int)
      */
-    void setSendBufferSize( int sendBufferSize );
+    void setSendBufferSize(int sendBufferSize);
 
     /**
      * @see DatagramSocket#getTrafficClass()
@@ -79,5 +78,5 @@ public interface DatagramSessionConfig extends IoSessionConfig
     /**
      * @see DatagramSocket#setTrafficClass(int)
      */
-    void setTrafficClass( int trafficClass );
+    void setTrafficClass(int trafficClass);
 }

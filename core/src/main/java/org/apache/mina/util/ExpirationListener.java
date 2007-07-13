@@ -25,7 +25,6 @@ package org.apache.mina.util;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * TODO Make this a inner interface of ExpiringMap
  */
-public interface ExpirationListener
-{
+public interface ExpirationListener {
     void expired(Object expiredObject);
 }

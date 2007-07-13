@@ -31,7 +31,7 @@ import org.apache.mina.common.IoSession;
  * @version $Rev$, $Date$
  */
 public interface SingleSessionIoHandlerFactory {
-    
+
     /**
      * Returns a {@link SingleSessionIoHandler} for the given session.
      * 

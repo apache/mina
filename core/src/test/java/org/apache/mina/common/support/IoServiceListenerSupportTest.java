@@ -43,302 +43,299 @@ import org.easymock.MockControl;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
-public class IoServiceListenerSupportTest extends TestCase
-{
-    private static final SocketAddress ADDRESS = new InetSocketAddress( 8080 );
+public class IoServiceListenerSupportTest extends TestCase {
+    private static final SocketAddress ADDRESS = new InetSocketAddress(8080);
 
-    public void testServiceLifecycle() throws Exception
-    {
+    public void testServiceLifecycle() throws Exception {
         IoServiceListenerSupport support = new IoServiceListenerSupport();
-    
-        MockControl listenerControl = MockControl.createStrictControl( IoServiceListener.class );
-        IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
-        
+
+        MockControl listenerControl = MockControl
+                .createStrictControl(IoServiceListener.class);
+        IoServiceListener listener = (IoServiceListener) listenerControl
+                .getMock();
+
         // Test activation
-        listener.serviceActivated( null, ADDRESS, null, null );
-        
+        listener.serviceActivated(null, ADDRESS, null, null);
+
         listenerControl.replay();
-        
-        support.add( listener );
-        support.fireServiceActivated( null, ADDRESS, null, null );
-        
+
+        support.add(listener);
+        support.fireServiceActivated(null, ADDRESS, null, null);
+
         listenerControl.verify();
-        
-        Assert.assertEquals( 1, support.getManagedServiceAddresses().size() );
-        Assert.assertTrue( support.getManagedServiceAddresses().contains( ADDRESS ) );
-        
+
+        Assert.assertEquals(1, support.getManagedServiceAddresses().size());
+        Assert.assertTrue(support.getManagedServiceAddresses()
+                .contains(ADDRESS));
+
         // Test deactivation & other side effects
         listenerControl.reset();
-        listener.serviceDeactivated( null, ADDRESS, null, null );
+        listener.serviceDeactivated(null, ADDRESS, null, null);
 
         listenerControl.replay();
         //// Activate more than once
-        support.fireServiceActivated( null, ADDRESS, null, null );
+        support.fireServiceActivated(null, ADDRESS, null, null);
         //// Deactivate
-        support.fireServiceDeactivated( null, ADDRESS, null, null );
+        support.fireServiceDeactivated(null, ADDRESS, null, null);
         //// Deactivate more than once
-        support.fireServiceDeactivated( null, ADDRESS, null, null );
-        
+        support.fireServiceDeactivated(null, ADDRESS, null, null);
+
         listenerControl.verify();
 
-        Assert.assertEquals( 0, support.getManagedServiceAddresses().size() );
-        Assert.assertFalse( support.getManagedServiceAddresses().contains( ADDRESS ) );
+        Assert.assertEquals(0, support.getManagedServiceAddresses().size());
+        Assert.assertFalse(support.getManagedServiceAddresses().contains(
+                ADDRESS));
     }
-    
-    public void testSessionLifecycle() throws Exception
-    {
+
+    public void testSessionLifecycle() throws Exception {
         IoServiceListenerSupport support = new IoServiceListenerSupport();
-    
-        TestSession session = new TestSession( ADDRESS );
-        
-        MockControl chainControl = MockControl.createStrictControl( IoFilterChain.class );
-        IoFilterChain chain = ( IoFilterChain ) chainControl.getMock();
-        session.setFilterChain( chain );
-        
-        MockControl listenerControl = MockControl.createStrictControl( IoServiceListener.class );
-        IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
-        
+
+        TestSession session = new TestSession(ADDRESS);
+
+        MockControl chainControl = MockControl
+                .createStrictControl(IoFilterChain.class);
+        IoFilterChain chain = (IoFilterChain) chainControl.getMock();
+        session.setFilterChain(chain);
+
+        MockControl listenerControl = MockControl
+                .createStrictControl(IoServiceListener.class);
+        IoServiceListener listener = (IoServiceListener) listenerControl
+                .getMock();
+
         // Test creation
-        listener.sessionCreated( session );
-        chain.fireSessionCreated( session );
-        chain.fireSessionOpened( session);
-        
+        listener.sessionCreated(session);
+        chain.fireSessionCreated(session);
+        chain.fireSessionOpened(session);
+
         listenerControl.replay();
         chainControl.replay();
-        
-        support.add( listener );
-        support.fireSessionCreated( session );
-        
+
+        support.add(listener);
+        support.fireSessionCreated(session);
+
         listenerControl.verify();
         chainControl.verify();
-        
-        Assert.assertEquals( 1, support.getManagedSessions( ADDRESS ).size() );
-        Assert.assertTrue( support.getManagedSessions( ADDRESS ).contains( session ) );
-        
+
+        Assert.assertEquals(1, support.getManagedSessions(ADDRESS).size());
+        Assert
+                .assertTrue(support.getManagedSessions(ADDRESS).contains(
+                        session));
+
         // Test destruction & other side effects
         listenerControl.reset();
         chainControl.reset();
-        chain.fireSessionClosed( session );
-        listener.sessionDestroyed( session );
+        chain.fireSessionClosed(session);
+        listener.sessionDestroyed(session);
 
         listenerControl.replay();
         //// Activate more than once
-        support.fireSessionCreated( session );
+        support.fireSessionCreated(session);
         //// Deactivate
-        support.fireSessionDestroyed( session );
+        support.fireSessionDestroyed(session);
         //// Deactivate more than once
-        support.fireSessionDestroyed( session );
-        
+        support.fireSessionDestroyed(session);
+
         listenerControl.verify();
 
-        Assert.assertFalse( session.isClosing() );
-        Assert.assertEquals( 0, support.getManagedSessions( ADDRESS ).size() );
-        Assert.assertFalse( support.getManagedSessions( ADDRESS ).contains( session ) );
+        Assert.assertFalse(session.isClosing());
+        Assert.assertEquals(0, support.getManagedSessions(ADDRESS).size());
+        Assert.assertFalse(support.getManagedSessions(ADDRESS)
+                .contains(session));
     }
-    
-    public void testDisconnectOnUnbind() throws Exception
-    {
+
+    public void testDisconnectOnUnbind() throws Exception {
         final IoServiceListenerSupport support = new IoServiceListenerSupport();
-    
-        MockControl acceptorControl = MockControl.createStrictControl( IoAcceptor.class );
-        IoAcceptor acceptor = ( IoAcceptor ) acceptorControl.getMock();
 
-        final TestSession session = new TestSession( acceptor, ADDRESS );
+        MockControl acceptorControl = MockControl
+                .createStrictControl(IoAcceptor.class);
+        IoAcceptor acceptor = (IoAcceptor) acceptorControl.getMock();
 
-        MockControl configControl = MockControl.createStrictControl( IoAcceptorConfig.class );
-        IoAcceptorConfig config = ( IoAcceptorConfig ) configControl.getMock();
+        final TestSession session = new TestSession(acceptor, ADDRESS);
 
-        MockControl chainControl = MockControl.createStrictControl( IoFilterChain.class );
-        IoFilterChain chain = ( IoFilterChain ) chainControl.getMock();
-        session.setFilterChain( chain );
-        
-        MockControl listenerControl = MockControl.createStrictControl( IoServiceListener.class );
-        IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
-        
+        MockControl configControl = MockControl
+                .createStrictControl(IoAcceptorConfig.class);
+        IoAcceptorConfig config = (IoAcceptorConfig) configControl.getMock();
+
+        MockControl chainControl = MockControl
+                .createStrictControl(IoFilterChain.class);
+        IoFilterChain chain = (IoFilterChain) chainControl.getMock();
+        session.setFilterChain(chain);
+
+        MockControl listenerControl = MockControl
+                .createStrictControl(IoServiceListener.class);
+        IoServiceListener listener = (IoServiceListener) listenerControl
+                .getMock();
+
         // Activate a service and create a session.
-        listener.serviceActivated( acceptor, ADDRESS, null, config );
-        listener.sessionCreated( session );
-        chain.fireSessionCreated( session );
-        chain.fireSessionOpened( session );
-        
+        listener.serviceActivated(acceptor, ADDRESS, null, config);
+        listener.sessionCreated(session);
+        chain.fireSessionCreated(session);
+        chain.fireSessionOpened(session);
+
         listenerControl.replay();
         chainControl.replay();
-        
-        support.add( listener );
-        support.fireServiceActivated( acceptor, ADDRESS, null, config );
-        support.fireSessionCreated( session );
-        
+
+        support.add(listener);
+        support.fireServiceActivated(acceptor, ADDRESS, null, config);
+        support.fireSessionCreated(session);
+
         listenerControl.verify();
         chainControl.verify();
-        
+
         // Deactivate a service and make sure the session is closed & destroyed.
         listenerControl.reset();
         chainControl.reset();
 
-        listener.serviceDeactivated( acceptor, ADDRESS, null, config );
-        configControl.expectAndReturn(config.isDisconnectOnUnbind(), true );
-        listener.sessionDestroyed( session );
-        chain.fireSessionClosed( session );
+        listener.serviceDeactivated(acceptor, ADDRESS, null, config);
+        configControl.expectAndReturn(config.isDisconnectOnUnbind(), true);
+        listener.sessionDestroyed(session);
+        chain.fireSessionClosed(session);
 
         listenerControl.replay();
         configControl.replay();
         chainControl.replay();
 
-        new Thread()
-        {
+        new Thread() {
             // Emulate I/O service
-            public void run()
-            {
-                try
-                {
-                    Thread.sleep( 500 );
-                }
-                catch( InterruptedException e )
-                {
+            public void run() {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                support.fireSessionDestroyed( session );
+                support.fireSessionDestroyed(session);
             }
         }.start();
-        support.fireServiceDeactivated( acceptor, ADDRESS, null, config );
-        
+        support.fireServiceDeactivated(acceptor, ADDRESS, null, config);
+
         listenerControl.verify();
         configControl.verify();
         chainControl.verify();
 
-        Assert.assertTrue( session.isClosing() );
-        Assert.assertEquals( 0, support.getManagedSessions( ADDRESS ).size() );
-        Assert.assertFalse( support.getManagedSessions( ADDRESS ).contains( session ) );
+        Assert.assertTrue(session.isClosing());
+        Assert.assertEquals(0, support.getManagedSessions(ADDRESS).size());
+        Assert.assertFalse(support.getManagedSessions(ADDRESS)
+                .contains(session));
     }
-    
-    public void testConnectorActivation() throws Exception
-    {
+
+    public void testConnectorActivation() throws Exception {
         IoServiceListenerSupport support = new IoServiceListenerSupport();
-    
-        MockControl connectorControl = MockControl.createStrictControl( IoConnector.class );
-        IoConnector connector = ( IoConnector ) connectorControl.getMock();
 
-        final TestSession session = new TestSession( connector, ADDRESS );
+        MockControl connectorControl = MockControl
+                .createStrictControl(IoConnector.class);
+        IoConnector connector = (IoConnector) connectorControl.getMock();
 
-        MockControl chainControl = MockControl.createStrictControl( IoFilterChain.class );
-        IoFilterChain chain = ( IoFilterChain ) chainControl.getMock();
-        session.setFilterChain( chain );
+        final TestSession session = new TestSession(connector, ADDRESS);
 
-        MockControl listenerControl = MockControl.createStrictControl( IoServiceListener.class );
-        IoServiceListener listener = ( IoServiceListener ) listenerControl.getMock();
-        
+        MockControl chainControl = MockControl
+                .createStrictControl(IoFilterChain.class);
+        IoFilterChain chain = (IoFilterChain) chainControl.getMock();
+        session.setFilterChain(chain);
+
+        MockControl listenerControl = MockControl
+                .createStrictControl(IoServiceListener.class);
+        IoServiceListener listener = (IoServiceListener) listenerControl
+                .getMock();
+
         // Creating a session should activate a service automatically.
-        listener.serviceActivated( connector, ADDRESS, null, null );
-        listener.sessionCreated( session );
-        chain.fireSessionCreated( session );
-        chain.fireSessionOpened( session );
-        
+        listener.serviceActivated(connector, ADDRESS, null, null);
+        listener.sessionCreated(session);
+        chain.fireSessionCreated(session);
+        chain.fireSessionOpened(session);
+
         listenerControl.replay();
         chainControl.replay();
-        
-        support.add( listener );
-        support.fireSessionCreated( session );
-        
+
+        support.add(listener);
+        support.fireSessionCreated(session);
+
         listenerControl.verify();
         chainControl.verify();
-        
+
         // Destroying a session should deactivate a service automatically.
         listenerControl.reset();
         chainControl.reset();
-        listener.sessionDestroyed( session );
-        chain.fireSessionClosed( session );
-        listener.serviceDeactivated( connector, ADDRESS, null, null );
-        
+        listener.sessionDestroyed(session);
+        chain.fireSessionClosed(session);
+        listener.serviceDeactivated(connector, ADDRESS, null, null);
+
         listenerControl.replay();
         chainControl.replay();
-        
-        support.fireSessionDestroyed( session );
-        
+
+        support.fireSessionDestroyed(session);
+
         listenerControl.verify();
         chainControl.verify();
 
-        Assert.assertEquals( 0, support.getManagedSessions( ADDRESS ).size() );
-        Assert.assertFalse( support.getManagedSessions( ADDRESS ).contains( session ) );
+        Assert.assertEquals(0, support.getManagedSessions(ADDRESS).size());
+        Assert.assertFalse(support.getManagedSessions(ADDRESS)
+                .contains(session));
     }
-    
-    private static class TestSession extends BaseIoSession
-    {
+
+    private static class TestSession extends BaseIoSession {
         private final IoService service;
+
         private final SocketAddress serviceAddress;
+
         private IoFilterChain filterChain;
-        
-        TestSession( SocketAddress serviceAddress )
-        {
-            this( null, serviceAddress );
+
+        TestSession(SocketAddress serviceAddress) {
+            this(null, serviceAddress);
         }
-        
-        TestSession( IoService service, SocketAddress serviceAddress )
-        {
+
+        TestSession(IoService service, SocketAddress serviceAddress) {
             this.service = service;
             this.serviceAddress = serviceAddress;
         }
 
-        protected void updateTrafficMask()
-        {
+        protected void updateTrafficMask() {
         }
 
-        public IoSessionConfig getConfig()
-        {
+        public IoSessionConfig getConfig() {
             return null;
         }
 
-        public IoFilterChain getFilterChain()
-        {
+        public IoFilterChain getFilterChain() {
             return filterChain;
         }
-        
-        public void setFilterChain( IoFilterChain filterChain )
-        {
+
+        public void setFilterChain(IoFilterChain filterChain) {
             this.filterChain = filterChain;
         }
 
-        public IoHandler getHandler()
-        {
+        public IoHandler getHandler() {
             return null;
         }
 
-        public SocketAddress getLocalAddress()
-        {
+        public SocketAddress getLocalAddress() {
             return null;
         }
 
-        public SocketAddress getRemoteAddress()
-        {
+        public SocketAddress getRemoteAddress() {
             return null;
         }
 
-        public int getScheduledWriteBytes()
-        {
+        public int getScheduledWriteBytes() {
             return 0;
         }
 
-        public int getScheduledWriteRequests()
-        {
+        public int getScheduledWriteRequests() {
             return 0;
         }
 
-        public IoService getService()
-        {
+        public IoService getService() {
             return service;
         }
 
-        public SocketAddress getServiceAddress()
-        {
+        public SocketAddress getServiceAddress() {
             return serviceAddress;
         }
 
-        public IoServiceConfig getServiceConfig()
-        {
+        public IoServiceConfig getServiceConfig() {
             return null;
         }
 
-        public TransportType getTransportType()
-        {
+        public TransportType getTransportType() {
             return null;
         }
     }

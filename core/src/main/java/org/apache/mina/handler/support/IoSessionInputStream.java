@@ -33,46 +33,39 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoSessionInputStream extends InputStream
-{
+public class IoSessionInputStream extends InputStream {
     private final Object mutex = new Object();
+
     private final ByteBuffer buf;
 
     private volatile boolean closed;
+
     private volatile boolean released;
+
     private IOException exception;
 
-    public IoSessionInputStream()
-    {
-        buf = ByteBuffer.allocate( 16 );
-        buf.setAutoExpand( true );
-        buf.limit( 0 );
+    public IoSessionInputStream() {
+        buf = ByteBuffer.allocate(16);
+        buf.setAutoExpand(true);
+        buf.limit(0);
     }
 
-    public int available()
-    {
-        if( released )
-        {
+    public int available() {
+        if (released) {
             return 0;
-        }
-        else
-        {
-            synchronized( mutex )
-            {
+        } else {
+            synchronized (mutex) {
                 return buf.remaining();
             }
         }
     }
 
-    public void close()
-    {
-        if( closed )
-        {
+    public void close() {
+        if (closed) {
             return;
         }
 
-        synchronized( mutex )
-        {
+        synchronized (mutex) {
             closed = true;
             releaseBuffer();
 
@@ -80,12 +73,9 @@ public class IoSessionInputStream extends InputStream
         }
     }
 
-    public int read() throws IOException
-    {
-        synchronized( mutex )
-        {
-            if( !waitForData() )
-            {
+    public int read() throws IOException {
+        synchronized (mutex) {
+            if (!waitForData()) {
                 return -1;
             }
 
@@ -93,64 +83,50 @@ public class IoSessionInputStream extends InputStream
         }
     }
 
-    public int read( byte[] b, int off, int len ) throws IOException
-    {
-        synchronized( mutex )
-        {
-            if( !waitForData() )
-            {
+    public int read(byte[] b, int off, int len) throws IOException {
+        synchronized (mutex) {
+            if (!waitForData()) {
                 return -1;
             }
 
             int readBytes;
 
-            if( len > buf.remaining() )
-            {
+            if (len > buf.remaining()) {
                 readBytes = buf.remaining();
-            }
-            else
-            {
+            } else {
                 readBytes = len;
             }
 
-            buf.get( b, off, readBytes );
+            buf.get(b, off, readBytes);
 
             return readBytes;
         }
     }
 
-    private boolean waitForData() throws IOException
-    {
-        if( released )
-        {
+    private boolean waitForData() throws IOException {
+        if (released) {
             return false;
         }
 
-        synchronized( mutex )
-        {
-            while( !released && buf.remaining() == 0 && exception == null )
-            {
-                try
-                {
+        synchronized (mutex) {
+            while (!released && buf.remaining() == 0 && exception == null) {
+                try {
                     mutex.wait();
-                }
-                catch( InterruptedException e )
-                {
-                    IOException ioe = new IOException( "Interrupted while waiting for more data" );
-                    ioe.initCause( e );
+                } catch (InterruptedException e) {
+                    IOException ioe = new IOException(
+                            "Interrupted while waiting for more data");
+                    ioe.initCause(e);
                     throw ioe;
                 }
             }
         }
 
-        if( exception != null )
-        {
+        if (exception != null) {
             releaseBuffer();
             throw exception;
         }
 
-        if( closed && buf.remaining() == 0 )
-        {
+        if (closed && buf.remaining() == 0) {
             releaseBuffer();
 
             return false;
@@ -159,10 +135,8 @@ public class IoSessionInputStream extends InputStream
         return true;
     }
 
-    private void releaseBuffer()
-    {
-        if( released )
-        {
+    private void releaseBuffer() {
+        if (released) {
             return;
         }
 
@@ -170,37 +144,28 @@ public class IoSessionInputStream extends InputStream
         buf.release();
     }
 
-    public void write( ByteBuffer src )
-    {
-        synchronized( mutex )
-        {
-            if( closed )
-            {
+    public void write(ByteBuffer src) {
+        synchronized (mutex) {
+            if (closed) {
                 return;
             }
 
-            if( buf.hasRemaining() )
-            {
+            if (buf.hasRemaining()) {
                 this.buf.compact();
-                this.buf.put( src );
+                this.buf.put(src);
                 this.buf.flip();
-            }
-            else
-            {
+            } else {
                 this.buf.clear();
-                this.buf.put( src );
+                this.buf.put(src);
                 this.buf.flip();
                 mutex.notifyAll();
             }
         }
     }
 
-    public void throwException( IOException e )
-    {
-        synchronized( mutex )
-        {
-            if( exception == null )
-            {
+    public void throwException(IOException e) {
+        synchronized (mutex) {
+            if (exception == null) {
                 exception = e;
 
                 mutex.notifyAll();

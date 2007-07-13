@@ -37,93 +37,79 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DelegatedIoAcceptor implements IoAcceptor
-{
+public class DelegatedIoAcceptor implements IoAcceptor {
     protected IoAcceptor delegate;
-    
+
     /**
      * Creates a new instance.
      */
-    protected DelegatedIoAcceptor()
-    {
+    protected DelegatedIoAcceptor() {
     }
-    
+
     /**
      * Sets the delegate.  This method should be invoked before any operations
      * is requested.
      */
-    protected void init( IoAcceptor delegate )
-    {
+    protected void init(IoAcceptor delegate) {
         this.delegate = delegate;
     }
-    
-    public void bind( SocketAddress address, IoHandler handler ) throws IOException
-    {
-        delegate.bind( address, handler );
+
+    public void bind(SocketAddress address, IoHandler handler)
+            throws IOException {
+        delegate.bind(address, handler);
     }
 
-    public void bind( SocketAddress address, IoHandler handler, IoServiceConfig config ) throws IOException
-    {
-        delegate.bind( address, handler, config );
+    public void bind(SocketAddress address, IoHandler handler,
+            IoServiceConfig config) throws IOException {
+        delegate.bind(address, handler, config);
     }
 
-    public void unbind( SocketAddress address )
-    {
-        delegate.unbind( address );
+    public void unbind(SocketAddress address) {
+        delegate.unbind(address);
     }
-    
-    public void unbindAll()
-    {
+
+    public void unbindAll() {
         delegate.unbindAll();
     }
-    
-    public boolean isManaged( SocketAddress address )
-    {
-        return delegate.isManaged( address );
+
+    public boolean isManaged(SocketAddress address) {
+        return delegate.isManaged(address);
     }
 
-    public Set getManagedServiceAddresses()
-    {
+    public Set getManagedServiceAddresses() {
         return delegate.getManagedServiceAddresses();
     }
 
-    public Set getManagedSessions( SocketAddress serviceAddress )
-    {
-        return delegate.getManagedSessions( serviceAddress );
+    public Set getManagedSessions(SocketAddress serviceAddress) {
+        return delegate.getManagedSessions(serviceAddress);
     }
 
-    public IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
-    {
-        return delegate.newSession( remoteAddress, localAddress );
+    public IoSession newSession(SocketAddress remoteAddress,
+            SocketAddress localAddress) {
+        return delegate.newSession(remoteAddress, localAddress);
     }
 
-    public IoServiceConfig getDefaultConfig()
-    {
+    public IoServiceConfig getDefaultConfig() {
         return delegate.getDefaultConfig();
     }
 
-    public IoFilterChainBuilder getFilterChainBuilder()
-    {
+    public IoFilterChainBuilder getFilterChainBuilder() {
         return delegate.getFilterChainBuilder();
     }
 
-    public void setFilterChainBuilder( IoFilterChainBuilder builder )
-    {
-        delegate.setFilterChainBuilder( builder );
+    public void setFilterChainBuilder(IoFilterChainBuilder builder) {
+        delegate.setFilterChainBuilder(builder);
     }
 
-    public DefaultIoFilterChainBuilder getFilterChain()
-    {
+    public DefaultIoFilterChainBuilder getFilterChain() {
         return delegate.getFilterChain();
     }
 
-    public void addListener( IoServiceListener listener )
-    {
-        delegate.addListener( listener );
+    public void addListener(IoServiceListener listener) {
+        delegate.addListener(listener);
     }
 
-    public void removeListener( IoServiceListener listener )
-    {
-        delegate.removeListener( listener );
+    public void removeListener(IoServiceListener listener) {
+        delegate.removeListener(listener);
     }
 }

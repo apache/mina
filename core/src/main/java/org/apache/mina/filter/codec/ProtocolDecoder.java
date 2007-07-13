@@ -36,8 +36,7 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ProtocolDecoder
-{
+public interface ProtocolDecoder {
     /**
      * Decodes binary or protocol-specific content into higher-level message objects.
      * MINA invokes {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
@@ -46,9 +45,9 @@ public interface ProtocolDecoder
      * 
      * @throws Exception if the read data violated protocol specification
      */
-    void decode( IoSession session, ByteBuffer in,
-                 ProtocolDecoderOutput out ) throws Exception;
-    
+    void decode(IoSession session, ByteBuffer in, ProtocolDecoderOutput out)
+            throws Exception;
+
     /**
      * Invoked when the specified <tt>session</tt> is closed.  This method is useful
      * when you deal with the protocol which doesn't specify the length of a message
@@ -58,12 +57,13 @@ public interface ProtocolDecoder
      * 
      * @throws Exception if the read data violated protocol specification
      */
-    void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception;
-    
+    void finishDecode(IoSession session, ProtocolDecoderOutput out)
+            throws Exception;
+
     /**
      * Releases all resources related with this decoder.
      * 
      * @throws Exception if failed to dispose all resources
      */
-    void dispose( IoSession session ) throws Exception;
+    void dispose(IoSession session) throws Exception;
 }

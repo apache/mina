@@ -19,7 +19,6 @@
  */
 package org.apache.mina.handler.demux;
 
-
 /**
  * An exception that is thrown when {@link DemuxingIoHandler}
  * cannot find any {@link MessageHandler}s associated with the specific
@@ -30,26 +29,21 @@ package org.apache.mina.handler.demux;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class UnknownMessageTypeException extends RuntimeException
-{
+public class UnknownMessageTypeException extends RuntimeException {
     private static final long serialVersionUID = 3257290227428047158L;
 
-    public UnknownMessageTypeException()
-    {
+    public UnknownMessageTypeException() {
     }
 
-    public UnknownMessageTypeException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public UnknownMessageTypeException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public UnknownMessageTypeException( String message )
-    {
-        super( message );
+    public UnknownMessageTypeException(String message) {
+        super(message);
     }
 
-    public UnknownMessageTypeException( Throwable cause )
-    {
-        super( cause );
+    public UnknownMessageTypeException(Throwable cause) {
+        super(cause);
     }
 }

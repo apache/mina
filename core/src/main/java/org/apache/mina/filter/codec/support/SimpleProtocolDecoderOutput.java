@@ -32,33 +32,29 @@ import org.apache.mina.util.Queue;
  * @version $Rev$, $Date$
  *
  */
-public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
-{
+public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
     private final NextFilter nextFilter;
+
     private final IoSession session;
+
     private final Queue messageQueue = new Queue();
-    
-    public SimpleProtocolDecoderOutput( IoSession session, NextFilter nextFilter )
-    {
+
+    public SimpleProtocolDecoderOutput(IoSession session, NextFilter nextFilter) {
         this.nextFilter = nextFilter;
         this.session = session;
     }
-    
-    public void write( Object message )
-    {
-        messageQueue.push( message );
-        if( session instanceof BaseIoSession )
-        {
-            ( ( BaseIoSession ) session ).increaseReadMessages();
+
+    public void write(Object message) {
+        messageQueue.push(message);
+        if (session instanceof BaseIoSession) {
+            ((BaseIoSession) session).increaseReadMessages();
         }
     }
 
-    public void flush()
-    {
-        while( !messageQueue.isEmpty() )
-        {
-            nextFilter.messageReceived( session, messageQueue.pop() );
+    public void flush() {
+        while (!messageQueue.isEmpty()) {
+            nextFilter.messageReceived(session, messageQueue.pop());
         }
-        
+
     }
 }

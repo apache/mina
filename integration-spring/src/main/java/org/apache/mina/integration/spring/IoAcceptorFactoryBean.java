@@ -29,7 +29,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-
 /**
  * Spring {@link FactoryBean} which enables the bindings of an {@link IoAcceptor}
  * to be configured using Spring. Example of usage:
@@ -106,9 +105,10 @@ import org.springframework.util.Assert;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoAcceptorFactoryBean implements FactoryBean, InitializingBean, DisposableBean
-{
-    private Binding[] bindings = new Binding[ 0 ];
+public class IoAcceptorFactoryBean implements FactoryBean, InitializingBean,
+        DisposableBean {
+    private Binding[] bindings = new Binding[0];
+
     private IoAcceptor target;
 
     /**
@@ -116,8 +116,7 @@ public class IoAcceptorFactoryBean implements FactoryBean, InitializingBean, Dis
      * 
      * @param target the target {@link IoAcceptor}.
      */
-    public void setTarget( IoAcceptor target )
-    {
+    public void setTarget(IoAcceptor target) {
         this.target = target;
     }
 
@@ -132,60 +131,47 @@ public class IoAcceptorFactoryBean implements FactoryBean, InitializingBean, Dis
      * @see IoAcceptor#bind(SocketAddress, IoHandler, IoServiceConfig)
      * @see Binding
      */
-    public void setBindings( Binding[] bindings )
-    {
-        Assert.notNull( bindings, "Property 'bindings' may not be null" );
+    public void setBindings(Binding[] bindings) {
+        Assert.notNull(bindings, "Property 'bindings' may not be null");
         this.bindings = bindings;
     }
-    
-    public Object getObject() throws Exception
-    {
+
+    public Object getObject() throws Exception {
         return target;
     }
 
-    public Class getObjectType()
-    {
+    public Class getObjectType() {
         return IoAcceptor.class;
     }
 
-    public boolean isSingleton()
-    {
+    public boolean isSingleton() {
         return true;
     }
 
-    public void afterPropertiesSet() throws Exception
-    {
-        Assert.notNull( target, "Property 'target' may not be null" );
-        
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(target, "Property 'target' may not be null");
+
         /*
          * Bind all.
          */
-        for( int i = 0; i < bindings.length; i++ )
-        {
-            Binding b = bindings[ i ];
-            if( b.getServiceConfig() != null )
-            {
-                target.bind( b.getAddress(), b.getHandler(), b.getServiceConfig() );
-            }
-            else
-            {
-                target.bind( b.getAddress(), b.getHandler() );
+        for (int i = 0; i < bindings.length; i++) {
+            Binding b = bindings[i];
+            if (b.getServiceConfig() != null) {
+                target.bind(b.getAddress(), b.getHandler(), b
+                        .getServiceConfig());
+            } else {
+                target.bind(b.getAddress(), b.getHandler());
             }
         }
     }
 
-    public void destroy() throws Exception
-    {
-        for( int i = 0; i < bindings.length; i++ )
-        {
-            Binding b = bindings[ i ];
-            try
-            {
-                target.unbind( b.getAddress() );
+    public void destroy() throws Exception {
+        for (int i = 0; i < bindings.length; i++) {
+            Binding b = bindings[i];
+            try {
+                target.unbind(b.getAddress());
+            } catch (Exception ignored) {
             }
-            catch( Exception ignored )
-            {
-            }
-        }        
+        }
     }
 }

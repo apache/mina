@@ -28,38 +28,30 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture
-{
+public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture {
     /**
      * Creates a new instance.
      */
-    public DefaultCloseFuture( IoSession session )
-    {
-        super( session );
+    public DefaultCloseFuture(IoSession session) {
+        super(session);
     }
-    
+
     /**
      * Creates a new instance which uses the specified object as a lock.
      */
-    public DefaultCloseFuture( IoSession session, Object lock )
-    {
-        super( session, lock );
+    public DefaultCloseFuture(IoSession session, Object lock) {
+        super(session, lock);
     }
-    
-    public boolean isClosed()
-    {
-        if( isReady() )
-        {
-            return ( ( Boolean ) getValue() ).booleanValue();
-        }
-        else
-        {
+
+    public boolean isClosed() {
+        if (isReady()) {
+            return ((Boolean) getValue()).booleanValue();
+        } else {
             return false;
         }
     }
-    
-    public void setClosed()
-    {
-        setValue( Boolean.TRUE );
+
+    public void setClosed() {
+        setValue(Boolean.TRUE);
     }
 }

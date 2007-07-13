@@ -41,8 +41,7 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface SingleSessionIoHandler
-{
+public interface SingleSessionIoHandler {
 
     /**
      * Invoked when the session is created. Initialize default socket parameters

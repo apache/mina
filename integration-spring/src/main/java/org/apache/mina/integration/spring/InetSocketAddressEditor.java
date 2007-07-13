@@ -42,40 +42,30 @@ import org.springframework.util.Assert;
  * 
  * @see java.net.InetSocketAddress
  */
-public class InetSocketAddressEditor extends PropertyEditorSupport
-{
-    public void setAsText( String text ) throws IllegalArgumentException
-    {
-        setValue( parseSocketAddress( text ) );
+public class InetSocketAddressEditor extends PropertyEditorSupport {
+    public void setAsText(String text) throws IllegalArgumentException {
+        setValue(parseSocketAddress(text));
     }
-    
-    private SocketAddress parseSocketAddress( String s )
-    {
-        Assert.notNull( s, "null SocketAddress string" );
+
+    private SocketAddress parseSocketAddress(String s) {
+        Assert.notNull(s, "null SocketAddress string");
         s = s.trim();
-        int colonIndex = s.indexOf( ":" );
-        if( colonIndex > 0 )
-        {
-            String host = s.substring( 0, colonIndex );
-            int port = parsePort( s.substring( colonIndex + 1 ) );
-            return new InetSocketAddress( host, port );
-        }
-        else
-        {
-            int port = parsePort( s.substring( colonIndex + 1 ) );
-            return new InetSocketAddress( port );
+        int colonIndex = s.indexOf(":");
+        if (colonIndex > 0) {
+            String host = s.substring(0, colonIndex);
+            int port = parsePort(s.substring(colonIndex + 1));
+            return new InetSocketAddress(host, port);
+        } else {
+            int port = parsePort(s.substring(colonIndex + 1));
+            return new InetSocketAddress(port);
         }
     }
 
-    private int parsePort( String s )
-    {
-        try
-        {
-            return Integer.parseInt( s );
+    private int parsePort(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException nfe) {
+            throw new IllegalArgumentException("Illegal port number: " + s);
         }
-        catch( NumberFormatException nfe )
-        {
-            throw new IllegalArgumentException( "Illegal port number: " + s );
-        }
-    }    
+    }
 }

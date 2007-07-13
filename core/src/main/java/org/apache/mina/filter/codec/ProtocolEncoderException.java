@@ -26,39 +26,34 @@ package org.apache.mina.filter.codec;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ProtocolEncoderException extends ProtocolCodecException
-{
+public class ProtocolEncoderException extends ProtocolCodecException {
     private static final long serialVersionUID = 8752989973624459604L;
 
     /**
      * Constructs a new instance.
      */
-    public ProtocolEncoderException()
-    {
+    public ProtocolEncoderException() {
     }
 
     /**
      * Constructs a new instance with the specified message.
      */
-    public ProtocolEncoderException( String message )
-    {
-        super( message );
+    public ProtocolEncoderException(String message) {
+        super(message);
     }
 
     /**
      * Constructs a new instance with the specified cause.
      */
-    public ProtocolEncoderException( Throwable cause )
-    {
-        super( cause );
+    public ProtocolEncoderException(Throwable cause) {
+        super(cause);
     }
 
     /**
      * Constructs a new instance with the specified message and the specified
      * cause.
      */
-    public ProtocolEncoderException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public ProtocolEncoderException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

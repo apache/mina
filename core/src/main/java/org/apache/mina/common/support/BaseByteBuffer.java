@@ -41,396 +41,331 @@ import org.apache.mina.common.ByteBufferAllocator;
  * @noinspection StaticNonFinalField
  * @see ByteBufferAllocator
  */
-public abstract class BaseByteBuffer extends ByteBuffer
-{
+public abstract class BaseByteBuffer extends ByteBuffer {
     private boolean autoExpand;
-    
+
     /**
      * We don't have any access to Buffer.markValue(), so we need to track it down,
      * which will cause small extra overhead.
      */
     private int mark = -1;
 
-    protected BaseByteBuffer()
-    {
+    protected BaseByteBuffer() {
     }
 
-    public boolean isDirect()
-    {
+    public boolean isDirect() {
         return buf().isDirect();
     }
-    
-    public boolean isReadOnly()
-    {
+
+    public boolean isReadOnly() {
         return buf().isReadOnly();
     }
 
-    public int capacity()
-    {
+    public int capacity() {
         return buf().capacity();
     }
-    
-    public ByteBuffer capacity( int newCapacity )
-    {
-        if( newCapacity > capacity() )
-        {
+
+    public ByteBuffer capacity(int newCapacity) {
+        if (newCapacity > capacity()) {
             // Allocate a new buffer and transfer all settings to it.
             int pos = position();
             int limit = limit();
             ByteOrder bo = order();
 
-            capacity0( newCapacity );
-            buf().limit( limit );
-            if( mark >= 0 )
-            {
-                buf().position( mark );
+            capacity0(newCapacity);
+            buf().limit(limit);
+            if (mark >= 0) {
+                buf().position(mark);
                 buf().mark();
             }
-            buf().position( pos );
-            buf().order( bo );
+            buf().position(pos);
+            buf().order(bo);
         }
-        
+
         return this;
     }
-    
+
     /**
      * Implement this method to increase the capacity of this buffer.
      * <tt>newCapacity</tt> is always greater than the current capacity.
      */
-    protected abstract void capacity0( int newCapacity );
+    protected abstract void capacity0(int newCapacity);
 
-    public boolean isAutoExpand()
-    {
+    public boolean isAutoExpand() {
         return autoExpand;
     }
 
-    public ByteBuffer setAutoExpand( boolean autoExpand )
-    {
+    public ByteBuffer setAutoExpand(boolean autoExpand) {
         this.autoExpand = autoExpand;
         return this;
     }
 
-    public ByteBuffer expand( int pos, int expectedRemaining )
-    {
+    public ByteBuffer expand(int pos, int expectedRemaining) {
         int end = pos + expectedRemaining;
-        if( end > capacity() )
-        {
+        if (end > capacity()) {
             // The buffer needs expansion.
-            capacity( end );
+            capacity(end);
         }
-        
-        if( end > limit() )
-        {
+
+        if (end > limit()) {
             // We call limit() directly to prevent StackOverflowError
-            buf().limit( end );
+            buf().limit(end);
         }
         return this;
     }
 
-    public int position()
-    {
+    public int position() {
         return buf().position();
     }
 
-    public ByteBuffer position( int newPosition )
-    {
-        autoExpand( newPosition, 0 );
-        buf().position( newPosition );
-        if( mark > newPosition )
-        {
+    public ByteBuffer position(int newPosition) {
+        autoExpand(newPosition, 0);
+        buf().position(newPosition);
+        if (mark > newPosition) {
             mark = -1;
         }
         return this;
     }
-    
-    public int limit()
-    {
+
+    public int limit() {
         return buf().limit();
     }
 
-    public ByteBuffer limit( int newLimit )
-    {
-        autoExpand( newLimit, 0 );
-        buf().limit( newLimit );
-        if( mark > newLimit )
-        {
+    public ByteBuffer limit(int newLimit) {
+        autoExpand(newLimit, 0);
+        buf().limit(newLimit);
+        if (mark > newLimit) {
             mark = -1;
         }
         return this;
     }
-    
-    public ByteBuffer mark()
-    {
+
+    public ByteBuffer mark() {
         buf().mark();
         mark = position();
         return this;
     }
-    
-    public int markValue()
-    {
+
+    public int markValue() {
         return mark;
     }
 
-    public ByteBuffer reset()
-    {
+    public ByteBuffer reset() {
         buf().reset();
         return this;
     }
-    
-    public ByteBuffer clear()
-    {
+
+    public ByteBuffer clear() {
         buf().clear();
         mark = -1;
         return this;
     }
-    
-    public ByteBuffer flip()
-    {
+
+    public ByteBuffer flip() {
         buf().flip();
         mark = -1;
         return this;
     }
-    
-    public ByteBuffer rewind()
-    {
+
+    public ByteBuffer rewind() {
         buf().rewind();
         mark = -1;
         return this;
     }
-    
-    public byte get()
-    {
+
+    public byte get() {
         return buf().get();
     }
 
-    public ByteBuffer put( byte b )
-    {
-        autoExpand( 1 );
-        buf().put( b );
+    public ByteBuffer put(byte b) {
+        autoExpand(1);
+        buf().put(b);
         return this;
     }
 
-    public byte get( int index )
-    {
-        return buf().get( index );
+    public byte get(int index) {
+        return buf().get(index);
     }
 
-    public ByteBuffer put( int index, byte b )
-    {
-        autoExpand( index, 1 );
-        buf().put( index, b );
+    public ByteBuffer put(int index, byte b) {
+        autoExpand(index, 1);
+        buf().put(index, b);
         return this;
     }
 
-    public ByteBuffer get( byte[] dst, int offset, int length )
-    {
-        buf().get( dst, offset, length );
+    public ByteBuffer get(byte[] dst, int offset, int length) {
+        buf().get(dst, offset, length);
         return this;
     }
 
-    public ByteBuffer put( java.nio.ByteBuffer src )
-    {
-        autoExpand( src.remaining() );
-        buf().put( src );
+    public ByteBuffer put(java.nio.ByteBuffer src) {
+        autoExpand(src.remaining());
+        buf().put(src);
         return this;
     }
 
-    public ByteBuffer put( byte[] src, int offset, int length )
-    {
-        autoExpand( length );
-        buf().put( src, offset, length );
+    public ByteBuffer put(byte[] src, int offset, int length) {
+        autoExpand(length);
+        buf().put(src, offset, length);
         return this;
     }
 
-    public ByteBuffer compact()
-    {
+    public ByteBuffer compact() {
         buf().compact();
         mark = -1;
         return this;
     }
 
-    public ByteOrder order()
-    {
+    public ByteOrder order() {
         return buf().order();
     }
 
-    public ByteBuffer order( ByteOrder bo )
-    {
-        buf().order( bo );
+    public ByteBuffer order(ByteOrder bo) {
+        buf().order(bo);
         return this;
     }
 
-    public char getChar()
-    {
+    public char getChar() {
         return buf().getChar();
     }
 
-    public ByteBuffer putChar( char value )
-    {
-        autoExpand( 2 );
-        buf().putChar( value );
+    public ByteBuffer putChar(char value) {
+        autoExpand(2);
+        buf().putChar(value);
         return this;
     }
 
-    public char getChar( int index )
-    {
-        return buf().getChar( index );
+    public char getChar(int index) {
+        return buf().getChar(index);
     }
 
-    public ByteBuffer putChar( int index, char value )
-    {
-        autoExpand( index, 2 );
-        buf().putChar( index, value );
+    public ByteBuffer putChar(int index, char value) {
+        autoExpand(index, 2);
+        buf().putChar(index, value);
         return this;
     }
 
-    public CharBuffer asCharBuffer()
-    {
+    public CharBuffer asCharBuffer() {
         return buf().asCharBuffer();
     }
 
-    public short getShort()
-    {
+    public short getShort() {
         return buf().getShort();
     }
 
-    public ByteBuffer putShort( short value )
-    {
-        autoExpand( 2 );
-        buf().putShort( value );
+    public ByteBuffer putShort(short value) {
+        autoExpand(2);
+        buf().putShort(value);
         return this;
     }
 
-    public short getShort( int index )
-    {
-        return buf().getShort( index );
+    public short getShort(int index) {
+        return buf().getShort(index);
     }
 
-    public ByteBuffer putShort( int index, short value )
-    {
-        autoExpand( index, 2 );
-        buf().putShort( index, value );
+    public ByteBuffer putShort(int index, short value) {
+        autoExpand(index, 2);
+        buf().putShort(index, value);
         return this;
     }
 
-    public ShortBuffer asShortBuffer()
-    {
+    public ShortBuffer asShortBuffer() {
         return buf().asShortBuffer();
     }
 
-    public int getInt()
-    {
+    public int getInt() {
         return buf().getInt();
     }
 
-    public ByteBuffer putInt( int value )
-    {
-        autoExpand( 4 );
-        buf().putInt( value );
+    public ByteBuffer putInt(int value) {
+        autoExpand(4);
+        buf().putInt(value);
         return this;
     }
 
-    public int getInt( int index )
-    {
-        return buf().getInt( index );
+    public int getInt(int index) {
+        return buf().getInt(index);
     }
 
-    public ByteBuffer putInt( int index, int value )
-    {
-        autoExpand( index, 4 );
-        buf().putInt( index, value );
+    public ByteBuffer putInt(int index, int value) {
+        autoExpand(index, 4);
+        buf().putInt(index, value);
         return this;
     }
 
-    public IntBuffer asIntBuffer()
-    {
+    public IntBuffer asIntBuffer() {
         return buf().asIntBuffer();
     }
 
-    public long getLong()
-    {
+    public long getLong() {
         return buf().getLong();
     }
 
-    public ByteBuffer putLong( long value )
-    {
-        autoExpand( 8 );
-        buf().putLong( value );
+    public ByteBuffer putLong(long value) {
+        autoExpand(8);
+        buf().putLong(value);
         return this;
     }
 
-    public long getLong( int index )
-    {
-        return buf().getLong( index );
+    public long getLong(int index) {
+        return buf().getLong(index);
     }
 
-    public ByteBuffer putLong( int index, long value )
-    {
-        autoExpand( index, 8 );
-        buf().putLong( index, value );
+    public ByteBuffer putLong(int index, long value) {
+        autoExpand(index, 8);
+        buf().putLong(index, value);
         return this;
     }
 
-    public LongBuffer asLongBuffer()
-    {
+    public LongBuffer asLongBuffer() {
         return buf().asLongBuffer();
     }
 
-    public float getFloat()
-    {
+    public float getFloat() {
         return buf().getFloat();
     }
 
-    public ByteBuffer putFloat( float value )
-    {
-        autoExpand( 4 );
-        buf().putFloat( value );
+    public ByteBuffer putFloat(float value) {
+        autoExpand(4);
+        buf().putFloat(value);
         return this;
     }
 
-    public float getFloat( int index )
-    {
-        return buf().getFloat( index );
+    public float getFloat(int index) {
+        return buf().getFloat(index);
     }
 
-    public ByteBuffer putFloat( int index, float value )
-    {
-        autoExpand( index, 4 );
-        buf().putFloat( index, value );
+    public ByteBuffer putFloat(int index, float value) {
+        autoExpand(index, 4);
+        buf().putFloat(index, value);
         return this;
     }
 
-    public FloatBuffer asFloatBuffer()
-    {
+    public FloatBuffer asFloatBuffer() {
         return buf().asFloatBuffer();
     }
 
-    public double getDouble()
-    {
+    public double getDouble() {
         return buf().getDouble();
     }
 
-    public ByteBuffer putDouble( double value )
-    {
-        autoExpand( 8 );
-        buf().putDouble( value );
+    public ByteBuffer putDouble(double value) {
+        autoExpand(8);
+        buf().putDouble(value);
         return this;
     }
 
-    public double getDouble( int index )
-    {
-        return buf().getDouble( index );
+    public double getDouble(int index) {
+        return buf().getDouble(index);
     }
 
-    public ByteBuffer putDouble( int index, double value )
-    {
-        autoExpand( index, 8 );
-        buf().putDouble( index, value );
+    public ByteBuffer putDouble(int index, double value) {
+        autoExpand(index, 8);
+        buf().putDouble(index, value);
         return this;
     }
 
-    public DoubleBuffer asDoubleBuffer()
-    {
+    public DoubleBuffer asDoubleBuffer() {
         return buf().asDoubleBuffer();
     }
 }

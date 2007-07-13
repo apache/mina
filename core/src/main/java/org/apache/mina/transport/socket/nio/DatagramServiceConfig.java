@@ -28,8 +28,7 @@ import org.apache.mina.common.IoSessionRecycler;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface DatagramServiceConfig extends IoServiceConfig
-{
+public interface DatagramServiceConfig extends IoServiceConfig {
     /**
      * Returns the {@link IoSessionRecycler} for this service.
      */
@@ -40,5 +39,5 @@ public interface DatagramServiceConfig extends IoServiceConfig
      * 
      * @param sessionRecycler <tt>null</tt> to use the default recycler
      */
-    void setSessionRecycler( IoSessionRecycler sessionRecycler );
+    void setSessionRecycler(IoSessionRecycler sessionRecycler);
 }

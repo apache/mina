@@ -29,26 +29,22 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-public class ReverseProtocolHandler extends IoHandlerAdapter
-{
-    public void exceptionCaught( IoSession session, Throwable cause )
-    {
+public class ReverseProtocolHandler extends IoHandlerAdapter {
+    public void exceptionCaught(IoSession session, Throwable cause) {
         cause.printStackTrace();
         // Close connection when unexpected exception is caught.
         session.close();
     }
 
-    public void messageReceived( IoSession session, Object message )
-    {
+    public void messageReceived(IoSession session, Object message) {
         // Reverse reveiced string
         String str = message.toString();
-        StringBuffer buf = new StringBuffer( str.length() );
-        for( int i = str.length() - 1; i >= 0; i-- )
-        {
-            buf.append( str.charAt( i ) );
+        StringBuffer buf = new StringBuffer(str.length());
+        for (int i = str.length() - 1; i >= 0; i--) {
+            buf.append(str.charAt(i));
         }
 
         // and write it back.
-        session.write( buf.toString() );
+        session.write(buf.toString());
     }
 }

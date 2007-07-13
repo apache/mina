@@ -31,21 +31,17 @@ import org.apache.mina.transport.AbstractConnectorTest;
  */
 public class DatagramConnectorTest extends AbstractConnectorTest {
 
-    protected IoAcceptor createAcceptor()
-    {
+    protected IoAcceptor createAcceptor() {
         return new DatagramAcceptor();
     }
 
-    protected IoConnector createConnector()
-    {
+    protected IoConnector createConnector() {
         return new DatagramConnector();
     }
 
-    public void testConnectFutureFailureTiming() throws Exception
-    {
+    public void testConnectFutureFailureTiming() throws Exception {
         // Skip the test; Datagram connection can be made even if there's no
         // server at the endpoint.
     }
-    
-    
+
 }

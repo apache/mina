@@ -44,38 +44,46 @@ import org.apache.mina.util.Queue;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-class SocketSessionImpl extends BaseIoSession
-{
+class SocketSessionImpl extends BaseIoSession {
     private final IoService manager;
+
     private final IoServiceConfig serviceConfig;
+
     private final SocketSessionConfig config = new SessionConfigImpl();
+
     private final SocketIoProcessor ioProcessor;
+
     private final SocketFilterChain filterChain;
+
     private final SocketChannel ch;
+
     private final Queue writeRequestQueue;
+
     private final IoHandler handler;
+
     private final SocketAddress remoteAddress;
+
     private final SocketAddress localAddress;
+
     private final SocketAddress serviceAddress;
+
     private final IoServiceListenerSupport serviceListeners;
+
     private SelectionKey key;
+
     private int readBufferSize;
 
     /**
      * Creates a new instance.
      */
-    SocketSessionImpl( IoService manager,
-                       SocketIoProcessor ioProcessor,
-                       IoServiceListenerSupport listeners,
-                       IoServiceConfig serviceConfig,
-                       SocketChannel ch,
-                       IoHandler defaultHandler,
-                       SocketAddress serviceAddress )
-    {
+    SocketSessionImpl(IoService manager, SocketIoProcessor ioProcessor,
+            IoServiceListenerSupport listeners, IoServiceConfig serviceConfig,
+            SocketChannel ch, IoHandler defaultHandler,
+            SocketAddress serviceAddress) {
         this.manager = manager;
         this.serviceListeners = listeners;
         this.ioProcessor = ioProcessor;
-        this.filterChain = new SocketFilterChain( this );
+        this.filterChain = new SocketFilterChain(this);
         this.ch = ch;
         this.writeRequestQueue = new Queue();
         this.handler = defaultHandler;
@@ -86,278 +94,204 @@ class SocketSessionImpl extends BaseIoSession
 
         // Apply the initial session settings
         IoSessionConfig sessionConfig = serviceConfig.getSessionConfig();
-        if( sessionConfig instanceof SocketSessionConfig )
-        {
-            SocketSessionConfig cfg = ( SocketSessionConfig ) sessionConfig;
-            this.config.setKeepAlive( cfg.isKeepAlive() );
-            this.config.setOobInline( cfg.isOobInline() );
-            this.config.setReceiveBufferSize( cfg.getReceiveBufferSize() );
-            this.config.setReuseAddress( cfg.isReuseAddress() );
-            this.config.setSendBufferSize( cfg.getSendBufferSize() );
-            this.config.setSoLinger( cfg.getSoLinger() );
-            this.config.setTcpNoDelay( cfg.isTcpNoDelay() );
+        if (sessionConfig instanceof SocketSessionConfig) {
+            SocketSessionConfig cfg = (SocketSessionConfig) sessionConfig;
+            this.config.setKeepAlive(cfg.isKeepAlive());
+            this.config.setOobInline(cfg.isOobInline());
+            this.config.setReceiveBufferSize(cfg.getReceiveBufferSize());
+            this.config.setReuseAddress(cfg.isReuseAddress());
+            this.config.setSendBufferSize(cfg.getSendBufferSize());
+            this.config.setSoLinger(cfg.getSoLinger());
+            this.config.setTcpNoDelay(cfg.isTcpNoDelay());
 
-            if( this.config.getTrafficClass() != cfg.getTrafficClass() )
-            {
-                this.config.setTrafficClass( cfg.getTrafficClass() );
+            if (this.config.getTrafficClass() != cfg.getTrafficClass()) {
+                this.config.setTrafficClass(cfg.getTrafficClass());
             }
         }
     }
 
-    public IoService getService()
-    {
+    public IoService getService() {
         return manager;
     }
-    
-    public IoServiceConfig getServiceConfig()
-    {
+
+    public IoServiceConfig getServiceConfig() {
         return serviceConfig;
     }
 
-    public IoSessionConfig getConfig()
-    {
+    public IoSessionConfig getConfig() {
         return config;
     }
 
-    SocketIoProcessor getIoProcessor()
-    {
+    SocketIoProcessor getIoProcessor() {
         return ioProcessor;
     }
 
-    public IoFilterChain getFilterChain()
-    {
+    public IoFilterChain getFilterChain() {
         return filterChain;
     }
 
-    SocketChannel getChannel()
-    {
+    SocketChannel getChannel() {
         return ch;
     }
 
-    IoServiceListenerSupport getServiceListeners()
-    {
+    IoServiceListenerSupport getServiceListeners() {
         return serviceListeners;
     }
 
-    SelectionKey getSelectionKey()
-    {
+    SelectionKey getSelectionKey() {
         return key;
     }
 
-    void setSelectionKey( SelectionKey key )
-    {
+    void setSelectionKey(SelectionKey key) {
         this.key = key;
     }
-    
-    public IoHandler getHandler()
-    {
+
+    public IoHandler getHandler() {
         return handler;
     }
 
-    protected void close0()
-    {
-        filterChain.fireFilterClose( this );
+    protected void close0() {
+        filterChain.fireFilterClose(this);
     }
 
-    Queue getWriteRequestQueue()
-    {
+    Queue getWriteRequestQueue() {
         return writeRequestQueue;
     }
 
-    public int getScheduledWriteRequests()
-    {
-        synchronized( writeRequestQueue )
-        {
+    public int getScheduledWriteRequests() {
+        synchronized (writeRequestQueue) {
             return writeRequestQueue.size();
         }
     }
 
-    public int getScheduledWriteBytes()
-    {
-        synchronized( writeRequestQueue )
-        {
+    public int getScheduledWriteBytes() {
+        synchronized (writeRequestQueue) {
             return writeRequestQueue.byteSize();
         }
     }
 
-    protected void write0( WriteRequest writeRequest )
-    {
-        filterChain.fireFilterWrite( this, writeRequest );
+    protected void write0(WriteRequest writeRequest) {
+        filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public TransportType getTransportType()
-    {
+    public TransportType getTransportType() {
         return TransportType.SOCKET;
     }
 
-    public SocketAddress getRemoteAddress()
-    {
+    public SocketAddress getRemoteAddress() {
         return remoteAddress;
     }
 
-    public SocketAddress getLocalAddress()
-    {
+    public SocketAddress getLocalAddress() {
         return localAddress;
     }
 
-    public SocketAddress getServiceAddress()
-    {
+    public SocketAddress getServiceAddress() {
         return serviceAddress;
     }
 
-    protected void updateTrafficMask()
-    {
-        this.ioProcessor.updateTrafficMask( this );
+    protected void updateTrafficMask() {
+        this.ioProcessor.updateTrafficMask(this);
     }
 
-    int getReadBufferSize()
-    {
+    int getReadBufferSize() {
         return readBufferSize;
     }
 
-    private class SessionConfigImpl extends BaseIoSessionConfig implements SocketSessionConfig
-    {
-        public boolean isKeepAlive()
-        {
-            try
-            {
+    private class SessionConfigImpl extends BaseIoSessionConfig implements
+            SocketSessionConfig {
+        public boolean isKeepAlive() {
+            try {
                 return ch.socket().getKeepAlive();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public void setKeepAlive( boolean on )
-        {
-            try
-            {
-                ch.socket().setKeepAlive( on );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+        public void setKeepAlive(boolean on) {
+            try {
+                ch.socket().setKeepAlive(on);
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public boolean isOobInline()
-        {
-            try
-            {
+        public boolean isOobInline() {
+            try {
                 return ch.socket().getOOBInline();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public void setOobInline( boolean on )
-        {
-            try
-            {
-                ch.socket().setOOBInline( on );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+        public void setOobInline(boolean on) {
+            try {
+                ch.socket().setOOBInline(on);
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public boolean isReuseAddress()
-        {
-            try
-            {
+        public boolean isReuseAddress() {
+            try {
                 return ch.socket().getReuseAddress();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public void setReuseAddress( boolean on )
-        {
-            try
-            {
-                ch.socket().setReuseAddress( on );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+        public void setReuseAddress(boolean on) {
+            try {
+                ch.socket().setReuseAddress(on);
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public int getSoLinger()
-        {
-            try
-            {
+        public int getSoLinger() {
+            try {
                 return ch.socket().getSoLinger();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public void setSoLinger( int linger )
-        {
-            try
-            {
-                if( linger < 0 )
-                {
-                    ch.socket().setSoLinger( false, 0 );
+        public void setSoLinger(int linger) {
+            try {
+                if (linger < 0) {
+                    ch.socket().setSoLinger(false, 0);
+                } else {
+                    ch.socket().setSoLinger(true, linger);
                 }
-                else
-                {
-                    ch.socket().setSoLinger( true, linger );
-                }
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public boolean isTcpNoDelay()
-        {
-            try
-            {
+        public boolean isTcpNoDelay() {
+            try {
                 return ch.socket().getTcpNoDelay();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public void setTcpNoDelay( boolean on )
-        {
-            try
-            {
-                ch.socket().setTcpNoDelay( on );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+        public void setTcpNoDelay(boolean on) {
+            try {
+                ch.socket().setTcpNoDelay(on);
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public int getTrafficClass()
-        {
-            if( SocketSessionConfigImpl.isGetTrafficClassAvailable() )
-            {
-                try
-                {
+        public int getTrafficClass() {
+            if (SocketSessionConfigImpl.isGetTrafficClassAvailable()) {
+                try {
                     return ch.socket().getTrafficClass();
-                }
-                catch( SocketException e )
-                {
+                } catch (SocketException e) {
                     // Throw an exception only when setTrafficClass is also available.
-                    if( SocketSessionConfigImpl.isSetTrafficClassAvailable() )
-                    {
-                        throw new RuntimeIOException( e );
+                    if (SocketSessionConfigImpl.isSetTrafficClassAvailable()) {
+                        throw new RuntimeIOException(e);
                     }
                 }
             }
@@ -365,74 +299,51 @@ class SocketSessionImpl extends BaseIoSession
             return 0;
         }
 
-        public void setTrafficClass( int tc )
-        {
-            if( SocketSessionConfigImpl.isSetTrafficClassAvailable() )
-            {
-                try
-                {
-                    ch.socket().setTrafficClass( tc );
-                }
-                catch( SocketException e )
-                {
-                    throw new RuntimeIOException( e );
+        public void setTrafficClass(int tc) {
+            if (SocketSessionConfigImpl.isSetTrafficClassAvailable()) {
+                try {
+                    ch.socket().setTrafficClass(tc);
+                } catch (SocketException e) {
+                    throw new RuntimeIOException(e);
                 }
             }
         }
 
-        public int getSendBufferSize()
-        {
-            try
-            {
+        public int getSendBufferSize() {
+            try {
                 return ch.socket().getSendBufferSize();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public void setSendBufferSize( int size )
-        {
-            if( SocketSessionConfigImpl.isSetSendBufferSizeAvailable() )
-            {
-                try
-                {
-                    ch.socket().setSendBufferSize( size );
-                }
-                catch( SocketException e )
-                {
-                    throw new RuntimeIOException( e );
+        public void setSendBufferSize(int size) {
+            if (SocketSessionConfigImpl.isSetSendBufferSizeAvailable()) {
+                try {
+                    ch.socket().setSendBufferSize(size);
+                } catch (SocketException e) {
+                    throw new RuntimeIOException(e);
                 }
             }
         }
 
-        public int getReceiveBufferSize()
-        {
-            try
-            {
+        public int getReceiveBufferSize() {
+            try {
                 return ch.socket().getReceiveBufferSize();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
-        public void setReceiveBufferSize( int size )
-        {
-            if( SocketSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
-            {
-                try
-                {
-                    ch.socket().setReceiveBufferSize( size );
+        public void setReceiveBufferSize(int size) {
+            if (SocketSessionConfigImpl.isSetReceiveBufferSizeAvailable()) {
+                try {
+                    ch.socket().setReceiveBufferSize(size);
                     // Re-retrieve the effective receive buffer size.
                     size = ch.socket().getReceiveBufferSize();
                     SocketSessionImpl.this.readBufferSize = size;
-                }
-                catch( SocketException e )
-                {
-                    throw new RuntimeIOException( e );
+                } catch (SocketException e) {
+                    throw new RuntimeIOException(e);
                 }
             }
         }

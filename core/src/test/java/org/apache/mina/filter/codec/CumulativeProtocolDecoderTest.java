@@ -43,142 +43,124 @@ import org.apache.mina.common.support.BaseIoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
-public class CumulativeProtocolDecoderTest extends TestCase
-{
+public class CumulativeProtocolDecoderTest extends TestCase {
     private final IoSession session = new IoSessionImpl();
+
     private ByteBuffer buf;
+
     private IntegerDecoder decoder;
+
     private IntegerDecoderOutput output;
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         junit.textui.TestRunner.run(CumulativeProtocolDecoderTest.class);
     }
 
-    protected void setUp() throws Exception
-    {
-        buf = ByteBuffer.allocate( 16 );
+    protected void setUp() throws Exception {
+        buf = ByteBuffer.allocate(16);
         decoder = new IntegerDecoder();
         output = new IntegerDecoderOutput();
     }
 
-    protected void tearDown() throws Exception
-    {
-        decoder.dispose( session );
+    protected void tearDown() throws Exception {
+        decoder.dispose(session);
     }
-    
-    public void testCumulation() throws Exception
-    {
-        buf.put( (byte) 0 );
-        buf.flip();
-        
-        decoder.decode( session, buf, output );
-        Assert.assertEquals( 0, output.getValues().size() );
-        Assert.assertEquals( buf.limit(), buf.position() );
-        
-        buf.clear();
-        buf.put( (byte) 0 );
-        buf.put( (byte) 0 );
-        buf.put( (byte) 1 );
+
+    public void testCumulation() throws Exception {
+        buf.put((byte) 0);
         buf.flip();
 
-        decoder.decode( session, buf, output );
-        Assert.assertEquals( 1, output.getValues().size() );
-        Assert.assertEquals( new Integer( 1 ), output.getValues().get( 0 ) );
-        Assert.assertEquals( buf.limit(), buf.position() );
+        decoder.decode(session, buf, output);
+        Assert.assertEquals(0, output.getValues().size());
+        Assert.assertEquals(buf.limit(), buf.position());
+
+        buf.clear();
+        buf.put((byte) 0);
+        buf.put((byte) 0);
+        buf.put((byte) 1);
+        buf.flip();
+
+        decoder.decode(session, buf, output);
+        Assert.assertEquals(1, output.getValues().size());
+        Assert.assertEquals(new Integer(1), output.getValues().get(0));
+        Assert.assertEquals(buf.limit(), buf.position());
     }
-    
-    public void testRepeatitiveDecode() throws Exception
-    {
-        for( int i = 0; i < 4; i ++ )
-        {
-            buf.putInt( i );
+
+    public void testRepeatitiveDecode() throws Exception {
+        for (int i = 0; i < 4; i++) {
+            buf.putInt(i);
         }
         buf.flip();
-        
-        decoder.decode( session, buf, output );
-        Assert.assertEquals( 4, output.getValues().size() );
-        Assert.assertEquals( buf.limit(), buf.position() );
-        
+
+        decoder.decode(session, buf, output);
+        Assert.assertEquals(4, output.getValues().size());
+        Assert.assertEquals(buf.limit(), buf.position());
+
         List expected = new ArrayList();
-        for( int i = 0; i < 4; i ++ )
-        {
-            expected.add( new Integer( i ) );
+        for (int i = 0; i < 4; i++) {
+            expected.add(new Integer(i));
         }
-        Assert.assertEquals( expected, output.getValues() );
+        Assert.assertEquals(expected, output.getValues());
     }
-    
+
     public void testWrongImplementationDetection() throws Exception {
-        try
-        {
-            new WrongDecoder().decode( session, buf, output );
+        try {
+            new WrongDecoder().decode(session, buf, output);
             Assert.fail();
-        }
-        catch( IllegalStateException e )
-        {
+        } catch (IllegalStateException e) {
             // OK
         }
     }
-    
-    private static class IntegerDecoder extends CumulativeProtocolDecoder
-    {
 
-        protected boolean doDecode( IoSession session, ByteBuffer in,
-                                    ProtocolDecoderOutput out ) throws Exception
-        {
-            Assert.assertTrue( in.hasRemaining() );
-            if( in.remaining() < 4 )
+    private static class IntegerDecoder extends CumulativeProtocolDecoder {
+
+        protected boolean doDecode(IoSession session, ByteBuffer in,
+                ProtocolDecoderOutput out) throws Exception {
+            Assert.assertTrue(in.hasRemaining());
+            if (in.remaining() < 4)
                 return false;
-            
-            out.write( new Integer( in.getInt() ) );
+
+            out.write(new Integer(in.getInt()));
             return true;
         }
 
-        public void dispose() throws Exception
-        {
+        public void dispose() throws Exception {
         }
-        
+
     }
-    
-    private static class IntegerDecoderOutput implements ProtocolDecoderOutput
-    {
+
+    private static class IntegerDecoderOutput implements ProtocolDecoderOutput {
         private List values = new ArrayList();
 
-        public void write( Object message )
-        {
-            values.add( message );
+        public void write(Object message) {
+            values.add(message);
         }
-        
-        public List getValues()
-        {
+
+        public List getValues() {
             return values;
         }
-        
-        public void clear()
-        {
+
+        public void clear() {
             values.clear();
         }
 
-        public void flush()
-        {
+        public void flush() {
         }
     }
-    
-    private static class WrongDecoder extends CumulativeProtocolDecoder
-    {
 
-        protected boolean doDecode( IoSession session, ByteBuffer in,
-                                    ProtocolDecoderOutput out ) throws Exception {
+    private static class WrongDecoder extends CumulativeProtocolDecoder {
+
+        protected boolean doDecode(IoSession session, ByteBuffer in,
+                ProtocolDecoderOutput out) throws Exception {
             return true;
         }
 
-        public void dispose() throws Exception
-        {
+        public void dispose() throws Exception {
         }
     }
-    
-    private static class IoSessionImpl extends BaseIoSession implements IoSession
-    {
+
+    private static class IoSessionImpl extends BaseIoSession implements
+            IoSession {
 
         public IoHandler getHandler() {
             return null;
@@ -208,47 +190,38 @@ public class CumulativeProtocolDecoderTest extends TestCase
             return null;
         }
 
-        public IoFilterChain getFilterChain()
-        {
+        public IoFilterChain getFilterChain() {
             return null;
         }
 
-        public int getScheduledWriteRequests()
-        {
+        public int getScheduledWriteRequests() {
             return 0;
         }
 
-        protected void updateTrafficMask()
-        {
+        protected void updateTrafficMask() {
         }
 
-        public boolean isClosing()
-        {
+        public boolean isClosing() {
             return false;
         }
 
-        public IoService getService()
-        {
+        public IoService getService() {
             return null;
         }
 
-        public IoServiceConfig getServiceConfig()
-        {
+        public IoServiceConfig getServiceConfig() {
             return null;
         }
 
-        public IoSessionConfig getConfig()
-        {
+        public IoSessionConfig getConfig() {
             return null;
         }
 
-        public SocketAddress getServiceAddress()
-        {
+        public SocketAddress getServiceAddress() {
             return null;
         }
 
-        public int getScheduledWriteBytes()
-        {
+        public int getScheduledWriteBytes() {
             return 0;
         }
     }

@@ -35,110 +35,99 @@ import org.apache.mina.common.ThreadModel;
  * @author The Apache MINA Project Team (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeEventOrderTest extends TestCase
-{
-    public void testServerToClient() throws Exception
-    {
+public class VmPipeEventOrderTest extends TestCase {
+    public void testServerToClient() throws Exception {
         IoAcceptor acceptor = new VmPipeAcceptor();
-        acceptor.getDefaultConfig().setThreadModel( ThreadModel.MANUAL );
+        acceptor.getDefaultConfig().setThreadModel(ThreadModel.MANUAL);
         //acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
 
         IoConnector connector = new VmPipeConnector();
-        connector.getDefaultConfig().setThreadModel( ThreadModel.MANUAL );
+        connector.getDefaultConfig().setThreadModel(ThreadModel.MANUAL);
         //connector.getFilterChain().addLast( "logger", new LoggingFilter() );
-        
-        acceptor.bind(
-                new VmPipeAddress( 1 ),
-                new IoHandlerAdapter() {
-                    public void sessionOpened( IoSession session ) throws Exception
-                    {
-                        session.write("B");
-                    }
-                    
-                    public void messageSent( IoSession session, Object message ) throws Exception
-                    {
-                        session.close();
-                    }
-                });
-        
+
+        acceptor.bind(new VmPipeAddress(1), new IoHandlerAdapter() {
+            public void sessionOpened(IoSession session) throws Exception {
+                session.write("B");
+            }
+
+            public void messageSent(IoSession session, Object message)
+                    throws Exception {
+                session.close();
+            }
+        });
+
         final StringBuffer actual = new StringBuffer();
-        
-        ConnectFuture future = connector.connect(
-                new VmPipeAddress( 1 ),
+
+        ConnectFuture future = connector.connect(new VmPipeAddress(1),
                 new IoHandlerAdapter() {
 
-                    public void messageReceived( IoSession session, Object message ) throws Exception
-                    {
-                        actual.append( message );
+                    public void messageReceived(IoSession session,
+                            Object message) throws Exception {
+                        actual.append(message);
                     }
 
-                    public void sessionClosed( IoSession session ) throws Exception
-                    {
-                        actual.append( "C" );
+                    public void sessionClosed(IoSession session)
+                            throws Exception {
+                        actual.append("C");
                     }
 
-                    public void sessionOpened( IoSession session ) throws Exception {
-                        actual.append( "A" );
+                    public void sessionOpened(IoSession session)
+                            throws Exception {
+                        actual.append("A");
                     }
-                    
+
                 });
 
         future.join();
         future.getSession().getCloseFuture().join();
         acceptor.unbindAll();
-        
+
         // sessionClosed() might not be invoked yet
         // even if the connection is closed.
-        while( actual.indexOf("C") < 0 )
-        {
+        while (actual.indexOf("C") < 0) {
             Thread.yield();
         }
-        
-        Assert.assertEquals( "ABC", actual.toString() );
+
+        Assert.assertEquals("ABC", actual.toString());
     }
 
-    public void testClientToServer() throws Exception
-    {
+    public void testClientToServer() throws Exception {
         IoAcceptor acceptor = new VmPipeAcceptor();
-        acceptor.getDefaultConfig().setThreadModel( ThreadModel.MANUAL );
+        acceptor.getDefaultConfig().setThreadModel(ThreadModel.MANUAL);
         //acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
 
         IoConnector connector = new VmPipeConnector();
-        connector.getDefaultConfig().setThreadModel( ThreadModel.MANUAL );
+        connector.getDefaultConfig().setThreadModel(ThreadModel.MANUAL);
         //connector.getFilterChain().addLast( "logger", new LoggingFilter() );
-        
+
         final StringBuffer actual = new StringBuffer();
-        
-        acceptor.bind(
-                new VmPipeAddress( 1 ),
+
+        acceptor.bind(new VmPipeAddress(1), new IoHandlerAdapter() {
+
+            public void messageReceived(IoSession session, Object message)
+                    throws Exception {
+                actual.append(message);
+            }
+
+            public void sessionClosed(IoSession session) throws Exception {
+                actual.append("C");
+            }
+
+            public void sessionOpened(IoSession session) throws Exception {
+                actual.append("A");
+            }
+
+        });
+
+        ConnectFuture future = connector.connect(new VmPipeAddress(1),
                 new IoHandlerAdapter() {
-
-                    public void messageReceived( IoSession session, Object message ) throws Exception
-                    {
-                        actual.append( message );
-                    }
-
-                    public void sessionClosed( IoSession session ) throws Exception
-                    {
-                        actual.append( "C" );
-                    }
-
-                    public void sessionOpened( IoSession session ) throws Exception {
-                        actual.append( "A" );
-                    }
-                    
-                });
-        
-        ConnectFuture future = connector.connect(
-                new VmPipeAddress( 1 ),
-                new IoHandlerAdapter() {
-                    public void sessionOpened( IoSession session ) throws Exception
-                    {
+                    public void sessionOpened(IoSession session)
+                            throws Exception {
                         session.write("B");
                     }
-                    
-                    public void messageSent( IoSession session, Object message ) throws Exception
-                    {
+
+                    public void messageSent(IoSession session, Object message)
+                            throws Exception {
                         session.close();
                     }
                 });
@@ -146,14 +135,13 @@ public class VmPipeEventOrderTest extends TestCase
         future.join();
         future.getSession().getCloseFuture().join();
         acceptor.unbindAll();
-        
+
         // sessionClosed() might not be invoked yet
         // even if the connection is closed.
-        while( actual.indexOf("C") < 0 )
-        {
+        while (actual.indexOf("C") < 0) {
             Thread.yield();
         }
-        
-        Assert.assertEquals( "ABC", actual.toString() );
+
+        Assert.assertEquals("ABC", actual.toString());
     }
 }

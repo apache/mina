@@ -28,22 +28,22 @@ import java.net.SocketAddress;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * TODO More documentation
  */
-public interface IoSessionRecycler
-{
+public interface IoSessionRecycler {
     /**
      * A dummy recycler that doesn't recycle any sessions.  Using this recycler will
      * make all session lifecycle events to be fired for every I/O for all connectionless
      * sessions.
      */
-    static IoSessionRecycler NOOP = new IoSessionRecycler()
-    {
-        public void put( IoSession session ) {}
-        public IoSession recycle( SocketAddress localAddress, SocketAddress remoteAddress )
-        {
+    static IoSessionRecycler NOOP = new IoSessionRecycler() {
+        public void put(IoSession session) {
+        }
+
+        public IoSession recycle(SocketAddress localAddress,
+                SocketAddress remoteAddress) {
             return null;
         }
-        public void remove( IoSession session )
-        {
+
+        public void remove(IoSession session) {
         }
     };
 
@@ -53,7 +53,7 @@ public interface IoSessionRecycler
      * @param session
      *            the new {@link IoSession}.
      */
-    void put( IoSession session );
+    void put(IoSession session);
 
     /**
      * Attempts to retrieve a recycled {@link IoSession}.
@@ -66,7 +66,7 @@ public interface IoSessionRecycler
      *            transport wants to recycle.
      * @return a recycled {@link IoSession}, or null if one cannot be found.
      */
-    IoSession recycle( SocketAddress localAddress, SocketAddress remoteAddress );
+    IoSession recycle(SocketAddress localAddress, SocketAddress remoteAddress);
 
     /**
      * Called when an {@link IoSession} is explicitly closed.
@@ -74,5 +74,5 @@ public interface IoSessionRecycler
      * @param session
      *            the new {@link IoSession}.
      */
-    void remove( IoSession session );
+    void remove(IoSession session);
 }

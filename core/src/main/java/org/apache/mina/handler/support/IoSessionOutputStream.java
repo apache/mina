@@ -34,18 +34,16 @@ import org.apache.mina.common.WriteFuture;
  * @version $Rev$, $Date$
  *
  */
-public class IoSessionOutputStream extends OutputStream
-{
+public class IoSessionOutputStream extends OutputStream {
     private final IoSession session;
+
     private WriteFuture lastWriteFuture;
-    
-    public IoSessionOutputStream( IoSession session )
-    {
+
+    public IoSessionOutputStream(IoSession session) {
         this.session = session;
     }
-    
-    public void close() throws IOException
-    {
+
+    public void close() throws IOException {
         try {
             flush();
         } finally {
@@ -53,45 +51,38 @@ public class IoSessionOutputStream extends OutputStream
         }
     }
 
-    private void checkClosed() throws IOException
-    {
-        if( ! session.isConnected() )
-        {
-            throw new IOException( "The session has been closed." );
+    private void checkClosed() throws IOException {
+        if (!session.isConnected()) {
+            throw new IOException("The session has been closed.");
         }
-    }
-    
-    private synchronized void write( ByteBuffer buf ) throws IOException
-    {
-        checkClosed();
-        WriteFuture future = session.write( buf );
-        lastWriteFuture = future;
-    }
-    
-    public void write( byte[] b, int off, int len ) throws IOException
-    {
-        write( ByteBuffer.wrap( (byte[]) b.clone(), off, len ) );
     }
 
-    public void write( int b ) throws IOException
-    {
-        ByteBuffer buf = ByteBuffer.allocate( 1 );
-        buf.put( ( byte ) b );
-        buf.flip();
-        write( buf );
+    private synchronized void write(ByteBuffer buf) throws IOException {
+        checkClosed();
+        WriteFuture future = session.write(buf);
+        lastWriteFuture = future;
     }
-    
-    public synchronized void flush() throws IOException
-    {
-        if( lastWriteFuture == null )
-        {
+
+    public void write(byte[] b, int off, int len) throws IOException {
+        write(ByteBuffer.wrap((byte[]) b.clone(), off, len));
+    }
+
+    public void write(int b) throws IOException {
+        ByteBuffer buf = ByteBuffer.allocate(1);
+        buf.put((byte) b);
+        buf.flip();
+        write(buf);
+    }
+
+    public synchronized void flush() throws IOException {
+        if (lastWriteFuture == null) {
             return;
         }
-        
+
         lastWriteFuture.join();
-        if( !lastWriteFuture.isWritten() )
-        {
-            throw new IOException( "The bytes could not be written to the session" );
+        if (!lastWriteFuture.isWritten()) {
+            throw new IOException(
+                    "The bytes could not be written to the session");
         }
     }
 }

@@ -33,96 +33,79 @@ import org.apache.mina.common.ThreadModel;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable
-{
+public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable {
     /**
      * Current filter chain builder.
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
-    
+
     /**
      * The default thread model.
      */
-    private final ThreadModel defaultThreadModel = ExecutorThreadModel.getInstance("AnonymousIoService");
-    
+    private final ThreadModel defaultThreadModel = ExecutorThreadModel
+            .getInstance("AnonymousIoService");
+
     /**
      * Current thread model.
      */
     private ThreadModel threadModel = defaultThreadModel;
-    
-    public BaseIoServiceConfig()
-    {
+
+    public BaseIoServiceConfig() {
         super();
     }
 
-    public IoFilterChainBuilder getFilterChainBuilder()
-    {
+    public IoFilterChainBuilder getFilterChainBuilder() {
         return filterChainBuilder;
     }
 
-    public void setFilterChainBuilder( IoFilterChainBuilder builder )
-    {
-        if( builder == null )
-        {
+    public void setFilterChainBuilder(IoFilterChainBuilder builder) {
+        if (builder == null) {
             builder = new DefaultIoFilterChainBuilder();
         }
         filterChainBuilder = builder;
     }
-    
-    public DefaultIoFilterChainBuilder getFilterChain()
-    {
-        if( filterChainBuilder instanceof DefaultIoFilterChainBuilder )
-        {
-            return ( DefaultIoFilterChainBuilder ) filterChainBuilder;
-        }
-        else
-        {
+
+    public DefaultIoFilterChainBuilder getFilterChain() {
+        if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
+            return (DefaultIoFilterChainBuilder) filterChainBuilder;
+        } else {
             throw new IllegalStateException(
-                    "Current filter chain builder is not a DefaultIoFilterChainBuilder." );
+                    "Current filter chain builder is not a DefaultIoFilterChainBuilder.");
         }
     }
-    
-    public ThreadModel getThreadModel()
-    {
+
+    public ThreadModel getThreadModel() {
         return threadModel;
     }
 
-    public void setThreadModel( ThreadModel threadModel )
-    {
-        if( threadModel == null )
-        {
+    public void setThreadModel(ThreadModel threadModel) {
+        if (threadModel == null) {
             // We reuse the previous default model to prevent too much
             // daemon threads are created.
             threadModel = defaultThreadModel;
         }
         this.threadModel = threadModel;
     }
-    
-    public Object clone()
-    {
+
+    public Object clone() {
         BaseIoServiceConfig ret;
-        try
-        {
-            ret = ( BaseIoServiceConfig ) super.clone();
+        try {
+            ret = (BaseIoServiceConfig) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw (InternalError) new InternalError().initCause(e);
         }
-        catch( CloneNotSupportedException e )
-        {
-            throw ( InternalError ) new InternalError().initCause( e );
-        }
-        
+
         // Try to clone the chain builder.
-        try
-        {
-            Method cloneMethod = this.filterChainBuilder.getClass().getMethod( "clone", null );
-            if( cloneMethod.isAccessible() )
-            {
-                ret.filterChainBuilder = ( IoFilterChainBuilder ) cloneMethod.invoke( this.filterChainBuilder, null );
+        try {
+            Method cloneMethod = this.filterChainBuilder.getClass().getMethod(
+                    "clone", null);
+            if (cloneMethod.isAccessible()) {
+                ret.filterChainBuilder = (IoFilterChainBuilder) cloneMethod
+                        .invoke(this.filterChainBuilder, null);
             }
+        } catch (Exception e) {
         }
-        catch( Exception e )
-        {
-        }
-        
+
         return ret;
     }
 }

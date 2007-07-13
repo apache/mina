@@ -28,23 +28,20 @@ import java.io.IOException;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$, 
  */
-public class WriteTimeoutException extends IOException
-{
+public class WriteTimeoutException extends IOException {
     private static final long serialVersionUID = 3906931157944579121L;
 
     /**
      * Creates a new exception.
      */
-    public WriteTimeoutException()
-    {
+    public WriteTimeoutException() {
         super();
     }
 
     /**
      * Creates a new exception.
      */
-    public WriteTimeoutException( String s )
-    {
-        super( s );
+    public WriteTimeoutException(String s) {
+        super(s);
     }
 }

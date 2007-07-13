@@ -39,155 +39,133 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ProtocolCodecFilter extends IoFilterAdapter
-{
-    public static final String ENCODER = ProtocolCodecFilter.class.getName() + ".encoder";
-    public static final String DECODER = ProtocolCodecFilter.class.getName() + ".decoder";
-    
-    private static final String DECODER_LOCK = ProtocolCodecFilter.class.getName() + ".decoderLock";
-    
+public class ProtocolCodecFilter extends IoFilterAdapter {
+    public static final String ENCODER = ProtocolCodecFilter.class.getName()
+            + ".encoder";
+
+    public static final String DECODER = ProtocolCodecFilter.class.getName()
+            + ".decoder";
+
+    private static final String DECODER_LOCK = ProtocolCodecFilter.class
+            .getName()
+            + ".decoderLock";
+
     private static final Class[] EMPTY_PARAMS = new Class[0];
-    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap( new byte[0] );
+
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(new byte[0]);
 
     private final ProtocolCodecFactory factory;
-    
-    public ProtocolCodecFilter( ProtocolCodecFactory factory )
-    {
-        if( factory == null )
-        {
-            throw new NullPointerException( "factory" );
+
+    public ProtocolCodecFilter(ProtocolCodecFactory factory) {
+        if (factory == null) {
+            throw new NullPointerException("factory");
         }
         this.factory = factory;
     }
-    
-    public ProtocolCodecFilter( final ProtocolEncoder encoder, final ProtocolDecoder decoder )
-    {
-        if( encoder == null )
-        {
-            throw new NullPointerException( "encoder" );
+
+    public ProtocolCodecFilter(final ProtocolEncoder encoder,
+            final ProtocolDecoder decoder) {
+        if (encoder == null) {
+            throw new NullPointerException("encoder");
         }
-        if( decoder == null )
-        {
-            throw new NullPointerException( "decoder" );
+        if (decoder == null) {
+            throw new NullPointerException("decoder");
         }
-        
-        this.factory = new ProtocolCodecFactory()
-        {
-            public ProtocolEncoder getEncoder()
-            {
+
+        this.factory = new ProtocolCodecFactory() {
+            public ProtocolEncoder getEncoder() {
                 return encoder;
             }
 
-            public ProtocolDecoder getDecoder()
-            {
+            public ProtocolDecoder getDecoder() {
                 return decoder;
             }
         };
     }
-    
-    public ProtocolCodecFilter( final Class encoderClass, final Class decoderClass )
-    {
-        if( encoderClass == null )
-        {
-            throw new NullPointerException( "encoderClass" );
+
+    public ProtocolCodecFilter(final Class encoderClass,
+            final Class decoderClass) {
+        if (encoderClass == null) {
+            throw new NullPointerException("encoderClass");
         }
-        if( decoderClass == null )
-        {
-            throw new NullPointerException( "decoderClass" );
+        if (decoderClass == null) {
+            throw new NullPointerException("decoderClass");
         }
-        if( !ProtocolEncoder.class.isAssignableFrom( encoderClass ) )
-        {
-            throw new IllegalArgumentException( "encoderClass: " + encoderClass.getName() );
+        if (!ProtocolEncoder.class.isAssignableFrom(encoderClass)) {
+            throw new IllegalArgumentException("encoderClass: "
+                    + encoderClass.getName());
         }
-        if( !ProtocolDecoder.class.isAssignableFrom( decoderClass ) )
-        {
-            throw new IllegalArgumentException( "decoderClass: " + decoderClass.getName() );
+        if (!ProtocolDecoder.class.isAssignableFrom(decoderClass)) {
+            throw new IllegalArgumentException("decoderClass: "
+                    + decoderClass.getName());
         }
-        try
-        {
-            encoderClass.getConstructor( EMPTY_PARAMS );
+        try {
+            encoderClass.getConstructor(EMPTY_PARAMS);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(
+                    "encoderClass doesn't have a public default constructor.");
         }
-        catch( NoSuchMethodException e )
-        {
-            throw new IllegalArgumentException( "encoderClass doesn't have a public default constructor." );
+        try {
+            decoderClass.getConstructor(EMPTY_PARAMS);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(
+                    "decoderClass doesn't have a public default constructor.");
         }
-        try
-        {
-            decoderClass.getConstructor( EMPTY_PARAMS );
-        }
-        catch( NoSuchMethodException e )
-        {
-            throw new IllegalArgumentException( "decoderClass doesn't have a public default constructor." );
-        }
-        
-        this.factory = new ProtocolCodecFactory()
-        {
-            public ProtocolEncoder getEncoder() throws Exception
-            {
-                return ( ProtocolEncoder ) encoderClass.newInstance();
+
+        this.factory = new ProtocolCodecFactory() {
+            public ProtocolEncoder getEncoder() throws Exception {
+                return (ProtocolEncoder) encoderClass.newInstance();
             }
 
-            public ProtocolDecoder getDecoder() throws Exception
-            {
-                return ( ProtocolDecoder ) decoderClass.newInstance();
+            public ProtocolDecoder getDecoder() throws Exception {
+                return (ProtocolDecoder) decoderClass.newInstance();
             }
         };
     }
 
-    public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-        if( parent.contains( ProtocolCodecFilter.class ) )
-        {
-            throw new IllegalStateException( "A filter chain cannot contain more than one ProtocolCodecFilter." );
+    public void onPreAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        if (parent.contains(ProtocolCodecFilter.class)) {
+            throw new IllegalStateException(
+                    "A filter chain cannot contain more than one ProtocolCodecFilter.");
         }
     }
-    
-    public void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-        disposeEncoder( parent.getSession() );
-        disposeDecoder( parent.getSession() ); 
+
+    public void onPostRemove(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        disposeEncoder(parent.getSession());
+        disposeDecoder(parent.getSession());
     }
 
-    public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
-    {
-        if( !( message instanceof ByteBuffer ) )
-        {
-            nextFilter.messageReceived( session, message );
+    public void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception {
+        if (!(message instanceof ByteBuffer)) {
+            nextFilter.messageReceived(session, message);
             return;
         }
 
-        ByteBuffer in = ( ByteBuffer ) message;
-        ProtocolDecoder decoder = getDecoder( session );
-        Object decoderLock = getDecoderLock( session );
-        ProtocolDecoderOutput decoderOut = getDecoderOut( session, nextFilter );
-        
-        try
-        {
-            synchronized( decoderLock )
-            {
-                decoder.decode( session, in, decoderOut );
+        ByteBuffer in = (ByteBuffer) message;
+        ProtocolDecoder decoder = getDecoder(session);
+        Object decoderLock = getDecoderLock(session);
+        ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
+
+        try {
+            synchronized (decoderLock) {
+                decoder.decode(session, in, decoderOut);
             }
-        }
-        catch( Throwable t )
-        {
+        } catch (Throwable t) {
             ProtocolDecoderException pde;
-            if( t instanceof ProtocolDecoderException )
-            {
-                pde = ( ProtocolDecoderException ) t;
+            if (t instanceof ProtocolDecoderException) {
+                pde = (ProtocolDecoderException) t;
+            } else {
+                pde = new ProtocolDecoderException(t);
             }
-            else
-            {
-                pde = new ProtocolDecoderException( t );
-            }
-            pde.setHexdump( in.getHexDump() );
+            pde.setHexdump(in.getHexDump());
             throw pde;
-        }
-        finally
-        {
+        } finally {
             // Dispose the decoder if this session is connectionless.
-            if( session.getTransportType().isConnectionless() )
-            {
-                disposeDecoder( session );
+            if (session.getTransportType().isConnectionless()) {
+                disposeDecoder(session);
             }
 
             // Release the read buffer.
@@ -197,237 +175,193 @@ public class ProtocolCodecFilter extends IoFilterAdapter
         }
     }
 
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
-    {
-        if( message instanceof HiddenByteBuffer )
-        {
+    public void messageSent(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception {
+        if (message instanceof HiddenByteBuffer) {
             return;
         }
 
-        if( !( message instanceof MessageByteBuffer ) )
-        {
-            nextFilter.messageSent( session, message );
+        if (!(message instanceof MessageByteBuffer)) {
+            nextFilter.messageSent(session, message);
             return;
         }
 
-        nextFilter.messageSent( session, ( ( MessageByteBuffer ) message ).message );
+        nextFilter.messageSent(session, ((MessageByteBuffer) message).message);
     }
-    
-    public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
-    {
+
+    public void filterWrite(NextFilter nextFilter, IoSession session,
+            WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
-        if( message instanceof ByteBuffer )
-        {
-            nextFilter.filterWrite( session, writeRequest );
+        if (message instanceof ByteBuffer) {
+            nextFilter.filterWrite(session, writeRequest);
             return;
         }
 
-        ProtocolEncoder encoder = getEncoder( session );
-        ProtocolEncoderOutputImpl encoderOut = getEncoderOut( session, nextFilter, writeRequest );
-        
-        try
-        {
-            encoder.encode( session, message, encoderOut );
+        ProtocolEncoder encoder = getEncoder(session);
+        ProtocolEncoderOutputImpl encoderOut = getEncoderOut(session,
+                nextFilter, writeRequest);
+
+        try {
+            encoder.encode(session, message, encoderOut);
             encoderOut.flush();
-            nextFilter.filterWrite(
-                    session,
-                    new WriteRequest(
-                            new MessageByteBuffer( writeRequest.getMessage() ),
-                            writeRequest.getFuture(), writeRequest.getDestination() ) );
-        }
-        catch( Throwable t )
-        {
+            nextFilter.filterWrite(session, new WriteRequest(
+                    new MessageByteBuffer(writeRequest.getMessage()),
+                    writeRequest.getFuture(), writeRequest.getDestination()));
+        } catch (Throwable t) {
             ProtocolEncoderException pee;
-            if( t instanceof ProtocolEncoderException )
-            {
-                pee = ( ProtocolEncoderException ) t;
-            }
-            else
-            {
-                pee = new ProtocolEncoderException( t );
+            if (t instanceof ProtocolEncoderException) {
+                pee = (ProtocolEncoderException) t;
+            } else {
+                pee = new ProtocolEncoderException(t);
             }
             throw pee;
-        }
-        finally
-        {
+        } finally {
             // Dispose the encoder if this session is connectionless.
-            if( session.getTransportType().isConnectionless() )
-            {
-                disposeEncoder( session );
+            if (session.getTransportType().isConnectionless()) {
+                disposeEncoder(session);
             }
         }
     }
-    
-    public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
-    {
+
+    public void sessionClosed(NextFilter nextFilter, IoSession session)
+            throws Exception {
         // Call finishDecode() first when a connection is closed.
-        ProtocolDecoder decoder = getDecoder( session );
-        ProtocolDecoderOutput decoderOut = getDecoderOut( session, nextFilter );
-        try
-        {
-            decoder.finishDecode( session, decoderOut );
-        }
-        catch( Throwable t )
-        {
+        ProtocolDecoder decoder = getDecoder(session);
+        ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
+        try {
+            decoder.finishDecode(session, decoderOut);
+        } catch (Throwable t) {
             ProtocolDecoderException pde;
-            if( t instanceof ProtocolDecoderException )
-            {
-                pde = ( ProtocolDecoderException ) t;
-            }
-            else
-            {
-                pde = new ProtocolDecoderException( t );
+            if (t instanceof ProtocolDecoderException) {
+                pde = (ProtocolDecoderException) t;
+            } else {
+                pde = new ProtocolDecoderException(t);
             }
             throw pde;
-        }
-        finally
-        {
+        } finally {
             // Dispose all.
-            disposeEncoder( session );
-            disposeDecoder( session );
+            disposeEncoder(session);
+            disposeDecoder(session);
 
             decoderOut.flush();
         }
-        
-        nextFilter.sessionClosed( session );
+
+        nextFilter.sessionClosed(session);
     }
 
-    private ProtocolEncoder getEncoder( IoSession session ) throws Exception
-    {
-        ProtocolEncoder encoder = ( ProtocolEncoder ) session.getAttribute( ENCODER );
-        if( encoder == null )
-        {
+    private ProtocolEncoder getEncoder(IoSession session) throws Exception {
+        ProtocolEncoder encoder = (ProtocolEncoder) session
+                .getAttribute(ENCODER);
+        if (encoder == null) {
             encoder = factory.getEncoder();
-            session.setAttribute( ENCODER, encoder );
+            session.setAttribute(ENCODER, encoder);
         }
         return encoder;
     }
-    
-    private Object getDecoderLock( IoSession session )
-    {
-        Object lock = session.getAttribute( DECODER_LOCK );
-        if( lock == null )
-        {
+
+    private Object getDecoderLock(IoSession session) {
+        Object lock = session.getAttribute(DECODER_LOCK);
+        if (lock == null) {
             lock = new Object();
-            session.setAttribute( DECODER_LOCK, lock );
+            session.setAttribute(DECODER_LOCK, lock);
         }
-        
+
         return lock;
     }
-    
-    private ProtocolEncoderOutputImpl getEncoderOut( IoSession session, NextFilter nextFilter, WriteRequest writeRequest )
-    {
-        return new ProtocolEncoderOutputImpl( session, nextFilter, writeRequest );
+
+    private ProtocolEncoderOutputImpl getEncoderOut(IoSession session,
+            NextFilter nextFilter, WriteRequest writeRequest) {
+        return new ProtocolEncoderOutputImpl(session, nextFilter, writeRequest);
     }
-    
-    private ProtocolDecoder getDecoder( IoSession session ) throws Exception
-    {
-        ProtocolDecoder decoder = ( ProtocolDecoder ) session.getAttribute( DECODER );
-        if( decoder == null )
-        {
+
+    private ProtocolDecoder getDecoder(IoSession session) throws Exception {
+        ProtocolDecoder decoder = (ProtocolDecoder) session
+                .getAttribute(DECODER);
+        if (decoder == null) {
             decoder = factory.getDecoder();
-            session.setAttribute( DECODER, decoder );
+            session.setAttribute(DECODER, decoder);
         }
         return decoder;
     }
-    
-    private ProtocolDecoderOutput getDecoderOut( IoSession session, NextFilter nextFilter )
-    {
-        return new SimpleProtocolDecoderOutput( session, nextFilter );
+
+    private ProtocolDecoderOutput getDecoderOut(IoSession session,
+            NextFilter nextFilter) {
+        return new SimpleProtocolDecoderOutput(session, nextFilter);
     }
-    
-    private void disposeEncoder( IoSession session )
-    {
-        ProtocolEncoder encoder = ( ProtocolEncoder ) session.removeAttribute( ENCODER );
-        if( encoder == null )
-        {
+
+    private void disposeEncoder(IoSession session) {
+        ProtocolEncoder encoder = (ProtocolEncoder) session
+                .removeAttribute(ENCODER);
+        if (encoder == null) {
             return;
         }
 
-        try
-        {
-            encoder.dispose( session );
-        }
-        catch( Throwable t )
-        {
-            SessionLog.warn(
-                    session,
-                    "Failed to dispose: " + encoder.getClass().getName() +
-                    " (" + encoder + ')' );
+        try {
+            encoder.dispose(session);
+        } catch (Throwable t) {
+            SessionLog.warn(session, "Failed to dispose: "
+                    + encoder.getClass().getName() + " (" + encoder + ')');
         }
     }
 
-    private void disposeDecoder( IoSession session )
-    {
-        ProtocolDecoder decoder = ( ProtocolDecoder ) session.removeAttribute( DECODER );
-        if( decoder == null )
-        {
+    private void disposeDecoder(IoSession session) {
+        ProtocolDecoder decoder = (ProtocolDecoder) session
+                .removeAttribute(DECODER);
+        if (decoder == null) {
             return;
         }
 
-        try
-        {
-            decoder.dispose( session );
-        }
-        catch( Throwable t )
-        {
-            SessionLog.warn(
-                    session,
-                    "Falied to dispose: " + decoder.getClass().getName() +
-                    " (" + decoder + ')' );
+        try {
+            decoder.dispose(session);
+        } catch (Throwable t) {
+            SessionLog.warn(session, "Falied to dispose: "
+                    + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }
 
-    private static class HiddenByteBuffer extends ByteBufferProxy
-    {
-        private HiddenByteBuffer( ByteBuffer buf )
-        {
-            super( buf );
+    private static class HiddenByteBuffer extends ByteBufferProxy {
+        private HiddenByteBuffer(ByteBuffer buf) {
+            super(buf);
         }
     }
-    
-    private static class MessageByteBuffer extends ByteBufferProxy
-    {
+
+    private static class MessageByteBuffer extends ByteBufferProxy {
         private final Object message;
-        
-        private MessageByteBuffer( Object message )
-        {
-            super( EMPTY_BUFFER );
+
+        private MessageByteBuffer(Object message) {
+            super(EMPTY_BUFFER);
             this.message = message;
         }
 
-        public void acquire()
-        {
+        public void acquire() {
             // no-op since we are wraping a zero-byte buffer, this instance is to just curry the message
         }
 
-        public void release()
-        {
+        public void release() {
             // no-op since we are wraping a zero-byte buffer, this instance is to just curry the message
         }
     }
-    
-    private static class ProtocolEncoderOutputImpl extends SimpleProtocolEncoderOutput
-    {
+
+    private static class ProtocolEncoderOutputImpl extends
+            SimpleProtocolEncoderOutput {
         private final IoSession session;
+
         private final NextFilter nextFilter;
+
         private final WriteRequest writeRequest;
-        
-        public ProtocolEncoderOutputImpl( IoSession session, NextFilter nextFilter, WriteRequest writeRequest )
-        {
+
+        public ProtocolEncoderOutputImpl(IoSession session,
+                NextFilter nextFilter, WriteRequest writeRequest) {
             this.session = session;
             this.nextFilter = nextFilter;
             this.writeRequest = writeRequest;
         }
 
-        protected WriteFuture doFlush( ByteBuffer buf )
-        {
-            WriteFuture future = new DefaultWriteFuture( session );
-            nextFilter.filterWrite(
-                    session,
-                    new WriteRequest(
-                            new HiddenByteBuffer( buf ),
-                            future, writeRequest.getDestination() ) );
+        protected WriteFuture doFlush(ByteBuffer buf) {
+            WriteFuture future = new DefaultWriteFuture(session);
+            nextFilter.filterWrite(session, new WriteRequest(
+                    new HiddenByteBuffer(buf), future, writeRequest
+                            .getDestination()));
             return future;
         }
     }

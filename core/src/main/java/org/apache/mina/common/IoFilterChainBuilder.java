@@ -35,25 +35,21 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoFilterChainBuilder
-{
+public interface IoFilterChainBuilder {
     /**
      * An implementation which does nothing.
      */
-    IoFilterChainBuilder NOOP = new IoFilterChainBuilder()
-    {
-        public void buildFilterChain( IoFilterChain chain ) throws Exception
-        {
+    IoFilterChainBuilder NOOP = new IoFilterChainBuilder() {
+        public void buildFilterChain(IoFilterChain chain) throws Exception {
         }
-        
-        public String toString()
-        {
+
+        public String toString() {
             return "NOOP";
         }
     };
-    
+
     /**
      * Modifies the specified <tt>chain</tt>.
      */
-    void buildFilterChain( IoFilterChain chain ) throws Exception;
+    void buildFilterChain(IoFilterChain chain) throws Exception;
 }

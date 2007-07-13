@@ -40,69 +40,68 @@ import org.apache.mina.util.AvailablePortFinder;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 436993 $, $Date: 2006-08-26 07:36:56 +0900 (토, 26  8월 2006) $ 
  */
-public class DatagramRecyclerTest extends TestCase
-{
+public class DatagramRecyclerTest extends TestCase {
     private final IoAcceptor acceptor = new DatagramAcceptor();
+
     private final IoConnector connector = new DatagramConnector();
 
-    public DatagramRecyclerTest()
-    {
+    public DatagramRecyclerTest() {
     }
-    
-    public void testDatagramRecycler() throws Exception
-    {
-        int port = AvailablePortFinder.getNextAvailable( 1024 );
+
+    public void testDatagramRecycler() throws Exception {
+        int port = AvailablePortFinder.getNextAvailable(1024);
         DatagramAcceptorConfig config = new DatagramAcceptorConfig();
-        ExpiringSessionRecycler recycler = new ExpiringSessionRecycler( 1, 1 );
-        config.setSessionRecycler( recycler );
-        
+        ExpiringSessionRecycler recycler = new ExpiringSessionRecycler(1, 1);
+        config.setSessionRecycler(recycler);
+
         MockHandler acceptorHandler = new MockHandler();
         MockHandler connectorHandler = new MockHandler();
-        
-        acceptor.bind( new InetSocketAddress( port ), acceptorHandler, config );
-        
-        try
-        {
-            ConnectFuture future = connector.connect(
-                    new InetSocketAddress( "localhost", port ), connectorHandler, config );
+
+        acceptor.bind(new InetSocketAddress(port), acceptorHandler, config);
+
+        try {
+            ConnectFuture future = connector.connect(new InetSocketAddress(
+                    "localhost", port), connectorHandler, config);
             future.join();
-            
+
             // Write whatever to trigger the acceptor.
-            future.getSession().write( ByteBuffer.allocate(1) ).join();
+            future.getSession().write(ByteBuffer.allocate(1)).join();
 
             // Wait until the connection is closed.
-            future.getSession().getCloseFuture().join( 3000 );
-            Assert.assertTrue( future.getSession().getCloseFuture().isClosed() );
-            acceptorHandler.session.getCloseFuture().join( 3000 );
-            Assert.assertTrue( acceptorHandler.session.getCloseFuture().isClosed() );
-            
-            Thread.sleep( 1000 );
+            future.getSession().getCloseFuture().join(3000);
+            Assert.assertTrue(future.getSession().getCloseFuture().isClosed());
+            acceptorHandler.session.getCloseFuture().join(3000);
+            Assert.assertTrue(acceptorHandler.session.getCloseFuture()
+                    .isClosed());
 
-            Assert.assertEquals( "CROPSECL", connectorHandler.result );
-            Assert.assertEquals( "CROPRECL", acceptorHandler.result );
-        }
-        finally
-        {
-            acceptor.unbind( new InetSocketAddress( port ) );
+            Thread.sleep(1000);
+
+            Assert.assertEquals("CROPSECL", connectorHandler.result);
+            Assert.assertEquals("CROPRECL", acceptorHandler.result);
+        } finally {
+            acceptor.unbind(new InetSocketAddress(port));
         }
     }
-    
-    private class MockHandler extends IoHandlerAdapter
-    {
+
+    private class MockHandler extends IoHandlerAdapter {
         public IoSession session;
+
         public String result = "";
 
-        public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+        public void exceptionCaught(IoSession session, Throwable cause)
+                throws Exception {
             this.session = session;
             result += "CA";
         }
 
-        public void messageReceived(IoSession session, Object message) throws Exception {
+        public void messageReceived(IoSession session, Object message)
+                throws Exception {
             this.session = session;
             result += "RE";
         }
 
-        public void messageSent(IoSession session, Object message) throws Exception {
+        public void messageSent(IoSession session, Object message)
+                throws Exception {
             this.session = session;
             result += "SE";
         }
@@ -117,7 +116,8 @@ public class DatagramRecyclerTest extends TestCase
             result += "CR";
         }
 
-        public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
+        public void sessionIdle(IoSession session, IdleStatus status)
+                throws Exception {
             this.session = session;
             result += "ID";
         }

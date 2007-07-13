@@ -41,487 +41,400 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-class SocketIoProcessor
-{
+class SocketIoProcessor {
     private final Object lock = new Object();
 
     private final String threadName;
+
     private final Executor executor;
+
     /**
      * @noinspection FieldAccessedSynchronizedAndUnsynchronized
      */
     private Selector selector;
 
     private final Queue newSessions = new Queue();
+
     private final Queue removingSessions = new Queue();
+
     private final Queue flushingSessions = new Queue();
+
     private final Queue trafficControllingSessions = new Queue();
 
     private Worker worker;
+
     private long lastIdleCheckTime = System.currentTimeMillis();
 
-    SocketIoProcessor( String threadName, Executor executor )
-    {
+    SocketIoProcessor(String threadName, Executor executor) {
         this.threadName = threadName;
         this.executor = executor;
     }
 
-    void addNew( SocketSessionImpl session ) throws IOException
-    {
-        synchronized( newSessions )
-        {
-            newSessions.push( session );
+    void addNew(SocketSessionImpl session) throws IOException {
+        synchronized (newSessions) {
+            newSessions.push(session);
         }
 
         startupWorker();
     }
 
-    void remove( SocketSessionImpl session ) throws IOException
-    {
-        scheduleRemove( session );
+    void remove(SocketSessionImpl session) throws IOException {
+        scheduleRemove(session);
         startupWorker();
     }
 
-    private void startupWorker() throws IOException
-    {
-        synchronized( lock )
-        {
-            if( worker == null )
-            {
+    private void startupWorker() throws IOException {
+        synchronized (lock) {
+            if (worker == null) {
                 selector = Selector.open();
                 worker = new Worker();
-                executor.execute( new NamePreservingRunnable( worker ) );
+                executor.execute(new NamePreservingRunnable(worker));
             }
             selector.wakeup();
         }
     }
 
-    void flush( SocketSessionImpl session )
-    {
-        scheduleFlush( session );
+    void flush(SocketSessionImpl session) {
+        scheduleFlush(session);
         Selector selector = this.selector;
-        if( selector != null )
-        {
+        if (selector != null) {
             selector.wakeup();
         }
     }
 
-    void updateTrafficMask( SocketSessionImpl session )
-    {
-        scheduleTrafficControl( session );
+    void updateTrafficMask(SocketSessionImpl session) {
+        scheduleTrafficControl(session);
         Selector selector = this.selector;
-        if( selector != null )
-        {
+        if (selector != null) {
             selector.wakeup();
         }
     }
 
-    private void scheduleRemove( SocketSessionImpl session )
-    {
-        synchronized( removingSessions )
-        {
-            removingSessions.push( session );
+    private void scheduleRemove(SocketSessionImpl session) {
+        synchronized (removingSessions) {
+            removingSessions.push(session);
         }
     }
 
-    private void scheduleFlush( SocketSessionImpl session )
-    {
-        synchronized( flushingSessions )
-        {
-            flushingSessions.push( session );
+    private void scheduleFlush(SocketSessionImpl session) {
+        synchronized (flushingSessions) {
+            flushingSessions.push(session);
         }
     }
 
-    private void scheduleTrafficControl( SocketSessionImpl session )
-    {
-        synchronized( trafficControllingSessions )
-        {
-            trafficControllingSessions.push( session );
+    private void scheduleTrafficControl(SocketSessionImpl session) {
+        synchronized (trafficControllingSessions) {
+            trafficControllingSessions.push(session);
         }
     }
 
-    private void doAddNew()
-    {
-        if( newSessions.isEmpty() )
+    private void doAddNew() {
+        if (newSessions.isEmpty())
             return;
 
-        for( ; ; )
-        {
+        for (;;) {
             SocketSessionImpl session;
 
-            synchronized( newSessions )
-            {
-                session = ( SocketSessionImpl ) newSessions.pop();
+            synchronized (newSessions) {
+                session = (SocketSessionImpl) newSessions.pop();
             }
 
-            if( session == null )
+            if (session == null)
                 break;
 
             SocketChannel ch = session.getChannel();
-            try
-            {
-                ch.configureBlocking( false );
-                session.setSelectionKey( ch.register( selector,
-                                                      SelectionKey.OP_READ,
-                                                      session ) );
+            try {
+                ch.configureBlocking(false);
+                session.setSelectionKey(ch.register(selector,
+                        SelectionKey.OP_READ, session));
 
                 // AbstractIoFilterChain.CONNECT_FUTURE is cleared inside here
                 // in AbstractIoFilterChain.fireSessionOpened().
-                session.getServiceListeners().fireSessionCreated( session );
-            }
-            catch( IOException e )
-            {
+                session.getServiceListeners().fireSessionCreated(session);
+            } catch (IOException e) {
                 // Clear the AbstractIoFilterChain.CONNECT_FUTURE attribute
                 // and call ConnectFuture.setException().
-                session.getFilterChain().fireExceptionCaught( session, e );
+                session.getFilterChain().fireExceptionCaught(session, e);
             }
         }
     }
 
-    private void doRemove()
-    {
-        if( removingSessions.isEmpty() )
+    private void doRemove() {
+        if (removingSessions.isEmpty())
             return;
 
-        for( ; ; )
-        {
+        for (;;) {
             SocketSessionImpl session;
 
-            synchronized( removingSessions )
-            {
-                session = ( SocketSessionImpl ) removingSessions.pop();
+            synchronized (removingSessions) {
+                session = (SocketSessionImpl) removingSessions.pop();
             }
 
-            if( session == null )
+            if (session == null)
                 break;
 
             SocketChannel ch = session.getChannel();
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
             // (In case that Session.close() is called before addSession() is processed)
-            if( key == null )
-            {
-                scheduleRemove( session );
+            if (key == null) {
+                scheduleRemove(session);
                 break;
             }
             // skip if channel is already closed
-            if( !key.isValid() )
-            {
+            if (!key.isValid()) {
                 continue;
             }
 
-            try
-            {
+            try {
                 key.cancel();
                 ch.close();
-            }
-            catch( IOException e )
-            {
-                session.getFilterChain().fireExceptionCaught( session, e );
-            }
-            finally
-            {
-                releaseWriteBuffers( session );
-                session.getServiceListeners().fireSessionDestroyed( session );
+            } catch (IOException e) {
+                session.getFilterChain().fireExceptionCaught(session, e);
+            } finally {
+                releaseWriteBuffers(session);
+                session.getServiceListeners().fireSessionDestroyed(session);
             }
         }
     }
 
-    private void process( Set selectedKeys )
-    {
+    private void process(Set selectedKeys) {
         Iterator it = selectedKeys.iterator();
 
-        while( it.hasNext() )
-        {
-            SelectionKey key = ( SelectionKey ) it.next();
-            SocketSessionImpl session = ( SocketSessionImpl ) key.attachment();
+        while (it.hasNext()) {
+            SelectionKey key = (SelectionKey) it.next();
+            SocketSessionImpl session = (SocketSessionImpl) key.attachment();
 
-            if( key.isReadable() && session.getTrafficMask().isReadable() )
-            {
-                read( session );
+            if (key.isReadable() && session.getTrafficMask().isReadable()) {
+                read(session);
             }
 
-            if( key.isWritable() && session.getTrafficMask().isWritable() )
-            {
-                scheduleFlush( session );
+            if (key.isWritable() && session.getTrafficMask().isWritable()) {
+                scheduleFlush(session);
             }
         }
 
         selectedKeys.clear();
     }
 
-    private void read( SocketSessionImpl session )
-    {
-        ByteBuffer buf = ByteBuffer.allocate( session.getReadBufferSize() );
+    private void read(SocketSessionImpl session) {
+        ByteBuffer buf = ByteBuffer.allocate(session.getReadBufferSize());
         SocketChannel ch = session.getChannel();
 
-        try
-        {
+        try {
             buf.clear();
 
             int readBytes = 0;
             int ret;
 
-            try
-            {
-                while( ( ret = ch.read( buf.buf() ) ) > 0 )
-                {
+            try {
+                while ((ret = ch.read(buf.buf())) > 0) {
                     readBytes += ret;
                 }
-            }
-            finally
-            {
+            } finally {
                 buf.flip();
             }
 
-            session.increaseReadBytes( readBytes );
+            session.increaseReadBytes(readBytes);
 
-            if( readBytes > 0 )
-            {
-                session.getFilterChain().fireMessageReceived( session, buf );
+            if (readBytes > 0) {
+                session.getFilterChain().fireMessageReceived(session, buf);
                 buf = null;
             }
-            if( ret < 0 )
-            {
-                scheduleRemove( session );
+            if (ret < 0) {
+                scheduleRemove(session);
             }
-        }
-        catch( Throwable e )
-        {
-            if( e instanceof IOException )
-                scheduleRemove( session );
-            session.getFilterChain().fireExceptionCaught( session, e );
-        }
-        finally
-        {
-            if( buf != null )
+        } catch (Throwable e) {
+            if (e instanceof IOException)
+                scheduleRemove(session);
+            session.getFilterChain().fireExceptionCaught(session, e);
+        } finally {
+            if (buf != null)
                 buf.release();
         }
     }
 
-    private void notifyIdleness()
-    {
+    private void notifyIdleness() {
         // process idle sessions
         long currentTime = System.currentTimeMillis();
-        if( ( currentTime - lastIdleCheckTime ) >= 1000 )
-        {
+        if ((currentTime - lastIdleCheckTime) >= 1000) {
             lastIdleCheckTime = currentTime;
             Set keys = selector.keys();
-            if( keys != null )
-            {
-                for( Iterator it = keys.iterator(); it.hasNext(); )
-                {
-                    SelectionKey key = ( SelectionKey ) it.next();
-                    SocketSessionImpl session = ( SocketSessionImpl ) key.attachment();
-                    notifyIdleness( session, currentTime );
+            if (keys != null) {
+                for (Iterator it = keys.iterator(); it.hasNext();) {
+                    SelectionKey key = (SelectionKey) it.next();
+                    SocketSessionImpl session = (SocketSessionImpl) key
+                            .attachment();
+                    notifyIdleness(session, currentTime);
                 }
             }
         }
     }
 
-    private void notifyIdleness( SocketSessionImpl session, long currentTime )
-    {
-        notifyIdleness0(
-            session, currentTime,
-            session.getIdleTimeInMillis( IdleStatus.BOTH_IDLE ),
-            IdleStatus.BOTH_IDLE,
-            Math.max( session.getLastIoTime(), session.getLastIdleTime( IdleStatus.BOTH_IDLE ) ) );
-        notifyIdleness0(
-            session, currentTime,
-            session.getIdleTimeInMillis( IdleStatus.READER_IDLE ),
-            IdleStatus.READER_IDLE,
-            Math.max( session.getLastReadTime(), session.getLastIdleTime( IdleStatus.READER_IDLE ) ) );
-        notifyIdleness0(
-            session, currentTime,
-            session.getIdleTimeInMillis( IdleStatus.WRITER_IDLE ),
-            IdleStatus.WRITER_IDLE,
-            Math.max( session.getLastWriteTime(), session.getLastIdleTime( IdleStatus.WRITER_IDLE ) ) );
+    private void notifyIdleness(SocketSessionImpl session, long currentTime) {
+        notifyIdleness0(session, currentTime, session
+                .getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
+                        .getLastIdleTime(IdleStatus.BOTH_IDLE)));
+        notifyIdleness0(session, currentTime, session
+                .getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(),
+                        session.getLastIdleTime(IdleStatus.READER_IDLE)));
+        notifyIdleness0(session, currentTime, session
+                .getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(),
+                        session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
 
-        notifyWriteTimeout( session, currentTime, session
-            .getWriteTimeoutInMillis(), session.getLastWriteTime() );
+        notifyWriteTimeout(session, currentTime, session
+                .getWriteTimeoutInMillis(), session.getLastWriteTime());
     }
 
-    private void notifyIdleness0( SocketSessionImpl session, long currentTime,
-                                  long idleTime, IdleStatus status,
-                                  long lastIoTime )
-    {
-        if( idleTime > 0 && lastIoTime != 0
-            && ( currentTime - lastIoTime ) >= idleTime )
-        {
-            session.increaseIdleCount( status );
-            session.getFilterChain().fireSessionIdle( session, status );
+    private void notifyIdleness0(SocketSessionImpl session, long currentTime,
+            long idleTime, IdleStatus status, long lastIoTime) {
+        if (idleTime > 0 && lastIoTime != 0
+                && (currentTime - lastIoTime) >= idleTime) {
+            session.increaseIdleCount(status);
+            session.getFilterChain().fireSessionIdle(session, status);
         }
     }
 
-    private void notifyWriteTimeout( SocketSessionImpl session,
-                                     long currentTime,
-                                     long writeTimeout, long lastIoTime )
-    {
+    private void notifyWriteTimeout(SocketSessionImpl session,
+            long currentTime, long writeTimeout, long lastIoTime) {
         SelectionKey key = session.getSelectionKey();
-        if( writeTimeout > 0
-            && ( currentTime - lastIoTime ) >= writeTimeout
-            && key != null && key.isValid()
-            && ( key.interestOps() & SelectionKey.OP_WRITE ) != 0 )
-        {
-            session.getFilterChain().fireExceptionCaught( session, new WriteTimeoutException() );
+        if (writeTimeout > 0 && (currentTime - lastIoTime) >= writeTimeout
+                && key != null && key.isValid()
+                && (key.interestOps() & SelectionKey.OP_WRITE) != 0) {
+            session.getFilterChain().fireExceptionCaught(session,
+                    new WriteTimeoutException());
         }
     }
 
-    private void doFlush()
-    {
-        if( flushingSessions.size() == 0 )
+    private void doFlush() {
+        if (flushingSessions.size() == 0)
             return;
 
-        for( ; ; )
-        {
+        for (;;) {
             SocketSessionImpl session;
 
-            synchronized( flushingSessions )
-            {
-                session = ( SocketSessionImpl ) flushingSessions.pop();
+            synchronized (flushingSessions) {
+                session = (SocketSessionImpl) flushingSessions.pop();
             }
 
-            if( session == null )
+            if (session == null)
                 break;
 
-            if( !session.isConnected() )
-            {
-                releaseWriteBuffers( session );
+            if (!session.isConnected()) {
+                releaseWriteBuffers(session);
                 continue;
             }
 
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
             // (In case that Session.write() is called before addSession() is processed)
-            if( key == null )
-            {
-                scheduleFlush( session );
+            if (key == null) {
+                scheduleFlush(session);
                 break;
             }
 
             // Skip if the channel is already closed.
-            if( !key.isValid() )
-            {
+            if (!key.isValid()) {
                 continue;
             }
 
-            try
-            {
-                doFlush( session );
-            }
-            catch( IOException e )
-            {
-                scheduleRemove( session );
-                session.getFilterChain().fireExceptionCaught( session, e );
+            try {
+                doFlush(session);
+            } catch (IOException e) {
+                scheduleRemove(session);
+                session.getFilterChain().fireExceptionCaught(session, e);
             }
         }
     }
 
-    private void releaseWriteBuffers( SocketSessionImpl session )
-    {
+    private void releaseWriteBuffers(SocketSessionImpl session) {
         Queue writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
 
-        while( ( req = ( WriteRequest ) writeRequestQueue.pop() ) != null )
-        {
-            try
-            {
-                ( ( ByteBuffer ) req.getMessage() ).release();
-            }
-            catch( IllegalStateException e )
-            {
-                session.getFilterChain().fireExceptionCaught( session, e );
-            }
-            finally
-            {
-                req.getFuture().setWritten( false );
+        while ((req = (WriteRequest) writeRequestQueue.pop()) != null) {
+            try {
+                ((ByteBuffer) req.getMessage()).release();
+            } catch (IllegalStateException e) {
+                session.getFilterChain().fireExceptionCaught(session, e);
+            } finally {
+                req.getFuture().setWritten(false);
             }
         }
     }
 
-    private void doFlush( SocketSessionImpl session ) throws IOException
-    {
+    private void doFlush(SocketSessionImpl session) throws IOException {
         // Clear OP_WRITE
         SelectionKey key = session.getSelectionKey();
-        key.interestOps( key.interestOps() & ( ~SelectionKey.OP_WRITE ) );
+        key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
 
         SocketChannel ch = session.getChannel();
         Queue writeRequestQueue = session.getWriteRequestQueue();
 
-        for( ; ; )
-        {
+        for (;;) {
             WriteRequest req;
 
-            synchronized( writeRequestQueue )
-            {
-                req = ( WriteRequest ) writeRequestQueue.first();
+            synchronized (writeRequestQueue) {
+                req = (WriteRequest) writeRequestQueue.first();
             }
 
-            if( req == null )
+            if (req == null)
                 break;
 
-            ByteBuffer buf = ( ByteBuffer ) req.getMessage();
-            if( buf.remaining() == 0 )
-            {
-                synchronized( writeRequestQueue )
-                {
+            ByteBuffer buf = (ByteBuffer) req.getMessage();
+            if (buf.remaining() == 0) {
+                synchronized (writeRequestQueue) {
                     writeRequestQueue.pop();
                 }
 
                 session.increaseWrittenMessages();
 
                 buf.reset();
-                session.getFilterChain().fireMessageSent( session, req );
+                session.getFilterChain().fireMessageSent(session, req);
                 continue;
             }
 
-            if( key.isWritable() )
-            {
-                int writtenBytes = ch.write( buf.buf() );
-                if( writtenBytes > 0 )
-                {
-                    session.increaseWrittenBytes( writtenBytes );
+            if (key.isWritable()) {
+                int writtenBytes = ch.write(buf.buf());
+                if (writtenBytes > 0) {
+                    session.increaseWrittenBytes(writtenBytes);
                 }
             }
 
-            if( buf.hasRemaining() )
-            {
+            if (buf.hasRemaining()) {
                 // Kernel buffer is full
-                key.interestOps( key.interestOps() | SelectionKey.OP_WRITE );
+                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
                 break;
             }
         }
     }
 
-    private void doUpdateTrafficMask()
-    {
-        if( trafficControllingSessions.isEmpty() )
+    private void doUpdateTrafficMask() {
+        if (trafficControllingSessions.isEmpty())
             return;
 
-        for( ; ; )
-        {
+        for (;;) {
             SocketSessionImpl session;
 
-            synchronized( trafficControllingSessions )
-            {
-                session = ( SocketSessionImpl ) trafficControllingSessions.pop();
+            synchronized (trafficControllingSessions) {
+                session = (SocketSessionImpl) trafficControllingSessions.pop();
             }
 
-            if( session == null )
+            if (session == null)
                 break;
 
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
             // (In case that Session.suspend??() or session.resume??() is 
             // called before addSession() is processed)
-            if( key == null )
-            {
-                scheduleTrafficControl( session );
+            if (key == null) {
+                scheduleTrafficControl(session);
                 break;
             }
             // skip if channel is already closed
-            if( !key.isValid() )
-            {
+            if (!key.isValid()) {
                 continue;
             }
 
@@ -529,62 +442,48 @@ class SocketIoProcessor
             // session's write queue, set OP_WRITE to trigger flushing.
             int ops = SelectionKey.OP_READ;
             Queue writeRequestQueue = session.getWriteRequestQueue();
-            synchronized( writeRequestQueue )
-            {
-                if( !writeRequestQueue.isEmpty() )
-                {
+            synchronized (writeRequestQueue) {
+                if (!writeRequestQueue.isEmpty()) {
                     ops |= SelectionKey.OP_WRITE;
                 }
             }
 
             // Now mask the preferred ops with the mask of the current session
             int mask = session.getTrafficMask().getInterestOps();
-            key.interestOps( ops & mask );
+            key.interestOps(ops & mask);
         }
     }
 
+    private class Worker implements Runnable {
+        public void run() {
+            Thread.currentThread().setName(SocketIoProcessor.this.threadName);
 
-    private class Worker implements Runnable
-    {
-        public void run()
-        {
-            Thread.currentThread().setName( SocketIoProcessor.this.threadName );
-
-            for( ; ; )
-            {
-                try
-                {
-                    int nKeys = selector.select( 1000 );
+            for (;;) {
+                try {
+                    int nKeys = selector.select(1000);
                     doAddNew();
                     doUpdateTrafficMask();
 
-                    if( nKeys > 0 )
-                    {
-                        process( selector.selectedKeys() );
+                    if (nKeys > 0) {
+                        process(selector.selectedKeys());
                     }
 
                     doFlush();
                     doRemove();
                     notifyIdleness();
 
-                    if( selector.keys().isEmpty() )
-                    {
-                        synchronized( lock )
-                        {
-                            if( selector.keys().isEmpty() && newSessions.isEmpty() )
-                            {
+                    if (selector.keys().isEmpty()) {
+                        synchronized (lock) {
+                            if (selector.keys().isEmpty()
+                                    && newSessions.isEmpty()) {
                                 worker = null;
 
-                                try
-                                {
+                                try {
                                     selector.close();
-                                }
-                                catch( IOException e )
-                                {
-                                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                                }
-                                finally
-                                {
+                                } catch (IOException e) {
+                                    ExceptionMonitor.getInstance()
+                                            .exceptionCaught(e);
+                                } finally {
                                     selector = null;
                                 }
 
@@ -592,18 +491,13 @@ class SocketIoProcessor
                             }
                         }
                     }
-                }
-                catch( Throwable t )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( t );
+                } catch (Throwable t) {
+                    ExceptionMonitor.getInstance().exceptionCaught(t);
 
-                    try
-                    {
-                        Thread.sleep( 1000 );
-                    }
-                    catch( InterruptedException e1 )
-                    {
-                        ExceptionMonitor.getInstance().exceptionCaught( e1 );
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e1);
                     }
                 }
             }

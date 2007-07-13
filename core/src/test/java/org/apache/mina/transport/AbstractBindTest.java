@@ -45,22 +45,21 @@ import org.slf4j.LoggerFactory;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$ 
  */
-public abstract class AbstractBindTest extends TestCase
-{
+public abstract class AbstractBindTest extends TestCase {
     protected final IoAcceptor acceptor;
+
     protected int port;
 
-    public AbstractBindTest( IoAcceptor acceptor )
-    {
+    public AbstractBindTest(IoAcceptor acceptor) {
         this.acceptor = acceptor;
     }
-    
-    protected abstract SocketAddress createSocketAddress( int port );
-    protected abstract int getPort( SocketAddress address );
-    
-    protected void bind( boolean reuseAddress ) throws IOException
-    {
-        setReuseAddress( reuseAddress );
+
+    protected abstract SocketAddress createSocketAddress(int port);
+
+    protected abstract int getPort(SocketAddress address);
+
+    protected void bind(boolean reuseAddress) throws IOException {
+        setReuseAddress(reuseAddress);
 
         // Find an availble test port and bind to it.
         boolean socketBound = false;
@@ -68,172 +67,144 @@ public abstract class AbstractBindTest extends TestCase
         // Let's start from port #1 to detect possible resource leak
         // because test will fail in port 1-1023 if user run this test
         // as a normal user.
-        for( port = 1; port <= 65535; port ++ )
-        {
+        for (port = 1; port <= 65535; port++) {
             socketBound = false;
-            try
-            {
-                acceptor.bind( createSocketAddress( port ),
-                        new EchoProtocolHandler() );
+            try {
+                acceptor.bind(createSocketAddress(port),
+                        new EchoProtocolHandler());
                 socketBound = true;
                 break;
-            }
-            catch( IOException e )
-            {
+            } catch (IOException e) {
             }
         }
 
         // If there is no port available, test fails.
-        if( !socketBound )
-        {
-            throw new IOException( "Cannot bind any test port." );
+        if (!socketBound) {
+            throw new IOException("Cannot bind any test port.");
         }
 
         //System.out.println( "Using port " + port + " for testing." );
     }
 
-    private void setReuseAddress( boolean reuseAddress )
-    {
-        if( acceptor instanceof DatagramAcceptor )
-        {
-            ( ( DatagramSessionConfig ) acceptor.getDefaultConfig().getSessionConfig() ).setReuseAddress( reuseAddress );
-        }
-        else if( acceptor instanceof SocketAcceptor )
-        {
-            ( ( SocketAcceptorConfig ) acceptor.getDefaultConfig() ).setReuseAddress( reuseAddress );
+    private void setReuseAddress(boolean reuseAddress) {
+        if (acceptor instanceof DatagramAcceptor) {
+            ((DatagramSessionConfig) acceptor.getDefaultConfig()
+                    .getSessionConfig()).setReuseAddress(reuseAddress);
+        } else if (acceptor instanceof SocketAcceptor) {
+            ((SocketAcceptorConfig) acceptor.getDefaultConfig())
+                    .setReuseAddress(reuseAddress);
         }
     }
-    
-    public void tearDown()
-    {
-        try
-        {
+
+    public void tearDown() {
+        try {
             acceptor.unbindAll();
-        }
-        catch( Exception e )
-        {
+        } catch (Exception e) {
             // ignore
         }
     }
 
-    public void testAnonymousBind() throws Exception
-    {
-        acceptor.bind( null, new IoHandlerAdapter() );
-        Assert.assertEquals( 1, acceptor.getManagedServiceAddresses().size() );
+    public void testAnonymousBind() throws Exception {
+        acceptor.bind(null, new IoHandlerAdapter());
+        Assert.assertEquals(1, acceptor.getManagedServiceAddresses().size());
         acceptor.unbindAll();
         Thread.sleep(500);
-        Assert.assertEquals( 0, acceptor.getManagedServiceAddresses().size() );
-        
-        acceptor.bind( createSocketAddress( 0 ), new IoHandlerAdapter() );
-        Assert.assertEquals( 1, acceptor.getManagedServiceAddresses().size() );
-        SocketAddress address =
-                ( SocketAddress ) acceptor.getManagedServiceAddresses().iterator().next();
-        Assert.assertTrue( getPort( address ) != 0 );
-        acceptor.unbind( address );
+        Assert.assertEquals(0, acceptor.getManagedServiceAddresses().size());
+
+        acceptor.bind(createSocketAddress(0), new IoHandlerAdapter());
+        Assert.assertEquals(1, acceptor.getManagedServiceAddresses().size());
+        SocketAddress address = (SocketAddress) acceptor
+                .getManagedServiceAddresses().iterator().next();
+        Assert.assertTrue(getPort(address) != 0);
+        acceptor.unbind(address);
     }
-    
-    public void testDuplicateBind() throws IOException
-    {
-        bind( false );
-        
-        try
-        {
-            acceptor.bind( createSocketAddress( port ), new EchoProtocolHandler() );
-            Assert.fail( "IOException is not thrown" );
-        }
-        catch( IOException e )
-        {
+
+    public void testDuplicateBind() throws IOException {
+        bind(false);
+
+        try {
+            acceptor.bind(createSocketAddress(port), new EchoProtocolHandler());
+            Assert.fail("IOException is not thrown");
+        } catch (IOException e) {
         }
     }
 
-    public void testDuplicateUnbind() throws IOException
-    {
-        bind( false );
-        
+    public void testDuplicateUnbind() throws IOException {
+        bind(false);
+
         // this should succeed
-        acceptor.unbind( createSocketAddress( port ) );
-        
-        try
-        {
-            // this should fail
-            acceptor.unbind( createSocketAddress( port ) );
-            Assert.fail( "Exception is not thrown" );
-        }
-        catch( Exception e )
-        {
-        }
-    }
-    
-    public void testManyTimes() throws IOException
-    {
-        bind( true );
-        
-        SocketAddress addr = createSocketAddress( port );
-        EchoProtocolHandler handler = new EchoProtocolHandler();
-        for( int i = 0; i < 1024; i++ ) 
-        {
-            acceptor.unbind( addr );
-            acceptor.bind( addr, handler );
-        }
-    }
-    
-    public void _testRegressively() throws IOException
-    {
-        setReuseAddress( true );
+        acceptor.unbind(createSocketAddress(port));
 
-        SocketAddress addr = createSocketAddress( port );
+        try {
+            // this should fail
+            acceptor.unbind(createSocketAddress(port));
+            Assert.fail("Exception is not thrown");
+        } catch (Exception e) {
+        }
+    }
+
+    public void testManyTimes() throws IOException {
+        bind(true);
+
+        SocketAddress addr = createSocketAddress(port);
         EchoProtocolHandler handler = new EchoProtocolHandler();
-        for( int i = 0; i < 1048576; i++ )
-        {
-            acceptor.bind( addr, handler );
+        for (int i = 0; i < 1024; i++) {
+            acceptor.unbind(addr);
+            acceptor.bind(addr, handler);
+        }
+    }
+
+    public void _testRegressively() throws IOException {
+        setReuseAddress(true);
+
+        SocketAddress addr = createSocketAddress(port);
+        EchoProtocolHandler handler = new EchoProtocolHandler();
+        for (int i = 0; i < 1048576; i++) {
+            acceptor.bind(addr, handler);
             testDuplicateBind();
             testDuplicateUnbind();
-            if( i % 100 == 0 )
-            {
-                System.out.println( i + " (" + new Date() + ")" );
+            if (i % 100 == 0) {
+                System.out.println(i + " (" + new Date() + ")");
             }
         }
-        bind( false );
+        bind(false);
     }
 
-    private static class EchoProtocolHandler extends IoHandlerAdapter
-    {
-        private static final Logger log = LoggerFactory.getLogger( EchoProtocolHandler.class );
+    private static class EchoProtocolHandler extends IoHandlerAdapter {
+        private static final Logger log = LoggerFactory
+                .getLogger(EchoProtocolHandler.class);
 
-        public void sessionCreated( IoSession session )
-        {
-            if( session.getConfig() instanceof SocketSessionConfig )
-            {
-                ( ( SocketSessionConfig ) session.getConfig() ).setReceiveBufferSize( 2048 );
+        public void sessionCreated(IoSession session) {
+            if (session.getConfig() instanceof SocketSessionConfig) {
+                ((SocketSessionConfig) session.getConfig())
+                        .setReceiveBufferSize(2048);
             }
 
-            session.setIdleTime( IdleStatus.BOTH_IDLE, 10 );
+            session.setIdleTime(IdleStatus.BOTH_IDLE, 10);
         }
 
-        public void sessionIdle( IoSession session, IdleStatus status )
-        {
-            log.info( "*** IDLE #" + session.getIdleCount( IdleStatus.BOTH_IDLE ) + " ***" );
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            log.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE)
+                    + " ***");
         }
 
-        public void exceptionCaught( IoSession session, Throwable cause )
-        {
+        public void exceptionCaught(IoSession session, Throwable cause) {
             cause.printStackTrace();
             session.close();
         }
 
-        public void messageReceived( IoSession session, Object message ) throws Exception
-        {
-            if( !( message instanceof ByteBuffer ) )
-            {
+        public void messageReceived(IoSession session, Object message)
+                throws Exception {
+            if (!(message instanceof ByteBuffer)) {
                 return;
             }
 
-            ByteBuffer rb = ( ByteBuffer ) message;
+            ByteBuffer rb = (ByteBuffer) message;
             // Write the received data back to remote peer
-            ByteBuffer wb = ByteBuffer.allocate( rb.remaining() );
-            wb.put( rb );
+            ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+            wb.put(rb);
             wb.flip();
-            session.write( wb );
+            session.write(wb);
         }
     }
 }

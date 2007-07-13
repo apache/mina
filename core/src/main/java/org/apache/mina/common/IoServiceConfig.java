@@ -25,13 +25,12 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoServiceConfig
-{
+public interface IoServiceConfig {
     /**
      * Resturns the default configuration of the new {@link IoSession}s.
      */
     IoSessionConfig getSessionConfig();
-    
+
     /**
      * Returns the {@link IoFilterChainBuilder} which will modify the
      * {@link IoFilterChain} of all {@link IoSession}s which is created
@@ -39,7 +38,7 @@ public interface IoServiceConfig
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
      */
     IoFilterChainBuilder getFilterChainBuilder();
-    
+
     /**
      * Sets the {@link IoFilterChainBuilder} which will modify the
      * {@link IoFilterChain} of all {@link IoSession}s which is created
@@ -47,8 +46,8 @@ public interface IoServiceConfig
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
      */
-    void setFilterChainBuilder( IoFilterChainBuilder builder );
-    
+    void setFilterChainBuilder(IoFilterChainBuilder builder);
+
     /**
      * A shortcut for <tt>( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )</tt>.
      * Please note that the returned object is not a <b>real</b> {@link IoFilterChain}
@@ -60,7 +59,7 @@ public interface IoServiceConfig
      *                               not a {@link DefaultIoFilterChainBuilder}
      */
     DefaultIoFilterChainBuilder getFilterChain();
-    
+
     /**
      * Returns the default {@link ThreadModel} of the {@link IoService}.
      * The default value is a {@link ExecutorThreadModel}() whose service name is
@@ -69,7 +68,7 @@ public interface IoServiceConfig
      * {@link ExecutorThreadModel#getInstance(String)}.
      */
     ThreadModel getThreadModel();
-    
+
     /**
      * Sets the default {@link ThreadModel} of the {@link IoService}.
      * If you specify <tt>null</tt>, this property will be set to the
@@ -79,8 +78,8 @@ public interface IoServiceConfig
      * It is strongly recommended to set a new {@link ExecutorThreadModel} by calling
      * {@link ExecutorThreadModel#getInstance(String)}.
      */
-    void setThreadModel( ThreadModel threadModel );
-    
+    void setThreadModel(ThreadModel threadModel);
+
     /**
      * Returns a deep clone of this configuration.
      */

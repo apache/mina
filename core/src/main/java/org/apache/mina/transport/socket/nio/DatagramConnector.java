@@ -31,14 +31,12 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends DelegatedIoConnector
-{
+public class DatagramConnector extends DelegatedIoConnector {
     /**
      * Creates a new instance using a NewThreadExecutor 
      */
-    public DatagramConnector()
-    {
-        init( new DatagramConnectorDelegate( this, new NewThreadExecutor( ) ) );
+    public DatagramConnector() {
+        init(new DatagramConnectorDelegate(this, new NewThreadExecutor()));
     }
 
     /**
@@ -46,19 +44,17 @@ public class DatagramConnector extends DelegatedIoConnector
      * 
      * @param executor Executor to use for launching threads
      */
-    public DatagramConnector( Executor executor )
-    {
-        init( new DatagramConnectorDelegate( this, executor ) );
+    public DatagramConnector(Executor executor) {
+        init(new DatagramConnectorDelegate(this, executor));
     }
-    
+
     /**
      * Sets the default config this connector should use.
      * 
      * @param defaultConfig the default config.
      * @throws NullPointerException if the specified value is <code>null</code>.
      */
-    public void setDefaultConfig( DatagramConnectorConfig defaultConfig )
-    {
-        ( ( DatagramConnectorDelegate ) delegate ).setDefaultConfig( defaultConfig );
+    public void setDefaultConfig(DatagramConnectorConfig defaultConfig) {
+        ((DatagramConnectorDelegate) delegate).setDefaultConfig(defaultConfig);
     }
 }

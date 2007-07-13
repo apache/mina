@@ -56,8 +56,7 @@ import org.apache.mina.common.IoSession;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
-public interface IoHandlerCommand
-{
+public interface IoHandlerCommand {
     /**
      * <p>Execute a unit of processing work to be performed.  This
      * {@link IoHandlerCommand} may either complete the required processing
@@ -75,8 +74,9 @@ public interface IoHandlerCommand
      * @exception Exception general purpose exception return
      *                      to indicate abnormal termination
      */
-    void execute( NextCommand next, IoSession session, Object message ) throws Exception;
-    
+    void execute(NextCommand next, IoSession session, Object message)
+            throws Exception;
+
     /**
      * Represents an indirect reference to the next {@link IoHandlerCommand} of
      * the {@link IoHandlerChain}.  This interface provides a way to forward
@@ -85,12 +85,11 @@ public interface IoHandlerCommand
      * @author The Apache Directory Project (mina-dev@directory.apache.org)
      * @version $Rev$, $Date$
      */
-    public interface NextCommand
-    {
+    public interface NextCommand {
         /**
          * Forwards the request to the next {@link IoHandlerCommand} in the
          * {@link IoHandlerChain}.
          */
-        void execute( IoSession session, Object message ) throws Exception;
+        void execute(IoSession session, Object message) throws Exception;
     }
 }

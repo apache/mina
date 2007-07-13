@@ -33,8 +33,7 @@ import org.apache.mina.common.IoServiceListener;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoService implements IoService
-{
+public abstract class BaseIoService implements IoService {
     /**
      * Current filter chain builder.
      */
@@ -44,66 +43,52 @@ public abstract class BaseIoService implements IoService
      * Maintains the {@link IoServiceListener}s of this service.
      */
     private final IoServiceListenerSupport listeners;
-    
-    protected BaseIoService()
-    {
+
+    protected BaseIoService() {
         this.listeners = new IoServiceListenerSupport();
     }
-    
-    public IoFilterChainBuilder getFilterChainBuilder()
-    {
+
+    public IoFilterChainBuilder getFilterChainBuilder() {
         return filterChainBuilder;
     }
 
-    public void setFilterChainBuilder( IoFilterChainBuilder builder )
-    {
-        if( builder == null )
-        {
+    public void setFilterChainBuilder(IoFilterChainBuilder builder) {
+        if (builder == null) {
             builder = new DefaultIoFilterChainBuilder();
         }
         filterChainBuilder = builder;
     }
-    
-    public DefaultIoFilterChainBuilder getFilterChain()
-    {
-        if( filterChainBuilder instanceof DefaultIoFilterChainBuilder )
-        {
-            return ( DefaultIoFilterChainBuilder ) filterChainBuilder;
-        }
-        else
-        {
+
+    public DefaultIoFilterChainBuilder getFilterChain() {
+        if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
+            return (DefaultIoFilterChainBuilder) filterChainBuilder;
+        } else {
             throw new IllegalStateException(
-                    "Current filter chain builder is not a DefaultIoFilterChainBuilder." );
+                    "Current filter chain builder is not a DefaultIoFilterChainBuilder.");
         }
     }
-    
-    public void addListener( IoServiceListener listener )
-    {
-        getListeners().add( listener );
+
+    public void addListener(IoServiceListener listener) {
+        getListeners().add(listener);
     }
-    
-    public void removeListener( IoServiceListener listener )
-    {
-        getListeners().remove( listener );
+
+    public void removeListener(IoServiceListener listener) {
+        getListeners().remove(listener);
     }
-    
-    public Set getManagedServiceAddresses()
-    {
+
+    public Set getManagedServiceAddresses() {
         return getListeners().getManagedServiceAddresses();
     }
 
-    public Set getManagedSessions( SocketAddress serviceAddress )
-    {
-        return getListeners().getManagedSessions( serviceAddress );
+    public Set getManagedSessions(SocketAddress serviceAddress) {
+        return getListeners().getManagedSessions(serviceAddress);
     }
 
-    public boolean isManaged( SocketAddress serviceAddress )
-    {
-        return getListeners().isManaged( serviceAddress );
+    public boolean isManaged(SocketAddress serviceAddress) {
+        return getListeners().isManaged(serviceAddress);
     }
 
-    protected IoServiceListenerSupport getListeners()
-    {
+    protected IoServiceListenerSupport getListeners() {
         return listeners;
     }
 }

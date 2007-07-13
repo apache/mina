@@ -27,17 +27,14 @@ import java.io.Serializable;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractMessage implements Serializable
-{
+public abstract class AbstractMessage implements Serializable {
     private int sequence;
 
-    public int getSequence()
-    {
+    public int getSequence() {
         return sequence;
     }
 
-    public void setSequence( int sequence )
-    {
+    public void setSequence(int sequence) {
         this.sequence = sequence;
     }
 }

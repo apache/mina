@@ -35,37 +35,35 @@ import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class Server
-{
+public class Server {
     private static final int SERVER_PORT = 8080;
+
     // Set this to false to use object serialization instead of custom codec.
     private static final boolean USE_CUSTOM_CODEC = true;
 
-    public static void main( String[] args ) throws Throwable
-    {
+    public static void main(String[] args) throws Throwable {
         IoAcceptor acceptor = new SocketAcceptor();
-        
+
         // Prepare the service configuration.
         SocketAcceptorConfig cfg = new SocketAcceptorConfig();
-        cfg.setReuseAddress( true );
-        if( USE_CUSTOM_CODEC )
-        {
+        cfg.setReuseAddress(true);
+        if (USE_CUSTOM_CODEC) {
+            cfg.getFilterChain()
+                    .addLast(
+                            "codec",
+                            new ProtocolCodecFilter(
+                                    new SumUpProtocolCodecFactory(true)));
+        } else {
             cfg.getFilterChain().addLast(
                     "codec",
-                    new ProtocolCodecFilter( new SumUpProtocolCodecFactory( true ) ) );
+                    new ProtocolCodecFilter(
+                            new ObjectSerializationCodecFactory()));
         }
-        else
-        {
-            cfg.getFilterChain().addLast(
-                    "codec",
-                    new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
-        }
-        cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
+        cfg.getFilterChain().addLast("logger", new LoggingFilter());
 
-        acceptor.bind(
-                new InetSocketAddress( SERVER_PORT ),
-                new ServerSessionHandler( ), cfg );
+        acceptor.bind(new InetSocketAddress(SERVER_PORT),
+                new ServerSessionHandler(), cfg);
 
-        System.out.println( "Listening on port " + SERVER_PORT );
+        System.out.println("Listening on port " + SERVER_PORT);
     }
 }

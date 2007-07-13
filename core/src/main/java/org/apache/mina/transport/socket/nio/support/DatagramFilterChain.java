@@ -33,41 +33,35 @@ import org.apache.mina.util.Queue;
  */
 class DatagramFilterChain extends AbstractIoFilterChain {
 
-    DatagramFilterChain( IoSession parent )
-    {
-        super( parent );
+    DatagramFilterChain(IoSession parent) {
+        super(parent);
     }
-    
-    protected void doWrite( IoSession session, WriteRequest writeRequest )
-    {
-        DatagramSessionImpl s = ( DatagramSessionImpl ) session;
+
+    protected void doWrite(IoSession session, WriteRequest writeRequest) {
+        DatagramSessionImpl s = (DatagramSessionImpl) session;
         Queue writeRequestQueue = s.getWriteRequestQueue();
-        
+
         // SocketIoProcessor.doFlush() will reset it after write is finished
         // because the buffer will be passed with messageSent event. 
-        ( ( ByteBuffer ) writeRequest.getMessage() ).mark();
-        synchronized( writeRequestQueue )
-        {
-            writeRequestQueue.push( writeRequest );
-            if( writeRequestQueue.size() == 1 && session.getTrafficMask().isWritable() )
-            {
+        ((ByteBuffer) writeRequest.getMessage()).mark();
+        synchronized (writeRequestQueue) {
+            writeRequestQueue.push(writeRequest);
+            if (writeRequestQueue.size() == 1
+                    && session.getTrafficMask().isWritable()) {
                 // Notify DatagramService only when writeRequestQueue was empty.
-                s.getManagerDelegate().flushSession( s );
+                s.getManagerDelegate().flushSession(s);
             }
         }
     }
 
-    protected void doClose( IoSession session )
-    {
-        DatagramSessionImpl s = ( DatagramSessionImpl ) session;
+    protected void doClose(IoSession session) {
+        DatagramSessionImpl s = (DatagramSessionImpl) session;
         DatagramService manager = s.getManagerDelegate();
-        if( manager instanceof DatagramConnectorDelegate )
-        {
-            ( ( DatagramConnectorDelegate ) manager ).closeSession( s );
-        }
-        else
-        {
-            ( ( DatagramAcceptorDelegate ) manager ).getListeners().fireSessionDestroyed( session );
+        if (manager instanceof DatagramConnectorDelegate) {
+            ((DatagramConnectorDelegate) manager).closeSession(s);
+        } else {
+            ((DatagramAcceptorDelegate) manager).getListeners()
+                    .fireSessionDestroyed(session);
             session.getCloseFuture().setClosed();
         }
     }

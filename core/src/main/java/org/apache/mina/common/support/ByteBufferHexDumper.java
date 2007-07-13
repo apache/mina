@@ -21,68 +21,61 @@ package org.apache.mina.common.support;
 
 import org.apache.mina.common.ByteBuffer;
 
-
 /**
  * Provides utility methods for ByteBuffers.
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ByteBufferHexDumper
-{
+public class ByteBufferHexDumper {
     private static final byte[] highDigits;
 
     private static final byte[] lowDigits;
 
     // initialize lookup tables
-    static
-    {
+    static {
         final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8',
-                               '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+                '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
         int i;
-        byte[] high = new byte[ 256 ];
-        byte[] low = new byte[ 256 ];
+        byte[] high = new byte[256];
+        byte[] low = new byte[256];
 
-        for( i = 0; i < 256; i++ )
-        {
-            high[ i ] = digits[ i >>> 4 ];
-            low[ i ] = digits[ i & 0x0F ];
+        for (i = 0; i < 256; i++) {
+            high[i] = digits[i >>> 4];
+            low[i] = digits[i & 0x0F];
         }
 
         highDigits = high;
         lowDigits = low;
     }
 
-    public static String getHexdump( ByteBuffer in )
-    {
+    public static String getHexdump(ByteBuffer in) {
         int size = in.remaining();
 
-        if( size == 0 )
-        {
+        if (size == 0) {
             return "empty";
         }
 
-        StringBuffer out = new StringBuffer( ( in.remaining() * 3 ) - 1 );
+        StringBuffer out = new StringBuffer((in.remaining() * 3) - 1);
 
         int mark = in.position();
 
         // fill the first
         int byteValue = in.get() & 0xFF;
-        out.append( ( char ) highDigits[ byteValue ] );
-        out.append( ( char ) lowDigits[ byteValue ] );
+        out.append((char) highDigits[byteValue]);
+        out.append((char) lowDigits[byteValue]);
         size--;
 
         // and the others, too
-        for( ; size > 0; size-- )
-        {
-            out.append( ' ' );
+        for (; size > 0; size--) {
+            out.append(' ');
             byteValue = in.get() & 0xFF;
-            out.append( ( char ) highDigits[ byteValue ] );
-            out.append( ( char ) lowDigits[ byteValue ] );
+            out.append((char) highDigits[byteValue]);
+            out.append((char) lowDigits[byteValue]);
         }
 
-        in.position( mark );
+        in.position(mark);
 
         return out.toString();
     }

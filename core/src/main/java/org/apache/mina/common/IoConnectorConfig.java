@@ -25,8 +25,7 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoConnectorConfig extends IoServiceConfig
-{
+public interface IoConnectorConfig extends IoServiceConfig {
     /**
      * Returns the connect timeout in seconds.
      */
@@ -40,5 +39,5 @@ public interface IoConnectorConfig extends IoServiceConfig
     /**
      * Sets the connect timeout in seconds.
      */
-    void setConnectTimeout( int connectTimeout );
+    void setConnectTimeout(int connectTimeout);
 }

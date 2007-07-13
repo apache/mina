@@ -75,8 +75,7 @@ import org.apache.mina.filter.ReferenceCountingIoFilter;
  * 
  * @see IoFilterAdapter
  */
-public interface IoFilter
-{
+public interface IoFilter {
     /**
      * Invoked by {@link ReferenceCountingIoFilter} when this filter
      * is added to a {@link IoFilterChain} at the first time, so you can
@@ -92,7 +91,7 @@ public interface IoFilter
      * you don't wrap a filter with {@link ReferenceCountingIoFilter}.
      */
     void destroy() throws Exception;
-    
+
     /**
      * Invoked before this filter is added to the specified <tt>parent</tt>.
      * Please note that this method can be invoked more than once if
@@ -104,8 +103,9 @@ public interface IoFilter
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception;
-    
+    void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter)
+            throws Exception;
+
     /**
      * Invoked after this filter is added to the specified <tt>parent</tt>.
      * Please note that this method can be invoked more than once if
@@ -117,8 +117,9 @@ public interface IoFilter
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception;
-    
+    void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter)
+            throws Exception;
+
     /**
      * Invoked before this filter is removed from the specified <tt>parent</tt>.
      * Please note that this method can be invoked more than once if
@@ -130,8 +131,9 @@ public interface IoFilter
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPreRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception;
-    
+    void onPreRemove(IoFilterChain parent, String name, NextFilter nextFilter)
+            throws Exception;
+
     /**
      * Invoked after this filter is removed from the specified <tt>parent</tt>.
      * Please note that this method can be invoked more than once if
@@ -143,185 +145,180 @@ public interface IoFilter
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception;
-    
+    void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter)
+            throws Exception;
+
     /**
      * Filters {@link IoHandler#sessionCreated(IoSession)} event.
      */
-    void sessionCreated( NextFilter nextFilter, IoSession session ) throws Exception;
-    
+    void sessionCreated(NextFilter nextFilter, IoSession session)
+            throws Exception;
+
     /**
      * Filters {@link IoHandler#sessionOpened(IoSession)} event.
      */
-    void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception;
+    void sessionOpened(NextFilter nextFilter, IoSession session)
+            throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionClosed(IoSession)} event.
      */
-    void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception;
+    void sessionClosed(NextFilter nextFilter, IoSession session)
+            throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionIdle(IoSession,IdleStatus)}
      * event.
      */
-    void sessionIdle( NextFilter nextFilter, IoSession session,
-                      IdleStatus status ) throws Exception;
+    void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status)
+            throws Exception;
 
     /**
      * Filters {@link IoHandler#exceptionCaught(IoSession,Throwable)}
      * event.
      */
-    void exceptionCaught( NextFilter nextFilter,
-                          IoSession session, Throwable cause ) throws Exception;
+    void exceptionCaught(NextFilter nextFilter, IoSession session,
+            Throwable cause) throws Exception;
 
     /**
      * Filters {@link IoHandler#messageReceived(IoSession,Object)}
      * event.
      */
-    void messageReceived( NextFilter nextFilter,
-                          IoSession session, Object message ) throws Exception;
+    void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception;
 
     /**
      * Filters {@link IoHandler#messageSent(IoSession,Object)}
      * event.
      */
-    void messageSent( NextFilter nextFilter, IoSession session,
-                      Object message ) throws Exception;
+    void messageSent(NextFilter nextFilter, IoSession session, Object message)
+            throws Exception;
 
     /**
      * Filters {@link IoSession#close()} method invocation.
      */
-    void filterClose( NextFilter nextFilter, IoSession session ) throws Exception;
-    
+    void filterClose(NextFilter nextFilter, IoSession session) throws Exception;
+
     /**
      * Filters {@link IoSession#write(Object)} method invocation.
      */
-    void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception;
-    
+    void filterWrite(NextFilter nextFilter, IoSession session,
+            WriteRequest writeRequest) throws Exception;
+
     /**
      * Represents the next {@link IoFilter} in {@link IoFilterChain}.
      */
-    public interface NextFilter
-    {
+    public interface NextFilter {
         /**
          * Forwards <tt>sessionCreated</tt> event to next filter.
          */
-        void sessionCreated( IoSession session );
-        
+        void sessionCreated(IoSession session);
+
         /**
          * Forwards <tt>sessionOpened</tt> event to next filter.
          */
-        void sessionOpened( IoSession session );
+        void sessionOpened(IoSession session);
 
         /**
          * Forwards <tt>sessionClosed</tt> event to next filter.
          */
-        void sessionClosed( IoSession session );
+        void sessionClosed(IoSession session);
 
         /**
          * Forwards <tt>sessionIdle</tt> event to next filter.
          */
-        void sessionIdle( IoSession session, IdleStatus status );
+        void sessionIdle(IoSession session, IdleStatus status);
 
         /**
          * Forwards <tt>exceptionCaught</tt> event to next filter.
          */
-        void exceptionCaught( IoSession session, Throwable cause );
+        void exceptionCaught(IoSession session, Throwable cause);
 
         /**
          * Forwards <tt>messageReceived</tt> event to next filter.
          */
-        void messageReceived( IoSession session, Object message );
+        void messageReceived(IoSession session, Object message);
 
         /**
          * Forwards <tt>messageSent</tt> event to next filter.
          */
-        void messageSent( IoSession session, Object message );
+        void messageSent(IoSession session, Object message);
 
         /**
          * Forwards <tt>filterWrite</tt> event to next filter.
          */
-        void filterWrite( IoSession session, WriteRequest writeRequest );
-        
+        void filterWrite(IoSession session, WriteRequest writeRequest);
+
         /**
          * Forwards <tt>filterClose</tt> event to next filter.
          */
-        void filterClose( IoSession session );
+        void filterClose(IoSession session);
     }
-    
+
     /**
      * Represents write request fired by {@link IoSession#write(Object)}.
      */
-    public static class WriteRequest
-    {
-        private static final WriteFuture UNUSED_FUTURE = new WriteFuture()
-        {
-            public boolean isWritten()
-            {
+    public static class WriteRequest {
+        private static final WriteFuture UNUSED_FUTURE = new WriteFuture() {
+            public boolean isWritten() {
                 return false;
             }
 
-            public void setWritten( boolean written )
-            {
+            public void setWritten(boolean written) {
             }
-            
-            public IoSession getSession()
-            {
+
+            public IoSession getSession() {
                 return null;
             }
 
-            public Object getLock()
-            {
+            public Object getLock() {
                 return this;
             }
 
-            public void join()
-            {
+            public void join() {
             }
 
-            public boolean join( long timeoutInMillis )
-            {
+            public boolean join(long timeoutInMillis) {
                 return true;
             }
 
-            public boolean isReady()
-            {
+            public boolean isReady() {
                 return true;
             }
 
-            public void addListener( IoFutureListener listener )
-            {
-                throw new IllegalStateException( "You can't add a listener to a dummy future." );
+            public void addListener(IoFutureListener listener) {
+                throw new IllegalStateException(
+                        "You can't add a listener to a dummy future.");
             }
 
-            public void removeListener( IoFutureListener listener )
-            {
-                throw new IllegalStateException( "You can't add a listener to a dummy future." );
+            public void removeListener(IoFutureListener listener) {
+                throw new IllegalStateException(
+                        "You can't add a listener to a dummy future.");
             }
         };
-        
+
         private final Object message;
+
         private final WriteFuture future;
+
         private final SocketAddress destination;
-        
+
         /**
          * Creates a new instance without {@link WriteFuture}.  You'll get
          * an instance of {@link WriteFuture} even if you called this constructor
          * because {@link #getFuture()} will return a bogus future.
          */
-        public WriteRequest( Object message )
-        {
-            this( message, null, null );
+        public WriteRequest(Object message) {
+            this(message, null, null);
         }
 
         /**
          * Creates a new instance with {@link WriteFuture}.
          */
-        public WriteRequest( Object message, WriteFuture future )
-        {
-            this( message, future, null );
+        public WriteRequest(Object message, WriteFuture future) {
+            this(message, future, null);
         }
-        
+
         /**
          * Creates a new instance.
          * 
@@ -330,18 +327,16 @@ public interface IoFilter
          * @param destination the destination of the message.  This property will be
          *                    ignored unless the transport supports it.
          */
-        public WriteRequest( Object message, WriteFuture future, SocketAddress destination )
-        {
-            if( message == null )
-            {
-                throw new NullPointerException( "message" );
+        public WriteRequest(Object message, WriteFuture future,
+                SocketAddress destination) {
+            if (message == null) {
+                throw new NullPointerException("message");
             }
-            
-            if( future == null )
-            {
+
+            if (future == null) {
                 future = UNUSED_FUTURE;
             }
-            
+
             this.message = message;
             this.future = future;
             this.destination = destination;
@@ -350,31 +345,27 @@ public interface IoFilter
         /**
          * Returns {@link WriteFuture} that is associated with this write request.
          */
-        public WriteFuture getFuture()
-        {
+        public WriteFuture getFuture() {
             return future;
         }
 
         /**
          * Returns a message object to be written.
          */
-        public Object getMessage()
-        {
+        public Object getMessage() {
             return message;
         }
-        
+
         /**
          * Returne the destination of this write request.
          * 
          * @return <tt>null</tt> for the default destination
          */
-        public SocketAddress getDestination() 
-        {
+        public SocketAddress getDestination() {
             return destination;
         }
-        
-        public String toString()
-        {
+
+        public String toString() {
             return message.toString();
         }
     }

@@ -26,7 +26,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
-
 /**
  * Finds currently available server ports.
  *
@@ -34,8 +33,7 @@ import java.util.TreeSet;
  * @version $Rev$
  * @see <a href="http://www.iana.org/assignments/port-numbers">IANA.org</a>
  */
-public class AvailablePortFinder
-{
+public class AvailablePortFinder {
     /**
      * The minimum number of server port number.
      */
@@ -49,8 +47,7 @@ public class AvailablePortFinder
     /**
      * Creates a new instance.
      */
-    private AvailablePortFinder()
-    {
+    private AvailablePortFinder() {
     }
 
     /**
@@ -60,8 +57,7 @@ public class AvailablePortFinder
      *
      * WARNING: this can take a very long time.
      */
-    public static Set getAvailablePorts()
-    {
+    public static Set getAvailablePorts() {
         return getAvailablePorts(MIN_PORT_NUMBER, MAX_PORT_NUMBER);
     }
 
@@ -70,8 +66,7 @@ public class AvailablePortFinder
      *
      * @throws NoSuchElementException if there are no ports available
      */
-    public static int getNextAvailable()
-    {
+    public static int getNextAvailable() {
         return getNextAvailable(MIN_PORT_NUMBER);
     }
 
@@ -81,24 +76,20 @@ public class AvailablePortFinder
      * @param fromPort the port to scan for availability
      * @throws NoSuchElementException if there are no ports available
      */
-    public static int getNextAvailable(int fromPort)
-    {
-        if ((fromPort < MIN_PORT_NUMBER) || (fromPort > MAX_PORT_NUMBER))
-        {
+    public static int getNextAvailable(int fromPort) {
+        if ((fromPort < MIN_PORT_NUMBER) || (fromPort > MAX_PORT_NUMBER)) {
             throw new IllegalArgumentException("Invalid start port: "
-                                               + fromPort);
+                    + fromPort);
         }
 
-        for (int i = fromPort; i <= MAX_PORT_NUMBER; i++)
-        {
-            if( available( i ) )
-            {
+        for (int i = fromPort; i <= MAX_PORT_NUMBER; i++) {
+            if (available(i)) {
                 return i;
             }
         }
 
         throw new NoSuchElementException("Could not find an available port "
-                                         + "above " + fromPort);
+                + "above " + fromPort);
     }
 
     /**
@@ -106,46 +97,34 @@ public class AvailablePortFinder
      *
      * @param port the port to check for availability
      */
-    public static boolean available( int port )
-    {
-        if ( ( port < MIN_PORT_NUMBER) || ( port > MAX_PORT_NUMBER ) )
-        {
-            throw new IllegalArgumentException( "Invalid start port: " + port );
+    public static boolean available(int port) {
+        if ((port < MIN_PORT_NUMBER) || (port > MAX_PORT_NUMBER)) {
+            throw new IllegalArgumentException("Invalid start port: " + port);
         }
 
         ServerSocket ss = null;
         DatagramSocket ds = null;
-        try
-        {
-            ss = new ServerSocket( port );
-            ss.setReuseAddress( true );
-            ds = new DatagramSocket( port );
-            ds.setReuseAddress( true );
+        try {
+            ss = new ServerSocket(port);
+            ss.setReuseAddress(true);
+            ds = new DatagramSocket(port);
+            ds.setReuseAddress(true);
             return true;
-        }
-        catch (IOException e)
-        {
-        }
-        finally
-        {
-            if (ds != null)
-            {
+        } catch (IOException e) {
+        } finally {
+            if (ds != null) {
                 ds.close();
             }
 
-            if (ss != null)
-            {
-                try
-                {
+            if (ss != null) {
+                try {
                     ss.close();
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
                     /* should not be thrown */
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -157,40 +136,27 @@ public class AvailablePortFinder
      * {@link #MIN_PORT_NUMBER} and {@link #MAX_PORT_NUMBER} or
      * <code>fromPort</code> if greater than <code>toPort</code>.
      */
-    public static Set getAvailablePorts(int fromPort, int toPort)
-    {
-        if (
-            (fromPort < MIN_PORT_NUMBER) || (toPort > MAX_PORT_NUMBER)
-                || (fromPort > toPort))
-        {
+    public static Set getAvailablePorts(int fromPort, int toPort) {
+        if ((fromPort < MIN_PORT_NUMBER) || (toPort > MAX_PORT_NUMBER)
+                || (fromPort > toPort)) {
             throw new IllegalArgumentException("Invalid port range: "
-                                               + fromPort + " ~ " + toPort);
+                    + fromPort + " ~ " + toPort);
         }
 
         Set result = new TreeSet();
 
-        for (int i = fromPort; i <= toPort; i++)
-        {
+        for (int i = fromPort; i <= toPort; i++) {
             ServerSocket s = null;
 
-            try
-            {
+            try {
                 s = new ServerSocket(i);
                 result.add(new Integer(i));
-            }
-            catch (IOException e)
-            {
-            }
-            finally
-            {
-                if (s != null)
-                {
-                    try
-                    {
+            } catch (IOException e) {
+            } finally {
+                if (s != null) {
+                    try {
                         s.close();
-                    }
-                    catch (IOException e)
-                    {
+                    } catch (IOException e) {
                         /* should not be thrown */
                     }
                 }

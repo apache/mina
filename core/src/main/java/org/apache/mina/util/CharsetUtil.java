@@ -23,36 +23,32 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-
 /**
  * Utilities for dealing with Charsets.
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$
  */
-public class CharsetUtil
-{
-    public static String getDefaultCharsetName()
-    {
+public class CharsetUtil {
+    public static String getDefaultCharsetName() {
         // Use reflection here to be able to compile mina with jdk 1.4.
-        try
-        {
-            Class charsetClass = Class.forName( "java.nio.charset.Charset" );
-            Object charSet = charsetClass.getMethod( "defaultCharset", null ).invoke( null, null );
-            return ( String ) charsetClass.getMethod( "name", null ).invoke( charSet, null );
-        }
-        catch ( Exception e )
-        {
+        try {
+            Class charsetClass = Class.forName("java.nio.charset.Charset");
+            Object charSet = charsetClass.getMethod("defaultCharset", null)
+                    .invoke(null, null);
+            return (String) charsetClass.getMethod("name", null).invoke(
+                    charSet, null);
+        } catch (Exception e) {
             //ignore, not on java 5
         }
 
         // Try to use OutputStreamWriter instead.
-        OutputStreamWriter writer = new OutputStreamWriter( new ByteArrayOutputStream() );
+        OutputStreamWriter writer = new OutputStreamWriter(
+                new ByteArrayOutputStream());
         return writer.getEncoding();
     }
 
-    public static Charset getDefaultCharset()
-    {
-        return Charset.forName( getDefaultCharsetName() );
+    public static Charset getDefaultCharset() {
+        return Charset.forName(getDefaultCharsetName());
     }
 }

@@ -29,7 +29,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
 
-
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.util.Assert;
 
@@ -57,111 +56,100 @@ import org.springframework.util.Assert;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SSLContextFactoryBean extends AbstractFactoryBean
-{
+public class SSLContextFactoryBean extends AbstractFactoryBean {
     private String protocol = "TLS";
+
     private String provider = null;
+
     private SecureRandom secureRandom = null;
-    
+
     private KeyStore keyManagerFactoryKeyStore = null;
+
     private char[] keyManagerFactoryKeyStorePassword = null;
+
     private KeyManagerFactory keyManagerFactory = null;
+
     private String keyManagerFactoryAlgorithm = null;
+
     private String keyManagerFactoryProvider = null;
+
     private boolean keyManagerFactoryAlgorithmUseDefault = false;
 
     private KeyStore trustManagerFactoryKeyStore = null;
+
     private TrustManagerFactory trustManagerFactory = null;
+
     private String trustManagerFactoryAlgorithm = null;
+
     private String trustManagerFactoryProvider = null;
+
     private boolean trustManagerFactoryAlgorithmUseDefault = false;
+
     private ManagerFactoryParameters trustManagerFactoryParameters = null;
-    
-    protected Object createInstance() throws Exception
-    {
+
+    protected Object createInstance() throws Exception {
         KeyManagerFactory kmf = this.keyManagerFactory;
         TrustManagerFactory tmf = this.trustManagerFactory;
-        
-        if( kmf == null )
-        {
+
+        if (kmf == null) {
             String algorithm = keyManagerFactoryAlgorithm;
-            if( algorithm == null && keyManagerFactoryAlgorithmUseDefault )
-            {
+            if (algorithm == null && keyManagerFactoryAlgorithmUseDefault) {
                 algorithm = KeyManagerFactory.getDefaultAlgorithm();
             }
-            if( algorithm != null )
-            {
-                if( keyManagerFactoryProvider == null )
-                {
-                    kmf = KeyManagerFactory.getInstance( algorithm );
-                }
-                else
-                {
-                    kmf = KeyManagerFactory.getInstance( algorithm, 
-                                                    keyManagerFactoryProvider );
+            if (algorithm != null) {
+                if (keyManagerFactoryProvider == null) {
+                    kmf = KeyManagerFactory.getInstance(algorithm);
+                } else {
+                    kmf = KeyManagerFactory.getInstance(algorithm,
+                            keyManagerFactoryProvider);
                 }
             }
         }
-        
-        if( tmf == null )
-        {
+
+        if (tmf == null) {
             String algorithm = trustManagerFactoryAlgorithm;
-            if( algorithm == null && trustManagerFactoryAlgorithmUseDefault )
-            {
+            if (algorithm == null && trustManagerFactoryAlgorithmUseDefault) {
                 algorithm = TrustManagerFactory.getDefaultAlgorithm();
             }
-            if( algorithm != null )
-            {
-                if( trustManagerFactoryProvider == null )
-                {
-                    tmf = TrustManagerFactory.getInstance( algorithm );
-                }
-                else
-                {
-                    tmf = TrustManagerFactory.getInstance( algorithm, 
-                                                  trustManagerFactoryProvider );
+            if (algorithm != null) {
+                if (trustManagerFactoryProvider == null) {
+                    tmf = TrustManagerFactory.getInstance(algorithm);
+                } else {
+                    tmf = TrustManagerFactory.getInstance(algorithm,
+                            trustManagerFactoryProvider);
                 }
             }
         }
-        
-        KeyManager[] keyManagers = null; 
-        if( kmf != null )
-        {
-            kmf.init( keyManagerFactoryKeyStore, 
-                      keyManagerFactoryKeyStorePassword );
+
+        KeyManager[] keyManagers = null;
+        if (kmf != null) {
+            kmf.init(keyManagerFactoryKeyStore,
+                    keyManagerFactoryKeyStorePassword);
             keyManagers = kmf.getKeyManagers();
         }
-        TrustManager[] trustManagers = null; 
-        if( tmf != null )
-        {
-            if( trustManagerFactoryParameters != null )
-            {
-                tmf.init( trustManagerFactoryParameters );
-            }
-            else
-            {
-                tmf.init( trustManagerFactoryKeyStore );
+        TrustManager[] trustManagers = null;
+        if (tmf != null) {
+            if (trustManagerFactoryParameters != null) {
+                tmf.init(trustManagerFactoryParameters);
+            } else {
+                tmf.init(trustManagerFactoryKeyStore);
             }
             trustManagers = tmf.getTrustManagers();
         }
-        
+
         SSLContext context = null;
-        if( provider == null )
-        {
-            context = SSLContext.getInstance( protocol );
+        if (provider == null) {
+            context = SSLContext.getInstance(protocol);
+        } else {
+            context = SSLContext.getInstance(protocol, provider);
         }
-        else
-        {
-            context = SSLContext.getInstance( protocol, provider );
-        }
-        
-        context.init( keyManagers, trustManagers, secureRandom );
-        
+
+        context.init(keyManagers, trustManagers, secureRandom);
+
         return context;
     }
 
-    public Class getObjectType()
-    {
+    public Class getObjectType() {
         return SSLContext.class;
     }
 
@@ -173,9 +161,8 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * @throws IllegalArgumentException if the specified value is 
      *         <code>null</code>.
      */
-    public void setProtocol( String protocol )
-    {
-        Assert.notNull( protocol, "Property 'protocol' may not be null" );
+    public void setProtocol(String protocol) {
+        Assert.notNull(protocol, "Property 'protocol' may not be null");
         this.protocol = protocol;
     }
 
@@ -188,8 +175,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param useDefault <code>true</code> or <code>false</code>.
      */
-    public void setKeyManagerFactoryAlgorithmUseDefault( boolean useDefault )
-    {
+    public void setKeyManagerFactoryAlgorithmUseDefault(boolean useDefault) {
         this.keyManagerFactoryAlgorithmUseDefault = useDefault;
     }
 
@@ -202,8 +188,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param useDefault <code>true</code> or <code>false</code>.
      */
-    public void setTrustManagerFactoryAlgorithmUseDefault( boolean useDefault )
-    {
+    public void setTrustManagerFactoryAlgorithmUseDefault(boolean useDefault) {
         this.trustManagerFactoryAlgorithmUseDefault = useDefault;
     }
 
@@ -214,8 +199,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param factory the factory.
      */
-    public void setKeyManagerFactory( KeyManagerFactory factory )
-    {
+    public void setKeyManagerFactory(KeyManagerFactory factory) {
         this.keyManagerFactory = factory;
     }
 
@@ -237,8 +221,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param algorithm the algorithm to use.
      */
-    public void setKeyManagerFactoryAlgorithm( String algorithm )
-    {
+    public void setKeyManagerFactoryAlgorithm(String algorithm) {
         this.keyManagerFactoryAlgorithm = algorithm;
     }
 
@@ -259,8 +242,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param provider the name of the provider.
      */
-    public void setKeyManagerFactoryProvider( String provider )
-    {
+    public void setKeyManagerFactoryProvider(String provider) {
         this.keyManagerFactoryProvider = provider;
     }
 
@@ -271,8 +253,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param keyStore the key store.
      */
-    public void setKeyManagerFactoryKeyStore( KeyStore keyStore )
-    {
+    public void setKeyManagerFactoryKeyStore(KeyStore keyStore) {
         this.keyManagerFactoryKeyStore = keyStore;
     }
 
@@ -283,14 +264,10 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param password the password. Use <code>null</code> to disable password.
      */
-    public void setKeyManagerFactoryKeyStorePassword( String password )
-    {
-        if( password != null )
-        {
+    public void setKeyManagerFactoryKeyStorePassword(String password) {
+        if (password != null) {
             this.keyManagerFactoryKeyStorePassword = password.toCharArray();
-        }
-        else
-        {
+        } else {
             this.keyManagerFactoryKeyStorePassword = null;
         }
     }
@@ -302,8 +279,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param factory the factory.
      */
-    public void setTrustManagerFactory( TrustManagerFactory factory )
-    {
+    public void setTrustManagerFactory(TrustManagerFactory factory) {
         this.trustManagerFactory = factory;
     }
 
@@ -325,8 +301,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param algorithm the algorithm to use.
      */
-    public void setTrustManagerFactoryAlgorithm( String algorithm )
-    {
+    public void setTrustManagerFactoryAlgorithm(String algorithm) {
         this.trustManagerFactoryAlgorithm = algorithm;
     }
 
@@ -341,8 +316,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param keyStore the key store.
      */
-    public void setTrustManagerFactoryKeyStore( KeyStore keyStore )
-    {
+    public void setTrustManagerFactoryKeyStore(KeyStore keyStore) {
         this.trustManagerFactoryKeyStore = keyStore;
     }
 
@@ -353,8 +327,8 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      *  
      * @param parameters describing provider-specific trust material.
      */
-    public void setTrustManagerFactoryParameters( ManagerFactoryParameters parameters )
-    {
+    public void setTrustManagerFactoryParameters(
+            ManagerFactoryParameters parameters) {
         this.trustManagerFactoryParameters = parameters;
     }
 
@@ -375,8 +349,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      * 
      * @param provider the name of the provider.
      */
-    public void setTrustManagerFactoryProvider( String provider )
-    {
+    public void setTrustManagerFactoryProvider(String provider) {
         this.trustManagerFactoryProvider = provider;
     }
 
@@ -388,10 +361,8 @@ public class SSLContextFactoryBean extends AbstractFactoryBean
      *        JVM's default should be used.
      * @see SSLContext#init(javax.net.ssl.KeyManager[], javax.net.ssl.TrustManager[], java.security.SecureRandom)
      */
-    public void setSecureRandom( SecureRandom secureRandom )
-    {
+    public void setSecureRandom(SecureRandom secureRandom) {
         this.secureRandom = secureRandom;
     }
 
-    
 }

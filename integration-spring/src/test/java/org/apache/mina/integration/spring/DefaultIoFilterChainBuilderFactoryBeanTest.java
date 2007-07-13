@@ -35,81 +35,71 @@ import junit.framework.TestCase;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase
-{
+public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase {
     MockControl mockChain;
+
     IoFilterChain chain;
+
     IoFilter[] filters;
 
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
-        
-        mockChain = MockControl.createControl( IoFilterChain.class );
-        chain = ( IoFilterChain ) mockChain.getMock();
+
+        mockChain = MockControl.createControl(IoFilterChain.class);
+        chain = (IoFilterChain) mockChain.getMock();
         filters = new IoFilter[] {
-                ( IoFilter ) MockControl.createControl( IoFilter.class ).getMock(),
-                ( IoFilter ) MockControl.createControl( IoFilter.class ).getMock(),
-                ( IoFilter ) MockControl.createControl( IoFilter.class ).getMock()
-        };        
+                (IoFilter) MockControl.createControl(IoFilter.class).getMock(),
+                (IoFilter) MockControl.createControl(IoFilter.class).getMock(),
+                (IoFilter) MockControl.createControl(IoFilter.class).getMock() };
     }
-    
-    public void testUnnamedFilters() throws Exception
-    {
-        chain.addLast( "prefix0", filters[ 0 ] );
-        chain.addLast( "prefix1", filters[ 1 ] );
-        chain.addLast( "prefix2", filters[ 2 ] );
-        
+
+    public void testUnnamedFilters() throws Exception {
+        chain.addLast("prefix0", filters[0]);
+        chain.addLast("prefix1", filters[1]);
+        chain.addLast("prefix2", filters[2]);
+
         mockChain.replay();
-        
-        DefaultIoFilterChainBuilderFactoryBean factory = 
-                                   new DefaultIoFilterChainBuilderFactoryBean();
-        factory.setFilters( Arrays.asList( filters ) );
-        factory.setFilterNamePrefix( "prefix" );
-        DefaultIoFilterChainBuilder builder = 
-                             ( DefaultIoFilterChainBuilder) factory.createInstance();
-        builder.buildFilterChain( chain );
-        
+
+        DefaultIoFilterChainBuilderFactoryBean factory = new DefaultIoFilterChainBuilderFactoryBean();
+        factory.setFilters(Arrays.asList(filters));
+        factory.setFilterNamePrefix("prefix");
+        DefaultIoFilterChainBuilder builder = (DefaultIoFilterChainBuilder) factory
+                .createInstance();
+        builder.buildFilterChain(chain);
+
         mockChain.verify();
     }
-    
-    public void testIllegalObjectsInFilterList() throws Exception
-    {
+
+    public void testIllegalObjectsInFilterList() throws Exception {
         LinkedList mappings = new LinkedList();
-        mappings.add( new IoFilterMapping( "f0", filters[ 0 ] ) );
-        mappings.add( new Object() );
-        DefaultIoFilterChainBuilderFactoryBean factory = 
-            new DefaultIoFilterChainBuilderFactoryBean();
-        try
-        {
-            factory.setFilters( mappings );
-            fail( "Illegal object in list of filters. IllegalArgumentException expected." );
-        }
-        catch( IllegalArgumentException iae )
-        {
+        mappings.add(new IoFilterMapping("f0", filters[0]));
+        mappings.add(new Object());
+        DefaultIoFilterChainBuilderFactoryBean factory = new DefaultIoFilterChainBuilderFactoryBean();
+        try {
+            factory.setFilters(mappings);
+            fail("Illegal object in list of filters. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
     }
-    
-    public void testNamedAndUnnamedFilters() throws Exception
-    {
+
+    public void testNamedAndUnnamedFilters() throws Exception {
         LinkedList mappings = new LinkedList();
-        mappings.add( new IoFilterMapping( "f0", filters[ 0 ] ) );
-        mappings.add( filters[ 1 ] );
-        mappings.add( new IoFilterMapping( "f2", filters[ 2 ] ) );
-        
-        chain.addLast( "f0", filters[ 0 ] );
-        chain.addLast( "filter1", filters[ 1 ] );
-        chain.addLast( "f2", filters[ 2 ] );
-        
+        mappings.add(new IoFilterMapping("f0", filters[0]));
+        mappings.add(filters[1]);
+        mappings.add(new IoFilterMapping("f2", filters[2]));
+
+        chain.addLast("f0", filters[0]);
+        chain.addLast("filter1", filters[1]);
+        chain.addLast("f2", filters[2]);
+
         mockChain.replay();
-        
-        DefaultIoFilterChainBuilderFactoryBean factory = 
-                                   new DefaultIoFilterChainBuilderFactoryBean();
-        factory.setFilters( mappings );
-        DefaultIoFilterChainBuilder builder = 
-                             ( DefaultIoFilterChainBuilder) factory.createInstance();
-        builder.buildFilterChain( chain );
-        
+
+        DefaultIoFilterChainBuilderFactoryBean factory = new DefaultIoFilterChainBuilderFactoryBean();
+        factory.setFilters(mappings);
+        DefaultIoFilterChainBuilder builder = (DefaultIoFilterChainBuilder) factory
+                .createInstance();
+        builder.buildFilterChain(chain);
+
         mockChain.verify();
-    }    
+    }
 }
