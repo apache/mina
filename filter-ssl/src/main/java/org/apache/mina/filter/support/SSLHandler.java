@@ -33,6 +33,8 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.IoEventType;
+import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
@@ -57,8 +59,8 @@ public class SSLHandler
     private final SSLFilter parent;
     private final SSLContext ctx;
     private final IoSession session;
-    private final Queue<Event> preHandshakeEventQueue = new LinkedList<Event>();
-    private final Queue<Event> postHandshakeEventQueue = new ConcurrentLinkedQueue<Event>();
+    private final Queue<IoFilterEvent> preHandshakeEventQueue = new LinkedList<IoFilterEvent>();
+    private final Queue<IoFilterEvent> postHandshakeEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
 
     private SSLEngine sslEngine;
 
@@ -250,31 +252,31 @@ public class SSLHandler
 
     public void schedulePreHandshakeWriteRequest( NextFilter nextFilter, WriteRequest writeRequest )
     {
-        preHandshakeEventQueue.offer( new Event( EventType.FILTER_WRITE, nextFilter, writeRequest ) );
+        preHandshakeEventQueue.offer( new IoFilterEvent( nextFilter, IoEventType.WRITE, session, writeRequest ) );
     }
     
     public void flushPreHandshakeEvents() throws SSLException
     {
-        Event scheduledWrite;
+        IoFilterEvent scheduledWrite;
         
         while( ( scheduledWrite = preHandshakeEventQueue.poll() ) != null )
         {
             if( SessionLog.isDebugEnabled( session ) )
             {
-                SessionLog.debug( session, " Flushing buffered write request: " + scheduledWrite.data );
+                SessionLog.debug( session, " Flushing buffered write request: " + scheduledWrite.getParameter() );
             }
-            parent.filterWrite( scheduledWrite.nextFilter, session, ( WriteRequest ) scheduledWrite.data );
+            parent.filterWrite( scheduledWrite.getNextFilter(), session, ( WriteRequest ) scheduledWrite.getParameter() );
         }
     }
     
     public void schedulePostHandshakeWriteRequest( NextFilter nextFilter, WriteRequest writeRequest )
     {
-        postHandshakeEventQueue.offer( new Event( EventType.FILTER_WRITE, nextFilter, writeRequest ) );
+        postHandshakeEventQueue.offer( new IoFilterEvent( nextFilter, IoEventType.WRITE, session, writeRequest ) );
     }
     
     public void schedulePostHandshakeMessage( NextFilter nextFilter, Object message )
     {
-        postHandshakeEventQueue.offer( new Event( EventType.RECEIVED, nextFilter, message ) );
+        postHandshakeEventQueue.offer( new IoFilterEvent( nextFilter, IoEventType.MESSAGE_RECEIVED, session, message ) );
     }
 
     public void flushPostHandshakeEvents()
@@ -285,17 +287,17 @@ public class SSLHandler
             return;
         }
         
-        Event e;
+        IoFilterEvent e;
         
         while( ( e = postHandshakeEventQueue.poll() ) != null )
         {
-            if( EventType.RECEIVED == e.type )
+            if( IoEventType.MESSAGE_RECEIVED == e.getType() )
             {
-                e.nextFilter.messageReceived( session, e.data );
+                e.getNextFilter().messageReceived( session, e.getParameter() );
             }
             else
             {
-                e.nextFilter.filterWrite( session, ( WriteRequest ) e.data );
+                e.getNextFilter().filterWrite( session, ( WriteRequest ) e.getParameter() );
             }
         }
     }
@@ -804,53 +806,5 @@ public class SSLHandler
         copy.put( src );
         copy.flip();
         return copy;
-    }
-
-    private static class EventType
-    {
-        public static final EventType RECEIVED = new EventType( "RECEIVED" );
-        public static final EventType FILTER_WRITE = new EventType( "FILTER_WRITE" );
-
-        private final String value;
-
-        private EventType( String value )
-        {
-            this.value = value;
-        }
-
-        @Override
-        public String toString()
-        {
-            return value;
-        }
-    }
-
-    private static class Event
-    {
-        private final EventType type;
-        private final NextFilter nextFilter;
-        private final Object data;
-
-        Event( EventType type, NextFilter nextFilter, Object data )
-        {
-            this.type = type;
-            this.nextFilter = nextFilter;
-            this.data = data;
-        }
-
-        public Object getData()
-        {
-            return data;
-        }
-
-        public NextFilter getNextFilter()
-        {
-            return nextFilter;
-        }
-
-        public EventType getType()
-        {
-            return type;
-        }
     }
 }

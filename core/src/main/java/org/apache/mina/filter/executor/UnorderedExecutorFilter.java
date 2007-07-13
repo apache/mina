@@ -22,7 +22,7 @@ package org.apache.mina.filter.executor;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoFilterEvent;
 
 /**
  * A filter that forwards I/O events to {@link Executor} to enforce a certain
@@ -69,27 +69,23 @@ public class UnorderedExecutorFilter extends AbstractExecutorFilter
         super(executor);
     }
 
-    protected void fireEvent( NextFilter nextFilter, IoSession session,
-                            EventType type, Object data )
+    protected void fireEvent( IoFilterEvent event )
     {
-        Event event = new Event( type, nextFilter, data );
-        getExecutor().execute(new ProcessEventRunnable(session, event));
+        getExecutor().execute(new ProcessEventRunnable(event));
     }
 
     private class ProcessEventRunnable implements Runnable
     {
-        private final IoSession session;
-        private final Event event;
+        private final IoFilterEvent event;
 
-        ProcessEventRunnable( IoSession session, Event event )
+        ProcessEventRunnable( IoFilterEvent event )
         {
-            this.session = session;
             this.event = event;
         }
 
         public void run()
         {
-            processEvent( event.getNextFilter(), session, event.getType(), event.getData() );
+            processEvent( event );
         }
     }
 }

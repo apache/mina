@@ -24,6 +24,7 @@ import java.util.Queue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,10 +73,9 @@ public class ExecutorFilter extends AbstractExecutorFilter
         super( executor );
     }
 
-    protected void fireEvent( NextFilter nextFilter, IoSession session,
-                            EventType type, Object data )
+    protected void fireEvent(IoFilterEvent event)
     {
-        Event event = new Event( type, nextFilter, data );
+        IoSession session = event.getSession();
         SessionBuffer buf = SessionBuffer.getSessionBuffer( session );
 
         boolean execute;
@@ -123,7 +123,7 @@ public class ExecutorFilter extends AbstractExecutorFilter
         }
 
         private final IoSession session;
-        private final Queue<Event> eventQueue = new LinkedList<Event>();
+        private final Queue<IoFilterEvent> eventQueue = new LinkedList<IoFilterEvent>();
         private boolean processingCompleted = true;
 
         private SessionBuffer( IoSession session )
@@ -145,7 +145,7 @@ public class ExecutorFilter extends AbstractExecutorFilter
         {
             while( true )
             {
-                Event event;
+                IoFilterEvent event;
 
                 synchronized( buffer.eventQueue )
                 {
@@ -158,7 +158,7 @@ public class ExecutorFilter extends AbstractExecutorFilter
                     }
                 }
 
-                processEvent( event.getNextFilter(), buffer.session, event.getType(), event.getData() );
+                processEvent( event );
             }
 
             if ( logger.isDebugEnabled() ) {

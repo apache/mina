@@ -25,7 +25,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
@@ -70,69 +72,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter
         return executor;
     }
 
-    protected abstract void fireEvent(
-            NextFilter nextFilter, IoSession session, EventType type, Object data );
-
-    protected static class EventType
-    {
-        public static final EventType OPENED = new EventType( "OPENED" );
-
-        public static final EventType CLOSED = new EventType( "CLOSED" );
-
-        public static final EventType READ = new EventType( "READ" );
-
-        public static final EventType WRITTEN = new EventType( "WRITTEN" );
-
-        public static final EventType RECEIVED = new EventType( "RECEIVED" );
-
-        public static final EventType SENT = new EventType( "SENT" );
-
-        public static final EventType IDLE = new EventType( "IDLE" );
-
-        public static final EventType EXCEPTION = new EventType( "EXCEPTION" );
-
-        private final String value;
-
-        private EventType( String value )
-        {
-            this.value = value;
-        }
-
-        @Override
-        public String toString()
-        {
-            return value;
-        }
-    }
-
-    protected static class Event
-    {
-        private final EventType type;
-        private final NextFilter nextFilter;
-        private final Object data;
-
-        protected Event( EventType type, NextFilter nextFilter, Object data )
-        {
-            this.type = type;
-            this.nextFilter = nextFilter;
-            this.data = data;
-        }
-
-        public Object getData()
-        {
-            return data;
-        }
-
-        public NextFilter getNextFilter()
-        {
-            return nextFilter;
-        }
-
-        public EventType getType()
-        {
-            return type;
-        }
-    }
+    protected abstract void fireEvent(IoFilterEvent event);
 
     public final void sessionCreated( NextFilter nextFilter, IoSession session )
     {
@@ -142,74 +82,82 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter
     public final void sessionOpened( NextFilter nextFilter,
                                IoSession session )
     {
-        fireEvent( nextFilter, session, EventType.OPENED, null );
+        fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED, session, null) );
     }
 
     public final void sessionClosed( NextFilter nextFilter,
                                IoSession session )
     {
-        fireEvent( nextFilter, session, EventType.CLOSED, null );
+        fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED, session, null) );
     }
 
     public final void sessionIdle( NextFilter nextFilter,
                              IoSession session, IdleStatus status )
     {
-        fireEvent( nextFilter, session, EventType.IDLE, status );
+        fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE, session, status) );
     }
 
     public final void exceptionCaught( NextFilter nextFilter,
                                  IoSession session, Throwable cause )
     {
-        fireEvent( nextFilter, session, EventType.EXCEPTION, cause );
+        fireEvent( new IoFilterEvent(nextFilter, IoEventType.EXCEPTION_CAUGHT, session, cause) );
     }
 
     public final void messageReceived( NextFilter nextFilter,
                                  IoSession session, Object message )
     {
-        fireEvent( nextFilter, session, EventType.RECEIVED, message );
+        fireEvent( new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message) );
     }
 
     public final void messageSent( NextFilter nextFilter,
                              IoSession session, WriteRequest writeRequest )
     {
-        fireEvent( nextFilter, session, EventType.SENT, writeRequest );
-    }
-
-    protected final void processEvent( NextFilter nextFilter, IoSession session, EventType type, Object data )
-    {
-        if( type == EventType.RECEIVED )
-        {
-            nextFilter.messageReceived( session, data );
-        }
-        else if( type == EventType.SENT )
-        {
-            nextFilter.messageSent( session, (WriteRequest) data );
-        }
-        else if( type == EventType.EXCEPTION )
-        {
-            nextFilter.exceptionCaught( session, (Throwable) data );
-        }
-        else if( type == EventType.IDLE )
-        {
-            nextFilter.sessionIdle( session, (IdleStatus) data );
-        }
-        else if( type == EventType.OPENED )
-        {
-            nextFilter.sessionOpened( session );
-        }
-        else if( type == EventType.CLOSED )
-        {
-            nextFilter.sessionClosed( session );
-        }
+        fireEvent( new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT, session, writeRequest) );
     }
 
     public final void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest )
     {
-        nextFilter.filterWrite( session, writeRequest );
+        fireEvent( new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest) );
     }
 
     public final void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
     {
-        nextFilter.filterClose( session );
+        fireEvent( new IoFilterEvent(nextFilter, IoEventType.CLOSE, session, null) );
+    }
+
+    protected final void processEvent( IoFilterEvent event )
+    {
+        NextFilter nextFilter = event.getNextFilter();
+        IoSession session = event.getSession();
+        Object data = event.getParameter();
+        
+        switch (event.getType()) {
+        case MESSAGE_RECEIVED:
+            nextFilter.messageReceived(session, data);
+            break;
+        case MESSAGE_SENT:
+            nextFilter.messageSent( session, (WriteRequest) data );
+            break;
+        case WRITE:
+            nextFilter.filterWrite( session, (WriteRequest) data );
+            break;
+        case CLOSE:
+            nextFilter.filterClose( session );
+            break;
+        case EXCEPTION_CAUGHT:
+            nextFilter.exceptionCaught( session, (Throwable) data );
+            break;
+        case SESSION_IDLE:
+            nextFilter.sessionIdle( session, (IdleStatus) data );
+            break;
+        case SESSION_OPENED:
+            nextFilter.sessionOpened( session );
+            break;
+        case SESSION_CLOSED:
+            nextFilter.sessionClosed( session );
+            break;
+        default:
+            throw new InternalError("Unknown event type: " + event.getType());
+        }
     }
 }
