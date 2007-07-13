@@ -28,6 +28,7 @@ package org.apache.mina.common;
  * @version $Rev$, $Date$
  */
 public enum IoEventType {
+    SESSION_CREATED,
     SESSION_OPENED,
     SESSION_CLOSED,
     MESSAGE_RECEIVED,
