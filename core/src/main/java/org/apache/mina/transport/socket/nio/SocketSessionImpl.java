@@ -61,7 +61,7 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession {
 
     private SelectionKey key;
 
-    private int readBufferSize;
+    private int readBufferSize = 1024;
 
     /**
      * Creates a new instance.
@@ -182,6 +182,10 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession {
 
     int getReadBufferSize() {
         return readBufferSize;
+    }
+    
+    void setReadBufferSize(int readBufferSize) {
+        this.readBufferSize = readBufferSize;
     }
 
     private class SessionConfigImpl extends BaseIoSessionConfig implements
@@ -327,7 +331,6 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession {
                     ch.socket().setReceiveBufferSize(size);
                     // Re-retrieve the effective receive buffer size.
                     size = ch.socket().getReceiveBufferSize();
-                    SocketSessionImpl.this.readBufferSize = size;
                 } catch (SocketException e) {
                     throw new RuntimeIOException(e);
                 }
