@@ -140,15 +140,14 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     private static boolean preferDirectBuffers = false;
 
     /**
-     * Returns the current allocator which manages the allocated buffers.
+     * Returns the allocator used by existing and new buffers
      */
     public static ByteBufferAllocator getAllocator() {
         return allocator;
     }
 
     /**
-     * Changes the current allocator with the specified one to manage
-     * the allocated buffers from now.
+     * Sets the allocator used by existing and new buffers
      */
     public static void setAllocator(ByteBufferAllocator newAllocator) {
         if (newAllocator == null) {
@@ -236,6 +235,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         return wrap(java.nio.ByteBuffer.wrap(byteArray, offset, length));
     }
 
+    /**
+     * Creates a new instance of ByteBuffer.  This is an empty constructor.
+     *
+     */
     protected ByteBuffer() {
     }
 
@@ -994,7 +997,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Returns hexdump of this buffer.
+     * Returns hexdump of this buffer.  The data and pointer are 
+     * not changed as a result of this method call.
+     * 
+     * @return
+     *  hexidecimal representation of this ByteBuffer
      */
     public String getHexDump() {
         return this.getHexDump(Integer.MAX_VALUE);
@@ -1005,6 +1012,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * 
      * @param lengthLimit The maximum number of bytes to dump from 
      *                    the current buffer position.
+     * @return 
+     *  hexidecimal representation of this ByteBuffer
      */
     public String getHexDump(int lengthLimit) {
         return ByteBufferHexDumper.getHexdump(this, lengthLimit);
