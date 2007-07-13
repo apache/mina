@@ -21,6 +21,7 @@ package org.apache.mina.filter.executor;
 
 import java.util.concurrent.Executor;
 
+import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterEvent;
 
@@ -56,17 +57,17 @@ public class UnorderedExecutorFilter extends AbstractExecutorFilter
      * Creates a new instance with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
-    public UnorderedExecutorFilter()
+    public UnorderedExecutorFilter(IoEventType... eventTypes)
     {
-        super();
+        super(eventTypes);
     }
     
     /**
      * Creates a new instance with the specified <tt>executor</tt>.
      */
-    public UnorderedExecutorFilter( Executor executor )
+    public UnorderedExecutorFilter( Executor executor, IoEventType... eventTypes )
     {
-        super(executor);
+        super(executor, eventTypes);
     }
 
     protected void fireEvent( IoFilterEvent event )

@@ -19,6 +19,10 @@
  */
 package org.apache.mina.filter.executor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -40,28 +44,52 @@ import org.apache.mina.common.WriteRequest;
  */
 public abstract class AbstractExecutorFilter extends IoFilterAdapter
 {
+    private final EnumSet<IoEventType> eventTypes;
     private final Executor executor;
 
     /**
      * Creates a new instance with the default thread pool implementation
-     * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
+     * (<tt>new ThreadPoolExecutor(1, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
-    protected AbstractExecutorFilter()
+    protected AbstractExecutorFilter(IoEventType... eventTypes)
     {
-        this( new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>() ) );
+        this( new ThreadPoolExecutor(1, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>() ),
+                eventTypes );
     }
     
     /**
      * Creates a new instance with the specified <tt>executor</tt>.
      */
-    protected AbstractExecutorFilter( Executor executor )
+    protected AbstractExecutorFilter( Executor executor, IoEventType... eventTypes )
     {
         if( executor == null )
         {
             throw new NullPointerException( "executor" );
         }
+        if( eventTypes == null || eventTypes.length == 0 ) {
+            eventTypes = new IoEventType[] {
+                    IoEventType.EXCEPTION_CAUGHT,
+                    IoEventType.MESSAGE_RECEIVED,
+                    IoEventType.MESSAGE_SENT,
+                    IoEventType.SESSION_CLOSED,
+                    IoEventType.SESSION_IDLE,
+                    IoEventType.SESSION_OPENED,
+            };
+        }
+        
+        for (IoEventType t: eventTypes) {
+            if (t == IoEventType.SESSION_CREATED) {
+                throw new IllegalArgumentException(
+                        IoEventType.SESSION_CREATED + " is not allowed.");
+            }
+        }
 
         this.executor = executor;
+        
+        Collection<IoEventType> eventTypeCollection =
+            new ArrayList<IoEventType>(eventTypes.length);
+        Collections.addAll(eventTypeCollection, eventTypes);
+        this.eventTypes = EnumSet.copyOf(eventTypeCollection);
     }
 
     /**
@@ -82,47 +110,79 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter
     public final void sessionOpened( NextFilter nextFilter,
                                IoSession session )
     {
-        fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED, session, null) );
+        if (eventTypes.contains(IoEventType.SESSION_OPENED)) {
+            fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED, session, null) );
+        } else {
+            nextFilter.sessionOpened(session);
+        }
     }
 
     public final void sessionClosed( NextFilter nextFilter,
                                IoSession session )
     {
-        fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED, session, null) );
+        if (eventTypes.contains(IoEventType.SESSION_CLOSED)) {
+            fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED, session, null) );
+        } else {
+            nextFilter.sessionClosed(session);
+        }
     }
 
     public final void sessionIdle( NextFilter nextFilter,
                              IoSession session, IdleStatus status )
     {
-        fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE, session, status) );
+        if (eventTypes.contains(IoEventType.SESSION_IDLE)) {
+            fireEvent( new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE, session, status) );
+        } else {
+            nextFilter.sessionIdle(session, status);
+        }
     }
 
     public final void exceptionCaught( NextFilter nextFilter,
                                  IoSession session, Throwable cause )
     {
-        fireEvent( new IoFilterEvent(nextFilter, IoEventType.EXCEPTION_CAUGHT, session, cause) );
+        if (eventTypes.contains(IoEventType.EXCEPTION_CAUGHT)) {
+            fireEvent( new IoFilterEvent(nextFilter, IoEventType.EXCEPTION_CAUGHT, session, cause) );
+        } else {
+            nextFilter.exceptionCaught(session, cause);
+        }
     }
 
     public final void messageReceived( NextFilter nextFilter,
                                  IoSession session, Object message )
     {
-        fireEvent( new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message) );
+        if (eventTypes.contains(IoEventType.MESSAGE_RECEIVED)) {
+            fireEvent( new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message) );
+        } else {
+            nextFilter.messageReceived(session, message);
+        }
     }
 
     public final void messageSent( NextFilter nextFilter,
                              IoSession session, WriteRequest writeRequest )
     {
-        fireEvent( new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT, session, writeRequest) );
+        if (eventTypes.contains(IoEventType.MESSAGE_SENT)) {
+            fireEvent( new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT, session, writeRequest) );
+        } else {
+            nextFilter.messageSent(session, writeRequest);
+        }
     }
 
     public final void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest )
     {
-        fireEvent( new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest) );
+        if (eventTypes.contains(IoEventType.WRITE)) {
+            fireEvent( new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest) );
+        } else {
+            nextFilter.filterWrite(session, writeRequest);
+        }
     }
 
     public final void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
     {
-        fireEvent( new IoFilterEvent(nextFilter, IoEventType.CLOSE, session, null) );
+        if (eventTypes.contains(IoEventType.CLOSE)) {
+            fireEvent( new IoFilterEvent(nextFilter, IoEventType.CLOSE, session, null) );
+        } else {
+            nextFilter.filterClose(session);
+        }
     }
 
     protected final void processEvent( IoFilterEvent event )
