@@ -43,32 +43,38 @@ import org.apache.mina.common.support.IoServiceListenerSupport;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeSessionImpl extends BaseIoSession
-{
-    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig()
-    {
+public class VmPipeSessionImpl extends BaseIoSession {
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {
     };
 
     private final IoService service;
+
     private final IoServiceConfig serviceConfig;
+
     private final IoServiceListenerSupport serviceListeners;
+
     private final SocketAddress localAddress;
+
     private final SocketAddress remoteAddress;
+
     private final SocketAddress serviceAddress;
+
     private final IoHandler handler;
+
     private final VmPipeFilterChain filterChain;
+
     private final VmPipeSessionImpl remoteSession;
+
     final Object lock;
+
     final BlockingQueue<Object> pendingDataQueue;
 
     /**
      * Constructor for client-side session.
      */
-    public VmPipeSessionImpl(
-        IoService service, IoServiceConfig serviceConfig,
-        IoServiceListenerSupport serviceListeners, Object lock, SocketAddress localAddress,
-        IoHandler handler, VmPipe remoteEntry )
-    {
+    public VmPipeSessionImpl(IoService service, IoServiceConfig serviceConfig,
+            IoServiceListenerSupport serviceListeners, Object lock,
+            SocketAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
         this.service = service;
         this.serviceConfig = serviceConfig;
         this.serviceListeners = serviceListeners;
@@ -76,17 +82,16 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.localAddress = localAddress;
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
-        this.filterChain = new VmPipeFilterChain( this );
+        this.filterChain = new VmPipeFilterChain(this);
         this.pendingDataQueue = new LinkedBlockingQueue<Object>();
 
-        remoteSession = new VmPipeSessionImpl( this, remoteEntry );
+        remoteSession = new VmPipeSessionImpl(this, remoteEntry);
     }
 
     /**
      * Constructor for server-side session.
      */
-    private VmPipeSessionImpl( VmPipeSessionImpl remoteSession, VmPipe entry )
-    {
+    private VmPipeSessionImpl(VmPipeSessionImpl remoteSession, VmPipe entry) {
         this.service = entry.getAcceptor();
         this.serviceConfig = entry.getConfig();
         this.serviceListeners = entry.getListeners();
@@ -94,113 +99,92 @@ public class VmPipeSessionImpl extends BaseIoSession
         this.localAddress = this.serviceAddress = remoteSession.remoteAddress;
         this.remoteAddress = remoteSession.localAddress;
         this.handler = entry.getHandler();
-        this.filterChain = new VmPipeFilterChain( this );
+        this.filterChain = new VmPipeFilterChain(this);
         this.remoteSession = remoteSession;
         this.pendingDataQueue = new LinkedBlockingQueue<Object>();
     }
 
-    public IoService getService()
-    {
+    public IoService getService() {
         return service;
     }
 
-    IoServiceListenerSupport getServiceListeners()
-    {
+    IoServiceListenerSupport getServiceListeners() {
         return serviceListeners;
     }
 
-    public IoServiceConfig getServiceConfig()
-    {
+    public IoServiceConfig getServiceConfig() {
         return serviceConfig;
     }
 
-    public IoSessionConfig getConfig()
-    {
+    public IoSessionConfig getConfig() {
         return CONFIG;
     }
 
-    public IoFilterChain getFilterChain()
-    {
+    public IoFilterChain getFilterChain() {
         return filterChain;
     }
 
-    public VmPipeSessionImpl getRemoteSession()
-    {
+    public VmPipeSessionImpl getRemoteSession() {
         return remoteSession;
     }
 
-    public IoHandler getHandler()
-    {
+    public IoHandler getHandler() {
         return handler;
     }
 
     @Override
-    protected void close0()
-    {
-        filterChain.fireFilterClose( this );
+    protected void close0() {
+        filterChain.fireFilterClose(this);
     }
 
     @Override
-    protected void write0( WriteRequest writeRequest )
-    {
-        this.filterChain.fireFilterWrite( this, writeRequest );
+    protected void write0(WriteRequest writeRequest) {
+        this.filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public int getScheduledWriteRequests()
-    {
+    public int getScheduledWriteRequests() {
         return 0;
     }
 
-    public int getScheduledWriteBytes()
-    {
+    public int getScheduledWriteBytes() {
         return 0;
     }
 
-    public TransportType getTransportType()
-    {
+    public TransportType getTransportType() {
         return TransportType.VM_PIPE;
     }
 
-    public SocketAddress getRemoteAddress()
-    {
+    public SocketAddress getRemoteAddress() {
         return remoteAddress;
     }
 
-    public SocketAddress getLocalAddress()
-    {
+    public SocketAddress getLocalAddress() {
         return localAddress;
     }
 
-    public SocketAddress getServiceAddress()
-    {
+    public SocketAddress getServiceAddress() {
         return serviceAddress;
     }
 
     @Override
-    protected void updateTrafficMask()
-    {
-        if( getTrafficMask().isReadable() || getTrafficMask().isWritable() )
-        {
+    protected void updateTrafficMask() {
+        if (getTrafficMask().isReadable() || getTrafficMask().isWritable()) {
             List<Object> data = new ArrayList<Object>();
 
-            pendingDataQueue.drainTo( data );
+            pendingDataQueue.drainTo(data);
 
-            for( Object aData : data )
-            {
-                if( aData instanceof WriteRequest )
-                {
+            for (Object aData : data) {
+                if (aData instanceof WriteRequest) {
                     // TODO Optimize unefficient data transfer.
                     // Data will be returned to pendingDataQueue
                     // if getTraffic().isWritable() is false.
-                    WriteRequest wr = ( WriteRequest ) aData;
-                    filterChain.doWrite( this, wr );
-                }
-                else
-                {
+                    WriteRequest wr = (WriteRequest) aData;
+                    filterChain.doWrite(this, wr);
+                } else {
                     // TODO Optimize unefficient data transfer.
                     // Data will be returned to pendingDataQueue
                     // if getTraffic().isReadable() is false.
-                    filterChain.fireMessageReceived( this, aData );
+                    filterChain.fireMessageReceived(this, aData);
                 }
             }
         }

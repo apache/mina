@@ -23,31 +23,30 @@ package org.apache.mina.integration.jmx;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoServiceManagerMBean
-{
+public interface IoServiceManagerMBean {
     /**
      * amount of session currently managed
      * @return session count
      */
     int getManagedSessionCount();
-    
+
     /**
      * start collecting throughput statistics for all the managed sessions 
      * @param millisecondsPolling polling time in milliseconds like 5000 for computing throughput every 5 seconds
      */
     void startCollectingStats(int millisecondsPolling);
-    
+
     /**
      * stop collecting throughput statistics 
      */
     void stopCollectingStats();
-    
+
     /**
      * bytes read per seconds sum of all the managed sessions  
      * @return bytes per seconds
      */
     float getTotalByteReadThroughput();
-    
+
     /**
      * bytes written per seconds sum for all the managed sessions  
      * @return bytes per seconds
@@ -77,13 +76,13 @@ public interface IoServiceManagerMBean
      * @return bytes per seconds
      */
     float getAverageByteWrittenThroughput();
-    
+
     /**
      * average messages read per seconds for all the managed sessions  
      * @return messages per seconds
      */
     float getAverageMessageReadThroughput();
-    
+
     /**
      * average messages written per seconds for all the managed sessions  
      * @return messages per seconds

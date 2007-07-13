@@ -43,36 +43,36 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class Main
-{
-    
-    public static void main( String[] args ) throws Exception
-    {
-        if( args.length != 3 )
-        {
-            System.out.println( Main.class.getName() + " <proxy-port> <server-hostname> <server-port>" );
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        if (args.length != 3) {
+            System.out.println(Main.class.getName()
+                    + " <proxy-port> <server-hostname> <server-port>");
             return;
         }
 
         // Create TCP/IP acceptor.
         IoAcceptor acceptor = new SocketAcceptor();
-        ( ( SocketAcceptorConfig ) acceptor.getDefaultConfig() ).setReuseAddress( true );
-        
+        ((SocketAcceptorConfig) acceptor.getDefaultConfig())
+                .setReuseAddress(true);
+
         // Create TCP/IP connector.
         IoConnector connector = new SocketConnector();
 
         // Set connect timeout.
-        ( ( IoConnectorConfig ) connector.getDefaultConfig()).setConnectTimeout( 30 );
-        
-        ClientToProxyIoHandler handler = new ClientToProxyIoHandler( 
-                new ServerToProxyIoHandler(), connector,
-                new InetSocketAddress( args[ 1 ],
-                        Integer.parseInt( args[ 2 ] ) ) );
-        
-        // Start proxy.
-        acceptor.bind( new InetSocketAddress( Integer.parseInt( args[ 0 ] ) ), handler );
+        ((IoConnectorConfig) connector.getDefaultConfig())
+                .setConnectTimeout(30);
 
-        System.out.println( "Listening on port " + Integer.parseInt( args[ 0 ] ) );
+        ClientToProxyIoHandler handler = new ClientToProxyIoHandler(
+                new ServerToProxyIoHandler(), connector, new InetSocketAddress(
+                        args[1], Integer.parseInt(args[2])));
+
+        // Start proxy.
+        acceptor
+                .bind(new InetSocketAddress(Integer.parseInt(args[0])), handler);
+
+        System.out.println("Listening on port " + Integer.parseInt(args[0]));
     }
-    
+
 }

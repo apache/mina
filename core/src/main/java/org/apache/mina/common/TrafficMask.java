@@ -28,61 +28,56 @@ import java.nio.channels.SelectionKey;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class TrafficMask
-{
+public class TrafficMask {
     /**
      * This mask suspends both reads and writes.
      */
-    public static final TrafficMask NONE = new TrafficMask( 0, "none" );
+    public static final TrafficMask NONE = new TrafficMask(0, "none");
+
     /**
      * This mask suspends writes, and resumes reads if reads were suspended.
      */
-    public static final TrafficMask READ = new TrafficMask( SelectionKey.OP_READ, "read" );
+    public static final TrafficMask READ = new TrafficMask(
+            SelectionKey.OP_READ, "read");
+
     /**
      * This mask suspends reads, and resumes writes if writes were suspended.
      */
-    public static final TrafficMask WRITE = new TrafficMask( SelectionKey.OP_WRITE, "write" );
+    public static final TrafficMask WRITE = new TrafficMask(
+            SelectionKey.OP_WRITE, "write");
+
     /**
      * This mask resumes both reads and writes if any of them were suspended.
      */
-    public static final TrafficMask ALL =
-        new TrafficMask( SelectionKey.OP_READ | SelectionKey.OP_WRITE, "all" );
-    
+    public static final TrafficMask ALL = new TrafficMask(SelectionKey.OP_READ
+            | SelectionKey.OP_WRITE, "all");
+
     /**
      * Returns an appropriate {@link TrafficMask} instance from the
      * specified <tt>interestOps</tt>.
      * @see SelectionKey
      */
-    public static TrafficMask getInstance( int interestOps )
-    {
-        boolean read = ( interestOps & SelectionKey.OP_READ ) != 0;
-        boolean write = ( interestOps & SelectionKey.OP_WRITE ) != 0;
-        if( read )
-        {
-            if( write )
-            {
+    public static TrafficMask getInstance(int interestOps) {
+        boolean read = (interestOps & SelectionKey.OP_READ) != 0;
+        boolean write = (interestOps & SelectionKey.OP_WRITE) != 0;
+        if (read) {
+            if (write) {
                 return ALL;
-            }
-            else
-            {
+            } else {
                 return READ;
             }
-        }
-        else if( write )
-        {
+        } else if (write) {
             return WRITE;
-        }
-        else
-        {
+        } else {
             return NONE;
         }
     }
-    
+
     private final int interestOps;
+
     private final String name;
-    
-    private TrafficMask( int interestOps, String name )
-    {
+
+    private TrafficMask(int interestOps, String name) {
         this.interestOps = interestOps;
         this.name = name;
     }
@@ -90,32 +85,28 @@ public class TrafficMask
     /**
      * Returns the name of this mask.
      */
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
-    
+
     /**
      * Returns <tt>true</tt> if this mask allows a read operation.
      */
-    public boolean isReadable()
-    {
-        return ( interestOps & SelectionKey.OP_READ ) != 0;
+    public boolean isReadable() {
+        return (interestOps & SelectionKey.OP_READ) != 0;
     }
-    
+
     /**
      * Returns <tt>true</tt> if this mask allows a write operation.
      */
-    public boolean isWritable()
-    {
-        return ( interestOps & SelectionKey.OP_WRITE ) != 0;
+    public boolean isWritable() {
+        return (interestOps & SelectionKey.OP_WRITE) != 0;
     }
-    
+
     /**
      * Returns an interestOps of {@link SelectionKey} for this mask.
      */
-    public int getInterestOps()
-    {
+    public int getInterestOps() {
         return interestOps;
     }
 
@@ -123,39 +114,34 @@ public class TrafficMask
      * Peforms an <tt>AND</tt> operation on this mask with the specified
      * <tt>mask</tt> and returns the result.
      */
-    public TrafficMask and( TrafficMask mask )
-    {
-        return getInstance( interestOps & mask.interestOps );
+    public TrafficMask and(TrafficMask mask) {
+        return getInstance(interestOps & mask.interestOps);
     }
-    
+
     /**
      * Peforms an <tt>OR</tt> operation on this mask with the specified
      * <tt>mask</tt> and returns the result.
      */
-    public TrafficMask or( TrafficMask mask )
-    {
-        return getInstance( interestOps | mask.interestOps );
+    public TrafficMask or(TrafficMask mask) {
+        return getInstance(interestOps | mask.interestOps);
     }
-    
+
     /**
      * Returns a negated mask of this one.
      */
-    public TrafficMask not()
-    {
-        return getInstance( ~interestOps );
+    public TrafficMask not() {
+        return getInstance(~interestOps);
     }
-    
+
     /**
      * Peforms an <tt>XOR</tt> operation on this mask with the specified
      * <tt>mask</tt> and returns the result.
      */
-    public TrafficMask xor( TrafficMask mask )
-    {
-        return getInstance( interestOps ^ mask.interestOps );
+    public TrafficMask xor(TrafficMask mask) {
+        return getInstance(interestOps ^ mask.interestOps);
     }
-    
-    public String toString()
-    {
+
+    public String toString() {
         return name;
     }
 }

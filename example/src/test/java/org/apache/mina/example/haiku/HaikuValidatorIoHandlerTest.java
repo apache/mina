@@ -38,21 +38,22 @@ public class HaikuValidatorIoHandlerTest extends MockObjectTestCase {
     }
 
     public void testValidHaiku() throws Exception {
-        Mock session = mock( IoSession.class );
-        session.expects( once() ).method( "write" ).with( eq( "HAIKU!" ) );
+        Mock session = mock(IoSession.class);
+        session.expects(once()).method("write").with(eq("HAIKU!"));
         IoSession sessionProxy = (IoSession) session.proxy();
 
-        handler.messageReceived( sessionProxy, new Haiku( "Oh, I drank too much.",
-                                                          "Why, oh why did I sign up",
-                                                          "For an eight thirty?" ) );
+        handler.messageReceived(sessionProxy, new Haiku(
+                "Oh, I drank too much.", "Why, oh why did I sign up",
+                "For an eight thirty?"));
     }
 
     public void testInvalidHaiku() throws Exception {
-        Mock session = mock( IoSession.class );
-        session.expects( once() ).method( "write" )
-            .with( eq( "NOT A HAIKU: phrase 1, 'foo' had 1 syllables, not 5" ) );
+        Mock session = mock(IoSession.class);
+        session.expects(once()).method("write").with(
+                eq("NOT A HAIKU: phrase 1, 'foo' had 1 syllables, not 5"));
         IoSession sessionProxy = (IoSession) session.proxy();
 
-        handler.messageReceived( sessionProxy, new Haiku( "foo", "a haiku", "poo" ) );
+        handler.messageReceived(sessionProxy,
+                new Haiku("foo", "a haiku", "poo"));
     }
 }

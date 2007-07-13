@@ -25,8 +25,7 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoSessionConfig
-{
+public interface IoSessionConfig {
     /**
      * Returns a deep clone of this configuration.
      */

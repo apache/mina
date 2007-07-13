@@ -29,20 +29,20 @@ import org.apache.mina.transport.vmpipe.VmPipeAddress;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipe
-{
+public class VmPipe {
     private final VmPipeAcceptor acceptor;
+
     private final VmPipeAddress address;
+
     private final IoHandler handler;
+
     private final IoServiceConfig config;
+
     private final IoServiceListenerSupport listeners;
-    
-    public VmPipe( VmPipeAcceptor acceptor,
-                   VmPipeAddress address,
-                   IoHandler handler,
-                   IoServiceConfig config,
-                   IoServiceListenerSupport listeners)
-    {
+
+    public VmPipe(VmPipeAcceptor acceptor, VmPipeAddress address,
+            IoHandler handler, IoServiceConfig config,
+            IoServiceListenerSupport listeners) {
         this.acceptor = acceptor;
         this.address = address;
         this.handler = handler;
@@ -50,28 +50,23 @@ public class VmPipe
         this.listeners = listeners;
     }
 
-    public VmPipeAcceptor getAcceptor()
-    {
+    public VmPipeAcceptor getAcceptor() {
         return acceptor;
     }
 
-    public VmPipeAddress getAddress()
-    {
+    public VmPipeAddress getAddress() {
         return address;
     }
 
-    public IoHandler getHandler()
-    {
+    public IoHandler getHandler() {
         return handler;
     }
-    
-    public IoServiceConfig getConfig()
-    {
+
+    public IoServiceConfig getConfig() {
         return config;
     }
-    
-    public IoServiceListenerSupport getListeners()
-    {
+
+    public IoServiceListenerSupport getListeners() {
         return listeners;
     }
 }

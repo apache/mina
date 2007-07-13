@@ -36,28 +36,25 @@ import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-public class Main
-{
+public class Main {
     private static final int PORT = 8080;
 
-    public static void main( String[] args ) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         IoAcceptor acceptor = new SocketAcceptor();
 
         // Prepare the configuration
         SocketAcceptorConfig cfg = new SocketAcceptorConfig();
-        cfg.setReuseAddress( true );
-        cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
+        cfg.setReuseAddress(true);
+        cfg.getFilterChain().addLast("logger", new LoggingFilter());
         cfg.getFilterChain().addLast(
                 "codec",
-                new ProtocolCodecFilter(
-                        new TextLineCodecFactory( Charset.forName( "UTF-8" ) ) ) );
+                new ProtocolCodecFilter(new TextLineCodecFactory(Charset
+                        .forName("UTF-8"))));
 
         // Bind
-        acceptor.bind(
-                new InetSocketAddress( PORT ),
-                new ReverseProtocolHandler(), cfg );
+        acceptor.bind(new InetSocketAddress(PORT),
+                new ReverseProtocolHandler(), cfg);
 
-        System.out.println( "Listening on port " + PORT );
+        System.out.println("Listening on port " + PORT);
     }
 }

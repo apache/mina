@@ -36,44 +36,36 @@ import org.apache.mina.common.TrafficMask;
  * @version $Rev$, $Date$
  *
  */
-public class ClientToProxyIoHandler extends AbstractProxyIoHandler
-{
-    private final ServerToProxyIoHandler connectorHandler; 
-    private final IoConnector connector; 
+public class ClientToProxyIoHandler extends AbstractProxyIoHandler {
+    private final ServerToProxyIoHandler connectorHandler;
+
+    private final IoConnector connector;
+
     private final InetSocketAddress address;
 
-    public ClientToProxyIoHandler( ServerToProxyIoHandler connectorHandler, 
-                        IoConnector connector, InetSocketAddress address )
-    {
+    public ClientToProxyIoHandler(ServerToProxyIoHandler connectorHandler,
+            IoConnector connector, InetSocketAddress address) {
         this.connectorHandler = connectorHandler;
         this.connector = connector;
         this.address = address;
     }
 
-    public void sessionOpened( final IoSession session ) throws Exception 
-    {
-        connector.connect( address, connectorHandler ).addListener( 
-                new IoFutureListener()
-        {
-            public void operationComplete( IoFuture f )
-            {
-                ConnectFuture future = ( ConnectFuture ) f;
-                try
-                {
-                    future.getSession().setAttachment( session );
-                    session.setAttachment( future.getSession() );
-                    future.getSession().setTrafficMask( TrafficMask.ALL );
-                }
-                catch( RuntimeIOException e )
-                {
-                    // Connect failed
-                    session.close();
-                }
-                finally
-                {
-                    session.setTrafficMask( TrafficMask.ALL );
-                }
-            }
-        } );
+    public void sessionOpened(final IoSession session) throws Exception {
+        connector.connect(address, connectorHandler).addListener(
+                new IoFutureListener() {
+                    public void operationComplete(IoFuture f) {
+                        ConnectFuture future = (ConnectFuture) f;
+                        try {
+                            future.getSession().setAttachment(session);
+                            session.setAttachment(future.getSession());
+                            future.getSession().setTrafficMask(TrafficMask.ALL);
+                        } catch (RuntimeIOException e) {
+                            // Connect failed
+                            session.close();
+                        } finally {
+                            session.setTrafficMask(TrafficMask.ALL);
+                        }
+                    }
+                });
     }
 }

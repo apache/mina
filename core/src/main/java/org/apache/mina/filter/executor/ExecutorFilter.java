@@ -44,28 +44,26 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */
-public class ExecutorFilter extends IoFilterAdapter
-{
+public class ExecutorFilter extends IoFilterAdapter {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final Executor executor;
 
     /**
      * Creates a new instace with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
-    public ExecutorFilter()
-    {
-        this( new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>() ) );
+    public ExecutorFilter() {
+        this(new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>()));
     }
-    
+
     /**
      * Creates a new instance with the specified <tt>executor</tt>.
      */
-    public ExecutorFilter( Executor executor )
-    {
-        if( executor == null )
-        {
-            throw new NullPointerException( "executor" );
+    public ExecutorFilter(Executor executor) {
+        if (executor == null) {
+            throw new NullPointerException("executor");
         }
 
         this.executor = executor;
@@ -74,241 +72,202 @@ public class ExecutorFilter extends IoFilterAdapter
     /**
      * Returns the underlying {@link Executor} instance this filter uses.
      */
-    public Executor getExecutor()
-    {
+    public Executor getExecutor() {
         return executor;
     }
 
-    private void fireEvent( NextFilter nextFilter, IoSession session,
-                            EventType type, Object data )
-    {
-        Event event = new Event( type, nextFilter, data );
-        SessionBuffer buf = SessionBuffer.getSessionBuffer( session );
+    private void fireEvent(NextFilter nextFilter, IoSession session,
+            EventType type, Object data) {
+        Event event = new Event(type, nextFilter, data);
+        SessionBuffer buf = SessionBuffer.getSessionBuffer(session);
 
         boolean execute;
-        synchronized( buf.eventQueue )
-        {
-            buf.eventQueue.offer( event );
-            if( buf.processingCompleted )
-            {
+        synchronized (buf.eventQueue) {
+            buf.eventQueue.offer(event);
+            if (buf.processingCompleted) {
                 buf.processingCompleted = false;
                 execute = true;
-            }
-            else
-            {
-            	execute = false;
+            } else {
+                execute = false;
             }
         }
-        
-        if( execute )
-        {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Launching thread for " + session.getRemoteAddress() );
+
+        if (execute) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Launching thread for "
+                        + session.getRemoteAddress());
             }
 
-            executor.execute( new ProcessEventsRunnable( buf ) );
+            executor.execute(new ProcessEventsRunnable(buf));
         }
     }
 
-    private static class SessionBuffer
-    {
-        private static final String KEY = SessionBuffer.class.getName() + ".KEY";
+    private static class SessionBuffer {
+        private static final String KEY = SessionBuffer.class.getName()
+                + ".KEY";
 
-        private static SessionBuffer getSessionBuffer( IoSession session )
-        {
-            synchronized( session )
-            {
-                SessionBuffer buf = (SessionBuffer)session.getAttribute( KEY );
-                if( buf == null )
-                {
-                    buf = new SessionBuffer( session );
-                    session.setAttribute( KEY, buf );
+        private static SessionBuffer getSessionBuffer(IoSession session) {
+            synchronized (session) {
+                SessionBuffer buf = (SessionBuffer) session.getAttribute(KEY);
+                if (buf == null) {
+                    buf = new SessionBuffer(session);
+                    session.setAttribute(KEY, buf);
                 }
                 return buf;
             }
         }
 
         private final IoSession session;
+
         private final Queue<Event> eventQueue = new LinkedList<Event>();
+
         private boolean processingCompleted = true;
 
-        private SessionBuffer( IoSession session )
-        {
+        private SessionBuffer(IoSession session) {
             this.session = session;
         }
     }
 
-    protected static class EventType
-    {
-        public static final EventType OPENED = new EventType( "OPENED" );
+    protected static class EventType {
+        public static final EventType OPENED = new EventType("OPENED");
 
-        public static final EventType CLOSED = new EventType( "CLOSED" );
+        public static final EventType CLOSED = new EventType("CLOSED");
 
-        public static final EventType READ = new EventType( "READ" );
+        public static final EventType READ = new EventType("READ");
 
-        public static final EventType WRITTEN = new EventType( "WRITTEN" );
+        public static final EventType WRITTEN = new EventType("WRITTEN");
 
-        public static final EventType RECEIVED = new EventType( "RECEIVED" );
+        public static final EventType RECEIVED = new EventType("RECEIVED");
 
-        public static final EventType SENT = new EventType( "SENT" );
+        public static final EventType SENT = new EventType("SENT");
 
-        public static final EventType IDLE = new EventType( "IDLE" );
+        public static final EventType IDLE = new EventType("IDLE");
 
-        public static final EventType EXCEPTION = new EventType( "EXCEPTION" );
+        public static final EventType EXCEPTION = new EventType("EXCEPTION");
 
         private final String value;
 
-        private EventType( String value )
-        {
+        private EventType(String value) {
             this.value = value;
         }
 
-        public String toString()
-        {
+        public String toString() {
             return value;
         }
     }
 
-    protected static class Event
-    {
+    protected static class Event {
         private final EventType type;
+
         private final NextFilter nextFilter;
+
         private final Object data;
 
-        Event( EventType type, NextFilter nextFilter, Object data )
-        {
+        Event(EventType type, NextFilter nextFilter, Object data) {
             this.type = type;
             this.nextFilter = nextFilter;
             this.data = data;
         }
 
-        public Object getData()
-        {
+        public Object getData() {
             return data;
         }
 
-        public NextFilter getNextFilter()
-        {
+        public NextFilter getNextFilter() {
             return nextFilter;
         }
 
-        public EventType getType()
-        {
+        public EventType getType() {
             return type;
         }
     }
 
-    public void sessionCreated( NextFilter nextFilter, IoSession session )
-    {
-        nextFilter.sessionCreated( session );
+    public void sessionCreated(NextFilter nextFilter, IoSession session) {
+        nextFilter.sessionCreated(session);
     }
 
-    public void sessionOpened( NextFilter nextFilter,
-                               IoSession session )
-    {
-        fireEvent( nextFilter, session, EventType.OPENED, null );
+    public void sessionOpened(NextFilter nextFilter, IoSession session) {
+        fireEvent(nextFilter, session, EventType.OPENED, null);
     }
 
-    public void sessionClosed( NextFilter nextFilter,
-                               IoSession session )
-    {
-        fireEvent( nextFilter, session, EventType.CLOSED, null );
+    public void sessionClosed(NextFilter nextFilter, IoSession session) {
+        fireEvent(nextFilter, session, EventType.CLOSED, null);
     }
 
-    public void sessionIdle( NextFilter nextFilter,
-                             IoSession session, IdleStatus status )
-    {
-        fireEvent( nextFilter, session, EventType.IDLE, status );
+    public void sessionIdle(NextFilter nextFilter, IoSession session,
+            IdleStatus status) {
+        fireEvent(nextFilter, session, EventType.IDLE, status);
     }
 
-    public void exceptionCaught( NextFilter nextFilter,
-                                 IoSession session, Throwable cause )
-    {
-        fireEvent( nextFilter, session, EventType.EXCEPTION, cause );
+    public void exceptionCaught(NextFilter nextFilter, IoSession session,
+            Throwable cause) {
+        fireEvent(nextFilter, session, EventType.EXCEPTION, cause);
     }
 
-    public void messageReceived( NextFilter nextFilter,
-                                 IoSession session, Object message )
-    {
-        fireEvent( nextFilter, session, EventType.RECEIVED, message );
+    public void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) {
+        fireEvent(nextFilter, session, EventType.RECEIVED, message);
     }
 
-    public void messageSent( NextFilter nextFilter,
-                             IoSession session, Object message )
-    {
-        fireEvent( nextFilter, session, EventType.SENT, message );
+    public void messageSent(NextFilter nextFilter, IoSession session,
+            Object message) {
+        fireEvent(nextFilter, session, EventType.SENT, message);
     }
 
-    protected void processEvent( NextFilter nextFilter, IoSession session, EventType type, Object data )
-    {
-        if( type == EventType.RECEIVED )
-        {
-            nextFilter.messageReceived( session, data );
-        }
-        else if( type == EventType.SENT )
-        {
-            nextFilter.messageSent( session, data );
-        }
-        else if( type == EventType.EXCEPTION )
-        {
-            nextFilter.exceptionCaught( session, (Throwable)data );
-        }
-        else if( type == EventType.IDLE )
-        {
-            nextFilter.sessionIdle( session, (IdleStatus)data );
-        }
-        else if( type == EventType.OPENED )
-        {
-            nextFilter.sessionOpened( session );
-        }
-        else if( type == EventType.CLOSED )
-        {
-            nextFilter.sessionClosed( session );
+    protected void processEvent(NextFilter nextFilter, IoSession session,
+            EventType type, Object data) {
+        if (type == EventType.RECEIVED) {
+            nextFilter.messageReceived(session, data);
+        } else if (type == EventType.SENT) {
+            nextFilter.messageSent(session, data);
+        } else if (type == EventType.EXCEPTION) {
+            nextFilter.exceptionCaught(session, (Throwable) data);
+        } else if (type == EventType.IDLE) {
+            nextFilter.sessionIdle(session, (IdleStatus) data);
+        } else if (type == EventType.OPENED) {
+            nextFilter.sessionOpened(session);
+        } else if (type == EventType.CLOSED) {
+            nextFilter.sessionClosed(session);
         }
     }
 
-    public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest )
-    {
-        nextFilter.filterWrite( session, writeRequest );
+    public void filterWrite(NextFilter nextFilter, IoSession session,
+            WriteRequest writeRequest) {
+        nextFilter.filterWrite(session, writeRequest);
     }
 
-    public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        nextFilter.filterClose( session );
+    public void filterClose(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        nextFilter.filterClose(session);
     }
 
-    private class ProcessEventsRunnable implements Runnable
-    {
+    private class ProcessEventsRunnable implements Runnable {
         private final SessionBuffer buffer;
 
-        ProcessEventsRunnable( SessionBuffer buffer )
-        {
+        ProcessEventsRunnable(SessionBuffer buffer) {
             this.buffer = buffer;
         }
 
-        public void run()
-        {
-            while( true )
-            {
+        public void run() {
+            while (true) {
                 Event event;
 
-                synchronized( buffer.eventQueue )
-                {
+                synchronized (buffer.eventQueue) {
                     event = buffer.eventQueue.poll();
-                    
-                    if( event == null )
-                    {
+
+                    if (event == null) {
                         buffer.processingCompleted = true;
                         break;
                     }
                 }
 
-                processEvent( event.getNextFilter(), buffer.session, event.getType(), event.getData() );
+                processEvent(event.getNextFilter(), buffer.session, event
+                        .getType(), event.getData());
             }
 
-            if ( logger.isDebugEnabled() ) {
-                logger.debug( "Exiting since queue is empty for " + buffer.session.getRemoteAddress() );
+            if (logger.isDebugEnabled()) {
+                logger.debug("Exiting since queue is empty for "
+                        + buffer.session.getRemoteAddress());
             }
         }
     }

@@ -31,13 +31,11 @@ import org.apache.mina.transport.AbstractConnectorTest;
  */
 public class SocketConnectorTest extends AbstractConnectorTest {
 
-    protected IoAcceptor createAcceptor()
-    {
+    protected IoAcceptor createAcceptor() {
         return new SocketAcceptor();
     }
 
-    protected IoConnector createConnector()
-    {
+    protected IoConnector createConnector() {
         return new SocketConnector();
     }
 }

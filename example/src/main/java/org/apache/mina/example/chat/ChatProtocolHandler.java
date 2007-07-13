@@ -35,136 +35,115 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ChatProtocolHandler extends IoHandlerAdapter
-{
-    private Set<IoSession> sessions = Collections.synchronizedSet( new HashSet<IoSession>() );
-    private Set<String> users = Collections.synchronizedSet( new HashSet<String>() );
+public class ChatProtocolHandler extends IoHandlerAdapter {
+    private Set<IoSession> sessions = Collections
+            .synchronizedSet(new HashSet<IoSession>());
 
-    public void exceptionCaught( IoSession session, Throwable cause )
-    {
-        SessionLog.error( session, "", cause );
+    private Set<String> users = Collections
+            .synchronizedSet(new HashSet<String>());
+
+    public void exceptionCaught(IoSession session, Throwable cause) {
+        SessionLog.error(session, "", cause);
         // Close connection when unexpected exception is caught.
         session.close();
     }
 
-    public void messageReceived( IoSession session, Object message )
-    {
-        String theMessage = ( String ) message;
-        String[] result = theMessage.split( " ", 2 );
-        String theCommand = result[ 0 ];
+    public void messageReceived(IoSession session, Object message) {
+        String theMessage = (String) message;
+        String[] result = theMessage.split(" ", 2);
+        String theCommand = result[0];
 
-        try
-        {
+        try {
 
-            ChatCommand command = ChatCommand.valueOf( theCommand );
-            String user = ( String ) session.getAttribute( "user" );
+            ChatCommand command = ChatCommand.valueOf(theCommand);
+            String user = (String) session.getAttribute("user");
 
-            switch( command.toInt() )
-            {
+            switch (command.toInt()) {
 
             case ChatCommand.QUIT:
-                session.write( "QUIT OK" );
+                session.write("QUIT OK");
                 session.close();
                 break;
             case ChatCommand.LOGIN:
 
-                if( user != null )
-                {
-                    session.write( "LOGIN ERROR user " + user
-                            + " already logged in." );
+                if (user != null) {
+                    session.write("LOGIN ERROR user " + user
+                            + " already logged in.");
                     return;
                 }
 
-                if( result.length == 2 )
-                {
-                    user = result[ 1 ];
-                }
-                else
-                {
-                    session.write( "LOGIN ERROR invalid login command." );
+                if (result.length == 2) {
+                    user = result[1];
+                } else {
+                    session.write("LOGIN ERROR invalid login command.");
                     return;
                 }
 
                 // check if the username is already used
-                if( users.contains( user ) )
-                {
-                    session.write( "LOGIN ERROR the name " + user
-                            + " is already used." );
+                if (users.contains(user)) {
+                    session.write("LOGIN ERROR the name " + user
+                            + " is already used.");
                     return;
                 }
 
-                sessions.add( session );
-                session.setAttribute( "user", user );
+                sessions.add(session);
+                session.setAttribute("user", user);
 
                 // Allow all users
-                users.add( user );
-                session.write( "LOGIN OK" );
-                broadcast( "The user " + user + " has joined the chat session." );
+                users.add(user);
+                session.write("LOGIN OK");
+                broadcast("The user " + user + " has joined the chat session.");
                 break;
 
             case ChatCommand.BROADCAST:
 
-                if( result.length == 2 )
-                {
-                    broadcast( user + ": " + result[ 1 ] );
+                if (result.length == 2) {
+                    broadcast(user + ": " + result[1]);
                 }
                 break;
             default:
-                SessionLog.info( session, "Unhandled command: " + command );
+                SessionLog.info(session, "Unhandled command: " + command);
                 break;
             }
 
-        }
-        catch( IllegalArgumentException e )
-        {
-            SessionLog.debug( session, e.getMessage() );
+        } catch (IllegalArgumentException e) {
+            SessionLog.debug(session, e.getMessage());
         }
     }
 
-    public void broadcast( String message )
-    {
-        synchronized( sessions )
-        {
+    public void broadcast(String message) {
+        synchronized (sessions) {
             Iterator iter = sessions.iterator();
-            while( iter.hasNext() )
-            {
-                IoSession s = ( IoSession ) iter.next();
-                if( s.isConnected() )
-                {
-                    s.write( "BROADCAST OK " + message );
+            while (iter.hasNext()) {
+                IoSession s = (IoSession) iter.next();
+                if (s.isConnected()) {
+                    s.write("BROADCAST OK " + message);
                 }
             }
         }
     }
 
-    public void sessionClosed( IoSession session ) throws Exception
-    {
-        String user = ( String ) session.getAttribute( "user" );
-        users.remove( user );
-        sessions.remove( session );
-        broadcast( "The user " + user + " has left the chat session." );
+    public void sessionClosed(IoSession session) throws Exception {
+        String user = (String) session.getAttribute("user");
+        users.remove(user);
+        sessions.remove(session);
+        broadcast("The user " + user + " has left the chat session.");
     }
 
-    public boolean isChatUser( String name )
-    {
-        return users.contains( name );
+    public boolean isChatUser(String name) {
+        return users.contains(name);
     }
 
-    public int getNumberOfUsers()
-    {
+    public int getNumberOfUsers() {
         return users.size();
     }
 
-    public void kick( String name )
-    {
-        synchronized( sessions )
-        {
+    public void kick(String name) {
+        synchronized (sessions) {
             Iterator iter = sessions.iterator();
-            while( iter.hasNext() )
-            {
-                IoSession s = ( IoSession ) iter.next();
-                if( name.equals( s.getAttribute( "user" ) ) )
-                {
+            while (iter.hasNext()) {
+                IoSession s = (IoSession) iter.next();
+                if (name.equals(s.getAttribute("user"))) {
                     s.close();
                     break;
                 }

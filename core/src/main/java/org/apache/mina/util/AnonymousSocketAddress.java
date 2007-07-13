@@ -27,34 +27,28 @@ import java.net.SocketAddress;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class AnonymousSocketAddress extends SocketAddress implements Comparable
-{
+public class AnonymousSocketAddress extends SocketAddress implements Comparable {
     private static final long serialVersionUID = 3978421416766944048L;
 
     /**
      * Creates a new instance with the specifid port number.
      */
-    public AnonymousSocketAddress()
-    {
+    public AnonymousSocketAddress() {
     }
 
-    public int hashCode()
-    {
-        return System.identityHashCode( this );
+    public int hashCode() {
+        return System.identityHashCode(this);
     }
 
-    public boolean equals( Object o )
-    {
+    public boolean equals(Object o) {
         return this == o;
     }
 
-    public int compareTo( Object o )
-    {
-        return this.hashCode() - ( ( AnonymousSocketAddress ) o ).hashCode();
+    public int compareTo(Object o) {
+        return this.hashCode() - ((AnonymousSocketAddress) o).hashCode();
     }
 
-    public String toString()
-    {
+    public String toString() {
         return "anonymous(" + hashCode() + ')';
     }
 }

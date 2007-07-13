@@ -26,8 +26,7 @@ package org.apache.mina.example.chat;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ChatCommand
-{
+public class ChatCommand {
     public static final int LOGIN = 0;
 
     public static final int QUIT = 1;
@@ -36,32 +35,26 @@ public class ChatCommand
 
     private final int num;
 
-    private ChatCommand( int num )
-    {
+    private ChatCommand(int num) {
         this.num = num;
     }
 
-    public int toInt()
-    {
+    public int toInt() {
         return num;
     }
 
-    public static ChatCommand valueOf( String s )
-    {
+    public static ChatCommand valueOf(String s) {
         s = s.toUpperCase();
-        if( "LOGIN".equals( s ) )
-        {
-            return new ChatCommand( LOGIN );
+        if ("LOGIN".equals(s)) {
+            return new ChatCommand(LOGIN);
         }
-        if( "QUIT".equals( s ) )
-        {
-            return new ChatCommand( QUIT );
+        if ("QUIT".equals(s)) {
+            return new ChatCommand(QUIT);
         }
-        if( "BROADCAST".equals( s ) )
-        {
-            return new ChatCommand( BROADCAST );
+        if ("BROADCAST".equals(s)) {
+            return new ChatCommand(BROADCAST);
         }
 
-        throw new IllegalArgumentException( "Unrecognized command: " + s );
+        throw new IllegalArgumentException("Unrecognized command: " + s);
     }
 }

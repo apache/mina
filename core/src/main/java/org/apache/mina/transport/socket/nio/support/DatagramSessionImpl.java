@@ -48,37 +48,45 @@ import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
-{
+class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession {
     private final IoService wrapperManager;
+
     private final IoServiceConfig serviceConfig;
+
     private final DatagramSessionConfig config = new SessionConfigImpl();
+
     private final DatagramService managerDelegate;
+
     private final DatagramFilterChain filterChain;
+
     private final DatagramChannel ch;
+
     private final Queue<WriteRequest> writeRequestQueue;
+
     private final IoHandler handler;
+
     private final SocketAddress localAddress;
+
     private final SocketAddress serviceAddress;
+
     private SocketAddress remoteAddress;
+
     private SelectionKey key;
+
     private int readBufferSize;
 
     /**
      * Creates a new instance.
      */
-    DatagramSessionImpl( IoService wrapperManager,
-                         DatagramService managerDelegate,
-                         IoServiceConfig serviceConfig,
-                         DatagramChannel ch, IoHandler defaultHandler,
-                         SocketAddress serviceAddress,
-                         SocketAddress localAddress)
-    {
+    DatagramSessionImpl(IoService wrapperManager,
+            DatagramService managerDelegate, IoServiceConfig serviceConfig,
+            DatagramChannel ch, IoHandler defaultHandler,
+            SocketAddress serviceAddress, SocketAddress localAddress) {
         this.wrapperManager = wrapperManager;
         this.managerDelegate = managerDelegate;
-        this.filterChain = new DatagramFilterChain( this );
+        this.filterChain = new DatagramFilterChain(this);
         this.ch = ch;
-        this.writeRequestQueue = new ConcurrentLinkedQueue<WriteRequest>( );
+        this.writeRequestQueue = new ConcurrentLinkedQueue<WriteRequest>();
         this.handler = defaultHandler;
         this.remoteAddress = ch.socket().getRemoteSocketAddress();
 
@@ -88,299 +96,226 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession
 
         // Apply the initial session settings
         IoSessionConfig sessionConfig = serviceConfig.getSessionConfig();
-        if( sessionConfig instanceof DatagramSessionConfig )
-        {
-            DatagramSessionConfig cfg = ( DatagramSessionConfig ) sessionConfig;
-            this.config.setBroadcast( cfg.isBroadcast() );
-            this.config.setReceiveBufferSize( cfg.getReceiveBufferSize() );
-            this.config.setReuseAddress( cfg.isReuseAddress() );
-            this.config.setSendBufferSize( cfg.getSendBufferSize() );
+        if (sessionConfig instanceof DatagramSessionConfig) {
+            DatagramSessionConfig cfg = (DatagramSessionConfig) sessionConfig;
+            this.config.setBroadcast(cfg.isBroadcast());
+            this.config.setReceiveBufferSize(cfg.getReceiveBufferSize());
+            this.config.setReuseAddress(cfg.isReuseAddress());
+            this.config.setSendBufferSize(cfg.getSendBufferSize());
 
-            if( this.config.getTrafficClass() != cfg.getTrafficClass() )
-            {
-                this.config.setTrafficClass( cfg.getTrafficClass() );
+            if (this.config.getTrafficClass() != cfg.getTrafficClass()) {
+                this.config.setTrafficClass(cfg.getTrafficClass());
             }
         }
     }
 
-    public IoService getService()
-    {
+    public IoService getService() {
         return wrapperManager;
     }
 
-    public IoServiceConfig getServiceConfig()
-    {
+    public IoServiceConfig getServiceConfig() {
         return serviceConfig;
     }
 
-    public IoSessionConfig getConfig()
-    {
+    public IoSessionConfig getConfig() {
         return config;
     }
 
-    DatagramService getManagerDelegate()
-    {
+    DatagramService getManagerDelegate() {
         return managerDelegate;
     }
 
-    public IoFilterChain getFilterChain()
-    {
+    public IoFilterChain getFilterChain() {
         return filterChain;
     }
 
-    DatagramChannel getChannel()
-    {
+    DatagramChannel getChannel() {
         return ch;
     }
 
-    SelectionKey getSelectionKey()
-    {
+    SelectionKey getSelectionKey() {
         return key;
     }
 
-    void setSelectionKey( SelectionKey key )
-    {
+    void setSelectionKey(SelectionKey key) {
         this.key = key;
     }
 
-    public IoHandler getHandler()
-    {
+    public IoHandler getHandler() {
         return handler;
     }
 
     @Override
-    protected void close0()
-    {
+    protected void close0() {
         IoServiceConfig config = getServiceConfig();
-        if( config instanceof DatagramServiceConfig )
-        {
-            ( ( DatagramServiceConfig ) config ).getSessionRecycler().remove( this );
+        if (config instanceof DatagramServiceConfig) {
+            ((DatagramServiceConfig) config).getSessionRecycler().remove(this);
         }
-        filterChain.fireFilterClose( this );
+        filterChain.fireFilterClose(this);
     }
 
-    Queue<WriteRequest> getWriteRequestQueue()
-    {
+    Queue<WriteRequest> getWriteRequestQueue() {
         return writeRequestQueue;
     }
 
     @Override
-    public WriteFuture write( Object message, SocketAddress destination )
-    {
-        if( !this.config.isBroadcast() )
-        {
-            throw new IllegalStateException( "Non-broadcast session" );
+    public WriteFuture write(Object message, SocketAddress destination) {
+        if (!this.config.isBroadcast()) {
+            throw new IllegalStateException("Non-broadcast session");
         }
 
-        return super.write( message, destination );
+        return super.write(message, destination);
     }
 
     @Override
-    protected void write0( WriteRequest writeRequest )
-    {
-        filterChain.fireFilterWrite( this, writeRequest );
+    protected void write0(WriteRequest writeRequest) {
+        filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public int getScheduledWriteRequests()
-    {
+    public int getScheduledWriteRequests() {
         return writeRequestQueue.size();
     }
 
-    public int getScheduledWriteBytes()
-    {
+    public int getScheduledWriteBytes() {
         int byteSize = 0;
 
-        for( WriteRequest request : writeRequestQueue )
-        {
-            byteSize += ( ( ByteBuffer ) request.getMessage() ).remaining();
+        for (WriteRequest request : writeRequestQueue) {
+            byteSize += ((ByteBuffer) request.getMessage()).remaining();
         }
 
         return byteSize;
     }
 
-    public TransportType getTransportType()
-    {
+    public TransportType getTransportType() {
         return TransportType.DATAGRAM;
     }
 
-    public SocketAddress getRemoteAddress()
-    {
+    public SocketAddress getRemoteAddress() {
         return remoteAddress;
     }
 
-    void setRemoteAddress( SocketAddress remoteAddress )
-    {
+    void setRemoteAddress(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
     }
 
-    public SocketAddress getLocalAddress()
-    {
+    public SocketAddress getLocalAddress() {
         return localAddress;
     }
 
-    public SocketAddress getServiceAddress()
-    {
+    public SocketAddress getServiceAddress() {
         return serviceAddress;
     }
 
     @Override
-    protected void updateTrafficMask()
-    {
-        managerDelegate.updateTrafficMask( this );
+    protected void updateTrafficMask() {
+        managerDelegate.updateTrafficMask(this);
     }
 
-    int getReadBufferSize()
-    {
+    int getReadBufferSize() {
         return readBufferSize;
     }
 
-    private class SessionConfigImpl extends DatagramSessionConfigImpl implements DatagramSessionConfig
-    {
+    private class SessionConfigImpl extends DatagramSessionConfigImpl implements
+            DatagramSessionConfig {
         @Override
-        public int getReceiveBufferSize()
-        {
-            try
-            {
+        public int getReceiveBufferSize() {
+            try {
                 return ch.socket().getReceiveBufferSize();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
         @Override
-        public void setReceiveBufferSize( int receiveBufferSize )
-        {
-            if( DatagramSessionConfigImpl.isSetReceiveBufferSizeAvailable() )
-            {
-                try
-                {
-                    ch.socket().setReceiveBufferSize( receiveBufferSize );
+        public void setReceiveBufferSize(int receiveBufferSize) {
+            if (DatagramSessionConfigImpl.isSetReceiveBufferSizeAvailable()) {
+                try {
+                    ch.socket().setReceiveBufferSize(receiveBufferSize);
                     // Re-retrieve the effective receive buffer size.
                     receiveBufferSize = ch.socket().getReceiveBufferSize();
                     DatagramSessionImpl.this.readBufferSize = receiveBufferSize;
-                }
-                catch( SocketException e )
-                {
-                    throw new RuntimeIOException( e );
+                } catch (SocketException e) {
+                    throw new RuntimeIOException(e);
                 }
             }
         }
 
         @Override
-        public boolean isBroadcast()
-        {
-            try
-            {
+        public boolean isBroadcast() {
+            try {
                 return ch.socket().getBroadcast();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
         @Override
-        public void setBroadcast( boolean broadcast )
-        {
-            try
-            {
-                ch.socket().setBroadcast( broadcast );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+        public void setBroadcast(boolean broadcast) {
+            try {
+                ch.socket().setBroadcast(broadcast);
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
         @Override
-        public int getSendBufferSize()
-        {
-            try
-            {
+        public int getSendBufferSize() {
+            try {
                 return ch.socket().getSendBufferSize();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
         @Override
-        public void setSendBufferSize( int sendBufferSize )
-        {
-            if( DatagramSessionConfigImpl.isSetSendBufferSizeAvailable() )
-            {
-                try
-                {
-                    ch.socket().setSendBufferSize( sendBufferSize );
-                }
-                catch( SocketException e )
-                {
-                    throw new RuntimeIOException( e );
+        public void setSendBufferSize(int sendBufferSize) {
+            if (DatagramSessionConfigImpl.isSetSendBufferSizeAvailable()) {
+                try {
+                    ch.socket().setSendBufferSize(sendBufferSize);
+                } catch (SocketException e) {
+                    throw new RuntimeIOException(e);
                 }
             }
         }
 
         @Override
-        public boolean isReuseAddress()
-        {
-            try
-            {
+        public boolean isReuseAddress() {
+            try {
                 return ch.socket().getReuseAddress();
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
         @Override
-        public void setReuseAddress( boolean reuseAddress )
-        {
-            try
-            {
-                ch.socket().setReuseAddress( reuseAddress );
-            }
-            catch( SocketException e )
-            {
-                throw new RuntimeIOException( e );
+        public void setReuseAddress(boolean reuseAddress) {
+            try {
+                ch.socket().setReuseAddress(reuseAddress);
+            } catch (SocketException e) {
+                throw new RuntimeIOException(e);
             }
         }
 
         @Override
-        public int getTrafficClass()
-        {
-            if( DatagramSessionConfigImpl.isGetTrafficClassAvailable() )
-            {
-                try
-                {
+        public int getTrafficClass() {
+            if (DatagramSessionConfigImpl.isGetTrafficClassAvailable()) {
+                try {
                     return ch.socket().getTrafficClass();
+                } catch (SocketException e) {
+                    throw new RuntimeIOException(e);
                 }
-                catch( SocketException e )
-                {
-                    throw new RuntimeIOException( e );
-                }
-            }
-            else
-            {
+            } else {
                 return 0;
             }
         }
 
         @Override
-        public void setTrafficClass( int trafficClass )
-        {
-            if( DatagramSessionConfigImpl.isSetTrafficClassAvailable() )
-            {
-                try
-                {
-                    ch.socket().setTrafficClass( trafficClass );
-                }
-                catch( SocketException e )
-                {
-                    throw new RuntimeIOException( e );
+        public void setTrafficClass(int trafficClass) {
+            if (DatagramSessionConfigImpl.isSetTrafficClassAvailable()) {
+                try {
+                    ch.socket().setTrafficClass(trafficClass);
+                } catch (SocketException e) {
+                    throw new RuntimeIOException(e);
                 }
             }
         }

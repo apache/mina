@@ -40,28 +40,21 @@ import org.springframework.util.Assert;
  * 
  * @see org.apache.mina.transport.vmpipe.VmPipeAddress
  */
-public class VmPipeAddressEditor extends PropertyEditorSupport
-{
-    public void setAsText( String text ) throws IllegalArgumentException
-    {
-        setValue( parseSocketAddress( text ) );
+public class VmPipeAddressEditor extends PropertyEditorSupport {
+    public void setAsText(String text) throws IllegalArgumentException {
+        setValue(parseSocketAddress(text));
     }
-    
-    private SocketAddress parseSocketAddress( String s )
-    {
-        Assert.notNull( s, "null SocketAddress string" );
+
+    private SocketAddress parseSocketAddress(String s) {
+        Assert.notNull(s, "null SocketAddress string");
         s = s.trim();
-        if( s.startsWith( ":" ) )
-        {
-            s = s.substring( 1 );
+        if (s.startsWith(":")) {
+            s = s.substring(1);
         }
-        try
-        {
-            return new VmPipeAddress( Integer.parseInt( s.trim() ) );
-        }
-        catch( NumberFormatException nfe )
-        {
-            throw new IllegalArgumentException( "Illegal vm pipe address: " + s );
+        try {
+            return new VmPipeAddress(Integer.parseInt(s.trim()));
+        } catch (NumberFormatException nfe) {
+            throw new IllegalArgumentException("Illegal vm pipe address: " + s);
         }
     }
 }

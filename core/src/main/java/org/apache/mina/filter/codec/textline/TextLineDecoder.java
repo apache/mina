@@ -35,46 +35,44 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
-public class TextLineDecoder implements ProtocolDecoder
-{
-    private static final String CONTEXT = TextLineDecoder.class.getName() + ".context";
+public class TextLineDecoder implements ProtocolDecoder {
+    private static final String CONTEXT = TextLineDecoder.class.getName()
+            + ".context";
 
     private final Charset charset;
+
     private final LineDelimiter delimiter;
+
     private ByteBuffer delimBuf;
+
     private int maxLineLength = 1024;
 
     /**
      * Creates a new instance with the current default {@link Charset}
      * and {@link LineDelimiter#AUTO} delimiter.
      */
-    public TextLineDecoder()
-    {
-        this( Charset.defaultCharset(), LineDelimiter.AUTO );
+    public TextLineDecoder() {
+        this(Charset.defaultCharset(), LineDelimiter.AUTO);
     }
 
     /**
      * Creates a new instance with the spcified <tt>charset</tt>
      * and {@link LineDelimiter#AUTO} delimiter.
      */
-    public TextLineDecoder( Charset charset )
-    {
-        this( charset, LineDelimiter.AUTO );
+    public TextLineDecoder(Charset charset) {
+        this(charset, LineDelimiter.AUTO);
     }
 
     /**
      * Creates a new instance with the specified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.
      */
-    public TextLineDecoder( Charset charset, LineDelimiter delimiter )
-    {
-        if( charset == null )
-        {
-            throw new NullPointerException( "charset" );
+    public TextLineDecoder(Charset charset, LineDelimiter delimiter) {
+        if (charset == null) {
+            throw new NullPointerException("charset");
         }
-        if( delimiter == null )
-        {
-            throw new NullPointerException( "delimiter" );
+        if (delimiter == null) {
+            throw new NullPointerException("delimiter");
         }
 
         this.charset = charset;
@@ -87,8 +85,7 @@ public class TextLineDecoder implements ProtocolDecoder
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1024</tt> (1KB).
      */
-    public int getMaxLineLength()
-    {
+    public int getMaxLineLength() {
         return maxLineLength;
     }
 
@@ -98,209 +95,179 @@ public class TextLineDecoder implements ProtocolDecoder
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1024</tt> (1KB).
      */
-    public void setMaxLineLength( int maxLineLength )
-    {
-        if( maxLineLength <= 0 )
-        {
-            throw new IllegalArgumentException( "maxLineLength: " + maxLineLength );
+    public void setMaxLineLength(int maxLineLength) {
+        if (maxLineLength <= 0) {
+            throw new IllegalArgumentException("maxLineLength: "
+                    + maxLineLength);
         }
 
         this.maxLineLength = maxLineLength;
     }
 
-    public void decode( IoSession session, ByteBuffer in,
-                        ProtocolDecoderOutput out )
-            throws Exception
-    {
+    public void decode(IoSession session, ByteBuffer in,
+            ProtocolDecoderOutput out) throws Exception {
         Context ctx = getContext(session);
 
-        if( LineDelimiter.AUTO.equals( delimiter ) )
-        {
-            ctx.setMatchCount(
-                    decodeAuto(
-                            in,
-                            ctx.getBuffer(),
-                            ctx.getMatchCount(),
-                            ctx.getDecoder(),
-                            out ) );
-        }
-        else
-        {
-            ctx.setMatchCount(
-                    decodeNormal(
-                            in,
-                            ctx.getBuffer(),
-                            ctx.getMatchCount(),
-                            ctx.getDecoder(),
-                            out ) );
+        if (LineDelimiter.AUTO.equals(delimiter)) {
+            ctx.setMatchCount(decodeAuto(in, ctx.getBuffer(), ctx
+                    .getMatchCount(), ctx.getDecoder(), out));
+        } else {
+            ctx.setMatchCount(decodeNormal(in, ctx.getBuffer(), ctx
+                    .getMatchCount(), ctx.getDecoder(), out));
         }
     }
 
     private Context getContext(IoSession session) {
-        Context ctx = (Context) session.getAttribute( CONTEXT );
-        if( ctx == null )
-        {
+        Context ctx = (Context) session.getAttribute(CONTEXT);
+        if (ctx == null) {
             ctx = new Context();
-            session.setAttribute( CONTEXT, ctx );
+            session.setAttribute(CONTEXT, ctx);
         }
         return ctx;
     }
 
-    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
-    {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
+            throws Exception {
     }
 
-    public void dispose( IoSession session ) throws Exception
-    {
-        Context ctx = ( Context ) session.getAttribute( CONTEXT );
-        if( ctx != null )
-        {
+    public void dispose(IoSession session) throws Exception {
+        Context ctx = (Context) session.getAttribute(CONTEXT);
+        if (ctx != null) {
             ctx.getBuffer().release();
-            session.removeAttribute( CONTEXT );
+            session.removeAttribute(CONTEXT);
         }
     }
 
-    private int decodeAuto( ByteBuffer in, ByteBuffer buf, int matchCount, CharsetDecoder decoder, ProtocolDecoderOutput out ) throws CharacterCodingException
-    {
+    private int decodeAuto(ByteBuffer in, ByteBuffer buf, int matchCount,
+            CharsetDecoder decoder, ProtocolDecoderOutput out)
+            throws CharacterCodingException {
         // Try to find a match
         int oldPos = in.position();
         int oldLimit = in.limit();
-        while( in.hasRemaining() )
-        {
+        while (in.hasRemaining()) {
             byte b = in.get();
             boolean matched = false;
-            switch( b )
-            {
+            switch (b) {
             case '\r':
                 // Might be Mac, but we don't auto-detect Mac EOL
                 // to avoid confusion.
-                matchCount ++;
+                matchCount++;
                 break;
             case '\n':
                 // UNIX
-                matchCount ++;
+                matchCount++;
                 matched = true;
                 break;
             default:
                 matchCount = 0;
             }
 
-            if( matched )
-            {
+            if (matched) {
                 // Found a match.
                 int pos = in.position();
-                in.limit( pos );
-                in.position( oldPos );
-                
-                buf.put( in );
-                if( buf.position() > maxLineLength )
-                {
-                    throw new BufferDataException( "Line is too long: " + buf.position() );
+                in.limit(pos);
+                in.position(oldPos);
+
+                buf.put(in);
+                if (buf.position() > maxLineLength) {
+                    throw new BufferDataException("Line is too long: "
+                            + buf.position());
                 }
                 buf.flip();
-                buf.limit( buf.limit() - matchCount );
-                out.write( buf.getString( decoder ) );
+                buf.limit(buf.limit() - matchCount);
+                out.write(buf.getString(decoder));
                 buf.clear();
-                
-                in.limit( oldLimit );
-                in.position( pos );
+
+                in.limit(oldLimit);
+                in.position(pos);
                 oldPos = pos;
                 matchCount = 0;
             }
         }
-        
+
         // Put remainder to buf.
-        in.position( oldPos );
-        buf.put( in );
-        
+        in.position(oldPos);
+        buf.put(in);
+
         return matchCount;
     }
 
-    private int decodeNormal( ByteBuffer in, ByteBuffer buf, int matchCount, CharsetDecoder decoder, ProtocolDecoderOutput out ) throws CharacterCodingException
-    {
+    private int decodeNormal(ByteBuffer in, ByteBuffer buf, int matchCount,
+            CharsetDecoder decoder, ProtocolDecoderOutput out)
+            throws CharacterCodingException {
         // Convert delimiter to ByteBuffer if not done yet.
-        if( delimBuf == null )
-        {
-            ByteBuffer tmp = ByteBuffer.allocate( 2 ).setAutoExpand( true );
-            tmp.putString( delimiter.getValue(), charset.newEncoder() );
+        if (delimBuf == null) {
+            ByteBuffer tmp = ByteBuffer.allocate(2).setAutoExpand(true);
+            tmp.putString(delimiter.getValue(), charset.newEncoder());
             tmp.flip();
             delimBuf = tmp;
         }
-        
+
         // Try to find a match
         int oldPos = in.position();
         int oldLimit = in.limit();
-        while( in.hasRemaining() )
-        {
+        while (in.hasRemaining()) {
             byte b = in.get();
-            if( delimBuf.get( matchCount ) == b )
-            {
-                matchCount ++;
-                if( matchCount == delimBuf.limit() )
-                {
+            if (delimBuf.get(matchCount) == b) {
+                matchCount++;
+                if (matchCount == delimBuf.limit()) {
                     // Found a match.
                     int pos = in.position();
-                    in.limit( pos );
-                    in.position( oldPos );
-                    
-                    buf.put( in );
-                    if( buf.position() > maxLineLength )
-                    {
-                        throw new BufferDataException( "Line is too long: " + buf.position() );
+                    in.limit(pos);
+                    in.position(oldPos);
+
+                    buf.put(in);
+                    if (buf.position() > maxLineLength) {
+                        throw new BufferDataException("Line is too long: "
+                                + buf.position());
                     }
                     buf.flip();
-                    buf.limit( buf.limit() - matchCount );
-                    out.write( buf.getString( decoder ) );
+                    buf.limit(buf.limit() - matchCount);
+                    out.write(buf.getString(decoder));
                     buf.clear();
-                    
-                    in.limit( oldLimit );
-                    in.position( pos );
+
+                    in.limit(oldLimit);
+                    in.position(pos);
                     oldPos = pos;
                     matchCount = 0;
                 }
-            }
-            else
-            {
+            } else {
                 matchCount = 0;
             }
         }
-        
+
         // Put remainder to buf.
-        in.position( oldPos );
-        buf.put( in );
-        
+        in.position(oldPos);
+        buf.put(in);
+
         return matchCount;
     }
 
-    private class Context
-    {
+    private class Context {
         private final CharsetDecoder decoder;
+
         private final ByteBuffer buf;
+
         private int matchCount = 0;
 
-        private Context()
-        {
+        private Context() {
             decoder = charset.newDecoder();
-            buf = ByteBuffer.allocate( 80 ).setAutoExpand( true );
+            buf = ByteBuffer.allocate(80).setAutoExpand(true);
         }
 
-        public CharsetDecoder getDecoder()
-        {
+        public CharsetDecoder getDecoder() {
             return decoder;
         }
 
-        public ByteBuffer getBuffer()
-        {
+        public ByteBuffer getBuffer() {
             return buf;
         }
 
-        public int getMatchCount()
-        {
+        public int getMatchCount() {
             return matchCount;
         }
 
-        public void setMatchCount( int matchCount )
-        {
+        public void setMatchCount(int matchCount) {
             this.matchCount = matchCount;
         }
     }

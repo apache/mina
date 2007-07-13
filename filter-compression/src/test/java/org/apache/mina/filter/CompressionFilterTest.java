@@ -34,102 +34,110 @@ import junit.framework.TestCase;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class CompressionFilterTest extends TestCase
-{
+public class CompressionFilterTest extends TestCase {
     private MockControl mockSession;
+
     private MockControl mockNextFilter;
+
     private MockControl mockIoFilterChain;
+
     private IoSession session;
+
     private NextFilter nextFilter;
+
     private IoFilterChain ioFilterChain;
+
     private CompressionFilter filter;
+
     private Zlib deflater;
+
     private Zlib inflater;
+
     private Zlib actualDeflater;
+
     private Zlib actualInflater;
 
     // the sample data to be used for testing
-    String strCompress =
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  " +
-            "The quick brown fox jumps over the lazy dog.  ";
+    String strCompress = "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  ";
 
-    protected void setUp()
-    {
+    protected void setUp() {
         // create the necessary mock controls.
-        mockSession = MockControl.createControl( IoSession.class );
-        mockNextFilter = MockControl.createControl( NextFilter.class );
-        mockIoFilterChain = MockControl.createControl( IoFilterChain.class );
+        mockSession = MockControl.createControl(IoSession.class);
+        mockNextFilter = MockControl.createControl(NextFilter.class);
+        mockIoFilterChain = MockControl.createControl(IoFilterChain.class);
 
         // set the default matcher
-        mockNextFilter.setDefaultMatcher( new DataMatcher() );
+        mockNextFilter.setDefaultMatcher(new DataMatcher());
 
-        session = ( IoSession ) mockSession.getMock();
-        nextFilter = ( NextFilter ) mockNextFilter.getMock();
-        ioFilterChain = ( IoFilterChain ) mockIoFilterChain.getMock();
+        session = (IoSession) mockSession.getMock();
+        nextFilter = (NextFilter) mockNextFilter.getMock();
+        ioFilterChain = (IoFilterChain) mockIoFilterChain.getMock();
 
         // create an instance of the filter
-        filter = new CompressionFilter( CompressionFilter.COMPRESSION_MAX );
+        filter = new CompressionFilter(CompressionFilter.COMPRESSION_MAX);
 
         // deflater and inflater that will be used by the filter
-        deflater = new Zlib( Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER );
-        inflater = new Zlib( Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER );
+        deflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER);
+        inflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
 
         // create instances of the deflater and inflater to help test the output
-        actualDeflater = new Zlib( Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER );
-        actualInflater = new Zlib( Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER );
+        actualDeflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER);
+        actualInflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
     }
 
-    public void testCompression() throws Exception
-    {
+    public void testCompression() throws Exception {
         // prepare the input data
-        ByteBuffer buf = ByteBuffer.wrap( strCompress.getBytes( "UTF8" ) );
-        ByteBuffer actualOutput = actualDeflater.deflate( buf );
-        WriteRequest writeRequest = new WriteRequest( buf );
+        ByteBuffer buf = ByteBuffer.wrap(strCompress.getBytes("UTF8"));
+        ByteBuffer actualOutput = actualDeflater.deflate(buf);
+        WriteRequest writeRequest = new WriteRequest(buf);
 
         // record all the mock calls
-        ioFilterChain.contains( CompressionFilter.class );
-        mockIoFilterChain.setReturnValue( false );
+        ioFilterChain.contains(CompressionFilter.class);
+        mockIoFilterChain.setReturnValue(false);
 
         ioFilterChain.getSession();
-        mockIoFilterChain.setReturnValue( session );
+        mockIoFilterChain.setReturnValue(session);
 
-        session.setAttribute( CompressionFilter.class.getName() + ".Deflater", deflater );
-        mockSession.setDefaultMatcher( new DataMatcher() );
-        mockSession.setReturnValue( null, MockControl.ONE );
+        session.setAttribute(CompressionFilter.class.getName() + ".Deflater",
+                deflater);
+        mockSession.setDefaultMatcher(new DataMatcher());
+        mockSession.setReturnValue(null, MockControl.ONE);
 
-        session.setAttribute( CompressionFilter.class.getName() + ".Inflater", inflater );
-        mockSession.setReturnValue( null, MockControl.ONE );
+        session.setAttribute(CompressionFilter.class.getName() + ".Inflater",
+                inflater);
+        mockSession.setReturnValue(null, MockControl.ONE);
 
-        session.containsAttribute( CompressionFilter.DISABLE_COMPRESSION_ONCE );
-        mockSession.setReturnValue( false );
+        session.containsAttribute(CompressionFilter.DISABLE_COMPRESSION_ONCE);
+        mockSession.setReturnValue(false);
 
-        session.getAttribute( CompressionFilter.class.getName() + ".Deflater" );
-        mockSession.setReturnValue( deflater );
+        session.getAttribute(CompressionFilter.class.getName() + ".Deflater");
+        mockSession.setReturnValue(deflater);
 
-        nextFilter.filterWrite( session, new WriteRequest( actualOutput ) );
+        nextFilter.filterWrite(session, new WriteRequest(actualOutput));
 
         // switch to playback mode
         mockSession.replay();
@@ -137,40 +145,41 @@ public class CompressionFilterTest extends TestCase
         mockNextFilter.replay();
 
         // make the actual calls on the filter
-        filter.onPreAdd( ioFilterChain, "CompressionFilter", nextFilter );
-        filter.filterWrite( nextFilter, session, writeRequest );
+        filter.onPreAdd(ioFilterChain, "CompressionFilter", nextFilter);
+        filter.filterWrite(nextFilter, session, writeRequest);
 
         // verify that all the calls happened as recorded
         mockNextFilter.verify();
 
-        assertTrue( true );
+        assertTrue(true);
     }
 
-    public void testDecompression() throws Exception
-    {
+    public void testDecompression() throws Exception {
         // prepare the input data
-        ByteBuffer buf = ByteBuffer.wrap( strCompress.getBytes( "UTF8" ) );
-        ByteBuffer byteInput = actualDeflater.deflate( buf );
-        ByteBuffer actualOutput = actualInflater.inflate( byteInput );
+        ByteBuffer buf = ByteBuffer.wrap(strCompress.getBytes("UTF8"));
+        ByteBuffer byteInput = actualDeflater.deflate(buf);
+        ByteBuffer actualOutput = actualInflater.inflate(byteInput);
 
         // record all the mock calls
-        ioFilterChain.contains( CompressionFilter.class );
-        mockIoFilterChain.setReturnValue( false );
+        ioFilterChain.contains(CompressionFilter.class);
+        mockIoFilterChain.setReturnValue(false);
 
         ioFilterChain.getSession();
-        mockIoFilterChain.setReturnValue( session );
+        mockIoFilterChain.setReturnValue(session);
 
-        session.setAttribute( CompressionFilter.class.getName() + ".Deflater", deflater );
-        mockSession.setDefaultMatcher( new DataMatcher() );
-        mockSession.setReturnValue( null, MockControl.ONE );
+        session.setAttribute(CompressionFilter.class.getName() + ".Deflater",
+                deflater);
+        mockSession.setDefaultMatcher(new DataMatcher());
+        mockSession.setReturnValue(null, MockControl.ONE);
 
-        session.setAttribute( CompressionFilter.class.getName() + ".Inflater", inflater );
-        mockSession.setReturnValue( null, MockControl.ONE );
+        session.setAttribute(CompressionFilter.class.getName() + ".Inflater",
+                inflater);
+        mockSession.setReturnValue(null, MockControl.ONE);
 
-        session.getAttribute( CompressionFilter.class.getName() + ".Inflater" );
-        mockSession.setReturnValue( inflater );
+        session.getAttribute(CompressionFilter.class.getName() + ".Inflater");
+        mockSession.setReturnValue(inflater);
 
-        nextFilter.messageReceived( session, actualOutput );
+        nextFilter.messageReceived(session, actualOutput);
 
         // switch to playback mode
         mockSession.replay();
@@ -178,13 +187,13 @@ public class CompressionFilterTest extends TestCase
         mockNextFilter.replay();
 
         // make the actual calls on the filter
-        filter.onPreAdd( ioFilterChain, "CompressionFilter", nextFilter );
-        filter.messageReceived( nextFilter, session, byteInput );
+        filter.onPreAdd(ioFilterChain, "CompressionFilter", nextFilter);
+        filter.messageReceived(nextFilter, session, byteInput);
 
         // verify that all the calls happened as recorded
         mockNextFilter.verify();
 
-        assertTrue( true );
+        assertTrue(true);
     }
 
     /**
@@ -192,18 +201,15 @@ public class CompressionFilterTest extends TestCase
      * 
      * @author The Apache Directory MINA subproject (mina-dev@directory.apache.org)
      */
-    class DataMatcher extends AbstractMatcher
-    {
-        protected boolean argumentMatches( Object arg0, Object arg1 )
-        {
+    class DataMatcher extends AbstractMatcher {
+        protected boolean argumentMatches(Object arg0, Object arg1) {
             // we need to only verify the ByteBuffer output
-            if( arg0 instanceof WriteRequest )
-            {
+            if (arg0 instanceof WriteRequest) {
                 WriteRequest expected = (WriteRequest) arg0;
                 WriteRequest actual = (WriteRequest) arg1;
                 ByteBuffer bExpected = (ByteBuffer) expected.getMessage();
                 ByteBuffer bActual = (ByteBuffer) actual.getMessage();
-                return bExpected.equals( bActual );
+                return bExpected.equals(bActual);
             }
             return true;
         }

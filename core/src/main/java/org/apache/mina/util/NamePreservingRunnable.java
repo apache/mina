@@ -25,26 +25,20 @@ package org.apache.mina.util;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 446581 $, $Date: 2006-09-15 11:36:12Z $,
  */
-public class NamePreservingRunnable implements Runnable
-{
+public class NamePreservingRunnable implements Runnable {
     private final Runnable runnable;
 
-    public NamePreservingRunnable( Runnable runnable )
-    {
+    public NamePreservingRunnable(Runnable runnable) {
         this.runnable = runnable;
     }
 
-    public void run()
-    {
+    public void run() {
         String name = Thread.currentThread().getName();
 
-        try
-        {
+        try {
             runnable.run();
-        }
-        finally
-        {
-            Thread.currentThread().setName( name );
+        } finally {
+            Thread.currentThread().setName(name);
         }
     }
 }

@@ -29,19 +29,15 @@ import org.apache.mina.transport.socket.nio.SocketSessionConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SessionUtil
-{
-    public static void initialize( IoSession session )
-    {
+public class SessionUtil {
+    public static void initialize(IoSession session) {
         IoSessionConfig cfg = session.getConfig();
-        if( cfg instanceof SocketSessionConfig )
-        {
-            SocketSessionConfig sCfg = ( SocketSessionConfig ) cfg;
-            sCfg.setKeepAlive( true );
+        if (cfg instanceof SocketSessionConfig) {
+            SocketSessionConfig sCfg = (SocketSessionConfig) cfg;
+            sCfg.setKeepAlive(true);
         }
     }
 
-    private SessionUtil()
-    {
+    private SessionUtil() {
     }
 }

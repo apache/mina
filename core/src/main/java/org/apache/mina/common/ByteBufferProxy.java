@@ -43,8 +43,7 @@ import java.nio.charset.CharsetEncoder;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ByteBufferProxy extends ByteBuffer
-{
+public class ByteBufferProxy extends ByteBuffer {
 
     /**
      * The buffer proxied by this proxy.
@@ -55,599 +54,494 @@ public class ByteBufferProxy extends ByteBuffer
      * Create a new instance.
      * @param buf the buffer to be proxied
      */
-    protected ByteBufferProxy( ByteBuffer buf )
-    {
-        if( buf == null )
-        {
-            throw new NullPointerException( "buf" );
+    protected ByteBufferProxy(ByteBuffer buf) {
+        if (buf == null) {
+            throw new NullPointerException("buf");
         }
         this.buf = buf;
     }
 
-    public void acquire()
-    {
+    public void acquire() {
         buf.acquire();
     }
 
-    public void release()
-    {
+    public void release() {
         buf.release();
     }
 
-    public boolean isDirect()
-    {
+    public boolean isDirect() {
         return buf.isDirect();
     }
 
-    public java.nio.ByteBuffer buf()
-    {
+    public java.nio.ByteBuffer buf() {
         return buf.buf();
     }
 
-    public int capacity()
-    {
+    public int capacity() {
         return buf.capacity();
     }
 
-    public int position()
-    {
+    public int position() {
         return buf.position();
     }
 
-    public ByteBuffer position( int newPosition )
-    {
-        buf.position( newPosition );
+    public ByteBuffer position(int newPosition) {
+        buf.position(newPosition);
         return this;
     }
 
-    public int limit()
-    {
+    public int limit() {
         return buf.limit();
     }
 
-    public ByteBuffer limit( int newLimit )
-    {
-        buf.limit( newLimit );
+    public ByteBuffer limit(int newLimit) {
+        buf.limit(newLimit);
         return this;
     }
 
-    public ByteBuffer mark()
-    {
+    public ByteBuffer mark() {
         buf.mark();
         return this;
     }
 
-    public ByteBuffer reset()
-    {
+    public ByteBuffer reset() {
         buf.reset();
         return this;
     }
 
-    public ByteBuffer clear()
-    {
+    public ByteBuffer clear() {
         buf.clear();
         return this;
     }
 
-    public ByteBuffer sweep()
-    {
+    public ByteBuffer sweep() {
         buf.sweep();
         return this;
     }
-    
-    public ByteBuffer sweep( byte value )
-    {
-        buf.sweep( value );
+
+    public ByteBuffer sweep(byte value) {
+        buf.sweep(value);
         return this;
     }
 
-    public ByteBuffer flip()
-    {
+    public ByteBuffer flip() {
         buf.flip();
         return this;
     }
 
-    public ByteBuffer rewind()
-    {
+    public ByteBuffer rewind() {
         buf.rewind();
         return this;
     }
 
-    public int remaining()
-    {
+    public int remaining() {
         return buf.remaining();
     }
 
-    public boolean hasRemaining()
-    {
+    public boolean hasRemaining() {
         return buf.hasRemaining();
     }
 
-    public byte get()
-    {
+    public byte get() {
         return buf.get();
     }
 
-    public short getUnsigned()
-    {
+    public short getUnsigned() {
         return buf.getUnsigned();
     }
 
-    public ByteBuffer put( byte b )
-    {
-        buf.put( b );
+    public ByteBuffer put(byte b) {
+        buf.put(b);
         return this;
     }
 
-    public byte get( int index )
-    {
-        return buf.get( index );
+    public byte get(int index) {
+        return buf.get(index);
     }
 
-    public short getUnsigned( int index )
-    {
-        return buf.getUnsigned( index );
+    public short getUnsigned(int index) {
+        return buf.getUnsigned(index);
     }
 
-    public ByteBuffer put( int index, byte b )
-    {
-        buf.put( index, b );
+    public ByteBuffer put(int index, byte b) {
+        buf.put(index, b);
         return this;
     }
 
-    public ByteBuffer get( byte[] dst, int offset, int length )
-    {
-        buf.get( dst, offset, length );
+    public ByteBuffer get(byte[] dst, int offset, int length) {
+        buf.get(dst, offset, length);
         return this;
     }
 
-    public ByteBuffer get( byte[] dst )
-    {
-        buf.get( dst );
+    public ByteBuffer get(byte[] dst) {
+        buf.get(dst);
         return this;
     }
 
-    public ByteBuffer put( ByteBuffer src )
-    {
-        buf.put( src );
+    public ByteBuffer put(ByteBuffer src) {
+        buf.put(src);
         return this;
     }
 
-    public ByteBuffer put( java.nio.ByteBuffer src )
-    {
-        buf.put( src );
+    public ByteBuffer put(java.nio.ByteBuffer src) {
+        buf.put(src);
         return this;
     }
 
-    public ByteBuffer put( byte[] src, int offset, int length )
-    {
-        buf.put( src, offset, length );
+    public ByteBuffer put(byte[] src, int offset, int length) {
+        buf.put(src, offset, length);
         return this;
     }
 
-    public ByteBuffer put( byte[] src )
-    {
-        buf.put( src );
+    public ByteBuffer put(byte[] src) {
+        buf.put(src);
         return this;
     }
 
-    public ByteBuffer compact()
-    {
+    public ByteBuffer compact() {
         buf.compact();
         return this;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return buf.toString();
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return buf.hashCode();
     }
 
-    public boolean equals( Object ob )
-    {
-        return buf.equals( ob );
+    public boolean equals(Object ob) {
+        return buf.equals(ob);
     }
 
-    public int compareTo( ByteBuffer that )
-    {
-        return buf.compareTo( that );
+    public int compareTo(ByteBuffer that) {
+        return buf.compareTo(that);
     }
 
-    public ByteOrder order()
-    {
+    public ByteOrder order() {
         return buf.order();
     }
 
-    public ByteBuffer order( ByteOrder bo )
-    {
-        buf.order( bo );
+    public ByteBuffer order(ByteOrder bo) {
+        buf.order(bo);
         return this;
     }
 
-    public char getChar()
-    {
+    public char getChar() {
         return buf.getChar();
     }
 
-    public ByteBuffer putChar( char value )
-    {
-        buf.putChar( value );
+    public ByteBuffer putChar(char value) {
+        buf.putChar(value);
         return this;
     }
 
-    public char getChar( int index )
-    {
-        return buf.getChar( index );
+    public char getChar(int index) {
+        return buf.getChar(index);
     }
 
-    public ByteBuffer putChar( int index, char value )
-    {
-        buf.putChar( index, value );
+    public ByteBuffer putChar(int index, char value) {
+        buf.putChar(index, value);
         return this;
     }
 
-    public CharBuffer asCharBuffer()
-    {
+    public CharBuffer asCharBuffer() {
         return buf.asCharBuffer();
     }
 
-    public short getShort()
-    {
+    public short getShort() {
         return buf.getShort();
     }
 
-    public int getUnsignedShort()
-    {
+    public int getUnsignedShort() {
         return buf.getUnsignedShort();
     }
 
-    public ByteBuffer putShort( short value )
-    {
-        buf.putShort( value );
+    public ByteBuffer putShort(short value) {
+        buf.putShort(value);
         return this;
     }
 
-    public short getShort( int index )
-    {
-        return buf.getShort( index );
+    public short getShort(int index) {
+        return buf.getShort(index);
     }
 
-    public int getUnsignedShort( int index )
-    {
-        return buf.getUnsignedShort( index );
+    public int getUnsignedShort(int index) {
+        return buf.getUnsignedShort(index);
     }
 
-    public ByteBuffer putShort( int index, short value )
-    {
-        buf.putShort( index, value );
+    public ByteBuffer putShort(int index, short value) {
+        buf.putShort(index, value);
         return this;
     }
 
-    public ShortBuffer asShortBuffer()
-    {
+    public ShortBuffer asShortBuffer() {
         return buf.asShortBuffer();
     }
 
-    public int getInt()
-    {
+    public int getInt() {
         return buf.getInt();
     }
 
-    public long getUnsignedInt()
-    {
+    public long getUnsignedInt() {
         return buf.getUnsignedInt();
     }
 
-    public ByteBuffer putInt( int value )
-    {
-        buf.putInt( value );
+    public ByteBuffer putInt(int value) {
+        buf.putInt(value);
         return this;
     }
 
-    public int getInt( int index )
-    {
-        return buf.getInt( index );
+    public int getInt(int index) {
+        return buf.getInt(index);
     }
 
-    public long getUnsignedInt( int index )
-    {
-        return buf.getUnsignedInt( index );
+    public long getUnsignedInt(int index) {
+        return buf.getUnsignedInt(index);
     }
 
-    public ByteBuffer putInt( int index, int value )
-    {
-        buf.putInt( index, value );
+    public ByteBuffer putInt(int index, int value) {
+        buf.putInt(index, value);
         return this;
     }
 
-    public IntBuffer asIntBuffer()
-    {
+    public IntBuffer asIntBuffer() {
         return buf.asIntBuffer();
     }
 
-    public long getLong()
-    {
+    public long getLong() {
         return buf.getLong();
     }
 
-    public ByteBuffer putLong( long value )
-    {
-        buf.putLong( value );
+    public ByteBuffer putLong(long value) {
+        buf.putLong(value);
         return this;
     }
 
-    public long getLong( int index )
-    {
-        return buf.getLong( index );
+    public long getLong(int index) {
+        return buf.getLong(index);
     }
 
-    public ByteBuffer putLong( int index, long value )
-    {
-        buf.putLong( index, value );
+    public ByteBuffer putLong(int index, long value) {
+        buf.putLong(index, value);
         return this;
     }
 
-    public LongBuffer asLongBuffer()
-    {
+    public LongBuffer asLongBuffer() {
         return buf.asLongBuffer();
     }
 
-    public float getFloat()
-    {
+    public float getFloat() {
         return buf.getFloat();
     }
 
-    public ByteBuffer putFloat( float value )
-    {
-        buf.putFloat( value );
+    public ByteBuffer putFloat(float value) {
+        buf.putFloat(value);
         return this;
     }
 
-    public float getFloat( int index )
-    {
-        return buf.getFloat( index );
+    public float getFloat(int index) {
+        return buf.getFloat(index);
     }
 
-    public ByteBuffer putFloat( int index, float value )
-    {
-        buf.putFloat( index, value );
+    public ByteBuffer putFloat(int index, float value) {
+        buf.putFloat(index, value);
         return this;
     }
 
-    public FloatBuffer asFloatBuffer()
-    {
+    public FloatBuffer asFloatBuffer() {
         return buf.asFloatBuffer();
     }
 
-    public double getDouble()
-    {
+    public double getDouble() {
         return buf.getDouble();
     }
 
-    public ByteBuffer putDouble( double value )
-    {
-        buf.putDouble( value );
+    public ByteBuffer putDouble(double value) {
+        buf.putDouble(value);
         return this;
     }
 
-    public double getDouble( int index )
-    {
-        return buf.getDouble( index );
+    public double getDouble(int index) {
+        return buf.getDouble(index);
     }
 
-    public ByteBuffer putDouble( int index, double value )
-    {
-        buf.putDouble( index, value );
+    public ByteBuffer putDouble(int index, double value) {
+        buf.putDouble(index, value);
         return this;
     }
 
-    public DoubleBuffer asDoubleBuffer()
-    {
+    public DoubleBuffer asDoubleBuffer() {
         return buf.asDoubleBuffer();
     }
 
-    public String getHexDump()
-    {
+    public String getHexDump() {
         return buf.getHexDump();
     }
 
-    public String getString( int fieldSize, CharsetDecoder decoder )
-            throws CharacterCodingException
-    {
-        return buf.getString( fieldSize, decoder );
+    public String getString(int fieldSize, CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return buf.getString(fieldSize, decoder);
     }
 
-    public String getString( CharsetDecoder decoder )
-            throws CharacterCodingException
-    {
-        return buf.getString( decoder );
-    }
-    
-    public String getPrefixedString( CharsetDecoder decoder )
-            throws CharacterCodingException
-    {
-        return buf.getPrefixedString( decoder );
+    public String getString(CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return buf.getString(decoder);
     }
 
-    public String getPrefixedString( int prefixLength, CharsetDecoder decoder )
-            throws CharacterCodingException
-    {
-        return buf.getPrefixedString( prefixLength, decoder );
+    public String getPrefixedString(CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return buf.getPrefixedString(decoder);
     }
 
-    public ByteBuffer putString( CharSequence in, int fieldSize,
-                                CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putString( in, fieldSize, encoder );
+    public String getPrefixedString(int prefixLength, CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return buf.getPrefixedString(prefixLength, decoder);
+    }
+
+    public ByteBuffer putString(CharSequence in, int fieldSize,
+            CharsetEncoder encoder) throws CharacterCodingException {
+        buf.putString(in, fieldSize, encoder);
         return this;
     }
 
-    public ByteBuffer putString( CharSequence in, CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putString( in, encoder );
-        return this;
-    }
-    
-    public ByteBuffer putPrefixedString( CharSequence in, CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putPrefixedString( in, encoder );
+    public ByteBuffer putString(CharSequence in, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        buf.putString(in, encoder);
         return this;
     }
 
-    public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, CharsetEncoder encoder ) throws CharacterCodingException
-    {
-        buf.putPrefixedString( in, prefixLength, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        buf.putPrefixedString(in, encoder);
         return this;
     }
 
-    public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, int padding, CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putPrefixedString( in, prefixLength, padding, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+            CharsetEncoder encoder) throws CharacterCodingException {
+        buf.putPrefixedString(in, prefixLength, encoder);
         return this;
     }
 
-    public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, int padding, byte padValue, CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putPrefixedString( in, prefixLength, padding, padValue, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+            int padding, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        buf.putPrefixedString(in, prefixLength, padding, encoder);
         return this;
     }
 
-    public ByteBuffer skip( int size )
-    {
-        buf.skip( size );
+    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+            int padding, byte padValue, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        buf.putPrefixedString(in, prefixLength, padding, padValue, encoder);
         return this;
     }
 
-    public ByteBuffer fill( byte value, int size )
-    {
-        buf.fill( value, size );
+    public ByteBuffer skip(int size) {
+        buf.skip(size);
         return this;
     }
 
-    public ByteBuffer fillAndReset( byte value, int size )
-    {
-        buf.fillAndReset( value, size );
+    public ByteBuffer fill(byte value, int size) {
+        buf.fill(value, size);
         return this;
     }
 
-    public ByteBuffer fill( int size )
-    {
-        buf.fill( size );
+    public ByteBuffer fillAndReset(byte value, int size) {
+        buf.fillAndReset(value, size);
         return this;
     }
 
-    public ByteBuffer fillAndReset( int size )
-    {
-        buf.fillAndReset( size );
+    public ByteBuffer fill(int size) {
+        buf.fill(size);
         return this;
     }
 
-    public boolean isAutoExpand()
-    {
+    public ByteBuffer fillAndReset(int size) {
+        buf.fillAndReset(size);
+        return this;
+    }
+
+    public boolean isAutoExpand() {
         return buf.isAutoExpand();
     }
 
-    public ByteBuffer setAutoExpand( boolean autoExpand )
-    {
-        buf.setAutoExpand( autoExpand );
-        return this;
-    }
-    
-    public ByteBuffer expand( int pos, int expectedRemaining )
-    {
-        buf.expand( pos, expectedRemaining );
+    public ByteBuffer setAutoExpand(boolean autoExpand) {
+        buf.setAutoExpand(autoExpand);
         return this;
     }
 
-    public ByteBuffer expand( int expectedRemaining )
-    {
-        buf.expand( expectedRemaining );
+    public ByteBuffer expand(int pos, int expectedRemaining) {
+        buf.expand(pos, expectedRemaining);
         return this;
     }
 
-    public boolean isPooled()
-    {
+    public ByteBuffer expand(int expectedRemaining) {
+        buf.expand(expectedRemaining);
+        return this;
+    }
+
+    public boolean isPooled() {
         return buf.isPooled();
     }
-    
-    public void setPooled( boolean pooled )
-    {
-        buf.setPooled( pooled );
+
+    public void setPooled(boolean pooled) {
+        buf.setPooled(pooled);
     }
-    
-    public Object getObject() throws ClassNotFoundException
-    {
+
+    public Object getObject() throws ClassNotFoundException {
         return buf.getObject();
     }
 
-    public Object getObject( ClassLoader classLoader ) throws ClassNotFoundException
-    {
-        return buf.getObject( classLoader );
+    public Object getObject(ClassLoader classLoader)
+            throws ClassNotFoundException {
+        return buf.getObject(classLoader);
     }
 
-    public ByteBuffer putObject( Object o )
-    {
-        buf.putObject( o );
+    public ByteBuffer putObject(Object o) {
+        buf.putObject(o);
         return this;
     }
-    
-    public InputStream asInputStream()
-    {
+
+    public InputStream asInputStream() {
         return buf.asInputStream();
     }
-    
-    public OutputStream asOutputStream()
-    {
+
+    public OutputStream asOutputStream() {
         return buf.asOutputStream();
     }
 
-    public ByteBuffer duplicate()
-    {
+    public ByteBuffer duplicate() {
         return buf.duplicate();
     }
 
-    public ByteBuffer slice()
-    {
+    public ByteBuffer slice() {
         return buf.slice();
     }
 
-    public ByteBuffer asReadOnlyBuffer()
-    {
+    public ByteBuffer asReadOnlyBuffer() {
         return buf.asReadOnlyBuffer();
     }
 
-    public byte[] array()
-    {
+    public byte[] array() {
         return buf.array();
     }
 
-    public int arrayOffset()
-    {
+    public int arrayOffset() {
         return buf.arrayOffset();
     }
 
-    public ByteBuffer capacity( int newCapacity )
-    {
-        buf.capacity( newCapacity );
+    public ByteBuffer capacity(int newCapacity) {
+        buf.capacity(newCapacity);
         return this;
     }
 
-    public boolean isReadOnly()
-    {
+    public boolean isReadOnly() {
         return buf.isReadOnly();
     }
 
-    public int markValue()
-    {
+    public int markValue() {
         return buf.markValue();
     }
 }

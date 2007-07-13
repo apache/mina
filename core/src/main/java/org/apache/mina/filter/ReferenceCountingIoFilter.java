@@ -24,7 +24,6 @@ import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 
-
 /**
  * An {@link IoFilter}s wrapper that keeps track of the number of usages of this filter and will call init/destroy
  * when the filter is not in use.
@@ -32,102 +31,97 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ReferenceCountingIoFilter implements IoFilter
-{
+public class ReferenceCountingIoFilter implements IoFilter {
     private final IoFilter filter;
+
     private int count = 0;
 
-    public ReferenceCountingIoFilter( IoFilter filter )
-    {
+    public ReferenceCountingIoFilter(IoFilter filter) {
         this.filter = filter;
     }
 
-    public void init() throws Exception
-    {
+    public void init() throws Exception {
         // no-op, will init on-demand in pre-add if count == 0
     }
 
-    public void destroy() throws Exception
-    {
+    public void destroy() throws Exception {
         //no-op, will destroy on-demand in post-remove if count == 0
     }
 
-    public synchronized void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-        if( 0 == count )
-        {
+    public synchronized void onPreAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        if (0 == count) {
             filter.init();
 
             ++count;
         }
 
-        filter.onPreAdd( parent, name, nextFilter );
+        filter.onPreAdd(parent, name, nextFilter);
     }
 
-    public synchronized void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-        filter.onPostRemove( parent, name, nextFilter );
+    public synchronized void onPostRemove(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        filter.onPostRemove(parent, name, nextFilter);
 
         --count;
 
-        if( 0 == count ) {
+        if (0 == count) {
             filter.destroy();
         }
     }
 
-    public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause ) throws Exception
-    {
-        filter.exceptionCaught( nextFilter, session, cause );
+    public void exceptionCaught(NextFilter nextFilter, IoSession session,
+            Throwable cause) throws Exception {
+        filter.exceptionCaught(nextFilter, session, cause);
     }
 
-    public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        filter.filterClose( nextFilter, session );
+    public void filterClose(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        filter.filterClose(nextFilter, session);
     }
 
-    public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest )
-        throws Exception
-    {
-        filter.filterWrite( nextFilter, session, writeRequest );
+    public void filterWrite(NextFilter nextFilter, IoSession session,
+            WriteRequest writeRequest) throws Exception {
+        filter.filterWrite(nextFilter, session, writeRequest);
     }
 
-    public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
-    {
-        filter.messageReceived( nextFilter, session, message );
+    public void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception {
+        filter.messageReceived(nextFilter, session, message);
     }
 
-    public void messageSent( NextFilter nextFilter, IoSession session, Object message ) throws Exception
-    {
-        filter.messageSent( nextFilter, session, message );
+    public void messageSent(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception {
+        filter.messageSent(nextFilter, session, message);
     }
 
-    public void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-        filter.onPostAdd( parent, name, nextFilter );
+    public void onPostAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        filter.onPostAdd(parent, name, nextFilter);
     }
 
-    public void onPreRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-        filter.onPreRemove( parent, name, nextFilter );
+    public void onPreRemove(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        filter.onPreRemove(parent, name, nextFilter);
     }
 
-    public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        filter.sessionClosed( nextFilter, session );
+    public void sessionClosed(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        filter.sessionClosed(nextFilter, session);
     }
 
-    public void sessionCreated( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        filter.sessionCreated( nextFilter, session );
+    public void sessionCreated(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        filter.sessionCreated(nextFilter, session);
     }
 
-    public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status ) throws Exception
-    {
-        filter.sessionIdle( nextFilter, session, status );
+    public void sessionIdle(NextFilter nextFilter, IoSession session,
+            IdleStatus status) throws Exception {
+        filter.sessionIdle(nextFilter, session, status);
     }
 
-    public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        filter.sessionOpened( nextFilter, session );
+    public void sessionOpened(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        filter.sessionOpened(nextFilter, session);
     }
 }

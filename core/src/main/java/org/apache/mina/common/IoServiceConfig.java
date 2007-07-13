@@ -25,8 +25,7 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoServiceConfig extends Cloneable
-{
+public interface IoServiceConfig extends Cloneable {
     /**
      * Resturns the default configuration of the new {@link IoSession}s.
      */
@@ -47,7 +46,7 @@ public interface IoServiceConfig extends Cloneable
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
      */
-    void setFilterChainBuilder( IoFilterChainBuilder builder );
+    void setFilterChainBuilder(IoFilterChainBuilder builder);
 
     /**
      * A shortcut for <tt>( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )</tt>.
@@ -79,7 +78,7 @@ public interface IoServiceConfig extends Cloneable
      * It is strongly recommended to set a new {@link ExecutorThreadModel} by calling
      * {@link ExecutorThreadModel#getInstance(String)}.
      */
-    void setThreadModel( ThreadModel threadModel );
+    void setThreadModel(ThreadModel threadModel);
 
     /**
      * Returns a deep clone of this configuration.

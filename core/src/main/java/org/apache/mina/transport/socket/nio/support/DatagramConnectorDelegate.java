@@ -55,140 +55,128 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnectorDelegate extends BaseIoConnector implements DatagramService
-{
-    private static final AtomicInteger nextId = new AtomicInteger( );
+public class DatagramConnectorDelegate extends BaseIoConnector implements
+        DatagramService {
+    private static final AtomicInteger nextId = new AtomicInteger();
 
     private final Object lock = new Object();
+
     private final IoConnector wrapper;
+
     private final Executor executor;
+
     private final int id = nextId.getAndIncrement();
+
     private Selector selector;
+
     private DatagramConnectorConfig defaultConfig = new DatagramConnectorConfig();
+
     private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
+
     private final Queue<DatagramSessionImpl> cancelQueue = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+
     private final Queue<DatagramSessionImpl> flushingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+
     private final Queue<DatagramSessionImpl> trafficControllingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+
     private Worker worker;
 
     /**
      * Creates a new instance.
      */
-    public DatagramConnectorDelegate( IoConnector wrapper, Executor executor )
-    {
+    public DatagramConnectorDelegate(IoConnector wrapper, Executor executor) {
         this.wrapper = wrapper;
         this.executor = executor;
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
-    {
-        return connect( address, null, handler, config );
+    public ConnectFuture connect(SocketAddress address, IoHandler handler,
+            IoServiceConfig config) {
+        return connect(address, null, handler, config);
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                                  IoHandler handler, IoServiceConfig config )
-    {
-        if( address == null )
-            throw new NullPointerException( "address" );
-        if( handler == null )
-            throw new NullPointerException( "handler" );
+    public ConnectFuture connect(SocketAddress address,
+            SocketAddress localAddress, IoHandler handler,
+            IoServiceConfig config) {
+        if (address == null)
+            throw new NullPointerException("address");
+        if (handler == null)
+            throw new NullPointerException("handler");
 
-        if( !( address instanceof InetSocketAddress ) )
-            throw new IllegalArgumentException( "Unexpected address type: "
-                + address.getClass() );
+        if (!(address instanceof InetSocketAddress))
+            throw new IllegalArgumentException("Unexpected address type: "
+                    + address.getClass());
 
-        if( localAddress != null && !( localAddress instanceof InetSocketAddress ) )
-        {
-            throw new IllegalArgumentException( "Unexpected local address type: "
-                + localAddress.getClass() );
+        if (localAddress != null
+                && !(localAddress instanceof InetSocketAddress)) {
+            throw new IllegalArgumentException(
+                    "Unexpected local address type: " + localAddress.getClass());
         }
 
-        if( config == null )
-        {
+        if (config == null) {
             config = getDefaultConfig();
         }
 
         DatagramChannel ch = null;
         boolean initialized = false;
-        try
-        {
+        try {
             ch = DatagramChannel.open();
             DatagramSessionConfig cfg;
-            if( config.getSessionConfig() instanceof DatagramSessionConfig )
-            {
-                cfg = ( DatagramSessionConfig ) config.getSessionConfig();
-            }
-            else
-            {
+            if (config.getSessionConfig() instanceof DatagramSessionConfig) {
+                cfg = (DatagramSessionConfig) config.getSessionConfig();
+            } else {
                 cfg = getDefaultConfig().getSessionConfig();
             }
 
-            ch.socket().setReuseAddress( cfg.isReuseAddress() );
-            ch.socket().setBroadcast( cfg.isBroadcast() );
-            ch.socket().setReceiveBufferSize( cfg.getReceiveBufferSize() );
-            ch.socket().setSendBufferSize( cfg.getSendBufferSize() );
+            ch.socket().setReuseAddress(cfg.isReuseAddress());
+            ch.socket().setBroadcast(cfg.isBroadcast());
+            ch.socket().setReceiveBufferSize(cfg.getReceiveBufferSize());
+            ch.socket().setSendBufferSize(cfg.getSendBufferSize());
 
-            if( ch.socket().getTrafficClass() != cfg.getTrafficClass() )
-            {
-                ch.socket().setTrafficClass( cfg.getTrafficClass() );
+            if (ch.socket().getTrafficClass() != cfg.getTrafficClass()) {
+                ch.socket().setTrafficClass(cfg.getTrafficClass());
             }
 
-            if( localAddress != null )
-            {
-                ch.socket().bind( localAddress );
+            if (localAddress != null) {
+                ch.socket().bind(localAddress);
             }
-            ch.connect( address );
-            ch.configureBlocking( false );
+            ch.connect(address);
+            ch.configureBlocking(false);
             initialized = true;
-        }
-        catch( IOException e )
-        {
-            return DefaultConnectFuture.newFailedFuture( e );
-        }
-        finally
-        {
-            if( !initialized && ch != null )
-            {
-                try
-                {
+        } catch (IOException e) {
+            return DefaultConnectFuture.newFailedFuture(e);
+        } finally {
+            if (!initialized && ch != null) {
+                try {
                     ch.disconnect();
                     ch.close();
-                }
-                catch( IOException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
         }
 
-        RegistrationRequest request = new RegistrationRequest( ch, handler, config );
-        try
-        {
+        RegistrationRequest request = new RegistrationRequest(ch, handler,
+                config);
+        try {
             startupWorker();
-        }
-        catch( IOException e )
-        {
-            try
-            {
+        } catch (IOException e) {
+            try {
                 ch.disconnect();
                 ch.close();
-            }
-            catch( IOException e2 )
-            {
-                ExceptionMonitor.getInstance().exceptionCaught( e2 );
+            } catch (IOException e2) {
+                ExceptionMonitor.getInstance().exceptionCaught(e2);
             }
 
-            return DefaultConnectFuture.newFailedFuture( e );
+            return DefaultConnectFuture.newFailedFuture(e);
         }
 
-        registerQueue.add( request );
+        registerQueue.add(request);
 
         selector.wakeup();
         return request;
     }
 
-    public DatagramConnectorConfig getDefaultConfig()
-    {
+    public DatagramConnectorConfig getDefaultConfig() {
         return defaultConfig;
     }
 
@@ -198,36 +186,27 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
      * @param defaultConfig the default config.
      * @throws NullPointerException if the specified value is <code>null</code>.
      */
-    public void setDefaultConfig( DatagramConnectorConfig defaultConfig )
-    {
-        if( defaultConfig == null )
-        {
-            throw new NullPointerException( "defaultConfig" );
+    public void setDefaultConfig(DatagramConnectorConfig defaultConfig) {
+        if (defaultConfig == null) {
+            throw new NullPointerException("defaultConfig");
         }
         this.defaultConfig = defaultConfig;
     }
 
-    private void startupWorker() throws IOException
-    {
-        synchronized( lock )
-        {
-            if( worker == null )
-            {
+    private void startupWorker() throws IOException {
+        synchronized (lock) {
+            if (worker == null) {
                 selector = Selector.open();
                 worker = new Worker();
-                executor.execute( new NamePreservingRunnable( worker ) );
+                executor.execute(new NamePreservingRunnable(worker));
             }
         }
     }
 
-    public void closeSession( DatagramSessionImpl session )
-    {
-        try
-        {
+    public void closeSession(DatagramSessionImpl session) {
+        try {
             startupWorker();
-        }
-        catch( IOException e )
-        {
+        } catch (IOException e) {
             // IOException is thrown only when Worker thread is not
             // running and failed to open a selector.  We simply return
             // silently here because it we can simply conclude that
@@ -236,391 +215,318 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
             return;
         }
 
-        cancelQueue.add( session );
+        cancelQueue.add(session);
 
         selector.wakeup();
     }
 
-    public void flushSession( DatagramSessionImpl session )
-    {
-        scheduleFlush( session );
+    public void flushSession(DatagramSessionImpl session) {
+        scheduleFlush(session);
         Selector selector = this.selector;
-        if( selector != null )
-        {
+        if (selector != null) {
             selector.wakeup();
         }
     }
 
-    private void scheduleFlush( DatagramSessionImpl session )
-    {
-        flushingSessions.add( session );
+    private void scheduleFlush(DatagramSessionImpl session) {
+        flushingSessions.add(session);
     }
 
-    public void updateTrafficMask( DatagramSessionImpl session )
-    {
-        scheduleTrafficControl( session );
+    public void updateTrafficMask(DatagramSessionImpl session) {
+        scheduleTrafficControl(session);
         Selector selector = this.selector;
-        if( selector != null )
-        {
+        if (selector != null) {
             selector.wakeup();
         }
     }
 
-    private void scheduleTrafficControl( DatagramSessionImpl session )
-    {
-        trafficControllingSessions.add( session );
+    private void scheduleTrafficControl(DatagramSessionImpl session) {
+        trafficControllingSessions.add(session);
     }
 
-    private void doUpdateTrafficMask()
-    {
-        if( trafficControllingSessions.isEmpty() )
+    private void doUpdateTrafficMask() {
+        if (trafficControllingSessions.isEmpty())
             return;
 
-        for( ; ; )
-        {
+        for (;;) {
             DatagramSessionImpl session = trafficControllingSessions.poll();
 
-            if( session == null )
+            if (session == null)
                 break;
 
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
             // (In case that Session.suspend??() or session.resume??() is
             // called before addSession() is processed)
-            if( key == null )
-            {
-                scheduleTrafficControl( session );
+            if (key == null) {
+                scheduleTrafficControl(session);
                 break;
             }
             // skip if channel is already closed
-            if( !key.isValid() )
-            {
+            if (!key.isValid()) {
                 continue;
             }
 
             // The normal is OP_READ and, if there are write requests in the
             // session's write queue, set OP_WRITE to trigger flushing.
             int ops = SelectionKey.OP_READ;
-            if( !session.getWriteRequestQueue().isEmpty() )
-            {
+            if (!session.getWriteRequestQueue().isEmpty()) {
                 ops |= SelectionKey.OP_WRITE;
             }
 
             // Now mask the preferred ops with the mask of the current session
             int mask = session.getTrafficMask().getInterestOps();
-            key.interestOps( ops & mask );
+            key.interestOps(ops & mask);
         }
     }
 
-    private class Worker implements Runnable
-    {
-        public void run()
-        {
-            Thread.currentThread().setName( "DatagramConnector-" + id );
+    private class Worker implements Runnable {
+        public void run() {
+            Thread.currentThread().setName("DatagramConnector-" + id);
 
-            for( ; ; )
-            {
-                try
-                {
+            for (;;) {
+                try {
                     int nKeys = selector.select();
 
                     registerNew();
                     doUpdateTrafficMask();
 
-                    if( nKeys > 0 )
-                    {
-                        processReadySessions( selector.selectedKeys() );
+                    if (nKeys > 0) {
+                        processReadySessions(selector.selectedKeys());
                     }
 
                     flushSessions();
                     cancelKeys();
 
-                    if( selector.keys().isEmpty() )
-                    {
-                        synchronized( lock )
-                        {
-                            if( selector.keys().isEmpty() &&
-                                registerQueue.isEmpty() &&
-                                cancelQueue.isEmpty() )
-                            {
+                    if (selector.keys().isEmpty()) {
+                        synchronized (lock) {
+                            if (selector.keys().isEmpty()
+                                    && registerQueue.isEmpty()
+                                    && cancelQueue.isEmpty()) {
                                 worker = null;
-                                try
-                                {
+                                try {
                                     selector.close();
-                                }
-                                catch( IOException e )
-                                {
-                                    ExceptionMonitor.getInstance().exceptionCaught( e );
-                                }
-                                finally
-                                {
+                                } catch (IOException e) {
+                                    ExceptionMonitor.getInstance()
+                                            .exceptionCaught(e);
+                                } finally {
                                     selector = null;
                                 }
                                 break;
                             }
                         }
                     }
-                }
-                catch( IOException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
 
-                    try
-                    {
-                        Thread.sleep( 1000 );
-                    }
-                    catch( InterruptedException e1 )
-                    {
-                        ExceptionMonitor.getInstance().exceptionCaught( e1 );
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e1);
                     }
                 }
             }
         }
     }
 
-    private void processReadySessions( Set<SelectionKey> keys )
-    {
+    private void processReadySessions(Set<SelectionKey> keys) {
         Iterator<SelectionKey> it = keys.iterator();
-        while( it.hasNext() )
-        {
+        while (it.hasNext()) {
             SelectionKey key = it.next();
             it.remove();
 
-            DatagramSessionImpl session = ( DatagramSessionImpl ) key.attachment();
+            DatagramSessionImpl session = (DatagramSessionImpl) key
+                    .attachment();
 
             // Let the recycler know that the session is still active. 
-            getSessionRecycler( session ).recycle(
-                    session.getLocalAddress(), session.getRemoteAddress() );
+            getSessionRecycler(session).recycle(session.getLocalAddress(),
+                    session.getRemoteAddress());
 
-            if( key.isReadable() && session.getTrafficMask().isReadable() )
-            {
-                readSession( session );
+            if (key.isReadable() && session.getTrafficMask().isReadable()) {
+                readSession(session);
             }
 
-            if( key.isWritable() && session.getTrafficMask().isWritable() )
-            {
-                scheduleFlush( session );
+            if (key.isWritable() && session.getTrafficMask().isWritable()) {
+                scheduleFlush(session);
             }
         }
     }
 
-    private IoSessionRecycler getSessionRecycler( IoSession session )
-    {
+    private IoSessionRecycler getSessionRecycler(IoSession session) {
         IoServiceConfig config = session.getServiceConfig();
         IoSessionRecycler sessionRecycler;
-        if( config instanceof DatagramServiceConfig )
-        {
-            sessionRecycler = ( ( DatagramServiceConfig ) config ).getSessionRecycler();
-        }
-        else
-        {
+        if (config instanceof DatagramServiceConfig) {
+            sessionRecycler = ((DatagramServiceConfig) config)
+                    .getSessionRecycler();
+        } else {
             sessionRecycler = defaultConfig.getSessionRecycler();
         }
         return sessionRecycler;
     }
 
-    private void readSession( DatagramSessionImpl session )
-    {
+    private void readSession(DatagramSessionImpl session) {
 
-        ByteBuffer readBuf = ByteBuffer.allocate( session.getReadBufferSize() );
-        try
-        {
-            int readBytes = session.getChannel().read( readBuf.buf() );
-            if( readBytes > 0 )
-            {
+        ByteBuffer readBuf = ByteBuffer.allocate(session.getReadBufferSize());
+        try {
+            int readBytes = session.getChannel().read(readBuf.buf());
+            if (readBytes > 0) {
                 readBuf.flip();
-                ByteBuffer newBuf = ByteBuffer.allocate( readBuf.limit() );
-                newBuf.put( readBuf );
+                ByteBuffer newBuf = ByteBuffer.allocate(readBuf.limit());
+                newBuf.put(readBuf);
                 newBuf.flip();
 
-                session.increaseReadBytes( readBytes );
-                session.getFilterChain().fireMessageReceived( session, newBuf );
+                session.increaseReadBytes(readBytes);
+                session.getFilterChain().fireMessageReceived(session, newBuf);
             }
-        }
-        catch( IOException e )
-        {
-            session.getFilterChain().fireExceptionCaught( session, e );
-        }
-        finally
-        {
+        } catch (IOException e) {
+            session.getFilterChain().fireExceptionCaught(session, e);
+        } finally {
             readBuf.release();
         }
     }
 
-    private void flushSessions()
-    {
-        if( flushingSessions.size() == 0 )
+    private void flushSessions() {
+        if (flushingSessions.size() == 0)
             return;
 
-        for( ; ; )
-        {
+        for (;;) {
             DatagramSessionImpl session = flushingSessions.poll();
 
-            if( session == null )
+            if (session == null)
                 break;
 
-            try
-            {
-                flush( session );
-            }
-            catch( IOException e )
-            {
-                session.getFilterChain().fireExceptionCaught( session, e );
+            try {
+                flush(session);
+            } catch (IOException e) {
+                session.getFilterChain().fireExceptionCaught(session, e);
             }
         }
     }
 
-    private void flush( DatagramSessionImpl session ) throws IOException
-    {
+    private void flush(DatagramSessionImpl session) throws IOException {
         DatagramChannel ch = session.getChannel();
 
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
-        for( ; ; )
-        {
+        for (;;) {
             WriteRequest req = writeRequestQueue.peek();
 
-            if( req == null )
+            if (req == null)
                 break;
 
-            ByteBuffer buf = ( ByteBuffer ) req.getMessage();
-            if( buf.remaining() == 0 )
-            {
+            ByteBuffer buf = (ByteBuffer) req.getMessage();
+            if (buf.remaining() == 0) {
                 // pop and fire event
                 writeRequestQueue.poll();
 
                 session.increaseWrittenMessages();
                 buf.reset();
-                session.getFilterChain().fireMessageSent( session, req );
+                session.getFilterChain().fireMessageSent(session, req);
                 continue;
             }
 
             SelectionKey key = session.getSelectionKey();
-            if( key == null )
-            {
-                scheduleFlush( session );
+            if (key == null) {
+                scheduleFlush(session);
                 break;
             }
-            if( !key.isValid() )
-            {
+            if (!key.isValid()) {
                 continue;
             }
 
-            int writtenBytes = ch.write( buf.buf() );
+            int writtenBytes = ch.write(buf.buf());
 
-            if( writtenBytes == 0 )
-            {
+            if (writtenBytes == 0) {
                 // Kernel buffer is full
-                key.interestOps( key.interestOps() | SelectionKey.OP_WRITE );
-            }
-            else if( writtenBytes > 0 )
-            {
-                key.interestOps( key.interestOps()
-                    & ( ~SelectionKey.OP_WRITE ) );
+                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+            } else if (writtenBytes > 0) {
+                key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
 
                 // pop and fire event
                 writeRequestQueue.poll();
 
-                session.increaseWrittenBytes( writtenBytes );
+                session.increaseWrittenBytes(writtenBytes);
                 session.increaseWrittenMessages();
                 buf.reset();
-                session.getFilterChain().fireMessageSent( session, req );
+                session.getFilterChain().fireMessageSent(session, req);
             }
         }
     }
 
-    private void registerNew()
-    {
-        if( registerQueue.isEmpty() )
+    private void registerNew() {
+        if (registerQueue.isEmpty())
             return;
 
-        for( ; ; )
-        {
+        for (;;) {
             RegistrationRequest req = registerQueue.poll();
 
-            if( req == null )
+            if (req == null)
                 break;
 
-            DatagramSessionImpl session = new DatagramSessionImpl(
-                wrapper, this,
-                req.config,
-                req.channel, req.handler,
-                req.channel.socket().getRemoteSocketAddress(),
-                req.channel.socket().getLocalSocketAddress());
+            DatagramSessionImpl session = new DatagramSessionImpl(wrapper,
+                    this, req.config, req.channel, req.handler, req.channel
+                            .socket().getRemoteSocketAddress(), req.channel
+                            .socket().getLocalSocketAddress());
 
             // AbstractIoFilterChain will notify the connect future.
-            session.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, req );
+            session.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE, req);
 
             boolean success = false;
-            try
-            {
-                SelectionKey key = req.channel.register( selector,
-                    SelectionKey.OP_READ, session );
+            try {
+                SelectionKey key = req.channel.register(selector,
+                        SelectionKey.OP_READ, session);
 
-                session.setSelectionKey( key );
-                buildFilterChain( req, session );
-                getSessionRecycler( session ).put( session );
+                session.setSelectionKey(key);
+                buildFilterChain(req, session);
+                getSessionRecycler(session).put(session);
 
                 // The CONNECT_FUTURE attribute is cleared and notified here.
-                getListeners().fireSessionCreated( session );
+                getListeners().fireSessionCreated(session);
                 success = true;
-            }
-            catch( Throwable t )
-            {
+            } catch (Throwable t) {
                 // The CONNECT_FUTURE attribute is cleared and notified here.
-                session.getFilterChain().fireExceptionCaught( session, t );
-            }
-            finally
-            {
-                if( !success )
-                {
-                    try
-                    {
+                session.getFilterChain().fireExceptionCaught(session, t);
+            } finally {
+                if (!success) {
+                    try {
                         req.channel.disconnect();
                         req.channel.close();
-                    }
-                    catch( IOException e )
-                    {
-                        ExceptionMonitor.getInstance().exceptionCaught( e );
+                    } catch (IOException e) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e);
                     }
                 }
             }
         }
     }
 
-    private void buildFilterChain( RegistrationRequest req, IoSession session ) throws Exception
-    {
-        getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-        req.config.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
-        req.config.getThreadModel().buildFilterChain( session.getFilterChain() );
+    private void buildFilterChain(RegistrationRequest req, IoSession session)
+            throws Exception {
+        getFilterChainBuilder().buildFilterChain(session.getFilterChain());
+        req.config.getFilterChainBuilder().buildFilterChain(
+                session.getFilterChain());
+        req.config.getThreadModel().buildFilterChain(session.getFilterChain());
     }
 
-    private void cancelKeys()
-    {
-        if( cancelQueue.isEmpty() )
+    private void cancelKeys() {
+        if (cancelQueue.isEmpty())
             return;
 
-        for( ; ; )
-        {
+        for (;;) {
             DatagramSessionImpl session = cancelQueue.poll();
 
-            if( session == null )
+            if (session == null)
                 break;
-            else
-            {
+            else {
                 SelectionKey key = session.getSelectionKey();
-                DatagramChannel ch = ( DatagramChannel ) key.channel();
-                try
-                {
+                DatagramChannel ch = (DatagramChannel) key.channel();
+                try {
                     ch.disconnect();
                     ch.close();
-                }
-                catch( IOException e )
-                {
-                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
 
-                getListeners().fireSessionDestroyed( session );
+                getListeners().fireSessionDestroyed(session);
                 session.getCloseFuture().setClosed();
                 key.cancel();
                 selector.wakeup(); // wake up again to trigger thread death
@@ -628,16 +534,15 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements Datagr
         }
     }
 
-    private static class RegistrationRequest extends DefaultConnectFuture
-    {
+    private static class RegistrationRequest extends DefaultConnectFuture {
         private final DatagramChannel channel;
+
         private final IoHandler handler;
+
         private final IoServiceConfig config;
 
-        private RegistrationRequest( DatagramChannel channel,
-                                     IoHandler handler,
-                                     IoServiceConfig config )
-        {
+        private RegistrationRequest(DatagramChannel channel, IoHandler handler,
+                IoServiceConfig config) {
             this.channel = channel;
             this.handler = handler;
             this.config = config;

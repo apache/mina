@@ -35,48 +35,47 @@ import java.io.IOException;
  * 
  * @see IoHandlerAdapter
  */
-public interface IoHandler
-{
+public interface IoHandler {
     /**
      * Invoked when the session is created.  Initialize default socket
      * parameters and user-defined attributes here.
      */
-    void sessionCreated( IoSession session ) throws Exception;
-    
+    void sessionCreated(IoSession session) throws Exception;
+
     /**
      * Invoked when the connection is opened.  This method is not invoked if the
      * transport type is UDP.
      */
-    void sessionOpened( IoSession session ) throws Exception;
+    void sessionOpened(IoSession session) throws Exception;
 
     /**
      * Invoked when the connection is closed.  This method is not invoked if the
      * transport type is UDP.
      */
-    void sessionClosed( IoSession session ) throws Exception;
+    void sessionClosed(IoSession session) throws Exception;
 
     /**
      * Invoked when the connection is idle.  Refer to {@link IdleStatus}.  This
      * method is not invoked if the transport type is UDP.
      */
-    void sessionIdle( IoSession session, IdleStatus status ) throws Exception;
+    void sessionIdle(IoSession session, IdleStatus status) throws Exception;
 
     /**
      * Invoked when any exception is thrown by user {@link IoHandler}
      * implementation or by MINA.  If <code>cause</code> is instanceof
      * {@link IOException}, MINA will close the connection automatically.
      */
-    void exceptionCaught( IoSession session, Throwable cause ) throws Exception;
+    void exceptionCaught(IoSession session, Throwable cause) throws Exception;
 
     /**
      * Invoked when protocol message is received.  Implement your protocol flow
      * here.
      */
-    void messageReceived( IoSession session, Object message ) throws Exception;
+    void messageReceived(IoSession session, Object message) throws Exception;
 
     /**
      * Invoked when protocol message that user requested by
      * {@link IoSession#write(Object)} is sent out actually.
      */
-    void messageSent( IoSession session, Object message ) throws Exception;
+    void messageSent(IoSession session, Object message) throws Exception;
 }

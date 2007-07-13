@@ -32,14 +32,12 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptor extends DelegatedIoAcceptor
-{
+public class DatagramAcceptor extends DelegatedIoAcceptor {
     /**
      * Creates a new instance using a NewThreadExecutor
      */
-    public DatagramAcceptor()
-    {
-        init( new DatagramAcceptorDelegate( this, new NewThreadExecutor( ) ) );
+    public DatagramAcceptor() {
+        init(new DatagramAcceptorDelegate(this, new NewThreadExecutor()));
     }
 
     /**
@@ -47,15 +45,13 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
      *
      * @param executor Executor to use for launching threads
      */
-    public DatagramAcceptor( Executor executor )
-    {
-        init( new DatagramAcceptorDelegate( this, executor ) );
+    public DatagramAcceptor(Executor executor) {
+        init(new DatagramAcceptorDelegate(this, executor));
     }
-    
+
     @Override
-    public DatagramAcceptorConfig getDefaultConfig()
-    {
-        return ( DatagramAcceptorConfig ) super.getDefaultConfig();
+    public DatagramAcceptorConfig getDefaultConfig() {
+        return (DatagramAcceptorConfig) super.getDefaultConfig();
     }
 
     /**
@@ -64,8 +60,7 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
      * @param defaultConfig the default config.
      * @throws NullPointerException if the specified value is <code>null</code>.
      */
-    public void setDefaultConfig( DatagramAcceptorConfig defaultConfig )
-    {
-        ( ( DatagramAcceptorDelegate ) delegate ).setDefaultConfig( defaultConfig );
+    public void setDefaultConfig(DatagramAcceptorConfig defaultConfig) {
+        ((DatagramAcceptorDelegate) delegate).setDefaultConfig(defaultConfig);
     }
 }

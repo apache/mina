@@ -41,33 +41,39 @@ public class ToHaikuIoFilterTest extends MockObjectTestCase {
     }
 
     public void testThreeStringsMakesAHaiku() throws Exception {
-        Mock list = mock( List.class );
-        list.expects( once() ).method( "add" ).with( eq( "two" ) ).will( returnValue( true ) );
-        list.expects( once() ).method( "add" ).with( eq( "three" ) ).will( returnValue( true ) );
-        list.expects( once() ).method( "toArray" ).with( isA( String[].class ) )
-            .will( returnValue( new String[]{ "one", "two", "three" } ) );
-        list.expects( exactly( 2 ) ).method( "size" )
-            .will( onConsecutiveCalls( returnValue( 2 ), returnValue( 3 ) ) );
+        Mock list = mock(List.class);
+        list.expects(once()).method("add").with(eq("two")).will(
+                returnValue(true));
+        list.expects(once()).method("add").with(eq("three")).will(
+                returnValue(true));
+        list.expects(once()).method("toArray").with(isA(String[].class)).will(
+                returnValue(new String[] { "one", "two", "three" }));
+        list.expects(exactly(2)).method("size").will(
+                onConsecutiveCalls(returnValue(2), returnValue(3)));
 
-        Mock session = mock( IoSession.class );
-        session.expects( exactly( 3 ) ).method( "getAttribute" ).with( eq( "phrases" ) )
-            .will( onConsecutiveCalls( returnValue( null ), returnValue( list.proxy() ),
-                                       returnValue( list.proxy() ), returnValue( list.proxy() ) ) );
-        session.expects( exactly( 1 ) ).method( "setAttribute" )
-            .with( eq( "phrases" ), eq( Collections.emptyList() ) );
-        session.expects( exactly( 1 ) ).method( "removeAttribute" ).with( eq( "phrases" ) );
+        Mock session = mock(IoSession.class);
+        session.expects(exactly(3)).method("getAttribute").with(eq("phrases"))
+                .will(
+                        onConsecutiveCalls(returnValue(null), returnValue(list
+                                .proxy()), returnValue(list.proxy()),
+                                returnValue(list.proxy())));
+        session.expects(exactly(1)).method("setAttribute").with(eq("phrases"),
+                eq(Collections.emptyList()));
+        session.expects(exactly(1)).method("removeAttribute").with(
+                eq("phrases"));
 
         IoSession sessionProxy = (IoSession) session.proxy();
 
-        Mock nextFilter = mock( IoFilter.NextFilter.class );
-        nextFilter.expects( once() ).method( "messageReceived" )
-            .with( eq( sessionProxy ), eq( new Haiku( "one", "two", "three" ) ) );
+        Mock nextFilter = mock(IoFilter.NextFilter.class);
+        nextFilter.expects(once()).method("messageReceived").with(
+                eq(sessionProxy), eq(new Haiku("one", "two", "three")));
 
-        IoFilter.NextFilter nextFilterProxy = (IoFilter.NextFilter) nextFilter.proxy();
+        IoFilter.NextFilter nextFilterProxy = (IoFilter.NextFilter) nextFilter
+                .proxy();
 
-        filter.messageReceived( nextFilterProxy, sessionProxy, "one" );
-        filter.messageReceived( nextFilterProxy, sessionProxy, "two" );
-        filter.messageReceived( nextFilterProxy, sessionProxy, "three" );
+        filter.messageReceived(nextFilterProxy, sessionProxy, "one");
+        filter.messageReceived(nextFilterProxy, sessionProxy, "two");
+        filter.messageReceived(nextFilterProxy, sessionProxy, "three");
     }
 
 }

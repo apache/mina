@@ -35,34 +35,29 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class AddMessageEncoder extends AbstractMessageEncoder
-{
+public class AddMessageEncoder extends AbstractMessageEncoder {
     private static final Set<Class<?>> TYPES;
-   
-    static
-    {
+
+    static {
         Set<Class<?>> types = new HashSet<Class<?>>();
-        types.add( AddMessage.class );
-        TYPES = Collections.unmodifiableSet( types );
+        types.add(AddMessage.class);
+        TYPES = Collections.unmodifiableSet(types);
     }
 
-    public AddMessageEncoder()
-    {
-        super( Constants.ADD );
+    public AddMessageEncoder() {
+        super(Constants.ADD);
     }
 
-    protected void encodeBody( IoSession session, AbstractMessage message, ByteBuffer out )
-    {
-        AddMessage m = ( AddMessage ) message;
-        out.putInt( m.getValue() );
+    protected void encodeBody(IoSession session, AbstractMessage message,
+            ByteBuffer out) {
+        AddMessage m = (AddMessage) message;
+        out.putInt(m.getValue());
     }
 
-    public Set<Class<?>> getMessageTypes()
-    {
+    public Set<Class<?>> getMessageTypes() {
         return TYPES;
     }
 
-    public void dispose() throws Exception
-    {
+    public void dispose() throws Exception {
     }
 }

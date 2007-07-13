@@ -48,138 +48,117 @@ import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
  * @author The Apache MINA Project Team (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ObjectSerializationTest extends TestCase
-{
-    public void testEncoder() throws Exception
-    {
+public class ObjectSerializationTest extends TestCase {
+    public void testEncoder() throws Exception {
         final String expected = "1234";
 
         IoSession session = new MockIoSession();
-        SimpleProtocolEncoderOutput out = new SimpleProtocolEncoderOutput()
-        {
-            protected WriteFuture doFlush( ByteBuffer buf )
-            {
+        SimpleProtocolEncoderOutput out = new SimpleProtocolEncoderOutput() {
+            protected WriteFuture doFlush(ByteBuffer buf) {
                 return null;
             }
         };
-        
+
         ProtocolEncoder encoder = new ObjectSerializationEncoder();
-        encoder.encode( session, expected, out );
-        
-        Assert.assertEquals( 1, out.getBufferQueue().size() );
+        encoder.encode(session, expected, out);
+
+        Assert.assertEquals(1, out.getBufferQueue().size());
         ByteBuffer buf = out.getBufferQueue().poll();
-        
-        testDecoderAndInputStream( expected, buf );
+
+        testDecoderAndInputStream(expected, buf);
     }
-    
-    public void testOutputStream() throws Exception
-    {
+
+    public void testOutputStream() throws Exception {
         final String expected = "1234";
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectSerializationOutputStream osos =
-            new ObjectSerializationOutputStream( baos );
+        ObjectSerializationOutputStream osos = new ObjectSerializationOutputStream(
+                baos);
 
-        osos.writeObject( expected );
+        osos.writeObject(expected);
         osos.flush();
 
-        testDecoderAndInputStream( expected, ByteBuffer.wrap( baos.toByteArray() ) );
+        testDecoderAndInputStream(expected, ByteBuffer.wrap(baos.toByteArray()));
     }
-    
-    private void testDecoderAndInputStream( String expected, ByteBuffer in ) throws Exception
-    {
+
+    private void testDecoderAndInputStream(String expected, ByteBuffer in)
+            throws Exception {
         // Test InputStream
-        ObjectSerializationInputStream osis = 
-            new ObjectSerializationInputStream(
-                    in.duplicate().asInputStream() );
+        ObjectSerializationInputStream osis = new ObjectSerializationInputStream(
+                in.duplicate().asInputStream());
 
         Object actual = osis.readObject();
-        assertEquals( expected, actual );
-        
+        assertEquals(expected, actual);
+
         // Test ProtocolDecoder
         ProtocolDecoder decoder = new ObjectSerializationDecoder();
         MockProtocolDecoderOutput decoderOut = new MockProtocolDecoderOutput();
         IoSession session = new MockIoSession();
-        decoder.decode( session, in.duplicate(), decoderOut );
+        decoder.decode(session, in.duplicate(), decoderOut);
 
-        Assert.assertEquals( expected, decoderOut.result.get( 0 ) );
-        Assert.assertEquals( 1, decoderOut.result.size() );
+        Assert.assertEquals(expected, decoderOut.result.get(0));
+        Assert.assertEquals(1, decoderOut.result.size());
     }
-    
-    private static class MockIoSession extends BaseIoSession
-    {
 
-        protected void updateTrafficMask()
-        {
+    private static class MockIoSession extends BaseIoSession {
+
+        protected void updateTrafficMask() {
         }
 
-        public IoSessionConfig getConfig()
-        {
+        public IoSessionConfig getConfig() {
             return null;
         }
 
-        public IoFilterChain getFilterChain()
-        {
+        public IoFilterChain getFilterChain() {
             return null;
         }
 
-        public IoHandler getHandler()
-        {
+        public IoHandler getHandler() {
             return null;
         }
 
-        public SocketAddress getLocalAddress()
-        {
+        public SocketAddress getLocalAddress() {
             return null;
         }
 
-        public SocketAddress getRemoteAddress()
-        {
+        public SocketAddress getRemoteAddress() {
             return null;
         }
 
-        public int getScheduledWriteBytes()
-        {
+        public int getScheduledWriteBytes() {
             return 0;
         }
 
-        public int getScheduledWriteRequests()
-        {
+        public int getScheduledWriteRequests() {
             return 0;
         }
 
-        public IoService getService()
-        {
+        public IoService getService() {
             return null;
         }
 
-        public SocketAddress getServiceAddress()
-        {
+        public SocketAddress getServiceAddress() {
             return null;
         }
 
-        public IoServiceConfig getServiceConfig()
-        {
+        public IoServiceConfig getServiceConfig() {
             return null;
         }
 
-        public TransportType getTransportType()
-        {
+        public TransportType getTransportType() {
             return null;
         }
     }
-    
-    private static class MockProtocolDecoderOutput implements ProtocolDecoderOutput
-    {
+
+    private static class MockProtocolDecoderOutput implements
+            ProtocolDecoderOutput {
         private List<Object> result = new ArrayList<Object>();
 
-        public void flush()
-        {
+        public void flush() {
         }
 
-        public void write( Object message )
-        {
-            result.add( message );
+        public void write(Object message) {
+            result.add(message);
         }
     }
 }

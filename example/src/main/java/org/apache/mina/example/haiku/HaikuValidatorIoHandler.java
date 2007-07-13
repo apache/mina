@@ -31,14 +31,15 @@ public class HaikuValidatorIoHandler extends IoHandlerAdapter {
     private final HaikuValidator validator = new HaikuValidator();
 
     @Override
-    public void messageReceived( IoSession session, Object message ) throws Exception {
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
         Haiku haiku = (Haiku) message;
 
         try {
-            validator.validate( haiku );
-            session.write( "HAIKU!" );
-        } catch( InvalidHaikuException e ) {
-            session.write( "NOT A HAIKU: " + e.getMessage() );
+            validator.validate(haiku);
+            session.write("HAIKU!");
+        } catch (InvalidHaikuException e) {
+            session.write("NOT A HAIKU: " + e.getMessage());
         }
     }
 }

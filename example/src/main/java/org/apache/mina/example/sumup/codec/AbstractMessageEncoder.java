@@ -32,30 +32,29 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractMessageEncoder implements MessageEncoder
-{
+public abstract class AbstractMessageEncoder implements MessageEncoder {
     private final int type;
 
-    protected AbstractMessageEncoder( int type )
-    {
+    protected AbstractMessageEncoder(int type) {
         this.type = type;
     }
 
-    public void encode( IoSession session, Object message, ProtocolEncoderOutput out ) throws Exception
-    {
-        AbstractMessage m = ( AbstractMessage ) message ;
-        ByteBuffer buf = ByteBuffer.allocate( 16 );
-        buf.setAutoExpand( true ); // Enable auto-expand for easier encoding
-        
+    public void encode(IoSession session, Object message,
+            ProtocolEncoderOutput out) throws Exception {
+        AbstractMessage m = (AbstractMessage) message;
+        ByteBuffer buf = ByteBuffer.allocate(16);
+        buf.setAutoExpand(true); // Enable auto-expand for easier encoding
+
         // Encode a header
-        buf.putShort( ( short ) type );
-        buf.putInt( m.getSequence() );
-        
+        buf.putShort((short) type);
+        buf.putInt(m.getSequence());
+
         // Encode a body
-        encodeBody( session, m, buf );
+        encodeBody(session, m, buf);
         buf.flip();
-        out.write( buf );
+        out.write(buf);
     }
-    
-    protected abstract void encodeBody( IoSession session, AbstractMessage message, ByteBuffer out );
+
+    protected abstract void encodeBody(IoSession session,
+            AbstractMessage message, ByteBuffer out);
 }

@@ -27,25 +27,19 @@ import org.apache.mina.common.ByteBuffer;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ByteBufferUtil
-{
-    public static void acquireIfPossible( Object message )
-    {
-        if( message instanceof ByteBuffer )
-        {
-            ( ( ByteBuffer ) message ).acquire();
+public class ByteBufferUtil {
+    public static void acquireIfPossible(Object message) {
+        if (message instanceof ByteBuffer) {
+            ((ByteBuffer) message).acquire();
         }
     }
-    
-    public static void releaseIfPossible( Object message )
-    {
-        if( message instanceof ByteBuffer )
-        {
-            ( ( ByteBuffer ) message ).release();
+
+    public static void releaseIfPossible(Object message) {
+        if (message instanceof ByteBuffer) {
+            ((ByteBuffer) message).release();
         }
     }
-    
-    private ByteBufferUtil()
-    {
+
+    private ByteBufferUtil() {
     }
 }

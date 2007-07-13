@@ -37,8 +37,7 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ProtocolEncoder
-{
+public interface ProtocolEncoder {
 
     /**
      * Encodes higher-level message objects into binary or protocol-specific data.
@@ -49,14 +48,13 @@ public interface ProtocolEncoder
      * 
      * @throws Exception if the message violated protocol specification
      */
-    void encode( IoSession session, Object message,
-                 ProtocolEncoderOutput out ) throws Exception;
+    void encode(IoSession session, Object message, ProtocolEncoderOutput out)
+            throws Exception;
 
-    
     /**
      * Releases all resources related with this encoder.
      * 
      * @throws Exception if failed to dispose all resources
      */
-    void dispose( IoSession session ) throws Exception;
+    void dispose(IoSession session) throws Exception;
 }

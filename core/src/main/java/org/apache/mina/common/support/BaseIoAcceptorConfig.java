@@ -27,23 +27,19 @@ import org.apache.mina.common.IoAcceptorConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoAcceptorConfig extends BaseIoServiceConfig implements IoAcceptorConfig
-{
+public abstract class BaseIoAcceptorConfig extends BaseIoServiceConfig
+        implements IoAcceptorConfig {
     private boolean disconnectOnUnbind = true;
-    
-    protected BaseIoAcceptorConfig()
-    {
+
+    protected BaseIoAcceptorConfig() {
         super();
     }
 
-
-    public boolean isDisconnectOnUnbind()
-    {
+    public boolean isDisconnectOnUnbind() {
         return disconnectOnUnbind;
     }
 
-    public void setDisconnectOnUnbind( boolean disconnectClientsOnUnbind )
-    {
+    public void setDisconnectOnUnbind(boolean disconnectClientsOnUnbind) {
         this.disconnectOnUnbind = disconnectClientsOnUnbind;
     }
 }

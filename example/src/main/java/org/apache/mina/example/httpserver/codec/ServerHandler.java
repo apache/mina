@@ -31,23 +31,20 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ServerHandler extends IoHandlerAdapter
-{
+public class ServerHandler extends IoHandlerAdapter {
     @Override
-    public void sessionOpened( IoSession session )
-    {
+    public void sessionOpened(IoSession session) {
         // set idle time to 60 seconds
-        session.setIdleTime( IdleStatus.BOTH_IDLE, 60 );
+        session.setIdleTime(IdleStatus.BOTH_IDLE, 60);
     }
 
     @Override
-    public void messageReceived( IoSession session, Object message )
-    {
+    public void messageReceived(IoSession session, Object message) {
         // Check that we can service the request context
         HttpResponseMessage response = new HttpResponseMessage();
-        response.setContentType( "text/plain" );
-        response.setResponseCode( HttpResponseMessage.HTTP_STATUS_SUCCESS );
-        response.appendBody( "CONNECTED" );
+        response.setContentType("text/plain");
+        response.setResponseCode(HttpResponseMessage.HTTP_STATUS_SUCCESS);
+        response.appendBody("CONNECTED");
 
         // msg.setResponseCode(HttpResponseMessage.HTTP_STATUS_SUCCESS);
         // byte[] b = new byte[ta.buffer.limit()];
@@ -65,22 +62,19 @@ public class ServerHandler extends IoHandlerAdapter
         // "<html><body><h1>UNKNOWN REQUEST %d</h1></body></html>",
         // HttpResponseMessage.HTTP_STATUS_NOT_FOUND));
 
-        if( response != null )
-        {
-            session.write( response ).join();
+        if (response != null) {
+            session.write(response).join();
         }
     }
 
     @Override
-    public void sessionIdle( IoSession session, IdleStatus status )
-    {
-        SessionLog.info( session, "Disconnecting the idle." );
+    public void sessionIdle(IoSession session, IdleStatus status) {
+        SessionLog.info(session, "Disconnecting the idle.");
         session.close();
     }
 
     @Override
-    public void exceptionCaught( IoSession session, Throwable cause )
-    {
+    public void exceptionCaught(IoSession session, Throwable cause) {
         session.close();
     }
 }

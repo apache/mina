@@ -19,15 +19,13 @@
  */
 package org.apache.mina.common;
 
-
 /**
  * Represents the result of an ashynchronous I/O operation.
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoFuture
-{
+public interface IoFuture {
     /**
      * Returns the {@link IoSession} which is associated with this future.
      */
@@ -43,7 +41,7 @@ public interface IoFuture
      *
      * @return <tt>true</tt> if the operation is finished.
      */
-    boolean join( long timeoutInMillis );
+    boolean join(long timeoutInMillis);
 
     /**
      * Returns if the asynchronous operation is finished.
@@ -54,11 +52,11 @@ public interface IoFuture
      * Adds an event <tt>listener</tt> which is notified when
      * the state of this future changes.
      */
-    void addListener( IoFutureListener listener );
+    void addListener(IoFutureListener listener);
 
     /**
      * Removes an existing event <tt>listener</tt> which is notified when
      * the state of this future changes.
      */
-    void removeListener( IoFutureListener listener );
+    void removeListener(IoFutureListener listener);
 }

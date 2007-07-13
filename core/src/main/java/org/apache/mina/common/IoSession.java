@@ -82,7 +82,7 @@ public interface IoSession {
      * You can also wait for the returned {@link WriteFuture} if you want
      * to wait for the message actually written.
      */
-    WriteFuture write( Object message );
+    WriteFuture write(Object message);
 
     /**
      * Closes this session immediately.  This operation is asynthronous.
@@ -103,7 +103,7 @@ public interface IoSession {
      *
      * @return Old attachment.  <tt>null</tt> if it is new.
      */
-    Object setAttachment( Object attachment );
+    Object setAttachment(Object attachment);
 
     /**
      * Returns the value of user-defined attribute of this session.
@@ -111,7 +111,7 @@ public interface IoSession {
      * @param key the key of the attribute
      * @return <tt>null</tt> if there is no attribute with the specified key
      */
-    Object getAttribute( String key );
+    Object getAttribute(String key);
 
     /**
      * Sets a user-defined attribute.
@@ -120,7 +120,7 @@ public interface IoSession {
      * @param value the value of the attribute
      * @return The old value of the attribute.  <tt>null</tt> if it is new.
      */
-    Object setAttribute( String key, Object value );
+    Object setAttribute(String key, Object value);
 
     /**
      * Sets a user defined attribute without a value.  This is useful when
@@ -130,20 +130,20 @@ public interface IoSession {
      * @param key the key of the attribute
      * @return The old value of the attribute.  <tt>null</tt> if it is new.
      */
-    Object setAttribute( String key );
+    Object setAttribute(String key);
 
     /**
      * Removes a user-defined attribute with the specified key.
      *
      * @return The old value of the attribute.  <tt>null</tt> if not found.
      */
-    Object removeAttribute( String key );
+    Object removeAttribute(String key);
 
     /**
      * Returns <tt>true</tt> if this session contains the attribute with
      * the specified <tt>key</tt>.
      */
-    boolean containsAttribute( String key );
+    boolean containsAttribute(String key);
 
     /**
      * Returns the set of keys of all user-defined attributes.
@@ -196,17 +196,17 @@ public interface IoSession {
     /**
      * Returns idle time for the specified type of idleness in seconds.
      */
-    int getIdleTime( IdleStatus status );
+    int getIdleTime(IdleStatus status);
 
     /**
      * Returns idle time for the specified type of idleness in milliseconds.
      */
-    long getIdleTimeInMillis( IdleStatus status );
+    long getIdleTimeInMillis(IdleStatus status);
 
     /**
      * Sets idle time for the specified type of idleness in seconds.
      */
-    void setIdleTime( IdleStatus status, int idleTime );
+    void setIdleTime(IdleStatus status, int idleTime);
 
     /**
      * Returns write timeout in seconds.
@@ -221,7 +221,7 @@ public interface IoSession {
     /**
      * Sets write timeout in seconds.
      */
-    void setWriteTimeout( int writeTimeout );
+    void setWriteTimeout(int writeTimeout);
 
     /**
      * Returns the current {@link TrafficMask} of this session.
@@ -233,7 +233,7 @@ public interface IoSession {
      * the parent {@link IoService} to start to control the traffic
      * of this session immediately.
      */
-    void setTrafficMask( TrafficMask trafficMask );
+    void setTrafficMask(TrafficMask trafficMask);
 
     /**
      * A shortcut method for {@link #setTrafficMask(TrafficMask)} that
@@ -320,7 +320,7 @@ public interface IoSession {
      * Returns <code>true</code> if this session is idle for the specified
      * {@link IdleStatus}.
      */
-    boolean isIdle( IdleStatus status );
+    boolean isIdle(IdleStatus status);
 
     /**
      * Returns the number of the fired continuous <tt>sessionIdle</tt> events
@@ -332,11 +332,11 @@ public interface IoSession {
      * <tt>2</tt> and so on if <tt>sessionIdle</tt> event is fired again without
      * any I/O between two (or more) <tt>sessionIdle</tt> events.
      */
-    int getIdleCount( IdleStatus status );
+    int getIdleCount(IdleStatus status);
 
     /**
      * Returns the time in millis when the last <tt>sessionIdle</tt> event
      * is fired for the specified {@link IdleStatus}.
      */
-    long getLastIdleTime( IdleStatus status );
+    long getLastIdleTime(IdleStatus status);
 }

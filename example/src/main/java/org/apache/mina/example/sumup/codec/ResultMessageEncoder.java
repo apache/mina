@@ -35,43 +35,35 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ResultMessageEncoder extends AbstractMessageEncoder
-{
+public class ResultMessageEncoder extends AbstractMessageEncoder {
     private static final Set<Class<?>> TYPES;
-    
-    static
-    {
+
+    static {
         Set<Class<?>> types = new HashSet<Class<?>>();
-        types.add( ResultMessage.class );
-        TYPES = Collections.unmodifiableSet( types );
+        types.add(ResultMessage.class);
+        TYPES = Collections.unmodifiableSet(types);
     }
 
-    public ResultMessageEncoder()
-    {
-        super( Constants.RESULT );
+    public ResultMessageEncoder() {
+        super(Constants.RESULT);
     }
 
-    protected void encodeBody( IoSession session, AbstractMessage message, ByteBuffer out )
-    {
-        ResultMessage m = ( ResultMessage ) message;
-        if( m.isOk() )
-        {
-            out.putShort( ( short ) Constants.RESULT_OK );
-            out.putInt( m.getValue() );
-        }
-        else
-        {
-            out.putShort( ( short ) Constants.RESULT_ERROR );
+    protected void encodeBody(IoSession session, AbstractMessage message,
+            ByteBuffer out) {
+        ResultMessage m = (ResultMessage) message;
+        if (m.isOk()) {
+            out.putShort((short) Constants.RESULT_OK);
+            out.putInt(m.getValue());
+        } else {
+            out.putShort((short) Constants.RESULT_ERROR);
         }
     }
 
-    public Set<Class<?>> getMessageTypes()
-    {
+    public Set<Class<?>> getMessageTypes() {
         return TYPES;
     }
 
-    public void dispose() throws Exception
-    {
+    public void dispose() throws Exception {
     }
 
 }

@@ -45,29 +45,25 @@ import org.springframework.util.Assert;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean
-{
-    private IoFilterMapping[] filterMappings = new IoFilterMapping[ 0 ];
+public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean {
+    private IoFilterMapping[] filterMappings = new IoFilterMapping[0];
+
     private String prefix = "filter";
 
-    protected Object createInstance() throws Exception
-    {
+    protected Object createInstance() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
-        for( int i = 0; i < filterMappings.length; i++ )
-        {
-            String name = filterMappings[ i ].getName();
-            if( name == null )
-            {
+        for (int i = 0; i < filterMappings.length; i++) {
+            String name = filterMappings[i].getName();
+            if (name == null) {
                 name = prefix + i;
             }
-            builder.addLast( name, filterMappings[ i ].getFilter() );
+            builder.addLast(name, filterMappings[i].getFilter());
         }
-        
+
         return builder;
     }
 
-    public Class getObjectType()
-    {
+    public Class getObjectType() {
         return DefaultIoFilterChainBuilder.class;
     }
 
@@ -80,9 +76,8 @@ public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean
      * @throws IllegalArgumentException if the specified value is 
      *         <code>null</code>.
      */
-    public void setFilterNamePrefix( String prefix )
-    {
-        Assert.notNull( prefix, "Property 'filterNamePrefix' may not be null" );
+    public void setFilterNamePrefix(String prefix) {
+        Assert.notNull(prefix, "Property 'filterNamePrefix' may not be null");
         this.prefix = prefix;
     }
 
@@ -100,32 +95,26 @@ public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean
      *         <code>null</code> or contains objects of the wrong type.
      * @see #setFilterNamePrefix(String)
      */
-    public void setFilters( List filters )
-    {
-        Assert.notNull( filters, "Property 'filters' may not be null" );
-        IoFilterMapping[] filterMappings = new IoFilterMapping[ filters.size() ];
+    public void setFilters(List filters) {
+        Assert.notNull(filters, "Property 'filters' may not be null");
+        IoFilterMapping[] filterMappings = new IoFilterMapping[filters.size()];
 
-        for( int i = 0; i < filterMappings.length; i++ )
-        {
-            Object o = filters.get( i );
-            if( o instanceof IoFilterMapping )
-            {
-                filterMappings[ i ] = ( IoFilterMapping ) o;
-            }
-            else if( o instanceof IoFilter )
-            {
-                filterMappings[ i ] = new IoFilterMapping();
-                filterMappings[ i ].setFilter( ( IoFilter ) o );
-            }
-            else
-            {
-                throw new IllegalArgumentException( "List may only contain "
-                        + "IoFilter or IoFilterMapping objects. Found object of "
-                        + "type " + o.getClass().getName() 
-                        + " at position " + i + "." );
+        for (int i = 0; i < filterMappings.length; i++) {
+            Object o = filters.get(i);
+            if (o instanceof IoFilterMapping) {
+                filterMappings[i] = (IoFilterMapping) o;
+            } else if (o instanceof IoFilter) {
+                filterMappings[i] = new IoFilterMapping();
+                filterMappings[i].setFilter((IoFilter) o);
+            } else {
+                throw new IllegalArgumentException(
+                        "List may only contain "
+                                + "IoFilter or IoFilterMapping objects. Found object of "
+                                + "type " + o.getClass().getName()
+                                + " at position " + i + ".");
             }
         }
-        
+
         this.filterMappings = filterMappings;
     }
 

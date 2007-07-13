@@ -32,43 +32,36 @@ import org.apache.mina.common.IoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SynchronizedProtocolEncoder implements ProtocolEncoder
-{
+public class SynchronizedProtocolEncoder implements ProtocolEncoder {
     private final ProtocolEncoder encoder;
 
     /**
      * Creates a new instance which decorates the specified <tt>encoder</tt>.
      */
-    public SynchronizedProtocolEncoder( ProtocolEncoder encoder )
-    {
-        if( encoder == null )
-        {
-            throw new NullPointerException( "encoder" );
+    public SynchronizedProtocolEncoder(ProtocolEncoder encoder) {
+        if (encoder == null) {
+            throw new NullPointerException("encoder");
         }
         this.encoder = encoder;
     }
-    
+
     /**
      * Returns the encoder this encoder is decorating.
      */
-    public ProtocolEncoder getEncoder()
-    {
+    public ProtocolEncoder getEncoder() {
         return encoder;
     }
 
-    public void encode( IoSession session, Object message, ProtocolEncoderOutput out ) throws Exception
-    {
-        synchronized( encoder )
-        {
-            encoder.encode( session, message, out );
+    public void encode(IoSession session, Object message,
+            ProtocolEncoderOutput out) throws Exception {
+        synchronized (encoder) {
+            encoder.encode(session, message, out);
         }
     }
 
-    public void dispose( IoSession session ) throws Exception
-    {
-        synchronized( encoder )
-        {
-            encoder.dispose( session );
+    public void dispose(IoSession session) throws Exception {
+        synchronized (encoder) {
+            encoder.dispose(session);
         }
     }
 }

@@ -41,18 +41,13 @@ import java.net.UnknownHostException;
  * 
  * @see java.net.InetAddress
  */
-public class InetAddressEditor extends PropertyEditorSupport
-{
-    public void setAsText( String text ) throws IllegalArgumentException
-    {
-        try
-        {
-            setValue( InetAddress.getByName( text ) );
-        }
-        catch( UnknownHostException uhe )
-        {
+public class InetAddressEditor extends PropertyEditorSupport {
+    public void setAsText(String text) throws IllegalArgumentException {
+        try {
+            setValue(InetAddress.getByName(text));
+        } catch (UnknownHostException uhe) {
             IllegalArgumentException iae = new IllegalArgumentException();
-            iae.initCause( uhe );
+            iae.initCause(uhe);
         }
     }
 }

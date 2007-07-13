@@ -39,201 +39,187 @@ import org.apache.mina.util.AvailablePortFinder;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractTrafficControlTest extends TestCase
-{
+public abstract class AbstractTrafficControlTest extends TestCase {
     protected int port = 0;
+
     protected IoAcceptor acceptor;
+
     protected TransportType transportType;
-    
-    public AbstractTrafficControlTest( IoAcceptor acceptor )
-    {
+
+    public AbstractTrafficControlTest(IoAcceptor acceptor) {
         this.acceptor = acceptor;
     }
 
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
-        
+
         port = AvailablePortFinder.getNextAvailable();
-        
-        acceptor.bind( createServerSocketAddress( port ), 
-                       new ServerIoHandler() );
-        
+
+        acceptor.bind(createServerSocketAddress(port), new ServerIoHandler());
+
     }
 
-    protected void tearDown() throws Exception
-    {
+    protected void tearDown() throws Exception {
         super.tearDown();
-        
-        acceptor.unbind( createServerSocketAddress( port ) );
+
+        acceptor.unbind(createServerSocketAddress(port));
     }
 
-    protected abstract ConnectFuture connect( int port, IoHandler handler) throws Exception;
-    protected abstract SocketAddress createServerSocketAddress( int port );
-    
-    public void testSuspendResumeReadWrite() throws Exception
-    {
-        ConnectFuture future = connect( port, new ClientIoHandler() );
+    protected abstract ConnectFuture connect(int port, IoHandler handler)
+            throws Exception;
+
+    protected abstract SocketAddress createServerSocketAddress(int port);
+
+    public void testSuspendResumeReadWrite() throws Exception {
+        ConnectFuture future = connect(port, new ClientIoHandler());
         future.join();
         IoSession session = future.getSession();
-        
+
         // We wait for the sessionCreated() event is fired becayse we cannot guarentee that
         // it is invoked already.
-        while( session.getAttribute( "lock" ) == null )
-        {
+        while (session.getAttribute("lock") == null) {
             Thread.yield();
         }
-        
-        Object lock = session.getAttribute( "lock" );
-        synchronized( lock )
-        {
-        
-            write( session, "1" );
-            assertEquals( '1', read( session ) );
-            assertEquals( "1", getReceived( session ) );
-            assertEquals( "1", getSent( session ) );
-            
+
+        Object lock = session.getAttribute("lock");
+        synchronized (lock) {
+
+            write(session, "1");
+            assertEquals('1', read(session));
+            assertEquals("1", getReceived(session));
+            assertEquals("1", getSent(session));
+
             session.suspendRead();
-            
-            write( session, "2" );
-            assertFalse( canRead( session ) );
-            assertEquals( "1", getReceived( session ) );
-            assertEquals( "12", getSent( session ) );
-            
+
+            write(session, "2");
+            assertFalse(canRead(session));
+            assertEquals("1", getReceived(session));
+            assertEquals("12", getSent(session));
+
             session.suspendWrite();
-            
-            write( session, "3" );
-            assertFalse( canRead( session ) );
-            assertEquals( "1", getReceived( session ) );
-            assertEquals( "12", getSent( session ) );
-            
+
+            write(session, "3");
+            assertFalse(canRead(session));
+            assertEquals("1", getReceived(session));
+            assertEquals("12", getSent(session));
+
             session.resumeRead();
-            
-            write( session, "4" );
-            assertEquals( '2', read( session ) );
-            assertEquals( "12", getReceived( session ) );
-            assertEquals( "12", getSent( session ) );
-            
+
+            write(session, "4");
+            assertEquals('2', read(session));
+            assertEquals("12", getReceived(session));
+            assertEquals("12", getSent(session));
+
             session.resumeWrite();
-            assertEquals( '3', read( session ) );
-            assertEquals( '4', read( session ) );
-            
-            write( session, "5" );
-            assertEquals( '5', read( session ) );
-            assertEquals( "12345", getReceived( session ) );
-            assertEquals( "12345", getSent( session ) );
-            
+            assertEquals('3', read(session));
+            assertEquals('4', read(session));
+
+            write(session, "5");
+            assertEquals('5', read(session));
+            assertEquals("12345", getReceived(session));
+            assertEquals("12345", getSent(session));
+
             session.suspendWrite();
-            
-            write( session, "6" );
-            assertFalse( canRead( session ) );
-            assertEquals( "12345", getReceived( session ) );
-            assertEquals( "12345", getSent( session ) );
-            
+
+            write(session, "6");
+            assertFalse(canRead(session));
+            assertEquals("12345", getReceived(session));
+            assertEquals("12345", getSent(session));
+
             session.suspendRead();
             session.resumeWrite();
-            
-            write( session, "7" );
-            assertFalse( canRead( session ) );
-            assertEquals( "12345", getReceived( session ) );
-            assertEquals( "1234567", getSent( session ) );
-            
+
+            write(session, "7");
+            assertFalse(canRead(session));
+            assertEquals("12345", getReceived(session));
+            assertEquals("1234567", getSent(session));
+
             session.resumeRead();
-            assertEquals( '6', read( session ) );
-            assertEquals( '7', read( session ) );
-            
-            assertEquals( "1234567", getReceived( session ) );
-            assertEquals( "1234567", getSent( session ) );
-        
+            assertEquals('6', read(session));
+            assertEquals('7', read(session));
+
+            assertEquals("1234567", getReceived(session));
+            assertEquals("1234567", getSent(session));
+
         }
-            
+
         session.close().join();
     }
 
-    private void write( IoSession session, String s ) throws Exception
-    {
-        session.write( ByteBuffer.wrap( s.getBytes( "ASCII" ) ) );
+    private void write(IoSession session, String s) throws Exception {
+        session.write(ByteBuffer.wrap(s.getBytes("ASCII")));
     }
 
-    private int read( IoSession session ) throws Exception
-    {
-        int pos = ( ( Integer) session.getAttribute( "pos" ) ).intValue();
-        for( int i = 0; i < 10 && pos == getReceived( session ).length(); i++ )
-        {
-            Object lock = session.getAttribute( "lock" );
-            lock.wait( 200 );
+    private int read(IoSession session) throws Exception {
+        int pos = ((Integer) session.getAttribute("pos")).intValue();
+        for (int i = 0; i < 10 && pos == getReceived(session).length(); i++) {
+            Object lock = session.getAttribute("lock");
+            lock.wait(200);
         }
-        session.setAttribute( "pos", new Integer( pos + 1 ) );
-        return getReceived( session ).charAt( pos );
+        session.setAttribute("pos", new Integer(pos + 1));
+        return getReceived(session).charAt(pos);
     }
-    
-    private boolean canRead( IoSession session ) throws Exception
-    {
-        int pos = ( ( Integer) session.getAttribute( "pos" ) ).intValue();
-        Object lock = session.getAttribute( "lock" );
-        lock.wait( 250 );
-        String received = getReceived( session );
+
+    private boolean canRead(IoSession session) throws Exception {
+        int pos = ((Integer) session.getAttribute("pos")).intValue();
+        Object lock = session.getAttribute("lock");
+        lock.wait(250);
+        String received = getReceived(session);
         return pos < received.length();
     }
-    
-    private String getReceived( IoSession session ) throws Exception
-    {
-        return session.getAttribute( "received" ).toString();
+
+    private String getReceived(IoSession session) throws Exception {
+        return session.getAttribute("received").toString();
     }
-    
-    private String getSent( IoSession session ) throws Exception
-    {
-        return session.getAttribute( "sent" ).toString();
+
+    private String getSent(IoSession session) throws Exception {
+        return session.getAttribute("sent").toString();
     }
-    
-    public static class ClientIoHandler extends IoHandlerAdapter
-    {
-        public void sessionCreated( IoSession session ) throws Exception
-        {
-            super.sessionCreated( session );
-            session.setAttribute( "pos", new Integer( 0 ) );
-            session.setAttribute( "received", new StringBuffer() );
-            session.setAttribute( "sent", new StringBuffer() );
-            session.setAttribute( "lock", new Object() );
+
+    public static class ClientIoHandler extends IoHandlerAdapter {
+        public void sessionCreated(IoSession session) throws Exception {
+            super.sessionCreated(session);
+            session.setAttribute("pos", new Integer(0));
+            session.setAttribute("received", new StringBuffer());
+            session.setAttribute("sent", new StringBuffer());
+            session.setAttribute("lock", new Object());
         }
 
-        public void messageReceived( IoSession session, Object message ) throws Exception
-        {
-            ByteBuffer buffer = ( ByteBuffer ) message;
-            byte[] data = new byte[ buffer.remaining() ];
-            buffer.get( data );
-            Object lock = session.getAttribute( "lock" );
-            synchronized ( lock )
-            {
-                StringBuffer sb = ( StringBuffer ) session.getAttribute( "received" );
-                sb.append( new String( data, "ASCII" ) );
+        public void messageReceived(IoSession session, Object message)
+                throws Exception {
+            ByteBuffer buffer = (ByteBuffer) message;
+            byte[] data = new byte[buffer.remaining()];
+            buffer.get(data);
+            Object lock = session.getAttribute("lock");
+            synchronized (lock) {
+                StringBuffer sb = (StringBuffer) session
+                        .getAttribute("received");
+                sb.append(new String(data, "ASCII"));
                 lock.notifyAll();
             }
         }
 
-        public void messageSent( IoSession session, Object message ) throws Exception
-        {
-            ByteBuffer buffer = ( ByteBuffer ) message;
+        public void messageSent(IoSession session, Object message)
+                throws Exception {
+            ByteBuffer buffer = (ByteBuffer) message;
             buffer.rewind();
-            byte[] data = new byte[ buffer.remaining() ];
-            buffer.get( data );
-            StringBuffer sb = ( StringBuffer ) session.getAttribute( "sent" );
-            sb.append( new String( data, "ASCII" ) );
+            byte[] data = new byte[buffer.remaining()];
+            buffer.get(data);
+            StringBuffer sb = (StringBuffer) session.getAttribute("sent");
+            sb.append(new String(data, "ASCII"));
         }
-        
+
     }
-    
-    private static class ServerIoHandler extends IoHandlerAdapter
-    {
-        public void messageReceived( IoSession session, Object message )
-                throws Exception
-        {
+
+    private static class ServerIoHandler extends IoHandlerAdapter {
+        public void messageReceived(IoSession session, Object message)
+                throws Exception {
             // Just echo the received bytes.
-            ByteBuffer rb = ( ByteBuffer ) message;
-            ByteBuffer wb = ByteBuffer.allocate( rb.remaining() );
-            wb.put( rb );
+            ByteBuffer rb = (ByteBuffer) message;
+            ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+            wb.put(rb);
             wb.flip();
-            session.write( wb );                
-        }    
-    }    
+            session.write(wb);
+        }
+    }
 }

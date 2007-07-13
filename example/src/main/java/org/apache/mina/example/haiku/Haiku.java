@@ -27,10 +27,10 @@ import java.util.Arrays;
 public class Haiku {
     private final String[] phrases;
 
-    public Haiku( String... lines ) {
+    public Haiku(String... lines) {
         this.phrases = lines;
-        if( null == lines || lines.length != 3 ) {
-            throw new IllegalArgumentException( "Must pass in 3 phrases of text");
+        if (null == lines || lines.length != 3) {
+            throw new IllegalArgumentException("Must pass in 3 phrases of text");
         }
     }
 
@@ -39,22 +39,24 @@ public class Haiku {
     }
 
     @Override
-    public boolean equals( Object o ) {
-        if ( this == o ) return true;
-        if ( o == null || getClass() != o.getClass() ) return false;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         Haiku haiku = (Haiku) o;
 
-        return Arrays.equals( phrases, haiku.phrases );
+        return Arrays.equals(phrases, haiku.phrases);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode( phrases );
+        return Arrays.hashCode(phrases);
     }
 
     @Override
     public String toString() {
-        return Arrays.toString( phrases );
+        return Arrays.toString(phrases);
     }
 }

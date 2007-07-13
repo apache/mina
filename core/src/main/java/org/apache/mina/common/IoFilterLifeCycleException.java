@@ -27,26 +27,21 @@ package org.apache.mina.common;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoFilterLifeCycleException extends RuntimeException
-{
+public class IoFilterLifeCycleException extends RuntimeException {
     private static final long serialVersionUID = -5542098881633506449L;
 
-    public IoFilterLifeCycleException()
-    {
+    public IoFilterLifeCycleException() {
     }
 
-    public IoFilterLifeCycleException( String message )
-    {
-        super( message );
+    public IoFilterLifeCycleException(String message) {
+        super(message);
     }
 
-    public IoFilterLifeCycleException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public IoFilterLifeCycleException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public IoFilterLifeCycleException( Throwable cause )
-    {
-        super( cause );
+    public IoFilterLifeCycleException(Throwable cause) {
+        super(cause);
     }
 }

@@ -32,90 +32,75 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class SimpleProtocolEncoderOutput implements ProtocolEncoderOutput
-{
+public abstract class SimpleProtocolEncoderOutput implements
+        ProtocolEncoderOutput {
     private final Queue<ByteBuffer> bufferQueue = new LinkedList<ByteBuffer>();
 
-    public SimpleProtocolEncoderOutput()
-    {
+    public SimpleProtocolEncoderOutput() {
     }
 
-    public Queue<ByteBuffer> getBufferQueue()
-    {
+    public Queue<ByteBuffer> getBufferQueue() {
         return bufferQueue;
     }
 
-    public void write( ByteBuffer buf )
-    {
-        bufferQueue.add( buf );
+    public void write(ByteBuffer buf) {
+        bufferQueue.add(buf);
     }
 
-    public void mergeAll()
-    {
+    public void mergeAll() {
         int sum = 0;
         final int size = bufferQueue.size();
-        
-        if( size < 2 )
-        {
+
+        if (size < 2) {
             // no need to merge!
             return;
         }
-        
+
         // Get the size of merged BB
-        for( Object o: bufferQueue )
-        {
-            sum += ( ( ByteBuffer ) o ).remaining();
+        for (Object o : bufferQueue) {
+            sum += ((ByteBuffer) o).remaining();
         }
-        
+
         // Allocate a new BB that will contain all fragments
-        ByteBuffer newBuf = ByteBuffer.allocate( sum );
-        
+        ByteBuffer newBuf = ByteBuffer.allocate(sum);
+
         // and merge all.
-        for( ;; )
-        {
+        for (;;) {
             ByteBuffer buf = bufferQueue.poll();
-            if( buf == null )
-            {
+            if (buf == null) {
                 break;
             }
-    
-            newBuf.put( buf );
+
+            newBuf.put(buf);
             buf.release();
         }
-        
+
         // Push the new buffer finally.
         newBuf.flip();
         bufferQueue.offer(newBuf);
     }
 
-    public WriteFuture flush()
-    {
+    public WriteFuture flush() {
         Queue<ByteBuffer> bufferQueue = this.bufferQueue;
         WriteFuture future = null;
-        if( bufferQueue.isEmpty() )
-        {
+        if (bufferQueue.isEmpty()) {
             return null;
-        }
-        else
-        {
-            for( ;; )
-            {
+        } else {
+            for (;;) {
                 ByteBuffer buf = bufferQueue.poll();
-                if( buf == null )
-                {
+                if (buf == null) {
                     break;
                 }
-                
+
                 // Flush only when the buffer has remaining.
-                if( buf.hasRemaining() )
-                {
-                    future = doFlush( buf );
+                if (buf.hasRemaining()) {
+                    future = doFlush(buf);
                 }
             }
         }
-        
+
         return future;
     }
 
-    protected abstract WriteFuture doFlush( ByteBuffer buf );
+    protected abstract WriteFuture doFlush(ByteBuffer buf);
 }

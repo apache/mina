@@ -43,118 +43,98 @@ public class SessionLog {
      * Session attribute key: {@link Logger}
      */
     public static final String LOGGER = SessionLog.class.getName() + ".logger";
-    
-    private static Class getClass( IoSession session )
-    {
+
+    private static Class getClass(IoSession session) {
         return session.getHandler().getClass();
     }
 
-    public static void debug( IoSession session, String message )
-    {
-        Logger log = getLogger( session );
-        if( log.isDebugEnabled() )
-        {
-            log.debug( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+    public static void debug(IoSession session, String message) {
+        Logger log = getLogger(session);
+        if (log.isDebugEnabled()) {
+            log.debug(String.valueOf(session.getAttribute(PREFIX)) + message);
         }
     }
 
-    public static void debug( IoSession session, String message, Throwable cause )
-    {
-        Logger log = getLogger( session );
-        if( log.isDebugEnabled() )
-        {
-            log.debug( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+    public static void debug(IoSession session, String message, Throwable cause) {
+        Logger log = getLogger(session);
+        if (log.isDebugEnabled()) {
+            log.debug(String.valueOf(session.getAttribute(PREFIX)) + message,
+                    cause);
         }
     }
 
-    public static void info( IoSession session, String message )
-    {
-        Logger log = getLogger( session );
-        if( log.isInfoEnabled() )
-        {
-            log.info( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+    public static void info(IoSession session, String message) {
+        Logger log = getLogger(session);
+        if (log.isInfoEnabled()) {
+            log.info(String.valueOf(session.getAttribute(PREFIX)) + message);
         }
     }
 
-    public static void info( IoSession session, String message, Throwable cause )
-    {
-        Logger log = getLogger( session );
-        if( log.isInfoEnabled() )
-        {
-            log.info( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+    public static void info(IoSession session, String message, Throwable cause) {
+        Logger log = getLogger(session);
+        if (log.isInfoEnabled()) {
+            log.info(String.valueOf(session.getAttribute(PREFIX)) + message,
+                    cause);
         }
     }
 
-    public static void warn( IoSession session, String message )
-    {
-        Logger log = getLogger( session );
-        if( log.isWarnEnabled() )
-        {
-            log.warn( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+    public static void warn(IoSession session, String message) {
+        Logger log = getLogger(session);
+        if (log.isWarnEnabled()) {
+            log.warn(String.valueOf(session.getAttribute(PREFIX)) + message);
         }
     }
 
-    public static void warn( IoSession session, String message, Throwable cause )
-    {
-        Logger log = getLogger( session );
-        if( log.isWarnEnabled() )
-        {
-            log.warn( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+    public static void warn(IoSession session, String message, Throwable cause) {
+        Logger log = getLogger(session);
+        if (log.isWarnEnabled()) {
+            log.warn(String.valueOf(session.getAttribute(PREFIX)) + message,
+                    cause);
         }
     }
 
-    public static void error( IoSession session, String message )
-    {
-        Logger log = getLogger( session );
-        if( log.isErrorEnabled() )
-        {
-            log.error( String.valueOf( session.getAttribute( PREFIX ) ) + message );
+    public static void error(IoSession session, String message) {
+        Logger log = getLogger(session);
+        if (log.isErrorEnabled()) {
+            log.error(String.valueOf(session.getAttribute(PREFIX)) + message);
         }
     }
 
-    public static void error( IoSession session, String message, Throwable cause )
-    {
-        Logger log = getLogger( session );
-        if( log.isErrorEnabled() )
-        {
-            log.error( String.valueOf( session.getAttribute( PREFIX ) ) + message, cause );
+    public static void error(IoSession session, String message, Throwable cause) {
+        Logger log = getLogger(session);
+        if (log.isErrorEnabled()) {
+            log.error(String.valueOf(session.getAttribute(PREFIX)) + message,
+                    cause);
         }
     }
-    
-    public static boolean isDebugEnabled( IoSession session )
-    {
-        return getLogger( session ).isDebugEnabled();
-    }
-    
-    public static boolean isInfoEnabled( IoSession session )
-    {
-        return getLogger( session ).isInfoEnabled();
-    }
-    
-    public static boolean isWarnEnabled( IoSession session )
-    {
-        return getLogger( session ).isWarnEnabled();
-    }
-    
-    public static boolean isErrorEnabled( IoSession session )
-    {
-        return getLogger( session ).isErrorEnabled();
+
+    public static boolean isDebugEnabled(IoSession session) {
+        return getLogger(session).isDebugEnabled();
     }
 
-    private static Logger getLogger( IoSession session )
-    {
-        Logger log = ( Logger ) session.getAttribute( LOGGER );
-        if( log == null )
-        {
-            log = LoggerFactory.getLogger( getClass( session ) );
-            String prefix = ( String ) session.getAttribute( PREFIX );
-            if( prefix == null )
-            {
+    public static boolean isInfoEnabled(IoSession session) {
+        return getLogger(session).isInfoEnabled();
+    }
+
+    public static boolean isWarnEnabled(IoSession session) {
+        return getLogger(session).isWarnEnabled();
+    }
+
+    public static boolean isErrorEnabled(IoSession session) {
+        return getLogger(session).isErrorEnabled();
+    }
+
+    private static Logger getLogger(IoSession session) {
+        Logger log = (Logger) session.getAttribute(LOGGER);
+        if (log == null) {
+            log = LoggerFactory.getLogger(getClass(session));
+            String prefix = (String) session.getAttribute(PREFIX);
+            if (prefix == null) {
                 prefix = "[" + session.getRemoteAddress() + "] ";
-                session.setAttribute( PREFIX, prefix );
+                session.setAttribute(PREFIX, prefix);
             }
 
-            session.setAttribute( LOGGER, log );
+            session.setAttribute(LOGGER, log);
         }
 
         return log;

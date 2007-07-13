@@ -25,28 +25,23 @@ package org.apache.mina.example.sumup.message;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class AddMessage extends AbstractMessage
-{
+public class AddMessage extends AbstractMessage {
     private static final long serialVersionUID = -940833727168119141L;
 
     private int value;
 
-    public AddMessage()
-    {
+    public AddMessage() {
     }
 
-    public int getValue()
-    {
+    public int getValue() {
         return value;
     }
 
-    public void setValue( int value )
-    {
+    public void setValue(int value) {
         this.value = value;
     }
 
-    public String toString()
-    {
+    public String toString() {
         // it is a good practice to create toString() method on message classes.
         return getSequence() + ":ADD(" + value + ')';
     }

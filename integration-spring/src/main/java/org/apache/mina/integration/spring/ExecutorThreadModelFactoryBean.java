@@ -34,9 +34,10 @@ import java.util.concurrent.Executor;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ExecutorThreadModelFactoryBean implements FactoryBean, InitializingBean
-{
+public class ExecutorThreadModelFactoryBean implements FactoryBean,
+        InitializingBean {
     private String serviceName = null;
+
     private Executor executor = null;
 
     /**
@@ -48,9 +49,8 @@ public class ExecutorThreadModelFactoryBean implements FactoryBean, Initializing
      * @throws IllegalArgumentException if the specified value is
      *         <code>null</code>.
      */
-    public void setExecutor( Executor executor )
-    {
-        Assert.notNull( executor, "Property 'executor' may not be null" );
+    public void setExecutor(Executor executor) {
+        Assert.notNull(executor, "Property 'executor' may not be null");
         this.executor = executor;
     }
 
@@ -63,35 +63,30 @@ public class ExecutorThreadModelFactoryBean implements FactoryBean, Initializing
      * @throws IllegalArgumentException if the specified value is
      *         <code>null</code>.
      */
-    public void setServiceName( String serviceName )
-    {
-        Assert.notNull( serviceName, "Property 'serviceName' may not be null" );
+    public void setServiceName(String serviceName) {
+        Assert.notNull(serviceName, "Property 'serviceName' may not be null");
         this.serviceName = serviceName;
     }
 
-    public Class getObjectType()
-    {
+    public Class getObjectType() {
         return ExecutorThreadModel.class;
     }
 
-    public Object getObject() throws Exception
-    {
-        ExecutorThreadModel model = ExecutorThreadModel.getInstance( serviceName );
-        if( executor != null )
-        {
-            model.setExecutor( executor );
+    public Object getObject() throws Exception {
+        ExecutorThreadModel model = ExecutorThreadModel
+                .getInstance(serviceName);
+        if (executor != null) {
+            model.setExecutor(executor);
         }
         return model;
     }
 
-    public boolean isSingleton()
-    {
+    public boolean isSingleton() {
         return true;
     }
 
-    public void afterPropertiesSet() throws Exception
-    {
-        Assert.notNull( serviceName, "Property 'serviceName' may not be null" );
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(serviceName, "Property 'serviceName' may not be null");
     }
 
 }

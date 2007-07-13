@@ -40,80 +40,81 @@ import org.apache.mina.common.IoFilter.WriteRequest;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoSession implements IoSession
-{
+public abstract class BaseIoSession implements IoSession {
     private final Object lock = new Object();
-    private final Map<String,Object> attributes =
-        Collections.synchronizedMap(new HashMap<String, Object>(8));
+
+    private final Map<String, Object> attributes = Collections
+            .synchronizedMap(new HashMap<String, Object>(8));
+
     private final long creationTime;
 
     /**
      * A future that will be set 'closed' when the connection is closed.
      */
-    private final CloseFuture closeFuture = new DefaultCloseFuture( this );
+    private final CloseFuture closeFuture = new DefaultCloseFuture(this);
+
     private boolean closing;
 
     // Configuration variables
     private int idleTimeForRead;
+
     private int idleTimeForWrite;
+
     private int idleTimeForBoth;
+
     private int writeTimeout;
+
     private TrafficMask trafficMask = TrafficMask.ALL;
 
     // Status variables
     private long readBytes;
+
     private long writtenBytes;
 
     private long readMessages;
+
     private long writtenMessages;
 
     private long lastReadTime;
+
     private long lastWriteTime;
 
     private int idleCountForBoth;
+
     private int idleCountForRead;
+
     private int idleCountForWrite;
 
     private long lastIdleTimeForBoth;
+
     private long lastIdleTimeForRead;
+
     private long lastIdleTimeForWrite;
 
-
-    protected BaseIoSession()
-    {
-        creationTime = lastReadTime = lastWriteTime =
-            lastIdleTimeForBoth = lastIdleTimeForRead = lastIdleTimeForWrite =
-                System.currentTimeMillis();
+    protected BaseIoSession() {
+        creationTime = lastReadTime = lastWriteTime = lastIdleTimeForBoth = lastIdleTimeForRead = lastIdleTimeForWrite = System
+                .currentTimeMillis();
     }
 
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return !closeFuture.isClosed();
     }
 
-    public boolean isClosing()
-    {
-        synchronized( lock )
-        {
+    public boolean isClosing() {
+        synchronized (lock) {
             return closing || closeFuture.isClosed();
         }
     }
 
-    public CloseFuture getCloseFuture()
-    {
+    public CloseFuture getCloseFuture() {
         return closeFuture;
     }
 
-    public CloseFuture close()
-    {
-        synchronized( lock )
-        {
-            if( isClosing() )
-            {
+    public CloseFuture close() {
+        synchronized (lock) {
+            if (isClosing()) {
                 return closeFuture;
-            }
-            else
-            {
+            } else {
                 closing = true;
             }
         }
@@ -127,28 +128,23 @@ public abstract class BaseIoSession implements IoSession
      * By default, this method is implemented to set the future to
      * 'closed' immediately.
      */
-    protected void close0()
-    {
+    protected void close0() {
         closeFuture.setClosed();
     }
 
-    public WriteFuture write( Object message )
-    {
-        return write( message, null );
+    public WriteFuture write(Object message) {
+        return write(message, null);
     }
 
-    public WriteFuture write( Object message, SocketAddress remoteAddress )
-    {
-        synchronized( lock )
-        {
-            if( isClosing() || !isConnected() )
-            {
-                return DefaultWriteFuture.newNotWrittenFuture( this );
+    public WriteFuture write(Object message, SocketAddress remoteAddress) {
+        synchronized (lock) {
+            if (isClosing() || !isConnected()) {
+                return DefaultWriteFuture.newNotWrittenFuture(this);
             }
         }
 
-        WriteFuture future = new DefaultWriteFuture( this );
-        write0( new WriteRequest( message, future, remoteAddress ) );
+        WriteFuture future = new DefaultWriteFuture(this);
+        write0(new WriteRequest(message, future, remoteAddress));
 
         return future;
     }
@@ -160,129 +156,104 @@ public abstract class BaseIoSession implements IoSession
      * By default, this method is implemented to set the future to
      * 'not written' immediately.
      */
-    protected void write0( WriteRequest writeRequest )
-    {
-        writeRequest.getFuture().setWritten( false );
+    protected void write0(WriteRequest writeRequest) {
+        writeRequest.getFuture().setWritten(false);
     }
 
-
-    public Object getAttachment()
-    {
-        return getAttribute( "" );
+    public Object getAttachment() {
+        return getAttribute("");
     }
 
-    public Object setAttachment( Object attachment )
-    {
-        return setAttribute( "", attachment );
+    public Object setAttachment(Object attachment) {
+        return setAttribute("", attachment);
     }
 
-    public Object getAttribute( String key )
-    {
-        return attributes.get( key );
+    public Object getAttribute(String key) {
+        return attributes.get(key);
     }
 
-    public Object setAttribute( String key, Object value )
-    {
-        if( value == null )
-        {
-            return removeAttribute( key );
-        }
-        else
-        {
-            return attributes.put( key, value );
+    public Object setAttribute(String key, Object value) {
+        if (value == null) {
+            return removeAttribute(key);
+        } else {
+            return attributes.put(key, value);
         }
     }
 
-    public Object setAttribute( String key )
-    {
-        return setAttribute( key, Boolean.TRUE );
+    public Object setAttribute(String key) {
+        return setAttribute(key, Boolean.TRUE);
     }
 
-    public Object removeAttribute( String key )
-    {
-        return attributes.remove( key );
+    public Object removeAttribute(String key) {
+        return attributes.remove(key);
     }
 
-    public boolean containsAttribute( String key )
-    {
-        return getAttribute( key ) != null;
+    public boolean containsAttribute(String key) {
+        return getAttribute(key) != null;
     }
 
-    public Set<String> getAttributeKeys()
-    {
+    public Set<String> getAttributeKeys() {
         synchronized (attributes) {
-            return new HashSet<String>( attributes.keySet() );
+            return new HashSet<String>(attributes.keySet());
         }
     }
 
-    public int getIdleTime( IdleStatus status )
-    {
-        if( status == IdleStatus.BOTH_IDLE )
+    public int getIdleTime(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE)
             return idleTimeForBoth;
 
-        if( status == IdleStatus.READER_IDLE )
+        if (status == IdleStatus.READER_IDLE)
             return idleTimeForRead;
 
-        if( status == IdleStatus.WRITER_IDLE )
+        if (status == IdleStatus.WRITER_IDLE)
             return idleTimeForWrite;
 
-        throw new IllegalArgumentException( "Unknown idle status: " + status );
+        throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public long getIdleTimeInMillis( IdleStatus status )
-    {
-        return getIdleTime( status ) * 1000L;
+    public long getIdleTimeInMillis(IdleStatus status) {
+        return getIdleTime(status) * 1000L;
     }
 
-    public void setIdleTime( IdleStatus status, int idleTime )
-    {
-        if( idleTime < 0 )
-            throw new IllegalArgumentException( "Illegal idle time: "
-                                                + idleTime );
+    public void setIdleTime(IdleStatus status, int idleTime) {
+        if (idleTime < 0)
+            throw new IllegalArgumentException("Illegal idle time: " + idleTime);
 
-        if( status == IdleStatus.BOTH_IDLE )
+        if (status == IdleStatus.BOTH_IDLE)
             idleTimeForBoth = idleTime;
-        else if( status == IdleStatus.READER_IDLE )
+        else if (status == IdleStatus.READER_IDLE)
             idleTimeForRead = idleTime;
-        else if( status == IdleStatus.WRITER_IDLE )
+        else if (status == IdleStatus.WRITER_IDLE)
             idleTimeForWrite = idleTime;
         else
-            throw new IllegalArgumentException( "Unknown idle status: "
-                                                + status );
+            throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public int getWriteTimeout()
-    {
+    public int getWriteTimeout() {
         return writeTimeout;
     }
 
-    public long getWriteTimeoutInMillis()
-    {
+    public long getWriteTimeoutInMillis() {
         return writeTimeout * 1000L;
     }
 
-    public void setWriteTimeout( int writeTimeout )
-    {
-        if( writeTimeout < 0 )
-            throw new IllegalArgumentException( "Illegal write timeout: "
-                                                + writeTimeout );
+    public void setWriteTimeout(int writeTimeout) {
+        if (writeTimeout < 0)
+            throw new IllegalArgumentException("Illegal write timeout: "
+                    + writeTimeout);
         this.writeTimeout = writeTimeout;
     }
 
-    public TrafficMask getTrafficMask()
-    {
+    public TrafficMask getTrafficMask() {
         return trafficMask;
     }
 
-    public void setTrafficMask( TrafficMask trafficMask )
-    {
-        if( trafficMask == null )
-        {
-            throw new NullPointerException( "trafficMask" );
+    public void setTrafficMask(TrafficMask trafficMask) {
+        if (trafficMask == null) {
+            throw new NullPointerException("trafficMask");
         }
 
-        if( this.trafficMask == trafficMask )
-        {
+        if (this.trafficMask == trafficMask) {
             return;
         }
 
@@ -290,24 +261,20 @@ public abstract class BaseIoSession implements IoSession
         updateTrafficMask();
     }
 
-    public void suspendRead()
-    {
-        setTrafficMask( getTrafficMask().and( TrafficMask.READ.not() ) );
+    public void suspendRead() {
+        setTrafficMask(getTrafficMask().and(TrafficMask.READ.not()));
     }
 
-    public void suspendWrite()
-    {
-        setTrafficMask( getTrafficMask().and( TrafficMask.WRITE.not() ) );
+    public void suspendWrite() {
+        setTrafficMask(getTrafficMask().and(TrafficMask.WRITE.not()));
     }
 
-    public void resumeRead()
-    {
-        setTrafficMask( getTrafficMask().or( TrafficMask.READ ) );
+    public void resumeRead() {
+        setTrafficMask(getTrafficMask().or(TrafficMask.READ));
     }
 
-    public void resumeWrite()
-    {
-        setTrafficMask( getTrafficMask().or( TrafficMask.WRITE ) );
+    public void resumeWrite() {
+        setTrafficMask(getTrafficMask().or(TrafficMask.WRITE));
     }
 
     /**
@@ -316,148 +283,121 @@ public abstract class BaseIoSession implements IoSession
      */
     protected abstract void updateTrafficMask();
 
-    public long getReadBytes()
-    {
+    public long getReadBytes() {
         return readBytes;
     }
 
-    public long getWrittenBytes()
-    {
+    public long getWrittenBytes() {
         return writtenBytes;
     }
 
-    public long getWrittenWriteRequests()
-    {
+    public long getWrittenWriteRequests() {
         return writtenMessages;
     }
 
-    public long getReadMessages()
-    {
+    public long getReadMessages() {
         return readMessages;
     }
 
-    public long getWrittenMessages()
-    {
+    public long getWrittenMessages() {
         return writtenMessages;
     }
 
-    public void increaseReadBytes( int increment )
-    {
+    public void increaseReadBytes(int increment) {
         readBytes += increment;
         lastReadTime = System.currentTimeMillis();
         idleCountForBoth = 0;
         idleCountForRead = 0;
     }
 
-    public void increaseWrittenBytes( int increment )
-    {
+    public void increaseWrittenBytes(int increment) {
         writtenBytes += increment;
         lastWriteTime = System.currentTimeMillis();
         idleCountForBoth = 0;
         idleCountForWrite = 0;
     }
 
-    public void increaseReadMessages()
-    {
+    public void increaseReadMessages() {
         readMessages++;
     }
 
-    public void increaseWrittenMessages()
-    {
+    public void increaseWrittenMessages() {
         writtenMessages++;
     }
 
-    public long getCreationTime()
-    {
+    public long getCreationTime() {
         return creationTime;
     }
 
-    public long getLastIoTime()
-    {
-        return Math.max( lastReadTime, lastWriteTime );
+    public long getLastIoTime() {
+        return Math.max(lastReadTime, lastWriteTime);
     }
 
-    public long getLastReadTime()
-    {
+    public long getLastReadTime() {
         return lastReadTime;
     }
 
-    public long getLastWriteTime()
-    {
+    public long getLastWriteTime() {
         return lastWriteTime;
     }
 
-    public boolean isIdle( IdleStatus status )
-    {
-        if( status == IdleStatus.BOTH_IDLE )
+    public boolean isIdle(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE)
             return idleCountForBoth > 0;
 
-        if( status == IdleStatus.READER_IDLE )
+        if (status == IdleStatus.READER_IDLE)
             return idleCountForRead > 0;
 
-        if( status == IdleStatus.WRITER_IDLE )
+        if (status == IdleStatus.WRITER_IDLE)
             return idleCountForWrite > 0;
 
-        throw new IllegalArgumentException( "Unknown idle status: " + status );
+        throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public int getIdleCount( IdleStatus status )
-    {
-        if( status == IdleStatus.BOTH_IDLE )
+    public int getIdleCount(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE)
             return idleCountForBoth;
 
-        if( status == IdleStatus.READER_IDLE )
+        if (status == IdleStatus.READER_IDLE)
             return idleCountForRead;
 
-        if( status == IdleStatus.WRITER_IDLE )
+        if (status == IdleStatus.WRITER_IDLE)
             return idleCountForWrite;
 
-        throw new IllegalArgumentException( "Unknown idle status: " + status );
+        throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public long getLastIdleTime( IdleStatus status )
-    {
-        if( status == IdleStatus.BOTH_IDLE )
+    public long getLastIdleTime(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE)
             return lastIdleTimeForBoth;
 
-        if( status == IdleStatus.READER_IDLE )
+        if (status == IdleStatus.READER_IDLE)
             return lastIdleTimeForRead;
 
-        if( status == IdleStatus.WRITER_IDLE )
+        if (status == IdleStatus.WRITER_IDLE)
             return lastIdleTimeForWrite;
 
-        throw new IllegalArgumentException( "Unknown idle status: " + status );
+        throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public void increaseIdleCount( IdleStatus status )
-    {
-        if( status == IdleStatus.BOTH_IDLE )
-        {
-            idleCountForBoth ++;
+    public void increaseIdleCount(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE) {
+            idleCountForBoth++;
             lastIdleTimeForBoth = System.currentTimeMillis();
-        }
-        else if( status == IdleStatus.READER_IDLE )
-        {
-            idleCountForRead ++;
+        } else if (status == IdleStatus.READER_IDLE) {
+            idleCountForRead++;
             lastIdleTimeForRead = System.currentTimeMillis();
-        }
-        else if( status == IdleStatus.WRITER_IDLE )
-        {
-            idleCountForWrite ++;
+        } else if (status == IdleStatus.WRITER_IDLE) {
+            idleCountForWrite++;
             lastIdleTimeForWrite = System.currentTimeMillis();
-        }
-        else
-            throw new IllegalArgumentException( "Unknown idle status: "
-                                                + status );
+        } else
+            throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
     @Override
-    public String toString()
-    {
-        return "(" + getTransportType() +
-               ", R: " + getRemoteAddress() +
-               ", L: " + getLocalAddress() +
-               ", S: " + getServiceAddress() +
-               ')';
+    public String toString() {
+        return "(" + getTransportType() + ", R: " + getRemoteAddress()
+                + ", L: " + getLocalAddress() + ", S: " + getServiceAddress()
+                + ')';
     }
 }

@@ -34,8 +34,7 @@ import org.apache.mina.common.ByteBuffer;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class HttpResponseMessage
-{
+public class HttpResponseMessage {
     /** HTTP response codes */
     public static final int HTTP_STATUS_SUCCESS = 200;
 
@@ -45,74 +44,59 @@ public class HttpResponseMessage
     private Map<String, String> headers = new HashMap<String, String>();
 
     /** Storage for body of HTTP response. */
-    private ByteArrayOutputStream body = new ByteArrayOutputStream( 1024 );
+    private ByteArrayOutputStream body = new ByteArrayOutputStream(1024);
 
     private int responseCode = HTTP_STATUS_SUCCESS;
 
-    public HttpResponseMessage()
-    {
-        headers.put( "Server", "HttpServer (" + Server.VERSION_STRING + ')' );
-        headers.put( "Cache-Control", "private" );
-        headers.put( "Content-Type", "text/html; charset=iso-8859-1" );
-        headers.put( "Connection", "keep-alive" );
-        headers.put( "Keep-Alive", "200" );
-        headers.put( "Date", new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss zzz" ).format( new Date() ) );
-        headers.put( "Last-Modified", new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss zzz" ).format( new Date() ) );
+    public HttpResponseMessage() {
+        headers.put("Server", "HttpServer (" + Server.VERSION_STRING + ')');
+        headers.put("Cache-Control", "private");
+        headers.put("Content-Type", "text/html; charset=iso-8859-1");
+        headers.put("Connection", "keep-alive");
+        headers.put("Keep-Alive", "200");
+        headers.put("Date", new SimpleDateFormat(
+                "EEE, dd MMM yyyy HH:mm:ss zzz").format(new Date()));
+        headers.put("Last-Modified", new SimpleDateFormat(
+                "EEE, dd MMM yyyy HH:mm:ss zzz").format(new Date()));
     }
 
-    public Map getHeaders()
-    {
+    public Map getHeaders() {
         return headers;
     }
 
-    public void setContentType( String contentType )
-    {
-        headers.put( "Content-Type", contentType );
+    public void setContentType(String contentType) {
+        headers.put("Content-Type", contentType);
     }
 
-    public void setResponseCode( int responseCode )
-    {
+    public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
     }
 
-    public int getResponseCode()
-    {
+    public int getResponseCode() {
         return this.responseCode;
     }
 
-    public void appendBody( byte[] b )
-    {
-        try
-        {
-            body.write( b );
-        }
-        catch( IOException ex )
-        {
+    public void appendBody(byte[] b) {
+        try {
+            body.write(b);
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    public void appendBody( String s )
-    {
-        try
-        {
-            body.write( s.getBytes() );
-        }
-        catch( IOException ex )
-        {
+    public void appendBody(String s) {
+        try {
+            body.write(s.getBytes());
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    public ByteBuffer getBody()
-    {
-        return ByteBuffer.wrap( body.toByteArray() );
+    public ByteBuffer getBody() {
+        return ByteBuffer.wrap(body.toByteArray());
     }
 
-    public int getBodyLength()
-    {
+    public int getBodyLength() {
         return body.size();
     }
 }

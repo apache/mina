@@ -28,50 +28,41 @@ import org.apache.mina.common.WriteFuture;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture
-{
+public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**
      * Returns a new {@link DefaultWriteFuture} which is already marked as 'written'.
      */
-    public static WriteFuture newWrittenFuture( IoSession session )
-    {
-        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture( session );
-        unwrittenFuture.setWritten( true );
+    public static WriteFuture newWrittenFuture(IoSession session) {
+        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture(session);
+        unwrittenFuture.setWritten(true);
         return unwrittenFuture;
     }
 
     /**
      * Returns a new {@link DefaultWriteFuture} which is already marked as 'not written'.
      */
-    public static WriteFuture newNotWrittenFuture( IoSession session )
-    {
-        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture( session );
-        unwrittenFuture.setWritten( false );
+    public static WriteFuture newNotWrittenFuture(IoSession session) {
+        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture(session);
+        unwrittenFuture.setWritten(false);
         return unwrittenFuture;
     }
 
     /**
      * Creates a new instance.
      */
-    public DefaultWriteFuture( IoSession session )
-    {
-        super( session );
+    public DefaultWriteFuture(IoSession session) {
+        super(session);
     }
 
-    public boolean isWritten()
-    {
-        if( isReady() )
-        {
-            return ( Boolean ) getValue();
-        }
-        else
-        {
+    public boolean isWritten() {
+        if (isReady()) {
+            return (Boolean) getValue();
+        } else {
             return false;
         }
     }
 
-    public void setWritten( boolean written )
-    {
-        setValue( written? Boolean.TRUE : Boolean.FALSE );
+    public void setWritten(boolean written) {
+        setValue(written ? Boolean.TRUE : Boolean.FALSE);
     }
 }

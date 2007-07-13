@@ -19,7 +19,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-
 import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoSessionRecycler;
@@ -33,8 +32,8 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements DatagramServiceConfig
-{
+public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements
+        DatagramServiceConfig {
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
 
     /**
@@ -49,36 +48,30 @@ public class DatagramAcceptorConfig extends BaseIoAcceptorConfig implements Data
      *
      * @throws RuntimeIOException if failed to get the default configuration
      */
-    public DatagramAcceptorConfig()
-    {
+    public DatagramAcceptorConfig() {
         super();
         sessionConfig.setReuseAddress(true);
     }
 
-    public DatagramSessionConfig getSessionConfig()
-    {
+    public DatagramSessionConfig getSessionConfig() {
         return sessionConfig;
     }
 
-    public IoSessionRecycler getSessionRecycler()
-    {
+    public IoSessionRecycler getSessionRecycler() {
         return sessionRecycler;
     }
 
     // FIXME There can be a problem if a user changes the recycler after the service is activated.
-    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
-    {
-        if( sessionRecycler == null )
-        {
+    public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
+        if (sessionRecycler == null) {
             sessionRecycler = DEFAULT_RECYCLER;
         }
         this.sessionRecycler = sessionRecycler;
     }
 
-    public Object clone()
-    {
-        DatagramAcceptorConfig ret = ( DatagramAcceptorConfig ) super.clone();
-        ret.sessionConfig = ( DatagramSessionConfig ) this.sessionConfig.clone();
+    public Object clone() {
+        DatagramAcceptorConfig ret = (DatagramAcceptorConfig) super.clone();
+        ret.sessionConfig = (DatagramSessionConfig) this.sessionConfig.clone();
         return ret;
     }
 }

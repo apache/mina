@@ -33,20 +33,24 @@ import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
  * @author Apache Mina Project (dev@mina.apache.org)
  * @version $Rev: $, $Date:  $
  */
- 
-  public class HaikuValidationServer {
-      public static void main( String... args ) throws Exception {
-          ExecutorService executor = Executors.newCachedThreadPool();
-          SocketAcceptor acceptor = 
-            new SocketAcceptor( Runtime.getRuntime().availableProcessors(), executor );
 
-          SocketAcceptorConfig config = new SocketAcceptorConfig();
+public class HaikuValidationServer {
+    public static void main(String... args) throws Exception {
+        ExecutorService executor = Executors.newCachedThreadPool();
+        SocketAcceptor acceptor = new SocketAcceptor(Runtime.getRuntime()
+                .availableProcessors(), executor);
 
-          config.getFilterChain().addLast( "executor", new ExecutorFilter( executor ) );
-          config.getFilterChain().addLast( "to-string", 
-            new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName( "US-ASCII" ) ) ) );
-          config.getFilterChain().addLast( "to-haiki", new ToHaikuIoFilter() );
+        SocketAcceptorConfig config = new SocketAcceptorConfig();
 
-          acceptor.bind( new InetSocketAddress( 42458 ), new HaikuValidatorIoHandler(), config );
-      }
-  }
+        config.getFilterChain().addLast("executor",
+                new ExecutorFilter(executor));
+        config.getFilterChain().addLast(
+                "to-string",
+                new ProtocolCodecFilter(new TextLineCodecFactory(Charset
+                        .forName("US-ASCII"))));
+        config.getFilterChain().addLast("to-haiki", new ToHaikuIoFilter());
+
+        acceptor.bind(new InetSocketAddress(42458),
+                new HaikuValidatorIoHandler(), config);
+    }
+}

@@ -48,8 +48,7 @@ import org.apache.mina.util.IdentityHashSet;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoServiceListenerSupport
-{
+public class IoServiceListenerSupport {
     /**
      * A list of {@link IoServiceListener}s.
      */
@@ -63,54 +62,45 @@ public class IoServiceListenerSupport
     /**
      * Tracks managed sesssions with <tt>serviceAddress</tt> as a key.
      */
-    private final ConcurrentMap<SocketAddress, Set<IoSession>> managedSessions =
-        new ConcurrentHashMap<SocketAddress, Set<IoSession>>();
+    private final ConcurrentMap<SocketAddress, Set<IoSession>> managedSessions = new ConcurrentHashMap<SocketAddress, Set<IoSession>>();
 
     /**
      * Creates a new instance.
      */
-    public IoServiceListenerSupport()
-    {
+    public IoServiceListenerSupport() {
     }
 
     /**
      * Adds a new listener.
      */
-    public void add( IoServiceListener listener )
-    {
-        listeners.add( listener );
+    public void add(IoServiceListener listener) {
+        listeners.add(listener);
     }
 
     /**
      * Removes an existing listener.
      */
-    public void remove( IoServiceListener listener )
-    {
-        listeners.remove( listener );
+    public void remove(IoServiceListener listener) {
+        listeners.remove(listener);
     }
 
-    public Set<SocketAddress> getManagedServiceAddresses()
-    {
-        return Collections.unmodifiableSet( managedServiceAddresses );
+    public Set<SocketAddress> getManagedServiceAddresses() {
+        return Collections.unmodifiableSet(managedServiceAddresses);
     }
 
-    public boolean isManaged( SocketAddress serviceAddress )
-    {
-        return managedServiceAddresses.contains( serviceAddress );
+    public boolean isManaged(SocketAddress serviceAddress) {
+        return managedServiceAddresses.contains(serviceAddress);
     }
 
-    public Set<IoSession> getManagedSessions( SocketAddress serviceAddress )
-    {
-        Set<IoSession> sessions = managedSessions.get( serviceAddress );
+    public Set<IoSession> getManagedSessions(SocketAddress serviceAddress) {
+        Set<IoSession> sessions = managedSessions.get(serviceAddress);
 
-        if( null == sessions )
-        {
+        if (null == sessions) {
             return Collections.emptySet();
         }
 
-        synchronized( sessions )
-        {
-            return new IdentityHashSet<IoSession>( sessions );
+        synchronized (sessions) {
+            return new IdentityHashSet<IoSession>(sessions);
         }
     }
 
@@ -118,18 +108,15 @@ public class IoServiceListenerSupport
      * Calls {@link IoServiceListener#serviceActivated(IoService, SocketAddress, IoHandler, IoServiceConfig)}
      * for all registered listeners.
      */
-    public void fireServiceActivated(
-        IoService service, SocketAddress serviceAddress,
-        IoHandler handler, IoServiceConfig config )
-    {
-        if( !managedServiceAddresses.add( serviceAddress ) )
-        {
+    public void fireServiceActivated(IoService service,
+            SocketAddress serviceAddress, IoHandler handler,
+            IoServiceConfig config) {
+        if (!managedServiceAddresses.add(serviceAddress)) {
             return;
         }
 
-        for( IoServiceListener listener : listeners )
-        {
-            listener.serviceActivated( service, serviceAddress, handler, config );
+        for (IoServiceListener listener : listeners) {
+            listener.serviceActivated(service, serviceAddress, handler, config);
         }
     }
 
@@ -137,42 +124,36 @@ public class IoServiceListenerSupport
      * Calls {@link IoServiceListener#serviceDeactivated(IoService, SocketAddress, IoHandler, IoServiceConfig)}
      * for all registered listeners.
      */
-    public synchronized void fireServiceDeactivated(
-        IoService service, SocketAddress serviceAddress,
-        IoHandler handler, IoServiceConfig config )
-    {
-        if( !managedServiceAddresses.remove( serviceAddress ) )
-        {
+    public synchronized void fireServiceDeactivated(IoService service,
+            SocketAddress serviceAddress, IoHandler handler,
+            IoServiceConfig config) {
+        if (!managedServiceAddresses.remove(serviceAddress)) {
             return;
         }
 
-        try
-        {
-            for( IoServiceListener listener : listeners )
-            {
-                listener.serviceDeactivated( service, serviceAddress, handler, config );
+        try {
+            for (IoServiceListener listener : listeners) {
+                listener.serviceDeactivated(service, serviceAddress, handler,
+                        config);
             }
-        }
-        finally
-        {
-            disconnectSessions( serviceAddress, config );
+        } finally {
+            disconnectSessions(serviceAddress, config);
         }
     }
-
 
     /**
      * Calls {@link IoServiceListener#sessionCreated(IoSession)} for all registered listeners.
      */
-    public void fireSessionCreated( IoSession session )
-    {
+    public void fireSessionCreated(IoSession session) {
         SocketAddress serviceAddress = session.getServiceAddress();
 
         // Get the session set.
         Set<IoSession> s = new IdentityHashSet<IoSession>();
-        Set<IoSession> sessions = managedSessions.putIfAbsent( serviceAddress, Collections.synchronizedSet( s ) );
+        Set<IoSession> sessions = managedSessions.putIfAbsent(serviceAddress,
+                Collections.synchronizedSet(s));
         boolean firstSession;
 
-        if( null == sessions ) {
+        if (null == sessions) {
             sessions = s;
             firstSession = true;
         } else {
@@ -180,117 +161,98 @@ public class IoServiceListenerSupport
         }
 
         // If already registered, ignore.
-        if( !sessions.add( session ) )
-        {
+        if (!sessions.add(session)) {
             return;
         }
 
         // If the first connector session, fire a virtual service activation event.
-        if( session.getService() instanceof IoConnector && firstSession )
-        {
-            fireServiceActivated(
-                session.getService(), session.getServiceAddress(),
-                session.getHandler(), session.getServiceConfig() );
+        if (session.getService() instanceof IoConnector && firstSession) {
+            fireServiceActivated(session.getService(), session
+                    .getServiceAddress(), session.getHandler(), session
+                    .getServiceConfig());
         }
 
         // Fire session events.
-        session.getFilterChain().fireSessionCreated( session );
-        session.getFilterChain().fireSessionOpened( session );
+        session.getFilterChain().fireSessionCreated(session);
+        session.getFilterChain().fireSessionOpened(session);
 
         // Fire listener events.
-        for( IoServiceListener listener : listeners )
-        {
-            listener.sessionCreated( session );
+        for (IoServiceListener listener : listeners) {
+            listener.sessionCreated(session);
         }
     }
 
     /**
      * Calls {@link IoServiceListener#sessionDestroyed(IoSession)} for all registered listeners.
      */
-    public void fireSessionDestroyed( IoSession session )
-    {
+    public void fireSessionDestroyed(IoSession session) {
         SocketAddress serviceAddress = session.getServiceAddress();
 
         // Get the session set.
-        Set<IoSession> sessions = managedSessions.get( serviceAddress );
+        Set<IoSession> sessions = managedSessions.get(serviceAddress);
         // Ignore if unknown.
-        if( sessions == null )
-        {
+        if (sessions == null) {
             return;
         }
 
-        sessions.remove( session );
+        sessions.remove(session);
 
         boolean lastSession = false;
 
         // Try to remove the remaining empty session set after removal.
-        if( sessions.isEmpty() )
-        {
-            lastSession = managedSessions.remove( serviceAddress, sessions );
+        if (sessions.isEmpty()) {
+            lastSession = managedSessions.remove(serviceAddress, sessions);
         }
 
         // Fire session events.
-        session.getFilterChain().fireSessionClosed( session );
+        session.getFilterChain().fireSessionClosed(session);
 
         // Fire listener events.
-        try
-        {
-            for( IoServiceListener listener : listeners )
-            {
-                listener.sessionDestroyed( session );
+        try {
+            for (IoServiceListener listener : listeners) {
+                listener.sessionDestroyed(session);
             }
-        }
-        finally
-        {
+        } finally {
             // Fire a virtual service deactivation event for the last session of the connector.
             //TODO double-check that this is *STILL* the last session. May not be the case
-            if( session.getService() instanceof IoConnector && lastSession )
-            {
-                fireServiceDeactivated(
-                    session.getService(), session.getServiceAddress(),
-                    session.getHandler(), session.getServiceConfig() );
+            if (session.getService() instanceof IoConnector && lastSession) {
+                fireServiceDeactivated(session.getService(), session
+                        .getServiceAddress(), session.getHandler(), session
+                        .getServiceConfig());
             }
         }
     }
 
-    private void disconnectSessions( SocketAddress serviceAddress, IoServiceConfig config )
-    {
-        if( !( config instanceof IoAcceptorConfig ) )
-        {
+    private void disconnectSessions(SocketAddress serviceAddress,
+            IoServiceConfig config) {
+        if (!(config instanceof IoAcceptorConfig)) {
             return;
         }
 
-        if( !( ( IoAcceptorConfig ) config ).isDisconnectOnUnbind() )
-        {
+        if (!((IoAcceptorConfig) config).isDisconnectOnUnbind()) {
             return;
         }
 
-        Set<IoSession> sessions = getManagedSessions( serviceAddress );
+        Set<IoSession> sessions = getManagedSessions(serviceAddress);
 
-        if( sessions.isEmpty() ) {
+        if (sessions.isEmpty()) {
             return;
         }
 
-        final CountDownLatch latch = new CountDownLatch( sessions.size() );
+        final CountDownLatch latch = new CountDownLatch(sessions.size());
 
-        for( IoSession session : sessions )
-        {
-            session.close().addListener( new IoFutureListener()
-            {
-                public void operationComplete( IoFuture future )
-                {
+        for (IoSession session : sessions) {
+            session.close().addListener(new IoFutureListener() {
+                public void operationComplete(IoFuture future) {
                     latch.countDown();
                 }
-            } );
+            });
         }
 
-        try
-        {
+        try {
             latch.await();
-        }
-        catch( InterruptedException e )
-        {
-            throw new RuntimeIOException( e );
+        } catch (InterruptedException e) {
+            throw new RuntimeIOException(e);
         }
     }
 }

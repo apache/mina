@@ -33,45 +33,40 @@ import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class Server
-{
+public class Server {
     /** Default HTTP port */
     private static int DEFAULT_PORT = 8080;
 
     /** Tile server revision number */
     public static final String VERSION_STRING = "$Revision$ $Date$";
 
-    public static void main( String[] args )
-    {
+    public static void main(String[] args) {
         int port = DEFAULT_PORT;
 
-        for( int i = 0; i < args.length; i++ )
-        {
-            if( args[ i ].equals( "-port" ) )
-            {
-                port = Integer.parseInt( args[ i + 1 ] );
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-port")) {
+                port = Integer.parseInt(args[i + 1]);
             }
         }
 
-        try
-        {
+        try {
             // Create an acceptor
             IoAcceptor acceptor = new SocketAcceptor();
-            
+
             // Create a service configuration
             SocketAcceptorConfig cfg = new SocketAcceptorConfig();
-            cfg.setReuseAddress( true );
+            cfg.setReuseAddress(true);
             cfg.getFilterChain().addLast(
                     "protocolFilter",
-                    new ProtocolCodecFilter( new HttpServerProtocolCodecFactory() ) );
-            cfg.getFilterChain().addLast( "logger", new LoggingFilter() );
+                    new ProtocolCodecFilter(
+                            new HttpServerProtocolCodecFactory()));
+            cfg.getFilterChain().addLast("logger", new LoggingFilter());
 
-            acceptor.bind( new InetSocketAddress( port ), new ServerHandler(), cfg );
+            acceptor
+                    .bind(new InetSocketAddress(port), new ServerHandler(), cfg);
 
-            System.out.println( "Server now listening on port " + port );
-        }
-        catch( Exception ex )
-        {
+            System.out.println("Server now listening on port " + port);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

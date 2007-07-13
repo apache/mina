@@ -34,35 +34,31 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class TextLineCodecFactory implements ProtocolCodecFactory
-{
+public class TextLineCodecFactory implements ProtocolCodecFactory {
     private final TextLineEncoder encoder;
+
     private final TextLineDecoder decoder;
 
     /**
      * Creates a new instance with the current default {@link Charset}.
      */
-    public TextLineCodecFactory()
-    {
-        this( Charset.defaultCharset() );
+    public TextLineCodecFactory() {
+        this(Charset.defaultCharset());
     }
 
     /**
      * Creates a new instance with the specified {@link Charset}.
      */
-    public TextLineCodecFactory( Charset charset )
-    {
-        encoder = new TextLineEncoder( charset, LineDelimiter.UNIX );
-        decoder = new TextLineDecoder( charset, LineDelimiter.AUTO );
+    public TextLineCodecFactory(Charset charset) {
+        encoder = new TextLineEncoder(charset, LineDelimiter.UNIX);
+        decoder = new TextLineDecoder(charset, LineDelimiter.AUTO);
     }
 
-    public ProtocolEncoder getEncoder()
-    {
+    public ProtocolEncoder getEncoder() {
         return encoder;
     }
 
-    public ProtocolDecoder getDecoder()
-    {
+    public ProtocolDecoder getDecoder() {
         return decoder;
     }
 
@@ -74,8 +70,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link TextLineEncoder#getMaxLineLength()}.
      */
-    public int getEncoderMaxLineLength()
-    {
+    public int getEncoderMaxLineLength() {
         return encoder.getMaxLineLength();
     }
 
@@ -87,9 +82,8 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link TextLineEncoder#setMaxLineLength(int)}.
      */
-    public void setEncoderMaxLineLength( int maxLineLength )
-    {
-        encoder.setMaxLineLength( maxLineLength );
+    public void setEncoderMaxLineLength(int maxLineLength) {
+        encoder.setMaxLineLength(maxLineLength);
     }
 
     /**
@@ -100,8 +94,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link TextLineDecoder#getMaxLineLength()}.
      */
-    public int getDecoderMaxLineLength()
-    {
+    public int getDecoderMaxLineLength() {
         return decoder.getMaxLineLength();
     }
 
@@ -113,8 +106,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link TextLineDecoder#setMaxLineLength(int)}.
      */
-    public void setDecoderMaxLineLength( int maxLineLength )
-    {
-        decoder.setMaxLineLength( maxLineLength );
+    public void setDecoderMaxLineLength(int maxLineLength) {
+        decoder.setMaxLineLength(maxLineLength);
     }
 }

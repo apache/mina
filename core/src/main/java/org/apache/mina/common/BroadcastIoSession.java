@@ -38,8 +38,7 @@ import java.net.SocketAddress;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface BroadcastIoSession extends IoSession
-{
+public interface BroadcastIoSession extends IoSession {
     /**
      * Writes the specified <tt>message</tt> to the specified <tt>destination</tt>.
      * This operation is asynchronous; {@link IoHandler#messageSent(IoSession, Object)}

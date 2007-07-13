@@ -37,13 +37,12 @@ import org.apache.mina.filter.executor.ExecutorFilter;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ExecutorThreadModel implements ThreadModel
-{
+public class ExecutorThreadModel implements ThreadModel {
     /**
      * Maps a service name to a PooledThreadModel instance.
      * Without this map, we might create extremely many thread pools that leads the system to
      * coma. */
-    private static final Map<String,ExecutorThreadModel> service2model = new HashMap<String, ExecutorThreadModel>();
+    private static final Map<String, ExecutorThreadModel> service2model = new HashMap<String, ExecutorThreadModel>();
 
     /**
      * Returns a {@link ExecutorThreadModel} instance for the specified <tt>serviceName</tt>.
@@ -53,21 +52,17 @@ public class ExecutorThreadModel implements ThreadModel
      *
      * @param serviceName the name of the service that needs thread pooling
      */
-    public static ExecutorThreadModel getInstance( String serviceName )
-    {
-        if( serviceName == null )
-        {
-            throw new NullPointerException( "serviceName" );
+    public static ExecutorThreadModel getInstance(String serviceName) {
+        if (serviceName == null) {
+            throw new NullPointerException("serviceName");
         }
 
         ExecutorThreadModel model;
-        synchronized( service2model )
-        {
-            model = service2model.get( serviceName );
-            if( model == null )
-            {
-                model = new ExecutorThreadModel( serviceName );
-                service2model.put( serviceName, model );
+        synchronized (service2model) {
+            model = service2model.get(serviceName);
+            if (model == null) {
+                model = new ExecutorThreadModel(serviceName);
+                service2model.put(serviceName, model);
             }
         }
 
@@ -75,33 +70,34 @@ public class ExecutorThreadModel implements ThreadModel
     }
 
     private final String threadNamePrefix;
+
     private final ExecutorFilter defaultFilter;
+
     private ExecutorFilter filter = new ExecutorFilter();
 
-    private ExecutorThreadModel( String threadNamePrefix )
-    {
+    private ExecutorThreadModel(String threadNamePrefix) {
         this.threadNamePrefix = threadNamePrefix;
 
         // Create the default filter
         defaultFilter = new ExecutorFilter();
-        ThreadPoolExecutor tpe = ( ThreadPoolExecutor ) defaultFilter.getExecutor();
+        ThreadPoolExecutor tpe = (ThreadPoolExecutor) defaultFilter
+                .getExecutor();
         final ThreadFactory originalThreadFactory = tpe.getThreadFactory();
-        ThreadFactory newThreadFactory = new ThreadFactory()
-        {
-            private final AtomicInteger threadId = new AtomicInteger( 0 );
+        ThreadFactory newThreadFactory = new ThreadFactory() {
+            private final AtomicInteger threadId = new AtomicInteger(0);
 
-            public Thread newThread( Runnable runnable )
-            {
-                Thread t = originalThreadFactory.newThread( runnable );
-                t.setName( ExecutorThreadModel.this.threadNamePrefix + '-' + threadId.incrementAndGet() );
-                t.setDaemon( true );
+            public Thread newThread(Runnable runnable) {
+                Thread t = originalThreadFactory.newThread(runnable);
+                t.setName(ExecutorThreadModel.this.threadNamePrefix + '-'
+                        + threadId.incrementAndGet());
+                t.setDaemon(true);
                 return t;
             }
         };
-        tpe.setThreadFactory( newThreadFactory );
+        tpe.setThreadFactory(newThreadFactory);
 
         // Set to default.
-        setExecutor( null );
+        setExecutor(null);
     }
 
     /**
@@ -109,8 +105,7 @@ public class ExecutorThreadModel implements ThreadModel
      * You can change various properties such as the number of threads
      * by calling methods of the {@link Executor} implementation.
      */
-    public Executor getExecutor()
-    {
+    public Executor getExecutor() {
         return filter.getExecutor();
     }
 
@@ -121,20 +116,15 @@ public class ExecutorThreadModel implements ThreadModel
      *
      * @param executor <tt>null</tt> to revert to the default setting
      */
-    public void setExecutor( Executor executor )
-    {
-        if( executor == null )
-        {
+    public void setExecutor(Executor executor) {
+        if (executor == null) {
             filter = defaultFilter;
-        }
-        else
-        {
-            filter = new ExecutorFilter( executor );
+        } else {
+            filter = new ExecutorFilter(executor);
         }
     }
 
-    public void buildFilterChain( IoFilterChain chain ) throws Exception
-    {
-        chain.addFirst( ExecutorThreadModel.class.getName(), filter );
+    public void buildFilterChain(IoFilterChain chain) throws Exception {
+        chain.addFirst(ExecutorThreadModel.class.getName(), filter);
     }
 }

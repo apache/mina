@@ -54,17 +54,17 @@ import org.springframework.util.Assert;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class Binding implements InitializingBean
-{
+public class Binding implements InitializingBean {
     private SocketAddress address = null;
+
     private IoHandler handler = null;
+
     private IoServiceConfig serviceConfig = null;
 
     /**
      * Creates a new empty instance.
      */
-    public Binding()
-    {
+    public Binding() {
     }
 
     /**
@@ -75,12 +75,11 @@ public class Binding implements InitializingBean
      * @throws IllegalArgumentException if the any of the specified values are 
      *         <code>null</code>.
      */
-    public Binding( SocketAddress address, IoHandler handler )
-    {
-        setAddress( address );
-        setHandler( handler );
+    public Binding(SocketAddress address, IoHandler handler) {
+        setAddress(address);
+        setHandler(handler);
     }
-    
+
     /**
      * Creates a new instance using the specified values.
      * 
@@ -90,12 +89,11 @@ public class Binding implements InitializingBean
      * @throws IllegalArgumentException if the any of the specified values are 
      *         <code>null</code>.
      */
-    public Binding( SocketAddress address, IoHandler handler, 
-                    IoServiceConfig serviceConfig )
-    {
-        setAddress( address );
-        setHandler( handler );
-        setServiceConfig( serviceConfig );
+    public Binding(SocketAddress address, IoHandler handler,
+            IoServiceConfig serviceConfig) {
+        setAddress(address);
+        setHandler(handler);
+        setServiceConfig(serviceConfig);
     }
 
     /**
@@ -103,8 +101,7 @@ public class Binding implements InitializingBean
      *  
      * @return the address.
      */
-    public SocketAddress getAddress()
-    {
+    public SocketAddress getAddress() {
         return address;
     }
 
@@ -115,9 +112,8 @@ public class Binding implements InitializingBean
      * @throws IllegalArgumentException if the specified value is 
      *         <code>null</code>.
      */
-    public void setAddress( SocketAddress address )
-    {
-        Assert.notNull( address, "Property 'address' may not be null" );
+    public void setAddress(SocketAddress address) {
+        Assert.notNull(address, "Property 'address' may not be null");
         this.address = address;
     }
 
@@ -126,8 +122,7 @@ public class Binding implements InitializingBean
      * 
      * @return the handler.
      */
-    public IoHandler getHandler()
-    {
+    public IoHandler getHandler() {
         return handler;
     }
 
@@ -138,26 +133,22 @@ public class Binding implements InitializingBean
      * @throws IllegalArgumentException if the specified value is 
      *         <code>null</code>.
      */
-    public void setHandler( IoHandler handler )
-    {
-        Assert.notNull( handler, "Property 'handler' may not be null" );
+    public void setHandler(IoHandler handler) {
+        Assert.notNull(handler, "Property 'handler' may not be null");
         this.handler = handler;
     }
 
-    public IoServiceConfig getServiceConfig()
-    {
+    public IoServiceConfig getServiceConfig() {
         return serviceConfig;
     }
 
-    public void setServiceConfig( IoServiceConfig serviceConfig )
-    {
+    public void setServiceConfig(IoServiceConfig serviceConfig) {
         this.serviceConfig = serviceConfig;
     }
 
-    public void afterPropertiesSet() throws Exception
-    {
-        Assert.notNull( address, "Property 'address' may not be null" );
-        Assert.notNull( handler, "Property 'handler' may not be null" );
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(address, "Property 'address' may not be null");
+        Assert.notNull(handler, "Property 'handler' may not be null");
     }
 
 }

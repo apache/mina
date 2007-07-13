@@ -26,6 +26,5 @@ package org.apache.mina.example.proxy;
  * @version $Rev$, $Date$
  *
  */
-public class ServerToProxyIoHandler extends AbstractProxyIoHandler
-{
+public class ServerToProxyIoHandler extends AbstractProxyIoHandler {
 }

@@ -32,27 +32,23 @@ import org.apache.mina.filter.codec.demux.MessageDecoder;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class AddMessageDecoder extends AbstractMessageDecoder
-{
+public class AddMessageDecoder extends AbstractMessageDecoder {
 
-    public AddMessageDecoder()
-    {
-        super( Constants.ADD );
+    public AddMessageDecoder() {
+        super(Constants.ADD);
     }
 
-    protected AbstractMessage decodeBody( IoSession session, ByteBuffer in )
-    {
-        if( in.remaining() < Constants.ADD_BODY_LEN )
-        {
+    protected AbstractMessage decodeBody(IoSession session, ByteBuffer in) {
+        if (in.remaining() < Constants.ADD_BODY_LEN) {
             return null;
         }
 
         AddMessage m = new AddMessage();
-        m.setValue( in.getInt() );
+        m.setValue(in.getInt());
         return m;
     }
 
-    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
-    {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
+            throws Exception {
     }
 }

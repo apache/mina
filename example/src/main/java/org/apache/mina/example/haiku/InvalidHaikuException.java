@@ -26,13 +26,17 @@ public class InvalidHaikuException extends Exception {
     private static final long serialVersionUID = 34877739006797894L;
 
     private final int position;
+
     private final String phrase;
+
     private final int syllableCount;
+
     private final int expectedSyllableCount;
 
-    public InvalidHaikuException( int position, String phrase, int syllableCount, int expectedSyllableCount ) {
-        super( "phrase " + position + ", '" + phrase + "' had " + syllableCount + " syllables, not " +
-               expectedSyllableCount );
+    public InvalidHaikuException(int position, String phrase,
+            int syllableCount, int expectedSyllableCount) {
+        super("phrase " + position + ", '" + phrase + "' had " + syllableCount
+                + " syllables, not " + expectedSyllableCount);
 
         this.position = position;
         this.phrase = phrase;

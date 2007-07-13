@@ -25,17 +25,17 @@ package org.apache.mina.example.haiku;
 public class HaikuValidator {
     private static final int[] SYLLABLE_COUNTS = { 5, 7, 5 };
 
-    public void validate( Haiku haiku ) throws InvalidHaikuException {
+    public void validate(Haiku haiku) throws InvalidHaikuException {
         String[] phrases = haiku.getPhrases();
 
-        for ( int i = 0; i < phrases.length; i++ ) {
+        for (int i = 0; i < phrases.length; i++) {
             String phrase = phrases[i];
-            int count = PhraseUtilities.countSyllablesInPhrase( phrase );
+            int count = PhraseUtilities.countSyllablesInPhrase(phrase);
 
-            if ( count != SYLLABLE_COUNTS[i] ) {
-                throw new InvalidHaikuException( i + 1, phrase, count, SYLLABLE_COUNTS[i] );
+            if (count != SYLLABLE_COUNTS[i]) {
+                throw new InvalidHaikuException(i + 1, phrase, count,
+                        SYLLABLE_COUNTS[i]);
             }
         }
     }
 }
-

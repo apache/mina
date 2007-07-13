@@ -26,8 +26,7 @@ package org.apache.mina.example.tennis;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class TennisBall
-{
+public class TennisBall {
     private final boolean ping;
 
     private final int ttl;
@@ -35,16 +34,14 @@ public class TennisBall
     /**
      * Creates a new ball with the specified TTL (Time To Live) value.
      */
-    public TennisBall( int ttl )
-    {
-        this( ttl, true );
+    public TennisBall(int ttl) {
+        this(ttl, true);
     }
 
     /**
      * Creates a new ball with the specified TTL value and PING/PONG state.
      */
-    private TennisBall( int ttl, boolean ping )
-    {
+    private TennisBall(int ttl, boolean ping) {
         this.ttl = ttl;
         this.ping = ping;
     }
@@ -52,8 +49,7 @@ public class TennisBall
     /**
      * Returns the TTL value of this ball.
      */
-    public int getTTL()
-    {
+    public int getTTL() {
         return ttl;
     }
 
@@ -61,23 +57,18 @@ public class TennisBall
      * Returns the ball after {@link TennisPlayer}'s stroke.
      * The returned ball has decreased TTL value and switched PING/PONG state.
      */
-    public TennisBall stroke()
-    {
-        return new TennisBall( ttl - 1, !ping );
+    public TennisBall stroke() {
+        return new TennisBall(ttl - 1, !ping);
     }
 
     /**
      * Returns string representation of this message (<code>[PING|PONG]
      * (TTL)</code>).
      */
-    public String toString()
-    {
-        if( ping )
-        {
+    public String toString() {
+        if (ping) {
             return "PING (" + ttl + ")";
-        }
-        else
-        {
+        } else {
             return "PONG (" + ttl + ")";
         }
     }

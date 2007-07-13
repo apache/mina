@@ -30,26 +30,24 @@ import org.apache.mina.common.IoSession;
  */
 public class ToHaikuIoFilter extends IoFilterAdapter {
 
-    @SuppressWarnings( { "unchecked" } )
+    @SuppressWarnings( { "unchecked" })
     @Override
-    public void messageReceived( NextFilter nextFilter, IoSession session, Object message )
-        throws Exception
-    {
-        List<String> phrases = (List<String>) session.getAttribute( "phrases" );
+    public void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception {
+        List<String> phrases = (List<String>) session.getAttribute("phrases");
 
-        if ( null == phrases ) {
+        if (null == phrases) {
             phrases = new ArrayList<String>();
-            session.setAttribute( "phrases", phrases );
+            session.setAttribute("phrases", phrases);
         }
 
-        phrases.add( (String) message );
+        phrases.add((String) message);
 
-        if ( phrases.size() == 3 ) {
-            session.removeAttribute( "phrases" );
+        if (phrases.size() == 3) {
+            session.removeAttribute("phrases");
 
-            super.messageReceived( nextFilter,
-                                   session,
-                                   new Haiku( phrases.toArray( new String[3] ) ) );
+            super.messageReceived(nextFilter, session, new Haiku(phrases
+                    .toArray(new String[3])));
         }
     }
 }

@@ -39,102 +39,84 @@ import org.apache.mina.common.support.BaseIoSession;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class ChainedIoHandlerTest extends TestCase
-{
-    public static void main( String[] args )
-    {
-        junit.textui.TestRunner.run( ChainedIoHandlerTest.class );
+public class ChainedIoHandlerTest extends TestCase {
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(ChainedIoHandlerTest.class);
     }
-    
-    public void testChainedCommand() throws Exception
-    {
+
+    public void testChainedCommand() throws Exception {
         IoHandlerChain chain = new IoHandlerChain();
         StringBuffer buf = new StringBuffer();
-        chain.addLast( "A", new TestCommand( buf, 'A' ) );
-        chain.addLast( "B", new TestCommand( buf, 'B' ) );
-        chain.addLast( "C", new TestCommand( buf, 'C' ) );
-        
-        new ChainedIoHandler( chain ).messageReceived(
-                new BaseIoSession()
-                {
-                    protected void updateTrafficMask()
-                    {
-                    }
+        chain.addLast("A", new TestCommand(buf, 'A'));
+        chain.addLast("B", new TestCommand(buf, 'B'));
+        chain.addLast("C", new TestCommand(buf, 'C'));
 
-                    public IoService getService()
-                    {
-                        return null;
-                    }
+        new ChainedIoHandler(chain).messageReceived(new BaseIoSession() {
+            protected void updateTrafficMask() {
+            }
 
-                    public IoServiceConfig getServiceConfig()
-                    {
-                        return null;
-                    }
+            public IoService getService() {
+                return null;
+            }
 
-                    public IoHandler getHandler()
-                    {
-                        return null;
-                    }
+            public IoServiceConfig getServiceConfig() {
+                return null;
+            }
 
-                    public IoFilterChain getFilterChain()
-                    {
-                        return null;
-                    }
+            public IoHandler getHandler() {
+                return null;
+            }
 
-                    public TransportType getTransportType()
-                    {
-                        return null;
-                    }
+            public IoFilterChain getFilterChain() {
+                return null;
+            }
 
-                    public SocketAddress getRemoteAddress()
-                    {
-                        return null;
-                    }
+            public TransportType getTransportType() {
+                return null;
+            }
 
-                    public SocketAddress getLocalAddress()
-                    {
-                        return null;
-                    }
+            public SocketAddress getRemoteAddress() {
+                return null;
+            }
 
-                    public int getScheduledWriteRequests()
-                    {
-                        return 0;
-                    }
+            public SocketAddress getLocalAddress() {
+                return null;
+            }
 
-                    public IoSessionConfig getConfig()
-                    {
-                        return null;
-                    }
+            public int getScheduledWriteRequests() {
+                return 0;
+            }
 
-                    public SocketAddress getServiceAddress()
-                    {
-                        return null;
-                    }
+            public IoSessionConfig getConfig() {
+                return null;
+            }
 
-                    public int getScheduledWriteBytes()
-                    {
-                        return 0;
-                    }
-                }, null );
-        
-        Assert.assertEquals( "ABC", buf.toString() );
+            public SocketAddress getServiceAddress() {
+                return null;
+            }
+
+            public int getScheduledWriteBytes() {
+                return 0;
+            }
+        }, null);
+
+        Assert.assertEquals("ABC", buf.toString());
     }
-    
-    private class TestCommand implements IoHandlerCommand
-    {
+
+    private class TestCommand implements IoHandlerCommand {
         private final StringBuffer buf;
+
         private final char ch;
-        
-        private TestCommand( StringBuffer buf, char ch )
-        {
+
+        private TestCommand(StringBuffer buf, char ch) {
             this.buf = buf;
             this.ch = ch;
         }
 
-        public void execute( NextCommand next, IoSession session, Object message ) throws Exception
-        {
-            buf.append( ch );
-            next.execute( session, message );
+        public void execute(NextCommand next, IoSession session, Object message)
+                throws Exception {
+            buf.append(ch);
+            next.execute(session, message);
         }
     }
 }

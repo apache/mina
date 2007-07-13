@@ -29,13 +29,12 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  */
-public abstract class MessageDecoderAdapter implements MessageDecoder
-{
+public abstract class MessageDecoderAdapter implements MessageDecoder {
     /**
      * Override this method to deal with the closed connection.
      * The default implementation does nothing.
      */
-    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
-    {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
+            throws Exception {
     }
 }

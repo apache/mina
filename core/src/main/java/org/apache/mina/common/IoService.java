@@ -22,7 +22,6 @@ package org.apache.mina.common;
 import java.net.SocketAddress;
 import java.util.Set;
 
-
 /**
  * Base interface for all {@link IoAcceptor}s and {@link IoConnector}s
  * that provide I/O service and manage {@link IoSession}s.
@@ -30,19 +29,18 @@ import java.util.Set;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoService
-{
+public interface IoService {
     /**
      * Adds an {@link IoServiceListener} that listens any events related with
      * this service.
      */
-    void addListener( IoServiceListener listener );
+    void addListener(IoServiceListener listener);
 
     /**
      * Removed an existing {@link IoServiceListener} that listens any events
      * related with this service.
      */
-    void removeListener( IoServiceListener listener );
+    void removeListener(IoServiceListener listener);
 
     /**
      * Returns all {@link SocketAddress}es this service is managing.
@@ -57,7 +55,7 @@ public interface IoService
      * If this service is an {@link IoAcceptor}, <tt>serviceAddress</tt> is a bind address.
      * If this service is an {@link IoConnector}, <tt>serviceAddress</tt> is a remote address.
      */
-    boolean isManaged( SocketAddress serviceAddress );
+    boolean isManaged(SocketAddress serviceAddress);
 
     /**
      * Returns all sessions with the specified remote or local address,
@@ -72,7 +70,7 @@ public interface IoService
      * @throws UnsupportedOperationException if this operation isn't supported
      *         for the particular transport type implemented by this {@link IoService}.
      */
-    Set<IoSession> getManagedSessions( SocketAddress serviceAddress );
+    Set<IoSession> getManagedSessions(SocketAddress serviceAddress);
 
     /**
      * Returns the default configuration which is used when you didn't specify
@@ -95,7 +93,7 @@ public interface IoService
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
      */
-    void setFilterChainBuilder( IoFilterChainBuilder builder );
+    void setFilterChainBuilder(IoFilterChainBuilder builder);
 
     /**
      * A shortcut for <tt>( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )</tt>.

@@ -33,34 +33,28 @@ public class TransportTypeTest extends TestCase {
     public static void main(String[] args) {
         junit.textui.TestRunner.run(TransportTypeTest.class);
     }
-    
-    public void testRegistration()
-    {
-        TransportType myType = new TransportType( new String[] { "a", "b", "c" }, true );
-        
-        Assert.assertSame( myType, TransportType.getInstance( "a" ) );
-        Assert.assertSame( myType, TransportType.getInstance( "A" ) );
-        Assert.assertSame( myType, TransportType.getInstance( "b" ) );
-        Assert.assertSame( myType, TransportType.getInstance( "B" ) );
-        Assert.assertSame( myType, TransportType.getInstance( "c" ) );
-        Assert.assertSame( myType, TransportType.getInstance( "C" ) );
-        try
-        {
-            TransportType.getInstance( "unknown" );
+
+    public void testRegistration() {
+        TransportType myType = new TransportType(
+                new String[] { "a", "b", "c" }, true);
+
+        Assert.assertSame(myType, TransportType.getInstance("a"));
+        Assert.assertSame(myType, TransportType.getInstance("A"));
+        Assert.assertSame(myType, TransportType.getInstance("b"));
+        Assert.assertSame(myType, TransportType.getInstance("B"));
+        Assert.assertSame(myType, TransportType.getInstance("c"));
+        Assert.assertSame(myType, TransportType.getInstance("C"));
+        try {
+            TransportType.getInstance("unknown");
             Assert.fail();
-        }
-        catch( IllegalArgumentException e )
-        {
+        } catch (IllegalArgumentException e) {
             // ignore
         }
-        
-        try
-        {
-            new TransportType( new String[] { "A" }, false );
+
+        try {
+            new TransportType(new String[] { "A" }, false);
             Assert.fail();
-        }
-        catch( IllegalArgumentException e )
-        {
+        } catch (IllegalArgumentException e) {
             // ignore
         }
     }

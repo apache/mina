@@ -30,8 +30,7 @@ import org.apache.mina.common.WriteFuture;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ProtocolEncoderOutput
-{
+public interface ProtocolEncoderOutput {
     /**
      * Callback for {@link ProtocolEncoder} to generate encoded
      * {@link ByteBuffer}s. {@link ProtocolEncoder} must call
@@ -39,8 +38,8 @@ public interface ProtocolEncoderOutput
      * 
      * @param buf the buffer which contains encoded data
      */
-    void write( ByteBuffer buf );
-    
+    void write(ByteBuffer buf);
+
     /**
      * Merges all buffers you wrote via {@link #write(ByteBuffer)} into
      * one {@link ByteBuffer} and replaces the old fragmented ones with it.
@@ -48,7 +47,7 @@ public interface ProtocolEncoderOutput
      * network packets.
      */
     void mergeAll();
-    
+
     /**
      * Flushes all buffers you wrote via {@link #write(ByteBuffer)} to
      * the session.  This operation is asynchronous; please wait for

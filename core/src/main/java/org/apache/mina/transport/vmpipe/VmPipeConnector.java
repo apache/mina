@@ -46,13 +46,12 @@ import org.apache.mina.util.AnonymousSocketAddress;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeConnector extends BaseIoConnector
-{
-    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {};
-    private final IoServiceConfig defaultConfig = new BaseIoConnectorConfig()
-    {
-        public IoSessionConfig getSessionConfig()
-        {
+public class VmPipeConnector extends BaseIoConnector {
+    private static final IoSessionConfig CONFIG = new BaseIoSessionConfig() {
+    };
+
+    private final IoServiceConfig defaultConfig = new BaseIoConnectorConfig() {
+        public IoSessionConfig getSessionConfig() {
             return CONFIG;
         }
     };
@@ -60,94 +59,81 @@ public class VmPipeConnector extends BaseIoConnector
     /**
      * Creates a new instance.
      */
-    public VmPipeConnector()
-    {
+    public VmPipeConnector() {
     }
 
-    public ConnectFuture connect( SocketAddress address, IoHandler handler, IoServiceConfig config )
-    {
-        return connect( address, null, handler, config );
+    public ConnectFuture connect(SocketAddress address, IoHandler handler,
+            IoServiceConfig config) {
+        return connect(address, null, handler, config);
     }
 
-    public ConnectFuture connect( SocketAddress address, SocketAddress localAddress, IoHandler handler, IoServiceConfig config )
-    {
-        if( address == null )
-            throw new NullPointerException( "address" );
-        if( handler == null )
-            throw new NullPointerException( "handler" );
-        if( ! ( address instanceof VmPipeAddress ) )
-            throw new IllegalArgumentException(
-                                                "address must be VmPipeAddress." );
+    public ConnectFuture connect(SocketAddress address,
+            SocketAddress localAddress, IoHandler handler,
+            IoServiceConfig config) {
+        if (address == null)
+            throw new NullPointerException("address");
+        if (handler == null)
+            throw new NullPointerException("handler");
+        if (!(address instanceof VmPipeAddress))
+            throw new IllegalArgumentException("address must be VmPipeAddress.");
 
-        if( config == null )
-        {
+        if (config == null) {
             config = getDefaultConfig();
         }
 
-        VmPipe entry = VmPipeAcceptor.boundHandlers.get( address );
-        if( entry == null )
-        {
-            return DefaultConnectFuture.newFailedFuture(
-                    new IOException( "Endpoint unavailable: " + address ) );
+        VmPipe entry = VmPipeAcceptor.boundHandlers.get(address);
+        if (entry == null) {
+            return DefaultConnectFuture.newFailedFuture(new IOException(
+                    "Endpoint unavailable: " + address));
         }
 
         DefaultConnectFuture future = new DefaultConnectFuture();
-        VmPipeSessionImpl localSession =
-            new VmPipeSessionImpl(
-                    this,
-                    config,
-                    getListeners(),
-                    new Object(), // lock
-                    new AnonymousSocketAddress(),
-                    handler,
-                    entry );
+        VmPipeSessionImpl localSession = new VmPipeSessionImpl(this, config,
+                getListeners(), new Object(), // lock
+                new AnonymousSocketAddress(), handler, entry);
 
         // initialize connector session
-        try
-        {
+        try {
             IoFilterChain filterChain = localSession.getFilterChain();
-            this.getFilterChainBuilder().buildFilterChain( filterChain );
-            config.getFilterChainBuilder().buildFilterChain( filterChain );
-            config.getThreadModel().buildFilterChain( filterChain );
+            this.getFilterChainBuilder().buildFilterChain(filterChain);
+            config.getFilterChainBuilder().buildFilterChain(filterChain);
+            config.getThreadModel().buildFilterChain(filterChain);
 
             // The following sentences don't throw any exceptions.
-            localSession.setAttribute( AbstractIoFilterChain.CONNECT_FUTURE, future );
-            getListeners().fireSessionCreated( localSession );
-            VmPipeIdleStatusChecker.getInstance().addSession( localSession);
-        }
-        catch( Throwable t )
-        {
-            future.setException( t );
+            localSession.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE,
+                    future);
+            getListeners().fireSessionCreated(localSession);
+            VmPipeIdleStatusChecker.getInstance().addSession(localSession);
+        } catch (Throwable t) {
+            future.setException(t);
             return future;
         }
 
         // initialize acceptor session
         VmPipeSessionImpl remoteSession = localSession.getRemoteSession();
-        try
-        {
+        try {
             IoFilterChain filterChain = remoteSession.getFilterChain();
-            entry.getAcceptor().getFilterChainBuilder().buildFilterChain( filterChain );
-            entry.getConfig().getFilterChainBuilder().buildFilterChain( filterChain );
-            entry.getConfig().getThreadModel().buildFilterChain( filterChain );
+            entry.getAcceptor().getFilterChainBuilder().buildFilterChain(
+                    filterChain);
+            entry.getConfig().getFilterChainBuilder().buildFilterChain(
+                    filterChain);
+            entry.getConfig().getThreadModel().buildFilterChain(filterChain);
 
             // The following sentences don't throw any exceptions.
-            entry.getListeners().fireSessionCreated( remoteSession );
-            VmPipeIdleStatusChecker.getInstance().addSession( remoteSession );
-        }
-        catch( Throwable t )
-        {
-            ExceptionMonitor.getInstance().exceptionCaught( t );
+            entry.getListeners().fireSessionCreated(remoteSession);
+            VmPipeIdleStatusChecker.getInstance().addSession(remoteSession);
+        } catch (Throwable t) {
+            ExceptionMonitor.getInstance().exceptionCaught(t);
             remoteSession.close();
         }
-        
-        ( ( VmPipeFilterChain ) localSession.getFilterChain() ).start();
-        ( ( VmPipeFilterChain ) remoteSession.getFilterChain() ).start();
+
+        ((VmPipeFilterChain) localSession.getFilterChain()).start();
+        ((VmPipeFilterChain) remoteSession.getFilterChain()).start();
 
         return future;
     }
 
-    public IoServiceConfig getDefaultConfig()
-    {
+    public IoServiceConfig getDefaultConfig() {
         return defaultConfig;
     }
 }

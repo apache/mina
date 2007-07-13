@@ -27,53 +27,40 @@ import junit.framework.TestCase;
 public class HaikuValidatorTest extends TestCase {
     // from http://allrileyedup.blogspot.com/2006/10/dont-hassle-haiku.html -- good friend of proyal@apache.org
     private static final String[] HAIKUS = {
-        "This class is boring.\n" +
-        "Will David ever shut up?\n" +
-        "What is Steph wearing?",
+            "This class is boring.\n" + "Will David ever shut up?\n"
+                    + "What is Steph wearing?",
 
-        "Oh, I drank too much.\n" +
-        "Why, oh why did I sign up\n" +
-        "For an eight thirty?",
+            "Oh, I drank too much.\n" + "Why, oh why did I sign up\n"
+                    + "For an eight thirty?",
 
-        "Which one should I do?\n" +
-        "Wax my chest or perm my hair?\n" +
-        "Can’t wait to decide.",
+            "Which one should I do?\n" + "Wax my chest or perm my hair?\n"
+                    + "Can’t wait to decide.",
 
-        "Watch my video.\n" +
-        "I can't stop this fee-ee-ling!\n" +
-        "What is wrong with me?",
+            "Watch my video.\n" + "I can't stop this fee-ee-ling!\n"
+                    + "What is wrong with me?",
 
-        "The car chases me.\n" +
-        "I must get away from it.\n" +
-        "Turbo Boost! Oh, yeah.",
+            "The car chases me.\n" + "I must get away from it.\n"
+                    + "Turbo Boost! Oh, yeah.",
 
-        "My new slogan is\n" +
-        "Don't hassle me... I'm oiling.\n" +
-        "You know it’s so true.",
+            "My new slogan is\n" + "Don't hassle me... I'm oiling.\n"
+                    + "You know it’s so true.",
 
-        "Michael, I love you.\n" +
-        "I long for you to tell me\n" +
-        "\"KITT, need you buddy.\"",
+            "Michael, I love you.\n" + "I long for you to tell me\n"
+                    + "\"KITT, need you buddy.\"",
 
-        "In Knight Rider, I’m\n" +
-        "A Man Who Does Not Exist.\n" +
-        "(Except in your dreams).",
+            "In Knight Rider, I’m\n" + "A Man Who Does Not Exist.\n"
+                    + "(Except in your dreams).",
 
-        "Yes, I’m Michael Knight\n" +
-        "Check out my unbuttoned shirt.\n" +
-        "And sexy tight pants.",
+            "Yes, I’m Michael Knight\n" + "Check out my unbuttoned shirt.\n"
+                    + "And sexy tight pants.",
 
-        "My bitch ex-wife sucks.\n" +
-        "And so do all the airlines.\n" +
-        "I miss Knight Rider.",
+            "My bitch ex-wife sucks.\n" + "And so do all the airlines.\n"
+                    + "I miss Knight Rider.",
 
-        "I am Michael Knight.\n" +
-        "I am David Hasselhoff.\n" +
-        "I’m not Rick James, bitch."
-    };
+            "I am Michael Knight.\n" + "I am David Hasselhoff.\n"
+                    + "I’m not Rick James, bitch." };
 
     private HaikuValidator validator;
-
 
     @Override
     protected void setUp() throws Exception {
@@ -83,12 +70,12 @@ public class HaikuValidatorTest extends TestCase {
     }
 
     public void testValidateHaikus() throws Exception {
-        for ( String s : HAIKUS ) {
-            String[] lines = s.split( "\n" );
+        for (String s : HAIKUS) {
+            String[] lines = s.split("\n");
 
-            Haiku haiku = new Haiku( lines );
+            Haiku haiku = new Haiku(lines);
 
-            validator.validate( haiku );
+            validator.validate(haiku);
         }
     }
 }

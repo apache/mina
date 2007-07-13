@@ -40,8 +40,7 @@ import java.net.SocketAddress;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoConnector extends IoService
-{
+public interface IoConnector extends IoService {
     /**
      * Connects to the specified <code>address</code>.  If communication starts
      * successfully, events are fired to the specified
@@ -49,8 +48,8 @@ public interface IoConnector extends IoService
      * 
      * @return {@link ConnectFuture} that will tell the result of the connection attempt
      */
-    ConnectFuture connect( SocketAddress address, IoHandler handler );
-    
+    ConnectFuture connect(SocketAddress address, IoHandler handler);
+
     /**
      * Connects to the specified <code>address</code>.  If communication starts
      * successfully, events are fired to the specified
@@ -59,8 +58,8 @@ public interface IoConnector extends IoService
      * @param config the configuration
      * @return {@link ConnectFuture} that will tell the result of the connection attempt
      */
-    ConnectFuture connect( SocketAddress address, IoHandler handler,
-                           IoServiceConfig config );
+    ConnectFuture connect(SocketAddress address, IoHandler handler,
+            IoServiceConfig config);
 
     /**
      * Connects to the specified <code>address</code>.  If communication starts
@@ -70,8 +69,8 @@ public interface IoConnector extends IoService
      * @param localAddress the local address the channel is bound to
      * @return {@link ConnectFuture} that will tell the result of the connection attempt
      */
-    ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                           IoHandler handler );
+    ConnectFuture connect(SocketAddress address, SocketAddress localAddress,
+            IoHandler handler);
 
     /**
      * Connects to the specified <code>address</code>.  If communication starts
@@ -81,6 +80,6 @@ public interface IoConnector extends IoService
      * @param config the configuration
      * @return {@link ConnectFuture} that will tell the result of the connection attempt
      */
-    ConnectFuture connect( SocketAddress address, SocketAddress localAddress,
-                           IoHandler handler, IoServiceConfig config );
+    ConnectFuture connect(SocketAddress address, SocketAddress localAddress,
+            IoHandler handler, IoServiceConfig config);
 }

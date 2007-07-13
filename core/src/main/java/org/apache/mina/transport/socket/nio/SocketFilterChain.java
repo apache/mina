@@ -35,35 +35,31 @@ import org.apache.mina.common.support.AbstractIoFilterChain;
  */
 class SocketFilterChain extends AbstractIoFilterChain {
 
-    SocketFilterChain( IoSession parent )
-    {
-        super( parent );
+    SocketFilterChain(IoSession parent) {
+        super(parent);
     }
 
     @Override
-	protected void doWrite( IoSession session, WriteRequest writeRequest )
-    {
-        SocketSessionImpl s = ( SocketSessionImpl ) session;
+    protected void doWrite(IoSession session, WriteRequest writeRequest) {
+        SocketSessionImpl s = (SocketSessionImpl) session;
         Queue<WriteRequest> writeRequestQueue = s.getWriteRequestQueue();
 
         // SocketIoProcessor.doFlush() will reset it after write is finished
         // because the buffer will be passed with messageSent event.
-        ( ( ByteBuffer ) writeRequest.getMessage() ).mark();
-        synchronized( writeRequestQueue )
-        {
-			writeRequestQueue.add( writeRequest );
-            if( writeRequestQueue.size() == 1 && session.getTrafficMask().isWritable() )
-            {
+        ((ByteBuffer) writeRequest.getMessage()).mark();
+        synchronized (writeRequestQueue) {
+            writeRequestQueue.add(writeRequest);
+            if (writeRequestQueue.size() == 1
+                    && session.getTrafficMask().isWritable()) {
                 // Notify SocketIoProcessor only when writeRequestQueue was empty.
-                s.getIoProcessor().flush( s );
+                s.getIoProcessor().flush(s);
             }
         }
     }
 
     @Override
-	protected void doClose( IoSession session ) throws IOException
-    {
-        SocketSessionImpl s = ( SocketSessionImpl ) session;
-        s.getIoProcessor().remove( s );
+    protected void doClose(IoSession session) throws IOException {
+        SocketSessionImpl s = (SocketSessionImpl) session;
+        s.getIoProcessor().remove(s);
     }
 }
