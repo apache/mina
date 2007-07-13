@@ -26,5 +26,6 @@ package org.apache.mina.filter.reqres;
  */
 public interface ResponseInspector {
     Object getRequestId(Object message);
+
     ResponseType getResponseType(Object message);
 }

@@ -30,36 +30,31 @@ import org.apache.mina.common.IoFilterChain;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoFilterImpl extends IoFilterAdapter
-{
+public class IoFilterImpl extends IoFilterAdapter {
     private final char c;
 
-    public IoFilterImpl( char c )
-    {
+    public IoFilterImpl(char c) {
         this.c = c;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return c;
     }
 
     @Override
-    public boolean equals( Object o )
-    {
-        if( o == null ) {
+    public boolean equals(Object o) {
+        if (o == null) {
             return false;
         }
-        if( ! ( o instanceof IoFilterImpl ) ) {
+        if (!(o instanceof IoFilterImpl)) {
             return false;
         }
-        return this.c == ( ( IoFilterImpl ) o ).c;
+        return this.c == ((IoFilterImpl) o).c;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "" + c;
     }
 }

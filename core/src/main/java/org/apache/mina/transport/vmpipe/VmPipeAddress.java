@@ -27,8 +27,7 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAddress extends SocketAddress implements Comparable
-{
+public class VmPipeAddress extends SocketAddress implements Comparable {
     private static final long serialVersionUID = 3257844376976830515L;
 
     private final int port;
@@ -36,51 +35,44 @@ public class VmPipeAddress extends SocketAddress implements Comparable
     /**
      * Creates a new instance with the specifid port number.
      */
-    public VmPipeAddress( int port )
-    {
+    public VmPipeAddress(int port) {
         this.port = port;
     }
 
     /**
      * Returns the port number.
      */
-    public int getPort()
-    {
+    public int getPort() {
         return port;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return port;
     }
 
     @Override
-    public boolean equals( Object o )
-    {
-        if( o == null ) {
+    public boolean equals(Object o) {
+        if (o == null) {
             return false;
         }
-        if( this == o ) {
+        if (this == o) {
             return true;
         }
-        if( o instanceof VmPipeAddress )
-        {
-            VmPipeAddress that = ( VmPipeAddress ) o;
+        if (o instanceof VmPipeAddress) {
+            VmPipeAddress that = (VmPipeAddress) o;
             return this.port == that.port;
         }
 
         return false;
     }
 
-    public int compareTo( Object o )
-    {
-        return this.port - ( ( VmPipeAddress ) o ).port;
+    public int compareTo(Object o) {
+        return this.port - ((VmPipeAddress) o).port;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         if (port >= 0) {
             return "vm:server:" + port;
         } else {

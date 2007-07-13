@@ -33,14 +33,16 @@ import org.apache.mina.common.TransportType;
 public class DefaultTransportType implements TransportType {
 
     private final String name;
+
     private final boolean connectionless;
+
     private final Class<? extends SocketAddress> addressType;
+
     private final Class<? extends Object> envelopeType;
+
     private final Class<? extends IoSessionConfig> sessionConfigType;
-    
-    public DefaultTransportType(
-            String name,
-            boolean connectionless,
+
+    public DefaultTransportType(String name, boolean connectionless,
             Class<? extends SocketAddress> addressType,
             Class<? extends Object> envelopeType,
             Class<? extends IoSessionConfig> sessionConfigType) {
@@ -48,32 +50,32 @@ public class DefaultTransportType implements TransportType {
         if (name == null) {
             throw new NullPointerException("name");
         }
-        
+
         name = name.trim();
-        
+
         if (name.length() == 0) {
             throw new IllegalArgumentException("name is empty.");
         }
-        
+
         if (addressType == null) {
             throw new NullPointerException("addressType");
         }
-        
+
         if (envelopeType == null) {
             throw new NullPointerException("envelopeType");
         }
-        
+
         if (sessionConfigType == null) {
             throw new NullPointerException("sessionConfigType");
         }
-        
+
         this.name = name;
         this.connectionless = connectionless;
         this.addressType = addressType;
         this.envelopeType = envelopeType;
         this.sessionConfigType = sessionConfigType;
     }
-    
+
     public Class<? extends SocketAddress> getAddressType() {
         return addressType;
     }
@@ -81,7 +83,7 @@ public class DefaultTransportType implements TransportType {
     public Class<? extends Object> getEnvelopeType() {
         return envelopeType;
     }
-    
+
     public Class<? extends IoSessionConfig> getSessionConfigType() {
         return sessionConfigType;
     }
@@ -93,7 +95,7 @@ public class DefaultTransportType implements TransportType {
     public boolean isConnectionless() {
         return connectionless;
     }
-    
+
     @Override
     public String toString() {
         return name;

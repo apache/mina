@@ -42,94 +42,76 @@ import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class TextLineEncoderTest extends TestCase
-{
-    public static void main( String[] args )
-    {
-        junit.textui.TestRunner.run( TextLineEncoderTest.class );
+public class TextLineEncoderTest extends TestCase {
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(TextLineEncoderTest.class);
     }
 
-    public void testEncode() throws Exception
-    {
-        TextLineEncoder encoder = new TextLineEncoder(
-                Charset.forName( "UTF-8" ), LineDelimiter.WINDOWS );
+    public void testEncode() throws Exception {
+        TextLineEncoder encoder = new TextLineEncoder(Charset.forName("UTF-8"),
+                LineDelimiter.WINDOWS);
         IoSession session = new DummySession();
-        SimpleProtocolEncoderOutput out =
-            new SimpleProtocolEncoderOutput()
-            {
-                @Override
-                protected WriteFuture doFlush( ByteBuffer buf )
-                {
-                    return null;
-                }
-            };
-        
-        encoder.encode( session, "ABC", out );
-        Assert.assertEquals( 1, out.getBufferQueue().size() );
+        SimpleProtocolEncoderOutput out = new SimpleProtocolEncoderOutput() {
+            @Override
+            protected WriteFuture doFlush(ByteBuffer buf) {
+                return null;
+            }
+        };
+
+        encoder.encode(session, "ABC", out);
+        Assert.assertEquals(1, out.getBufferQueue().size());
         ByteBuffer buf = out.getBufferQueue().poll();
-        Assert.assertEquals( 5, buf.remaining() );
-        Assert.assertEquals( 'A', buf.get() );
-        Assert.assertEquals( 'B', buf.get() );
-        Assert.assertEquals( 'C', buf.get() );
-        Assert.assertEquals( '\r', buf.get() );
-        Assert.assertEquals( '\n', buf.get() );
+        Assert.assertEquals(5, buf.remaining());
+        Assert.assertEquals('A', buf.get());
+        Assert.assertEquals('B', buf.get());
+        Assert.assertEquals('C', buf.get());
+        Assert.assertEquals('\r', buf.get());
+        Assert.assertEquals('\n', buf.get());
     }
 
-    private static class DummySession extends BaseIoSession
-    {
+    private static class DummySession extends BaseIoSession {
         @Override
-        protected void updateTrafficMask()
-        {
+        protected void updateTrafficMask() {
         }
 
-        public IoService getService()
-        {
+        public IoService getService() {
             return null;
         }
 
-        public IoHandler getHandler()
-        {
+        public IoHandler getHandler() {
             return null;
         }
 
-        public IoFilterChain getFilterChain()
-        {
+        public IoFilterChain getFilterChain() {
             return null;
         }
 
-        public TransportType getTransportType()
-        {
+        public TransportType getTransportType() {
             return null;
         }
 
-        public SocketAddress getRemoteAddress()
-        {
+        public SocketAddress getRemoteAddress() {
             return null;
         }
 
-        public SocketAddress getLocalAddress()
-        {
+        public SocketAddress getLocalAddress() {
             return null;
         }
 
-        public int getScheduledWriteMessages()
-        {
+        public int getScheduledWriteMessages() {
             return 0;
         }
 
-        public IoSessionConfig getConfig()
-        {
+        public IoSessionConfig getConfig() {
             return null;
         }
 
         @Override
-        public SocketAddress getServiceAddress()
-        {
+        public SocketAddress getServiceAddress() {
             return null;
         }
 
-        public int getScheduledWriteBytes()
-        {
+        public int getScheduledWriteBytes() {
             return 0;
         }
     }

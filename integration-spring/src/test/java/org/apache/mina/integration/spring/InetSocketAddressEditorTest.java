@@ -29,69 +29,53 @@ import junit.framework.TestCase;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class InetSocketAddressEditorTest extends TestCase
-{
+public class InetSocketAddressEditorTest extends TestCase {
     InetSocketAddressEditor editor;
 
     @Override
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
         editor = new InetSocketAddressEditor();
     }
-    
-    public void testSetAsTextWithWildcardAddress() throws Exception
-    {
-        editor.setAsText( "1" );
-        assertEquals( new InetSocketAddress( 1 ), editor.getValue() );
-        editor.setAsText( ":10" );
-        assertEquals( new InetSocketAddress( 10 ), editor.getValue() );
+
+    public void testSetAsTextWithWildcardAddress() throws Exception {
+        editor.setAsText("1");
+        assertEquals(new InetSocketAddress(1), editor.getValue());
+        editor.setAsText(":10");
+        assertEquals(new InetSocketAddress(10), editor.getValue());
     }
-    
-    public void testSetAsTextWithHostName() throws Exception
-    {
-        editor.setAsText( "www.google.com:80" );
-        assertEquals( new InetSocketAddress( "www.google.com", 80 ), editor.getValue() );
+
+    public void testSetAsTextWithHostName() throws Exception {
+        editor.setAsText("www.google.com:80");
+        assertEquals(new InetSocketAddress("www.google.com", 80), editor
+                .getValue());
     }
-    
-    public void testSetAsTextWithIpAddress() throws Exception
-    {
-        editor.setAsText( "192.168.0.1:1000" );
-        assertEquals( new InetSocketAddress( "192.168.0.1", 1000 ), editor.getValue() );
+
+    public void testSetAsTextWithIpAddress() throws Exception {
+        editor.setAsText("192.168.0.1:1000");
+        assertEquals(new InetSocketAddress("192.168.0.1", 1000), editor
+                .getValue());
     }
-    
-    public void testSetAsTextWithIllegalValues() throws Exception
-    {
-        try
-        {
-            editor.setAsText( null );
-            fail( "null string. IllegalArgumentException expected." );
+
+    public void testSetAsTextWithIllegalValues() throws Exception {
+        try {
+            editor.setAsText(null);
+            fail("null string. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
-        catch( IllegalArgumentException iae )
-        {
+        try {
+            editor.setAsText("bar");
+            fail("Illegal port number. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
-        try
-        {
-            editor.setAsText( "bar" );
-            fail( "Illegal port number. IllegalArgumentException expected." );
+        try {
+            editor.setAsText(":foo");
+            fail("Illegal port number. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
-        catch( IllegalArgumentException iae )
-        {
-        }
-        try
-        {
-            editor.setAsText( ":foo" );
-            fail( "Illegal port number. IllegalArgumentException expected." );
-        }
-        catch( IllegalArgumentException iae )
-        {
-        }
-        try
-        {
-            editor.setAsText( "www.foo.com:yada" );
-            fail( "Illegal port number. IllegalArgumentException expected." );
-        }
-        catch( IllegalArgumentException iae )
-        {
+        try {
+            editor.setAsText("www.foo.com:yada");
+            fail("Illegal port number. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
     }
 

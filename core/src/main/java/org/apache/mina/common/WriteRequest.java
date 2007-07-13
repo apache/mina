@@ -27,8 +27,7 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface WriteRequest
-{
+public interface WriteRequest {
     /**
      * Returns {@link WriteFuture} that is associated with this write request.
      */
@@ -38,7 +37,7 @@ public interface WriteRequest
      * Returns a message object to be written.
      */
     Object getMessage();
-    
+
     /**
      * Returne the destination of this write request.
      * 

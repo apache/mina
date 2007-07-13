@@ -39,274 +39,252 @@ import org.apache.mina.common.TransportType;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 
  */
-public class FutureTest extends TestCase
-{
-    
-    public void testCloseFuture() throws Exception
-    {
-        DefaultCloseFuture future = new DefaultCloseFuture( null );
-        assertFalse( future.isReady() );
-        assertFalse( future.isClosed() );
-        
-        TestThread thread = new TestThread( future );
+public class FutureTest extends TestCase {
+
+    public void testCloseFuture() throws Exception {
+        DefaultCloseFuture future = new DefaultCloseFuture(null);
+        assertFalse(future.isReady());
+        assertFalse(future.isClosed());
+
+        TestThread thread = new TestThread(future);
         thread.start();
-        
+
         future.setClosed();
         thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertTrue( future.isClosed() );
+
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertTrue(future.isClosed());
     }
-    
-    public void testConnectFuture() throws Exception
-    {
+
+    public void testConnectFuture() throws Exception {
         DefaultConnectFuture future = new DefaultConnectFuture();
-        assertFalse( future.isReady() );
-        assertFalse( future.isConnected() );
-        assertNull( future.getSession() );
-        assertNull( future.getException() );
+        assertFalse(future.isReady());
+        assertFalse(future.isConnected());
+        assertNull(future.getSession());
+        assertNull(future.getException());
 
-        TestThread thread = new TestThread( future );
+        TestThread thread = new TestThread(future);
         thread.start();
-        
-        IoSession session = new BaseIoSession()
-        {
-            public IoHandler getHandler()
-            {
+
+        IoSession session = new BaseIoSession() {
+            public IoHandler getHandler() {
                 return null;
             }
 
-            public IoFilterChain getFilterChain()
-            {
+            public IoFilterChain getFilterChain() {
                 return null;
             }
 
-            public TransportType getTransportType()
-            {
+            public TransportType getTransportType() {
                 return null;
             }
 
-            public SocketAddress getRemoteAddress()
-            {
+            public SocketAddress getRemoteAddress() {
                 return null;
             }
 
-            public SocketAddress getLocalAddress()
-            {
+            public SocketAddress getLocalAddress() {
                 return null;
             }
 
-            public int getScheduledWriteMessages()
-            {
+            public int getScheduledWriteMessages() {
                 return 0;
             }
 
             @Override
-            protected void updateTrafficMask()
-            {
+            protected void updateTrafficMask() {
             }
 
             @Override
-            public boolean isClosing()
-            {
+            public boolean isClosing() {
                 return false;
             }
 
-            public IoService getService()
-            {
+            public IoService getService() {
                 return null;
             }
 
-            public IoSessionConfig getConfig()
-            {
+            public IoSessionConfig getConfig() {
                 return null;
             }
 
             @Override
-            public SocketAddress getServiceAddress()
-            {
+            public SocketAddress getServiceAddress() {
                 return null;
             }
 
-            public int getScheduledWriteBytes()
-            {
+            public int getScheduledWriteBytes() {
                 return 0;
             }
         };
-        
-        future.setSession( session );
+
+        future.setSession(session);
         thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertTrue( future.isConnected() );
-        assertEquals( session, future.getSession() );
-        assertNull( future.getException() );
-        
+
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertTrue(future.isConnected());
+        assertEquals(session, future.getSession());
+        assertNull(future.getException());
+
         future = new DefaultConnectFuture();
-        thread = new TestThread( future );
+        thread = new TestThread(future);
         thread.start();
-        future.setException( new IOException() );
+        future.setException(new IOException());
         thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertFalse( future.isConnected() );
-        assertTrue( future.getException() instanceof IOException );
 
-        try
-        {
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertFalse(future.isConnected());
+        assertTrue(future.getException() instanceof IOException);
+
+        try {
             future.getSession();
-            fail( "IOException should be thrown." );
-        }
-        catch( Exception e )
-        {
+            fail("IOException should be thrown.");
+        } catch (Exception e) {
         }
     }
-    
-    public void testWriteFuture() throws Exception
-    {
-        DefaultWriteFuture future = new DefaultWriteFuture( null );
-        assertFalse( future.isReady() );
-        assertFalse( future.isWritten() );
-        
-        TestThread thread = new TestThread( future );
-        thread.start();
-        
-        future.setWritten( true );
-        thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertTrue( future.isWritten() );
 
-        future = new DefaultWriteFuture( null );
-        thread = new TestThread( future );
+    public void testWriteFuture() throws Exception {
+        DefaultWriteFuture future = new DefaultWriteFuture(null);
+        assertFalse(future.isReady());
+        assertFalse(future.isWritten());
+
+        TestThread thread = new TestThread(future);
         thread.start();
-        
-        future.setWritten( false );
+
+        future.setWritten(true);
         thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertFalse( future.isWritten() );
+
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertTrue(future.isWritten());
+
+        future = new DefaultWriteFuture(null);
+        thread = new TestThread(future);
+        thread.start();
+
+        future.setWritten(false);
+        thread.join();
+
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertFalse(future.isWritten());
     }
-    
+
     public void testAddListener() throws Exception {
-        DefaultCloseFuture future = new DefaultCloseFuture( null );
-        assertFalse( future.isReady() );
-        assertFalse( future.isClosed() );
-        
+        DefaultCloseFuture future = new DefaultCloseFuture(null);
+        assertFalse(future.isReady());
+        assertFalse(future.isClosed());
+
         TestListener listener1 = new TestListener();
         TestListener listener2 = new TestListener();
         future.addListener(listener1);
         future.addListener(listener2);
-        
-        TestThread thread = new TestThread( future );
-        thread.start();
-        
-        future.setClosed();
-        thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertTrue( future.isClosed() );
 
-        assertSame( future, listener1.notifiedFuture );
-        assertSame( future, listener2.notifiedFuture );
-    }
-    
-    public void testLateAddListener() throws Exception {
-        DefaultCloseFuture future = new DefaultCloseFuture( null );
-        assertFalse( future.isReady() );
-        assertFalse( future.isClosed() );
-        
-        TestThread thread = new TestThread( future );
+        TestThread thread = new TestThread(future);
         thread.start();
-        
+
         future.setClosed();
         thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertTrue( future.isClosed() );
+
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertTrue(future.isClosed());
+
+        assertSame(future, listener1.notifiedFuture);
+        assertSame(future, listener2.notifiedFuture);
+    }
+
+    public void testLateAddListener() throws Exception {
+        DefaultCloseFuture future = new DefaultCloseFuture(null);
+        assertFalse(future.isReady());
+        assertFalse(future.isClosed());
+
+        TestThread thread = new TestThread(future);
+        thread.start();
+
+        future.setClosed();
+        thread.join();
+
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertTrue(future.isClosed());
 
         TestListener listener = new TestListener();
         future.addListener(listener);
-        assertSame( future, listener.notifiedFuture );
+        assertSame(future, listener.notifiedFuture);
     }
-    
+
     public void testRemoveListener1() throws Exception {
-        DefaultCloseFuture future = new DefaultCloseFuture( null );
-        assertFalse( future.isReady() );
-        assertFalse( future.isClosed() );
-        
+        DefaultCloseFuture future = new DefaultCloseFuture(null);
+        assertFalse(future.isReady());
+        assertFalse(future.isClosed());
+
         TestListener listener1 = new TestListener();
         TestListener listener2 = new TestListener();
         future.addListener(listener1);
         future.addListener(listener2);
         future.removeListener(listener1);
-        
-        TestThread thread = new TestThread( future );
+
+        TestThread thread = new TestThread(future);
         thread.start();
-        
+
         future.setClosed();
         thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertTrue( future.isClosed() );
 
-        assertSame( null, listener1.notifiedFuture );
-        assertSame( future, listener2.notifiedFuture );
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertTrue(future.isClosed());
+
+        assertSame(null, listener1.notifiedFuture);
+        assertSame(future, listener2.notifiedFuture);
     }
-    
+
     public void testRemoveListener2() throws Exception {
-        DefaultCloseFuture future = new DefaultCloseFuture( null );
-        assertFalse( future.isReady() );
-        assertFalse( future.isClosed() );
-        
+        DefaultCloseFuture future = new DefaultCloseFuture(null);
+        assertFalse(future.isReady());
+        assertFalse(future.isClosed());
+
         TestListener listener1 = new TestListener();
         TestListener listener2 = new TestListener();
         future.addListener(listener1);
         future.addListener(listener2);
         future.removeListener(listener2);
-        
-        TestThread thread = new TestThread( future );
+
+        TestThread thread = new TestThread(future);
         thread.start();
-        
+
         future.setClosed();
         thread.join();
-        
-        assertTrue( thread.success );
-        assertTrue( future.isReady() );
-        assertTrue( future.isClosed() );
 
-        assertSame( future, listener1.notifiedFuture );
-        assertSame( null, listener2.notifiedFuture );
+        assertTrue(thread.success);
+        assertTrue(future.isReady());
+        assertTrue(future.isClosed());
+
+        assertSame(future, listener1.notifiedFuture);
+        assertSame(null, listener2.notifiedFuture);
     }
-    
-    private static class TestThread extends Thread
-    {
+
+    private static class TestThread extends Thread {
         private final IoFuture future;
+
         private boolean success;
-        
-        public TestThread( IoFuture future )
-        {
+
+        public TestThread(IoFuture future) {
             this.future = future;
         }
-        
+
         @Override
-        public void run()
-        {
-            success = future.awaitUninterruptibly( 10000 );
+        public void run() {
+            success = future.awaitUninterruptibly(10000);
         }
     }
-    
+
     private static class TestListener implements IoFutureListener {
         private IoFuture notifiedFuture;
-        
+
         public void operationComplete(IoFuture future) {
             this.notifiedFuture = future;
         }

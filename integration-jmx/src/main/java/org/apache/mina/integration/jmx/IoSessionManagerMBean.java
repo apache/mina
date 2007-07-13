@@ -19,23 +19,19 @@
  */
 package org.apache.mina.integration.jmx;
 
-
 import java.util.Date;
-
 
 /**
  * MBean interface for the session manager, it's used for instrumenting IoSession 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoSessionManagerMBean
-{
+public interface IoSessionManagerMBean {
     /**
      * is the session is connected
      * @return connection status
      */
     public boolean isConnected();
-
 
     /**
      * bytes read from the beginning
@@ -43,13 +39,11 @@ public interface IoSessionManagerMBean
      */
     public long getReadBytes();
 
-
     /**
      * bytes written from the beginning
      * @return total of bytes written
      */
     public long getWrittenBytes();
-
 
     /**
      * PDU decoded from the beginning. Only revelent if a ProtocolCodecFilter is installed.
@@ -57,19 +51,16 @@ public interface IoSessionManagerMBean
      */
     public long getReadMessages();
 
-
     /**
      * PDU encoded from the beginning. Only revelent if a ProtocolCodecFilter is installed.
      * @return
      */
     public long getWrittenMessages();
 
-
     /**
      * close the session
      */
     public void close();
-
 
     /**
      * when the session was created
@@ -77,20 +68,17 @@ public interface IoSessionManagerMBean
      */
     public Date getCreationTime();
 
-
     /**
      * last time the session processed an IO
      * @return date of last IO
      */
     public Date getLastIoTime();
 
-
     /**
      * last time the session processed a write
      * @return date of last write
      */
     public Date getLastWriteTime();
-
 
     /**
      * last time the session processed an read
@@ -109,24 +97,20 @@ public interface IoSessionManagerMBean
      */
     public void addLastLoggingFilter();
 
-
     /**
      * remove the logging filter at end of the chain
      */
     public void removeLastLoggingFilter();
-
 
     /**
      * add a logging filter at begining of the chain
      */
     public void addFirstLoggingFilter();
 
-
     /**
      * remove the logging filter at begining of the chain
      */
     public void removeFirstLoggingFilter();
-
 
     /**
      * read and write IDLE time
@@ -134,35 +118,32 @@ public interface IoSessionManagerMBean
      */
     public long getBothIdleTime();
 
-
     /**
      * read IDLE time
      * @return read idle time in milli-seconds
      */
     public long getReadIdleTime();
 
-
     /**
      * write IDLE time
      * @return write idle time in milli-seconds
      */
     public long getWriteIdleTime();
-    
-    
+
     /**
      * get the read bytes per second throughput
      * works only if a stat collector is inspecting this session, 
      * @return read bytes per seconds
      */
     public float getByteReadThroughtput();
-    
+
     /**
      * get the written bytes per second throughput
      * works only if a stat collector is inspecting this session, 
      * @return written bytes per seconds
      */
     public float getByteWrittenThroughtput();
-    
+
     /**
      * get the read messages per second throughput
      * works only if a stat collector is inspecting this session, and only if a ProtocolDecoderFilter is used 

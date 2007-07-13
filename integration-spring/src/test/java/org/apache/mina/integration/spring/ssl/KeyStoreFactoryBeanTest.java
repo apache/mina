@@ -35,45 +35,41 @@ import org.springframework.core.io.ClassPathResource;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class KeyStoreFactoryBeanTest extends TestCase
-{
-    public void testCreateInstanceFromResource() throws Exception
-    {
+public class KeyStoreFactoryBeanTest extends TestCase {
+    public void testCreateInstanceFromResource() throws Exception {
         // Test using default for now. 
         KeyStoreFactoryBean factory = new KeyStoreFactoryBean();
-        factory.setResource( new ClassPathResource( "keystore.cert", getClass() ) );
-        factory.setPassword( "boguspw" );
-        
-        KeyStore ks = ( KeyStore ) factory.createInstance();
-        
-        ks.getCertificate( "bogus" );
-        ks.getKey( "bogus", "boguspw".toCharArray() );
+        factory.setResource(new ClassPathResource("keystore.cert", getClass()));
+        factory.setPassword("boguspw");
+
+        KeyStore ks = (KeyStore) factory.createInstance();
+
+        ks.getCertificate("bogus");
+        ks.getKey("bogus", "boguspw".toCharArray());
     }
-    
-    public void testCreateInstanceFromFile() throws Exception
-    {
+
+    public void testCreateInstanceFromFile() throws Exception {
         // Copy the keystore from the class path to a temporary file.
-        File file = File.createTempFile( "keystoretest ", null );
+        File file = File.createTempFile("keystoretest ", null);
         file.deleteOnExit();
-        InputStream in = getClass().getResourceAsStream( "keystore.cert" );
+        InputStream in = getClass().getResourceAsStream("keystore.cert");
         OutputStream out = new FileOutputStream(file);
         int b;
-        while( ( b = in.read() ) != -1 )
-        {
-            out.write( b );
+        while ((b = in.read()) != -1) {
+            out.write(b);
         }
         in.close();
         out.close();
-        
+
         // Test using default for now. 
         KeyStoreFactoryBean factory = new KeyStoreFactoryBean();
-        factory.setFile( file );
-        factory.setPassword( "boguspw" );
-        
-        KeyStore ks = ( KeyStore ) factory.createInstance();
-        
-        ks.getCertificate( "bogus" );
-        ks.getKey( "bogus", "boguspw".toCharArray() );
-    }    
-    
+        factory.setFile(file);
+        factory.setPassword("boguspw");
+
+        KeyStore ks = (KeyStore) factory.createInstance();
+
+        ks.getCertificate("bogus");
+        ks.getKey("bogus", "boguspw".toCharArray());
+    }
+
 }

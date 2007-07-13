@@ -40,37 +40,35 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class Main
-{
-    
-    public static void main( String[] args ) throws Exception
-    {
-        if( args.length != 3 )
-        {
-            System.out.println( Main.class.getName() + " <proxy-port> <server-hostname> <server-port>" );
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        if (args.length != 3) {
+            System.out.println(Main.class.getName()
+                    + " <proxy-port> <server-hostname> <server-port>");
             return;
         }
 
         // Create TCP/IP acceptor.
         SocketAcceptor acceptor = new SocketAcceptor();
-        acceptor.setReuseAddress( true );
-        
+        acceptor.setReuseAddress(true);
+
         // Create TCP/IP connector.
         IoConnector connector = new SocketConnector();
 
         // Set connect timeout.
-        connector.setConnectTimeout( 30 );
-        
-        ClientToProxyIoHandler handler = new ClientToProxyIoHandler(
-                connector,
-                new InetSocketAddress( args[ 1 ], Integer.parseInt( args[ 2 ] ) ) );
-        
+        connector.setConnectTimeout(30);
+
+        ClientToProxyIoHandler handler = new ClientToProxyIoHandler(connector,
+                new InetSocketAddress(args[1], Integer.parseInt(args[2])));
+
         // Start proxy.
-        acceptor.setLocalAddress( new InetSocketAddress( Integer.parseInt( args[ 0 ] ) ) );
-        acceptor.setHandler( handler );
+        acceptor.setLocalAddress(new InetSocketAddress(Integer
+                .parseInt(args[0])));
+        acceptor.setHandler(handler);
         acceptor.bind();
 
-        System.out.println( "Listening on port " + Integer.parseInt( args[ 0 ] ) );
+        System.out.println("Listening on port " + Integer.parseInt(args[0]));
     }
-    
+
 }

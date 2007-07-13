@@ -29,51 +29,38 @@ import org.apache.mina.transport.vmpipe.VmPipeAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAddressEditorTest extends TestCase
-{
+public class VmPipeAddressEditorTest extends TestCase {
     VmPipeAddressEditor editor;
 
     @Override
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
         editor = new VmPipeAddressEditor();
     }
-    
-    public void testSetAsTextWithLegalValues() throws Exception
-    {
-        editor.setAsText( "1" );
-        assertEquals( new VmPipeAddress( 1 ), editor.getValue() );
-        editor.setAsText( ":10" );
-        assertEquals( new VmPipeAddress( 10 ), editor.getValue() );
-        editor.setAsText( ":100" );
-        assertEquals( new VmPipeAddress( 100 ), editor.getValue() );
+
+    public void testSetAsTextWithLegalValues() throws Exception {
+        editor.setAsText("1");
+        assertEquals(new VmPipeAddress(1), editor.getValue());
+        editor.setAsText(":10");
+        assertEquals(new VmPipeAddress(10), editor.getValue());
+        editor.setAsText(":100");
+        assertEquals(new VmPipeAddress(100), editor.getValue());
     }
-    
-    public void testSetAsTextWithIllegalValues() throws Exception
-    {
-        try
-        {
-            editor.setAsText( null );
-            fail( "null string. IllegalArgumentException expected." );
+
+    public void testSetAsTextWithIllegalValues() throws Exception {
+        try {
+            editor.setAsText(null);
+            fail("null string. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
-        catch( IllegalArgumentException iae )
-        {
+        try {
+            editor.setAsText("bar");
+            fail("Illegal port number. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
-        try
-        {
-            editor.setAsText( "bar" );
-            fail( "Illegal port number. IllegalArgumentException expected." );
-        }
-        catch( IllegalArgumentException iae )
-        {
-        }
-        try
-        {
-            editor.setAsText( ":foo" );
-            fail( "Illegal port number. IllegalArgumentException expected." );
-        }
-        catch( IllegalArgumentException iae )
-        {
+        try {
+            editor.setAsText(":foo");
+            fail("Illegal port number. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
     }
 

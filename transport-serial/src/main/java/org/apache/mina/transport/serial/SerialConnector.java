@@ -114,27 +114,29 @@ public class SerialConnector extends BaseIoConnector {
                 }
             }
         }
-        
-        return DefaultConnectFuture.newFailedFuture(new SerialPortUnavailableException(
-                "Serial port not found"));
+
+        return DefaultConnectFuture
+                .newFailedFuture(new SerialPortUnavailableException(
+                        "Serial port not found"));
     }
 
     public TransportType getTransportType() {
         return SerialSession.serialTransportType;
     }
 
-    private SerialPort initializePort(String user, 
-            CommPortIdentifier portId, SerialAddress portAddress)
+    private SerialPort initializePort(String user, CommPortIdentifier portId,
+            SerialAddress portAddress)
             throws UnsupportedCommOperationException, PortInUseException {
-	
-	SerialSessionConfig config = (SerialSessionConfig) getSessionConfig();
 
-        SerialPort serialPort = (SerialPort) portId.open(user, config.getTimeout()); 
+        SerialSessionConfig config = (SerialSessionConfig) getSessionConfig();
+
+        SerialPort serialPort = (SerialPort) portId.open(user, config
+                .getTimeout());
 
         serialPort.setSerialPortParams(portAddress.getBauds(), portAddress
                 .getDataBitsForRXTX(), portAddress.getStopBitsForRXTX(),
                 portAddress.getParityForRXTX());
-        
+
         serialPort.setFlowControlMode(portAddress.getFLowControlForRXTX());
 
         serialPort.notifyOnDataAvailable(true);

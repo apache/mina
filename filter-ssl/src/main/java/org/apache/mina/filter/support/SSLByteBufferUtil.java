@@ -31,13 +31,15 @@ import javax.net.ssl.SSLEngine;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class SSLByteBufferUtil
-{
+class SSLByteBufferUtil {
     private static final int PACKET_BUFFER_INDEX = 0;
+
     private static final int APPLICATION_BUFFER_INDEX = 1;
 
     private static boolean initiated = false;
+
     private static int packetBufferSize;
+
     private static int appBufferSize;
 
     /**
@@ -45,10 +47,8 @@ class SSLByteBufferUtil
      *
      * @param sslEngine SSLEngine
      */
-    static synchronized void initiate( SSLEngine sslEngine )
-    {
-        if( !initiated )
-        {
+    static synchronized void initiate(SSLEngine sslEngine) {
+        if (!initiated) {
             // init buffer sizes from SSLEngine
             packetBufferSize = sslEngine.getSession().getPacketBufferSize();
 
@@ -64,39 +64,33 @@ class SSLByteBufferUtil
      * Get bytebuffer with size the size of the largest SSL/TLS packet that may occur
      * (as defined by SSLSession).
      */
-    static ByteBuffer getPacketBuffer()
-    {
-        if( !initiated )
-        {
-            throw new IllegalStateException( "Not initialized" );
+    static ByteBuffer getPacketBuffer() {
+        if (!initiated) {
+            throw new IllegalStateException("Not initialized");
         }
-        return allocate( PACKET_BUFFER_INDEX );
+        return allocate(PACKET_BUFFER_INDEX);
     }
 
     /**
      * Get ByteBuffer with the size of the largest application buffer that may occur
      * (as defined by SSLSession).
      */
-    static ByteBuffer getApplicationBuffer()
-    {
-        if( !initiated )
-        {
-            throw new IllegalStateException( "Not initialized" );
+    static ByteBuffer getApplicationBuffer() {
+        if (!initiated) {
+            throw new IllegalStateException("Not initialized");
         }
-        return allocate( APPLICATION_BUFFER_INDEX );
+        return allocate(APPLICATION_BUFFER_INDEX);
     }
 
     /**
      * Allocate or get the buffer which is capable of the specified size.
      */
-    private static ByteBuffer allocate( int idx )
-    {
-        switch( idx )
-        {
+    private static ByteBuffer allocate(int idx) {
+        switch (idx) {
         case PACKET_BUFFER_INDEX:
-            return createBuffer( packetBufferSize );
+            return createBuffer(packetBufferSize);
         case APPLICATION_BUFFER_INDEX:
-            return createBuffer( appBufferSize );
+            return createBuffer(appBufferSize);
         default:
             throw new IllegalStateException();
         }
@@ -107,36 +101,25 @@ class SSLByteBufferUtil
      * @param buf buffer to be expande
      * @param newCapacity new capacity
      */
-    public static ByteBuffer expandBuffer( ByteBuffer buf, int newCapacity )
-    {
-        ByteBuffer newBuf = createBuffer( newCapacity );
+    public static ByteBuffer expandBuffer(ByteBuffer buf, int newCapacity) {
+        ByteBuffer newBuf = createBuffer(newCapacity);
         buf.flip();
-        newBuf.put( buf );
+        newBuf.put(buf);
         return newBuf;
     }
 
-    private static ByteBuffer createBuffer( int capacity )
-    {
-        if( org.apache.mina.common.ByteBuffer.isPreferDirectBuffers() )
-        {
-            try
-            {
-                return ByteBuffer.allocateDirect( capacity );
+    private static ByteBuffer createBuffer(int capacity) {
+        if (org.apache.mina.common.ByteBuffer.isPreferDirectBuffers()) {
+            try {
+                return ByteBuffer.allocateDirect(capacity);
+            } catch (OutOfMemoryError e) {
+                return ByteBuffer.allocate(capacity);
             }
-            catch( OutOfMemoryError e )
-            {
-                return ByteBuffer.allocate( capacity );
-            }
-        }
-        else
-        {
-            try
-            {
-                return ByteBuffer.allocate( capacity );
-            }
-            catch( OutOfMemoryError e )
-            {
-                return ByteBuffer.allocateDirect( capacity );
+        } else {
+            try {
+                return ByteBuffer.allocate(capacity);
+            } catch (OutOfMemoryError e) {
+                return ByteBuffer.allocateDirect(capacity);
             }
         }
     }

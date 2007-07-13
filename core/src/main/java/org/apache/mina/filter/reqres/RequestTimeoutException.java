@@ -31,7 +31,7 @@ public class RequestTimeoutException extends RuntimeException {
     private static final long serialVersionUID = 5546784978950631652L;
 
     private final Request request;
-    
+
     /**
      * Creates a new exception.
      */
@@ -56,7 +56,8 @@ public class RequestTimeoutException extends RuntimeException {
     /**
      * Creates a new exception.
      */
-    public RequestTimeoutException(Request request, String message, Throwable cause) {
+    public RequestTimeoutException(Request request, String message,
+            Throwable cause) {
         super(message);
         initCause(cause);
         if (request == null) {
@@ -75,7 +76,7 @@ public class RequestTimeoutException extends RuntimeException {
         }
         this.request = request;
     }
-    
+
     /**
      * Returns the request which has timed out.
      */

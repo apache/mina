@@ -31,46 +31,40 @@ import org.apache.mina.transport.socket.nio.SocketAcceptor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class Server
-{
+public class Server {
     /** Default HTTP port */
     private static final int DEFAULT_PORT = 8080;
 
     /** Tile server revision number */
     public static final String VERSION_STRING = "$Revision$ $Date$";
 
-    public static void main( String[] args )
-    {
+    public static void main(String[] args) {
         int port = DEFAULT_PORT;
 
-        for( int i = 0; i < args.length; i++ )
-        {
-            if( args[ i ].equals( "-port" ) )
-            {
-                port = Integer.parseInt( args[ i + 1 ] );
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-port")) {
+                port = Integer.parseInt(args[i + 1]);
             }
         }
 
-        try
-        {
+        try {
             // Create an acceptor
             SocketAcceptor acceptor = new SocketAcceptor();
-            
+
             // Create a service configuration
-            acceptor.setReuseAddress( true );
+            acceptor.setReuseAddress(true);
             acceptor.getFilterChain().addLast(
                     "protocolFilter",
-                    new ProtocolCodecFilter( new HttpServerProtocolCodecFactory() ) );
-            acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+                    new ProtocolCodecFilter(
+                            new HttpServerProtocolCodecFactory()));
+            acceptor.getFilterChain().addLast("logger", new LoggingFilter());
 
-            acceptor.setLocalAddress( new InetSocketAddress( port ) );
-            acceptor.setHandler( new ServerHandler() );
+            acceptor.setLocalAddress(new InetSocketAddress(port));
+            acceptor.setHandler(new ServerHandler());
             acceptor.bind();
 
-            System.out.println( "Server now listening on port " + port );
-        }
-        catch( Exception ex )
-        {
+            System.out.println("Server now listening on port " + port);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

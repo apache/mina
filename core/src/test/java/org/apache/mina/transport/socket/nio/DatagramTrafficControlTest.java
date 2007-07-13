@@ -34,27 +34,23 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Id$
  */
-public class DatagramTrafficControlTest extends AbstractTrafficControlTest
-{
+public class DatagramTrafficControlTest extends AbstractTrafficControlTest {
 
-    public DatagramTrafficControlTest()
-    {
-        super( new DatagramAcceptor() );
+    public DatagramTrafficControlTest() {
+        super(new DatagramAcceptor());
     }
 
     @Override
-    protected ConnectFuture connect( int port, IoHandler handler )
-            throws Exception
-    {
+    protected ConnectFuture connect(int port, IoHandler handler)
+            throws Exception {
         IoConnector connector = new DatagramConnector();
-        connector.setHandler( handler );
-        return connector.connect( new InetSocketAddress( "localhost", port ) );
+        connector.setHandler(handler);
+        return connector.connect(new InetSocketAddress("localhost", port));
     }
 
     @Override
-    protected SocketAddress createServerSocketAddress( int port )
-    {
-        return new InetSocketAddress( port );
+    protected SocketAddress createServerSocketAddress(int port) {
+        return new InetSocketAddress(port);
     }
 
 }

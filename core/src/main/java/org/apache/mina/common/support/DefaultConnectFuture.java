@@ -30,87 +30,73 @@ import org.apache.mina.common.RuntimeIOException;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFuture
-{
+public class DefaultConnectFuture extends DefaultIoFuture implements
+        ConnectFuture {
     /**
      * Returns a new {@link ConnectFuture} which is already marked as 'failed to connect'.
      */
-    public static ConnectFuture newFailedFuture( Throwable exception )
-    {
+    public static ConnectFuture newFailedFuture(Throwable exception) {
         DefaultConnectFuture failedFuture = new DefaultConnectFuture();
-        failedFuture.setException( exception );
+        failedFuture.setException(exception);
         return failedFuture;
     }
-    
+
     /**
      * Creates a new instance.
      */
-    public DefaultConnectFuture()
-    {
-        super( null );
+    public DefaultConnectFuture() {
+        super(null);
     }
-    
+
     @Override
-    public IoSession getSession() throws RuntimeIOException
-    {
+    public IoSession getSession() throws RuntimeIOException {
         Object v = getValue();
-        if( v instanceof RuntimeIOException )
-        {
-            throw ( RuntimeIOException ) v;
-        }
-        else if( v instanceof Throwable )
-        {
-            throw ( RuntimeIOException ) new RuntimeIOException( "Failed to get the session." ).initCause( ( Throwable ) v );
-        }
-        else
-        {
-            return ( IoSession ) v;
+        if (v instanceof RuntimeIOException) {
+            throw (RuntimeIOException) v;
+        } else if (v instanceof Throwable) {
+            throw (RuntimeIOException) new RuntimeIOException(
+                    "Failed to get the session.").initCause((Throwable) v);
+        } else {
+            return (IoSession) v;
         }
     }
-    
-    public Throwable getException()
-    {
+
+    public Throwable getException() {
         Object v = getValue();
-        if( v instanceof Throwable )
-        {
-            return ( Throwable ) v;
-        }
-        else
-        {
+        if (v instanceof Throwable) {
+            return (Throwable) v;
+        } else {
             return null;
         }
     }
 
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return getValue() instanceof IoSession;
     }
-    
-    public void setSession( IoSession session )
-    {
-        setValue( session );
+
+    public void setSession(IoSession session) {
+        setValue(session);
     }
-    
-    public void setException( Throwable exception )
-    {
-        setValue( exception );
+
+    public void setException(Throwable exception) {
+        setValue(exception);
     }
 
     @Override
     public ConnectFuture await() throws InterruptedException {
         return (ConnectFuture) super.await();
     }
-    
+
     @Override
     public ConnectFuture awaitUninterruptibly() {
         return (ConnectFuture) super.awaitUninterruptibly();
     }
-    
+
     @Override
     public ConnectFuture addListener(IoFutureListener listener) {
         return (ConnectFuture) super.addListener(listener);
     }
-    
+
     @Override
     public ConnectFuture removeListener(IoFutureListener listener) {
         return (ConnectFuture) super.removeListener(listener);

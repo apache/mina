@@ -35,14 +35,12 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptor extends DelegatedIoAcceptor
-{
+public class DatagramAcceptor extends DelegatedIoAcceptor {
     /**
      * Creates a new instance using a NewThreadExecutor
      */
-    public DatagramAcceptor()
-    {
-        init( new DatagramAcceptorDelegate( this, new NewThreadExecutor( ) ) );
+    public DatagramAcceptor() {
+        init(new DatagramAcceptorDelegate(this, new NewThreadExecutor()));
     }
 
     /**
@@ -50,21 +48,20 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
      * 
      * @param executor Executor to use for launching threads
      */
-    public DatagramAcceptor( Executor executor )
-    {
-        init( new DatagramAcceptorDelegate( this, executor ) );
+    public DatagramAcceptor(Executor executor) {
+        init(new DatagramAcceptorDelegate(this, executor));
     }
-    
+
     @Override
     public DatagramSessionConfig getSessionConfig() {
-        return ( ( DatagramAcceptorDelegate ) delegate ).getSessionConfig();
+        return ((DatagramAcceptorDelegate) delegate).getSessionConfig();
     }
 
     @Override
     public InetSocketAddress getLocalAddress() {
-        return ( ( DatagramAcceptorDelegate ) delegate ).getLocalAddress();
+        return ((DatagramAcceptorDelegate) delegate).getLocalAddress();
     }
-    
+
     // This method is overriden to work around a problem with
     // bean property access mechanism.
 
@@ -76,9 +73,8 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
     /**
      * Returns the {@link IoSessionRecycler} for this service.
      */
-    public IoSessionRecycler getSessionRecycler()
-    {
-        return ( ( DatagramAcceptorDelegate ) delegate ).getSessionRecycler();
+    public IoSessionRecycler getSessionRecycler() {
+        return ((DatagramAcceptorDelegate) delegate).getSessionRecycler();
     }
 
     /**
@@ -86,8 +82,8 @@ public class DatagramAcceptor extends DelegatedIoAcceptor
      * 
      * @param sessionRecycler <tt>null</tt> to use the default recycler
      */
-    public void setSessionRecycler( IoSessionRecycler sessionRecycler )
-    {
-        ( ( DatagramAcceptorDelegate ) delegate ).setSessionRecycler( sessionRecycler );
+    public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
+        ((DatagramAcceptorDelegate) delegate)
+                .setSessionRecycler(sessionRecycler);
     }
 }

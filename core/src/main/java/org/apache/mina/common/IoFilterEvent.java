@@ -30,18 +30,19 @@ import org.apache.mina.common.IoFilter.NextFilter;
  * @version $Rev$, $Date$
  */
 public class IoFilterEvent extends IoEvent {
-    
+
     private final NextFilter nextFilter;
 
-    public IoFilterEvent(NextFilter nextFilter, IoEventType type, IoSession session, Object parameter) {
+    public IoFilterEvent(NextFilter nextFilter, IoEventType type,
+            IoSession session, Object parameter) {
         super(type, session, parameter);
-        
+
         if (nextFilter == null) {
             throw new NullPointerException("nextFilter");
         }
         this.nextFilter = nextFilter;
     }
-    
+
     public NextFilter getNextFilter() {
         return nextFilter;
     }

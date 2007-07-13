@@ -54,21 +54,20 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Cloneable
-{
+public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
+        Cloneable {
     private List<Entry> entries;
+
     private Map<String, Entry> entriesByName;
-    
+
     /**
      * Creates a new instance with an empty filter list.
      */
-    public DefaultIoFilterChainBuilder()
-    {
+    public DefaultIoFilterChainBuilder() {
         init();
     }
-    
-    private void init()
-    {
+
+    private void init() {
         entries = new CopyOnWriteArrayList<Entry>();
         entriesByName = new HashMap<String, Entry>();
     }
@@ -76,110 +75,96 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     /**
      * @see IoFilterChain#getEntry(String)
      */
-    public synchronized Entry getEntry( String name )
-    {
-        return entriesByName.get( name );
+    public synchronized Entry getEntry(String name) {
+        return entriesByName.get(name);
     }
 
     /**
      * @see IoFilterChain#get(String)
      */
-    public synchronized IoFilter get( String name )
-    {
-        Entry e = getEntry( name );
-        if( e == null )
-        {
+    public synchronized IoFilter get(String name) {
+        Entry e = getEntry(name);
+        if (e == null) {
             return null;
         }
-        
+
         return e.getFilter();
     }
-    
+
     /**
      * @see IoFilterChain#getAll()
      */
-    public List<Entry> getAll()
-    {
-        return new ArrayList<Entry>( entries );
+    public List<Entry> getAll() {
+        return new ArrayList<Entry>(entries);
     }
-    
+
     /**
      * @see IoFilterChain#getAllReversed()
      */
-    public List<Entry> getAllReversed()
-    {
+    public List<Entry> getAllReversed() {
         List<Entry> result = getAll();
-        Collections.reverse( result );
+        Collections.reverse(result);
         return result;
     }
 
     /**
      * @see IoFilterChain#contains(String)
      */
-    public boolean contains( String name )
-    {
-        return getEntry( name ) != null;
+    public boolean contains(String name) {
+        return getEntry(name) != null;
     }
-    
+
     /**
      * @see IoFilterChain#contains(IoFilter)
      */
-    public boolean contains( IoFilter filter )
-    {
+    public boolean contains(IoFilter filter) {
         for (Entry e : entries) {
-            if( e.getFilter() == filter )
-            {
+            if (e.getFilter() == filter) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * @see IoFilterChain#contains(Class)
      */
-    public boolean contains( Class<? extends IoFilter> filterType )
-    {
+    public boolean contains(Class<? extends IoFilter> filterType) {
         for (Entry e : entries) {
-            if( filterType.isAssignableFrom( e.getFilter().getClass() ) )
-            {
+            if (filterType.isAssignableFrom(e.getFilter().getClass())) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * @see IoFilterChain#addFirst(String, IoFilter)
      */
-    public synchronized void addFirst( String name, IoFilter filter )
-    {
-        register( 0, new EntryImpl( name, filter ) );
+    public synchronized void addFirst(String name, IoFilter filter) {
+        register(0, new EntryImpl(name, filter));
     }
-    
+
     /**
      * @see IoFilterChain#addLast(String, IoFilter)
      */
-    public synchronized void addLast( String name, IoFilter filter )
-    {
-        register( entries.size(), new EntryImpl( name, filter ) );
+    public synchronized void addLast(String name, IoFilter filter) {
+        register(entries.size(), new EntryImpl(name, filter));
     }
 
     /**
      * @see IoFilterChain#addBefore(String, String, IoFilter)
      */
-    public synchronized void addBefore( String baseName, String name, IoFilter filter )
-    {
-        checkBaseName( baseName );
-        
-        for( ListIterator i = entries.listIterator(); i.hasNext(); )
-        {
-            Entry base = ( Entry ) i.next();
-            if( base.getName().equals( baseName ) )
-            {
-                register( i.previousIndex(), new EntryImpl( name, filter ) );
+    public synchronized void addBefore(String baseName, String name,
+            IoFilter filter) {
+        checkBaseName(baseName);
+
+        for (ListIterator i = entries.listIterator(); i.hasNext();) {
+            Entry base = (Entry) i.next();
+            if (base.getName().equals(baseName)) {
+                register(i.previousIndex(), new EntryImpl(name, filter));
                 break;
             }
         }
@@ -188,18 +173,16 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     /**
      * @see IoFilterChain#addAfter(String, String, IoFilter)
      */
-    public synchronized void addAfter( String baseName, String name, IoFilter filter )
-    {
-        checkBaseName( baseName );
-        
-        List<Entry> entries = new ArrayList<Entry>( this.entries );
-        
-        for( ListIterator<Entry> i = entries.listIterator(); i.hasNext(); )
-        {
+    public synchronized void addAfter(String baseName, String name,
+            IoFilter filter) {
+        checkBaseName(baseName);
+
+        List<Entry> entries = new ArrayList<Entry>(this.entries);
+
+        for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
             Entry base = i.next();
-            if( base.getName().equals( baseName ) )
-            {
-                register( i.nextIndex(), new EntryImpl( name, filter ) );
+            if (base.getName().equals(baseName)) {
+                register(i.nextIndex(), new EntryImpl(name, filter));
                 break;
             }
         }
@@ -208,27 +191,23 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
     /**
      * @see IoFilterChain#remove(String)
      */
-    public synchronized IoFilter remove( String name )
-    {
-        if( name == null )
-        {
-            throw new NullPointerException( "name" );
+    public synchronized IoFilter remove(String name) {
+        if (name == null) {
+            throw new NullPointerException("name");
         }
 
-        for( ListIterator<Entry> i = entries.listIterator(); i.hasNext(); )
-        {
+        for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
             Entry e = i.next();
-            if( e.getName().equals( name ) )
-            {
-                deregister( i.previousIndex(), e );
+            if (e.getName().equals(name)) {
+                deregister(i.previousIndex(), e);
                 return e.getFilter();
             }
         }
-        
-        throw new IllegalArgumentException( "Unknown filter name: " + name );
+
+        throw new IllegalArgumentException("Unknown filter name: " + name);
     }
 
-    public synchronized IoFilter replace( String name, IoFilter newFilter ) {
+    public synchronized IoFilter replace(String name, IoFilter newFilter) {
         checkBaseName(name);
         EntryImpl e = (EntryImpl) get(name);
         IoFilter oldFilter = e.getFilter();
@@ -236,174 +215,154 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder, Clonea
         return oldFilter;
     }
 
-    public synchronized void replace( IoFilter oldFilter, IoFilter newFilter ) {
-        for (Entry e: entries) {
+    public synchronized void replace(IoFilter oldFilter, IoFilter newFilter) {
+        for (Entry e : entries) {
             if (e.getFilter() == oldFilter) {
                 ((EntryImpl) e).setFilter(newFilter);
                 return;
             }
         }
-        throw new IllegalArgumentException("Filter not found: " + oldFilter.getClass().getName());
+        throw new IllegalArgumentException("Filter not found: "
+                + oldFilter.getClass().getName());
     }
 
-    public synchronized void replace( Class<? extends IoFilter> oldFilterType, IoFilter newFilter ) {
-        for (Entry e: entries) {
-            if( oldFilterType.isAssignableFrom( e.getFilter().getClass() ) )
-            {
+    public synchronized void replace(Class<? extends IoFilter> oldFilterType,
+            IoFilter newFilter) {
+        for (Entry e : entries) {
+            if (oldFilterType.isAssignableFrom(e.getFilter().getClass())) {
                 ((EntryImpl) e).setFilter(newFilter);
                 return;
             }
         }
-        throw new IllegalArgumentException("Filter not found: " + oldFilterType.getName());
+        throw new IllegalArgumentException("Filter not found: "
+                + oldFilterType.getName());
     }
 
     /**
      * @see IoFilterChain#clear()
      */
-    public synchronized void clear() throws Exception
-    {
+    public synchronized void clear() throws Exception {
         entries = new ArrayList<Entry>();
         entriesByName.clear();
     }
-    
-    public void buildFilterChain( IoFilterChain chain ) throws Exception
-    {
+
+    public void buildFilterChain(IoFilterChain chain) throws Exception {
         for (Entry e : entries) {
-            chain.addLast( e.getName(), e.getFilter() );
+            chain.addLast(e.getName(), e.getFilter());
         }
     }
-    
+
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append( "{ " );
-        
+        buf.append("{ ");
+
         boolean empty = true;
-        
+
         for (Entry e : entries) {
-            if( !empty )
-            {
-                buf.append( ", " );
-            }
-            else
-            {
+            if (!empty) {
+                buf.append(", ");
+            } else {
                 empty = false;
             }
-            
-            buf.append( '(' );
-            buf.append( e.getName() );
-            buf.append( ':' );
-            buf.append( e.getFilter() );
-            buf.append( ')' );
+
+            buf.append('(');
+            buf.append(e.getName());
+            buf.append(':');
+            buf.append(e.getFilter());
+            buf.append(')');
         }
-        
-        if( empty )
-        {
-            buf.append( "empty" );
+
+        if (empty) {
+            buf.append("empty");
         }
-        
-        buf.append( " }" );
-        
+
+        buf.append(" }");
+
         return buf.toString();
     }
-    
+
     @Override
-    public Object clone()
-    {
+    public Object clone() {
         DefaultIoFilterChainBuilder ret;
-        try
-        {
-            ret = ( DefaultIoFilterChainBuilder ) super.clone();
+        try {
+            ret = (DefaultIoFilterChainBuilder) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw (InternalError) new InternalError().initCause(e);
         }
-        catch( CloneNotSupportedException e )
-        {
-            throw ( InternalError ) new InternalError().initCause(e);
-        }
-        
+
         ret.init();
-        
+
         for (Entry e : entries) {
-            ret.addLast( e.getName(), e.getFilter() );
+            ret.addLast(e.getName(), e.getFilter());
         }
         return ret;
     }
 
-    private void checkBaseName( String baseName )
-    {
-        if( baseName == null )
-        {
-            throw new NullPointerException( "baseName" );
+    private void checkBaseName(String baseName) {
+        if (baseName == null) {
+            throw new NullPointerException("baseName");
         }
-        if( !entriesByName.containsKey( baseName ) )
-        {
-            throw new IllegalArgumentException( "Unknown filter name: " + baseName );
+        if (!entriesByName.containsKey(baseName)) {
+            throw new IllegalArgumentException("Unknown filter name: "
+                    + baseName);
         }
     }
 
-    private void register( int index, Entry e )
-    {
-        if( entriesByName.containsKey( e.getName() ) )
-        {
-            throw new IllegalArgumentException( "Other filter is using the same name: " + e.getName() );
+    private void register(int index, Entry e) {
+        if (entriesByName.containsKey(e.getName())) {
+            throw new IllegalArgumentException(
+                    "Other filter is using the same name: " + e.getName());
         }
 
-        List<Entry> newEntries = new ArrayList<Entry>( entries );
-        newEntries.add( index, e );
+        List<Entry> newEntries = new ArrayList<Entry>(entries);
+        newEntries.add(index, e);
         this.entries = newEntries;
-        entriesByName.put( e.getName(), e );
-    }
-    
-    private void deregister( int index, Entry e )
-    {
-        List<Entry> newEntries = new ArrayList<Entry>( entries );
-        newEntries.remove( index );
-        this.entries = newEntries;
-        entriesByName.remove( e.getName() );
+        entriesByName.put(e.getName(), e);
     }
 
-    private static class EntryImpl implements Entry
-    {
+    private void deregister(int index, Entry e) {
+        List<Entry> newEntries = new ArrayList<Entry>(entries);
+        newEntries.remove(index);
+        this.entries = newEntries;
+        entriesByName.remove(e.getName());
+    }
+
+    private static class EntryImpl implements Entry {
         private final String name;
+
         private IoFilter filter;
-        
-        private EntryImpl( String name, IoFilter filter )
-        {
-            if( name == null )
-            {
-                throw new NullPointerException( "name" );
+
+        private EntryImpl(String name, IoFilter filter) {
+            if (name == null) {
+                throw new NullPointerException("name");
             }
-            if( filter == null )
-            {
-                throw new NullPointerException( "filter" );
+            if (filter == null) {
+                throw new NullPointerException("filter");
             }
-            
+
             this.name = name;
             this.filter = filter;
         }
 
-        public String getName()
-        {
+        public String getName() {
             return name;
         }
-        
-        public IoFilter getFilter()
-        {
+
+        public IoFilter getFilter() {
             return filter;
         }
-        
+
         private void setFilter(IoFilter filter) {
             this.filter = filter;
         }
 
-        public NextFilter getNextFilter()
-        {
+        public NextFilter getNextFilter() {
             throw new IllegalStateException();
         }
-        
+
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "(" + getName() + ':' + filter + ')';
         }
     }

@@ -34,63 +34,60 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class SwingChatClientHandler extends IoHandlerAdapter
-{
-    
-    public interface Callback
-    {
+public class SwingChatClientHandler extends IoHandlerAdapter {
+
+    public interface Callback {
         void connected();
+
         void loggedIn();
+
         void loggedOut();
+
         void disconnected();
-        void messageReceived( String message );
-        void error( String message );
+
+        void messageReceived(String message);
+
+        void error(String message);
     }
-    
+
     private static final IoFilter LOGGING_FILTER = new LoggingFilter();
+
     private static final IoFilter CODEC_FILTER = new ProtocolCodecFilter(
-            new TextLineCodecFactory() );
+            new TextLineCodecFactory());
 
     private final Callback callback;
 
-    public SwingChatClientHandler( Callback callback )
-    {
+    public SwingChatClientHandler(Callback callback) {
         this.callback = callback;
     }
 
     @Override
-    public void sessionCreated( IoSession session ) throws Exception
-    {
-        session.getFilterChain().addLast( "codec", CODEC_FILTER );
-        session.getFilterChain().addLast( "logger", LOGGING_FILTER );
+    public void sessionCreated(IoSession session) throws Exception {
+        session.getFilterChain().addLast("codec", CODEC_FILTER);
+        session.getFilterChain().addLast("logger", LOGGING_FILTER);
     }
 
     @Override
-    public void sessionOpened( IoSession session ) throws Exception
-    {
+    public void sessionOpened(IoSession session) throws Exception {
         callback.connected();
     }
 
     @Override
-    public void messageReceived( IoSession session, Object message )
-            throws Exception
-    {
-        String theMessage = ( String ) message;
-        String[] result = theMessage.split( " ", 3 );
-        String status = result[ 1 ];
-        String theCommand = result[ 0 ];
-        ChatCommand command = ChatCommand.valueOf( theCommand );
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
+        String theMessage = (String) message;
+        String[] result = theMessage.split(" ", 3);
+        String status = result[1];
+        String theCommand = result[0];
+        ChatCommand command = ChatCommand.valueOf(theCommand);
 
-        if( "OK".equals( status ) )
-        {
+        if ("OK".equals(status)) {
 
-            switch( command.toInt() )
-            {
+            switch (command.toInt()) {
 
             case ChatCommand.BROADCAST:
-                if( result.length == 3 )
-                {
-                    callback.messageReceived( result[ 2 ] );
+                if (result.length == 3) {
+                    callback.messageReceived(result[2]);
                 }
                 break;
             case ChatCommand.LOGIN:
@@ -102,19 +99,15 @@ public class SwingChatClientHandler extends IoHandlerAdapter
                 break;
             }
 
-        }
-        else
-        {
-            if( result.length == 3 )
-            {
-                callback.error( result[ 2 ] );
+        } else {
+            if (result.length == 3) {
+                callback.error(result[2]);
             }
         }
     }
 
     @Override
-    public void sessionClosed( IoSession session ) throws Exception
-    {
+    public void sessionClosed(IoSession session) throws Exception {
         callback.disconnected();
     }
 

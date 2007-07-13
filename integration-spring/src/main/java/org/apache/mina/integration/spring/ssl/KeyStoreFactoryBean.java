@@ -38,12 +38,15 @@ import org.springframework.util.Assert;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class KeyStoreFactoryBean extends AbstractFactoryBean
-{
+public class KeyStoreFactoryBean extends AbstractFactoryBean {
     private String type = "JKS";
+
     private String provider = null;
+
     private char[] password = null;
+
     private File file = null;
+
     private Resource resource = null;
 
     /**
@@ -53,54 +56,39 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean
      * @return the {@link KeyStore} instance.
      */
     @Override
-    protected Object createInstance() throws Exception
-    {
-        if( file == null && resource == null )
-        {
-            throw new IllegalArgumentException( "Required property missing. " +
-                    "Either 'file' or 'resource' have to be specified" );
+    protected Object createInstance() throws Exception {
+        if (file == null && resource == null) {
+            throw new IllegalArgumentException("Required property missing. "
+                    + "Either 'file' or 'resource' have to be specified");
         }
-        
+
         KeyStore ks = null;
-        if( provider == null )
-        {
-            ks = KeyStore.getInstance( type );
+        if (provider == null) {
+            ks = KeyStore.getInstance(type);
+        } else {
+            ks = KeyStore.getInstance(type, provider);
         }
-        else
-        {
-            ks = KeyStore.getInstance( type, provider );
-        }
-        
+
         InputStream is = null;
-        if( file != null )
-        {
-            is = new BufferedInputStream( new FileInputStream( file ) );
-        }
-        else
-        {
+        if (file != null) {
+            is = new BufferedInputStream(new FileInputStream(file));
+        } else {
             is = resource.getInputStream();
         }
-        
-        try
-        {
-            ks.load( is, password );
-        }
-        finally
-        {
-            try
-            {
+
+        try {
+            ks.load(is, password);
+        } finally {
+            try {
                 is.close();
-            }
-            catch( IOException ignored )
-            {
+            } catch (IOException ignored) {
             }
         }
-        
+
         return ks;
     }
 
-    public Class getObjectType()
-    {
+    public Class getObjectType() {
         return KeyStore.class;
     }
 
@@ -110,8 +98,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean
      * 
      * @param file the file to load the key store from.
      */
-    public void setFile( File file )
-    {
+    public void setFile(File file) {
         this.file = file;
     }
 
@@ -122,14 +109,10 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean
      * @param password the password or <code>null</code> if no password is 
      *        needed.
      */
-    public void setPassword( String password )
-    {
-        if( password != null )
-        {
+    public void setPassword(String password) {
+        if (password != null) {
             this.password = password.toCharArray();
-        }
-        else
-        {
+        } else {
             this.password = null;
         }
     }
@@ -140,8 +123,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean
      * 
      * @param provider the name of the provider, e.g. SUN.
      */
-    public void setProvider( String provider )
-    {
+    public void setProvider(String provider) {
         this.provider = provider;
     }
 
@@ -151,8 +133,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean
      * 
      * @param resource the resource to load the key store from.
      */
-    public void setResource( Resource resource )
-    {
+    public void setResource(Resource resource) {
         this.resource = resource;
     }
 
@@ -164,9 +145,8 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean
      * @throws IllegalArgumentException if the specified value is 
      *         <code>null</code>.
      */
-    public void setType( String type )
-    {
-        Assert.notNull( type, "Property 'type' may not be null" );
+    public void setType(String type) {
+        Assert.notNull(type, "Property 'type' may not be null");
         this.type = type;
     }
 }

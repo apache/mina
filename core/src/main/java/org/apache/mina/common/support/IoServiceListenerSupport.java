@@ -39,13 +39,12 @@ import org.apache.mina.util.IdentityHashSet;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoServiceListenerSupport
-{
+public class IoServiceListenerSupport {
     /**
      * The {@link IoService} that this instance manages.
      */
     private final IoService service;
-    
+
     /**
      * A list of {@link IoServiceListener}s.
      */
@@ -55,48 +54,40 @@ public class IoServiceListenerSupport
      * Tracks managed sesssions.
      */
     private final Set<IoSession> managedSessions = new IdentityHashSet<IoSession>();
-    
+
     private boolean activated;
-    
+
     /**
      * Creates a new instance.
      */
-    public IoServiceListenerSupport( IoService service )
-    {
-        if( service == null )
-        {
-            throw new NullPointerException( "service" );
+    public IoServiceListenerSupport(IoService service) {
+        if (service == null) {
+            throw new NullPointerException("service");
         }
         this.service = service;
     }
-    
+
     /**
      * Adds a new listener.
      */
-    public void add( IoServiceListener listener )
-    {
-        synchronized( listeners )
-        {
-            listeners.add( listener );
+    public void add(IoServiceListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
         }
     }
 
     /**
      * Removes an existing listener.
      */
-    public void remove( IoServiceListener listener )
-    {
-        synchronized( listeners )
-        {
-            listeners.remove( listener );
+    public void remove(IoServiceListener listener) {
+        synchronized (listeners) {
+            listeners.remove(listener);
         }
     }
-    
-    public Set<IoSession> getManagedSessions()
-    {
-        synchronized( managedSessions )
-        {
-            return new IdentityHashSet<IoSession>( managedSessions );
+
+    public Set<IoSession> getManagedSessions() {
+        synchronized (managedSessions) {
+            return new IdentityHashSet<IoSession>(managedSessions);
         }
     }
 
@@ -104,188 +95,146 @@ public class IoServiceListenerSupport
      * Calls {@link IoServiceListener#serviceActivated(IoService)}
      * for all registered listeners.
      */
-    public void fireServiceActivated()
-    {
-        synchronized( listeners )
-        {
-            if( activated )
-            {
+    public void fireServiceActivated() {
+        synchronized (listeners) {
+            if (activated) {
                 return;
             }
-            
-            try
-            {
+
+            try {
                 for (IoServiceListener l : listeners) {
-                    l.serviceActivated( service );
+                    l.serviceActivated(service);
                 }
-            }
-            finally
-            {
+            } finally {
                 activated = true;
             }
         }
     }
-    
+
     /**
      * Calls {@link IoServiceListener#serviceDeactivated(IoService)}
      * for all registered listeners.
      */
-    public void fireServiceDeactivated()
-    {
+    public void fireServiceDeactivated() {
         boolean disconnect = false;
-        try
-        {
-            synchronized( listeners )
-            {
-                if( !activated )
-                {
+        try {
+            synchronized (listeners) {
+                if (!activated) {
                     return;
                 }
-                
+
                 disconnect = true;
 
-                try
-                {
+                try {
                     for (IoServiceListener l : listeners) {
-                        l.serviceDeactivated( service );
+                        l.serviceDeactivated(service);
                     }
-                }
-                finally
-                {
+                } finally {
                     activated = false;
                 }
             }
-        }
-        finally
-        {
-            if( disconnect )
-            {
+        } finally {
+            if (disconnect) {
                 disconnectSessions();
             }
         }
     }
-    
-    
+
     /**
      * Calls {@link IoServiceListener#sessionCreated(IoSession)} for all registered listeners.
      */
-    public void fireSessionCreated( IoSession session )
-    {
+    public void fireSessionCreated(IoSession session) {
         boolean firstSession = false;
-        synchronized( managedSessions )
-        {
+        synchronized (managedSessions) {
             firstSession = managedSessions.isEmpty();
 
             // If already registered, ignore.
-            if ( !managedSessions.add( session ) )
-            {
+            if (!managedSessions.add(session)) {
                 return;
             }
         }
-        
+
         // If the first connector session, fire a virtual service activation event.
-        if( session.getService() instanceof IoConnector && firstSession )
-        {
+        if (session.getService() instanceof IoConnector && firstSession) {
             fireServiceActivated();
         }
 
         // Fire session events.
-        session.getFilterChain().fireSessionCreated( session );
-        session.getFilterChain().fireSessionOpened( session);
-        
+        session.getFilterChain().fireSessionCreated(session);
+        session.getFilterChain().fireSessionOpened(session);
+
         // Fire listener events.
-        synchronized( listeners )
-        {
+        synchronized (listeners) {
             for (IoServiceListener l : listeners) {
-                l.sessionCreated( session );
+                l.sessionCreated(session);
             }
         }
     }
-    
+
     /**
      * Calls {@link IoServiceListener#sessionDestroyed(IoSession)} for all registered listeners.
      */
-    public void fireSessionDestroyed( IoSession session )
-    {
+    public void fireSessionDestroyed(IoSession session) {
         boolean lastSession = false;
-        synchronized( managedSessions )
-        {
+        synchronized (managedSessions) {
             // Try to remove the remaining empty seession set after removal.
-            if( !managedSessions.remove( session ) )
-            {
+            if (!managedSessions.remove(session)) {
                 return;
             }
-            
+
             lastSession = managedSessions.isEmpty();
         }
-        
+
         // Fire session events.
-        session.getFilterChain().fireSessionClosed( session );
-        
+        session.getFilterChain().fireSessionClosed(session);
+
         // Fire listener events.
-        try
-        {
-            synchronized( listeners )
-            {
+        try {
+            synchronized (listeners) {
                 for (IoServiceListener l : listeners) {
-                    l.sessionDestroyed( session );
+                    l.sessionDestroyed(session);
                 }
             }
-        }
-        finally
-        {
+        } finally {
             // Fire a virtual service deactivation event for the last session of the connector.
-            if( session.getService() instanceof IoConnector && lastSession )
-            {
+            if (session.getService() instanceof IoConnector && lastSession) {
                 fireServiceDeactivated();
             }
         }
     }
 
-    private void disconnectSessions()
-    {
-        if( !( service instanceof IoAcceptor ) )
-        {
+    private void disconnectSessions() {
+        if (!(service instanceof IoAcceptor)) {
             return;
         }
 
-        if( !( ( IoAcceptor ) service ).isDisconnectOnUnbind() )
-        {
+        if (!((IoAcceptor) service).isDisconnectOnUnbind()) {
             return;
         }
 
         final Object lock = new Object();
         Set<IoSession> sessionsCopy;
-        synchronized( managedSessions )
-        {
-            sessionsCopy = new IdentityHashSet<IoSession>( managedSessions );
+        synchronized (managedSessions) {
+            sessionsCopy = new IdentityHashSet<IoSession>(managedSessions);
         }
-        
+
         for (IoSession s : sessionsCopy) {
-            s.close().addListener( new IoFutureListener()
-            {
-                public void operationComplete( IoFuture future )
-                {
-                    synchronized( lock )
-                    {
+            s.close().addListener(new IoFutureListener() {
+                public void operationComplete(IoFuture future) {
+                    synchronized (lock) {
                         lock.notifyAll();
                     }
                 }
-            } );
+            });
         }
 
-        try
-        {
-            synchronized( lock )
-            {
-                while( !managedSessions.isEmpty() )
-                {
-                    lock.wait( 500 );
+        try {
+            synchronized (lock) {
+                while (!managedSessions.isEmpty()) {
+                    lock.wait(500);
                 }
             }
-        }
-        catch( InterruptedException ie )
-        {
+        } catch (InterruptedException ie) {
             // Ignored
         }
     }

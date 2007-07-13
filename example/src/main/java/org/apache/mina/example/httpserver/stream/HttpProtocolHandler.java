@@ -42,61 +42,56 @@ import org.apache.mina.handler.StreamIoHandler;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class HttpProtocolHandler extends StreamIoHandler
-{
+public class HttpProtocolHandler extends StreamIoHandler {
     @Override
-    protected void processStreamIo( IoSession session, InputStream in,
-                                    OutputStream out )
-    {
+    protected void processStreamIo(IoSession session, InputStream in,
+            OutputStream out) {
         // You *MUST* execute stream I/O logic in a separate thread.
-        new Worker( in, out ).start();
+        new Worker(in, out).start();
     }
-    
-    private static class Worker extends Thread
-    {
+
+    private static class Worker extends Thread {
         private final InputStream in;
+
         private final OutputStream out;
-        
-        public Worker( InputStream in, OutputStream out )
-        {
-            setDaemon( true );
+
+        public Worker(InputStream in, OutputStream out) {
+            setDaemon(true);
             this.in = in;
             this.out = out;
         }
-        
+
         @Override
-        public void run()
-        {
+        public void run() {
             String url;
             Map<String, String> headers = new TreeMap<String, String>();
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader( this.in ) );
-            PrintWriter out = new PrintWriter(
-                    new BufferedWriter( new OutputStreamWriter( this.out ) ) );
-            
-            try
-            {
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    this.in));
+            PrintWriter out = new PrintWriter(new BufferedWriter(
+                    new OutputStreamWriter(this.out)));
+
+            try {
                 // Get request URL.
-                url = in.readLine().split( " " )[1];
-                
+                url = in.readLine().split(" ")[1];
+
                 // Read header
                 String line;
-                while ( ( line = in.readLine() ) != null && !line.equals( "" ) )
-                {
+                while ((line = in.readLine()) != null && !line.equals("")) {
                     String[] tokens = line.split(": ");
-                    headers.put( tokens[0], tokens[1] );
+                    headers.put(tokens[0], tokens[1]);
                 }
-                
+
                 // Write header
-                out.println( "HTTP/1.0 200 OK" );
-                out.println( "Content-Type: text/html" );
-                out.println( "Server: MINA Example" );
+                out.println("HTTP/1.0 200 OK");
+                out.println("Content-Type: text/html");
+                out.println("Server: MINA Example");
                 out.println();
-                
+
                 // Write content
-                out.println( "<html><head></head><body>" );
-                out.println( "<h3>Request Summary for: " + url + "</h3>" );
-                out.println("<table border=\"1\"><tr><th>Key</th><th>Value</th></tr>");
+                out.println("<html><head></head><body>");
+                out.println("<h3>Request Summary for: " + url + "</h3>");
+                out
+                        .println("<table border=\"1\"><tr><th>Key</th><th>Value</th></tr>");
 
                 Iterator it = headers.entrySet().iterator();
                 while (it.hasNext()) {
@@ -112,21 +107,14 @@ public class HttpProtocolHandler extends StreamIoHandler
                 }
 
                 out.println("</body></html>");
-            }
-            catch( Exception e )
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
-            }
-            finally
-            {
+            } finally {
                 out.flush();
                 out.close();
-                try
-                {
+                try {
                     in.close();
-                }
-                catch( IOException e )
-                {
+                } catch (IOException e) {
                 }
             }
         }

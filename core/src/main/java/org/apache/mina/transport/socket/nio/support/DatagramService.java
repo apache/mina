@@ -19,30 +19,28 @@
  */
 package org.apache.mina.transport.socket.nio.support;
 
-
 /**
  * A base interface for {@link DatagramAcceptorDelegate} and {@link DatagramConnectorDelegate}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-interface DatagramService
-{
+interface DatagramService {
     /**
      * Requests this processor to flush the write buffer of the specified
      * session.  This method is invoked by MINA internally.
      */
-    void flushSession( DatagramSessionImpl session );
+    void flushSession(DatagramSessionImpl session);
 
     /**
      * Requests this processor to close the specified session.
      * This method is invoked by MINA internally.
      */
-    void closeSession( DatagramSessionImpl session );
-    
+    void closeSession(DatagramSessionImpl session);
+
     /**
      * Requests this processor to update the traffic mask for the specified
      * session. This method is invoked by MINA internally.
      */
-    void updateTrafficMask( DatagramSessionImpl session );    
+    void updateTrafficMask(DatagramSessionImpl session);
 }

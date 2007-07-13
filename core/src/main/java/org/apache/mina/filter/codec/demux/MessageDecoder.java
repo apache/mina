@@ -77,7 +77,8 @@ public interface MessageDecoder {
      *         
      * @throws Exception if the read data violated protocol specification 
      */
-    MessageDecoderResult decode(IoSession session, ByteBuffer in, ProtocolDecoderOutput out) throws Exception;
+    MessageDecoderResult decode(IoSession session, ByteBuffer in,
+            ProtocolDecoderOutput out) throws Exception;
 
     /**
      * Invoked when the specified <tt>session</tt> is closed while this decoder was
@@ -89,5 +90,6 @@ public interface MessageDecoder {
      * 
      * @throws Exception if the read data violated protocol specification
      */
-    void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception;
+    void finishDecode(IoSession session, ProtocolDecoderOutput out)
+            throws Exception;
 }

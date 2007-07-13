@@ -29,20 +29,16 @@ import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class SumUpProtocolCodecFactory extends DemuxingProtocolCodecFactory
-{
+public class SumUpProtocolCodecFactory extends DemuxingProtocolCodecFactory {
 
-    public SumUpProtocolCodecFactory( boolean server )
-    {
-        if( server )
+    public SumUpProtocolCodecFactory(boolean server) {
+        if (server) {
+            super.register(AddMessageDecoder.class);
+            super.register(ResultMessageEncoder.class);
+        } else // Client
         {
-            super.register( AddMessageDecoder.class );
-            super.register( ResultMessageEncoder.class );
-        }
-        else // Client
-        {
-            super.register( AddMessageEncoder.class );
-            super.register( ResultMessageDecoder.class );
+            super.register(AddMessageEncoder.class);
+            super.register(ResultMessageDecoder.class);
         }
     }
 }

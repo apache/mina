@@ -39,58 +39,50 @@ import javax.net.ssl.X509TrustManager;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class BogusTrustManagerFactory extends TrustManagerFactory
-{
+public class BogusTrustManagerFactory extends TrustManagerFactory {
 
-    public BogusTrustManagerFactory()
-    {
-        super( new BogusTrustManagerFactorySpi(), 
-               new Provider("MinaBogus", 1.0, "") {
-                private static final long serialVersionUID = -4024169055312053827L;}, "MinaBogus" );
+    public BogusTrustManagerFactory() {
+        super(new BogusTrustManagerFactorySpi(), new Provider("MinaBogus", 1.0,
+                "") {
+            private static final long serialVersionUID = -4024169055312053827L;
+        }, "MinaBogus");
     }
-    
-    private static final X509TrustManager X509 = new X509TrustManager()
-    {
-        public void checkClientTrusted( X509Certificate[] x509Certificates,
-                                       String s ) throws CertificateException
-        {
+
+    private static final X509TrustManager X509 = new X509TrustManager() {
+        public void checkClientTrusted(X509Certificate[] x509Certificates,
+                String s) throws CertificateException {
         }
 
-        public void checkServerTrusted( X509Certificate[] x509Certificates,
-                                       String s ) throws CertificateException
-        {
+        public void checkServerTrusted(X509Certificate[] x509Certificates,
+                String s) throws CertificateException {
         }
 
-        public X509Certificate[] getAcceptedIssuers()
-        {
-            return new X509Certificate[ 0 ];
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
         }
     };
 
     private static final TrustManager[] X509_MANAGERS = new TrustManager[] { X509 };
 
-    private static class BogusTrustManagerFactorySpi extends TrustManagerFactorySpi
-    {
-    
+    private static class BogusTrustManagerFactorySpi extends
+            TrustManagerFactorySpi {
+
         @Override
-        protected TrustManager[] engineGetTrustManagers()
-        {
+        protected TrustManager[] engineGetTrustManagers() {
             return X509_MANAGERS;
         }
-    
+
         @Override
-        protected void engineInit( KeyStore keystore ) throws KeyStoreException
-        {
+        protected void engineInit(KeyStore keystore) throws KeyStoreException {
             // noop
         }
-    
+
         @Override
         protected void engineInit(
-                                  ManagerFactoryParameters managerFactoryParameters )
-                throws InvalidAlgorithmParameterException
-        {
+                ManagerFactoryParameters managerFactoryParameters)
+                throws InvalidAlgorithmParameterException {
             // noop
         }
-    
+
     }
 }

@@ -36,75 +36,65 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ChatClientSupport
-{
+public class ChatClientSupport {
     private final IoHandler handler;
+
     private final String name;
+
     private IoSession session;
 
-    public ChatClientSupport( String name, IoHandler handler )
-    {
-        if( name == null )
-        {
-            throw new IllegalArgumentException( "Name can not be null" );
+    public ChatClientSupport(String name, IoHandler handler) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name can not be null");
         }
         this.name = name;
         this.handler = handler;
     }
 
-    public boolean connect( SocketConnector connector, SocketAddress address, boolean useSsl )
-    {
-        if( session != null && session.isConnected() )
-        {
-            throw new IllegalStateException( "Already connected. Disconnect first." );
+    public boolean connect(SocketConnector connector, SocketAddress address,
+            boolean useSsl) {
+        if (session != null && session.isConnected()) {
+            throw new IllegalStateException(
+                    "Already connected. Disconnect first.");
         }
-        
-        try
-        {
-            
-            if( useSsl )
-            {
-                SSLContext sslContext = BogusSSLContextFactory.getInstance( false );
-                SSLFilter sslFilter = new SSLFilter( sslContext );
-                sslFilter.setUseClientMode( true );
-                connector.getFilterChain().addLast( "sslFilter", sslFilter );
+
+        try {
+
+            if (useSsl) {
+                SSLContext sslContext = BogusSSLContextFactory
+                        .getInstance(false);
+                SSLFilter sslFilter = new SSLFilter(sslContext);
+                sslFilter.setUseClientMode(true);
+                connector.getFilterChain().addLast("sslFilter", sslFilter);
             }
-     
-            connector.setHandler( handler );
-            ConnectFuture future1 = connector.connect( address );
+
+            connector.setHandler(handler);
+            ConnectFuture future1 = connector.connect(address);
             future1.awaitUninterruptibly();
-            if( ! future1.isConnected() )
-            {
+            if (!future1.isConnected()) {
                 return false;
             }
             session = future1.getSession();
             login();
-            
+
             return true;
-        }
-        catch ( Exception e)
-        {
+        } catch (Exception e) {
             return false;
         }
     }
 
-    public void login()
-    {
-        session.write( "LOGIN " + name );
+    public void login() {
+        session.write("LOGIN " + name);
     }
 
-    public void broadcast( String message )
-    {
-        session.write( "BROADCAST " + message );
+    public void broadcast(String message) {
+        session.write("BROADCAST " + message);
     }
 
-    public void quit()
-    {
-        if( session != null )
-        {
-            if( session.isConnected() )
-            {
-                session.write( "QUIT" );
+    public void quit() {
+        if (session != null) {
+            if (session.isConnected()) {
+                session.write("QUIT");
                 // Wait until the chat ends.
                 session.getCloseFuture().awaitUninterruptibly();
             }

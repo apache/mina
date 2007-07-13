@@ -28,13 +28,11 @@ import org.apache.mina.common.IoSession;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class ProtocolEncoderAdapter implements ProtocolEncoder
-{
+public abstract class ProtocolEncoderAdapter implements ProtocolEncoder {
     /**
      * Override this method dispose all resources related with this encoder.
      * The default implementation does nothing.
      */
-    public void dispose( IoSession session ) throws Exception
-    {
+    public void dispose(IoSession session) throws Exception {
     }
 }

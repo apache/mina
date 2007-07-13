@@ -27,7 +27,7 @@ import org.apache.mina.common.RuntimeIOException;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: $, $Date: $
  */
-public class SerialPortUnavailableException extends RuntimeIOException { 
+public class SerialPortUnavailableException extends RuntimeIOException {
 
     private static final long serialVersionUID = 1L;
 

@@ -25,27 +25,22 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class RuntimeIOException extends RuntimeException
-{
+public class RuntimeIOException extends RuntimeException {
     private static final long serialVersionUID = 9029092241311939548L;
 
-    public RuntimeIOException()
-    {
+    public RuntimeIOException() {
         super();
     }
 
-    public RuntimeIOException( String message )
-    {
-        super( message );
+    public RuntimeIOException(String message) {
+        super(message);
     }
 
-    public RuntimeIOException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public RuntimeIOException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public RuntimeIOException( Throwable cause )
-    {
-        super( cause );
+    public RuntimeIOException(Throwable cause) {
+        super(cause);
     }
 }

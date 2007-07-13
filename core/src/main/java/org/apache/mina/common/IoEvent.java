@@ -29,9 +29,11 @@ package org.apache.mina.common;
  */
 public class IoEvent {
     private final IoEventType type;
+
     private final IoSession session;
+
     private final Object parameter;
-    
+
     public IoEvent(IoEventType type, IoSession session, Object parameter) {
         if (type == null) {
             throw new NullPointerException("type");
@@ -55,13 +57,14 @@ public class IoEvent {
     public Object getParameter() {
         return parameter;
     }
-    
+
     @Override
     public String toString() {
         if (getParameter() == null) {
             return "[" + getSession() + "] " + getType().name();
         } else {
-            return "[" + getSession() + "] " + getType().name() + ": " + getParameter();
+            return "[" + getSession() + "] " + getType().name() + ": "
+                    + getParameter();
         }
     }
 }

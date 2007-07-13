@@ -30,23 +30,19 @@ import org.apache.mina.transport.AbstractBindTest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 
  */
-public class DatagramBindTest extends AbstractBindTest
-{
+public class DatagramBindTest extends AbstractBindTest {
 
-    public DatagramBindTest()
-    {
-        super( new DatagramAcceptor() );
+    public DatagramBindTest() {
+        super(new DatagramAcceptor());
     }
 
     @Override
-    protected SocketAddress createSocketAddress( int port )
-    {
-        return new InetSocketAddress( port );
+    protected SocketAddress createSocketAddress(int port) {
+        return new InetSocketAddress(port);
     }
-    
+
     @Override
-    protected int getPort( SocketAddress address )
-    {
-        return ( ( InetSocketAddress ) address ).getPort();
+    protected int getPort(SocketAddress address) {
+        return ((InetSocketAddress) address).getPort();
     }
 }

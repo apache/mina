@@ -32,14 +32,12 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends DelegatedIoConnector
-{
+public class DatagramConnector extends DelegatedIoConnector {
     /**
      * Creates a new instance using a NewThreadExecutor 
      */
-    public DatagramConnector()
-    {
-        init( new DatagramConnectorDelegate( this, new NewThreadExecutor( ) ) );
+    public DatagramConnector() {
+        init(new DatagramConnectorDelegate(this, new NewThreadExecutor()));
     }
 
     /**
@@ -47,13 +45,12 @@ public class DatagramConnector extends DelegatedIoConnector
      * 
      * @param executor Executor to use for launching threads
      */
-    public DatagramConnector( Executor executor )
-    {
-        init( new DatagramConnectorDelegate( this, executor ) );
+    public DatagramConnector(Executor executor) {
+        init(new DatagramConnectorDelegate(this, executor));
     }
 
     @Override
     public DatagramSessionConfig getSessionConfig() {
-        return ( ( DatagramConnectorDelegate ) delegate ).getSessionConfig();
+        return ((DatagramConnectorDelegate) delegate).getSessionConfig();
     }
 }

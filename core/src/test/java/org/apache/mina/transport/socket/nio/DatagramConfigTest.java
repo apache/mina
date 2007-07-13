@@ -42,83 +42,72 @@ import org.apache.mina.util.AvailablePortFinder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 
  */
-public class DatagramConfigTest extends TestCase
-{
+public class DatagramConfigTest extends TestCase {
     private final IoAcceptor acceptor = new DatagramAcceptor();
 
     private final IoConnector connector = new DatagramConnector();
 
     private String result;
 
-    public DatagramConfigTest()
-    {
+    public DatagramConfigTest() {
     }
 
     @Override
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
         result = "";
     }
 
-    public void testAcceptorFilterChain() throws Exception
-    {
-        int port = AvailablePortFinder.getNextAvailable( 1024 );
+    public void testAcceptorFilterChain() throws Exception {
+        int port = AvailablePortFinder.getNextAvailable(1024);
         IoFilter mockFilter = new MockFilter();
         IoHandler mockHandler = new MockHandler();
-        
-        acceptor.getFilterChain().addLast( "mock", mockFilter );
-        acceptor.setLocalAddress( new InetSocketAddress( port ) );
-        acceptor.setHandler( mockHandler );
+
+        acceptor.getFilterChain().addLast("mock", mockFilter);
+        acceptor.setLocalAddress(new InetSocketAddress(port));
+        acceptor.setHandler(mockHandler);
         acceptor.bind();
-        
-        try
-        {
-            connector.setHandler( new IoHandlerAdapter() );
-            ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
+
+        try {
+            connector.setHandler(new IoHandlerAdapter());
+            ConnectFuture future = connector.connect(new InetSocketAddress(
+                    "localhost", port));
             future.awaitUninterruptibly();
-            
-            WriteFuture writeFuture = future.getSession().write( ByteBuffer.allocate( 16 ).putInt( 0 ).flip() );
+
+            WriteFuture writeFuture = future.getSession().write(
+                    ByteBuffer.allocate(16).putInt(0).flip());
             writeFuture.awaitUninterruptibly();
-            Assert.assertTrue( writeFuture.isWritten() );
-            
+            Assert.assertTrue(writeFuture.isWritten());
+
             future.getSession().close();
-    
-            for( int i = 0; i < 30; i ++ )
-            {
-                if ( result.length() == 2 )
-                {
+
+            for (int i = 0; i < 30; i++) {
+                if (result.length() == 2) {
                     break;
                 }
-                Thread.sleep( 100 );
+                Thread.sleep(100);
             }
-            
-            Assert.assertEquals( "FH", result );
-        }
-        finally
-        {
+
+            Assert.assertEquals("FH", result);
+        } finally {
             acceptor.unbind();
         }
     }
 
-    private class MockFilter extends IoFilterAdapter
-    {
+    private class MockFilter extends IoFilterAdapter {
 
         @Override
-        public void messageReceived( NextFilter nextFilter, IoSession session,
-                Object message ) throws Exception
-        {
+        public void messageReceived(NextFilter nextFilter, IoSession session,
+                Object message) throws Exception {
             result += "F";
-            nextFilter.messageReceived( session, message );
+            nextFilter.messageReceived(session, message);
         }
 
     }
 
-    private class MockHandler extends IoHandlerAdapter
-    {
+    private class MockHandler extends IoHandlerAdapter {
         @Override
-        public void messageReceived( IoSession session, Object message )
-                throws Exception
-        {
+        public void messageReceived(IoSession session, Object message)
+                throws Exception {
             result += "H";
         }
     }

@@ -35,39 +35,32 @@ import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
  * @version $Rev$, $Date$
  */
 public interface TransportType {
-    
+
     /**
      * A pre-defined transport type for TCP/IP socket transport.
      */
-    static TransportType SOCKET =
-        new DefaultTransportType(
-                "socket", false,
-                InetSocketAddress.class, ByteBuffer.class,
-                SocketSessionConfig.class);
-    
+    static TransportType SOCKET = new DefaultTransportType("socket", false,
+            InetSocketAddress.class, ByteBuffer.class,
+            SocketSessionConfig.class);
+
     /**
      * A pre-defined transport type for UDP/IP datagram transport.
      */
-    static TransportType DATAGRAM =
-        new DefaultTransportType(
-                "datagram", true,
-                InetSocketAddress.class, ByteBuffer.class,
-                DatagramSessionConfig.class);
-    
+    static TransportType DATAGRAM = new DefaultTransportType("datagram", true,
+            InetSocketAddress.class, ByteBuffer.class,
+            DatagramSessionConfig.class);
+
     /**
      * A pre-defined transport type for in-VM pipe transport.
      */
-    static TransportType VM_PIPE =
-        new DefaultTransportType(
-                "vmpipe", false,
-                VmPipeAddress.class, Object.class,
-                VmPipeSessionConfig.class);
-    
+    static TransportType VM_PIPE = new DefaultTransportType("vmpipe", false,
+            VmPipeAddress.class, Object.class, VmPipeSessionConfig.class);
+
     /**
      * Returns the name of this transport type.
      */
     String getName();
-    
+
     /**
      * Returns <code>true</code> if the session of this transport type is
      * connectionless.
@@ -78,12 +71,12 @@ public interface TransportType {
      * Returns the address type of this transport type.
      */
     Class<? extends SocketAddress> getAddressType();
-    
+
     /**
      * Returns the type of the envelope message of this transport type.
      */
     Class<? extends Object> getEnvelopeType();
-    
+
     /**
      * Returns the type of the {@link IoSessionConfig} of this transport type.
      */

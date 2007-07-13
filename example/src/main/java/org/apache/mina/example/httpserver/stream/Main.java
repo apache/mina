@@ -33,39 +33,34 @@ import org.apache.mina.transport.socket.nio.SocketAcceptor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class Main
-{
+public class Main {
     /** Choose your favorite port number. */
     private static final int PORT = 8080;
-    
+
     private static final boolean USE_SSL = false;
 
-    public static void main( String[] args ) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         IoAcceptor acceptor = new SocketAcceptor();
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
 
         // Add SSL filter if SSL is enabled.
-        if( USE_SSL )
-        {
-            addSSLSupport( chain );
+        if (USE_SSL) {
+            addSSLSupport(chain);
         }
 
         // Bind
-        acceptor.setLocalAddress( new InetSocketAddress( PORT ) );
-        acceptor.setHandler( new HttpProtocolHandler() );
+        acceptor.setLocalAddress(new InetSocketAddress(PORT));
+        acceptor.setHandler(new HttpProtocolHandler());
         acceptor.bind();
 
-        System.out.println( "Listening on port " + PORT );
+        System.out.println("Listening on port " + PORT);
     }
 
-
-    private static void addSSLSupport( DefaultIoFilterChainBuilder chain )
-        throws Exception
-    {
-        System.out.println( "SSL is enabled." );
-        SSLFilter sslFilter =
-            new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
-        chain.addLast( "sslFilter", sslFilter );
+    private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
+            throws Exception {
+        System.out.println("SSL is enabled.");
+        SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
+                .getInstance(true));
+        chain.addLast("sslFilter", sslFilter);
     }
 }

@@ -37,125 +37,95 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class NettyDecoder extends ProtocolDecoderAdapter
-{
+public class NettyDecoder extends ProtocolDecoderAdapter {
     private final MessageRecognizer recognizer;
 
-    private java.nio.ByteBuffer readBuf = java.nio.ByteBuffer.allocate( 1024 );
+    private java.nio.ByteBuffer readBuf = java.nio.ByteBuffer.allocate(1024);
 
     private Message readingMessage;
 
     /**
      * Creates a new instance with the specified {@link MessageRecognizer}.
      */
-    public NettyDecoder( MessageRecognizer recognizer )
-    {
-        if( recognizer == null ) {
+    public NettyDecoder(MessageRecognizer recognizer) {
+        if (recognizer == null) {
             throw new NullPointerException();
         }
 
         this.recognizer = recognizer;
     }
 
-
-    private void put( ByteBuffer in )
-    {
+    private void put(ByteBuffer in) {
         // copy to read buffer
-        if( in.remaining() > readBuf.remaining() ) {
-            expand( ( readBuf.position() + in.remaining() ) * 3 / 2 );
+        if (in.remaining() > readBuf.remaining()) {
+            expand((readBuf.position() + in.remaining()) * 3 / 2);
         }
-        readBuf.put( in.buf() );
+        readBuf.put(in.buf());
     }
 
-    private void expand( int newCapacity )
-    {
-        java.nio.ByteBuffer newBuf = java.nio.ByteBuffer
-                .allocate( newCapacity );
+    private void expand(int newCapacity) {
+        java.nio.ByteBuffer newBuf = java.nio.ByteBuffer.allocate(newCapacity);
         readBuf.flip();
-        newBuf.put( readBuf );
+        newBuf.put(readBuf);
         readBuf = newBuf;
     }
 
-    public void decode( IoSession session, ByteBuffer in, ProtocolDecoderOutput out ) throws Exception
-    {
-        put( in );
+    public void decode(IoSession session, ByteBuffer in,
+            ProtocolDecoderOutput out) throws Exception {
+        put(in);
 
         Message m = readingMessage;
-        try
-        {
-            for( ;; )
-            {
+        try {
+            for (;;) {
                 readBuf.flip();
-                if( m == null )
-                {
+                if (m == null) {
                     int limit = readBuf.limit();
                     boolean failed = true;
-                    try
-                    {
-                        m = recognizer.recognize( readBuf );
+                    try {
+                        m = recognizer.recognize(readBuf);
                         failed = false;
-                    }
-                    finally
-                    {
-                        if( failed )
-                        {
+                    } finally {
+                        if (failed) {
                             // clear the read buffer if failed to recognize
                             readBuf.clear();
                             break;
-                        }
-                        else
-                        {
-                            if( m == null )
-                            {
-                                readBuf.limit( readBuf.capacity() );
-                                readBuf.position( limit );
+                        } else {
+                            if (m == null) {
+                                readBuf.limit(readBuf.capacity());
+                                readBuf.position(limit);
                                 break; // finish decoding
-                            }
-                            else
-                            {
+                            } else {
                                 // reset buffer for read
-                                readBuf.limit( limit );
-                                readBuf.position( 0 );
+                                readBuf.limit(limit);
+                                readBuf.position(0);
                             }
                         }
                     }
                 }
 
-                if( m != null )
-                {
-                    try
-                    {
-                        if( m.read( readBuf ) )
-                        {
-                            out.write( m );
+                if (m != null) {
+                    try {
+                        if (m.read(readBuf)) {
+                            out.write(m);
                             m = null;
                         } else {
                             break;
                         }
-                    }
-                    finally
-                    {
-                        if( readBuf.hasRemaining() )
-                        {
+                    } finally {
+                        if (readBuf.hasRemaining()) {
                             readBuf.compact();
-                        }
-                        else
-                        {
+                        } else {
                             readBuf.clear();
                             break;
                         }
                     }
                 }
             }
-        }
-        catch( MessageParseException e )
-        {
+        } catch (MessageParseException e) {
             m = null; // discard reading message
-            throw new ProtocolDecoderException( "Failed to decode.", e );
-        }
-        finally
-        {
+            throw new ProtocolDecoderException("Failed to decode.", e);
+        } finally {
             readingMessage = m;
-        }                
+        }
     }
 }

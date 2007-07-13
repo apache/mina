@@ -57,8 +57,7 @@ import org.apache.mina.filter.support.Zlib;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class CompressionFilter extends IoFilterAdapter
-{
+public class CompressionFilter extends IoFilterAdapter {
     /**
      * Max compression level.  Will give the highest compression ratio, but
      * will also take more cpu time and is the slowest.
@@ -101,16 +100,17 @@ public class CompressionFilter extends IoFilterAdapter
             + ".DisableCompressionOnce";
 
     private boolean compressInbound = true;
+
     private boolean compressOutbound = true;
+
     private int compressionLevel;
 
     /**
      * Creates a new instance which compresses outboud data and decompresses
      * inbound data with default compression level.
      */
-    public CompressionFilter()
-    {
-        this( true, true, COMPRESSION_DEFAULT );
+    public CompressionFilter() {
+        this(true, true, COMPRESSION_DEFAULT);
     }
 
     /**
@@ -123,9 +123,8 @@ public class CompressionFilter extends IoFilterAdapter
      *                         {@link #COMPRESSION_MIN}, and
      *                         {@link #COMPRESSION_NONE}.
      */
-    public CompressionFilter( final int compressionLevel )
-    {
-        this( true, true, compressionLevel );
+    public CompressionFilter(final int compressionLevel) {
+        this(true, true, compressionLevel);
     }
 
     /**
@@ -139,145 +138,127 @@ public class CompressionFilter extends IoFilterAdapter
      *                         {@link #COMPRESSION_MIN}, and
      *                         {@link #COMPRESSION_NONE}.
      */
-    public CompressionFilter(
-            final boolean compressInbound,
-            final boolean compressOutbound,
-            final int compressionLevel )
-    {
+    public CompressionFilter(final boolean compressInbound,
+            final boolean compressOutbound, final int compressionLevel) {
         this.compressionLevel = compressionLevel;
         this.compressInbound = compressInbound;
         this.compressOutbound = compressOutbound;
     }
 
     @Override
-    public void messageReceived( NextFilter nextFilter,
-            IoSession session, Object message ) throws Exception
-    {
-        if( !compressInbound )
-        {
-            nextFilter.messageReceived( session, message );
+    public void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception {
+        if (!compressInbound) {
+            nextFilter.messageReceived(session, message);
             return;
         }
 
-        Zlib inflater = ( Zlib ) session.getAttribute( INFLATER );
-        if( inflater == null )
-        {
+        Zlib inflater = (Zlib) session.getAttribute(INFLATER);
+        if (inflater == null) {
             throw new IllegalStateException();
         }
 
-        ByteBuffer inBuffer = ( ByteBuffer ) message;
-        ByteBuffer outBuffer = inflater.inflate( inBuffer );
-        nextFilter.messageReceived( session, outBuffer );
+        ByteBuffer inBuffer = (ByteBuffer) message;
+        ByteBuffer outBuffer = inflater.inflate(inBuffer);
+        nextFilter.messageReceived(session, outBuffer);
     }
 
     /*
      * @see org.apache.mina.common.IoFilter#filterWrite(org.apache.mina.common.IoFilter.NextFilter, org.apache.mina.common.IoSession, org.apache.mina.common.IoFilter.WriteRequest)
      */
     @Override
-    public void filterWrite( NextFilter nextFilter,
-            IoSession session, WriteRequest writeRequest ) throws IOException
-    {
-        if( !compressOutbound )
-        {
-            nextFilter.filterWrite( session, writeRequest );
+    public void filterWrite(NextFilter nextFilter, IoSession session,
+            WriteRequest writeRequest) throws IOException {
+        if (!compressOutbound) {
+            nextFilter.filterWrite(session, writeRequest);
             return;
         }
 
-        if( session.containsAttribute( DISABLE_COMPRESSION_ONCE ) )
-        {
+        if (session.containsAttribute(DISABLE_COMPRESSION_ONCE)) {
             // Remove the marker attribute because it is temporary.
-            session.removeAttribute( DISABLE_COMPRESSION_ONCE );
-            nextFilter.filterWrite( session, writeRequest );
+            session.removeAttribute(DISABLE_COMPRESSION_ONCE);
+            nextFilter.filterWrite(session, writeRequest);
             return;
         }
 
-        Zlib deflater = ( Zlib ) session.getAttribute( DEFLATER );
-        if( deflater == null )
-        {
+        Zlib deflater = (Zlib) session.getAttribute(DEFLATER);
+        if (deflater == null) {
             throw new IllegalStateException();
         }
 
-        ByteBuffer inBuffer = ( ByteBuffer ) writeRequest.getMessage();
+        ByteBuffer inBuffer = (ByteBuffer) writeRequest.getMessage();
         if (!inBuffer.hasRemaining()) {
             // Ignore empty buffers
             nextFilter.filterWrite(session, writeRequest);
         } else {
-            ByteBuffer outBuf = deflater.deflate( inBuffer );
-            nextFilter.filterWrite(
-                    session,
-                    new DefaultWriteRequest(outBuf, writeRequest.getFuture(), writeRequest.getDestination()));
+            ByteBuffer outBuf = deflater.deflate(inBuffer);
+            nextFilter.filterWrite(session, new DefaultWriteRequest(outBuf,
+                    writeRequest.getFuture(), writeRequest.getDestination()));
         }
     }
 
     @Override
-    public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-        if( parent.contains( CompressionFilter.class ) )
-        {
-            throw new IllegalStateException( "A filter chain cannot contain more than" +
-                    " one Stream Compression filter." );
+    public void onPreAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        if (parent.contains(CompressionFilter.class)) {
+            throw new IllegalStateException(
+                    "A filter chain cannot contain more than"
+                            + " one Stream Compression filter.");
         }
 
-        Zlib deflater = new Zlib( compressionLevel, Zlib.MODE_DEFLATER );
-        Zlib inflater = new Zlib( compressionLevel, Zlib.MODE_INFLATER );
+        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_DEFLATER);
+        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER);
 
         IoSession session = parent.getSession();
 
-        session.setAttribute( DEFLATER, deflater );
-        session.setAttribute( INFLATER, inflater );
+        session.setAttribute(DEFLATER, deflater);
+        session.setAttribute(INFLATER, inflater);
     }
 
     /**
      * Returns <tt>true</tt> if incoming data is being compressed.
      */
-    public boolean isCompressInbound()
-    {
+    public boolean isCompressInbound() {
         return compressInbound;
     }
 
     /**
      * Sets if incoming data has to be compressed.
      */
-    public void setCompressInbound( boolean compressInbound )
-    {
+    public void setCompressInbound(boolean compressInbound) {
         this.compressInbound = compressInbound;
     }
 
     /**
      * Returns <tt>true</tt> if the filter is compressing data being written.
      */
-    public boolean isCompressOutbound()
-    {
+    public boolean isCompressOutbound() {
         return compressOutbound;
     }
 
     /**
      * Set if outgoing data has to be compressed.
      */
-    public void setCompressOutbound( boolean compressOutbound )
-    {
+    public void setCompressOutbound(boolean compressOutbound) {
         this.compressOutbound = compressOutbound;
     }
 
     @Override
-    public void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-        super.onPostRemove( parent, name, nextFilter );
+    public void onPostRemove(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        super.onPostRemove(parent, name, nextFilter);
         IoSession session = parent.getSession();
-        if( session == null )
-        {
+        if (session == null) {
             return;
         }
 
-        Zlib inflater = ( Zlib ) session.getAttribute( INFLATER );
-        Zlib deflater = ( Zlib ) session.getAttribute( DEFLATER );
-        if( deflater != null )
-        {
+        Zlib inflater = (Zlib) session.getAttribute(INFLATER);
+        Zlib deflater = (Zlib) session.getAttribute(DEFLATER);
+        if (deflater != null) {
             deflater.cleanUp();
         }
 
-        if( inflater != null )
-        {
+        if (inflater != null) {
             inflater.cleanUp();
         }
     }

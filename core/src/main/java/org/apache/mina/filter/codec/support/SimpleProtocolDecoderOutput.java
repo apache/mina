@@ -34,37 +34,33 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @version $Rev$, $Date$
  *
  */
-public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput
-{
+public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
     private final NextFilter nextFilter;
+
     private final IoSession session;
+
     private final Queue<Object> messageQueue = new LinkedList<Object>();
-    
-    public SimpleProtocolDecoderOutput( IoSession session, NextFilter nextFilter )
-    {
+
+    public SimpleProtocolDecoderOutput(IoSession session, NextFilter nextFilter) {
         this.nextFilter = nextFilter;
         this.session = session;
     }
-    
-    public void write( Object message )
-    {
+
+    public void write(Object message) {
         if (message == null) {
             throw new NullPointerException("message");
         }
 
-        messageQueue.offer( message );
-        if( session instanceof BaseIoSession )
-        {
-            ( ( BaseIoSession ) session ).increaseReadMessages();
+        messageQueue.offer(message);
+        if (session instanceof BaseIoSession) {
+            ((BaseIoSession) session).increaseReadMessages();
         }
     }
 
-    public void flush()
-    {
-        while( !messageQueue.isEmpty() )
-        {
-            nextFilter.messageReceived( session, messageQueue.poll() );
+    public void flush() {
+        while (!messageQueue.isEmpty()) {
+            nextFilter.messageReceived(session, messageQueue.poll());
         }
-        
+
     }
 }

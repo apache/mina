@@ -45,72 +45,75 @@ import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
  */
 public class MemoryMonitor {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final int PORT = 18567;
-	protected static final Dimension PANEL_SIZE = new Dimension(300,200);
-	
-	private JFrame frame;
-	private JTabbedPane tabbedPane;
-	private ConcurrentHashMap<SocketAddress, ClientPanel> clients;
+    public static final int PORT = 18567;
 
-	public MemoryMonitor() throws IOException {
+    protected static final Dimension PANEL_SIZE = new Dimension(300, 200);
 
-		DatagramAcceptor acceptor = new DatagramAcceptor();
-		acceptor.setLocalAddress(new InetSocketAddress(PORT));
-		acceptor.setHandler(new MemoryMonitorHandler(this));
+    private JFrame frame;
 
-		DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
-		chain.addLast("logger", new LoggingFilter());
+    private JTabbedPane tabbedPane;
 
-		DatagramSessionConfig dcfg = acceptor.getSessionConfig();
-		dcfg.setReuseAddress(true);
+    private ConcurrentHashMap<SocketAddress, ClientPanel> clients;
 
-		frame = new JFrame( "Memory monitor" );
-		tabbedPane = new JTabbedPane();
-		tabbedPane.add( "Welcome", createWelcomePanel());
-		frame.add( tabbedPane, BorderLayout.CENTER );
-		clients = new ConcurrentHashMap<SocketAddress,ClientPanel>();
-		frame.pack();
-		frame.setLocation(300, 300);
-		frame.setVisible( true );
+    public MemoryMonitor() throws IOException {
 
-		acceptor.bind();
-		System.out.println("UDPServer listening on port " + PORT);
-	}
+        DatagramAcceptor acceptor = new DatagramAcceptor();
+        acceptor.setLocalAddress(new InetSocketAddress(PORT));
+        acceptor.setHandler(new MemoryMonitorHandler(this));
 
-	private JPanel createWelcomePanel(){
-		JPanel panel = new JPanel();
-		panel.setPreferredSize(PANEL_SIZE);
-		panel.add( new JLabel("Welcome to the Memory Monitor"));
-		return panel;
-	}
-	
-	protected void recvUpdate(SocketAddress clientAddr, long update) {
-		ClientPanel clientPanel = clients.get(clientAddr);
-		if( clientPanel != null )
-			clientPanel.updateTextField(update);
-		else
-			System.err.println("Received update from unknown client");
-	}
+        DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+        chain.addLast("logger", new LoggingFilter());
 
-	protected void addClient(SocketAddress clientAddr) {
-		if (!containsClient(clientAddr)) {
-			ClientPanel clientPanel = new ClientPanel(clientAddr.toString());
-			tabbedPane.add(clientAddr.toString(), clientPanel);
-			clients.put(clientAddr, clientPanel);
-		}
-	}
+        DatagramSessionConfig dcfg = acceptor.getSessionConfig();
+        dcfg.setReuseAddress(true);
 
-	protected boolean containsClient(SocketAddress clientAddr) {
-		return clients.contains(clientAddr);
-	}
+        frame = new JFrame("Memory monitor");
+        tabbedPane = new JTabbedPane();
+        tabbedPane.add("Welcome", createWelcomePanel());
+        frame.add(tabbedPane, BorderLayout.CENTER);
+        clients = new ConcurrentHashMap<SocketAddress, ClientPanel>();
+        frame.pack();
+        frame.setLocation(300, 300);
+        frame.setVisible(true);
 
-	protected void removeClient(SocketAddress clientAddr) {
-		clients.remove(clientAddr);
-	}
+        acceptor.bind();
+        System.out.println("UDPServer listening on port " + PORT);
+    }
 
-	public static void main(String[] args) throws IOException {
-		new MemoryMonitor();
-	}
+    private JPanel createWelcomePanel() {
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(PANEL_SIZE);
+        panel.add(new JLabel("Welcome to the Memory Monitor"));
+        return panel;
+    }
+
+    protected void recvUpdate(SocketAddress clientAddr, long update) {
+        ClientPanel clientPanel = clients.get(clientAddr);
+        if (clientPanel != null)
+            clientPanel.updateTextField(update);
+        else
+            System.err.println("Received update from unknown client");
+    }
+
+    protected void addClient(SocketAddress clientAddr) {
+        if (!containsClient(clientAddr)) {
+            ClientPanel clientPanel = new ClientPanel(clientAddr.toString());
+            tabbedPane.add(clientAddr.toString(), clientPanel);
+            clients.put(clientAddr, clientPanel);
+        }
+    }
+
+    protected boolean containsClient(SocketAddress clientAddr) {
+        return clients.contains(clientAddr);
+    }
+
+    protected void removeClient(SocketAddress clientAddr) {
+        clients.remove(clientAddr);
+    }
+
+    public static void main(String[] args) throws IOException {
+        new MemoryMonitor();
+    }
 }

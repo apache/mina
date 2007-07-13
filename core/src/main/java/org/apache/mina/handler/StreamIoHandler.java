@@ -44,59 +44,57 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class StreamIoHandler extends IoHandlerAdapter
-{
-    private static final String KEY_IN = StreamIoHandler.class.getName() + ".in";
-    private static final String KEY_OUT = StreamIoHandler.class.getName() + ".out";
-    
+public abstract class StreamIoHandler extends IoHandlerAdapter {
+    private static final String KEY_IN = StreamIoHandler.class.getName()
+            + ".in";
+
+    private static final String KEY_OUT = StreamIoHandler.class.getName()
+            + ".out";
+
     private int readTimeout;
+
     private int writeTimeout;
-    
-    protected StreamIoHandler()
-    {
+
+    protected StreamIoHandler() {
     }
-    
+
     /**
      * Implement this method to execute your stream I/O logic;
      * <b>please note that you must forward the process request to other
      * thread or thread pool.</b>
      */
-    protected abstract void processStreamIo( IoSession session,
-                                             InputStream in, OutputStream out );
-    
+    protected abstract void processStreamIo(IoSession session, InputStream in,
+            OutputStream out);
+
     /**
      * Returns read timeout in seconds.
      * The default value is <tt>0</tt> (disabled).
      */
-    public int getReadTimeout()
-    {
+    public int getReadTimeout() {
         return readTimeout;
     }
-    
+
     /**
      * Sets read timeout in seconds.
      * The default value is <tt>0</tt> (disabled).
      */
-    public void setReadTimeout( int readTimeout )
-    {
+    public void setReadTimeout(int readTimeout) {
         this.readTimeout = readTimeout;
     }
-    
+
     /**
      * Returns write timeout in seconds.
      * The default value is <tt>0</tt> (disabled).
      */
-    public int getWriteTimeout()
-    {
+    public int getWriteTimeout() {
         return writeTimeout;
     }
-    
+
     /**
      * Sets write timeout in seconds.
      * The default value is <tt>0</tt> (disabled).
      */
-    public void setWriteTimeout( int writeTimeout )
-    {
+    public void setWriteTimeout(int writeTimeout) {
         this.writeTimeout = writeTimeout;
     }
 
@@ -104,73 +102,62 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
      * Initializes streams and timeout settings.
      */
     @Override
-    public void sessionOpened( IoSession session )
-    {
+    public void sessionOpened(IoSession session) {
         // Set timeouts
-        session.setWriteTimeout( writeTimeout );
-        session.setIdleTime( IdleStatus.READER_IDLE, readTimeout );
+        session.setWriteTimeout(writeTimeout);
+        session.setIdleTime(IdleStatus.READER_IDLE, readTimeout);
 
         // Create streams
         InputStream in = new IoSessionInputStream();
-        OutputStream out = new IoSessionOutputStream( session );
-        session.setAttribute( KEY_IN, in );
-        session.setAttribute( KEY_OUT, out );
-        processStreamIo( session, in, out );
+        OutputStream out = new IoSessionOutputStream(session);
+        session.setAttribute(KEY_IN, in);
+        session.setAttribute(KEY_OUT, out);
+        processStreamIo(session, in, out);
     }
 
     /**
      * Closes streams
      */
     @Override
-    public void sessionClosed( IoSession session ) throws Exception
-    {
-        final InputStream in = ( InputStream ) session.getAttribute( KEY_IN );
-        final OutputStream out = ( OutputStream ) session.getAttribute( KEY_OUT );
-        try
-        {
+    public void sessionClosed(IoSession session) throws Exception {
+        final InputStream in = (InputStream) session.getAttribute(KEY_IN);
+        final OutputStream out = (OutputStream) session.getAttribute(KEY_OUT);
+        try {
             in.close();
-        }
-        finally
-        {
+        } finally {
             out.close();
         }
     }
-    
+
     /**
      * Forwards read data to input stream.
      */
     @Override
-    public void messageReceived( IoSession session, Object buf )
-    {
-        final IoSessionInputStream in = ( IoSessionInputStream ) session.getAttribute( KEY_IN );
-        in.write( ( ByteBuffer ) buf );
+    public void messageReceived(IoSession session, Object buf) {
+        final IoSessionInputStream in = (IoSessionInputStream) session
+                .getAttribute(KEY_IN);
+        in.write((ByteBuffer) buf);
     }
 
     /**
      * Forwards caught exceptions to input stream.
      */
     @Override
-    public void exceptionCaught( IoSession session, Throwable cause )
-    {
-        final IoSessionInputStream in = ( IoSessionInputStream ) session.getAttribute( KEY_IN );
-        
+    public void exceptionCaught(IoSession session, Throwable cause) {
+        final IoSessionInputStream in = (IoSessionInputStream) session
+                .getAttribute(KEY_IN);
+
         IOException e = null;
-        if( cause instanceof StreamIoException )
-        {
-            e = ( IOException ) cause.getCause();
+        if (cause instanceof StreamIoException) {
+            e = (IOException) cause.getCause();
+        } else if (cause instanceof IOException) {
+            e = (IOException) cause;
         }
-        else if( cause instanceof IOException )
-        {
-            e = ( IOException ) cause;
-        }
-        
-        if( e != null && in != null )
-        {
-            in.throwException( e );
-        }
-        else
-        {
-            SessionLog.warn( session, "Unexpected exception.", cause );
+
+        if (e != null && in != null) {
+            in.throwException(e);
+        } else {
+            SessionLog.warn(session, "Unexpected exception.", cause);
             session.close();
         }
     }
@@ -179,21 +166,17 @@ public abstract class StreamIoHandler extends IoHandlerAdapter
      * Handles read timeout.
      */
     @Override
-    public void sessionIdle( IoSession session, IdleStatus status )
-    {
-        if( status == IdleStatus.READER_IDLE )
-        {
-            throw new StreamIoException(
-                    new SocketTimeoutException( "Read timeout" ) );
+    public void sessionIdle(IoSession session, IdleStatus status) {
+        if (status == IdleStatus.READER_IDLE) {
+            throw new StreamIoException(new SocketTimeoutException(
+                    "Read timeout"));
         }
     }
 
-    private static class StreamIoException extends RuntimeException
-    {
+    private static class StreamIoException extends RuntimeException {
         private static final long serialVersionUID = 3976736960742503222L;
 
-        public StreamIoException( IOException cause )
-        {
+        public StreamIoException(IOException cause) {
             super(cause);
         }
     }

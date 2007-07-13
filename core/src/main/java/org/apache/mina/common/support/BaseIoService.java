@@ -35,8 +35,7 @@ import org.apache.mina.common.IoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoService implements IoService
-{
+public abstract class BaseIoService implements IoService {
     /**
      * Current filter chain builder.
      */
@@ -44,100 +43,84 @@ public abstract class BaseIoService implements IoService
 
     /**
      * Current handler.
-     */    
+     */
     private IoHandler handler;
 
     /**
      * Maintains the {@link IoServiceListener}s of this service.
      */
     private final IoServiceListenerSupport listeners;
-    
+
     /**
      * The default {@link IoSessionConfig} which will be used to configure new sessions.
      */
     private IoSessionConfig sessionConfig;
-    
-    protected BaseIoService( IoSessionConfig sessionConfig )
-    {
+
+    protected BaseIoService(IoSessionConfig sessionConfig) {
         if (sessionConfig == null) {
             throw new NullPointerException("sessionConfig");
         }
-        
+
         if (!getTransportType().getSessionConfigType().isAssignableFrom(
                 sessionConfig.getClass())) {
-            throw new IllegalArgumentException(
-                    "sessionConfig type: " + sessionConfig.getClass() +
-                    " (expected: " + getTransportType().getSessionConfigType() + ")");
+            throw new IllegalArgumentException("sessionConfig type: "
+                    + sessionConfig.getClass() + " (expected: "
+                    + getTransportType().getSessionConfigType() + ")");
         }
 
         this.listeners = new IoServiceListenerSupport(this);
         this.sessionConfig = sessionConfig;
     }
-    
-    public IoFilterChainBuilder getFilterChainBuilder()
-    {
+
+    public IoFilterChainBuilder getFilterChainBuilder() {
         return filterChainBuilder;
     }
 
-    public void setFilterChainBuilder( IoFilterChainBuilder builder )
-    {
-        if( builder == null )
-        {
+    public void setFilterChainBuilder(IoFilterChainBuilder builder) {
+        if (builder == null) {
             builder = new DefaultIoFilterChainBuilder();
         }
         filterChainBuilder = builder;
     }
-    
-    public DefaultIoFilterChainBuilder getFilterChain()
-    {
-        if( filterChainBuilder instanceof DefaultIoFilterChainBuilder )
-        {
-            return ( DefaultIoFilterChainBuilder ) filterChainBuilder;
-        }
-        else
-        {
+
+    public DefaultIoFilterChainBuilder getFilterChain() {
+        if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
+            return (DefaultIoFilterChainBuilder) filterChainBuilder;
+        } else {
             throw new IllegalStateException(
-                    "Current filter chain builder is not a DefaultIoFilterChainBuilder." );
+                    "Current filter chain builder is not a DefaultIoFilterChainBuilder.");
         }
     }
-    
-    public void addListener( IoServiceListener listener )
-    {
-        getListeners().add( listener );
+
+    public void addListener(IoServiceListener listener) {
+        getListeners().add(listener);
     }
-    
-    public void removeListener( IoServiceListener listener )
-    {
-        getListeners().remove( listener );
+
+    public void removeListener(IoServiceListener listener) {
+        getListeners().remove(listener);
     }
-    
-    public Set<IoSession> getManagedSessions()
-    {
+
+    public Set<IoSession> getManagedSessions() {
         return getListeners().getManagedSessions();
     }
-    
-    public IoHandler getHandler()
-    {
+
+    public IoHandler getHandler() {
         return handler;
     }
-    
-    public void setHandler( IoHandler handler )
-    {
-        if( handler == null )
-        {
-            throw new NullPointerException( "handler" );
+
+    public void setHandler(IoHandler handler) {
+        if (handler == null) {
+            throw new NullPointerException("handler");
         }
 
         this.handler = handler;
     }
 
-    protected IoServiceListenerSupport getListeners()
-    {
+    protected IoServiceListenerSupport getListeners() {
         return listeners;
     }
-    
-    public IoSessionConfig getSessionConfig()
-    {
+
+    public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }
 }

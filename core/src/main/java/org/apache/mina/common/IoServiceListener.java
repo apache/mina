@@ -28,33 +28,32 @@ import java.util.EventListener;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoServiceListener extends EventListener
-{
+public interface IoServiceListener extends EventListener {
     /**
      * Invoked when a new service is activated by an {@link IoService}.
      * 
      * @param service the {@link IoService}
      */
-    void serviceActivated( IoService service );
-    
+    void serviceActivated(IoService service);
+
     /**
      * Invoked when a service is deactivated by an {@link IoService}.
      * 
      * @param service the {@link IoService}
      */
-    void serviceDeactivated( IoService service );
-    
+    void serviceDeactivated(IoService service);
+
     /**
      * Invoked when a new session is created by an {@link IoService}.
      * 
      * @param session the new session
      */
-    void sessionCreated( IoSession session );
-    
+    void sessionCreated(IoSession session);
+
     /**
      * Invoked when a session is being destroyed by an {@link IoService}.
      * 
      * @param session the session to be destroyed
      */
-    void sessionDestroyed( IoSession session );
+    void sessionDestroyed(IoSession session);
 }

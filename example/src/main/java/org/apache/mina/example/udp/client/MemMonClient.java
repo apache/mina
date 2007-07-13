@@ -42,102 +42,106 @@ import org.slf4j.LoggerFactory;
  */
 public class MemMonClient extends IoHandlerAdapter {
 
-	private Logger log = LoggerFactory.getLogger( MemMonClient.class );
-	
-	private IoSession session;
-	private IoConnector connector;
-	
-	/**
-	 * Default constructor.
-	 */
-	public MemMonClient() {
+    private Logger log = LoggerFactory.getLogger(MemMonClient.class);
 
-		log.debug("UDPClient::UDPClient");
-		log.debug( "Created a datagram connector" );
-		connector = new DatagramConnector();
-		
-		log.debug( "Setting the handler" );
-		connector.setHandler( this );
-		
-		log.debug( "About to connect to the server...");
-		ConnectFuture connFuture = connector.connect( new InetSocketAddress("localhost", 
-				MemoryMonitor.PORT ));
-		
-		log.debug("About to wait.");
-		connFuture.awaitUninterruptibly();
-		
-		log.debug( "Adding a future listener." );
-		connFuture.addListener( new IoFutureListener(){
-			public void operationComplete(IoFuture future) {
-				ConnectFuture connFuture = (ConnectFuture)future;
-				if( connFuture.isConnected() ){
-					log.debug("...connected");
-					session = future.getSession();
-					try {
-						sendData();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				} else {
-					log.error("Not connected...exiting");
-				}
-			}
-		});
-	}
-	
-	private void sendData() throws InterruptedException {
-		for( int i=0; i<30; i++ ){
-			long free = Runtime.getRuntime().freeMemory();
-			ByteBuffer buffer = ByteBuffer.allocate(8);
-			buffer.putLong( free );
-			buffer.flip();
-			session.write( buffer );
-			
-			try {
-				Thread.sleep( 1000 );
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				throw new InterruptedException( e.getMessage() );
-			}
-		}
-	}
-	
-	@Override
-	public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-		cause.printStackTrace();
-	}
+    private IoSession session;
 
-	@Override
-	public void messageReceived(IoSession session, Object message) throws Exception {
-		log.debug("Session recv...");
-	}
+    private IoConnector connector;
 
-	@Override
-	public void messageSent(IoSession session, Object message) throws Exception {
-		log.debug("Message sent...");
-	}
+    /**
+     * Default constructor.
+     */
+    public MemMonClient() {
 
-	@Override
-	public void sessionClosed(IoSession session) throws Exception {
-		log.debug("Session closed...");
-	}
+        log.debug("UDPClient::UDPClient");
+        log.debug("Created a datagram connector");
+        connector = new DatagramConnector();
 
-	@Override
-	public void sessionCreated(IoSession session) throws Exception {
-		log.debug("Session created...");
-	}
+        log.debug("Setting the handler");
+        connector.setHandler(this);
 
-	@Override
-	public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
-		log.debug("Session idle...");
-	}
+        log.debug("About to connect to the server...");
+        ConnectFuture connFuture = connector.connect(new InetSocketAddress(
+                "localhost", MemoryMonitor.PORT));
 
-	@Override
-	public void sessionOpened(IoSession session) throws Exception {
-		log.debug("Session opened...");
-	}
+        log.debug("About to wait.");
+        connFuture.awaitUninterruptibly();
 
-	public static void main(String[] args) {
-		new MemMonClient();
-	}
+        log.debug("Adding a future listener.");
+        connFuture.addListener(new IoFutureListener() {
+            public void operationComplete(IoFuture future) {
+                ConnectFuture connFuture = (ConnectFuture) future;
+                if (connFuture.isConnected()) {
+                    log.debug("...connected");
+                    session = future.getSession();
+                    try {
+                        sendData();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    log.error("Not connected...exiting");
+                }
+            }
+        });
+    }
+
+    private void sendData() throws InterruptedException {
+        for (int i = 0; i < 30; i++) {
+            long free = Runtime.getRuntime().freeMemory();
+            ByteBuffer buffer = ByteBuffer.allocate(8);
+            buffer.putLong(free);
+            buffer.flip();
+            session.write(buffer);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new InterruptedException(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void exceptionCaught(IoSession session, Throwable cause)
+            throws Exception {
+        cause.printStackTrace();
+    }
+
+    @Override
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
+        log.debug("Session recv...");
+    }
+
+    @Override
+    public void messageSent(IoSession session, Object message) throws Exception {
+        log.debug("Message sent...");
+    }
+
+    @Override
+    public void sessionClosed(IoSession session) throws Exception {
+        log.debug("Session closed...");
+    }
+
+    @Override
+    public void sessionCreated(IoSession session) throws Exception {
+        log.debug("Session created...");
+    }
+
+    @Override
+    public void sessionIdle(IoSession session, IdleStatus status)
+            throws Exception {
+        log.debug("Session idle...");
+    }
+
+    @Override
+    public void sessionOpened(IoSession session) throws Exception {
+        log.debug("Session opened...");
+    }
+
+    public static void main(String[] args) {
+        new MemMonClient();
+    }
 }

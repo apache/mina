@@ -35,28 +35,25 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ObjectSerializationDecoder extends CumulativeProtocolDecoder
-{
+public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
     private final ClassLoader classLoader;
+
     private int maxObjectSize = 1048576; // 1MB
-    
+
     /**
      * Creates a new instance with the {@link ClassLoader} of
      * the current thread.
      */
-    public ObjectSerializationDecoder()
-    {
-        this( Thread.currentThread().getContextClassLoader() );
+    public ObjectSerializationDecoder() {
+        this(Thread.currentThread().getContextClassLoader());
     }
-    
+
     /**
      * Creates a new instance with the specified {@link ClassLoader}.
      */
-    public ObjectSerializationDecoder( ClassLoader classLoader )
-    {
-        if( classLoader == null )
-        {
-            throw new NullPointerException( "classLoader" );
+    public ObjectSerializationDecoder(ClassLoader classLoader) {
+        if (classLoader == null) {
+            throw new NullPointerException("classLoader");
         }
         this.classLoader = classLoader;
     }
@@ -67,36 +64,33 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1048576</tt> (1MB).
      */
-    public int getMaxObjectSize()
-    {
+    public int getMaxObjectSize() {
         return maxObjectSize;
     }
-    
+
     /**
      * Sets the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, this
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1048576</tt> (1MB).
      */
-    public void setMaxObjectSize( int maxObjectSize )
-    {
-        if( maxObjectSize <= 0 )
-        {
-            throw new IllegalArgumentException( "maxObjectSize: " + maxObjectSize );
+    public void setMaxObjectSize(int maxObjectSize) {
+        if (maxObjectSize <= 0) {
+            throw new IllegalArgumentException("maxObjectSize: "
+                    + maxObjectSize);
         }
-        
+
         this.maxObjectSize = maxObjectSize;
     }
 
     @Override
-    protected boolean doDecode( IoSession session, ByteBuffer in, ProtocolDecoderOutput out ) throws Exception
-    {
-        if( !in.prefixedDataAvailable( 4, maxObjectSize ) )
-        {
+    protected boolean doDecode(IoSession session, ByteBuffer in,
+            ProtocolDecoderOutput out) throws Exception {
+        if (!in.prefixedDataAvailable(4, maxObjectSize)) {
             return false;
         }
 
-        out.write( in.getObject( classLoader ) );
+        out.write(in.getObject(classLoader));
         return true;
     }
 }

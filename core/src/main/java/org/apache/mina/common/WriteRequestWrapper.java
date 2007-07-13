@@ -30,7 +30,7 @@ import java.net.SocketAddress;
 public class WriteRequestWrapper implements WriteRequest {
 
     private final WriteRequest writeRequest;
-    
+
     /**
      * Creates a new instance that wraps the specified request.
      */
@@ -40,7 +40,7 @@ public class WriteRequestWrapper implements WriteRequest {
         }
         this.writeRequest = writeRequest;
     }
-    
+
     public SocketAddress getDestination() {
         return writeRequest.getDestination();
     }
@@ -52,14 +52,14 @@ public class WriteRequestWrapper implements WriteRequest {
     public Object getMessage() {
         return writeRequest.getMessage();
     }
-    
+
     /**
      * Returns the wrapped request object.
      */
     public WriteRequest getWriteRequest() {
-       return writeRequest; 
+        return writeRequest;
     }
-    
+
     @Override
     public String toString() {
         return getMessage().toString();

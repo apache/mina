@@ -38,94 +38,78 @@ import org.apache.mina.common.TransportType;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DelegatedIoConnector implements IoConnector
-{
+public class DelegatedIoConnector implements IoConnector {
     protected IoConnector delegate;
 
     /**
      * Creates a new instance.
      */
-    protected DelegatedIoConnector()
-    {
+    protected DelegatedIoConnector() {
     }
 
     /**
      * Sets the delegate.  This method should be invoked before any operation
      * is requested.
      */
-    protected void init( IoConnector delegate )
-    {
+    protected void init(IoConnector delegate) {
         this.delegate = delegate;
     }
-    
-    public IoFilterChainBuilder getFilterChainBuilder()
-    {
+
+    public IoFilterChainBuilder getFilterChainBuilder() {
         return delegate.getFilterChainBuilder();
     }
 
-    public void setFilterChainBuilder( IoFilterChainBuilder builder )
-    {
-        delegate.setFilterChainBuilder( builder );
+    public void setFilterChainBuilder(IoFilterChainBuilder builder) {
+        delegate.setFilterChainBuilder(builder);
     }
 
-    public DefaultIoFilterChainBuilder getFilterChain()
-    {
+    public DefaultIoFilterChainBuilder getFilterChain() {
         return delegate.getFilterChain();
     }
 
-    public void addListener( IoServiceListener listener )
-    {
-        delegate.addListener( listener );
+    public void addListener(IoServiceListener listener) {
+        delegate.addListener(listener);
     }
 
-    public void removeListener( IoServiceListener listener )
-    {
-        delegate.removeListener( listener );
+    public void removeListener(IoServiceListener listener) {
+        delegate.removeListener(listener);
     }
 
-    public ConnectFuture connect( SocketAddress remoteAddress )
-    {
-        return delegate.connect( remoteAddress );
+    public ConnectFuture connect(SocketAddress remoteAddress) {
+        return delegate.connect(remoteAddress);
     }
 
-    public ConnectFuture connect( SocketAddress remoteAddress, SocketAddress localAddress )
-    {
-        return delegate.connect( remoteAddress, localAddress );
+    public ConnectFuture connect(SocketAddress remoteAddress,
+            SocketAddress localAddress) {
+        return delegate.connect(remoteAddress, localAddress);
     }
 
-    public int getConnectTimeout()
-    {
+    public int getConnectTimeout() {
         return delegate.getConnectTimeout();
     }
 
-    public long getConnectTimeoutMillis()
-    {
+    public long getConnectTimeoutMillis() {
         return delegate.getConnectTimeoutMillis();
     }
 
-    public void setConnectTimeout( int connectTimeout )
-    {
-        delegate.setConnectTimeout( connectTimeout );
+    public void setConnectTimeout(int connectTimeout) {
+        delegate.setConnectTimeout(connectTimeout);
     }
 
-    public IoHandler getHandler()
-    {
+    public IoHandler getHandler() {
         return delegate.getHandler();
     }
 
-    public Set<IoSession> getManagedSessions()
-    {
+    public Set<IoSession> getManagedSessions() {
         return delegate.getManagedSessions();
     }
 
-    public IoSessionConfig getSessionConfig()
-    {
+    public IoSessionConfig getSessionConfig() {
         return delegate.getSessionConfig();
     }
-    
-    public void setHandler( IoHandler handler )
-    {
-        delegate.setHandler( handler );
+
+    public void setHandler(IoHandler handler) {
+        delegate.setHandler(handler);
     }
 
     public TransportType getTransportType() {

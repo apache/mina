@@ -40,31 +40,30 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoAcceptor extends IoService
-{
+public interface IoAcceptor extends IoService {
     /**
      * Returns the local address to bind.
      */
     SocketAddress getLocalAddress();
-    
+
     /**
      * Sets the local address to bind.
      * 
      * @throws IllegalStateException if this service is already running.
      */
-    void setLocalAddress( SocketAddress localAddress );
-    
+    void setLocalAddress(SocketAddress localAddress);
+
     /**
      * Returns <tt>true</tt> if and only if all clients are disconnected
      * when this acceptor unbinds the related local address.
      */
     boolean isDisconnectOnUnbind();
-    
+
     /**
      * Sets whether all clients are disconnected when this acceptor unbinds the
      * related local address.  The default value is <tt>true</tt>.
      */
-    void setDisconnectOnUnbind( boolean disconnectOnUnbind );
+    void setDisconnectOnUnbind(boolean disconnectOnUnbind);
 
     /**
      * Bind to the configured local address and start to accept incoming connections.
@@ -72,14 +71,14 @@ public interface IoAcceptor extends IoService
      * @throws IOException if failed to bind
      */
     void bind() throws IOException;
-    
+
     /**
      * Unbind from the configured local address and stop to accept incoming connections.
      * All managed connections will be closed if <tt>disconnectOnUnbind</tt> property is set.
      * This method does nothing if not bound yet.
      */
     void unbind();
-    
+
     /**
      * Returns <tt>true</tt> if and if only this service is bound to the local address.
      */
@@ -97,5 +96,5 @@ public interface IoAcceptor extends IoService
      * @throws UnsupportedOperationException if this operation is not supported
      * @throws IllegalStateException if this service is not running.
      */
-    IoSession newSession( SocketAddress remoteAddress );
+    IoSession newSession(SocketAddress remoteAddress);
 }

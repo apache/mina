@@ -21,7 +21,6 @@ package org.apache.mina.common;
 
 import java.util.Set;
 
-
 /**
  * Base interface for all {@link IoAcceptor}s and {@link IoConnector}s
  * that provide I/O service and manage {@link IoSession}s.
@@ -29,35 +28,34 @@ import java.util.Set;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoService
-{
+public interface IoService {
     /**
      * Returns the {@link TransportType} that this service runs on.
      */
     TransportType getTransportType();
-    
+
     /**
      * Adds an {@link IoServiceListener} that listens any events related with
      * this service.
      */
-    void addListener( IoServiceListener listener );
-    
+    void addListener(IoServiceListener listener);
+
     /**
      * Removed an existing {@link IoServiceListener} that listens any events
      * related with this service.
      */
-    void removeListener( IoServiceListener listener );
-    
+    void removeListener(IoServiceListener listener);
+
     /**
      * Returns the handler which will handle all connections managed by this service.
      */
     IoHandler getHandler();
-    
+
     /**
      * Sets the handler which will handle all connections managed by this service.
      */
-    void setHandler( IoHandler handler );
-    
+    void setHandler(IoHandler handler);
+
     /**
      * Returns all sessions which are currently managed by this service.
      * {@link IoAcceptor} will assume the specified <tt>address</tt> is a local
@@ -74,7 +72,7 @@ public interface IoService
      * created by this service.
      */
     IoSessionConfig getSessionConfig();
-    
+
     /**
      * Returns the {@link IoFilterChainBuilder} which will build the
      * {@link IoFilterChain} of all {@link IoSession}s which is created
@@ -82,7 +80,7 @@ public interface IoService
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
      */
     IoFilterChainBuilder getFilterChainBuilder();
-    
+
     /**
      * Sets the {@link IoFilterChainBuilder} which will build the
      * {@link IoFilterChain} of all {@link IoSession}s which is created
@@ -90,8 +88,8 @@ public interface IoService
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
      */
-    void setFilterChainBuilder( IoFilterChainBuilder builder );
-    
+    void setFilterChainBuilder(IoFilterChainBuilder builder);
+
     /**
      * A shortcut for <tt>( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )</tt>.
      * Please note that the returned object is not a <b>real</b> {@link IoFilterChain}

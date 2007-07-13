@@ -32,14 +32,12 @@ import org.apache.mina.transport.AbstractConnectorTest;
 public class SocketConnectorTest extends AbstractConnectorTest {
 
     @Override
-    protected IoAcceptor createAcceptor()
-    {
+    protected IoAcceptor createAcceptor() {
         return new SocketAcceptor();
     }
 
     @Override
-    protected IoConnector createConnector()
-    {
+    protected IoConnector createConnector() {
         return new SocketConnector();
     }
 }

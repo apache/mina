@@ -34,16 +34,14 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultExceptionMonitor extends ExceptionMonitor
-{
-    private final Logger log = LoggerFactory.getLogger( DefaultExceptionMonitor.class );
+public class DefaultExceptionMonitor extends ExceptionMonitor {
+    private final Logger log = LoggerFactory
+            .getLogger(DefaultExceptionMonitor.class);
 
     @Override
-    public void exceptionCaught( Throwable cause )
-    {
-        if( log.isWarnEnabled() )
-        {
-            log.warn( "Unexpected exception.", cause );
+    public void exceptionCaught(Throwable cause) {
+        if (log.isWarnEnabled()) {
+            log.warn("Unexpected exception.", cause);
         }
     }
 }

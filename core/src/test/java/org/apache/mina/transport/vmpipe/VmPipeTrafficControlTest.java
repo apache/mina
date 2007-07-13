@@ -33,27 +33,23 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Id$
  */
-public class VmPipeTrafficControlTest extends AbstractTrafficControlTest
-{
+public class VmPipeTrafficControlTest extends AbstractTrafficControlTest {
 
-    public VmPipeTrafficControlTest()
-    {
-        super( new VmPipeAcceptor() );
+    public VmPipeTrafficControlTest() {
+        super(new VmPipeAcceptor());
     }
 
     @Override
-    protected ConnectFuture connect( int port, IoHandler handler )
-            throws Exception
-    {
+    protected ConnectFuture connect(int port, IoHandler handler)
+            throws Exception {
         IoConnector connector = new VmPipeConnector();
-        connector.setHandler( handler );
-        return connector.connect( new VmPipeAddress( port ) );
+        connector.setHandler(handler);
+        return connector.connect(new VmPipeAddress(port));
     }
 
     @Override
-    protected SocketAddress createServerSocketAddress( int port )
-    {
-        return new VmPipeAddress( port );
+    protected SocketAddress createServerSocketAddress(int port) {
+        return new VmPipeAddress(port);
     }
 
 }

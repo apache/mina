@@ -28,53 +28,46 @@ import java.util.concurrent.TimeUnit;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultWriteRequest implements WriteRequest
-{
-    private static final WriteFuture UNUSED_FUTURE = new WriteFuture()
-    {
-        public boolean isWritten()
-        {
+public class DefaultWriteRequest implements WriteRequest {
+    private static final WriteFuture UNUSED_FUTURE = new WriteFuture() {
+        public boolean isWritten() {
             return false;
         }
 
-        public void setWritten( boolean written )
-        {
+        public void setWritten(boolean written) {
         }
-        
-        public IoSession getSession()
-        {
+
+        public IoSession getSession() {
             return null;
         }
 
-        public void join()
-        {
+        public void join() {
         }
 
-        public boolean join( long timeoutInMillis )
-        {
+        public boolean join(long timeoutInMillis) {
             return true;
         }
 
-        public boolean isReady()
-        {
+        public boolean isReady() {
             return true;
         }
 
-        public WriteFuture addListener( IoFutureListener listener )
-        {
-            throw new IllegalStateException( "You can't add a listener to a dummy future." );
+        public WriteFuture addListener(IoFutureListener listener) {
+            throw new IllegalStateException(
+                    "You can't add a listener to a dummy future.");
         }
 
-        public WriteFuture removeListener( IoFutureListener listener )
-        {
-            throw new IllegalStateException( "You can't add a listener to a dummy future." );
+        public WriteFuture removeListener(IoFutureListener listener) {
+            throw new IllegalStateException(
+                    "You can't add a listener to a dummy future.");
         }
 
         public WriteFuture await() throws InterruptedException {
             return this;
         }
 
-        public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
+        public boolean await(long timeout, TimeUnit unit)
+                throws InterruptedException {
             return true;
         }
 
@@ -94,29 +87,29 @@ public class DefaultWriteRequest implements WriteRequest
             return true;
         }
     };
-    
+
     private final Object message;
+
     private final WriteFuture future;
+
     private final SocketAddress destination;
-    
+
     /**
      * Creates a new instance without {@link WriteFuture}.  You'll get
      * an instance of {@link WriteFuture} even if you called this constructor
      * because {@link #getFuture()} will return a bogus future.
      */
-    public DefaultWriteRequest( Object message )
-    {
-        this( message, null, null );
+    public DefaultWriteRequest(Object message) {
+        this(message, null, null);
     }
 
     /**
      * Creates a new instance with {@link WriteFuture}.
      */
-    public DefaultWriteRequest( Object message, WriteFuture future )
-    {
-        this( message, future, null );
+    public DefaultWriteRequest(Object message, WriteFuture future) {
+        this(message, future, null);
     }
-    
+
     /**
      * Creates a new instance.
      * 
@@ -125,18 +118,16 @@ public class DefaultWriteRequest implements WriteRequest
      * @param destination the destination of the message.  This property will be
      *                    ignored unless the transport supports it.
      */
-    public DefaultWriteRequest( Object message, WriteFuture future, SocketAddress destination )
-    {
-        if( message == null )
-        {
-            throw new NullPointerException( "message" );
+    public DefaultWriteRequest(Object message, WriteFuture future,
+            SocketAddress destination) {
+        if (message == null) {
+            throw new NullPointerException("message");
         }
-        
-        if( future == null )
-        {
+
+        if (future == null) {
             future = UNUSED_FUTURE;
         }
-        
+
         this.message = message;
         this.future = future;
         this.destination = destination;
@@ -145,32 +136,28 @@ public class DefaultWriteRequest implements WriteRequest
     /**
      * Returns {@link WriteFuture} that is associated with this write request.
      */
-    public WriteFuture getFuture()
-    {
+    public WriteFuture getFuture() {
         return future;
     }
 
     /**
      * Returns a message object to be written.
      */
-    public Object getMessage()
-    {
+    public Object getMessage() {
         return message;
     }
-    
+
     /**
      * Returne the destination of this write request.
      * 
      * @return <tt>null</tt> for the default destination
      */
-    public SocketAddress getDestination() 
-    {
+    public SocketAddress getDestination() {
         return destination;
     }
-    
+
     @Override
-    public String toString()
-    {
+    public String toString() {
         return message.toString();
     }
 }

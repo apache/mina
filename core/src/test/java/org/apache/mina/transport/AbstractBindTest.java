@@ -44,24 +44,23 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 
  */
-public abstract class AbstractBindTest extends TestCase
-{
+public abstract class AbstractBindTest extends TestCase {
     protected final IoAcceptor acceptor;
+
     protected int port;
 
-    public AbstractBindTest( IoAcceptor acceptor )
-    {
+    public AbstractBindTest(IoAcceptor acceptor) {
         this.acceptor = acceptor;
     }
-    
-    protected abstract SocketAddress createSocketAddress( int port );
-    protected abstract int getPort( SocketAddress address );
-    
-    protected void bind( boolean reuseAddress ) throws IOException
-    {
-        acceptor.setHandler( new EchoProtocolHandler() );
 
-        setReuseAddress( reuseAddress );
+    protected abstract SocketAddress createSocketAddress(int port);
+
+    protected abstract int getPort(SocketAddress address);
+
+    protected void bind(boolean reuseAddress) throws IOException {
+        acceptor.setHandler(new EchoProtocolHandler());
+
+        setReuseAddress(reuseAddress);
 
         // Find an availble test port and bind to it.
         boolean socketBound = false;
@@ -69,170 +68,144 @@ public abstract class AbstractBindTest extends TestCase
         // Let's start from port #1 to detect possible resource leak
         // because test will fail in port 1-1023 if user run this test
         // as a normal user.
-        for( port = 1; port <= 65535; port ++ )
-        {
+        for (port = 1; port <= 65535; port++) {
             socketBound = false;
-            try
-            {
-                acceptor.setLocalAddress( createSocketAddress( port ) );
+            try {
+                acceptor.setLocalAddress(createSocketAddress(port));
                 acceptor.bind();
                 socketBound = true;
                 break;
-            }
-            catch( IOException e )
-            {
+            } catch (IOException e) {
             }
         }
 
         // If there is no port available, test fails.
-        if( !socketBound )
-        {
-            throw new IOException( "Cannot bind any test port." );
+        if (!socketBound) {
+            throw new IOException("Cannot bind any test port.");
         }
 
         //System.out.println( "Using port " + port + " for testing." );
     }
 
-    private void setReuseAddress( boolean reuseAddress )
-    {
-        if( acceptor instanceof DatagramAcceptor )
-        {
-            ( ( DatagramSessionConfig ) acceptor.getSessionConfig() ).setReuseAddress( reuseAddress );
-        }
-        else if( acceptor instanceof SocketAcceptor )
-        {
-            ( ( SocketAcceptor ) acceptor ).setReuseAddress( reuseAddress );
-        }
-    }
-    
-    @Override
-    public void tearDown()
-    {
-        try
-        {
-            acceptor.unbind();
-        }
-        catch( Exception e )
-        {
-            // ignore
-        }
-        
-        acceptor.setLocalAddress( null );
-    }
-    
-    public void testAnonymousBind() throws Exception
-    {
-        acceptor.setHandler( new IoHandlerAdapter() );
-        acceptor.setLocalAddress( null );
-        acceptor.bind();
-        Assert.assertNotNull( acceptor.getLocalAddress() );
-        acceptor.unbind();
-        acceptor.setLocalAddress( createSocketAddress( 0 ) );
-        acceptor.bind();
-        Assert.assertNotNull( acceptor.getLocalAddress() );
-        Assert.assertTrue( getPort( acceptor.getLocalAddress() ) != 0 );
-        acceptor.unbind();
-    }
-    
-    public void testDuplicateBind() throws IOException
-    {
-        bind( false );
-        
-        try
-        {
-            acceptor.bind();
-            Assert.fail( "IllegalStateException is not thrown" );
-        }
-        catch( IllegalStateException e )
-        {
+    private void setReuseAddress(boolean reuseAddress) {
+        if (acceptor instanceof DatagramAcceptor) {
+            ((DatagramSessionConfig) acceptor.getSessionConfig())
+                    .setReuseAddress(reuseAddress);
+        } else if (acceptor instanceof SocketAcceptor) {
+            ((SocketAcceptor) acceptor).setReuseAddress(reuseAddress);
         }
     }
 
-    public void testDuplicateUnbind() throws IOException
-    {
-        bind( false );
-        
+    @Override
+    public void tearDown() {
+        try {
+            acceptor.unbind();
+        } catch (Exception e) {
+            // ignore
+        }
+
+        acceptor.setLocalAddress(null);
+    }
+
+    public void testAnonymousBind() throws Exception {
+        acceptor.setHandler(new IoHandlerAdapter());
+        acceptor.setLocalAddress(null);
+        acceptor.bind();
+        Assert.assertNotNull(acceptor.getLocalAddress());
+        acceptor.unbind();
+        acceptor.setLocalAddress(createSocketAddress(0));
+        acceptor.bind();
+        Assert.assertNotNull(acceptor.getLocalAddress());
+        Assert.assertTrue(getPort(acceptor.getLocalAddress()) != 0);
+        acceptor.unbind();
+    }
+
+    public void testDuplicateBind() throws IOException {
+        bind(false);
+
+        try {
+            acceptor.bind();
+            Assert.fail("IllegalStateException is not thrown");
+        } catch (IllegalStateException e) {
+        }
+    }
+
+    public void testDuplicateUnbind() throws IOException {
+        bind(false);
+
         // this should succeed
         acceptor.unbind();
-        
+
         // this shouldn't fail
         acceptor.unbind();
     }
-    
-    public void testManyTimes() throws IOException
-    {
-        bind( true );
-        
-        for( int i = 0; i < 1024; i++ ) 
-        {
+
+    public void testManyTimes() throws IOException {
+        bind(true);
+
+        for (int i = 0; i < 1024; i++) {
             acceptor.unbind();
             acceptor.bind();
         }
     }
-    
-    public void _testRegressively() throws IOException
-    {
-        setReuseAddress( true );
 
-        SocketAddress addr = createSocketAddress( port );
+    public void _testRegressively() throws IOException {
+        setReuseAddress(true);
+
+        SocketAddress addr = createSocketAddress(port);
         EchoProtocolHandler handler = new EchoProtocolHandler();
-        acceptor.setLocalAddress( addr );
-        acceptor.setHandler( handler );
-        for( int i = 0; i < 1048576; i++ )
-        {
+        acceptor.setLocalAddress(addr);
+        acceptor.setHandler(handler);
+        for (int i = 0; i < 1048576; i++) {
             acceptor.bind();
             testDuplicateBind();
             testDuplicateUnbind();
-            if( i % 100 == 0 )
-            {
-                System.out.println( i + " (" + new Date() + ")" );
+            if (i % 100 == 0) {
+                System.out.println(i + " (" + new Date() + ")");
             }
         }
-        bind( false );
+        bind(false);
     }
 
-    private static class EchoProtocolHandler extends IoHandlerAdapter
-    {
-        private static final Logger log = LoggerFactory.getLogger( EchoProtocolHandler.class );
+    private static class EchoProtocolHandler extends IoHandlerAdapter {
+        private static final Logger log = LoggerFactory
+                .getLogger(EchoProtocolHandler.class);
 
         @Override
-        public void sessionCreated( IoSession session )
-        {
-            if( session.getConfig() instanceof SocketSessionConfig )
-            {
-                ( ( SocketSessionConfig ) session.getConfig() ).setReceiveBufferSize( 2048 );
+        public void sessionCreated(IoSession session) {
+            if (session.getConfig() instanceof SocketSessionConfig) {
+                ((SocketSessionConfig) session.getConfig())
+                        .setReceiveBufferSize(2048);
             }
 
-            session.setIdleTime( IdleStatus.BOTH_IDLE, 10 );
+            session.setIdleTime(IdleStatus.BOTH_IDLE, 10);
         }
 
         @Override
-        public void sessionIdle( IoSession session, IdleStatus status )
-        {
-            log.info( "*** IDLE #" + session.getIdleCount( IdleStatus.BOTH_IDLE ) + " ***" );
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            log.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE)
+                    + " ***");
         }
 
         @Override
-        public void exceptionCaught( IoSession session, Throwable cause )
-        {
+        public void exceptionCaught(IoSession session, Throwable cause) {
             cause.printStackTrace();
             session.close();
         }
 
         @Override
-        public void messageReceived( IoSession session, Object message ) throws Exception
-        {
-            if( !( message instanceof ByteBuffer ) )
-            {
+        public void messageReceived(IoSession session, Object message)
+                throws Exception {
+            if (!(message instanceof ByteBuffer)) {
                 return;
             }
 
-            ByteBuffer rb = ( ByteBuffer ) message;
+            ByteBuffer rb = (ByteBuffer) message;
             // Write the received data back to remote peer
-            ByteBuffer wb = ByteBuffer.allocate( rb.remaining() );
-            wb.put( rb );
+            ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+            wb.put(rb);
             wb.flip();
-            session.write( wb );
+            session.write(wb);
         }
     }
 }

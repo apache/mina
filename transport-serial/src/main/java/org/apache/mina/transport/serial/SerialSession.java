@@ -259,7 +259,8 @@ public class SerialSession extends BaseIoSession implements
 
                         if (readBytes > 0) {
                             increaseReadBytes(readBytes);
-                            ByteBuffer buf = ByteBuffer.wrap(data,0,readBytes);
+                            ByteBuffer buf = ByteBuffer
+                                    .wrap(data, 0, readBytes);
                             buf.put(data, 0, readBytes);
                             buf.flip();
                             getFilterChain().fireMessageReceived(

@@ -37,60 +37,60 @@ public interface IoFilterChain {
      * @return {@link IoSession}
      */
     IoSession getSession();
-    
+
     /**
      * Returns the {@link Entry} with the specified <tt>name</tt> in this chain.
      * @return <tt>null</tt> if there's no such name in this chain
      */
-    Entry getEntry( String name );
-    
+    Entry getEntry(String name);
+
     /**
      * Returns the {@link IoFilter} with the specified <tt>name</tt> in this chain.
      * @return <tt>null</tt> if there's no such name in this chain
      */
-    IoFilter get( String name );
-    
+    IoFilter get(String name);
+
     /**
      * Returns the {@link NextFilter} of the {@link IoFilter} with the
      * specified <tt>name</tt> in this chain.
      * @return <tt>null</tt> if there's no such name in this chain
      */
-    NextFilter getNextFilter( String name );
-    
+    NextFilter getNextFilter(String name);
+
     /**
      * Returns the list of all {@link Entry}s this chain contains.
      */
     List<Entry> getAll();
-    
+
     /**
      * Returns the reversed list of all {@link Entry}s this chain contains.
      */
     List<Entry> getAllReversed();
-    
+
     /**
      * Returns <tt>true</tt> if this chain contains an {@link IoFilter} with the
      * specified <tt>name</tt>.
      */
-    boolean contains( String name );
-    
+    boolean contains(String name);
+
     /**
      * Returns <tt>true</tt> if this chain contains the specified <tt>filter</tt>.
      */
-    boolean contains( IoFilter filter );
-    
+    boolean contains(IoFilter filter);
+
     /**
      * Returns <tt>true</tt> if this chain contains an {@link IoFilter} of the
      * specified <tt>filterType</tt>.  
      */
-    boolean contains( Class<? extends IoFilter> filterType );
-    
+    boolean contains(Class<? extends IoFilter> filterType);
+
     /**
      * Adds the specified filter with the specified name at the beginning of this chain.
      * @throws IoFilterLifeCycleException
      *             if {@link IoFilter#onPostAdd(IoFilterChain, String, NextFilter)} or
      *             {@link IoFilter#init()} throws an exception.
      */
-    void addFirst( String name, IoFilter filter );
+    void addFirst(String name, IoFilter filter);
 
     /**
      * Adds the specified filter with the specified name at the end of this chain.
@@ -98,7 +98,7 @@ public interface IoFilterChain {
      *             if {@link IoFilter#onPostAdd(IoFilterChain, String, NextFilter)} or
      *             {@link IoFilter#init()} throws an exception.
      */
-    void addLast( String name, IoFilter filter );
+    void addLast(String name, IoFilter filter);
 
     /**
      * Adds the specified filter with the specified name just before the filter whose name is
@@ -107,7 +107,7 @@ public interface IoFilterChain {
      *             if {@link IoFilter#onPostAdd(IoFilterChain, String, NextFilter)} or
      *             {@link IoFilter#init()} throws an exception.
      */
-    void addBefore( String baseName, String name, IoFilter filter );
+    void addBefore(String baseName, String name, IoFilter filter);
 
     /**
      * Adds the specified filter with the specified name just after the filter whose name is
@@ -116,7 +116,7 @@ public interface IoFilterChain {
      *             if {@link IoFilter#onPostAdd(IoFilterChain, String, NextFilter)} or
      *             {@link IoFilter#init()} throws an exception.
      */
-    void addAfter( String baseName, String name, IoFilter filter );
+    void addAfter(String baseName, String name, IoFilter filter);
 
     /**
      * Replace the filter with the specified name with the specified new
@@ -125,16 +125,16 @@ public interface IoFilterChain {
      * @return the old filter
      * @throws IllegalArgumentException if there's no such filter
      */
-    IoFilter replace( String name, IoFilter newFilter );
-    
+    IoFilter replace(String name, IoFilter newFilter);
+
     /**
      * Replace the filter with the specified name with the specified new
      * filter.
      * 
      * @throws IllegalArgumentException if there's no such filter
      */
-    void replace( IoFilter oldFilter, IoFilter newFilter );
-    
+    void replace(IoFilter oldFilter, IoFilter newFilter);
+
     /**
      * Replace the filter of the specified type with the specified new
      * filter.  If there's more than one filter with the specified type,
@@ -142,15 +142,15 @@ public interface IoFilterChain {
      * 
      * @throws IllegalArgumentException if there's no such filter
      */
-    void replace( Class<? extends IoFilter> oldFilterType, IoFilter newFilter );
-    
+    void replace(Class<? extends IoFilter> oldFilterType, IoFilter newFilter);
+
     /**
      * Removes the filter with the specified name from this chain.
      * @throws IoFilterLifeCycleException
      *             if {@link IoFilter#onPostRemove(IoFilterChain, String, NextFilter)} or
      *             {@link IoFilter#destroy()} throws an exception.
      */
-    IoFilter remove( String name );
+    IoFilter remove(String name);
 
     /**
      * Removes all filters added to this chain.
@@ -163,82 +163,81 @@ public interface IoFilterChain {
      * call this method at all.  Please use this method only when you implement a new transport
      * or fire a virtual event.
      */
-    public void fireSessionCreated( IoSession session );
+    public void fireSessionCreated(IoSession session);
 
     /**
      * Fires a {@link IoHandler#sessionOpened(IoSession)} event.  Most users don't need to call
      * this method at all.  Please use this method only when you implement a new transport or
      * fire a virtual event.
      */
-    public void fireSessionOpened( IoSession session );
+    public void fireSessionOpened(IoSession session);
 
     /**
      * Fires a {@link IoHandler#sessionClosed(IoSession)} event.  Most users don't need to call
      * this method at all.  Please use this method only when you implement a new transport or
      * fire a virtual event.
      */
-    public void fireSessionClosed( IoSession session );
+    public void fireSessionClosed(IoSession session);
 
     /**
      * Fires a {@link IoHandler#sessionIdle(IoSession, IdleStatus)} event.  Most users don't
      * need to call this method at all.  Please use this method only when you implement a new
      * transport or fire a virtual event.
      */
-    public void fireSessionIdle( IoSession session, IdleStatus status );
+    public void fireSessionIdle(IoSession session, IdleStatus status);
 
     /**
      * Fires a {@link #fireMessageReceived(IoSession, Object)} event.  Most users don't need to
      * call this method at all.  Please use this method only when you implement a new transport
      * or fire a virtual event.
      */
-    public void fireMessageReceived( IoSession session, Object message );
+    public void fireMessageReceived(IoSession session, Object message);
 
     /**
      * Fires a {@link IoHandler#sessionOpened(IoSession)} event.  Most users don't need to call
      * this method at all.  Please use this method only when you implement a new transport or
      * fire a virtual event.
      */
-    public void fireMessageSent( IoSession session, WriteRequest request );
+    public void fireMessageSent(IoSession session, WriteRequest request);
 
     /**
      * Fires a {@link IoHandler#exceptionCaught(IoSession, Throwable)} event.  Most users don't
      * need to call this method at all.  Please use this method only when you implement a new
      * transport or fire a virtual event.
      */
-    public void fireExceptionCaught( IoSession session, Throwable cause );
+    public void fireExceptionCaught(IoSession session, Throwable cause);
 
     /**
      * Fires a {@link IoSession#write(Object)} event.  Most users don't need to call this
      * method at all.  Please use this method only when you implement a new transport or fire a
      * virtual event.
      */
-    public void fireFilterWrite( IoSession session, WriteRequest writeRequest );
+    public void fireFilterWrite(IoSession session, WriteRequest writeRequest);
 
     /**
      * Fires a {@link IoSession#close()} event.  Most users don't need to call this method at
      * all.  Please use this method only when you implement a new transport or fire a virtual
      * event.
      */
-    public void fireFilterClose( IoSession session );
-    
+    public void fireFilterClose(IoSession session);
+
     /**
      * Represents a name-filter pair that an {@link IoFilterChain} contains.
      *
      * @author The Apache MINA Project (dev@mina.apache.org)
      * @version $Rev$, $Date$
      */
-    public interface Entry
-    {
+    public interface Entry {
         /**
          * Returns the name of the filter.
          */
         String getName();
-        
+
         /**
          * Returns the filter.
          */
         IoFilter getFilter();
-        
+
         /**
          * Returns the {@link NextFilter} of the filter.
          * 

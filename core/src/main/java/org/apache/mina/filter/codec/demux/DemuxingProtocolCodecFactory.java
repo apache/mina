@@ -84,17 +84,20 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
 
         boolean registered = false;
         if (MessageEncoder.class.isAssignableFrom(encoderOrDecoderClass)) {
-            register(new DefaultConstructorMessageEncoderFactory(encoderOrDecoderClass));
+            register(new DefaultConstructorMessageEncoderFactory(
+                    encoderOrDecoderClass));
             registered = true;
         }
 
         if (MessageDecoder.class.isAssignableFrom(encoderOrDecoderClass)) {
-            register(new DefaultConstructorMessageDecoderFactory(encoderOrDecoderClass));
+            register(new DefaultConstructorMessageDecoderFactory(
+                    encoderOrDecoderClass));
             registered = true;
         }
 
         if (!registered) {
-            throw new IllegalArgumentException("Unregisterable type: " + encoderOrDecoderClass);
+            throw new IllegalArgumentException("Unregisterable type: "
+                    + encoderOrDecoderClass);
         }
     }
 
@@ -108,7 +111,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
         MessageEncoderFactory[] encoderFactories = this.encoderFactories;
         MessageEncoderFactory[] newEncoderFactories = new MessageEncoderFactory[encoderFactories.length + 1];
-        System.arraycopy(encoderFactories, 0, newEncoderFactories, 0, encoderFactories.length);
+        System.arraycopy(encoderFactories, 0, newEncoderFactories, 0,
+                encoderFactories.length);
         newEncoderFactories[encoderFactories.length] = factory;
         this.encoderFactories = newEncoderFactories;
     }
@@ -123,7 +127,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
         MessageDecoderFactory[] decoderFactories = this.decoderFactories;
         MessageDecoderFactory[] newDecoderFactories = new MessageDecoderFactory[decoderFactories.length + 1];
-        System.arraycopy(decoderFactories, 0, newDecoderFactories, 0, decoderFactories.length);
+        System.arraycopy(decoderFactories, 0, newDecoderFactories, 0,
+                decoderFactories.length);
         newDecoderFactories[decoderFactories.length] = factory;
         this.decoderFactories = newDecoderFactories;
     }
@@ -159,7 +164,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
                 MessageEncoder encoder = encoderFactories[i].getEncoder();
                 Set<Class<?>> messageTypes = encoder.getMessageTypes();
                 if (messageTypes == null) {
-                    throw new IllegalStateException(encoder.getClass().getName()
+                    throw new IllegalStateException(encoder.getClass()
+                            .getName()
                             + "#getMessageTypes() may not return null.");
                 }
 
@@ -171,11 +177,13 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             }
         }
 
-        public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
+        public void encode(IoSession session, Object message,
+                ProtocolEncoderOutput out) throws Exception {
             Class<?> type = message.getClass();
             MessageEncoder encoder = findEncoder(type);
             if (encoder == null) {
-                throw new ProtocolEncoderException("Unexpected message type: " + type);
+                throw new ProtocolEncoderException("Unexpected message type: "
+                        + type);
             }
 
             encoder.encode(session, message, out);
@@ -190,7 +198,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             return encoder;
         }
 
-        private MessageEncoder findEncoder(Class<?> type, Set<Class<?>> triedClasses) {
+        private MessageEncoder findEncoder(Class<?> type,
+                Set<Class<?>> triedClasses) {
             MessageEncoder encoder;
 
             if (triedClasses.contains(type)) {
@@ -238,7 +247,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
 
         @Override
-        protected boolean doDecode(IoSession session, ByteBuffer in, ProtocolDecoderOutput out) throws Exception {
+        protected boolean doDecode(IoSession session, ByteBuffer in,
+                ProtocolDecoderOutput out) throws Exception {
             if (currentDecoder == null) {
                 MessageDecoder[] decoders = this.decoders;
                 int undecodables = 0;
@@ -261,8 +271,9 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
                     } else if (result == MessageDecoder.NOT_OK) {
                         undecodables++;
                     } else if (result != MessageDecoder.NEED_DATA) {
-                        throw new IllegalStateException("Unexpected decode result (see your decodable()): "
-                                + result);
+                        throw new IllegalStateException(
+                                "Unexpected decode result (see your decodable()): "
+                                        + result);
                     }
                 }
 
@@ -270,7 +281,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
                     // Throw an exception if all decoders cannot decode data.
                     String dump = in.getHexDump();
                     in.position(in.limit()); // Skip data
-                    throw new ProtocolDecoderException("No appropriate message decoder: " + dump);
+                    throw new ProtocolDecoderException(
+                            "No appropriate message decoder: " + dump);
                 }
 
                 if (currentDecoder == null) {
@@ -279,7 +291,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
                 }
             }
 
-            MessageDecoderResult result = currentDecoder.decode(session, in, out);
+            MessageDecoderResult result = currentDecoder.decode(session, in,
+                    out);
             if (result == MessageDecoder.OK) {
                 currentDecoder = null;
                 return true;
@@ -296,7 +309,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
 
         @Override
-        public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
+        public void finishDecode(IoSession session, ProtocolDecoderOutput out)
+                throws Exception {
             if (currentDecoder == null) {
                 return;
             }
@@ -313,7 +327,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
-    private static class SingletonMessageEncoderFactory implements MessageEncoderFactory {
+    private static class SingletonMessageEncoderFactory implements
+            MessageEncoderFactory {
         private final MessageEncoder encoder;
 
         private SingletonMessageEncoderFactory(MessageEncoder encoder) {
@@ -328,7 +343,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
-    private static class SingletonMessageDecoderFactory implements MessageDecoderFactory {
+    private static class SingletonMessageDecoderFactory implements
+            MessageDecoderFactory {
         private final MessageDecoder decoder;
 
         private SingletonMessageDecoderFactory(MessageDecoder decoder) {
@@ -343,7 +359,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
-    private static class DefaultConstructorMessageEncoderFactory implements MessageEncoderFactory {
+    private static class DefaultConstructorMessageEncoderFactory implements
+            MessageEncoderFactory {
         private final Class<?> encoderClass;
 
         private DefaultConstructorMessageEncoderFactory(Class<?> encoderClass) {
@@ -363,7 +380,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
-    private static class DefaultConstructorMessageDecoderFactory implements MessageDecoderFactory {
+    private static class DefaultConstructorMessageDecoderFactory implements
+            MessageDecoderFactory {
         private final Class<?> decoderClass;
 
         private DefaultConstructorMessageDecoderFactory(Class<?> decoderClass) {

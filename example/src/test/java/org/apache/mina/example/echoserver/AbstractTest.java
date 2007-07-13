@@ -41,59 +41,55 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
-public abstract class AbstractTest extends TestCase
-{
+public abstract class AbstractTest extends TestCase {
     protected boolean useSSL;
+
     protected int port;
 
     protected SocketAddress boundAddress;
+
     protected IoAcceptor datagramAcceptor;
+
     protected IoAcceptor socketAcceptor;
-    
-    protected AbstractTest()
-    {
+
+    protected AbstractTest() {
     }
 
-    protected static void assertEquals( byte[] expected, byte[] actual )
-    {
-        assertEquals( toString( expected ), toString( actual ) );
+    protected static void assertEquals(byte[] expected, byte[] actual) {
+        assertEquals(toString(expected), toString(actual));
     }
 
-    protected static void assertEquals( ByteBuffer expected, ByteBuffer actual )
-    {
-        assertEquals( toString( expected ), toString( actual ) );
+    protected static void assertEquals(ByteBuffer expected, ByteBuffer actual) {
+        assertEquals(toString(expected), toString(actual));
     }
 
-    protected static String toString( byte[] buf )
-    {
-        StringBuffer str = new StringBuffer( buf.length * 4 );
+    protected static String toString(byte[] buf) {
+        StringBuffer str = new StringBuffer(buf.length * 4);
         for (byte element : buf) {
-            str.append( element );
-            str.append( ' ' );
+            str.append(element);
+            str.append(' ');
         }
         return str.toString();
     }
-    
-    protected static String toString( ByteBuffer buf )
-    {
+
+    protected static String toString(ByteBuffer buf) {
         return buf.getHexDump();
     }
 
     @Override
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
         // Disable SSL by default
         useSSL = false;
-        final SSLFilter sslFilter =
-            new SSLFilter( BogusSSLContextFactory.getInstance( true ) );
+        final SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
+                .getInstance(true));
 
         boundAddress = null;
         datagramAcceptor = new DatagramAcceptor();
         socketAcceptor = new SocketAcceptor();
-        
-        ( ( DatagramSessionConfig ) datagramAcceptor.getSessionConfig() ).setReuseAddress( true );
-        ( ( SocketAcceptor ) socketAcceptor ).setReuseAddress( true );
-        
+
+        ((DatagramSessionConfig) datagramAcceptor.getSessionConfig())
+                .setReuseAddress(true);
+        ((SocketAcceptor) socketAcceptor).setReuseAddress(true);
 
         // Find an availble test port and bind to it.
         boolean socketBound = false;
@@ -102,99 +98,85 @@ public abstract class AbstractTest extends TestCase
         // Let's start from port #1 to detect possible resource leak
         // because test will fail in port 1-1023 if user run this test
         // as a normal user.
-        
+
         SocketAddress address = null;
-        
-        for( port = 1; port <= 65535; port ++ )
-        {
+
+        for (port = 1; port <= 65535; port++) {
             socketBound = false;
             datagramBound = false;
-            
-            address = new InetSocketAddress( port );
-            
-            try
-            {
-                socketAcceptor.setLocalAddress( address );
-                socketAcceptor.setHandler( new EchoProtocolHandler()
-                {
+
+            address = new InetSocketAddress(port);
+
+            try {
+                socketAcceptor.setLocalAddress(address);
+                socketAcceptor.setHandler(new EchoProtocolHandler() {
                     @Override
-                    public void sessionCreated( IoSession session )
-                    {
-                        if( useSSL )
-                        {
-                            session.getFilterChain().addFirst( "SSL", sslFilter );
+                    public void sessionCreated(IoSession session) {
+                        if (useSSL) {
+                            session.getFilterChain().addFirst("SSL", sslFilter);
                         }
                     }
 
                     // This is for TLS reentrance test
                     @Override
-                    public void messageReceived( IoSession session, Object message ) throws Exception
-                    {
-                        if( !( message instanceof ByteBuffer ) )
-                        {
+                    public void messageReceived(IoSession session,
+                            Object message) throws Exception {
+                        if (!(message instanceof ByteBuffer)) {
                             return;
                         }
-                        
-                        ByteBuffer buf = ( ByteBuffer ) message;
-                        if( session.getFilterChain().contains( "SSL" ) && buf.remaining() == 1 && buf.get() == ( byte ) '.' )
-                        {
-                            SessionLog.info( session, "TLS Reentrance" );
-                            ( ( SSLFilter ) session.getFilterChain().get( "SSL" ) ).startSSL( session );
+
+                        ByteBuffer buf = (ByteBuffer) message;
+                        if (session.getFilterChain().contains("SSL")
+                                && buf.remaining() == 1
+                                && buf.get() == (byte) '.') {
+                            SessionLog.info(session, "TLS Reentrance");
+                            ((SSLFilter) session.getFilterChain().get("SSL"))
+                                    .startSSL(session);
 
                             // Send a response
-                            buf = ByteBuffer.allocate( 1 );
-                            buf.put( ( byte ) '.' );
+                            buf = ByteBuffer.allocate(1);
+                            buf.put((byte) '.');
                             buf.flip();
-                            session.setAttribute( SSLFilter.DISABLE_ENCRYPTION_ONCE );
-                            session.write( buf );
-                        }
-                        else
-                        {
-                            super.messageReceived( session, message );
+                            session
+                                    .setAttribute(SSLFilter.DISABLE_ENCRYPTION_ONCE);
+                            session.write(buf);
+                        } else {
+                            super.messageReceived(session, message);
                         }
                     }
-                } );
+                });
                 socketAcceptor.bind();
                 socketBound = true;
 
-                datagramAcceptor.setLocalAddress( address );
-                datagramAcceptor.setHandler( new EchoProtocolHandler() );
+                datagramAcceptor.setLocalAddress(address);
+                datagramAcceptor.setHandler(new EchoProtocolHandler());
                 datagramAcceptor.bind();
                 datagramBound = true;
 
                 break;
-            }
-            catch( IOException e )
-            {
-            }
-            finally
-            {
-                if( socketBound && !datagramBound )
-                {
+            } catch (IOException e) {
+            } finally {
+                if (socketBound && !datagramBound) {
                     socketAcceptor.unbind();
                 }
-                if( datagramBound && !socketBound )
-                {
+                if (datagramBound && !socketBound) {
                     datagramAcceptor.unbind();
                 }
             }
         }
 
         // If there is no port available, test fails.
-        if( !socketBound || !datagramBound )
-        {
-            throw new IOException( "Cannot bind any test port." );
+        if (!socketBound || !datagramBound) {
+            throw new IOException("Cannot bind any test port.");
         }
 
         boundAddress = address;
-        System.out.println( "Using port " + port + " for testing." );
+        System.out.println("Using port " + port + " for testing.");
     }
 
     @Override
-    protected void tearDown() throws Exception
-    {
-        if( boundAddress != null )
-        {
+    protected void tearDown() throws Exception {
+        if (boundAddress != null) {
             socketAcceptor.unbind();
             datagramAcceptor.unbind();
         }

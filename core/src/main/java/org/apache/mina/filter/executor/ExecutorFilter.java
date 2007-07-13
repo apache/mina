@@ -53,117 +53,101 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */
-public class ExecutorFilter extends AbstractExecutorFilter
-{
+public class ExecutorFilter extends AbstractExecutorFilter {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * Creates a new instance with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
-    public ExecutorFilter(IoEventType... eventTypes)
-    {
+    public ExecutorFilter(IoEventType... eventTypes) {
         super(eventTypes);
     }
-    
+
     /**
      * Creates a new instance with the specified <tt>executor</tt>.
      */
-    public ExecutorFilter(Executor executor, IoEventType... eventTypes)
-    {
-        super( executor, eventTypes );
+    public ExecutorFilter(Executor executor, IoEventType... eventTypes) {
+        super(executor, eventTypes);
     }
 
-    protected void fireEvent(IoFilterEvent event)
-    {
+    protected void fireEvent(IoFilterEvent event) {
         IoSession session = event.getSession();
-        SessionBuffer buf = SessionBuffer.getSessionBuffer( session );
+        SessionBuffer buf = SessionBuffer.getSessionBuffer(session);
 
         boolean execute;
-        synchronized( buf.eventQueue )
-        {
-            buf.eventQueue.offer( event );
-            if( buf.processingCompleted )
-            {
+        synchronized (buf.eventQueue) {
+            buf.eventQueue.offer(event);
+            if (buf.processingCompleted) {
                 buf.processingCompleted = false;
                 execute = true;
-            }
-            else
-            {
+            } else {
                 execute = false;
             }
         }
-        
-        if( execute )
-        {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Launching thread for " + session.getRemoteAddress() );
+
+        if (execute) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Launching thread for "
+                        + session.getRemoteAddress());
             }
 
-            getExecutor().execute( new ProcessEventsRunnable( buf ) );
+            getExecutor().execute(new ProcessEventsRunnable(buf));
         }
     }
 
-    private static class SessionBuffer
-    {
-        private static final String KEY = SessionBuffer.class.getName() + ".KEY";
+    private static class SessionBuffer {
+        private static final String KEY = SessionBuffer.class.getName()
+                + ".KEY";
 
-        private static SessionBuffer getSessionBuffer( IoSession session )
-        {
-            synchronized( session )
-            {
-                SessionBuffer buf = (SessionBuffer)session.getAttribute( KEY );
-                if( buf == null )
-                {
-                    buf = new SessionBuffer( session );
-                    session.setAttribute( KEY, buf );
+        private static SessionBuffer getSessionBuffer(IoSession session) {
+            synchronized (session) {
+                SessionBuffer buf = (SessionBuffer) session.getAttribute(KEY);
+                if (buf == null) {
+                    buf = new SessionBuffer(session);
+                    session.setAttribute(KEY, buf);
                 }
                 return buf;
             }
         }
 
         private final IoSession session;
+
         private final Queue<IoFilterEvent> eventQueue = new LinkedList<IoFilterEvent>();
+
         private boolean processingCompleted = true;
 
-        private SessionBuffer( IoSession session )
-        {
+        private SessionBuffer(IoSession session) {
             this.session = session;
         }
     }
 
-    private class ProcessEventsRunnable implements Runnable
-    {
+    private class ProcessEventsRunnable implements Runnable {
         private final SessionBuffer buffer;
 
-        ProcessEventsRunnable( SessionBuffer buffer )
-        {
+        ProcessEventsRunnable(SessionBuffer buffer) {
             this.buffer = buffer;
         }
 
-        public void run()
-        {
-            while( true )
-            {
+        public void run() {
+            while (true) {
                 IoFilterEvent event;
 
-                synchronized( buffer.eventQueue )
-                {
+                synchronized (buffer.eventQueue) {
                     event = buffer.eventQueue.poll();
-                    
-                    if( event == null )
-                    {
+
+                    if (event == null) {
                         buffer.processingCompleted = true;
                         break;
                     }
                 }
 
-                processEvent( event );
+                processEvent(event);
             }
 
-            if ( logger.isDebugEnabled() ) {
-                logger.debug( "Exiting since queue is empty for " + buffer.session.getRemoteAddress() );
+            if (logger.isDebugEnabled()) {
+                logger.debug("Exiting since queue is empty for "
+                        + buffer.session.getRemoteAddress());
             }
         }
     }

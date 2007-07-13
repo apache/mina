@@ -29,68 +29,59 @@ import org.apache.mina.common.WriteFuture;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture
-{
+public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**
      * Returns a new {@link DefaultWriteFuture} which is already marked as 'written'.
      */
-    public static WriteFuture newWrittenFuture( IoSession session )
-    {
-        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture( session );
-        unwrittenFuture.setWritten( true );
+    public static WriteFuture newWrittenFuture(IoSession session) {
+        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture(session);
+        unwrittenFuture.setWritten(true);
         return unwrittenFuture;
     }
 
     /**
      * Returns a new {@link DefaultWriteFuture} which is already marked as 'not written'.
      */
-    public static WriteFuture newNotWrittenFuture( IoSession session )
-    {
-        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture( session );
-        unwrittenFuture.setWritten( false );
+    public static WriteFuture newNotWrittenFuture(IoSession session) {
+        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture(session);
+        unwrittenFuture.setWritten(false);
         return unwrittenFuture;
     }
-    
+
     /**
      * Creates a new instance.
      */
-    public DefaultWriteFuture( IoSession session )
-    {
-        super( session );
+    public DefaultWriteFuture(IoSession session) {
+        super(session);
     }
-    
-    public boolean isWritten()
-    {
-        if( isReady() )
-        {
-            return ( ( Boolean ) getValue() ).booleanValue();
-        }
-        else
-        {
+
+    public boolean isWritten() {
+        if (isReady()) {
+            return ((Boolean) getValue()).booleanValue();
+        } else {
             return false;
         }
     }
 
-    public void setWritten( boolean written )
-    {
-        setValue( written? Boolean.TRUE : Boolean.FALSE );
+    public void setWritten(boolean written) {
+        setValue(written ? Boolean.TRUE : Boolean.FALSE);
     }
 
     @Override
     public WriteFuture await() throws InterruptedException {
         return (WriteFuture) super.await();
     }
-    
+
     @Override
     public WriteFuture awaitUninterruptibly() {
         return (WriteFuture) super.awaitUninterruptibly();
     }
-    
+
     @Override
     public WriteFuture addListener(IoFutureListener listener) {
         return (WriteFuture) super.addListener(listener);
     }
-    
+
     @Override
     public WriteFuture removeListener(IoFutureListener listener) {
         return (WriteFuture) super.removeListener(listener);

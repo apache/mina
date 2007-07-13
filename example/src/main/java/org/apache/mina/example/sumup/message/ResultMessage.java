@@ -25,46 +25,37 @@ package org.apache.mina.example.sumup.message;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ResultMessage extends AbstractMessage
-{
+public class ResultMessage extends AbstractMessage {
     private static final long serialVersionUID = 7371210248110219946L;
 
     private boolean ok;
+
     private int value;
 
-    public ResultMessage()
-    {
+    public ResultMessage() {
     }
 
-    public boolean isOk()
-    {
+    public boolean isOk() {
         return ok;
     }
 
-    public void setOk( boolean ok )
-    {
+    public void setOk(boolean ok) {
         this.ok = ok;
     }
 
-    public int getValue()
-    {
+    public int getValue() {
         return value;
     }
 
-    public void setValue( int value )
-    {
+    public void setValue(int value) {
         this.value = value;
     }
 
     @Override
-    public String toString()
-    {
-        if( ok )
-        {
+    public String toString() {
+        if (ok) {
             return getSequence() + ":RESULT(" + value + ')';
-        }
-        else
-        {
+        } else {
             return getSequence() + ":RESULT(ERROR)";
         }
     }

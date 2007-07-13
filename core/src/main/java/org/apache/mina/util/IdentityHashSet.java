@@ -32,52 +32,43 @@ import java.util.Set;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IdentityHashSet<E> extends AbstractSet<E>
-{
+public class IdentityHashSet<E> extends AbstractSet<E> {
     private final Map<E, Boolean> delegate = new IdentityHashMap<E, Boolean>();
 
-    public IdentityHashSet()
-    {
+    public IdentityHashSet() {
     }
-    
-    public IdentityHashSet( Collection<E> c )
-    {
-        addAll( c );
+
+    public IdentityHashSet(Collection<E> c) {
+        addAll(c);
     }
 
     @Override
-    public int size()
-    {
+    public int size() {
         return delegate.size();
     }
 
     @Override
-    public boolean contains( Object o )
-    {
-        return delegate.containsKey( o );
+    public boolean contains(Object o) {
+        return delegate.containsKey(o);
     }
 
     @Override
-    public Iterator<E> iterator()
-    {
+    public Iterator<E> iterator() {
         return delegate.keySet().iterator();
     }
 
     @Override
-    public boolean add( E arg0 )
-    {
-        return delegate.put( arg0, Boolean.TRUE ) == null;
+    public boolean add(E arg0) {
+        return delegate.put(arg0, Boolean.TRUE) == null;
     }
 
     @Override
-    public boolean remove( Object arg0 )
-    {
-        return delegate.remove( arg0 ) != null;
+    public boolean remove(Object arg0) {
+        return delegate.remove(arg0) != null;
     }
 
     @Override
-    public void clear()
-    {
+    public void clear() {
         delegate.clear();
     }
 }

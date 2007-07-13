@@ -30,113 +30,92 @@ import org.apache.mina.common.support.BaseByteBuffer;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class SimpleByteBufferAllocator implements ByteBufferAllocator
-{
+public class SimpleByteBufferAllocator implements ByteBufferAllocator {
     private static final int MINIMUM_CAPACITY = 1;
 
-    public SimpleByteBufferAllocator()
-    {
+    public SimpleByteBufferAllocator() {
     }
-    
-    public ByteBuffer allocate( int capacity, boolean direct )
-    {
+
+    public ByteBuffer allocate(int capacity, boolean direct) {
         java.nio.ByteBuffer nioBuffer;
-        if( direct )
-        {
-            nioBuffer = java.nio.ByteBuffer.allocateDirect( capacity );            
+        if (direct) {
+            nioBuffer = java.nio.ByteBuffer.allocateDirect(capacity);
+        } else {
+            nioBuffer = java.nio.ByteBuffer.allocate(capacity);
         }
-        else
-        {
-            nioBuffer = java.nio.ByteBuffer.allocate( capacity );            
-        }
-        return new SimpleByteBuffer( nioBuffer, true );
-    }
-    
-    public ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
-    {
-        return new SimpleByteBuffer( nioBuffer, true );
+        return new SimpleByteBuffer(nioBuffer, true);
     }
 
-    public void dispose()
-    {
+    public ByteBuffer wrap(java.nio.ByteBuffer nioBuffer) {
+        return new SimpleByteBuffer(nioBuffer, true);
     }
 
-    private static class SimpleByteBuffer extends BaseByteBuffer
-    {
+    public void dispose() {
+    }
+
+    private static class SimpleByteBuffer extends BaseByteBuffer {
         private java.nio.ByteBuffer buf;
 
-        protected SimpleByteBuffer( java.nio.ByteBuffer buf, boolean autoExpandAllowed )
-        {
-            super( autoExpandAllowed );
+        protected SimpleByteBuffer(java.nio.ByteBuffer buf,
+                boolean autoExpandAllowed) {
+            super(autoExpandAllowed);
             this.buf = buf;
-            buf.order( ByteOrder.BIG_ENDIAN );
+            buf.order(ByteOrder.BIG_ENDIAN);
         }
 
         @Override
-        public java.nio.ByteBuffer buf()
-        {
+        public java.nio.ByteBuffer buf() {
             return buf;
         }
-        
+
         @Override
-        protected void capacity0( int requestedCapacity )
-        {
+        protected void capacity0(int requestedCapacity) {
             int newCapacity = MINIMUM_CAPACITY;
-            while( newCapacity < requestedCapacity )
-            {
+            while (newCapacity < requestedCapacity) {
                 newCapacity <<= 1;
             }
-            
+
             java.nio.ByteBuffer oldBuf = this.buf;
             java.nio.ByteBuffer newBuf;
-            if( isDirect() )
-            {
-                newBuf = java.nio.ByteBuffer.allocateDirect( newCapacity );
-            }
-            else
-            {
-                newBuf = java.nio.ByteBuffer.allocate( newCapacity );
+            if (isDirect()) {
+                newBuf = java.nio.ByteBuffer.allocateDirect(newCapacity);
+            } else {
+                newBuf = java.nio.ByteBuffer.allocate(newCapacity);
             }
 
             newBuf.clear();
             oldBuf.clear();
-            newBuf.put( oldBuf );
+            newBuf.put(oldBuf);
             this.buf = newBuf;
         }
 
         @Override
-        protected ByteBuffer duplicate0()
-        {
-            return new SimpleByteBuffer( this.buf.duplicate(), false );
+        protected ByteBuffer duplicate0() {
+            return new SimpleByteBuffer(this.buf.duplicate(), false);
         }
 
         @Override
-        protected ByteBuffer slice0()
-        {
-            return new SimpleByteBuffer( this.buf.slice(), false );
+        protected ByteBuffer slice0() {
+            return new SimpleByteBuffer(this.buf.slice(), false);
         }
 
         @Override
-        protected ByteBuffer asReadOnlyBuffer0()
-        {
-            return new SimpleByteBuffer( this.buf.asReadOnlyBuffer(), false );
+        protected ByteBuffer asReadOnlyBuffer0() {
+            return new SimpleByteBuffer(this.buf.asReadOnlyBuffer(), false);
         }
 
         @Override
-        public byte[] array()
-        {
+        public byte[] array() {
             return buf.array();
         }
-        
+
         @Override
-        public int arrayOffset()
-        {
+        public int arrayOffset() {
             return buf.arrayOffset();
         }
 
         @Override
-        public boolean hasArray()
-        {
+        public boolean hasArray() {
             return buf.hasArray();
         }
     }

@@ -29,54 +29,50 @@ import java.io.PrintWriter;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class LineDelimiter
-{
+public class LineDelimiter {
     /**
      * the line delimiter constant of the current O/S.
      */
     public static final LineDelimiter DEFAULT;
-    
-    static
-    {
+
+    static {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        PrintWriter out = new PrintWriter( bout );
+        PrintWriter out = new PrintWriter(bout);
         out.println();
-        DEFAULT = new LineDelimiter( new String( bout.toByteArray() ) );
+        DEFAULT = new LineDelimiter(new String(bout.toByteArray()));
     }
-    
+
     /**
      * A special line delimiter which is used for auto-detection of
      * EOL in {@link TextLineDecoder}.  If this delimiter is used,
      * {@link TextLineDecoder} will consider both  <tt>'\r'</tt> and
      * <tt>'\n'</tt> as a delimiter. 
      */
-    public static final LineDelimiter AUTO = new LineDelimiter( "" );
-    
+    public static final LineDelimiter AUTO = new LineDelimiter("");
+
     /**
      * The line delimiter constant of UNIX (<tt>"\n"</tt>)
      */
-    public static final LineDelimiter UNIX = new LineDelimiter( "\n" );
+    public static final LineDelimiter UNIX = new LineDelimiter("\n");
 
     /**
      * The line delimiter constant of MS Windows/DOS (<tt>"\r\n"</tt>)
      */
-    public static final LineDelimiter WINDOWS = new LineDelimiter( "\r\n" );
-    
+    public static final LineDelimiter WINDOWS = new LineDelimiter("\r\n");
+
     /**
      * The line delimiter constant of Mac OS (<tt>"\r"</tt>)
      */
-    public static final LineDelimiter MAC = new LineDelimiter( "\r" );
-    
+    public static final LineDelimiter MAC = new LineDelimiter("\r");
+
     private final String value;
 
     /**
      * Creates a new line delimiter with the specified <tt>value</tt>.
      */
-    public LineDelimiter( String value )
-    {
-        if( value == null )
-        {
-            throw new NullPointerException( "delimiter" );
+    public LineDelimiter(String value) {
+        if (value == null) {
+            throw new NullPointerException("delimiter");
         }
         this.value = value;
     }
@@ -84,44 +80,35 @@ public class LineDelimiter
     /**
      * Return the delimiter string.
      */
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
-    
+
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return value.hashCode();
     }
-    
+
     @Override
-    public boolean equals( Object o )
-    {
-        if( !( o instanceof LineDelimiter ) )
-        {
+    public boolean equals(Object o) {
+        if (!(o instanceof LineDelimiter)) {
             return false;
         }
-        
-        LineDelimiter that = ( LineDelimiter ) o;
-        return this.value.equals( that.value );
+
+        LineDelimiter that = (LineDelimiter) o;
+        return this.value.equals(that.value);
     }
-    
+
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append( "delimiter:" );
-        if( value.length() == 0 )
-        {
-            buf.append( " auto" );
-        }
-        else
-        {
-            for( int i = 0; i < value.length(); i ++ )
-            {
-                buf.append( " 0x" );
-                buf.append( Integer.toHexString( value.charAt( i ) ) );
+        buf.append("delimiter:");
+        if (value.length() == 0) {
+            buf.append(" auto");
+        } else {
+            for (int i = 0; i < value.length(); i++) {
+                buf.append(" 0x");
+                buf.append(Integer.toHexString(value.charAt(i)));
             }
         }
         return buf.toString();

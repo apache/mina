@@ -19,12 +19,10 @@
  */
 package org.apache.mina.common;
 
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.IoFilterChain.Entry;
-
 
 /**
  * Tests {@link DefaultIoFilterChainBuilder}.
@@ -32,125 +30,112 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoFilterChainBuilderTest extends TestCase
-{
-    public static void main( String[] args )
-    {
-        junit.textui.TestRunner.run( DefaultIoFilterChainBuilderTest.class );
+public class DefaultIoFilterChainBuilderTest extends TestCase {
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(DefaultIoFilterChainBuilderTest.class);
     }
 
     @Override
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
     }
 
     @Override
-    protected void tearDown() throws Exception
-    {
+    protected void tearDown() throws Exception {
     }
-    
-    public void testAdd() throws Exception
-    {
+
+    public void testAdd() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
-        
-        builder.addFirst( "A", new IoFilterAdapter() );
-        builder.addLast( "B", new IoFilterAdapter() );
-        builder.addFirst( "C", new IoFilterAdapter() );
-        builder.addLast( "D", new IoFilterAdapter() );
-        builder.addBefore( "B", "E", new IoFilterAdapter() );
-        builder.addBefore( "C", "F", new IoFilterAdapter() );
-        builder.addAfter( "B", "G", new IoFilterAdapter() );
-        builder.addAfter( "D", "H", new IoFilterAdapter() );
-        
+
+        builder.addFirst("A", new IoFilterAdapter());
+        builder.addLast("B", new IoFilterAdapter());
+        builder.addFirst("C", new IoFilterAdapter());
+        builder.addLast("D", new IoFilterAdapter());
+        builder.addBefore("B", "E", new IoFilterAdapter());
+        builder.addBefore("C", "F", new IoFilterAdapter());
+        builder.addAfter("B", "G", new IoFilterAdapter());
+        builder.addAfter("D", "H", new IoFilterAdapter());
+
         String actual = "";
         for (Entry e : builder.getAll()) {
             actual += e.getName();
         }
-        
-        Assert.assertEquals( "FCAEBGDH", actual );
+
+        Assert.assertEquals("FCAEBGDH", actual);
     }
-    
-    public void testGet() throws Exception
-    {
+
+    public void testGet() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
-        
+
         IoFilter filterA = new IoFilterAdapter();
         IoFilter filterB = new IoFilterAdapter();
         IoFilter filterC = new IoFilterAdapter();
         IoFilter filterD = new IoFilterAdapter();
-        
-        builder.addFirst( "A", filterA );
-        builder.addLast( "B", filterB );
-        builder.addBefore( "B", "C", filterC );
-        builder.addAfter( "A", "D", filterD );
-        
-        Assert.assertSame( filterA, builder.get( "A" ) );
-        Assert.assertSame( filterB, builder.get( "B" ) );
-        Assert.assertSame( filterC, builder.get( "C" ) );
-        Assert.assertSame( filterD, builder.get( "D" ) );
+
+        builder.addFirst("A", filterA);
+        builder.addLast("B", filterB);
+        builder.addBefore("B", "C", filterC);
+        builder.addAfter("A", "D", filterD);
+
+        Assert.assertSame(filterA, builder.get("A"));
+        Assert.assertSame(filterB, builder.get("B"));
+        Assert.assertSame(filterC, builder.get("C"));
+        Assert.assertSame(filterD, builder.get("D"));
     }
-    
-    public void testRemove() throws Exception
-    {
+
+    public void testRemove() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
-        
-        builder.addLast( "A", new IoFilterAdapter() );
-        builder.addLast( "B", new IoFilterAdapter() );
-        builder.addLast( "C", new IoFilterAdapter() );
-        builder.addLast( "D", new IoFilterAdapter() );
-        builder.addLast( "E", new IoFilterAdapter() );
-        
-        builder.remove( "A" );
-        builder.remove( "E" );
-        builder.remove( "C" );
-        builder.remove( "B" );
-        builder.remove( "D" );
-        
-        Assert.assertEquals( 0, builder.getAll().size() );
+
+        builder.addLast("A", new IoFilterAdapter());
+        builder.addLast("B", new IoFilterAdapter());
+        builder.addLast("C", new IoFilterAdapter());
+        builder.addLast("D", new IoFilterAdapter());
+        builder.addLast("E", new IoFilterAdapter());
+
+        builder.remove("A");
+        builder.remove("E");
+        builder.remove("C");
+        builder.remove("B");
+        builder.remove("D");
+
+        Assert.assertEquals(0, builder.getAll().size());
     }
-    
-    public void testClear() throws Exception
-    {
+
+    public void testClear() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
-        
-        builder.addLast( "A", new IoFilterAdapter() );
-        builder.addLast( "B", new IoFilterAdapter() );
-        builder.addLast( "C", new IoFilterAdapter() );
-        builder.addLast( "D", new IoFilterAdapter() );
-        builder.addLast( "E", new IoFilterAdapter() );
-        
+
+        builder.addLast("A", new IoFilterAdapter());
+        builder.addLast("B", new IoFilterAdapter());
+        builder.addLast("C", new IoFilterAdapter());
+        builder.addLast("D", new IoFilterAdapter());
+        builder.addLast("E", new IoFilterAdapter());
+
         builder.clear();
-        
-        Assert.assertEquals( 0, builder.getAll().size() );
+
+        Assert.assertEquals(0, builder.getAll().size());
     }
-    
-    public void testToString()
-    {
+
+    public void testToString() {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
-        
+
         // When the chain is empty
-        Assert.assertEquals( "{ empty }", builder.toString() );
-        
+        Assert.assertEquals("{ empty }", builder.toString());
+
         // When there's one filter
-        builder.addLast( "A", new IoFilterAdapter()
-        {
+        builder.addLast("A", new IoFilterAdapter() {
             @Override
-            public String toString()
-            {
+            public String toString() {
                 return "B";
             }
-        } );
-        Assert.assertEquals( "{ (A:B) }", builder.toString() );
-        
+        });
+        Assert.assertEquals("{ (A:B) }", builder.toString());
+
         // When there are two
-        builder.addLast( "C", new IoFilterAdapter()
-        {
+        builder.addLast("C", new IoFilterAdapter() {
             @Override
-            public String toString()
-            {
+            public String toString() {
                 return "D";
             }
-        } );
-        Assert.assertEquals( "{ (A:B), (C:D) }", builder.toString() );
+        });
+        Assert.assertEquals("{ (A:B), (C:D) }", builder.toString());
     }
 }

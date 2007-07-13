@@ -30,32 +30,24 @@ import org.easymock.MockControl;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoFilterMappingTest extends TestCase
-{
-    public void testConstructor() throws Exception
-    {
-        IoFilter filter = ( IoFilter ) MockControl.createControl(
-                IoFilter.class ).getMock();
+public class IoFilterMappingTest extends TestCase {
+    public void testConstructor() throws Exception {
+        IoFilter filter = (IoFilter) MockControl.createControl(IoFilter.class)
+                .getMock();
 
-        try
-        {
-            new IoFilterMapping( null, filter );
-            fail( "null name. IllegalArgumentException expected." );
+        try {
+            new IoFilterMapping(null, filter);
+            fail("null name. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
-        catch( IllegalArgumentException iae )
-        {
-        }
-        try
-        {
-            new IoFilterMapping( "name", null );
-            fail( "null filter. IllegalArgumentException expected." );
-        }
-        catch( IllegalArgumentException iae )
-        {
+        try {
+            new IoFilterMapping("name", null);
+            fail("null filter. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
         }
 
-        IoFilterMapping mapping = new IoFilterMapping( "name", filter );
-        assertEquals( "name", mapping.getName() );
-        assertSame( filter, mapping.getFilter() );
+        IoFilterMapping mapping = new IoFilterMapping("name", filter);
+        assertEquals("name", mapping.getName());
+        assertSame(filter, mapping.getFilter());
     }
 }

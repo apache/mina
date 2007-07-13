@@ -27,28 +27,23 @@ package org.apache.mina.common;
  * @version $Rev$, $Date$
  *
  */
-public class BufferDataException extends RuntimeException
-{
+public class BufferDataException extends RuntimeException {
     private static final long serialVersionUID = -4138189188602563502L;
 
-    public BufferDataException()
-    {
+    public BufferDataException() {
         super();
     }
 
-    public BufferDataException( String message )
-    {
-        super( message );
+    public BufferDataException(String message) {
+        super(message);
     }
 
-    public BufferDataException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public BufferDataException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public BufferDataException( Throwable cause )
-    {
-        super( cause );
+    public BufferDataException(Throwable cause) {
+        super(cause);
     }
 
 }

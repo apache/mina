@@ -134,8 +134,7 @@ import org.apache.mina.common.support.ByteBufferHexDumper;
  * @noinspection StaticNonFinalField
  * @see ByteBufferAllocator
  */
-public abstract class ByteBuffer implements Comparable<ByteBuffer>
-{
+public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     private static ByteBufferAllocator allocator = new SimpleByteBufferAllocator();
 
     private static boolean preferDirectBuffers = false;
@@ -143,8 +142,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * Returns the current allocator which manages the allocated buffers.
      */
-    public static ByteBufferAllocator getAllocator()
-    {
+    public static ByteBufferAllocator getAllocator() {
         return allocator;
     }
 
@@ -152,19 +150,16 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * Changes the current allocator with the specified one to manage
      * the allocated buffers from now.
      */
-    public static void setAllocator( ByteBufferAllocator newAllocator )
-    {
-        if( newAllocator == null )
-        {
-            throw new NullPointerException( "allocator" );
+    public static void setAllocator(ByteBufferAllocator newAllocator) {
+        if (newAllocator == null) {
+            throw new NullPointerException("allocator");
         }
 
         ByteBufferAllocator oldAllocator = allocator;
 
         allocator = newAllocator;
 
-        if( null != oldAllocator )
-        {
+        if (null != oldAllocator) {
             oldAllocator.dispose();
         }
     }
@@ -174,8 +169,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * by default when the type of the new buffer is not specified.  The
      * default value is <tt>false</tt>.
      */
-    public static boolean isPreferDirectBuffers()
-    {
+    public static boolean isPreferDirectBuffers() {
         return preferDirectBuffers;
     }
 
@@ -184,8 +178,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * type of the new buffer is not specified.  The default value is
      * <tt>false</tt>.
      */
-    public static void setPreferDirectBuffers( boolean preferDirectBuffers )
-    {
+    public static void setPreferDirectBuffers(boolean preferDirectBuffers) {
         ByteBuffer.preferDirectBuffers = preferDirectBuffers;
     }
 
@@ -200,19 +193,15 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * 
      * @see #setPreferDirectBuffers(boolean)
      */
-    public static ByteBuffer allocate( int capacity )
-    {
-        try
-        {
+    public static ByteBuffer allocate(int capacity) {
+        try {
             // first try to allocate a buffer of the preferred type.
-            return allocate( capacity, preferDirectBuffers );
-        }
-        catch( OutOfMemoryError e )
-        {
+            return allocate(capacity, preferDirectBuffers);
+        } catch (OutOfMemoryError e) {
             // fall through to the alternative type.
         }
 
-        return allocate( capacity, !preferDirectBuffers );
+        return allocate(capacity, !preferDirectBuffers);
     }
 
     /**
@@ -222,37 +211,32 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @param direct   <tt>true</tt> to get a direct buffer,
      *                 <tt>false</tt> to get a heap buffer.
      */
-    public static ByteBuffer allocate( int capacity, boolean direct )
-    {
-        return allocator.allocate( capacity, direct );
+    public static ByteBuffer allocate(int capacity, boolean direct) {
+        return allocator.allocate(capacity, direct);
     }
 
     /**
      * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
      */
-    public static ByteBuffer wrap( java.nio.ByteBuffer nioBuffer )
-    {
-        return allocator.wrap( nioBuffer );
+    public static ByteBuffer wrap(java.nio.ByteBuffer nioBuffer) {
+        return allocator.wrap(nioBuffer);
     }
 
     /**
      * Wraps the specified byte array into MINA heap buffer.
      */
-    public static ByteBuffer wrap( byte[] byteArray )
-    {
-        return wrap( java.nio.ByteBuffer.wrap( byteArray ) );
+    public static ByteBuffer wrap(byte[] byteArray) {
+        return wrap(java.nio.ByteBuffer.wrap(byteArray));
     }
 
     /**
      * Wraps the specified byte array into MINA heap buffer.
      */
-    public static ByteBuffer wrap( byte[] byteArray, int offset, int length )
-    {
-        return wrap( java.nio.ByteBuffer.wrap( byteArray, offset, length ) );
+    public static ByteBuffer wrap(byte[] byteArray, int offset, int length) {
+        return wrap(java.nio.ByteBuffer.wrap(byteArray, offset, length));
     }
 
-    protected ByteBuffer()
-    {
+    protected ByteBuffer() {
     }
 
     /**
@@ -264,7 +248,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @see java.nio.ByteBuffer#isDirect()
      */
     public abstract boolean isDirect();
-    
+
     /**
      * @see java.nio.ByteBuffer#isReadOnly()
      */
@@ -274,12 +258,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @see java.nio.ByteBuffer#capacity()
      */
     public abstract int capacity();
-    
+
     /**
      * Changes the capacity of this buffer.
      */
-    public abstract ByteBuffer capacity( int newCapacity );
-    
+    public abstract ByteBuffer capacity(int newCapacity);
+
     /**
      * Returns <tt>true</tt> if and only if <tt>autoExpand</tt> is turned on.
      */
@@ -288,7 +272,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * Turns on or off <tt>autoExpand</tt>.
      */
-    public abstract ByteBuffer setAutoExpand( boolean autoExpand );
+    public abstract ByteBuffer setAutoExpand(boolean autoExpand);
 
     /**
      * Changes the capacity and limit of this buffer so this buffer get
@@ -296,11 +280,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * This method works even if you didn't set <tt>autoExpand</tt> to
      * <tt>true</tt>.
      */
-    public ByteBuffer expand( int expectedRemaining )
-    {
-        return expand( position(), expectedRemaining );
+    public ByteBuffer expand(int expectedRemaining) {
+        return expand(position(), expectedRemaining);
     }
-    
+
     /**
      * Changes the capacity and limit of this buffer so this buffer get
      * the specified <tt>expectedRemaining</tt> room from the specified
@@ -308,7 +291,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * This method works even if you didn't set <tt>autoExpand</tt> to
      * <tt>true</tt>.
      */
-    public abstract ByteBuffer expand( int pos, int expectedRemaining );
+    public abstract ByteBuffer expand(int pos, int expectedRemaining);
 
     /**
      * @see java.nio.Buffer#position()
@@ -318,8 +301,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * @see java.nio.Buffer#position(int)
      */
-    public abstract ByteBuffer position( int newPosition );
-    
+    public abstract ByteBuffer position(int newPosition);
+
     /**
      * @see java.nio.Buffer#limit()
      */
@@ -328,13 +311,13 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * @see java.nio.Buffer#limit(int)
      */
-    public abstract ByteBuffer limit( int newLimit );
+    public abstract ByteBuffer limit(int newLimit);
 
     /**
      * @see java.nio.Buffer#mark()
      */
     public abstract ByteBuffer mark();
-    
+
     /**
      * Returns the position of the current mark.  This method returns <tt>-1</tt> if no
      * mark is set.
@@ -345,21 +328,20 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @see java.nio.Buffer#reset()
      */
     public abstract ByteBuffer reset();
-    
+
     /**
      * @see java.nio.Buffer#clear()
      */
     public abstract ByteBuffer clear();
-    
+
     /**
      * Clears this buffer and fills its content with <tt>NUL</tt>.
      * The position is set to zero, the limit is set to the capacity,
      * and the mark is discarded.
      */
-    public ByteBuffer sweep()
-    {
+    public ByteBuffer sweep() {
         clear();
-        return fillAndReset( remaining() );
+        return fillAndReset(remaining());
     }
 
     /**
@@ -367,10 +349,9 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * The position is set to zero, the limit is set to the capacity,
      * and the mark is discarded.
      */
-    public ByteBuffer sweep( byte value )
-    {
+    public ByteBuffer sweep(byte value) {
         clear();
-        return fillAndReset( value, remaining() );
+        return fillAndReset(value, remaining());
     }
 
     /**
@@ -386,16 +367,14 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * @see java.nio.Buffer#remaining()
      */
-    public int remaining()
-    {
+    public int remaining() {
         return limit() - position();
     }
 
     /**
      * @see java.nio.Buffer#hasRemaining()
      */
-    public boolean hasRemaining()
-    {
+    public boolean hasRemaining() {
         return limit() > position();
     }
 
@@ -413,7 +392,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @see java.nio.ByteBuffer#asReadOnlyBuffer()
      */
     public abstract ByteBuffer asReadOnlyBuffer();
-    
+
     /**
      * @see java.nio.ByteBuffer#hasArray()
      */
@@ -437,71 +416,66 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * Reads one unsigned byte as a short integer.
      */
-    public short getUnsigned()
-    {
-        return (short)( get() & 0xff );
+    public short getUnsigned() {
+        return (short) (get() & 0xff);
     }
 
     /**
      * @see java.nio.ByteBuffer#put(byte)
      */
-    public abstract ByteBuffer put( byte b );
+    public abstract ByteBuffer put(byte b);
 
     /**
      * @see java.nio.ByteBuffer#get(int)
      */
-    public abstract byte get( int index );
+    public abstract byte get(int index);
 
     /**
      * Reads one byte as an unsigned short integer.
      */
-    public short getUnsigned( int index )
-    {
-        return (short)( get( index ) & 0xff );
+    public short getUnsigned(int index) {
+        return (short) (get(index) & 0xff);
     }
 
     /**
      * @see java.nio.ByteBuffer#put(int, byte)
      */
-    public abstract ByteBuffer put( int index, byte b );
+    public abstract ByteBuffer put(int index, byte b);
 
     /**
      * @see java.nio.ByteBuffer#get(byte[], int, int)
      */
-    public abstract ByteBuffer get( byte[] dst, int offset, int length );
+    public abstract ByteBuffer get(byte[] dst, int offset, int length);
 
     /**
      * @see java.nio.ByteBuffer#get(byte[])
      */
-    public ByteBuffer get( byte[] dst )
-    {
-        return get( dst, 0, dst.length );
+    public ByteBuffer get(byte[] dst) {
+        return get(dst, 0, dst.length);
     }
 
     /**
      * Writes the content of the specified <tt>src</tt> into this buffer.
      */
-    public abstract ByteBuffer put( java.nio.ByteBuffer src );
+    public abstract ByteBuffer put(java.nio.ByteBuffer src);
 
     /**
      * Writes the content of the specified <tt>src</tt> into this buffer.
      */
-    public ByteBuffer put( ByteBuffer src )
-    {
-        return put( src.buf() );
+    public ByteBuffer put(ByteBuffer src) {
+        return put(src.buf());
     }
 
     /**
      * @see java.nio.ByteBuffer#put(byte[], int, int)
      */
-    public abstract ByteBuffer put( byte[] src, int offset, int length );
+    public abstract ByteBuffer put(byte[] src, int offset, int length);
 
     /**
      * @see java.nio.ByteBuffer#put(byte[])
      */
-    public ByteBuffer put( byte[] src )
-    {
-        return put( src, 0, src.length );
+    public ByteBuffer put(byte[] src) {
+        return put(src, 0, src.length);
     }
 
     /**
@@ -510,81 +484,66 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public abstract ByteBuffer compact();
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuffer buf = new StringBuffer();
-        if( isDirect() )
-        {
-            buf.append( "DirectBuffer" );
+        if (isDirect()) {
+            buf.append("DirectBuffer");
+        } else {
+            buf.append("HeapBuffer");
         }
-        else
-        {
-            buf.append( "HeapBuffer" );
-        }
-        buf.append( "[pos=" );
-        buf.append( position() );
-        buf.append( " lim=" );
-        buf.append( limit() );
-        buf.append( " cap=" );
-        buf.append( capacity() );
-        buf.append( ": " );
-        buf.append( getHexDump( 16 ) );
-        buf.append( ']' );
+        buf.append("[pos=");
+        buf.append(position());
+        buf.append(" lim=");
+        buf.append(limit());
+        buf.append(" cap=");
+        buf.append(capacity());
+        buf.append(": ");
+        buf.append(getHexDump(16));
+        buf.append(']');
         return buf.toString();
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int h = 1;
         int p = position();
-        for( int i = limit() - 1; i >= p; i -- )
-        {
-            h = 31 * h + get( i );
+        for (int i = limit() - 1; i >= p; i--) {
+            h = 31 * h + get(i);
         }
         return h;
     }
 
     @Override
-    public boolean equals( Object o )
-    {
-        if( !( o instanceof ByteBuffer ) )
-        {
+    public boolean equals(Object o) {
+        if (!(o instanceof ByteBuffer)) {
             return false;
         }
 
-        ByteBuffer that = (ByteBuffer)o;
-        if( this.remaining() != that.remaining() )
-        {
+        ByteBuffer that = (ByteBuffer) o;
+        if (this.remaining() != that.remaining()) {
             return false;
         }
 
         int p = this.position();
-        for( int i = this.limit() - 1, j = that.limit() - 1; i >= p; i --, j -- )
-        {
-            byte v1 = this.get( i );
-            byte v2 = that.get( j );
-            if( v1 != v2 )
-            {
+        for (int i = this.limit() - 1, j = that.limit() - 1; i >= p; i--, j--) {
+            byte v1 = this.get(i);
+            byte v2 = that.get(j);
+            if (v1 != v2) {
                 return false;
             }
         }
         return true;
     }
 
-    public int compareTo( ByteBuffer that )
-    {
-        int n = this.position() + Math.min( this.remaining(), that.remaining() );
-        for( int i = this.position(), j = that.position(); i < n; i ++, j ++ )
-        {
-            byte v1 = this.get( i );
-            byte v2 = that.get( j );
-            if( v1 == v2 )
-            {
+    public int compareTo(ByteBuffer that) {
+        int n = this.position() + Math.min(this.remaining(), that.remaining());
+        for (int i = this.position(), j = that.position(); i < n; i++, j++) {
+            byte v1 = this.get(i);
+            byte v2 = that.get(j);
+            if (v1 == v2) {
                 continue;
             }
-            if( v1 < v2 )
-            {
+            if (v1 < v2) {
                 return -1;
             }
 
@@ -601,7 +560,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * @see java.nio.ByteBuffer#order(ByteOrder)
      */
-    public abstract ByteBuffer order( ByteOrder bo );
+    public abstract ByteBuffer order(ByteOrder bo);
 
     /**
      * @see java.nio.ByteBuffer#getChar()
@@ -611,17 +570,17 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * @see java.nio.ByteBuffer#putChar(char)
      */
-    public abstract ByteBuffer putChar( char value );
+    public abstract ByteBuffer putChar(char value);
 
     /**
      * @see java.nio.ByteBuffer#getChar(int)
      */
-    public abstract char getChar( int index );
+    public abstract char getChar(int index);
 
     /**
      * @see java.nio.ByteBuffer#putChar(int, char)
      */
-    public abstract ByteBuffer putChar( int index, char value );
+    public abstract ByteBuffer putChar(int index, char value);
 
     /**
      * @see java.nio.ByteBuffer#asCharBuffer()
@@ -636,33 +595,31 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * Reads two bytes unsigned integer.
      */
-    public int getUnsignedShort()
-    {
+    public int getUnsignedShort() {
         return getShort() & 0xffff;
     }
 
     /**
      * @see java.nio.ByteBuffer#putShort(short)
      */
-    public abstract ByteBuffer putShort( short value );
+    public abstract ByteBuffer putShort(short value);
 
     /**
      * @see java.nio.ByteBuffer#getShort()
      */
-    public abstract short getShort( int index );
+    public abstract short getShort(int index);
 
     /**
      * Reads two bytes unsigned integer.
      */
-    public int getUnsignedShort( int index )
-    {
-        return getShort( index ) & 0xffff;
+    public int getUnsignedShort(int index) {
+        return getShort(index) & 0xffff;
     }
 
     /**
      * @see java.nio.ByteBuffer#putShort(int, short)
      */
-    public abstract ByteBuffer putShort( int index, short value );
+    public abstract ByteBuffer putShort(int index, short value);
 
     /**
      * @see java.nio.ByteBuffer#asShortBuffer()
@@ -677,8 +634,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * Reads four bytes unsigned integer.
      */
-    public long getUnsignedInt()
-    {
+    public long getUnsignedInt() {
         return getInt() & 0xffffffffL;
     }
 
@@ -701,7 +657,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
             return getMediumInt(b3, b2, b1);
         }
     }
-    
+
     /**
      * Relative <i>get</i> method for reading an unsigned medium int value.
      * 
@@ -721,7 +677,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
             return b3 << 16 | b2 << 8 | b1;
         }
     }
-    
+
     /**
      * Absolute <i>get</i> method for reading a medium int value.
      * 
@@ -745,7 +701,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
             return getMediumInt(b3, b2, b1);
         }
     }
-    
+
     /**
      * Absolute <i>get</i> method for reading an unsigned medium int value.
      * 
@@ -769,7 +725,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
             return b3 << 16 | b2 << 8 | b1;
         }
     }
-    
+
     private int getMediumInt(byte b1, byte b2, byte b3) {
         int ret = (b1 << 16 & 0xff0000) | (b2 << 8 & 0xff00) | (b3 & 0xff);
         // Check to see if the medium int is negative (high bit in b1 set)
@@ -801,19 +757,19 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *          If this buffer is read-only
      */
     public ByteBuffer putMediumInt(int value) {
-        byte b1 = (byte)(value >> 16);
-        byte b2 = (byte)(value >> 8);
-        byte b3 = (byte)value;
-        
+        byte b1 = (byte) (value >> 16);
+        byte b2 = (byte) (value >> 8);
+        byte b3 = (byte) value;
+
         if (ByteOrder.BIG_ENDIAN.equals(order())) {
             put(b1).put(b2).put(b3);
         } else {
             put(b3).put(b2).put(b1);
         }
-        
+
         return this;
     }
-    
+
     /**
      * Absolute <i>put</i> method for writing a medium int
      * value.
@@ -838,41 +794,40 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *          If this buffer is read-only
      */
     public ByteBuffer putMediumInt(int index, int value) {
-        byte b1 = (byte)(value >> 16);
-        byte b2 = (byte)(value >> 8);
-        byte b3 = (byte)value;
-        
+        byte b1 = (byte) (value >> 16);
+        byte b2 = (byte) (value >> 8);
+        byte b3 = (byte) value;
+
         if (ByteOrder.BIG_ENDIAN.equals(order())) {
             put(index, b1).put(index + 1, b2).put(index + 2, b3);
         } else {
             put(index, b3).put(index + 1, b2).put(index + 2, b1);
         }
-        
+
         return this;
     }
-    
+
     /**
      * @see java.nio.ByteBuffer#putInt(int)
      */
-    public abstract ByteBuffer putInt( int value );
+    public abstract ByteBuffer putInt(int value);
 
     /**
      * @see java.nio.ByteBuffer#getInt(int)
      */
-    public abstract int getInt( int index );
+    public abstract int getInt(int index);
 
     /**
      * Reads four bytes unsigned integer.
      */
-    public long getUnsignedInt( int index )
-    {
-        return getInt( index ) & 0xffffffffL;
+    public long getUnsignedInt(int index) {
+        return getInt(index) & 0xffffffffL;
     }
 
     /**
      * @see java.nio.ByteBuffer#putInt(int, int)
      */
-    public abstract ByteBuffer putInt( int index, int value );
+    public abstract ByteBuffer putInt(int index, int value);
 
     /**
      * @see java.nio.ByteBuffer#asIntBuffer()
@@ -887,17 +842,17 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * @see java.nio.ByteBuffer#putLong(int, long)
      */
-    public abstract ByteBuffer putLong( long value );
+    public abstract ByteBuffer putLong(long value);
 
     /**
      * @see java.nio.ByteBuffer#getLong(int)
      */
-    public abstract long getLong( int index );
+    public abstract long getLong(int index);
 
     /**
      * @see java.nio.ByteBuffer#putLong(int, long)
      */
-    public abstract ByteBuffer putLong( int index, long value );
+    public abstract ByteBuffer putLong(int index, long value);
 
     /**
      * @see java.nio.ByteBuffer#asLongBuffer()
@@ -912,17 +867,17 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * @see java.nio.ByteBuffer#putFloat(float)
      */
-    public abstract ByteBuffer putFloat( float value );
+    public abstract ByteBuffer putFloat(float value);
 
     /**
      * @see java.nio.ByteBuffer#getFloat(int)
      */
-    public abstract float getFloat( int index );
+    public abstract float getFloat(int index);
 
     /**
      * @see java.nio.ByteBuffer#putFloat(int, float)
      */
-    public abstract ByteBuffer putFloat( int index, float value );
+    public abstract ByteBuffer putFloat(int index, float value);
 
     /**
      * @see java.nio.ByteBuffer#asFloatBuffer()
@@ -937,17 +892,17 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * @see java.nio.ByteBuffer#putDouble(double)
      */
-    public abstract ByteBuffer putDouble( double value );
+    public abstract ByteBuffer putDouble(double value);
 
     /**
      * @see java.nio.ByteBuffer#getDouble(int)
      */
-    public abstract double getDouble( int index );
+    public abstract double getDouble(int index);
 
     /**
      * @see java.nio.ByteBuffer#putDouble(int, double)
      */
-    public abstract ByteBuffer putDouble( int index, double value );
+    public abstract ByteBuffer putDouble(int index, double value);
 
     /**
      * @see java.nio.ByteBuffer#asDoubleBuffer()
@@ -959,76 +914,58 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * {@link InputStream#read()} returns <tt>-1</tt> if the buffer position
      * reaches to the limit.
      */
-    public InputStream asInputStream()
-    {
-        return new InputStream()
-        {
+    public InputStream asInputStream() {
+        return new InputStream() {
             @Override
-            public int available()
-            {
+            public int available() {
                 return ByteBuffer.this.remaining();
             }
 
             @Override
-            public synchronized void mark( int readlimit )
-            {
+            public synchronized void mark(int readlimit) {
                 ByteBuffer.this.mark();
             }
 
             @Override
-            public boolean markSupported()
-            {
+            public boolean markSupported() {
                 return true;
             }
 
             @Override
-            public int read()
-            {
-                if( ByteBuffer.this.hasRemaining() )
-                {
+            public int read() {
+                if (ByteBuffer.this.hasRemaining()) {
                     return ByteBuffer.this.get() & 0xff;
-                }
-                else
-                {
+                } else {
                     return -1;
                 }
             }
 
             @Override
-            public int read( byte[] b, int off, int len )
-            {
+            public int read(byte[] b, int off, int len) {
                 int remaining = ByteBuffer.this.remaining();
-                if( remaining > 0 )
-                {
-                    int readBytes = Math.min( remaining, len );
-                    ByteBuffer.this.get( b, off, readBytes );
+                if (remaining > 0) {
+                    int readBytes = Math.min(remaining, len);
+                    ByteBuffer.this.get(b, off, readBytes);
                     return readBytes;
-                }
-                else
-                {
+                } else {
                     return -1;
                 }
             }
 
             @Override
-            public synchronized void reset()
-            {
+            public synchronized void reset() {
                 ByteBuffer.this.reset();
             }
 
             @Override
-            public long skip( long n )
-            {
+            public long skip(long n) {
                 int bytes;
-                if( n > Integer.MAX_VALUE )
-                {
+                if (n > Integer.MAX_VALUE) {
                     bytes = ByteBuffer.this.remaining();
+                } else {
+                    bytes = Math.min(ByteBuffer.this.remaining(), (int) n);
                 }
-                else
-                {
-                    bytes = Math.min( ByteBuffer.this.remaining(), (int)n );
-                }
-                ByteBuffer.this.skip( bytes );
+                ByteBuffer.this.skip(bytes);
                 return bytes;
             }
         };
@@ -1042,20 +979,16 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * calling {@link #setAutoExpand(boolean)} to prevent the unexpected runtime
      * exception.
      */
-    public OutputStream asOutputStream()
-    {
-        return new OutputStream()
-        {
+    public OutputStream asOutputStream() {
+        return new OutputStream() {
             @Override
-            public void write( byte[] b, int off, int len )
-            {
-                ByteBuffer.this.put( b, off, len );
+            public void write(byte[] b, int off, int len) {
+                ByteBuffer.this.put(b, off, len);
             }
 
             @Override
-            public void write( int b )
-            {
-                ByteBuffer.this.put( (byte)b );
+            public void write(int b) {
+                ByteBuffer.this.put((byte) b);
             }
         };
     }
@@ -1063,11 +996,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     /**
      * Returns hexdump of this buffer.
      */
-    public String getHexDump()
-    {
+    public String getHexDump() {
         return this.getHexDump(Integer.MAX_VALUE);
     }
-    
+
     /**
      * Return hexdump of this buffer with limited length.
      * 
@@ -1087,130 +1019,103 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * specified <code>decoder</code> and returns it.  This method reads
      * until the limit of this buffer if no <tt>NUL</tt> is found.
      */
-    public String getString( CharsetDecoder decoder ) throws CharacterCodingException
-    {
-        if( !hasRemaining() )
-        {
+    public String getString(CharsetDecoder decoder)
+            throws CharacterCodingException {
+        if (!hasRemaining()) {
             return "";
         }
 
-        boolean utf16 = decoder.charset().name().startsWith( "UTF-16" );
+        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
 
         int oldPos = position();
         int oldLimit = limit();
         int end = -1;
         int newPos;
 
-        if( !utf16 )
-        {
-            end = indexOf( ( byte ) 0x00 );
-            if( end < 0 )
-            {
+        if (!utf16) {
+            end = indexOf((byte) 0x00);
+            if (end < 0) {
                 newPos = end = oldLimit;
-            }
-            else
-            {
+            } else {
                 newPos = end + 1;
             }
-        }
-        else
-        {
+        } else {
             int i = oldPos;
-            for( ;; )
-            {
-                boolean wasZero = get( i ) == 0;
-                i ++;
-                
-                if( i >= oldLimit )
-                {
+            for (;;) {
+                boolean wasZero = get(i) == 0;
+                i++;
+
+                if (i >= oldLimit) {
                     break;
                 }
-                
-                if( get( i ) != 0 )
-                {
-                    i ++;
-                    if( i >= oldLimit )
-                    {
+
+                if (get(i) != 0) {
+                    i++;
+                    if (i >= oldLimit) {
                         break;
-                    }
-                    else
-                    {
+                    } else {
                         continue;
                     }
                 }
-                
-                if( wasZero )
-                {
+
+                if (wasZero) {
                     end = i - 1;
                     break;
                 }
             }
 
-            if( end < 0 )
-            {
-                newPos = end = oldPos + ( ( oldLimit - oldPos ) & 0xFFFFFFFE );
-            }
-            else
-            {
-                if( end + 2 <= oldLimit )
-                {
+            if (end < 0) {
+                newPos = end = oldPos + ((oldLimit - oldPos) & 0xFFFFFFFE);
+            } else {
+                if (end + 2 <= oldLimit) {
                     newPos = end + 2;
-                }
-                else
-                {
+                } else {
                     newPos = end;
                 }
             }
         }
 
-        if( oldPos == end )
-        {
-            position( newPos );
+        if (oldPos == end) {
+            position(newPos);
             return "";
         }
 
-        limit( end );
+        limit(end);
         decoder.reset();
 
-        int expectedLength = (int)( remaining() * decoder.averageCharsPerByte() ) + 1;
-        CharBuffer out = CharBuffer.allocate( expectedLength );
-        for( ; ; )
-        {
+        int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
+        CharBuffer out = CharBuffer.allocate(expectedLength);
+        for (;;) {
             CoderResult cr;
-            if( hasRemaining() )
-            {
-                cr = decoder.decode( buf(), out, true );
-            }
-            else
-            {
-                cr = decoder.flush( out );
+            if (hasRemaining()) {
+                cr = decoder.decode(buf(), out, true);
+            } else {
+                cr = decoder.flush(out);
             }
 
-            if( cr.isUnderflow() )
-            {
+            if (cr.isUnderflow()) {
                 break;
             }
 
-            if( cr.isOverflow() )
-            {
-                CharBuffer o = CharBuffer.allocate( out.capacity() + expectedLength );
+            if (cr.isOverflow()) {
+                CharBuffer o = CharBuffer.allocate(out.capacity()
+                        + expectedLength);
                 out.flip();
-                o.put( out );
+                o.put(out);
                 out = o;
                 continue;
             }
 
-            if( cr.isError() )
-            {
+            if (cr.isError()) {
                 // Revert the buffer back to the previous state.
-                limit( oldLimit );
-                position( oldPos );
+                limit(oldLimit);
+                position(oldPos);
                 cr.throwException();
             }
         }
 
-        limit( oldLimit );
-        position( newPos );
+        limit(oldLimit);
+        position(newPos);
         return out.flip().toString();
     }
 
@@ -1220,124 +1125,100 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *
      * @param fieldSize the maximum number of bytes to read
      */
-    public String getString( int fieldSize, CharsetDecoder decoder ) throws CharacterCodingException
-    {
-        checkFieldSize( fieldSize );
+    public String getString(int fieldSize, CharsetDecoder decoder)
+            throws CharacterCodingException {
+        checkFieldSize(fieldSize);
 
-        if( fieldSize == 0 )
-        {
+        if (fieldSize == 0) {
             return "";
         }
 
-        if( !hasRemaining() )
-        {
+        if (!hasRemaining()) {
             return "";
         }
 
-        boolean utf16 = decoder.charset().name().startsWith( "UTF-16" );
+        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
 
-        if( utf16 && ( ( fieldSize & 1 ) != 0 ) )
-        {
-            throw new IllegalArgumentException( "fieldSize is not even." );
+        if (utf16 && ((fieldSize & 1) != 0)) {
+            throw new IllegalArgumentException("fieldSize is not even.");
         }
 
         int oldPos = position();
         int oldLimit = limit();
         int end = oldPos + fieldSize;
 
-        if( oldLimit < end )
-        {
+        if (oldLimit < end) {
             throw new BufferUnderflowException();
         }
 
         int i;
-        
-        if( !utf16 )
-        {
-            for( i = oldPos; i < end; i ++ )
-            {
-                if( get( i ) == 0 )
-                {
+
+        if (!utf16) {
+            for (i = oldPos; i < end; i++) {
+                if (get(i) == 0) {
                     break;
                 }
             }
 
-            if( i == end )
-            {
-                limit( end );
+            if (i == end) {
+                limit(end);
+            } else {
+                limit(i);
             }
-            else
-            {
-                limit( i );
-            }
-        }
-        else
-        {
-            for( i = oldPos; i < end; i += 2 )
-            {
-                if( ( get( i ) == 0 ) && ( get( i + 1 ) == 0 ) )
-                {
+        } else {
+            for (i = oldPos; i < end; i += 2) {
+                if ((get(i) == 0) && (get(i + 1) == 0)) {
                     break;
                 }
             }
 
-            if( i == end )
-            {
-                limit( end );
-            }
-            else
-            {
-                limit( i );
+            if (i == end) {
+                limit(end);
+            } else {
+                limit(i);
             }
         }
 
-        if( !hasRemaining() )
-        {
-            limit( oldLimit );
-            position( end );
+        if (!hasRemaining()) {
+            limit(oldLimit);
+            position(end);
             return "";
         }
         decoder.reset();
 
-        int expectedLength = (int)( remaining() * decoder.averageCharsPerByte() ) + 1;
-        CharBuffer out = CharBuffer.allocate( expectedLength );
-        for( ; ; )
-        {
+        int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
+        CharBuffer out = CharBuffer.allocate(expectedLength);
+        for (;;) {
             CoderResult cr;
-            if( hasRemaining() )
-            {
-                cr = decoder.decode( buf(), out, true );
-            }
-            else
-            {
-                cr = decoder.flush( out );
+            if (hasRemaining()) {
+                cr = decoder.decode(buf(), out, true);
+            } else {
+                cr = decoder.flush(out);
             }
 
-            if( cr.isUnderflow() )
-            {
+            if (cr.isUnderflow()) {
                 break;
             }
 
-            if( cr.isOverflow() )
-            {
-                CharBuffer o = CharBuffer.allocate( out.capacity() + expectedLength );
+            if (cr.isOverflow()) {
+                CharBuffer o = CharBuffer.allocate(out.capacity()
+                        + expectedLength);
                 out.flip();
-                o.put( out );
+                o.put(out);
                 out = o;
                 continue;
             }
 
-            if( cr.isError() )
-            {
+            if (cr.isError()) {
                 // Revert the buffer back to the previous state.
-                limit( oldLimit );
-                position( oldPos );
+                limit(oldLimit);
+                position(oldPos);
                 cr.throwException();
             }
         }
 
-        limit( oldLimit );
-        position( end );
+        limit(oldLimit);
+        position(end);
         return out.flip().toString();
     }
 
@@ -1348,59 +1229,50 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putString(
-        CharSequence val, CharsetEncoder encoder ) throws CharacterCodingException
-    {
-        if( val.length() == 0 )
-        {
+    public ByteBuffer putString(CharSequence val, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        if (val.length() == 0) {
             return this;
         }
 
-        CharBuffer in = CharBuffer.wrap( val );
+        CharBuffer in = CharBuffer.wrap(val);
         encoder.reset();
 
         int expandedState = 0;
 
-        for( ; ; )
-        {
+        for (;;) {
             CoderResult cr;
-            if( in.hasRemaining() )
-            {
-                cr = encoder.encode( in, buf(), true );
-            }
-            else
-            {
-                cr = encoder.flush( buf() );
+            if (in.hasRemaining()) {
+                cr = encoder.encode(in, buf(), true);
+            } else {
+                cr = encoder.flush(buf());
             }
 
-            if( cr.isUnderflow() )
-            {
+            if (cr.isUnderflow()) {
                 break;
             }
-            if( cr.isOverflow() )
-            {
-                if( isAutoExpand() )
-                {
-                    switch( expandedState )
-                    {
-                        case 0:
-                            autoExpand( (int)Math.ceil( in.remaining() * encoder.averageBytesPerChar() ) );
-                            expandedState ++;
-                            break;
-                        case 1:
-                            autoExpand( (int)Math.ceil( in.remaining() * encoder.maxBytesPerChar() ) );
-                            expandedState ++;
-                            break;
-                        default:
-                            throw new RuntimeException( "Expanded by " +
-                                                        (int)Math.ceil( in.remaining() * encoder.maxBytesPerChar() ) +
-                                                        " but that wasn't enough for '" + val + "'" );
+            if (cr.isOverflow()) {
+                if (isAutoExpand()) {
+                    switch (expandedState) {
+                    case 0:
+                        autoExpand((int) Math.ceil(in.remaining()
+                                * encoder.averageBytesPerChar()));
+                        expandedState++;
+                        break;
+                    case 1:
+                        autoExpand((int) Math.ceil(in.remaining()
+                                * encoder.maxBytesPerChar()));
+                        expandedState++;
+                        break;
+                    default:
+                        throw new RuntimeException("Expanded by "
+                                + (int) Math.ceil(in.remaining()
+                                        * encoder.maxBytesPerChar())
+                                + " but that wasn't enough for '" + val + "'");
                     }
                     continue;
                 }
-            }
-            else
-            {
+            } else {
                 expandedState = 0;
             }
             cr.throwException();
@@ -1422,86 +1294,70 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *
      * @param fieldSize the maximum number of bytes to write
      */
-    public ByteBuffer putString(
-        CharSequence val, int fieldSize, CharsetEncoder encoder ) throws CharacterCodingException
-    {
-        checkFieldSize( fieldSize );
+    public ByteBuffer putString(CharSequence val, int fieldSize,
+            CharsetEncoder encoder) throws CharacterCodingException {
+        checkFieldSize(fieldSize);
 
-        if( fieldSize == 0 ) {
+        if (fieldSize == 0) {
             return this;
         }
 
-        autoExpand( fieldSize );
+        autoExpand(fieldSize);
 
-        boolean utf16 = encoder.charset().name().startsWith( "UTF-16" );
+        boolean utf16 = encoder.charset().name().startsWith("UTF-16");
 
-        if( utf16 && ( ( fieldSize & 1 ) != 0 ) )
-        {
-            throw new IllegalArgumentException( "fieldSize is not even." );
+        if (utf16 && ((fieldSize & 1) != 0)) {
+            throw new IllegalArgumentException("fieldSize is not even.");
         }
 
         int oldLimit = limit();
         int end = position() + fieldSize;
 
-        if( oldLimit < end )
-        {
+        if (oldLimit < end) {
             throw new BufferOverflowException();
         }
 
-        if( val.length() == 0 )
-        {
-            if( !utf16 )
-            {
-                put( (byte)0x00 );
+        if (val.length() == 0) {
+            if (!utf16) {
+                put((byte) 0x00);
+            } else {
+                put((byte) 0x00);
+                put((byte) 0x00);
             }
-            else
-            {
-                put( (byte)0x00 );
-                put( (byte)0x00 );
-            }
-            position( end );
+            position(end);
             return this;
         }
 
-        CharBuffer in = CharBuffer.wrap( val );
-        limit( end );
+        CharBuffer in = CharBuffer.wrap(val);
+        limit(end);
         encoder.reset();
 
-        for( ; ; )
-        {
+        for (;;) {
             CoderResult cr;
-            if( in.hasRemaining() )
-            {
-                cr = encoder.encode( in, buf(), true );
-            }
-            else
-            {
-                cr = encoder.flush( buf() );
+            if (in.hasRemaining()) {
+                cr = encoder.encode(in, buf(), true);
+            } else {
+                cr = encoder.flush(buf());
             }
 
-            if( cr.isUnderflow() || cr.isOverflow() )
-            {
+            if (cr.isUnderflow() || cr.isOverflow()) {
                 break;
             }
             cr.throwException();
         }
 
-        limit( oldLimit );
+        limit(oldLimit);
 
-        if( position() < end )
-        {
-            if( !utf16 )
-            {
-                put( (byte)0x00 );
-            }
-            else
-            {
-                put( (byte)0x00 );
-                put( (byte)0x00 );
+        if (position() < end) {
+            if (!utf16) {
+                put((byte) 0x00);
+            } else {
+                put((byte) 0x00);
+                put((byte) 0x00);
             }
         }
 
-        position( end );
+        position(end);
         return this;
     }
 
@@ -1510,9 +1366,9 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * encoded string, using the specified <code>decoder</code> and returns it.
      * This method is a shortcut for <tt>getPrefixedString(2, decoder)</tt>.
      */
-    public String getPrefixedString( CharsetDecoder decoder ) throws CharacterCodingException
-    {
-        return getPrefixedString( 2, decoder );
+    public String getPrefixedString(CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return getPrefixedString(2, decoder);
     }
 
     /**
@@ -1521,75 +1377,66 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *
      * @param prefixLength the length of the length field (1, 2, or 4)
      */
-    public String getPrefixedString( int prefixLength, CharsetDecoder decoder ) throws CharacterCodingException
-    {
-        if( !prefixedDataAvailable( prefixLength ) )
-        {
+    public String getPrefixedString(int prefixLength, CharsetDecoder decoder)
+            throws CharacterCodingException {
+        if (!prefixedDataAvailable(prefixLength)) {
             throw new BufferUnderflowException();
         }
 
         int fieldSize = 0;
 
-        switch( prefixLength )
-        {
-            case 1:
-                fieldSize = getUnsigned();
-                break;
-            case 2:
-                fieldSize = getUnsignedShort();
-                break;
-            case 4:
-                fieldSize = getInt();
-                break;
+        switch (prefixLength) {
+        case 1:
+            fieldSize = getUnsigned();
+            break;
+        case 2:
+            fieldSize = getUnsignedShort();
+            break;
+        case 4:
+            fieldSize = getInt();
+            break;
         }
 
-        if( fieldSize == 0 )
-        {
+        if (fieldSize == 0) {
             return "";
         }
 
-        boolean utf16 = decoder.charset().name().startsWith( "UTF-16" );
+        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
 
-        if( utf16 && ( ( fieldSize & 1 ) != 0 ) )
-        {
-            throw new BufferDataException( "fieldSize is not even for a UTF-16 string." );
+        if (utf16 && ((fieldSize & 1) != 0)) {
+            throw new BufferDataException(
+                    "fieldSize is not even for a UTF-16 string.");
         }
 
         int oldLimit = limit();
         int end = position() + fieldSize;
 
-        if( oldLimit < end )
-        {
+        if (oldLimit < end) {
             throw new BufferUnderflowException();
         }
 
-        limit( end );
+        limit(end);
         decoder.reset();
 
-        int expectedLength = (int)( remaining() * decoder.averageCharsPerByte() ) + 1;
-        CharBuffer out = CharBuffer.allocate( expectedLength );
-        for( ; ; )
-        {
+        int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
+        CharBuffer out = CharBuffer.allocate(expectedLength);
+        for (;;) {
             CoderResult cr;
-            if( hasRemaining() )
-            {
-                cr = decoder.decode( buf(), out, true );
-            }
-            else
-            {
-                cr = decoder.flush( out );
+            if (hasRemaining()) {
+                cr = decoder.decode(buf(), out, true);
+            } else {
+                cr = decoder.flush(out);
             }
 
-            if( cr.isUnderflow() )
-            {
+            if (cr.isUnderflow()) {
                 break;
             }
 
-            if( cr.isOverflow() )
-            {
-                CharBuffer o = CharBuffer.allocate( out.capacity() + expectedLength );
+            if (cr.isOverflow()) {
+                CharBuffer o = CharBuffer.allocate(out.capacity()
+                        + expectedLength);
                 out.flip();
-                o.put( out );
+                o.put(out);
                 out = o;
                 continue;
             }
@@ -1597,8 +1444,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
             cr.throwException();
         }
 
-        limit( oldLimit );
-        position( end );
+        limit(oldLimit);
+        position(end);
         return out.flip().toString();
     }
 
@@ -1610,9 +1457,9 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putPrefixedString( CharSequence in, CharsetEncoder encoder ) throws CharacterCodingException
-    {
-        return putPrefixedString( in, 2, 0, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        return putPrefixedString(in, 2, 0, encoder);
     }
 
     /**
@@ -1625,10 +1472,9 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, CharsetEncoder encoder )
-        throws CharacterCodingException
-    {
-        return putPrefixedString( in, prefixLength, 0, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+            CharsetEncoder encoder) throws CharacterCodingException {
+        return putPrefixedString(in, prefixLength, 0, encoder);
     }
 
     /**
@@ -1642,10 +1488,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, int padding, CharsetEncoder encoder )
-        throws CharacterCodingException
-    {
-        return putPrefixedString( in, prefixLength, padding, (byte)0, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+            int padding, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        return putPrefixedString(in, prefixLength, padding, (byte) 0, encoder);
     }
 
     /**
@@ -1659,116 +1505,103 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putPrefixedString( CharSequence val,
-                                         int prefixLength,
-                                         int padding,
-                                         byte padValue,
-                                         CharsetEncoder encoder ) throws CharacterCodingException
-    {
+    public ByteBuffer putPrefixedString(CharSequence val, int prefixLength,
+            int padding, byte padValue, CharsetEncoder encoder)
+            throws CharacterCodingException {
         int maxLength;
-        switch( prefixLength )
-        {
-            case 1:
-                maxLength = 255;
-                break;
-            case 2:
-                maxLength = 65535;
-                break;
-            case 4:
-                maxLength = Integer.MAX_VALUE;
-                break;
-            default:
-                throw new IllegalArgumentException( "prefixLength: " + prefixLength );
+        switch (prefixLength) {
+        case 1:
+            maxLength = 255;
+            break;
+        case 2:
+            maxLength = 65535;
+            break;
+        case 4:
+            maxLength = Integer.MAX_VALUE;
+            break;
+        default:
+            throw new IllegalArgumentException("prefixLength: " + prefixLength);
         }
 
-        if( val.length() > maxLength )
-        {
-            throw new IllegalArgumentException( "The specified string is too long." );
+        if (val.length() > maxLength) {
+            throw new IllegalArgumentException(
+                    "The specified string is too long.");
         }
-        if( val.length() == 0 )
-        {
-            switch( prefixLength )
-            {
-                case 1:
-                    put( (byte)0 );
-                    break;
-                case 2:
-                    putShort( (short)0 );
-                    break;
-                case 4:
-                    putInt( 0 );
-                    break;
+        if (val.length() == 0) {
+            switch (prefixLength) {
+            case 1:
+                put((byte) 0);
+                break;
+            case 2:
+                putShort((short) 0);
+                break;
+            case 4:
+                putInt(0);
+                break;
             }
             return this;
         }
 
         int padMask;
-        switch( padding )
-        {
-            case 0:
-            case 1:
-                padMask = 0;
-                break;
-            case 2:
-                padMask = 1;
-                break;
-            case 4:
-                padMask = 3;
-                break;
-            default:
-                throw new IllegalArgumentException( "padding: " + padding );
+        switch (padding) {
+        case 0:
+        case 1:
+            padMask = 0;
+            break;
+        case 2:
+            padMask = 1;
+            break;
+        case 4:
+            padMask = 3;
+            break;
+        default:
+            throw new IllegalArgumentException("padding: " + padding);
         }
 
-        CharBuffer in = CharBuffer.wrap( val );
-        int expectedLength = (int)( in.remaining() * encoder.averageBytesPerChar() ) + 1;
+        CharBuffer in = CharBuffer.wrap(val);
+        int expectedLength = (int) (in.remaining() * encoder
+                .averageBytesPerChar()) + 1;
 
-        skip( prefixLength ); // make a room for the length field
+        skip(prefixLength); // make a room for the length field
         int oldPos = position();
         encoder.reset();
 
-        for( ; ; )
-        {
+        for (;;) {
             CoderResult cr;
-            if( in.hasRemaining() )
-            {
-                cr = encoder.encode( in, buf(), true );
-            }
-            else
-            {
-                cr = encoder.flush( buf() );
+            if (in.hasRemaining()) {
+                cr = encoder.encode(in, buf(), true);
+            } else {
+                cr = encoder.flush(buf());
             }
 
-            if( position() - oldPos > maxLength )
-            {
-                throw new IllegalArgumentException( "The specified string is too long." );
+            if (position() - oldPos > maxLength) {
+                throw new IllegalArgumentException(
+                        "The specified string is too long.");
             }
 
-            if( cr.isUnderflow() )
-            {
+            if (cr.isUnderflow()) {
                 break;
             }
-            if( cr.isOverflow() && isAutoExpand() )
-            {
-                autoExpand( expectedLength );
+            if (cr.isOverflow() && isAutoExpand()) {
+                autoExpand(expectedLength);
                 continue;
             }
             cr.throwException();
         }
 
         // Write the length field
-        fill( padValue, padding - ( ( position() - oldPos ) & padMask ) );
+        fill(padValue, padding - ((position() - oldPos) & padMask));
         int length = position() - oldPos;
-        switch( prefixLength )
-        {
-            case 1:
-                put( oldPos - 1, (byte)length );
-                break;
-            case 2:
-                putShort( oldPos - 2, (short)length );
-                break;
-            case 4:
-                putInt( oldPos - 4, length );
-                break;
+        switch (prefixLength) {
+        case 1:
+            put(oldPos - 1, (byte) length);
+            break;
+        case 2:
+            putShort(oldPos - 2, (short) length);
+            break;
+        case 4:
+            putInt(oldPos - 4, length);
+            break;
         }
         return this;
     }
@@ -1777,83 +1610,71 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * Reads a Java object from the buffer using the context {@link ClassLoader}
      * of the current thread.
      */
-    public Object getObject() throws ClassNotFoundException
-    {
-        return getObject( Thread.currentThread().getContextClassLoader() );
+    public Object getObject() throws ClassNotFoundException {
+        return getObject(Thread.currentThread().getContextClassLoader());
     }
 
     /**
      * Reads a Java object from the buffer using the specified <tt>classLoader</tt>.
      */
-    public Object getObject( final ClassLoader classLoader ) throws ClassNotFoundException
-    {
-        if( !prefixedDataAvailable( 4 ) )
-        {
+    public Object getObject(final ClassLoader classLoader)
+            throws ClassNotFoundException {
+        if (!prefixedDataAvailable(4)) {
             throw new BufferUnderflowException();
         }
 
         int length = getInt();
-        if( length <= 4 )
-        {
-            throw new BufferDataException( "Object length should be greater than 4: " + length );
+        if (length <= 4) {
+            throw new BufferDataException(
+                    "Object length should be greater than 4: " + length);
         }
 
         int oldLimit = limit();
-        limit( position() + length );
-        try
-        {
-            ObjectInputStream in = new ObjectInputStream( asInputStream() )
-            {
+        limit(position() + length);
+        try {
+            ObjectInputStream in = new ObjectInputStream(asInputStream()) {
                 @Override
-                protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException
-                {
+                protected ObjectStreamClass readClassDescriptor()
+                        throws IOException, ClassNotFoundException {
                     String className = readUTF();
-                    Class<?> clazz = Class.forName( className, true, classLoader );
-                    return ObjectStreamClass.lookup( clazz );
+                    Class<?> clazz = Class
+                            .forName(className, true, classLoader);
+                    return ObjectStreamClass.lookup(clazz);
                 }
             };
             return in.readObject();
-        }
-        catch( IOException e )
-        {
-            throw new BufferDataException( e );
-        }
-        finally
-        {
-            limit( oldLimit );
+        } catch (IOException e) {
+            throw new BufferDataException(e);
+        } finally {
+            limit(oldLimit);
         }
     }
 
     /**
      * Writes the specified Java object to the buffer.
      */
-    public ByteBuffer putObject( Object o )
-    {
+    public ByteBuffer putObject(Object o) {
         int oldPos = position();
-        skip( 4 ); // Make a room for the length field.
-        try
-        {
-            ObjectOutputStream out = new ObjectOutputStream( asOutputStream() )
-            {
+        skip(4); // Make a room for the length field.
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(asOutputStream()) {
                 @Override
-                protected void writeClassDescriptor( ObjectStreamClass desc ) throws IOException
-                {
-                    writeUTF( desc.getName() );
+                protected void writeClassDescriptor(ObjectStreamClass desc)
+                        throws IOException {
+                    writeUTF(desc.getName());
                 }
             };
-            out.writeObject( o );
+            out.writeObject(o);
             out.flush();
-        }
-        catch( IOException e )
-        {
-            throw new BufferDataException( e );
+        } catch (IOException e) {
+            throw new BufferDataException(e);
         }
 
         // Fill the length field
         int newPos = position();
-        position( oldPos );
-        putInt( newPos - oldPos - 4 );
-        position( newPos );
+        position(oldPos);
+        putInt(newPos - oldPos - 4);
+        position(newPos);
         return this;
     }
 
@@ -1872,9 +1693,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @throws IllegalArgumentException if prefixLength is wrong
      * @throws BufferDataException      if data length is negative
      */
-    public boolean prefixedDataAvailable( int prefixLength )
-    {
-        return prefixedDataAvailable( prefixLength, Integer.MAX_VALUE );
+    public boolean prefixedDataAvailable(int prefixLength) {
+        return prefixedDataAvailable(prefixLength, Integer.MAX_VALUE);
     }
 
     /**
@@ -1888,81 +1708,69 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @throws IllegalArgumentException if prefixLength is wrong
      * @throws BufferDataException      if data length is negative or greater then <tt>maxDataLength</tt>
      */
-    public boolean prefixedDataAvailable( int prefixLength, int maxDataLength )
-    {
-        if( remaining() < prefixLength )
-        {
+    public boolean prefixedDataAvailable(int prefixLength, int maxDataLength) {
+        if (remaining() < prefixLength) {
             return false;
         }
 
         int dataLength;
-        switch( prefixLength )
-        {
-            case 1:
-                dataLength = getUnsigned( position() );
-                break;
-            case 2:
-                dataLength = getUnsignedShort( position() );
-                break;
-            case 4:
-                dataLength = getInt( position() );
-                break;
-            default:
-                throw new IllegalArgumentException( "prefixLength: " + prefixLength );
+        switch (prefixLength) {
+        case 1:
+            dataLength = getUnsigned(position());
+            break;
+        case 2:
+            dataLength = getUnsignedShort(position());
+            break;
+        case 4:
+            dataLength = getInt(position());
+            break;
+        default:
+            throw new IllegalArgumentException("prefixLength: " + prefixLength);
         }
 
-        if( dataLength < 0 || dataLength > maxDataLength )
-        {
-            throw new BufferDataException( "dataLength: " + dataLength );
+        if (dataLength < 0 || dataLength > maxDataLength) {
+            throw new BufferDataException("dataLength: " + dataLength);
         }
 
         return remaining() - prefixLength >= dataLength;
     }
-    
+
     /////////////////////
     // IndexOf methods //
     /////////////////////
-    
+
     /**
      * Returns the first occurence position of the specified byte from the current position to
      * the current limit.
      * 
      * @return <tt>-1</tt> if the specified byte is not found
      */
-    public int indexOf( byte b )
-    {
-        if( hasArray() )
-        {
+    public int indexOf(byte b) {
+        if (hasArray()) {
             int arrayOffset = arrayOffset();
             int beginPos = arrayOffset + position();
             int limit = arrayOffset + limit();
             byte[] array = array();
-            
-            for( int i = beginPos; i < limit; i ++ )
-            {
-                if( array[ i ] == b )
-                {
+
+            for (int i = beginPos; i < limit; i++) {
+                if (array[i] == b) {
                     return i - arrayOffset;
                 }
             }
-        }
-        else
-        {
+        } else {
             int beginPos = position();
             int limit = limit();
-            
-            for( int i = beginPos; i < limit; i ++ )
-            {
-                if( get( i ) == b )
-                {
+
+            for (int i = beginPos; i < limit; i++) {
+                if (get(i) == b) {
                     return i;
                 }
             }
         }
-        
+
         return -1;
     }
-    
+
     //////////////////////////
     // Skip or fill methods //
     //////////////////////////
@@ -1971,58 +1779,49 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * Forwards the position of this buffer as the specified <code>size</code>
      * bytes.
      */
-    public ByteBuffer skip( int size )
-    {
-        autoExpand( size );
-        return position( position() + size );
+    public ByteBuffer skip(int size) {
+        autoExpand(size);
+        return position(position() + size);
     }
 
     /**
      * Fills this buffer with the specified value.
      * This method moves buffer position forward.
      */
-    public ByteBuffer fill( byte value, int size )
-    {
-        autoExpand( size );
+    public ByteBuffer fill(byte value, int size) {
+        autoExpand(size);
         int q = size >>> 3;
         int r = size & 7;
 
-        if( q > 0 )
-        {
-            int intValue = value | ( value << 8 ) | ( value << 16 )
-                           | ( value << 24 );
+        if (q > 0) {
+            int intValue = value | (value << 8) | (value << 16) | (value << 24);
             long longValue = intValue;
             longValue <<= 32;
             longValue |= intValue;
 
-            for( int i = q; i > 0; i -- )
-            {
-                putLong( longValue );
+            for (int i = q; i > 0; i--) {
+                putLong(longValue);
             }
         }
 
         q = r >>> 2;
         r = r & 3;
 
-        if( q > 0 )
-        {
-            int intValue = value | ( value << 8 ) | ( value << 16 )
-                           | ( value << 24 );
-            putInt( intValue );
+        if (q > 0) {
+            int intValue = value | (value << 8) | (value << 16) | (value << 24);
+            putInt(intValue);
         }
 
         q = r >> 1;
         r = r & 1;
 
-        if( q > 0 )
-        {
-            short shortValue = (short)( value | ( value << 8 ) );
-            putShort( shortValue );
+        if (q > 0) {
+            short shortValue = (short) (value | (value << 8));
+            putShort(shortValue);
         }
 
-        if( r > 0 )
-        {
-            put( value );
+        if (r > 0) {
+            put(value);
         }
 
         return this;
@@ -2032,17 +1831,13 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * Fills this buffer with the specified value.
      * This method does not change buffer position.
      */
-    public ByteBuffer fillAndReset( byte value, int size )
-    {
-        autoExpand( size );
+    public ByteBuffer fillAndReset(byte value, int size) {
+        autoExpand(size);
         int pos = position();
-        try
-        {
-            fill( value, size );
-        }
-        finally
-        {
-            position( pos );
+        try {
+            fill(value, size);
+        } finally {
+            position(pos);
         }
         return this;
     }
@@ -2051,36 +1846,31 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * Fills this buffer with <code>NUL (0x00)</code>.
      * This method moves buffer position forward.
      */
-    public ByteBuffer fill( int size )
-    {
-        autoExpand( size );
+    public ByteBuffer fill(int size) {
+        autoExpand(size);
         int q = size >>> 3;
         int r = size & 7;
 
-        for( int i = q; i > 0; i -- )
-        {
-            putLong( 0L );
+        for (int i = q; i > 0; i--) {
+            putLong(0L);
         }
 
         q = r >>> 2;
         r = r & 3;
 
-        if( q > 0 )
-        {
-            putInt( 0 );
+        if (q > 0) {
+            putInt(0);
         }
 
         q = r >> 1;
         r = r & 1;
 
-        if( q > 0 )
-        {
-            putShort( (short)0 );
+        if (q > 0) {
+            putShort((short) 0);
         }
 
-        if( r > 0 )
-        {
-            put( (byte)0 );
+        if (r > 0) {
+            put((byte) 0);
         }
 
         return this;
@@ -2090,17 +1880,13 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * Fills this buffer with <code>NUL (0x00)</code>.
      * This method does not change buffer position.
      */
-    public ByteBuffer fillAndReset( int size )
-    {
-        autoExpand( size );
+    public ByteBuffer fillAndReset(int size) {
+        autoExpand(size);
         int pos = position();
-        try
-        {
-            fill( size );
-        }
-        finally
-        {
-            position( pos );
+        try {
+            fill(size);
+        } finally {
+            position(pos);
         }
 
         return this;
@@ -2109,7 +1895,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     //////////////////////////
     // Enum methods         //
     //////////////////////////
-    
+
     /**
      * Reads a byte from the buffer and returns the correlating enum constant defined
      * by the specified enum type.
@@ -2171,7 +1957,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public <E extends Enum<E>> E getEnumInt(Class<E> enumClass) {
         return toEnum(enumClass, getInt());
     }
-    
+
     /**
      * Reads an int from the buffer and returns the correlating enum constant defined
      * by the specified enum type.
@@ -2184,7 +1970,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public <E extends Enum<E>> E getEnumInt(int index, Class<E> enumClass) {
         return toEnum(enumClass, getInt(index));
     }
-    
+
     /**
      * Writes an enum's ordinal value to the buffer as a byte.
      * 
@@ -2192,9 +1978,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      */
     public ByteBuffer putEnum(Enum<?> e) {
         if (e.ordinal() > Byte.MAX_VALUE) {
-            throw new IllegalArgumentException(enumConversionErrorMessage(e, "byte"));
+            throw new IllegalArgumentException(enumConversionErrorMessage(e,
+                    "byte"));
         }
-        return put((byte)e.ordinal());
+        return put((byte) e.ordinal());
     }
 
     /**
@@ -2205,9 +1992,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      */
     public ByteBuffer putEnum(int index, Enum<?> e) {
         if (e.ordinal() > Byte.MAX_VALUE) {
-            throw new IllegalArgumentException(enumConversionErrorMessage(e, "byte"));
+            throw new IllegalArgumentException(enumConversionErrorMessage(e,
+                    "byte"));
         }
-        return put(index, (byte)e.ordinal());
+        return put(index, (byte) e.ordinal());
     }
 
     /**
@@ -2217,11 +2005,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      */
     public ByteBuffer putEnumShort(Enum<?> e) {
         if (e.ordinal() > Short.MAX_VALUE) {
-            throw new IllegalArgumentException(enumConversionErrorMessage(e, "short"));
+            throw new IllegalArgumentException(enumConversionErrorMessage(e,
+                    "short"));
         }
-        return putShort((short)e.ordinal());
+        return putShort((short) e.ordinal());
     }
-    
+
     /**
      * Writes an enum's ordinal value to the buffer as a short.
      * 
@@ -2230,11 +2019,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      */
     public ByteBuffer putEnumShort(int index, Enum<?> e) {
         if (e.ordinal() > Short.MAX_VALUE) {
-            throw new IllegalArgumentException(enumConversionErrorMessage(e, "short"));
+            throw new IllegalArgumentException(enumConversionErrorMessage(e,
+                    "short"));
         }
-        return putShort(index, (short)e.ordinal());
+        return putShort(index, (short) e.ordinal());
     }
-    
+
     /**
      * Writes an enum's ordinal value to the buffer as an integer.
      * 
@@ -2257,23 +2047,28 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     private <E> E toEnum(Class<E> enumClass, int i) {
         E[] enumConstants = enumClass.getEnumConstants();
         if (i > enumConstants.length) {
-            throw new IndexOutOfBoundsException(String.format("%d is too large of an ordinal to convert to the enum %s", i, enumClass.getName()));
+            throw new IndexOutOfBoundsException(String.format(
+                    "%d is too large of an ordinal to convert to the enum %s",
+                    i, enumClass.getName()));
         }
         return enumConstants[i];
     }
-    
+
     private String enumConversionErrorMessage(Enum<?> e, String type) {
-        return String.format("%s.%s has an ordinal value too large for a %s", e.getClass().getName(), e.name(), type);
+        return String.format("%s.%s has an ordinal value too large for a %s", e
+                .getClass().getName(), e.name(), type);
     }
-    
+
     //////////////////////////
     // EnumSet methods      //
     //////////////////////////
 
     private static final long BYTE_MASK = 0xFFL;
+
     private static final long SHORT_MASK = 0xFFFFL;
+
     private static final long INT_MASK = 0xFFFFFFFFL;
-    
+
     /**
      * Reads a byte sized bit vector and converts it to an {@link EnumSet}.
      * 
@@ -2298,7 +2093,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @param enumClass  the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public <E extends Enum<E>> EnumSet<E> getEnumSet(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSet(int index,
+            Class<E> enumClass) {
         return toEnumSet(enumClass, get(index) & BYTE_MASK);
     }
 
@@ -2323,7 +2119,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @param enumClass  the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index,
+            Class<E> enumClass) {
         return toEnumSet(enumClass, getShort(index) & SHORT_MASK);
     }
 
@@ -2348,7 +2145,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @param enumClass  the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index,
+            Class<E> enumClass) {
         return toEnumSet(enumClass, getInt(index) & INT_MASK);
     }
 
@@ -2373,7 +2171,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * @param enumClass  the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index,
+            Class<E> enumClass) {
         return toEnumSet(enumClass, getLong(index));
     }
 
@@ -2401,7 +2200,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public <E extends Enum<E>> ByteBuffer putEnumSet(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~BYTE_MASK) != 0) {
-            throw new IllegalArgumentException("The enum set is too large to fit in a byte: " + set);
+            throw new IllegalArgumentException(
+                    "The enum set is too large to fit in a byte: " + set);
         }
         return put((byte) vector);
     }
@@ -2416,7 +2216,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public <E extends Enum<E>> ByteBuffer putEnumSet(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~BYTE_MASK) != 0) {
-            throw new IllegalArgumentException("The enum set is too large to fit in a byte: " + set);
+            throw new IllegalArgumentException(
+                    "The enum set is too large to fit in a byte: " + set);
         }
         return put(index, (byte) vector);
     }
@@ -2430,7 +2231,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public <E extends Enum<E>> ByteBuffer putEnumSetShort(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~SHORT_MASK) != 0) {
-            throw new IllegalArgumentException("The enum set is too large to fit in a short: " + set);
+            throw new IllegalArgumentException(
+                    "The enum set is too large to fit in a short: " + set);
         }
         return putShort((short) vector);
     }
@@ -2445,7 +2247,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public <E extends Enum<E>> ByteBuffer putEnumSetShort(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~SHORT_MASK) != 0) {
-            throw new IllegalArgumentException("The enum set is too large to fit in a short: " + set);
+            throw new IllegalArgumentException(
+                    "The enum set is too large to fit in a short: " + set);
         }
         return putShort(index, (short) vector);
     }
@@ -2459,7 +2262,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public <E extends Enum<E>> ByteBuffer putEnumSetInt(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~INT_MASK) != 0) {
-            throw new IllegalArgumentException("The enum set is too large to fit in an int: " + set);
+            throw new IllegalArgumentException(
+                    "The enum set is too large to fit in an int: " + set);
         }
         return putInt((int) vector);
     }
@@ -2474,7 +2278,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
     public <E extends Enum<E>> ByteBuffer putEnumSetInt(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~INT_MASK) != 0) {
-            throw new IllegalArgumentException("The enum set is too large to fit in an int: " + set);
+            throw new IllegalArgumentException(
+                    "The enum set is too large to fit in an int: " + set);
         }
         return putInt(index, (int) vector);
     }
@@ -2507,7 +2312,9 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
         long vector = 0;
         for (E e : set) {
             if (e.ordinal() >= Long.SIZE) {
-                throw new IllegalArgumentException("The enum set is too large to fit in a bit vector: " + set);
+                throw new IllegalArgumentException(
+                        "The enum set is too large to fit in a bit vector: "
+                                + set);
             }
             vector |= 1L << e.ordinal();
         }
@@ -2518,11 +2325,9 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * This method forwards the call to {@link #expand(int)} only when
      * <tt>autoExpand</tt> property is <tt>true</tt>.
      */
-    protected ByteBuffer autoExpand( int expectedRemaining )
-    {
-        if( isAutoExpand() )
-        {
-            expand( expectedRemaining );
+    protected ByteBuffer autoExpand(int expectedRemaining) {
+        if (isAutoExpand()) {
+            expand(expectedRemaining);
         }
         return this;
     }
@@ -2531,21 +2336,17 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer>
      * This method forwards the call to {@link #expand(int)} only when
      * <tt>autoExpand</tt> property is <tt>true</tt>.
      */
-    protected ByteBuffer autoExpand( int pos, int expectedRemaining )
-    {
-        if( isAutoExpand() )
-        {
-            expand( pos, expectedRemaining );
+    protected ByteBuffer autoExpand(int pos, int expectedRemaining) {
+        if (isAutoExpand()) {
+            expand(pos, expectedRemaining);
         }
         return this;
     }
 
-    private static void checkFieldSize( int fieldSize )
-    {
-        if( fieldSize < 0 )
-        {
-            throw new IllegalArgumentException(
-                "fieldSize cannot be negative: " + fieldSize );
+    private static void checkFieldSize(int fieldSize) {
+        if (fieldSize < 0) {
+            throw new IllegalArgumentException("fieldSize cannot be negative: "
+                    + fieldSize);
         }
     }
 }

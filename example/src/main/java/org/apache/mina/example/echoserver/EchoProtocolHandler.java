@@ -36,53 +36,47 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class EchoProtocolHandler extends IoHandlerAdapter
-{
-    private static final Logger log = LoggerFactory.getLogger( EchoProtocolHandler.class );
+public class EchoProtocolHandler extends IoHandlerAdapter {
+    private static final Logger log = LoggerFactory
+            .getLogger(EchoProtocolHandler.class);
 
     @Override
-    public void sessionCreated( IoSession session )
-    {
-        if( session.getTransportType() == TransportType.SOCKET )
-        {
-            ( ( SocketSessionConfig ) session.getConfig() ).setReceiveBufferSize( 2048 );
+    public void sessionCreated(IoSession session) {
+        if (session.getTransportType() == TransportType.SOCKET) {
+            ((SocketSessionConfig) session.getConfig())
+                    .setReceiveBufferSize(2048);
         }
-        
-        session.setIdleTime( IdleStatus.BOTH_IDLE, 10 );
-        
+
+        session.setIdleTime(IdleStatus.BOTH_IDLE, 10);
+
         // We're going to use SSL negotiation notification.
-        session.setAttribute( SSLFilter.USE_NOTIFICATION );
-    }
-    
-    @Override
-    public void sessionIdle( IoSession session, IdleStatus status )
-    {
-        log.info(
-                "*** IDLE #" +
-                session.getIdleCount( IdleStatus.BOTH_IDLE ) +
-                " ***" );
+        session.setAttribute(SSLFilter.USE_NOTIFICATION);
     }
 
     @Override
-    public void exceptionCaught( IoSession session, Throwable cause )
-    {
+    public void sessionIdle(IoSession session, IdleStatus status) {
+        log.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE)
+                + " ***");
+    }
+
+    @Override
+    public void exceptionCaught(IoSession session, Throwable cause) {
         cause.printStackTrace();
         session.close();
     }
 
     @Override
-    public void messageReceived( IoSession session, Object message ) throws Exception
-    {
-        if( !( message instanceof ByteBuffer ) )
-        {
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
+        if (!(message instanceof ByteBuffer)) {
             return;
         }
 
-        ByteBuffer rb = ( ByteBuffer ) message;
+        ByteBuffer rb = (ByteBuffer) message;
         // Write the received data back to remote peer
-        ByteBuffer wb = ByteBuffer.allocate( rb.remaining() );
-        wb.put( rb );
+        ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+        wb.put(rb);
         wb.flip();
-        session.write( wb );
+        session.write(wb);
     }
 }

@@ -35,37 +35,33 @@ import org.apache.mina.util.SessionLog;
  * @version $Rev$, $Date$
  *
  */
-public abstract class AbstractProxyIoHandler extends IoHandlerAdapter
-{
-    private static final Charset CHARSET = Charset.forName( "iso8859-1" );
-    
+public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
+    private static final Charset CHARSET = Charset.forName("iso8859-1");
+
     @Override
-    public void sessionCreated( IoSession session ) throws Exception
-    {
-        session.setTrafficMask( TrafficMask.NONE );
+    public void sessionCreated(IoSession session) throws Exception {
+        session.setTrafficMask(TrafficMask.NONE);
     }
 
     @Override
-    public void sessionClosed( IoSession session ) throws Exception 
-    {
-        if( session.getAttachment() != null )
-        {
-            ( ( IoSession ) session.getAttachment() ).setAttachment( null );
-            ( ( IoSession ) session.getAttachment() ).close();
-            session.setAttachment( null );
+    public void sessionClosed(IoSession session) throws Exception {
+        if (session.getAttachment() != null) {
+            ((IoSession) session.getAttachment()).setAttachment(null);
+            ((IoSession) session.getAttachment()).close();
+            session.setAttachment(null);
         }
     }
-    
+
     @Override
-    public void messageReceived( IoSession session, Object message ) throws Exception
-    {
-        ByteBuffer rb = ( ByteBuffer ) message;
-        ByteBuffer wb = ByteBuffer.allocate( rb.remaining() );
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
+        ByteBuffer rb = (ByteBuffer) message;
+        ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
         rb.mark();
-        wb.put( rb );
+        wb.put(rb);
         wb.flip();
-        ( ( IoSession ) session.getAttachment() ).write( wb );
+        ((IoSession) session.getAttachment()).write(wb);
         rb.reset();
-        SessionLog.info( session, rb.getString( CHARSET.newDecoder() ) );
+        SessionLog.info(session, rb.getString(CHARSET.newDecoder()));
     }
 }

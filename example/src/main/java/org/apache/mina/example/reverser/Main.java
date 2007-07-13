@@ -34,27 +34,25 @@ import org.apache.mina.transport.socket.nio.SocketAcceptor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class Main
-{
+public class Main {
     private static final int PORT = 8080;
 
-    public static void main( String[] args ) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         SocketAcceptor acceptor = new SocketAcceptor();
 
         // Prepare the configuration
-        acceptor.setReuseAddress( true );
-        acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+        acceptor.setReuseAddress(true);
+        acceptor.getFilterChain().addLast("logger", new LoggingFilter());
         acceptor.getFilterChain().addLast(
                 "codec",
-                new ProtocolCodecFilter(
-                        new TextLineCodecFactory( Charset.forName( "UTF-8" ) ) ) );
+                new ProtocolCodecFilter(new TextLineCodecFactory(Charset
+                        .forName("UTF-8"))));
 
         // Bind
-        acceptor.setLocalAddress( new InetSocketAddress( PORT ) );
-        acceptor.setHandler( new ReverseProtocolHandler() );
+        acceptor.setLocalAddress(new InetSocketAddress(PORT));
+        acceptor.setHandler(new ReverseProtocolHandler());
         acceptor.bind();
 
-        System.out.println( "Listening on port " + PORT );
+        System.out.println("Listening on port " + PORT);
     }
 }

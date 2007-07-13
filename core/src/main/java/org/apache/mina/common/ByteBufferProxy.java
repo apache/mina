@@ -43,8 +43,7 @@ import java.nio.charset.CharsetEncoder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ByteBufferProxy extends ByteBuffer
-{
+public class ByteBufferProxy extends ByteBuffer {
 
     /**
      * The buffer proxied by this proxy.
@@ -55,687 +54,585 @@ public class ByteBufferProxy extends ByteBuffer
      * Create a new instance.
      * @param buf the buffer to be proxied
      */
-    protected ByteBufferProxy( ByteBuffer buf )
-    {
-        if( buf == null )
-        {
-            throw new NullPointerException( "buf" );
+    protected ByteBufferProxy(ByteBuffer buf) {
+        if (buf == null) {
+            throw new NullPointerException("buf");
         }
         this.buf = buf;
     }
 
     @Override
-    public boolean isDirect()
-    {
+    public boolean isDirect() {
         return buf.isDirect();
     }
-    
+
     @Override
-    public java.nio.ByteBuffer buf()
-    {
+    public java.nio.ByteBuffer buf() {
         return buf.buf();
     }
 
     @Override
-    public int capacity()
-    {
+    public int capacity() {
         return buf.capacity();
     }
 
     @Override
-    public int position()
-    {
+    public int position() {
         return buf.position();
     }
 
     @Override
-    public ByteBuffer position( int newPosition )
-    {
-        buf.position( newPosition );
+    public ByteBuffer position(int newPosition) {
+        buf.position(newPosition);
         return this;
     }
 
     @Override
-    public int limit()
-    {
+    public int limit() {
         return buf.limit();
     }
 
     @Override
-    public ByteBuffer limit( int newLimit )
-    {
-        buf.limit( newLimit );
+    public ByteBuffer limit(int newLimit) {
+        buf.limit(newLimit);
         return this;
     }
 
     @Override
-    public ByteBuffer mark()
-    {
+    public ByteBuffer mark() {
         buf.mark();
         return this;
     }
 
     @Override
-    public ByteBuffer reset()
-    {
+    public ByteBuffer reset() {
         buf.reset();
         return this;
     }
 
     @Override
-    public ByteBuffer clear()
-    {
+    public ByteBuffer clear() {
         buf.clear();
         return this;
     }
 
     @Override
-    public ByteBuffer sweep()
-    {
+    public ByteBuffer sweep() {
         buf.sweep();
-        return this;
-    }
-    
-    @Override
-    public ByteBuffer sweep( byte value )
-    {
-        buf.sweep( value );
         return this;
     }
 
     @Override
-    public ByteBuffer flip()
-    {
+    public ByteBuffer sweep(byte value) {
+        buf.sweep(value);
+        return this;
+    }
+
+    @Override
+    public ByteBuffer flip() {
         buf.flip();
         return this;
     }
 
     @Override
-    public ByteBuffer rewind()
-    {
+    public ByteBuffer rewind() {
         buf.rewind();
         return this;
     }
 
     @Override
-    public int remaining()
-    {
+    public int remaining() {
         return buf.remaining();
     }
 
     @Override
-    public boolean hasRemaining()
-    {
+    public boolean hasRemaining() {
         return buf.hasRemaining();
     }
 
     @Override
-    public byte get()
-    {
+    public byte get() {
         return buf.get();
     }
 
     @Override
-    public short getUnsigned()
-    {
+    public short getUnsigned() {
         return buf.getUnsigned();
     }
 
     @Override
-    public ByteBuffer put( byte b )
-    {
-        buf.put( b );
+    public ByteBuffer put(byte b) {
+        buf.put(b);
         return this;
     }
 
     @Override
-    public byte get( int index )
-    {
-        return buf.get( index );
+    public byte get(int index) {
+        return buf.get(index);
     }
 
     @Override
-    public short getUnsigned( int index )
-    {
-        return buf.getUnsigned( index );
+    public short getUnsigned(int index) {
+        return buf.getUnsigned(index);
     }
 
     @Override
-    public ByteBuffer put( int index, byte b )
-    {
-        buf.put( index, b );
+    public ByteBuffer put(int index, byte b) {
+        buf.put(index, b);
         return this;
     }
 
     @Override
-    public ByteBuffer get( byte[] dst, int offset, int length )
-    {
-        buf.get( dst, offset, length );
+    public ByteBuffer get(byte[] dst, int offset, int length) {
+        buf.get(dst, offset, length);
         return this;
     }
 
     @Override
-    public ByteBuffer get( byte[] dst )
-    {
-        buf.get( dst );
+    public ByteBuffer get(byte[] dst) {
+        buf.get(dst);
         return this;
     }
 
     @Override
-    public ByteBuffer put( ByteBuffer src )
-    {
-        buf.put( src );
+    public ByteBuffer put(ByteBuffer src) {
+        buf.put(src);
         return this;
     }
 
     @Override
-    public ByteBuffer put( java.nio.ByteBuffer src )
-    {
-        buf.put( src );
+    public ByteBuffer put(java.nio.ByteBuffer src) {
+        buf.put(src);
         return this;
     }
 
     @Override
-    public ByteBuffer put( byte[] src, int offset, int length )
-    {
-        buf.put( src, offset, length );
+    public ByteBuffer put(byte[] src, int offset, int length) {
+        buf.put(src, offset, length);
         return this;
     }
 
     @Override
-    public ByteBuffer put( byte[] src )
-    {
-        buf.put( src );
+    public ByteBuffer put(byte[] src) {
+        buf.put(src);
         return this;
     }
 
     @Override
-    public ByteBuffer compact()
-    {
+    public ByteBuffer compact() {
         buf.compact();
         return this;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return buf.toString();
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return buf.hashCode();
     }
 
     @Override
-    public boolean equals( Object ob )
-    {
-        return buf.equals( ob );
+    public boolean equals(Object ob) {
+        return buf.equals(ob);
     }
 
     @Override
-    public int compareTo( ByteBuffer that )
-    {
-        return buf.compareTo( that );
+    public int compareTo(ByteBuffer that) {
+        return buf.compareTo(that);
     }
 
     @Override
-    public ByteOrder order()
-    {
+    public ByteOrder order() {
         return buf.order();
     }
 
     @Override
-    public ByteBuffer order( ByteOrder bo )
-    {
-        buf.order( bo );
+    public ByteBuffer order(ByteOrder bo) {
+        buf.order(bo);
         return this;
     }
 
     @Override
-    public char getChar()
-    {
+    public char getChar() {
         return buf.getChar();
     }
 
     @Override
-    public ByteBuffer putChar( char value )
-    {
-        buf.putChar( value );
+    public ByteBuffer putChar(char value) {
+        buf.putChar(value);
         return this;
     }
 
     @Override
-    public char getChar( int index )
-    {
-        return buf.getChar( index );
+    public char getChar(int index) {
+        return buf.getChar(index);
     }
 
     @Override
-    public ByteBuffer putChar( int index, char value )
-    {
-        buf.putChar( index, value );
+    public ByteBuffer putChar(int index, char value) {
+        buf.putChar(index, value);
         return this;
     }
 
     @Override
-    public CharBuffer asCharBuffer()
-    {
+    public CharBuffer asCharBuffer() {
         return buf.asCharBuffer();
     }
 
     @Override
-    public short getShort()
-    {
+    public short getShort() {
         return buf.getShort();
     }
 
     @Override
-    public int getUnsignedShort()
-    {
+    public int getUnsignedShort() {
         return buf.getUnsignedShort();
     }
 
     @Override
-    public ByteBuffer putShort( short value )
-    {
-        buf.putShort( value );
+    public ByteBuffer putShort(short value) {
+        buf.putShort(value);
         return this;
     }
 
     @Override
-    public short getShort( int index )
-    {
-        return buf.getShort( index );
+    public short getShort(int index) {
+        return buf.getShort(index);
     }
 
     @Override
-    public int getUnsignedShort( int index )
-    {
-        return buf.getUnsignedShort( index );
+    public int getUnsignedShort(int index) {
+        return buf.getUnsignedShort(index);
     }
 
     @Override
-    public ByteBuffer putShort( int index, short value )
-    {
-        buf.putShort( index, value );
+    public ByteBuffer putShort(int index, short value) {
+        buf.putShort(index, value);
         return this;
     }
 
     @Override
-    public ShortBuffer asShortBuffer()
-    {
+    public ShortBuffer asShortBuffer() {
         return buf.asShortBuffer();
     }
 
     @Override
-    public int getInt()
-    {
+    public int getInt() {
         return buf.getInt();
     }
 
     @Override
-    public long getUnsignedInt()
-    {
+    public long getUnsignedInt() {
         return buf.getUnsignedInt();
     }
 
     @Override
-    public ByteBuffer putInt( int value )
-    {
-        buf.putInt( value );
+    public ByteBuffer putInt(int value) {
+        buf.putInt(value);
         return this;
     }
 
     @Override
-    public int getInt( int index )
-    {
-        return buf.getInt( index );
+    public int getInt(int index) {
+        return buf.getInt(index);
     }
 
     @Override
-    public long getUnsignedInt( int index )
-    {
-        return buf.getUnsignedInt( index );
+    public long getUnsignedInt(int index) {
+        return buf.getUnsignedInt(index);
     }
 
     @Override
-    public ByteBuffer putInt( int index, int value )
-    {
-        buf.putInt( index, value );
+    public ByteBuffer putInt(int index, int value) {
+        buf.putInt(index, value);
         return this;
     }
 
     @Override
-    public IntBuffer asIntBuffer()
-    {
+    public IntBuffer asIntBuffer() {
         return buf.asIntBuffer();
     }
 
     @Override
-    public long getLong()
-    {
+    public long getLong() {
         return buf.getLong();
     }
 
     @Override
-    public ByteBuffer putLong( long value )
-    {
-        buf.putLong( value );
+    public ByteBuffer putLong(long value) {
+        buf.putLong(value);
         return this;
     }
 
     @Override
-    public long getLong( int index )
-    {
-        return buf.getLong( index );
+    public long getLong(int index) {
+        return buf.getLong(index);
     }
 
     @Override
-    public ByteBuffer putLong( int index, long value )
-    {
-        buf.putLong( index, value );
+    public ByteBuffer putLong(int index, long value) {
+        buf.putLong(index, value);
         return this;
     }
 
     @Override
-    public LongBuffer asLongBuffer()
-    {
+    public LongBuffer asLongBuffer() {
         return buf.asLongBuffer();
     }
 
     @Override
-    public float getFloat()
-    {
+    public float getFloat() {
         return buf.getFloat();
     }
 
     @Override
-    public ByteBuffer putFloat( float value )
-    {
-        buf.putFloat( value );
+    public ByteBuffer putFloat(float value) {
+        buf.putFloat(value);
         return this;
     }
 
     @Override
-    public float getFloat( int index )
-    {
-        return buf.getFloat( index );
+    public float getFloat(int index) {
+        return buf.getFloat(index);
     }
 
     @Override
-    public ByteBuffer putFloat( int index, float value )
-    {
-        buf.putFloat( index, value );
+    public ByteBuffer putFloat(int index, float value) {
+        buf.putFloat(index, value);
         return this;
     }
 
     @Override
-    public FloatBuffer asFloatBuffer()
-    {
+    public FloatBuffer asFloatBuffer() {
         return buf.asFloatBuffer();
     }
 
     @Override
-    public double getDouble()
-    {
+    public double getDouble() {
         return buf.getDouble();
     }
 
     @Override
-    public ByteBuffer putDouble( double value )
-    {
-        buf.putDouble( value );
+    public ByteBuffer putDouble(double value) {
+        buf.putDouble(value);
         return this;
     }
 
     @Override
-    public double getDouble( int index )
-    {
-        return buf.getDouble( index );
+    public double getDouble(int index) {
+        return buf.getDouble(index);
     }
 
     @Override
-    public ByteBuffer putDouble( int index, double value )
-    {
-        buf.putDouble( index, value );
+    public ByteBuffer putDouble(int index, double value) {
+        buf.putDouble(index, value);
         return this;
     }
 
     @Override
-    public DoubleBuffer asDoubleBuffer()
-    {
+    public DoubleBuffer asDoubleBuffer() {
         return buf.asDoubleBuffer();
     }
 
     @Override
-    public String getHexDump()
-    {
+    public String getHexDump() {
         return buf.getHexDump();
     }
 
     @Override
-    public String getString( int fieldSize, CharsetDecoder decoder )
-            throws CharacterCodingException
-    {
-        return buf.getString( fieldSize, decoder );
+    public String getString(int fieldSize, CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return buf.getString(fieldSize, decoder);
     }
 
     @Override
-    public String getString( CharsetDecoder decoder )
-            throws CharacterCodingException
-    {
-        return buf.getString( decoder );
-    }
-    
-    @Override
-    public String getPrefixedString( CharsetDecoder decoder )
-            throws CharacterCodingException
-    {
-        return buf.getPrefixedString( decoder );
+    public String getString(CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return buf.getString(decoder);
     }
 
     @Override
-    public String getPrefixedString( int prefixLength, CharsetDecoder decoder )
-            throws CharacterCodingException
-    {
-        return buf.getPrefixedString( prefixLength, decoder );
+    public String getPrefixedString(CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return buf.getPrefixedString(decoder);
     }
 
     @Override
-    public ByteBuffer putString( CharSequence in, int fieldSize,
-                                CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putString( in, fieldSize, encoder );
+    public String getPrefixedString(int prefixLength, CharsetDecoder decoder)
+            throws CharacterCodingException {
+        return buf.getPrefixedString(prefixLength, decoder);
+    }
+
+    @Override
+    public ByteBuffer putString(CharSequence in, int fieldSize,
+            CharsetEncoder encoder) throws CharacterCodingException {
+        buf.putString(in, fieldSize, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer putString( CharSequence in, CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putString( in, encoder );
-        return this;
-    }
-    
-    @Override
-    public ByteBuffer putPrefixedString( CharSequence in, CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putPrefixedString( in, encoder );
+    public ByteBuffer putString(CharSequence in, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        buf.putString(in, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, CharsetEncoder encoder ) throws CharacterCodingException
-    {
-        buf.putPrefixedString( in, prefixLength, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        buf.putPrefixedString(in, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, int padding, CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putPrefixedString( in, prefixLength, padding, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+            CharsetEncoder encoder) throws CharacterCodingException {
+        buf.putPrefixedString(in, prefixLength, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer putPrefixedString( CharSequence in, int prefixLength, int padding, byte padValue, CharsetEncoder encoder )
-            throws CharacterCodingException
-    {
-        buf.putPrefixedString( in, prefixLength, padding, padValue, encoder );
+    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+            int padding, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        buf.putPrefixedString(in, prefixLength, padding, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer skip( int size )
-    {
-        buf.skip( size );
+    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+            int padding, byte padValue, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        buf.putPrefixedString(in, prefixLength, padding, padValue, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer fill( byte value, int size )
-    {
-        buf.fill( value, size );
+    public ByteBuffer skip(int size) {
+        buf.skip(size);
         return this;
     }
 
     @Override
-    public ByteBuffer fillAndReset( byte value, int size )
-    {
-        buf.fillAndReset( value, size );
+    public ByteBuffer fill(byte value, int size) {
+        buf.fill(value, size);
         return this;
     }
 
     @Override
-    public ByteBuffer fill( int size )
-    {
-        buf.fill( size );
+    public ByteBuffer fillAndReset(byte value, int size) {
+        buf.fillAndReset(value, size);
         return this;
     }
 
     @Override
-    public ByteBuffer fillAndReset( int size )
-    {
-        buf.fillAndReset( size );
+    public ByteBuffer fill(int size) {
+        buf.fill(size);
         return this;
     }
 
     @Override
-    public boolean isAutoExpand()
-    {
+    public ByteBuffer fillAndReset(int size) {
+        buf.fillAndReset(size);
+        return this;
+    }
+
+    @Override
+    public boolean isAutoExpand() {
         return buf.isAutoExpand();
     }
 
     @Override
-    public ByteBuffer setAutoExpand( boolean autoExpand )
-    {
-        buf.setAutoExpand( autoExpand );
-        return this;
-    }
-    
-    @Override
-    public ByteBuffer expand( int pos, int expectedRemaining )
-    {
-        buf.expand( pos, expectedRemaining );
+    public ByteBuffer setAutoExpand(boolean autoExpand) {
+        buf.setAutoExpand(autoExpand);
         return this;
     }
 
     @Override
-    public ByteBuffer expand( int expectedRemaining )
-    {
-        buf.expand( expectedRemaining );
+    public ByteBuffer expand(int pos, int expectedRemaining) {
+        buf.expand(pos, expectedRemaining);
         return this;
     }
 
     @Override
-    public Object getObject() throws ClassNotFoundException
-    {
+    public ByteBuffer expand(int expectedRemaining) {
+        buf.expand(expectedRemaining);
+        return this;
+    }
+
+    @Override
+    public Object getObject() throws ClassNotFoundException {
         return buf.getObject();
     }
 
     @Override
-    public Object getObject( ClassLoader classLoader ) throws ClassNotFoundException
-    {
-        return buf.getObject( classLoader );
+    public Object getObject(ClassLoader classLoader)
+            throws ClassNotFoundException {
+        return buf.getObject(classLoader);
     }
 
     @Override
-    public ByteBuffer putObject( Object o )
-    {
-        buf.putObject( o );
+    public ByteBuffer putObject(Object o) {
+        buf.putObject(o);
         return this;
     }
-    
+
     @Override
-    public InputStream asInputStream()
-    {
+    public InputStream asInputStream() {
         return buf.asInputStream();
     }
-    
+
     @Override
-    public OutputStream asOutputStream()
-    {
+    public OutputStream asOutputStream() {
         return buf.asOutputStream();
     }
 
     @Override
-    public ByteBuffer duplicate()
-    {
+    public ByteBuffer duplicate() {
         return buf.duplicate();
     }
 
     @Override
-    public ByteBuffer slice()
-    {
+    public ByteBuffer slice() {
         return buf.slice();
     }
 
     @Override
-    public ByteBuffer asReadOnlyBuffer()
-    {
+    public ByteBuffer asReadOnlyBuffer() {
         return buf.asReadOnlyBuffer();
     }
 
     @Override
-    public byte[] array()
-    {
+    public byte[] array() {
         return buf.array();
     }
 
     @Override
-    public int arrayOffset()
-    {
+    public int arrayOffset() {
         return buf.arrayOffset();
     }
 
     @Override
-    public ByteBuffer capacity( int newCapacity )
-    {
-        buf.capacity( newCapacity );
+    public ByteBuffer capacity(int newCapacity) {
+        buf.capacity(newCapacity);
         return this;
     }
 
     @Override
-    public boolean isReadOnly()
-    {
+    public boolean isReadOnly() {
         return buf.isReadOnly();
     }
 
     @Override
-    public int markValue()
-    {
+    public int markValue() {
         return buf.markValue();
     }
 
     @Override
-    public boolean hasArray()
-    {
+    public boolean hasArray() {
         return buf.hasArray();
     }
 }

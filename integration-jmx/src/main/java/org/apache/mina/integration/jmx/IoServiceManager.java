@@ -27,156 +27,124 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.management.StatCollector;
 
-
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoServiceManager implements IoServiceManagerMBean, MBeanRegistration
-{
+public class IoServiceManager implements IoServiceManagerMBean,
+        MBeanRegistration {
     private IoService service;
 
     private StatCollector collector = null;
 
-    private int milliSecondsPolling; 
+    private int milliSecondsPolling;
 
     private boolean autoStartCollecting = false;
-    
-    public IoServiceManager( IoService service , int milliSecondsPolling, boolean autoStartCollecting)
-    {
+
+    public IoServiceManager(IoService service, int milliSecondsPolling,
+            boolean autoStartCollecting) {
         this.autoStartCollecting = autoStartCollecting;
         this.service = service;
         this.milliSecondsPolling = milliSecondsPolling;
     }
 
-    public IoServiceManager( IoService service, int milliSecondsPolling ) 
-    {
-        this( service, milliSecondsPolling, false );
+    public IoServiceManager(IoService service, int milliSecondsPolling) {
+        this(service, milliSecondsPolling, false);
     }
 
-    public IoServiceManager( IoService service ) 
-    {
-        this( service, 5000, false );
+    public IoServiceManager(IoService service) {
+        this(service, 5000, false);
     }
 
-
-    public int getManagedSessionCount()
-    {
+    public int getManagedSessionCount() {
         return service.getManagedSessions().size();
     }
 
-
-    public void startCollectingStats()
-    {
-        if ( collector != null && collector.isRunning() )
-        {
-            throw new RuntimeException( "Already collecting stats" );
+    public void startCollectingStats() {
+        if (collector != null && collector.isRunning()) {
+            throw new RuntimeException("Already collecting stats");
         }
 
-        collector = new StatCollector( service, milliSecondsPolling );
+        collector = new StatCollector(service, milliSecondsPolling);
         collector.start();
     }
-    
-    public int getStatsPollingInterval()
-    {
+
+    public int getStatsPollingInterval() {
         return milliSecondsPolling;
     }
-    
-    public void setStatsPollingInterval( int millisecondsPolling ) 
-    {
+
+    public void setStatsPollingInterval(int millisecondsPolling) {
         this.milliSecondsPolling = millisecondsPolling;
     }
 
-    public void stopCollectingStats()
-    {
-        if ( collector != null && collector.isRunning() ) {
+    public void stopCollectingStats() {
+        if (collector != null && collector.isRunning()) {
             collector.stop();
         }
 
     }
 
-    public float getTotalByteReadThroughput()
-    {
+    public float getTotalByteReadThroughput() {
         return collector.getBytesReadThroughput();
     }
 
-
-    public float getTotalByteWrittenThroughput()
-    {
+    public float getTotalByteWrittenThroughput() {
         return collector.getBytesWrittenThroughput();
     }
 
-
-    public float getTotalMessageReadThroughput()
-    {
+    public float getTotalMessageReadThroughput() {
         return collector.getMsgReadThroughput();
     }
 
-
-    public float getTotalMessageWrittenThroughput()
-    {
+    public float getTotalMessageWrittenThroughput() {
         return collector.getMsgWrittenThroughput();
     }
 
-
-    public float getAverageByteReadThroughput()
-    {
+    public float getAverageByteReadThroughput() {
         return collector.getBytesReadThroughput() / collector.getSessionCount();
     }
 
-
-    public float getAverageByteWrittenThroughput()
-    {
-        return collector.getBytesWrittenThroughput() / collector.getSessionCount();    
+    public float getAverageByteWrittenThroughput() {
+        return collector.getBytesWrittenThroughput()
+                / collector.getSessionCount();
     }
 
-
-    public float getAverageMessageReadThroughput()
-    {
+    public float getAverageMessageReadThroughput() {
         return collector.getMsgReadThroughput() / collector.getSessionCount();
     }
 
-
-    public float getAverageMessageWrittenThroughput()
-    {
-        return collector.getMsgWrittenThroughput() / collector.getSessionCount();    
+    public float getAverageMessageWrittenThroughput() {
+        return collector.getMsgWrittenThroughput()
+                / collector.getSessionCount();
     }
-    
 
-    public void closeAllSessions()
-    {
+    public void closeAllSessions() {
         for (Object element : service.getManagedSessions()) {
-            IoSession session = ( IoSession ) element;
+            IoSession session = (IoSession) element;
             session.close();
         }
     }
 
-    public ObjectName preRegister( MBeanServer server, ObjectName name ) throws Exception 
-    {
+    public ObjectName preRegister(MBeanServer server, ObjectName name)
+            throws Exception {
         return name;
     }
 
-    public void postRegister( Boolean registrationDone )
-    {
-        if( registrationDone.booleanValue() )
-        {
-            if( autoStartCollecting )
-            {
+    public void postRegister(Boolean registrationDone) {
+        if (registrationDone.booleanValue()) {
+            if (autoStartCollecting) {
                 startCollectingStats();
             }
 
         }
     }
 
-    public void preDeregister() throws Exception
-    {
-        if( collector != null && collector.isRunning() )
-        {
+    public void preDeregister() throws Exception {
+        if (collector != null && collector.isRunning()) {
             stopCollectingStats();
         }
     }
 
-    public void postDeregister()
-    {
+    public void postDeregister() {
     }
 }

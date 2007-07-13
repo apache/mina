@@ -31,67 +31,60 @@ import org.apache.mina.common.IoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoConnector extends BaseIoService implements IoConnector
-{
+public abstract class BaseIoConnector extends BaseIoService implements
+        IoConnector {
     private int connectTimeout = 60; // 1 minute
 
-    protected BaseIoConnector( IoSessionConfig sessionConfig )
-    {
-        super( sessionConfig );
+    protected BaseIoConnector(IoSessionConfig sessionConfig) {
+        super(sessionConfig);
     }
 
-    public int getConnectTimeout()
-    {
+    public int getConnectTimeout() {
         return connectTimeout;
     }
 
-    public long getConnectTimeoutMillis()
-    {
+    public long getConnectTimeoutMillis() {
         return connectTimeout * 1000L;
     }
 
-    public void setConnectTimeout( int connectTimeout )
-    {
-        if( connectTimeout <= 0 )
-        {
-            throw new IllegalArgumentException( "connectTimeout: " + connectTimeout );
+    public void setConnectTimeout(int connectTimeout) {
+        if (connectTimeout <= 0) {
+            throw new IllegalArgumentException("connectTimeout: "
+                    + connectTimeout);
         }
         this.connectTimeout = connectTimeout;
     }
-    
-    public final ConnectFuture connect( SocketAddress remoteAddress )
-    {
-        return connect( remoteAddress, null );
+
+    public final ConnectFuture connect(SocketAddress remoteAddress) {
+        return connect(remoteAddress, null);
     }
-    
-    public final ConnectFuture connect( SocketAddress remoteAddress, SocketAddress localAddress )
-    {
-        if( remoteAddress == null ) {
-            throw new NullPointerException( "remoteAddress" );
-        }
-        
-        if( !getTransportType().getAddressType().isAssignableFrom(
-                remoteAddress.getClass() ) )
-        {
-            throw new IllegalArgumentException(
-                    "remoteAddress type: " + remoteAddress.getClass() + 
-                    " (expected: " + getTransportType().getAddressType() + ")");
+
+    public final ConnectFuture connect(SocketAddress remoteAddress,
+            SocketAddress localAddress) {
+        if (remoteAddress == null) {
+            throw new NullPointerException("remoteAddress");
         }
 
-        if( localAddress != null &&
-            !getTransportType().getAddressType().isAssignableFrom(
-                    localAddress.getClass() ) )
-        {
-            throw new IllegalArgumentException(
-                    "localAddress type: " + localAddress.getClass() + 
-                    " (expected: " + getTransportType().getAddressType() + ")");
+        if (!getTransportType().getAddressType().isAssignableFrom(
+                remoteAddress.getClass())) {
+            throw new IllegalArgumentException("remoteAddress type: "
+                    + remoteAddress.getClass() + " (expected: "
+                    + getTransportType().getAddressType() + ")");
         }
-        
-        if( getHandler() == null ) {
-            throw new IllegalStateException( "handler is not set." );
+
+        if (localAddress != null
+                && !getTransportType().getAddressType().isAssignableFrom(
+                        localAddress.getClass())) {
+            throw new IllegalArgumentException("localAddress type: "
+                    + localAddress.getClass() + " (expected: "
+                    + getTransportType().getAddressType() + ")");
         }
-        
-        return doConnect( remoteAddress, localAddress );
+
+        if (getHandler() == null) {
+            throw new IllegalStateException("handler is not set.");
+        }
+
+        return doConnect(remoteAddress, localAddress);
     }
 
     /**
@@ -99,5 +92,6 @@ public abstract class BaseIoConnector extends BaseIoService implements IoConnect
      * 
      * @param localAddress <tt>null</tt> if no local address is specified
      */
-    protected abstract ConnectFuture doConnect( SocketAddress remoteAddress, SocketAddress localAddress );
+    protected abstract ConnectFuture doConnect(SocketAddress remoteAddress,
+            SocketAddress localAddress);
 }

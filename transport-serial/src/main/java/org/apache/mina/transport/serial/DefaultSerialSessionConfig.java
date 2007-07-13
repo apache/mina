@@ -27,7 +27,6 @@ package org.apache.mina.transport.serial;
  */
 public class DefaultSerialSessionConfig implements SerialSessionConfig {
 
-
     private int timeout = 2000;
 
     private int receiveThreshold = -1;
@@ -48,7 +47,7 @@ public class DefaultSerialSessionConfig implements SerialSessionConfig {
     public int getInputBufferSize() {
         return inputBufferSize;
     }
-    
+
     public boolean isLowLantecy() {
         return lowLatency;
     }
@@ -72,7 +71,7 @@ public class DefaultSerialSessionConfig implements SerialSessionConfig {
     public int getTimeout() {
         return timeout;
     }
- 
+
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }

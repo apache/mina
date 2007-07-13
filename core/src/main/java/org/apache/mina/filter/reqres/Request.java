@@ -32,28 +32,37 @@ import java.util.concurrent.TimeUnit;
  */
 public class Request {
     private final Object id;
+
     private final Object message;
+
     private final boolean useResponseQueue;
+
     private final long timeoutMillis;
+
     private volatile Runnable timeoutTask;
+
     private volatile ScheduledFuture timeoutFuture;
 
     private final BlockingQueue<Object> responses = new LinkedBlockingQueue<Object>();
+
     private volatile boolean endOfResponses;
-    
+
     public Request(Object id, Object message, long timeoutMillis) {
         this(id, message, true, timeoutMillis);
     }
-    
-    public Request(Object id, Object message, boolean useResponseQueue, long timeoutMillis) {
-        this(id, message, useResponseQueue, timeoutMillis, TimeUnit.MILLISECONDS);
+
+    public Request(Object id, Object message, boolean useResponseQueue,
+            long timeoutMillis) {
+        this(id, message, useResponseQueue, timeoutMillis,
+                TimeUnit.MILLISECONDS);
     }
-    
+
     public Request(Object id, Object message, long timeout, TimeUnit unit) {
         this(id, message, true, timeout, unit);
     }
-    
-    public Request(Object id, Object message, boolean useResponseQueue, long timeout, TimeUnit unit) {
+
+    public Request(Object id, Object message, boolean useResponseQueue,
+            long timeout, TimeUnit unit) {
         if (id == null) {
             throw new NullPointerException("id");
         }
@@ -61,8 +70,8 @@ public class Request {
             throw new NullPointerException("message");
         }
         if (timeout < 0) {
-            throw new IllegalArgumentException(
-                    "timeout: " + timeout + " (expected: 0+)");
+            throw new IllegalArgumentException("timeout: " + timeout
+                    + " (expected: 0+)");
         } else if (timeout == 0) {
             timeout = Long.MAX_VALUE;
         }
@@ -70,13 +79,13 @@ public class Request {
         if (unit == null) {
             throw new NullPointerException("unit");
         }
-        
+
         this.id = id;
         this.message = message;
         this.useResponseQueue = useResponseQueue;
         this.timeoutMillis = unit.toMillis(timeout);
     }
-    
+
     public Object getId() {
         return id;
     }
@@ -88,23 +97,25 @@ public class Request {
     public long getTimeoutMillis() {
         return timeoutMillis;
     }
-    
+
     public boolean isUseResponseQueue() {
         return useResponseQueue;
     }
-    
+
     public boolean hasResponse() {
         checkUseResponseQueue();
         return !responses.isEmpty();
     }
-    
-    public Response awaitResponse() throws RequestTimeoutException, InterruptedException {
+
+    public Response awaitResponse() throws RequestTimeoutException,
+            InterruptedException {
         checkUseResponseQueue();
         chechEndOfResponses();
         return convertToResponse(responses.take());
     }
-    
-    public Response awaitResponse(long timeout, TimeUnit unit) throws RequestTimeoutException, InterruptedException {
+
+    public Response awaitResponse(long timeout, TimeUnit unit)
+            throws RequestTimeoutException, InterruptedException {
         checkUseResponseQueue();
         chechEndOfResponses();
         return convertToResponse(responses.poll(timeout, unit));
@@ -114,15 +125,16 @@ public class Request {
         if (o instanceof Response) {
             return (Response) o;
         }
-        
+
         if (o == null) {
             return null;
         }
-        
+
         throw (RequestTimeoutException) o;
     }
 
-    public Response awaitResponseUninterruptibly() throws RequestTimeoutException {
+    public Response awaitResponseUninterruptibly()
+            throws RequestTimeoutException {
         for (;;) {
             try {
                 return awaitResponse();
@@ -130,7 +142,7 @@ public class Request {
             }
         }
     }
-    
+
     private void chechEndOfResponses() {
         if (endOfResponses && responses.isEmpty() && useResponseQueue) {
             throw new NoSuchElementException(
@@ -144,69 +156,69 @@ public class Request {
                     "Response queue is not available; useResponseQueue is false.");
         }
     }
-    
+
     void signal(Response response) {
         signal0(response);
         if (response.getType() != ResponseType.PARTIAL) {
             endOfResponses = true;
         }
     }
-    
+
     void signal(RequestTimeoutException e) {
         signal0(e);
         endOfResponses = true;
     }
-    
+
     private void signal0(Object answer) {
         if (useResponseQueue) {
             responses.offer(answer);
         }
     }
-    
+
     @Override
     public int hashCode() {
         return getId().hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
         }
-        
+
         if (o == null) {
             return false;
         }
-        
+
         if (!(o instanceof Request)) {
             return false;
         }
-        
+
         Request that = (Request) o;
         return this.getId().equals(that.getId());
     }
 
     @Override
     public String toString() {
-        String timeout = (getTimeoutMillis() == Long.MAX_VALUE)?
-                "max" : String.valueOf(getTimeoutMillis());
+        String timeout = (getTimeoutMillis() == Long.MAX_VALUE) ? "max"
+                : String.valueOf(getTimeoutMillis());
 
-        return "request: { id=" + getId() +
-               ", timeout=" + timeout + ", message=" + getMessage() + " }";
+        return "request: { id=" + getId() + ", timeout=" + timeout
+                + ", message=" + getMessage() + " }";
     }
-    
+
     Runnable getTimeoutTask() {
         return timeoutTask;
     }
-    
+
     void setTimeoutTask(Runnable timeoutTask) {
         this.timeoutTask = timeoutTask;
     }
-    
+
     ScheduledFuture getTimeoutFuture() {
         return timeoutFuture;
     }
-    
+
     void setTimeoutFuture(ScheduledFuture timeoutFuture) {
         this.timeoutFuture = timeoutFuture;
     }

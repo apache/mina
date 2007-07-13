@@ -32,66 +32,56 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ClientSessionHandler extends IoHandlerAdapter
-{
+public class ClientSessionHandler extends IoHandlerAdapter {
     private final int[] values;
+
     private boolean finished;
 
-    public ClientSessionHandler( int[] values )
-    {
+    public ClientSessionHandler(int[] values) {
         this.values = values;
     }
 
-    public boolean isFinished()
-    {
+    public boolean isFinished() {
         return finished;
     }
 
     @Override
-    public void sessionOpened( IoSession session )
-    {
+    public void sessionOpened(IoSession session) {
         // send summation requests
-        for( int i = 0; i < values.length; i++ )
-        {
+        for (int i = 0; i < values.length; i++) {
             AddMessage m = new AddMessage();
-            m.setSequence( i );
-            m.setValue( values[ i ] );
-            session.write( m );
+            m.setSequence(i);
+            m.setValue(values[i]);
+            session.write(m);
         }
     }
 
     @Override
-    public void messageReceived( IoSession session, Object message )
-    {
+    public void messageReceived(IoSession session, Object message) {
         // server only sends ResultMessage. otherwise, we will have to identify
         // its type using instanceof operator.
-        ResultMessage rm = ( ResultMessage ) message;
-        if( rm.isOk() )
-        {
+        ResultMessage rm = (ResultMessage) message;
+        if (rm.isOk()) {
             // server returned OK code.
             // if received the result message which has the last sequence
             // number,
             // it is time to disconnect.
-            if( rm.getSequence() == values.length - 1 )
-            {
+            if (rm.getSequence() == values.length - 1) {
                 // print the sum and disconnect.
-                SessionLog.info( session, "The sum: " + rm.getValue() );
+                SessionLog.info(session, "The sum: " + rm.getValue());
                 session.close();
                 finished = true;
             }
-        }
-        else
-        {
+        } else {
             // seever returned error code because of overflow, etc.
-            SessionLog.warn( session, "Server error, disconnecting..." );
+            SessionLog.warn(session, "Server error, disconnecting...");
             session.close();
             finished = true;
         }
     }
 
     @Override
-    public void exceptionCaught( IoSession session, Throwable cause )
-    {
+    public void exceptionCaught(IoSession session, Throwable cause) {
         session.close();
     }
 }

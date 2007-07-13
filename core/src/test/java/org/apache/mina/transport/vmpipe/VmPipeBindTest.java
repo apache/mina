@@ -36,60 +36,54 @@ import org.apache.mina.transport.AbstractBindTest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 
  */
-public class VmPipeBindTest extends AbstractBindTest
-{
+public class VmPipeBindTest extends AbstractBindTest {
 
-    public VmPipeBindTest()
-    {
-        super( new VmPipeAcceptor() );
+    public VmPipeBindTest() {
+        super(new VmPipeAcceptor());
     }
 
     @Override
-    protected SocketAddress createSocketAddress( int port )
-    {
-        return new VmPipeAddress( port );
+    protected SocketAddress createSocketAddress(int port) {
+        return new VmPipeAddress(port);
     }
-    
+
     @Override
-    protected int getPort( SocketAddress address )
-    {
-        return ( ( VmPipeAddress ) address ).getPort();
+    protected int getPort(SocketAddress address) {
+        return ((VmPipeAddress) address).getPort();
     }
-    
-    public void testUnbindDisconnectsClients() throws Exception
-    {
+
+    public void testUnbindDisconnectsClients() throws Exception {
         // TODO: This test is almost identical to the test with the same name in SocketBindTest
-        bind( false );
-        
-        SocketAddress addr = createSocketAddress( port );
-     
+        bind(false);
+
+        SocketAddress addr = createSocketAddress(port);
+
         IoConnector connector = new VmPipeConnector();
-        connector.setHandler( new IoHandlerAdapter() );
-        IoSession[] sessions = new IoSession[ 5 ];
-        for( int i = 0; i < sessions.length; i++ )
-        {
-            ConnectFuture future = connector.connect( addr );
+        connector.setHandler(new IoHandlerAdapter());
+        IoSession[] sessions = new IoSession[5];
+        for (int i = 0; i < sessions.length; i++) {
+            ConnectFuture future = connector.connect(addr);
             future.awaitUninterruptibly();
-            sessions[ i ] = future.getSession();
-            Assert.assertTrue( sessions[ i ].isConnected() );
+            sessions[i] = future.getSession();
+            Assert.assertTrue(sessions[i].isConnected());
         }
-        
+
         // Wait for the server side sessions to be created.
-        Thread.sleep( 500 );
-        
+        Thread.sleep(500);
+
         Collection<IoSession> managedSessions = acceptor.getManagedSessions();
-        Assert.assertEquals( 5, managedSessions.size() );
+        Assert.assertEquals(5, managedSessions.size());
         for (IoSession element : sessions) {
-            Assert.assertFalse( managedSessions.contains( element ) );
+            Assert.assertFalse(managedSessions.contains(element));
         }
-        
+
         acceptor.unbind();
-        
+
         // Wait for the client side sessions to close.
-        Thread.sleep( 500 );
-             
+        Thread.sleep(500);
+
         for (IoSession element : sessions) {
-            Assert.assertFalse( element.isConnected() );
+            Assert.assertFalse(element.isConnected());
         }
     }
 }

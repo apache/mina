@@ -40,7 +40,7 @@ import org.apache.mina.common.IoSession;
  */
 public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     private final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
-    
+
     /**
      * Creates a new instance with no default attributes.  You can set
      * the additional attributes by calling methods such as 
@@ -54,10 +54,11 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * set the additional attributes by calling methods such as 
      * {@link #setAttribute(String, Object)} and {@link #setAttributes(Map)}.
      */
-    public SessionAttributeInitializingFilter(Map<String, ? extends Object> attributes) {
+    public SessionAttributeInitializingFilter(
+            Map<String, ? extends Object> attributes) {
         setAttributes(attributes);
     }
-    
+
     /**
      * Returns the value of user-defined attribute.
      * 
@@ -67,7 +68,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     public Object getAttribute(String key) {
         return attributes.get(key);
     }
-    
+
     /**
      * Sets a user-defined attribute.
      * 
@@ -82,7 +83,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
             return attributes.put(key, value);
         }
     }
-    
+
     /**
      * Sets a user defined attribute without a value.  This is useful when
      * you just want to put a 'mark' attribute.  Its value is set to
@@ -94,7 +95,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     public Object setAttribute(String key) {
         return attributes.put(key, Boolean.TRUE);
     }
-    
+
     /**
      * Removes a user-defined attribute with the specified key.
      * 
@@ -103,7 +104,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     public Object removeAttribute(String key) {
         return attributes.remove(key);
     }
-    
+
     /**
      * Returns <tt>true</tt> if this session contains the attribute with
      * the specified <tt>key</tt>.
@@ -111,14 +112,14 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     boolean containsAttribute(String key) {
         return attributes.containsKey(key);
     }
-    
+
     /**
      * Returns the set of keys of all user-defined attributes.
      */
     public Set<String> getAttributeKeys() {
         return attributes.keySet();
     }
-    
+
     /**
      * Sets the attribute map.  The specified attributes are copied into the
      * underlying map, so modifying the specified attributes parameter after
@@ -128,7 +129,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
         if (attributes == null) {
             attributes = new HashMap<String, Object>();
         }
-        
+
         this.attributes.clear();
         this.attributes.putAll(attributes);
     }
@@ -138,8 +139,9 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * map and forward the event to the next filter. 
      */
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-        for (Map.Entry<String, Object> e: attributes.entrySet()) {
+    public void sessionCreated(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        for (Map.Entry<String, Object> e : attributes.entrySet()) {
             session.setAttribute(e.getKey(), e.getValue());
         }
 

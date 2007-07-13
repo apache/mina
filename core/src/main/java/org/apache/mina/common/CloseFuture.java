@@ -35,22 +35,24 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface CloseFuture extends IoFuture
-{
+public interface CloseFuture extends IoFuture {
     /**
      * Returns <tt>true</tt> if the close request is finished and the session is closed.
      */
     boolean isClosed();
-    
+
     /**
      * Marks this future as closed and notifies all threads waiting for this
      * future.  This method is invoked by MINA internally.  Please do not call
      * this method directly.
      */
     void setClosed();
-    
+
     CloseFuture await() throws InterruptedException;
+
     CloseFuture awaitUninterruptibly();
-    CloseFuture addListener( IoFutureListener listener );
-    CloseFuture removeListener( IoFutureListener listener );
+
+    CloseFuture addListener(IoFutureListener listener);
+
+    CloseFuture removeListener(IoFutureListener listener);
 }

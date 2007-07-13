@@ -29,17 +29,16 @@ import org.apache.mina.common.IoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface SocketSessionConfig extends IoSessionConfig
-{
+public interface SocketSessionConfig extends IoSessionConfig {
     /**
      * @see Socket#getReuseAddress()
      */
     boolean isReuseAddress();
-    
+
     /**
      * @see Socket#setReuseAddress(boolean)
      */
-    void setReuseAddress( boolean reuseAddress );
+    void setReuseAddress(boolean reuseAddress);
 
     /**
      * @see Socket#getReceiveBufferSize()
@@ -49,7 +48,7 @@ public interface SocketSessionConfig extends IoSessionConfig
     /**
      * @see Socket#setReceiveBufferSize(int)
      */
-    void setReceiveBufferSize( int receiveBufferSize );
+    void setReceiveBufferSize(int receiveBufferSize);
 
     /**
      * @see Socket#getSendBufferSize()
@@ -59,7 +58,7 @@ public interface SocketSessionConfig extends IoSessionConfig
     /**
      * @see Socket#setSendBufferSize(int)
      */
-    void setSendBufferSize( int sendBufferSize );
+    void setSendBufferSize(int sendBufferSize);
 
     /**
      * @see Socket#getTrafficClass()
@@ -69,7 +68,7 @@ public interface SocketSessionConfig extends IoSessionConfig
     /**
      * @see Socket#setTrafficClass(int)
      */
-    void setTrafficClass( int trafficClass );
+    void setTrafficClass(int trafficClass);
 
     /**
      * @see Socket#getKeepAlive()
@@ -79,7 +78,7 @@ public interface SocketSessionConfig extends IoSessionConfig
     /**
      * @see Socket#setKeepAlive(boolean)
      */
-    void setKeepAlive( boolean keepAlive );
+    void setKeepAlive(boolean keepAlive);
 
     /**
      * @see Socket#getOOBInline()
@@ -89,7 +88,7 @@ public interface SocketSessionConfig extends IoSessionConfig
     /**
      * @see Socket#setOOBInline(boolean)
      */
-    void setOobInline( boolean oobInline );
+    void setOobInline(boolean oobInline);
 
     /**
      * Please note that enabling <tt>SO_LINGER</tt> in Java NIO can result
@@ -109,7 +108,7 @@ public interface SocketSessionConfig extends IoSessionConfig
      * @see Socket#setSoLinger(boolean, int)
      * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6179351">Sun Bug Database</a>
      */
-    void setSoLinger( int soLinger );
+    void setSoLinger(int soLinger);
 
     /**
      * @see Socket#getTcpNoDelay()
@@ -119,5 +118,5 @@ public interface SocketSessionConfig extends IoSessionConfig
     /**
      * @see Socket#setTcpNoDelay(boolean)
      */
-    void setTcpNoDelay( boolean tcpNoDelay );
+    void setTcpNoDelay(boolean tcpNoDelay);
 }

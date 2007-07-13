@@ -21,20 +21,18 @@ package org.apache.mina.common;
 
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * Represents the result of an ashynchronous I/O operation.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoFuture
-{
+public interface IoFuture {
     /**
      * Returns the {@link IoSession} which is associated with this future.
      */
     IoSession getSession();
-    
+
     /**
      * Wait for the asynchronous operation to end.
      */
@@ -45,14 +43,14 @@ public interface IoFuture
      * 
      * @return <tt>true</tt> if the operation is finished.
      */
-    boolean await( long timeout, TimeUnit unit ) throws InterruptedException;
+    boolean await(long timeout, TimeUnit unit) throws InterruptedException;
 
     /**
      * Wait for the asynchronous operation to end with the specified timeout.
      * 
      * @return <tt>true</tt> if the operation is finished.
      */
-    boolean await( long timeoutMillis ) throws InterruptedException;
+    boolean await(long timeoutMillis) throws InterruptedException;
 
     /**
      * Wait for the asynchronous operation to end uninterruptibly.
@@ -65,7 +63,7 @@ public interface IoFuture
      * 
      * @return <tt>true</tt> if the operation is finished.
      */
-    boolean awaitUninterruptibly( long timeout, TimeUnit unit );
+    boolean awaitUninterruptibly(long timeout, TimeUnit unit);
 
     /**
      * Wait for the asynchronous operation to end with the specified timeout
@@ -73,14 +71,14 @@ public interface IoFuture
      * 
      * @return <tt>true</tt> if the operation is finished.
      */
-    boolean awaitUninterruptibly( long timeoutMillis );
-    
+    boolean awaitUninterruptibly(long timeoutMillis);
+
     /**
      * @deprecated Replaced with {@link #awaitUninterruptibly()}.
      */
     @Deprecated
     void join();
-    
+
     /**
      * @deprecated Replaced with {@link #awaitUninterruptibly(long)}.
      */
@@ -96,11 +94,11 @@ public interface IoFuture
      * Adds an event <tt>listener</tt> which is notified when
      * the state of this future changes.
      */
-    IoFuture addListener( IoFutureListener listener );
-    
+    IoFuture addListener(IoFutureListener listener);
+
     /**
      * Removes an existing event <tt>listener</tt> which is notified when
      * the state of this future changes.
      */
-    IoFuture removeListener( IoFutureListener listener );
+    IoFuture removeListener(IoFutureListener listener);
 }

@@ -38,15 +38,17 @@ import org.apache.mina.util.SessionLog;
  * @version $Rev$, $Date$
  */
 public class ConnectionThrottleFilter extends IoFilterAdapter {
-    private static final long DEFAULT_TIME = 1000;  
+    private static final long DEFAULT_TIME = 1000;
+
     private long allowedInterval;
-    private final Map<String,Long> clients;
+
+    private final Map<String, Long> clients;
 
     /**
      * Default constructor.  Sets the wait time to 1 second
      */
     public ConnectionThrottleFilter() {
-        this( DEFAULT_TIME );
+        this(DEFAULT_TIME);
     }
 
     /**
@@ -57,9 +59,9 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
      * 	before making another successful connection
      * 
      */
-    public ConnectionThrottleFilter( long allowedInterval ){
+    public ConnectionThrottleFilter(long allowedInterval) {
         this.allowedInterval = allowedInterval;
-        clients = Collections.synchronizedMap( new HashMap<String,Long>());
+        clients = Collections.synchronizedMap(new HashMap<String, Long>());
     }
 
     /**
@@ -83,41 +85,44 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
      * @return
      * 	True if the session meets the criteria, otherwise false
      */
-    protected boolean isConnectionOk( IoSession session ){
+    protected boolean isConnectionOk(IoSession session) {
         SocketAddress remoteAddress = session.getRemoteAddress();
-        if( remoteAddress instanceof InetSocketAddress )
-        {
-            InetSocketAddress addr = (InetSocketAddress)remoteAddress;
+        if (remoteAddress instanceof InetSocketAddress) {
+            InetSocketAddress addr = (InetSocketAddress) remoteAddress;
             long now = System.currentTimeMillis();
-            
-            if( clients.containsKey(addr.getAddress().getHostAddress())){
-            	
-            	clients.put(addr.getAddress().getHostAddress(), now);
-            	SessionLog.info( session, "This is not a new client");
-                Long lastConnTime = clients.get(addr.getAddress().getHostAddress());
-                
+
+            if (clients.containsKey(addr.getAddress().getHostAddress())) {
+
+                clients.put(addr.getAddress().getHostAddress(), now);
+                SessionLog.info(session, "This is not a new client");
+                Long lastConnTime = clients.get(addr.getAddress()
+                        .getHostAddress());
+
                 // if the interval between now and the last connection is 
                 // less than the allowed interval, return false
-                if( (now-lastConnTime) < allowedInterval ){
-                	SessionLog.error(session, "Session connection interval too short");
+                if ((now - lastConnTime) < allowedInterval) {
+                    SessionLog.error(session,
+                            "Session connection interval too short");
                     return false;
                 } else {
-                	return true;
+                    return true;
                 }
             } else {
-            	clients.put( addr.getAddress().getHostAddress(), now );
+                clients.put(addr.getAddress().getHostAddress(), now);
                 return true;
             }
         }
-       
+
         return false;
     }
-   
+
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-        if( ! isConnectionOk(session)){
-             SessionLog.info( session, "Connections coming in too fast; closing." );
-             session.close();
-        } 
+    public void sessionCreated(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        if (!isConnectionOk(session)) {
+            SessionLog
+                    .info(session, "Connections coming in too fast; closing.");
+            session.close();
+        }
     }
 }

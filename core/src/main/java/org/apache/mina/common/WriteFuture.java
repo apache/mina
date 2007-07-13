@@ -42,8 +42,7 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface WriteFuture extends IoFuture
-{
+public interface WriteFuture extends IoFuture {
     /**
      * Returns <tt>true</tt> if the write operation is finished successfully.
      */
@@ -54,10 +53,13 @@ public interface WriteFuture extends IoFuture
      * waiting for this future.  This method is invoked by MINA internally.
      * Please do not call this method directly.
      */
-    void setWritten( boolean written );
+    void setWritten(boolean written);
 
     WriteFuture await() throws InterruptedException;
+
     WriteFuture awaitUninterruptibly();
-    WriteFuture addListener( IoFutureListener listener );
-    WriteFuture removeListener( IoFutureListener listener );
+
+    WriteFuture addListener(IoFutureListener listener);
+
+    WriteFuture removeListener(IoFutureListener listener);
 }

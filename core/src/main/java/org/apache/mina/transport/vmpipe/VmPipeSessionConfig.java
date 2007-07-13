@@ -27,6 +27,5 @@ import org.apache.mina.common.IoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface VmPipeSessionConfig extends IoSessionConfig
-{
+public interface VmPipeSessionConfig extends IoSessionConfig {
 }

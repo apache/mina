@@ -37,22 +37,20 @@ import org.apache.mina.transport.vmpipe.support.VmPipe;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAcceptor extends BaseIoAcceptor
-{
+public class VmPipeAcceptor extends BaseIoAcceptor {
     static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
-    
+
     /**
      * Creates a new instance.
      */
-    public VmPipeAcceptor()
-    {
-        super( new DefaultVmPipeSessionConfig() );
+    public VmPipeAcceptor() {
+        super(new DefaultVmPipeSessionConfig());
     }
 
     public TransportType getTransportType() {
         return TransportType.VM_PIPE;
     }
-    
+
     @Override
     public VmPipeSessionConfig getSessionConfig() {
         return (VmPipeSessionConfig) super.getSessionConfig();
@@ -62,7 +60,7 @@ public class VmPipeAcceptor extends BaseIoAcceptor
     public VmPipeAddress getLocalAddress() {
         return (VmPipeAddress) super.getLocalAddress();
     }
-    
+
     // This method is overriden to work around a problem with
     // bean property access mechanism.
 
@@ -72,57 +70,47 @@ public class VmPipeAcceptor extends BaseIoAcceptor
     }
 
     @Override
-    protected void doBind() throws IOException
-    {
+    protected void doBind() throws IOException {
         VmPipeAddress localAddress = getLocalAddress();
-        
-        synchronized( boundHandlers )
-        {
-            if( localAddress == null || localAddress.getPort() == 0 )
-            {
+
+        synchronized (boundHandlers) {
+            if (localAddress == null || localAddress.getPort() == 0) {
                 localAddress = null;
-                for( int i = 1; i < Integer.MAX_VALUE; i++ )
-                {
-                    VmPipeAddress newLocalAddress = new VmPipeAddress( i );
-                    if( !boundHandlers.containsKey( newLocalAddress ) )
-                    {
+                for (int i = 1; i < Integer.MAX_VALUE; i++) {
+                    VmPipeAddress newLocalAddress = new VmPipeAddress(i);
+                    if (!boundHandlers.containsKey(newLocalAddress)) {
                         localAddress = newLocalAddress;
                         break;
                     }
                 }
-                
+
                 if (localAddress == null) {
                     throw new IOException("No port available.");
                 }
-            }
-            else if( localAddress.getPort() < 0) {
+            } else if (localAddress.getPort() < 0) {
                 throw new IOException("Bind port number must be 0 or above.");
-            } else if( boundHandlers.containsKey( localAddress ) ) {
-                throw new IOException( "Address already bound: " + localAddress );
+            } else if (boundHandlers.containsKey(localAddress)) {
+                throw new IOException("Address already bound: " + localAddress);
             }
 
-            boundHandlers.put(
-                    localAddress, 
-                    new VmPipe( this, localAddress, getHandler(), getListeners() ) );
+            boundHandlers.put(localAddress, new VmPipe(this, localAddress,
+                    getHandler(), getListeners()));
         }
-        
-        setLocalAddress( localAddress );
+
+        setLocalAddress(localAddress);
         getListeners().fireServiceActivated();
     }
-    
+
     @Override
-    protected void doUnbind()
-    {
-        synchronized( boundHandlers )
-        {
-            boundHandlers.remove( getLocalAddress() );
+    protected void doUnbind() {
+        synchronized (boundHandlers) {
+            boundHandlers.remove(getLocalAddress());
         }
-        
+
         getListeners().fireServiceDeactivated();
     }
 
-    public IoSession newSession( SocketAddress remoteAddress )
-    {
+    public IoSession newSession(SocketAddress remoteAddress) {
         throw new UnsupportedOperationException();
     }
 }

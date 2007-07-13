@@ -29,48 +29,41 @@ import org.apache.mina.common.IoSession;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture
-{
+public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture {
     /**
      * Creates a new instance.
      */
-    public DefaultCloseFuture( IoSession session )
-    {
-        super( session );
+    public DefaultCloseFuture(IoSession session) {
+        super(session);
     }
-    
-    public boolean isClosed()
-    {
-        if( isReady() )
-        {
-            return ( ( Boolean ) getValue() ).booleanValue();
-        }
-        else
-        {
+
+    public boolean isClosed() {
+        if (isReady()) {
+            return ((Boolean) getValue()).booleanValue();
+        } else {
             return false;
         }
     }
-    
-    public void setClosed()
-    {
-        setValue( Boolean.TRUE );
+
+    public void setClosed() {
+        setValue(Boolean.TRUE);
     }
 
     @Override
     public CloseFuture await() throws InterruptedException {
         return (CloseFuture) super.await();
     }
-    
+
     @Override
     public CloseFuture awaitUninterruptibly() {
         return (CloseFuture) super.awaitUninterruptibly();
     }
-    
+
     @Override
     public CloseFuture addListener(IoFutureListener listener) {
         return (CloseFuture) super.addListener(listener);
     }
-    
+
     @Override
     public CloseFuture removeListener(IoFutureListener listener) {
         return (CloseFuture) super.removeListener(listener);

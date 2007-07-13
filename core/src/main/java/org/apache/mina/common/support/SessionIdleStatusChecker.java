@@ -31,12 +31,10 @@ import org.apache.mina.util.IdentityHashSet;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 525369 $, $Date: 2007-04-04 05:05:11 +0200 (mer., 04 avr. 2007) $
  */
-public class SessionIdleStatusChecker
-{
+public class SessionIdleStatusChecker {
     private static final SessionIdleStatusChecker INSTANCE = new SessionIdleStatusChecker();
-    
-    public static SessionIdleStatusChecker getInstance()
-    {
+
+    public static SessionIdleStatusChecker getInstance() {
         return INSTANCE;
     }
 
@@ -44,90 +42,68 @@ public class SessionIdleStatusChecker
 
     private final Worker worker = new Worker();
 
-    private SessionIdleStatusChecker()
-    {
+    private SessionIdleStatusChecker() {
         worker.start();
     }
 
-    public void addSession( BaseIoSession session )
-    {
-        synchronized( sessions )
-        {
-            sessions.add( session );
+    public void addSession(BaseIoSession session) {
+        synchronized (sessions) {
+            sessions.add(session);
         }
     }
 
-    private class Worker extends Thread
-    {
-        private Worker()
-        {
-            super( "VmPipeIdleStatusChecker" );
-            setDaemon( true );
+    private class Worker extends Thread {
+        private Worker() {
+            super("VmPipeIdleStatusChecker");
+            setDaemon(true);
         }
 
         @Override
-        public void run()
-        {
-            for( ;; )
-            {
-                try
-                {
-                    Thread.sleep( 1000 );
-                }
-                catch( InterruptedException e )
-                {
+        public void run() {
+            for (;;) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
                 }
 
                 long currentTime = System.currentTimeMillis();
 
-                synchronized( sessions )
-                {
+                synchronized (sessions) {
                     Iterator<BaseIoSession> it = sessions.iterator();
-                    while( it.hasNext() )
-                    {
+                    while (it.hasNext()) {
                         BaseIoSession session = it.next();
-                        if( !session.isConnected() )
-                        {
+                        if (!session.isConnected()) {
                             it.remove();
-                        }
-                        else
-                        {
-                            notifyIdleSession( session, currentTime );
+                        } else {
+                            notifyIdleSession(session, currentTime);
                         }
                     }
                 }
             }
         }
     }
-    
-    private void notifyIdleSession( BaseIoSession session, long currentTime )
-    {
-        notifyIdleSession0(
-                session, currentTime,
-                session.getIdleTimeInMillis( IdleStatus.BOTH_IDLE ),
-                IdleStatus.BOTH_IDLE,
-                Math.max( session.getLastIoTime(), session.getLastIdleTime( IdleStatus.BOTH_IDLE ) ) );
-        notifyIdleSession0(
-                session, currentTime,
-                session.getIdleTimeInMillis( IdleStatus.READER_IDLE ),
-                IdleStatus.READER_IDLE,
-                Math.max( session.getLastReadTime(), session.getLastIdleTime( IdleStatus.READER_IDLE ) ) );
-        notifyIdleSession0(
-                session, currentTime,
-                session.getIdleTimeInMillis( IdleStatus.WRITER_IDLE ),
-                IdleStatus.WRITER_IDLE,
-                Math.max( session.getLastWriteTime(), session.getLastIdleTime( IdleStatus.WRITER_IDLE ) ) );
+
+    private void notifyIdleSession(BaseIoSession session, long currentTime) {
+        notifyIdleSession0(session, currentTime, session
+                .getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
+                        .getLastIdleTime(IdleStatus.BOTH_IDLE)));
+        notifyIdleSession0(session, currentTime, session
+                .getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(),
+                        session.getLastIdleTime(IdleStatus.READER_IDLE)));
+        notifyIdleSession0(session, currentTime, session
+                .getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(),
+                        session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
     }
 
-    private void notifyIdleSession0( BaseIoSession session, long currentTime,
-                                    long idleTime, IdleStatus status,
-                                    long lastIoTime )
-    {
-        if( idleTime > 0 && lastIoTime != 0
-            && ( currentTime - lastIoTime ) >= idleTime )
-        {
-            session.increaseIdleCount( status );
-            session.getFilterChain().fireSessionIdle( session, status );
+    private void notifyIdleSession0(BaseIoSession session, long currentTime,
+            long idleTime, IdleStatus status, long lastIoTime) {
+        if (idleTime > 0 && lastIoTime != 0
+                && (currentTime - lastIoTime) >= idleTime) {
+            session.increaseIdleCount(status);
+            session.getFilterChain().fireSessionIdle(session, status);
         }
     }
 

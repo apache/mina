@@ -38,84 +38,84 @@ import org.apache.mina.util.AvailablePortFinder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 436993 $, $Date: 2006-08-26 07:36:56 +0900 (토, 26  8월 2006) $ 
  */
-public class DatagramRecyclerTest extends TestCase
-{
+public class DatagramRecyclerTest extends TestCase {
     private final DatagramAcceptor acceptor = new DatagramAcceptor();
+
     private final DatagramConnector connector = new DatagramConnector();
 
-    public DatagramRecyclerTest()
-    {
+    public DatagramRecyclerTest() {
     }
-    
-    public void testDatagramRecycler() throws Exception
-    {
-        int port = AvailablePortFinder.getNextAvailable( 1024 );
-        ExpiringSessionRecycler recycler = new ExpiringSessionRecycler( 1, 1 );
-        
+
+    public void testDatagramRecycler() throws Exception {
+        int port = AvailablePortFinder.getNextAvailable(1024);
+        ExpiringSessionRecycler recycler = new ExpiringSessionRecycler(1, 1);
+
         MockHandler acceptorHandler = new MockHandler();
         MockHandler connectorHandler = new MockHandler();
-        
-        acceptor.setLocalAddress( new InetSocketAddress( port ) );
-        acceptor.setHandler( acceptorHandler );
-        acceptor.setSessionRecycler( recycler );
+
+        acceptor.setLocalAddress(new InetSocketAddress(port));
+        acceptor.setHandler(acceptorHandler);
+        acceptor.setSessionRecycler(recycler);
         acceptor.bind();
-        
-        try
-        {
-            connector.setHandler( connectorHandler );
-            ConnectFuture future = connector.connect( new InetSocketAddress( "localhost", port ) );
+
+        try {
+            connector.setHandler(connectorHandler);
+            ConnectFuture future = connector.connect(new InetSocketAddress(
+                    "localhost", port));
             future.awaitUninterruptibly();
-            
+
             // Write whatever to trigger the acceptor.
-            future.getSession().write( ByteBuffer.allocate(1) ).awaitUninterruptibly();
+            future.getSession().write(ByteBuffer.allocate(1))
+                    .awaitUninterruptibly();
 
             // Close the client-side connection.
             // This doesn't mean that the acceptor-side connection is also closed.
             // The lifecycle of the acceptor-side connection is managed by the recycler.
             future.getSession().close();
             future.getSession().getCloseFuture().awaitUninterruptibly();
-            Assert.assertTrue( future.getSession().getCloseFuture().isClosed() );
-            
+            Assert.assertTrue(future.getSession().getCloseFuture().isClosed());
+
             // Wait until the acceptor-side connection is closed.
-            while( acceptorHandler.session == null )
-            {
+            while (acceptorHandler.session == null) {
                 Thread.yield();
             }
-            acceptorHandler.session.getCloseFuture().awaitUninterruptibly( 3000 );
-            
-            // Is it closed?
-            Assert.assertTrue( acceptorHandler.session.getCloseFuture().isClosed() );
-            
-            Thread.sleep( 1000 );
+            acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000);
 
-            Assert.assertEquals( "CROPSECL", connectorHandler.result );
-            Assert.assertEquals( "CROPRECL", acceptorHandler.result );
-        }
-        finally
-        {
+            // Is it closed?
+            Assert.assertTrue(acceptorHandler.session.getCloseFuture()
+                    .isClosed());
+
+            Thread.sleep(1000);
+
+            Assert.assertEquals("CROPSECL", connectorHandler.result);
+            Assert.assertEquals("CROPRECL", acceptorHandler.result);
+        } finally {
             acceptor.unbind();
         }
     }
-    
-    private class MockHandler extends IoHandlerAdapter
-    {
+
+    private class MockHandler extends IoHandlerAdapter {
         public IoSession session;
+
         public String result = "";
 
         @Override
-        public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+        public void exceptionCaught(IoSession session, Throwable cause)
+                throws Exception {
             this.session = session;
             result += "CA";
         }
 
         @Override
-        public void messageReceived(IoSession session, Object message) throws Exception {
+        public void messageReceived(IoSession session, Object message)
+                throws Exception {
             this.session = session;
             result += "RE";
         }
 
         @Override
-        public void messageSent(IoSession session, Object message) throws Exception {
+        public void messageSent(IoSession session, Object message)
+                throws Exception {
             this.session = session;
             result += "SE";
         }
@@ -133,7 +133,8 @@ public class DatagramRecyclerTest extends TestCase
         }
 
         @Override
-        public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
+        public void sessionIdle(IoSession session, IdleStatus status)
+                throws Exception {
             this.session = session;
             result += "ID";
         }

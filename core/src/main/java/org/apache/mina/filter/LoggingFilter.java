@@ -63,8 +63,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @see SessionLog
  */
-public class LoggingFilter extends IoFilterAdapter
-{
+public class LoggingFilter extends IoFilterAdapter {
     /**
      * Session attribute key: prefix string
      */
@@ -74,7 +73,7 @@ public class LoggingFilter extends IoFilterAdapter
      * Session attribute key: {@link Logger}
      */
     public static final String LOGGER = SessionLog.LOGGER;
-    
+
     /**
      * {@link LogLevel} which logs messages on the DEBUG level.
      */
@@ -95,7 +94,7 @@ public class LoggingFilter extends IoFilterAdapter
             SessionLog.debug(log, session, message, cause);
         }
     };
-    
+
     /**
      * {@link LogLevel} which logs messages on the INFO level.
      */
@@ -137,7 +136,7 @@ public class LoggingFilter extends IoFilterAdapter
             SessionLog.warn(log, session, message, cause);
         }
     };
-    
+
     /**
      * {@link LogLevel} which logs messages on the ERROR level.
      */
@@ -158,29 +157,47 @@ public class LoggingFilter extends IoFilterAdapter
             SessionLog.error(log, session, message, cause);
         }
     };
-    
+
     private static final String EVENT_LOGGER = LoggingFilter.class.getName()
             + ".event";
-    private static final String SESSION_CREATED_LOGGER = EVENT_LOGGER + ".sessionCreated";
-    private static final String SESSION_OPENED_LOGGER = EVENT_LOGGER + ".sessionOpened";
-    private static final String SESSION_CLOSED_LOGGER = EVENT_LOGGER + ".sessionClosed";
-    private static final String SESSION_IDLE_LOGGER = EVENT_LOGGER + ".sessionIdle";
-    private static final String EXCEPTION_CAUGHT_LOGGER = EVENT_LOGGER + ".exceptionCaught";
-    private static final String MESSAGE_RECEIVED_LOGGER = EVENT_LOGGER + ".messageReceived";
-    private static final String MESSAGE_SENT_LOGGER = EVENT_LOGGER + ".messageSent";
+
+    private static final String SESSION_CREATED_LOGGER = EVENT_LOGGER
+            + ".sessionCreated";
+
+    private static final String SESSION_OPENED_LOGGER = EVENT_LOGGER
+            + ".sessionOpened";
+
+    private static final String SESSION_CLOSED_LOGGER = EVENT_LOGGER
+            + ".sessionClosed";
+
+    private static final String SESSION_IDLE_LOGGER = EVENT_LOGGER
+            + ".sessionIdle";
+
+    private static final String EXCEPTION_CAUGHT_LOGGER = EVENT_LOGGER
+            + ".exceptionCaught";
+
+    private static final String MESSAGE_RECEIVED_LOGGER = EVENT_LOGGER
+            + ".messageReceived";
+
+    private static final String MESSAGE_SENT_LOGGER = EVENT_LOGGER
+            + ".messageSent";
+
     private static final String WRITE_LOGGER = EVENT_LOGGER + ".write";
+
     private static final String CLOSE_LOGGER = EVENT_LOGGER + ".close";
-    
+
     private String loggerNamePrefix = null;
+
     private LogLevel defaultLogLevel = INFO;
+
     private LogLevel exceptionCaughtLogLevel = INFO;
-    
+
     /**
      * Creates a new instance.
      */
     public LoggingFilter() {
     }
-    
+
     /**
      * Returns the prefix used for the names of the loggers used to log the different 
      * events. If <code>null</code> the name of the {@link Logger} used by
@@ -203,7 +220,7 @@ public class LoggingFilter extends IoFilterAdapter
     public void setLoggerNamePrefix(String loggerNamePrefix) {
         this.loggerNamePrefix = loggerNamePrefix;
     }
-    
+
     /**
      * Returns the current {@link LogLevel} which is used when this filter logs all 
      * events but the <code>exceptionCaught</code> event. The default is 
@@ -261,19 +278,22 @@ public class LoggingFilter extends IoFilterAdapter
 
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) {
-        defaultLogLevel.log(getLogger(session, SESSION_CREATED_LOGGER, "sessionCreated"), session, "CREATED");
+        defaultLogLevel.log(getLogger(session, SESSION_CREATED_LOGGER,
+                "sessionCreated"), session, "CREATED");
         nextFilter.sessionCreated(session);
     }
 
     @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session) {
-        defaultLogLevel.log(getLogger(session, SESSION_OPENED_LOGGER, "sessionOpened"), session, "OPENED");
+        defaultLogLevel.log(getLogger(session, SESSION_OPENED_LOGGER,
+                "sessionOpened"), session, "OPENED");
         nextFilter.sessionOpened(session);
     }
 
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session) {
-        defaultLogLevel.log(getLogger(session, SESSION_CLOSED_LOGGER, "sessionClosed"), session, "CLOSED");
+        defaultLogLevel.log(getLogger(session, SESSION_CLOSED_LOGGER,
+                "sessionClosed"), session, "CLOSED");
         nextFilter.sessionClosed(session);
     }
 
@@ -290,7 +310,8 @@ public class LoggingFilter extends IoFilterAdapter
     @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) {
-        Logger log = getLogger(session, EXCEPTION_CAUGHT_LOGGER, "exceptionCaught");
+        Logger log = getLogger(session, EXCEPTION_CAUGHT_LOGGER,
+                "exceptionCaught");
         if (exceptionCaughtLogLevel.isEnabled(log)) {
             exceptionCaughtLogLevel.log(log, session, "EXCEPTION:", cause);
         }
@@ -300,7 +321,8 @@ public class LoggingFilter extends IoFilterAdapter
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) {
-        Logger log = getLogger(session, MESSAGE_RECEIVED_LOGGER, "messageReceived");
+        Logger log = getLogger(session, MESSAGE_RECEIVED_LOGGER,
+                "messageReceived");
         if (defaultLogLevel.isEnabled(log)) {
             defaultLogLevel.log(log, session, "RECEIVED: " + message);
         }
@@ -312,7 +334,8 @@ public class LoggingFilter extends IoFilterAdapter
             WriteRequest writeRequest) {
         Logger log = getLogger(session, MESSAGE_SENT_LOGGER, "messageSent");
         if (defaultLogLevel.isEnabled(log)) {
-            defaultLogLevel.log(log, session, "SENT: " + writeRequest.getMessage());
+            defaultLogLevel.log(log, session, "SENT: "
+                    + writeRequest.getMessage());
         }
         nextFilter.messageSent(session, writeRequest);
     }
@@ -322,7 +345,8 @@ public class LoggingFilter extends IoFilterAdapter
             WriteRequest writeRequest) {
         Logger log = getLogger(session, WRITE_LOGGER, "write");
         if (defaultLogLevel.isEnabled(log)) {
-            defaultLogLevel.log(log, session, "WRITE: " + writeRequest.getMessage());
+            defaultLogLevel.log(log, session, "WRITE: "
+                    + writeRequest.getMessage());
         }
         nextFilter.filterWrite(session, writeRequest);
     }
@@ -330,10 +354,11 @@ public class LoggingFilter extends IoFilterAdapter
     @Override
     public void filterClose(NextFilter nextFilter, IoSession session)
             throws Exception {
-        defaultLogLevel.log(getLogger(session, CLOSE_LOGGER, "close"), session, "CLOSE");
+        defaultLogLevel.log(getLogger(session, CLOSE_LOGGER, "close"), session,
+                "CLOSE");
         nextFilter.filterClose(session);
     }
-    
+
     private Logger getLogger(IoSession session, String attribute, String event) {
         Logger log = (Logger) session.getAttribute(attribute);
         if (log == null) {
@@ -346,15 +371,19 @@ public class LoggingFilter extends IoFilterAdapter
         }
         return log;
     }
-    
+
     /**
      * Defines a logging level.
      */
     public static abstract class LogLevel {
-        LogLevel() {}
+        LogLevel() {
+        }
+
         public abstract boolean isEnabled(Logger log);
+
         public abstract void log(Logger log, IoSession session, String message);
-        public abstract void log(Logger log, IoSession session, String message, 
+
+        public abstract void log(Logger log, IoSession session, String message,
                 Throwable cause);
     }
 }

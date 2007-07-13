@@ -30,8 +30,7 @@ import org.apache.mina.common.IoSession;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler
-{
+public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler {
 
     /**
      * The session to which the handler is assigned.
@@ -43,10 +42,8 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler
      *
      * @param session the session to which the handler is assigned
      */
-    public SingleSessionIoHandlerAdapter(IoSession session)
-    {
-        if (session == null)
-        {
+    public SingleSessionIoHandlerAdapter(IoSession session) {
+        if (session == null) {
             throw new NullPointerException("session");
         }
         this.session = session;
@@ -57,36 +54,28 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler
      *
      * @return the session
      */
-    protected IoSession getSession()
-    {
+    protected IoSession getSession() {
         return session;
     }
 
-    public void exceptionCaught(Throwable th) throws Exception
-    {
+    public void exceptionCaught(Throwable th) throws Exception {
     }
 
-    public void messageReceived(Object message) throws Exception
-    {
+    public void messageReceived(Object message) throws Exception {
     }
 
-    public void messageSent(Object message) throws Exception
-    {
+    public void messageSent(Object message) throws Exception {
     }
 
-    public void sessionClosed() throws Exception
-    {
+    public void sessionClosed() throws Exception {
     }
 
-    public void sessionCreated() throws Exception
-    {
+    public void sessionCreated() throws Exception {
     }
 
-    public void sessionIdle(IdleStatus status) throws Exception
-    {
+    public void sessionIdle(IdleStatus status) throws Exception {
     }
 
-    public void sessionOpened() throws Exception
-    {
+    public void sessionOpened() throws Exception {
     }
 }

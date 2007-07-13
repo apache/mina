@@ -28,26 +28,21 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class SpringMain
-{
+public class SpringMain {
 
-    public static void main( String[] args ) throws Exception
-    {
-        if( System.getProperty( "com.sun.management.jmxremote" ) != null )
-        {
-            System.out.println( "JMX enabled." );
+    public static void main(String[] args) throws Exception {
+        if (System.getProperty("com.sun.management.jmxremote") != null) {
+            System.out.println("JMX enabled.");
+        } else {
+            System.out
+                    .println("JMX disabled. Please set the "
+                            + "'com.sun.management.jmxremote' system property to enable JMX.");
         }
-        else
-        {
-            System.out.println( "JMX disabled. Please set the "
-                    + "'com.sun.management.jmxremote' system property to enable JMX." );
-        }
-        new ClassPathXmlApplicationContext( getApplicationContext() );
-        System.out.println( "Listening ..." );
+        new ClassPathXmlApplicationContext(getApplicationContext());
+        System.out.println("Listening ...");
     }
 
-    public static String getApplicationContext()
-    {
+    public static String getApplicationContext() {
         return "org/apache/mina/example/chat/serverContext.xml";
     }
 }

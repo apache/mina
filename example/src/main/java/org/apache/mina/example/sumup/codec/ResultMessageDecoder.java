@@ -32,53 +32,45 @@ import org.apache.mina.filter.codec.demux.MessageDecoder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ResultMessageDecoder extends AbstractMessageDecoder
-{
+public class ResultMessageDecoder extends AbstractMessageDecoder {
     private int code;
+
     private boolean readCode;
-    
-    public ResultMessageDecoder()
-    {
-        super( Constants.RESULT );
+
+    public ResultMessageDecoder() {
+        super(Constants.RESULT);
     }
 
     @Override
-    protected AbstractMessage decodeBody( IoSession session, ByteBuffer in )
-    {
-        if( !readCode )
-        {
-            if( in.remaining() < Constants.RESULT_CODE_LEN )
-            {
+    protected AbstractMessage decodeBody(IoSession session, ByteBuffer in) {
+        if (!readCode) {
+            if (in.remaining() < Constants.RESULT_CODE_LEN) {
                 return null; // Need more data.
             }
-            
+
             code = in.getShort();
             readCode = true;
         }
-        
-        if( code == Constants.RESULT_OK )
-        {
-            if( in.remaining() < Constants.RESULT_VALUE_LEN )
-            {
+
+        if (code == Constants.RESULT_OK) {
+            if (in.remaining() < Constants.RESULT_VALUE_LEN) {
                 return null;
             }
-            
+
             ResultMessage m = new ResultMessage();
-            m.setOk( true );
-            m.setValue( in.getInt() );
+            m.setOk(true);
+            m.setValue(in.getInt());
             readCode = false;
             return m;
-        }
-        else
-        {
+        } else {
             ResultMessage m = new ResultMessage();
-            m.setOk( false );
+            m.setOk(false);
             readCode = false;
             return m;
         }
     }
 
-    public void finishDecode( IoSession session, ProtocolDecoderOutput out ) throws Exception
-    {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
+            throws Exception {
     }
 }

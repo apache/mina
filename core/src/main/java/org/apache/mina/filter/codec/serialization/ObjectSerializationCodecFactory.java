@@ -32,39 +32,35 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ObjectSerializationCodecFactory implements ProtocolCodecFactory
-{
+public class ObjectSerializationCodecFactory implements ProtocolCodecFactory {
     private final ObjectSerializationEncoder encoder;
+
     private final ObjectSerializationDecoder decoder;
-    
+
     /**
      * Creates a new instance with the {@link ClassLoader} of
      * the current thread.
      */
-    public ObjectSerializationCodecFactory()
-    {
-        this( Thread.currentThread().getContextClassLoader() );
+    public ObjectSerializationCodecFactory() {
+        this(Thread.currentThread().getContextClassLoader());
     }
-    
+
     /**
      * Creates a new instance with the specified {@link ClassLoader}.
      */
-    public ObjectSerializationCodecFactory( ClassLoader classLoader )
-    {
+    public ObjectSerializationCodecFactory(ClassLoader classLoader) {
         encoder = new ObjectSerializationEncoder();
-        decoder = new ObjectSerializationDecoder( classLoader );
+        decoder = new ObjectSerializationDecoder(classLoader);
     }
 
-    public ProtocolEncoder getEncoder()
-    {
+    public ProtocolEncoder getEncoder() {
         return encoder;
     }
 
-    public ProtocolDecoder getDecoder()
-    {
+    public ProtocolDecoder getDecoder() {
         return decoder;
     }
-    
+
     /**
      * Returns the allowed maximum size of the encoded object.
      * If the size of the encoded object exceeds this value, the encoder
@@ -73,11 +69,10 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link ObjectSerializationEncoder#getMaxObjectSize()}.
      */
-    public int getEncoderMaxObjectSize()
-    {
+    public int getEncoderMaxObjectSize() {
         return encoder.getMaxObjectSize();
     }
-    
+
     /**
      * Sets the allowed maximum size of the encoded object.
      * If the size of the encoded object exceeds this value, the encoder
@@ -86,11 +81,10 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link ObjectSerializationEncoder#setMaxObjectSize(int)}.
      */
-    public void setEncoderMaxObjectSize( int maxObjectSize )
-    {
-        encoder.setMaxObjectSize( maxObjectSize );
+    public void setEncoderMaxObjectSize(int maxObjectSize) {
+        encoder.setMaxObjectSize(maxObjectSize);
     }
-    
+
     /**
      * Returns the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, the
@@ -99,11 +93,10 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link ObjectSerializationDecoder#getMaxObjectSize()}.
      */
-    public int getDecoderMaxObjectSize()
-    {
+    public int getDecoderMaxObjectSize() {
         return decoder.getMaxObjectSize();
     }
-    
+
     /**
      * Sets the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, the
@@ -112,8 +105,7 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory
      * <p>
      * This method does the same job with {@link ObjectSerializationDecoder#setMaxObjectSize(int)}.
      */
-    public void setDecoderMaxObjectSize( int maxObjectSize )
-    {
-        decoder.setMaxObjectSize( maxObjectSize );
+    public void setDecoderMaxObjectSize(int maxObjectSize) {
+        decoder.setMaxObjectSize(maxObjectSize);
     }
 }

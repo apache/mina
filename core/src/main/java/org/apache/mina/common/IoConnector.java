@@ -40,8 +40,7 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoConnector extends IoService
-{
+public interface IoConnector extends IoService {
     /**
      * Returns the connect timeout in seconds.  The default value is 1 minute.
      */
@@ -55,15 +54,15 @@ public interface IoConnector extends IoService
     /**
      * Sets the connect timeout in seconds.  The default value is 1 minute.
      */
-    void setConnectTimeout( int connectTimeout );
-    
+    void setConnectTimeout(int connectTimeout);
+
     /**
      * Connects to the specified remote address.
      * 
      * @return the {@link ConnectFuture} instance which is completed when the 
      *         connection attempt initiated by this call succeeds or fails.
      */
-    ConnectFuture connect( SocketAddress remoteAddress );
+    ConnectFuture connect(SocketAddress remoteAddress);
 
     /**
      * Connects to the specified remote address binding to the specified local address.
@@ -71,5 +70,6 @@ public interface IoConnector extends IoService
      * @return the {@link ConnectFuture} instance which is completed when the 
      *         connection attempt initiated by this call succeeds or fails.
      */
-    ConnectFuture connect( SocketAddress remoteAddress, SocketAddress localAddress );
+    ConnectFuture connect(SocketAddress remoteAddress,
+            SocketAddress localAddress);
 }

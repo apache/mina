@@ -34,187 +34,164 @@ import org.apache.mina.common.support.BaseIoSession;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 
  */
-public class IoFilterChainTest extends TestCase
-{
+public class IoFilterChainTest extends TestCase {
     private IoFilterChainImpl chain;
+
     private IoSession session;
+
     private String result;
 
     @Override
-    public void setUp()
-    {
+    public void setUp() {
         chain = new IoFilterChainImpl();
         session = new TestSession();
         result = "";
     }
-    
+
     @Override
-    public void tearDown()
-    {
+    public void tearDown() {
     }
-    
-    public void testAdd() throws Exception
-    {
-        chain.addFirst( "A", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "B", new EventOrderTestFilter( 'A' ) );
-        chain.addFirst( "C", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "D", new EventOrderTestFilter( 'A' ) );
-        chain.addBefore( "B", "E", new EventOrderTestFilter( 'A' ) );
-        chain.addBefore( "C", "F", new EventOrderTestFilter( 'A' ) );
-        chain.addAfter( "B", "G", new EventOrderTestFilter( 'A' ) );
-        chain.addAfter( "D", "H", new EventOrderTestFilter( 'A' ) );
-        
+
+    public void testAdd() throws Exception {
+        chain.addFirst("A", new EventOrderTestFilter('A'));
+        chain.addLast("B", new EventOrderTestFilter('A'));
+        chain.addFirst("C", new EventOrderTestFilter('A'));
+        chain.addLast("D", new EventOrderTestFilter('A'));
+        chain.addBefore("B", "E", new EventOrderTestFilter('A'));
+        chain.addBefore("C", "F", new EventOrderTestFilter('A'));
+        chain.addAfter("B", "G", new EventOrderTestFilter('A'));
+        chain.addAfter("D", "H", new EventOrderTestFilter('A'));
+
         String actual = "";
         for (Entry e : chain.getAll()) {
             actual += e.getName();
         }
-        
-        Assert.assertEquals( "FCAEBGDH", actual );
+
+        Assert.assertEquals("FCAEBGDH", actual);
     }
-    
-    public void testGet() throws Exception
-    {
+
+    public void testGet() throws Exception {
         IoFilter filterA = new IoFilterAdapter();
         IoFilter filterB = new IoFilterAdapter();
         IoFilter filterC = new IoFilterAdapter();
         IoFilter filterD = new IoFilterAdapter();
-        
-        chain.addFirst( "A", filterA );
-        chain.addLast( "B", filterB );
-        chain.addBefore( "B", "C", filterC );
-        chain.addAfter( "A", "D", filterD );
-        
-        Assert.assertSame( filterA, chain.get( "A" ) );
-        Assert.assertSame( filterB, chain.get( "B" ) );
-        Assert.assertSame( filterC, chain.get( "C" ) );
-        Assert.assertSame( filterD, chain.get( "D" ) );
+
+        chain.addFirst("A", filterA);
+        chain.addLast("B", filterB);
+        chain.addBefore("B", "C", filterC);
+        chain.addAfter("A", "D", filterD);
+
+        Assert.assertSame(filterA, chain.get("A"));
+        Assert.assertSame(filterB, chain.get("B"));
+        Assert.assertSame(filterC, chain.get("C"));
+        Assert.assertSame(filterD, chain.get("D"));
     }
-    
-    public void testRemove() throws Exception
-    {
-        chain.addLast( "A", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "B", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "C", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "D", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "E", new EventOrderTestFilter( 'A' ) );
-        
-        chain.remove( "A" );
-        chain.remove( "E" );
-        chain.remove( "C" );
-        chain.remove( "B" );
-        chain.remove( "D" );
-        
-        Assert.assertEquals( 0, chain.getAll().size() );
+
+    public void testRemove() throws Exception {
+        chain.addLast("A", new EventOrderTestFilter('A'));
+        chain.addLast("B", new EventOrderTestFilter('A'));
+        chain.addLast("C", new EventOrderTestFilter('A'));
+        chain.addLast("D", new EventOrderTestFilter('A'));
+        chain.addLast("E", new EventOrderTestFilter('A'));
+
+        chain.remove("A");
+        chain.remove("E");
+        chain.remove("C");
+        chain.remove("B");
+        chain.remove("D");
+
+        Assert.assertEquals(0, chain.getAll().size());
     }
-    
-    public void testClear() throws Exception
-    {
-        chain.addLast( "A", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "B", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "C", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "D", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "E", new EventOrderTestFilter( 'A' ) );
-        
+
+    public void testClear() throws Exception {
+        chain.addLast("A", new EventOrderTestFilter('A'));
+        chain.addLast("B", new EventOrderTestFilter('A'));
+        chain.addLast("C", new EventOrderTestFilter('A'));
+        chain.addLast("D", new EventOrderTestFilter('A'));
+        chain.addLast("E", new EventOrderTestFilter('A'));
+
         chain.clear();
-        
-        Assert.assertEquals( 0, chain.getAll().size() );
+
+        Assert.assertEquals(0, chain.getAll().size());
     }
-    
-    public void testToString() throws Exception
-    {
+
+    public void testToString() throws Exception {
         // When the chain is empty
-        Assert.assertEquals( "{ empty }", chain.toString() );
-        
+        Assert.assertEquals("{ empty }", chain.toString());
+
         // When there's one filter
-        chain.addLast( "A", new IoFilterAdapter()
-        {
+        chain.addLast("A", new IoFilterAdapter() {
             @Override
-            public String toString()
-            {
+            public String toString() {
                 return "B";
             }
-        } );
-        Assert.assertEquals( "{ (A:B) }", chain.toString() );
-        
+        });
+        Assert.assertEquals("{ (A:B) }", chain.toString());
+
         // When there are two
-        chain.addLast( "C", new IoFilterAdapter()
-        {
+        chain.addLast("C", new IoFilterAdapter() {
             @Override
-            public String toString()
-            {
+            public String toString() {
                 return "D";
             }
-        } );
-        Assert.assertEquals( "{ (A:B), (C:D) }", chain.toString() );
+        });
+        Assert.assertEquals("{ (A:B), (C:D) }", chain.toString());
     }
 
-    public void testDefault()
-    {
-        run( "HS0 HSO HMR HMS HSI HEC HSC" );
+    public void testDefault() {
+        run("HS0 HSO HMR HMS HSI HEC HSC");
     }
-    
-    public void testChained() throws Exception
-    {
-        chain.addLast( "A", new EventOrderTestFilter( 'A' ) );
-        chain.addLast( "B", new EventOrderTestFilter( 'B' ) );
-        run( "AS0 BS0 HS0" +
-             "ASO BSO HSO" +
-             "AMR BMR HMR" +
-             "BFW AFW AMS BMS HMS" +
-             "ASI BSI HSI" +
-             "AEC BEC HEC" +
-             "ASC BSC HSC" );
+
+    public void testChained() throws Exception {
+        chain.addLast("A", new EventOrderTestFilter('A'));
+        chain.addLast("B", new EventOrderTestFilter('B'));
+        run("AS0 BS0 HS0" + "ASO BSO HSO" + "AMR BMR HMR"
+                + "BFW AFW AMS BMS HMS" + "ASI BSI HSI" + "AEC BEC HEC"
+                + "ASC BSC HSC");
     }
-    
-    public void testAddRemove() throws Exception
-    {
+
+    public void testAddRemove() throws Exception {
         IoFilter filter = new AddRemoveTestFilter();
 
-        chain.addFirst( "A", filter );
-        assertEquals( "ADDED", result );
-        
-        chain.remove( "A" );
-        assertEquals( "ADDEDREMOVED", result );
+        chain.addFirst("A", filter);
+        assertEquals("ADDED", result);
+
+        chain.remove("A");
+        assertEquals("ADDEDREMOVED", result);
     }
-    
-    private void run( String expectedResult )
-    {
-        chain.fireSessionCreated( session );
-        chain.fireSessionOpened( session );
-        chain.fireMessageReceived( session, new Object() );
-        chain.fireFilterWrite( session, new DefaultWriteRequest( new Object() ) );
-        chain.fireSessionIdle( session, IdleStatus.READER_IDLE );
-        chain.fireExceptionCaught( session, new Exception() );
-        chain.fireSessionClosed( session );
-        
-        result = formatResult( result );
-        expectedResult = formatResult( expectedResult );
-        
-        System.out.println( "Expected: " + expectedResult );
-        System.out.println( "Actual:   " + result );
-        Assert.assertEquals( expectedResult, result );
+
+    private void run(String expectedResult) {
+        chain.fireSessionCreated(session);
+        chain.fireSessionOpened(session);
+        chain.fireMessageReceived(session, new Object());
+        chain.fireFilterWrite(session, new DefaultWriteRequest(new Object()));
+        chain.fireSessionIdle(session, IdleStatus.READER_IDLE);
+        chain.fireExceptionCaught(session, new Exception());
+        chain.fireSessionClosed(session);
+
+        result = formatResult(result);
+        expectedResult = formatResult(expectedResult);
+
+        System.out.println("Expected: " + expectedResult);
+        System.out.println("Actual:   " + result);
+        Assert.assertEquals(expectedResult, result);
     }
-    
-    private String formatResult( String result )
-    {
-        result = result.replaceAll( "\\s", "" );
-        StringBuffer buf = new StringBuffer( result.length() * 4 / 3 );
-        for( int i = 0; i < result.length(); i++ )
-        {
-            buf.append( result.charAt( i ) );
-            if( i % 3 == 2 )
-            {
+
+    private String formatResult(String result) {
+        result = result.replaceAll("\\s", "");
+        StringBuffer buf = new StringBuffer(result.length() * 4 / 3);
+        for (int i = 0; i < result.length(); i++) {
+            buf.append(result.charAt(i));
+            if (i % 3 == 2) {
                 buf.append(' ');
             }
         }
-        
+
         return buf.toString();
     }
 
-    private class TestSession extends BaseIoSession implements IoSession
-    {
-        private final IoHandler handler = new IoHandlerAdapter()
-        {
+    private class TestSession extends BaseIoSession implements IoSession {
+        private final IoHandler handler = new IoHandlerAdapter() {
             @Override
             public void sessionCreated(IoSession session) {
                 result += "HS0";
@@ -238,9 +215,8 @@ public class IoFilterChainTest extends TestCase
             @Override
             public void exceptionCaught(IoSession session, Throwable cause) {
                 result += "HEC";
-                if( cause.getClass() != Exception.class )
-                {
-                    cause.printStackTrace( System.out );
+                if (cause.getClass() != Exception.class) {
+                    cause.printStackTrace(System.out);
                 }
             }
 
@@ -276,45 +252,37 @@ public class IoFilterChainTest extends TestCase
             return null;
         }
 
-        public IoFilterChain getFilterChain()
-        {
-            return new AbstractIoFilterChain( this )
-            {
+        public IoFilterChain getFilterChain() {
+            return new AbstractIoFilterChain(this) {
                 @Override
-                protected void doWrite( IoSession session, WriteRequest writeRequest )
-                {
+                protected void doWrite(IoSession session,
+                        WriteRequest writeRequest) {
                 }
 
                 @Override
-                protected void doClose( IoSession session )
-                {
+                protected void doClose(IoSession session) {
                 }
             };
         }
 
-        public int getScheduledWriteMessages()
-        {
+        public int getScheduledWriteMessages() {
             return 0;
         }
 
         @Override
-        protected void updateTrafficMask()
-        {
+        protected void updateTrafficMask() {
         }
 
         @Override
-        public boolean isClosing()
-        {
+        public boolean isClosing() {
             return false;
         }
 
-        public IoService getService()
-        {
+        public IoService getService() {
             return null;
         }
 
-        public IoSessionConfig getConfig()
-        {
+        public IoSessionConfig getConfig() {
             return null;
         }
 
@@ -328,161 +296,145 @@ public class IoFilterChainTest extends TestCase
         }
     }
 
-    private class EventOrderTestFilter extends IoFilterAdapter
-    {
+    private class EventOrderTestFilter extends IoFilterAdapter {
         private final char id;
 
-        private EventOrderTestFilter( char id )
-        {
+        private EventOrderTestFilter(char id) {
             this.id = id;
-        }
-        
-        @Override
-        public void sessionCreated( NextFilter nextFilter, IoSession session )
-        {
-            result += id + "S0";
-            nextFilter.sessionCreated( session );
         }
 
         @Override
-        public void sessionOpened( NextFilter nextFilter, IoSession session )
-        {
+        public void sessionCreated(NextFilter nextFilter, IoSession session) {
+            result += id + "S0";
+            nextFilter.sessionCreated(session);
+        }
+
+        @Override
+        public void sessionOpened(NextFilter nextFilter, IoSession session) {
             result += id + "SO";
-            nextFilter.sessionOpened( session );
+            nextFilter.sessionOpened(session);
         }
 
         @Override
         public void sessionClosed(NextFilter nextFilter, IoSession session) {
             result += id + "SC";
-            nextFilter.sessionClosed( session );
+            nextFilter.sessionClosed(session);
         }
 
         @Override
-        public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) {
+        public void sessionIdle(NextFilter nextFilter, IoSession session,
+                IdleStatus status) {
             result += id + "SI";
-            nextFilter.sessionIdle( session, status );
+            nextFilter.sessionIdle(session, status);
         }
 
         @Override
-        public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) {
+        public void exceptionCaught(NextFilter nextFilter, IoSession session,
+                Throwable cause) {
             result += id + "EC";
-            nextFilter.exceptionCaught( session, cause );
+            nextFilter.exceptionCaught(session, cause);
         }
 
         @Override
-        public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) {
+        public void filterWrite(NextFilter nextFilter, IoSession session,
+                WriteRequest writeRequest) {
             result += id + "FW";
-            nextFilter.filterWrite( session, writeRequest );
+            nextFilter.filterWrite(session, writeRequest);
         }
 
         @Override
-        public void messageReceived(NextFilter nextFilter, IoSession session, Object message) {
+        public void messageReceived(NextFilter nextFilter, IoSession session,
+                Object message) {
             result += id + "MR";
-            nextFilter.messageReceived( session, message );
+            nextFilter.messageReceived(session, message);
         }
 
         @Override
-        public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) {
+        public void messageSent(NextFilter nextFilter, IoSession session,
+                WriteRequest writeRequest) {
             result += id + "MS";
-            nextFilter.messageSent( session, writeRequest );
+            nextFilter.messageSent(session, writeRequest);
         }
 
         @Override
-        public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
-        {
-            nextFilter.filterClose( session );
+        public void filterClose(NextFilter nextFilter, IoSession session)
+                throws Exception {
+            nextFilter.filterClose(session);
         }
     }
 
-    private class AddRemoveTestFilter extends IoFilterAdapter
-    {
+    private class AddRemoveTestFilter extends IoFilterAdapter {
         @Override
-        public void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter )
-        {
+        public void onPostAdd(IoFilterChain parent, String name,
+                NextFilter nextFilter) {
             result += "ADDED";
         }
-        
+
         @Override
-        public void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter )
-        {
+        public void onPostRemove(IoFilterChain parent, String name,
+                NextFilter nextFilter) {
             result += "REMOVED";
         }
     }
 
-    private static class IoFilterChainImpl extends AbstractIoFilterChain
-    {
-        protected IoFilterChainImpl()
-        {
-            super( new BaseIoSession()
-            {
+    private static class IoFilterChainImpl extends AbstractIoFilterChain {
+        protected IoFilterChainImpl() {
+            super(new BaseIoSession() {
                 @Override
-                protected void updateTrafficMask()
-                {
+                protected void updateTrafficMask() {
                 }
 
-                public IoService getService()
-                {
+                public IoService getService() {
                     return null;
                 }
 
-                public IoHandler getHandler()
-                {
+                public IoHandler getHandler() {
                     return null;
                 }
 
-                public IoFilterChain getFilterChain()
-                {
+                public IoFilterChain getFilterChain() {
                     return null;
                 }
 
-                public TransportType getTransportType()
-                {
+                public TransportType getTransportType() {
                     return null;
                 }
 
-                public SocketAddress getRemoteAddress()
-                {
+                public SocketAddress getRemoteAddress() {
                     return null;
                 }
 
-                public SocketAddress getLocalAddress()
-                {
+                public SocketAddress getLocalAddress() {
                     return null;
                 }
 
-                public int getScheduledWriteMessages()
-                {
+                public int getScheduledWriteMessages() {
                     return 0;
                 }
 
-                public IoSessionConfig getConfig()
-                {
+                public IoSessionConfig getConfig() {
                     return null;
                 }
 
                 @Override
-                public SocketAddress getServiceAddress()
-                {
+                public SocketAddress getServiceAddress() {
                     return null;
                 }
 
-                public int getScheduledWriteBytes()
-                {
+                public int getScheduledWriteBytes() {
                     return 0;
                 }
-            } );
+            });
         }
 
         @Override
-        protected void doWrite( IoSession session, WriteRequest writeRequest )
-        {
-            fireMessageSent( session, writeRequest );
+        protected void doWrite(IoSession session, WriteRequest writeRequest) {
+            fireMessageSent(session, writeRequest);
         }
 
         @Override
-        protected void doClose( IoSession session )
-        {
+        protected void doClose(IoSession session) {
         }
     }
-    
+
 }

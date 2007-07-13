@@ -59,10 +59,14 @@ import org.apache.mina.filter.executor.ExecutorFilter;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 406554 $, $Date: 2006-05-15 06:46:02Z $
  */
-public class ReadThrottleFilterBuilder
-{
-    public static final String COUNTER = ReadThrottleFilterBuilder.class.getName() + ".counter";
-    public static final String SUSPENDED_READS = ReadThrottleFilterBuilder.class.getName() + ".suspendedReads";
+public class ReadThrottleFilterBuilder {
+    public static final String COUNTER = ReadThrottleFilterBuilder.class
+            .getName()
+            + ".counter";
+
+    public static final String SUSPENDED_READS = ReadThrottleFilterBuilder.class
+            .getName()
+            + ".suspendedReads";
 
     private volatile int maximumConnectionBufferSize = 1024 * 1024; // 1mb
 
@@ -73,8 +77,7 @@ public class ReadThrottleFilterBuilder
      *
      * @param maximumConnectionBufferSize New buffer size. Must be > 0
      */
-    public void setMaximumConnectionBufferSize( int maximumConnectionBufferSize )
-    {
+    public void setMaximumConnectionBufferSize(int maximumConnectionBufferSize) {
         this.maximumConnectionBufferSize = maximumConnectionBufferSize;
     }
 
@@ -84,12 +87,11 @@ public class ReadThrottleFilterBuilder
      *
      * @param chain {@link IoFilterChain} to attach self to.
      */
-    public void attach( IoFilterChain chain )
-    {
-        String name = getThreadPoolFilterEntryName( chain.getAll() );
+    public void attach(IoFilterChain chain) {
+        String name = getThreadPoolFilterEntryName(chain.getAll());
 
-        chain.addBefore( name, getClass().getName() + ".add", new Add() );
-        chain.addAfter( name, getClass().getName() + ".release", new Release() );
+        chain.addBefore(name, getClass().getName() + ".add", new Add());
+        chain.addAfter(name, getClass().getName() + ".release", new Release());
     }
 
     /**
@@ -98,102 +100,92 @@ public class ReadThrottleFilterBuilder
      *
      * @param builder {@link DefaultIoFilterChainBuilder} to attach self to.
      */
-    public void attach( DefaultIoFilterChainBuilder builder )
-    {
-        String name = getThreadPoolFilterEntryName( builder.getAll() );
+    public void attach(DefaultIoFilterChainBuilder builder) {
+        String name = getThreadPoolFilterEntryName(builder.getAll());
 
-        builder.addBefore( name, getClass().getName() + ".add", new Add() );
-        builder.addAfter( name, getClass().getName() + ".release", new Release() );
+        builder.addBefore(name, getClass().getName() + ".add", new Add());
+        builder
+                .addAfter(name, getClass().getName() + ".release",
+                        new Release());
     }
 
-    private String getThreadPoolFilterEntryName( List<Entry> entries )
-    {
+    private String getThreadPoolFilterEntryName(List<Entry> entries) {
         Iterator<Entry> i = entries.iterator();
 
-        while( i.hasNext() )
-        {
+        while (i.hasNext()) {
             Entry entry = i.next();
 
-            if( entry.getFilter().getClass().isAssignableFrom( ExecutorFilter.class ) )
-            {
+            if (entry.getFilter().getClass().isAssignableFrom(
+                    ExecutorFilter.class)) {
                 return entry.getName();
             }
         }
 
-        throw new IllegalStateException( "Chain does not contain a ExecutorFilter" );
+        throw new IllegalStateException(
+                "Chain does not contain a ExecutorFilter");
     }
 
-    private void add( IoSession session, int size )
-    {
-        synchronized( session )
-        {
-            int counter = getCounter( session ) + size;
+    private void add(IoSession session, int size) {
+        synchronized (session) {
+            int counter = getCounter(session) + size;
 
-            session.setAttribute( COUNTER, new Integer( counter ) );
+            session.setAttribute(COUNTER, new Integer(counter));
 
-            if( counter >= maximumConnectionBufferSize && session.getTrafficMask().isReadable() )
-            {
+            if (counter >= maximumConnectionBufferSize
+                    && session.getTrafficMask().isReadable()) {
                 session.suspendRead();
-                session.setAttribute( SUSPENDED_READS );
+                session.setAttribute(SUSPENDED_READS);
             }
         }
     }
 
-    private void release( IoSession session, int size )
-    {
-        synchronized( session )
-        {
-            int counter = Math.max( 0, getCounter( session ) - size );
+    private void release(IoSession session, int size) {
+        synchronized (session) {
+            int counter = Math.max(0, getCounter(session) - size);
 
-            session.setAttribute( COUNTER, new Integer( counter ) );
+            session.setAttribute(COUNTER, new Integer(counter));
 
-            if( counter < maximumConnectionBufferSize && isSuspendedReads( session ) )
-            {
+            if (counter < maximumConnectionBufferSize
+                    && isSuspendedReads(session)) {
                 session.resumeRead();
-                session.removeAttribute( SUSPENDED_READS );
+                session.removeAttribute(SUSPENDED_READS);
             }
-            
+
         }
     }
 
-    private boolean isSuspendedReads( IoSession session )
-    {
-        Boolean flag = (Boolean)session.getAttribute( SUSPENDED_READS );
+    private boolean isSuspendedReads(IoSession session) {
+        Boolean flag = (Boolean) session.getAttribute(SUSPENDED_READS);
 
         return null != flag && flag.booleanValue();
     }
 
-    private int getCounter( IoSession session )
-    {
-        Integer i = (Integer)session.getAttribute( COUNTER );
+    private int getCounter(IoSession session) {
+        Integer i = (Integer) session.getAttribute(COUNTER);
         return null == i ? 0 : i.intValue();
     }
 
-    private class Add extends IoFilterAdapter
-    {
+    private class Add extends IoFilterAdapter {
         @Override
-        public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
-        {
-            if( message instanceof ByteBuffer )
-            {
-                add( session, ( (ByteBuffer)message ).remaining() );
+        public void messageReceived(NextFilter nextFilter, IoSession session,
+                Object message) throws Exception {
+            if (message instanceof ByteBuffer) {
+                add(session, ((ByteBuffer) message).remaining());
             }
 
-            nextFilter.messageReceived( session, message );
+            nextFilter.messageReceived(session, message);
         }
     }
 
-    private class Release extends IoFilterAdapter
-    {
+    private class Release extends IoFilterAdapter {
         @Override
-        public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
-        {
-            if( message instanceof ByteBuffer )
-            {
-                release( session, ( (ByteBuffer)message ).remaining() );
+        public void messageReceived(NextFilter nextFilter, IoSession session,
+                Object message) throws Exception {
+            if (message instanceof ByteBuffer) {
+                release(session, ((ByteBuffer) message).remaining());
             }
 
-            nextFilter.messageReceived( session, message );
+            nextFilter.messageReceived(session, message);
         }
     }
 }

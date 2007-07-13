@@ -35,100 +35,89 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class TextLineEncoder extends ProtocolEncoderAdapter
-{
-    private static final String ENCODER = TextLineEncoder.class.getName() + ".encoder";
+public class TextLineEncoder extends ProtocolEncoderAdapter {
+    private static final String ENCODER = TextLineEncoder.class.getName()
+            + ".encoder";
 
     private final Charset charset;
+
     private final LineDelimiter delimiter;
+
     private int maxLineLength = Integer.MAX_VALUE;
 
-    public TextLineEncoder()
-    {
-        this( Charset.defaultCharset(), LineDelimiter.UNIX );
+    public TextLineEncoder() {
+        this(Charset.defaultCharset(), LineDelimiter.UNIX);
     }
-    
-    public TextLineEncoder( LineDelimiter delimiter )
-    {
-        this( Charset.defaultCharset(), delimiter );
+
+    public TextLineEncoder(LineDelimiter delimiter) {
+        this(Charset.defaultCharset(), delimiter);
     }
-    
-    public TextLineEncoder( Charset charset )
-    {
-        this( charset, LineDelimiter.UNIX );
+
+    public TextLineEncoder(Charset charset) {
+        this(charset, LineDelimiter.UNIX);
     }
-    
-    public TextLineEncoder( Charset charset, LineDelimiter delimiter )
-    {
-        if( charset == null )
-        {
-            throw new NullPointerException( "charset" );
+
+    public TextLineEncoder(Charset charset, LineDelimiter delimiter) {
+        if (charset == null) {
+            throw new NullPointerException("charset");
         }
-        if( delimiter == null )
-        {
-            throw new NullPointerException( "delimiter" );
+        if (delimiter == null) {
+            throw new NullPointerException("delimiter");
         }
-        if( LineDelimiter.AUTO.equals( delimiter ) )
-        {
-            throw new IllegalArgumentException( "AUTO delimiter is not allowed for encoder." );
+        if (LineDelimiter.AUTO.equals(delimiter)) {
+            throw new IllegalArgumentException(
+                    "AUTO delimiter is not allowed for encoder.");
         }
-        
-        
+
         this.charset = charset;
         this.delimiter = delimiter;
     }
-    
+
     /**
      * Returns the allowed maximum size of the encoded line.
      * If the size of the encoded line exceeds this value, the encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
      */
-    public int getMaxLineLength()
-    {
+    public int getMaxLineLength() {
         return maxLineLength;
     }
-    
+
     /**
      * Sets the allowed maximum size of the encoded line.
      * If the size of the encoded line exceeds this value, the encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
      */
-    public void setMaxLineLength( int maxLineLength )
-    {
-        if( maxLineLength <= 0 )
-        {
-            throw new IllegalArgumentException( "maxLineLength: " + maxLineLength );
+    public void setMaxLineLength(int maxLineLength) {
+        if (maxLineLength <= 0) {
+            throw new IllegalArgumentException("maxLineLength: "
+                    + maxLineLength);
         }
-        
+
         this.maxLineLength = maxLineLength;
     }
 
-    public void encode( IoSession session, Object message,
-                        ProtocolEncoderOutput out )
-            throws Exception
-    {
-        CharsetEncoder encoder = ( CharsetEncoder ) session.getAttribute( ENCODER );
-        if( encoder == null )
-        {
+    public void encode(IoSession session, Object message,
+            ProtocolEncoderOutput out) throws Exception {
+        CharsetEncoder encoder = (CharsetEncoder) session.getAttribute(ENCODER);
+        if (encoder == null) {
             encoder = charset.newEncoder();
-            session.setAttribute( ENCODER, encoder );
+            session.setAttribute(ENCODER, encoder);
         }
-        
+
         String value = message.toString();
-        ByteBuffer buf = ByteBuffer.allocate( value.length() ).setAutoExpand( true );
-        buf.putString( value, encoder );
-        if( buf.position() > maxLineLength )
-        {
-            throw new IllegalArgumentException( "Line length: " + buf.position() );
+        ByteBuffer buf = ByteBuffer.allocate(value.length())
+                .setAutoExpand(true);
+        buf.putString(value, encoder);
+        if (buf.position() > maxLineLength) {
+            throw new IllegalArgumentException("Line length: " + buf.position());
         }
-        buf.putString( delimiter.getValue(), encoder );
+        buf.putString(delimiter.getValue(), encoder);
         buf.flip();
-        out.write( buf );
+        out.write(buf);
     }
 
-    public void dispose() throws Exception
-    {
+    public void dispose() throws Exception {
     }
 }

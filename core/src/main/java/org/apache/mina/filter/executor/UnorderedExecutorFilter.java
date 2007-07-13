@@ -51,42 +51,35 @@ import org.apache.mina.common.IoFilterEvent;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class UnorderedExecutorFilter extends AbstractExecutorFilter
-{
+public class UnorderedExecutorFilter extends AbstractExecutorFilter {
     /**
      * Creates a new instance with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
-    public UnorderedExecutorFilter(IoEventType... eventTypes)
-    {
+    public UnorderedExecutorFilter(IoEventType... eventTypes) {
         super(eventTypes);
     }
-    
+
     /**
      * Creates a new instance with the specified <tt>executor</tt>.
      */
-    public UnorderedExecutorFilter( Executor executor, IoEventType... eventTypes )
-    {
+    public UnorderedExecutorFilter(Executor executor, IoEventType... eventTypes) {
         super(executor, eventTypes);
     }
 
-    protected void fireEvent( IoFilterEvent event )
-    {
+    protected void fireEvent(IoFilterEvent event) {
         getExecutor().execute(new ProcessEventRunnable(event));
     }
 
-    private class ProcessEventRunnable implements Runnable
-    {
+    private class ProcessEventRunnable implements Runnable {
         private final IoFilterEvent event;
 
-        ProcessEventRunnable( IoFilterEvent event )
-        {
+        ProcessEventRunnable(IoFilterEvent event) {
             this.event = event;
         }
 
-        public void run()
-        {
-            processEvent( event );
+        public void run() {
+            processEvent(event);
         }
     }
 }

@@ -26,14 +26,16 @@ package org.apache.mina.filter.reqres;
  */
 public class Response {
     private final Request request;
+
     private final ResponseType type;
+
     private final Object message;
 
     public Response(Request request, Object message, ResponseType type) {
         if (request == null) {
             throw new NullPointerException("request");
         }
-        
+
         if (message == null) {
             throw new NullPointerException("message");
         }
@@ -41,20 +43,20 @@ public class Response {
         if (type == null) {
             throw new NullPointerException("type");
         }
-        
+
         this.request = request;
         this.type = type;
         this.message = message;
     }
-    
+
     public Request getRequest() {
         return request;
     }
-    
+
     public ResponseType getType() {
         return type;
     }
-    
+
     public Object getMessage() {
         return message;
     }
@@ -63,32 +65,32 @@ public class Response {
     public int hashCode() {
         return getRequest().getId().hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
         }
-        
+
         if (o == null) {
             return false;
         }
-        
+
         if (!(o instanceof Response)) {
             return false;
         }
-        
+
         Response that = (Response) o;
         if (!this.getRequest().equals(that.getRequest())) {
             return false;
         }
-        
+
         return this.getType().equals(that.getType());
     }
-    
+
     @Override
     public String toString() {
-        return "response: { requestId=" + getRequest().getId() +
-               ", type=" + getType() + ", message=" + getMessage() + " }";
+        return "response: { requestId=" + getRequest().getId() + ", type="
+                + getType() + ", message=" + getMessage() + " }";
     }
 }

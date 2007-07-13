@@ -33,36 +33,35 @@ import org.apache.mina.transport.socket.nio.SocketAcceptor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class Server
-{
+public class Server {
     private static final int SERVER_PORT = 8080;
+
     // Set this to false to use object serialization instead of custom codec.
     private static final boolean USE_CUSTOM_CODEC = true;
 
-    public static void main( String[] args ) throws Throwable
-    {
+    public static void main(String[] args) throws Throwable {
         SocketAcceptor acceptor = new SocketAcceptor();
-        
-        // Prepare the service configuration.
-        acceptor.setReuseAddress( true );
-        if( USE_CUSTOM_CODEC )
-        {
-            acceptor.getFilterChain().addLast(
-                    "codec",
-                    new ProtocolCodecFilter( new SumUpProtocolCodecFactory( true ) ) );
-        }
-        else
-        {
-            acceptor.getFilterChain().addLast(
-                    "codec",
-                    new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
-        }
-        acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
 
-        acceptor.setLocalAddress( new InetSocketAddress( SERVER_PORT ) );
-        acceptor.setHandler( new ServerSessionHandler() );
+        // Prepare the service configuration.
+        acceptor.setReuseAddress(true);
+        if (USE_CUSTOM_CODEC) {
+            acceptor.getFilterChain()
+                    .addLast(
+                            "codec",
+                            new ProtocolCodecFilter(
+                                    new SumUpProtocolCodecFactory(true)));
+        } else {
+            acceptor.getFilterChain().addLast(
+                    "codec",
+                    new ProtocolCodecFilter(
+                            new ObjectSerializationCodecFactory()));
+        }
+        acceptor.getFilterChain().addLast("logger", new LoggingFilter());
+
+        acceptor.setLocalAddress(new InetSocketAddress(SERVER_PORT));
+        acceptor.setHandler(new ServerSessionHandler());
         acceptor.bind();
 
-        System.out.println( "Listening on port " + SERVER_PORT );
+        System.out.println("Listening on port " + SERVER_PORT);
     }
 }

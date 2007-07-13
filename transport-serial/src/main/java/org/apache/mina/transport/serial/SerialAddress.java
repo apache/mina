@@ -115,7 +115,7 @@ public class SerialAddress extends SocketAddress {
     public String getName() {
         return name;
     }
-    
+
     /**
      * The parity check for this communication. 
      * @return parity type
@@ -131,6 +131,7 @@ public class SerialAddress extends SocketAddress {
     public StopBits getStopBits() {
         return stopBits;
     }
+
     /**
      * Convert this serial address to a human readable string.
      */

@@ -34,8 +34,7 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ConnectFuture extends IoFuture
-{
+public interface ConnectFuture extends IoFuture {
     /**
      * Returns {@link IoSession} which is the result of connect operation.
      * 
@@ -43,7 +42,7 @@ public interface ConnectFuture extends IoFuture
      * @throws RuntimeIOException if connection attempt failed by an exception
      */
     IoSession getSession() throws RuntimeIOException;
-    
+
     /**
      * Returns the cause of the connection failure.
      * 
@@ -56,23 +55,26 @@ public interface ConnectFuture extends IoFuture
      * Returns <tt>true</tt> if the connect operation is finished successfully.
      */
     boolean isConnected();
-    
+
     /**
      * Sets the newly connected session and notifies all threads waiting for
      * this future.  This method is invoked by MINA internally.  Please do not
      * call this method directly.
      */
-    void setSession( IoSession session );
-    
+    void setSession(IoSession session);
+
     /**
      * Sets the exception caught due to connection failure and notifies all
      * threads waiting for this future.  This method is invoked by MINA
      * internally.  Please do not call this method directly.
      */
-    void setException( Throwable exception );
+    void setException(Throwable exception);
 
     ConnectFuture await() throws InterruptedException;
+
     ConnectFuture awaitUninterruptibly();
-    ConnectFuture addListener( IoFutureListener listener );
-    ConnectFuture removeListener( IoFutureListener listener );
+
+    ConnectFuture addListener(IoFutureListener listener);
+
+    ConnectFuture removeListener(IoFutureListener listener);
 }

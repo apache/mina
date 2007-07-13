@@ -29,7 +29,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
 
-
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.util.Assert;
 
@@ -59,33 +58,48 @@ import org.springframework.util.Assert;
  */
 public class SSLContextFactoryBean extends AbstractFactoryBean {
     private String protocol = "TLS";
+
     private final String provider = null;
+
     private SecureRandom secureRandom = null;
-    
+
     private KeyStore keyManagerFactoryKeyStore = null;
+
     private char[] keyManagerFactoryKeyStorePassword = null;
+
     private KeyManagerFactory keyManagerFactory = null;
+
     private String keyManagerFactoryAlgorithm = null;
+
     private String keyManagerFactoryProvider = null;
+
     private boolean keyManagerFactoryAlgorithmUseDefault = false;
 
     private KeyStore trustManagerFactoryKeyStore = null;
+
     private TrustManagerFactory trustManagerFactory = null;
+
     private String trustManagerFactoryAlgorithm = null;
+
     private String trustManagerFactoryProvider = null;
+
     private boolean trustManagerFactoryAlgorithmUseDefault = false;
+
     private ManagerFactoryParameters trustManagerFactoryParameters = null;
-    
+
     private int clientSessionCacheSize = -1;
+
     private int clientSessionTimeout = -1;
+
     private int serverSessionCacheSize = -1;
-    private int serverSessionTimeout = -1; 
-    
+
+    private int serverSessionTimeout = -1;
+
     @Override
     protected Object createInstance() throws Exception {
         KeyManagerFactory kmf = this.keyManagerFactory;
         TrustManagerFactory tmf = this.trustManagerFactory;
-        
+
         if (kmf == null) {
             String algorithm = keyManagerFactoryAlgorithm;
             if (algorithm == null && keyManagerFactoryAlgorithmUseDefault) {
@@ -100,7 +114,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
                 }
             }
         }
-        
+
         if (tmf == null) {
             String algorithm = trustManagerFactoryAlgorithm;
             if (algorithm == null && trustManagerFactoryAlgorithmUseDefault) {
@@ -115,7 +129,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
                 }
             }
         }
-        
+
         KeyManager[] keyManagers = null;
         if (kmf != null) {
             kmf.init(keyManagerFactoryKeyStore,
@@ -131,30 +145,34 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
             }
             trustManagers = tmf.getTrustManagers();
         }
-        
+
         SSLContext context = null;
         if (provider == null) {
             context = SSLContext.getInstance(protocol);
         } else {
             context = SSLContext.getInstance(protocol, provider);
         }
-        
+
         context.init(keyManagers, trustManagers, secureRandom);
-        
+
         if (clientSessionCacheSize >= 0) {
-            context.getClientSessionContext().setSessionCacheSize(clientSessionCacheSize);
+            context.getClientSessionContext().setSessionCacheSize(
+                    clientSessionCacheSize);
         }
 
         if (clientSessionTimeout >= 0) {
-            context.getClientSessionContext().setSessionTimeout(clientSessionTimeout);
+            context.getClientSessionContext().setSessionTimeout(
+                    clientSessionTimeout);
         }
 
         if (serverSessionCacheSize >= 0) {
-            context.getServerSessionContext().setSessionCacheSize(serverSessionCacheSize);
+            context.getServerSessionContext().setSessionCacheSize(
+                    serverSessionCacheSize);
         }
 
         if (serverSessionTimeout >= 0) {
-            context.getServerSessionContext().setSessionTimeout(serverSessionTimeout);
+            context.getServerSessionContext().setSessionTimeout(
+                    serverSessionTimeout);
         }
 
         return context;
@@ -340,7 +358,8 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      *  
      * @param parameters describing provider-specific trust material.
      */
-    public void setTrustManagerFactoryParameters(ManagerFactoryParameters parameters) {
+    public void setTrustManagerFactoryParameters(
+            ManagerFactoryParameters parameters) {
         this.trustManagerFactoryParameters = parameters;
     }
 
@@ -415,5 +434,5 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      */
     public void setServerSessionTimeout(int serverSessionTimeout) {
         this.serverSessionTimeout = serverSessionTimeout;
-    } 
+    }
 }

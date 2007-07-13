@@ -35,51 +35,54 @@ import org.apache.mina.common.IoSession;
  */
 public class MemoryMonitorHandler extends IoHandlerAdapter {
 
-	private MemoryMonitor server;
-	
-	public MemoryMonitorHandler( MemoryMonitor server ){
-		this.server = server;
-	}
-	
-	@Override
-	public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-		cause.printStackTrace();
-		session.close();
-	}
+    private MemoryMonitor server;
 
-	@Override
-	public void messageReceived(IoSession session, Object message) throws Exception {
-		
-		if( message instanceof ByteBuffer ){
-			ByteBuffer buffer = (ByteBuffer)message;
-			SocketAddress remoteAddress = session.getRemoteAddress();
-			server.recvUpdate( remoteAddress, buffer.getLong() );
-		}
-	}
+    public MemoryMonitorHandler(MemoryMonitor server) {
+        this.server = server;
+    }
 
-	@Override
-	public void sessionClosed(IoSession session) throws Exception {
-		System.out.println("Session closed...");
-		SocketAddress remoteAddress = session.getRemoteAddress();
-		server.removeClient( remoteAddress );
-	}
+    @Override
+    public void exceptionCaught(IoSession session, Throwable cause)
+            throws Exception {
+        cause.printStackTrace();
+        session.close();
+    }
 
-	@Override
-	public void sessionCreated(IoSession session) throws Exception {
-		
-		System.out.println("Session created...");
-		
-		SocketAddress remoteAddress = session.getRemoteAddress();
-		server.addClient( remoteAddress );
-	}
+    @Override
+    public void messageReceived(IoSession session, Object message)
+            throws Exception {
 
-	@Override
-	public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
-		System.out.println("Session idle...");
-	}
+        if (message instanceof ByteBuffer) {
+            ByteBuffer buffer = (ByteBuffer) message;
+            SocketAddress remoteAddress = session.getRemoteAddress();
+            server.recvUpdate(remoteAddress, buffer.getLong());
+        }
+    }
 
-	@Override
-	public void sessionOpened(IoSession session) throws Exception {
-		System.out.println("Session Opened...");
-	}
+    @Override
+    public void sessionClosed(IoSession session) throws Exception {
+        System.out.println("Session closed...");
+        SocketAddress remoteAddress = session.getRemoteAddress();
+        server.removeClient(remoteAddress);
+    }
+
+    @Override
+    public void sessionCreated(IoSession session) throws Exception {
+
+        System.out.println("Session created...");
+
+        SocketAddress remoteAddress = session.getRemoteAddress();
+        server.addClient(remoteAddress);
+    }
+
+    @Override
+    public void sessionIdle(IoSession session, IdleStatus status)
+            throws Exception {
+        System.out.println("Session idle...");
+    }
+
+    @Override
+    public void sessionOpened(IoSession session) throws Exception {
+        System.out.println("Session Opened...");
+    }
 }

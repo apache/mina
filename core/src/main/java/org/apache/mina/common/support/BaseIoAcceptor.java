@@ -31,10 +31,12 @@ import org.apache.mina.common.IoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor
-{
+public abstract class BaseIoAcceptor extends BaseIoService implements
+        IoAcceptor {
     private SocketAddress localAddress;
+
     private boolean disconnectOnUnbind = true;
+
     private boolean bound;
 
     /**
@@ -44,86 +46,70 @@ public abstract class BaseIoAcceptor extends BaseIoService implements IoAcceptor
      */
     protected final Object bindLock = new Object();
 
-    protected BaseIoAcceptor( IoSessionConfig sessionConfig )
-    {
-        super( sessionConfig );
+    protected BaseIoAcceptor(IoSessionConfig sessionConfig) {
+        super(sessionConfig);
     }
-    
-    public SocketAddress getLocalAddress()
-    {
+
+    public SocketAddress getLocalAddress() {
         return localAddress;
     }
-    
-    public void setLocalAddress( SocketAddress localAddress )
-    {
-        if( localAddress != null &&
-            !getTransportType().getAddressType().isAssignableFrom(
-                    localAddress.getClass() ) )
-        {
-            throw new IllegalArgumentException(
-                    "localAddress type: " + localAddress.getClass() + 
-                    " (expected: " + getTransportType().getAddressType() + ")");
+
+    public void setLocalAddress(SocketAddress localAddress) {
+        if (localAddress != null
+                && !getTransportType().getAddressType().isAssignableFrom(
+                        localAddress.getClass())) {
+            throw new IllegalArgumentException("localAddress type: "
+                    + localAddress.getClass() + " (expected: "
+                    + getTransportType().getAddressType() + ")");
         }
-        
-        synchronized( bindLock )
-        {
-            if( bound )
-            {
+
+        synchronized (bindLock) {
+            if (bound) {
                 throw new IllegalStateException(
-                        "localAddress can't be set while the acceptor is bound." );
+                        "localAddress can't be set while the acceptor is bound.");
             }
-    
+
             this.localAddress = localAddress;
         }
     }
-    
-    public boolean isDisconnectOnUnbind()
-    {
+
+    public boolean isDisconnectOnUnbind() {
         return disconnectOnUnbind;
     }
 
-    public void setDisconnectOnUnbind( boolean disconnectClientsOnUnbind )
-    {
+    public void setDisconnectOnUnbind(boolean disconnectClientsOnUnbind) {
         this.disconnectOnUnbind = disconnectClientsOnUnbind;
     }
-    
-    public final void bind() throws IOException
-    {
-        synchronized( bindLock )
-        {
-            if( bound )
-            {
-                throw new IllegalStateException( "Already bound to: " + getLocalAddress() );
+
+    public final void bind() throws IOException {
+        synchronized (bindLock) {
+            if (bound) {
+                throw new IllegalStateException("Already bound to: "
+                        + getLocalAddress());
             }
-            
-            if( getHandler() == null )
-            {
-                throw new IllegalStateException( "handler is not set." );
+
+            if (getHandler() == null) {
+                throw new IllegalStateException("handler is not set.");
             }
-            
+
             doBind();
             bound = true;
         }
     }
-    
-    public final void unbind()
-    {
-        synchronized( bindLock )
-        {
-            if( !bound )
-            {
+
+    public final void unbind() {
+        synchronized (bindLock) {
+            if (!bound) {
                 return;
             }
-            
+
             doUnbind();
             bound = false;
         }
     }
-    
-    public boolean isBound()
-    {
-        synchronized( bindLock )
-        {
+
+    public boolean isBound() {
+        synchronized (bindLock) {
             return bound;
         }
     }

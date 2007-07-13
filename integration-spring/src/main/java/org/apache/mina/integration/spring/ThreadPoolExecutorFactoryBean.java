@@ -40,8 +40,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
-{
+public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean {
     private int corePoolSize = 1;
 
     private int maxPoolSize = Integer.MAX_VALUE;
@@ -57,8 +56,7 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
     /**
      * Set the ThreadPoolExecutor's core pool size. Default is 1.
      */
-    public void setCorePoolSize( int corePoolSize )
-    {
+    public void setCorePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
     }
 
@@ -66,16 +64,14 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
      * Set the ThreadPoolExecutor's maximum pool size. Default is
      * <code>Integer.MAX_VALUE</code>.
      */
-    public void setMaxPoolSize( int maxPoolSize )
-    {
+    public void setMaxPoolSize(int maxPoolSize) {
         this.maxPoolSize = maxPoolSize;
     }
 
     /**
      * Set the ThreadPoolExecutor's keep alive seconds. Default is 60.
      */
-    public void setKeepAliveSeconds( int keepAliveSeconds )
-    {
+    public void setKeepAliveSeconds(int keepAliveSeconds) {
         this.keepAliveSeconds = keepAliveSeconds;
     }
 
@@ -89,8 +85,7 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
      * @see LinkedBlockingQueue
      * @see SynchronousQueue
      */
-    public void setQueueCapacity( int queueCapacity )
-    {
+    public void setQueueCapacity(int queueCapacity) {
         this.queueCapacity = queueCapacity;
     }
 
@@ -100,10 +95,9 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
      * 
      * @see Executors#defaultThreadFactory()
      */
-    public void setThreadFactory( ThreadFactory threadFactory )
-    {
-        this.threadFactory = ( threadFactory != null ? threadFactory
-                : Executors.defaultThreadFactory() );
+    public void setThreadFactory(ThreadFactory threadFactory) {
+        this.threadFactory = (threadFactory != null ? threadFactory : Executors
+                .defaultThreadFactory());
     }
 
     /**
@@ -113,39 +107,31 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean
      * @see ThreadPoolExecutor.AbortPolicy
      */
     public void setRejectedExecutionHandler(
-            RejectedExecutionHandler rejectedExecutionHandler )
-    {
-        this.rejectedExecutionHandler = ( rejectedExecutionHandler != null 
-                ? rejectedExecutionHandler
-                : new ThreadPoolExecutor.AbortPolicy() );
-    }
-    
-    @Override
-    protected Object createInstance() throws Exception
-    {
-        BlockingQueue<Runnable> queue = null;
-        if( queueCapacity > 0 ) 
-        {
-            queue = new LinkedBlockingQueue<Runnable>( queueCapacity );
-        }
-        else
-        {
-            queue = new SynchronousQueue<Runnable>();
-        }
-        return new ThreadPoolExecutor(
-                corePoolSize, maxPoolSize, keepAliveSeconds, TimeUnit.SECONDS,
-                queue, threadFactory, rejectedExecutionHandler );
+            RejectedExecutionHandler rejectedExecutionHandler) {
+        this.rejectedExecutionHandler = (rejectedExecutionHandler != null ? rejectedExecutionHandler
+                : new ThreadPoolExecutor.AbortPolicy());
     }
 
     @Override
-    protected void destroyInstance( Object o ) throws Exception
-    {
-        ThreadPoolExecutor executor = ( ThreadPoolExecutor ) o;
+    protected Object createInstance() throws Exception {
+        BlockingQueue<Runnable> queue = null;
+        if (queueCapacity > 0) {
+            queue = new LinkedBlockingQueue<Runnable>(queueCapacity);
+        } else {
+            queue = new SynchronousQueue<Runnable>();
+        }
+        return new ThreadPoolExecutor(corePoolSize, maxPoolSize,
+                keepAliveSeconds, TimeUnit.SECONDS, queue, threadFactory,
+                rejectedExecutionHandler);
+    }
+
+    @Override
+    protected void destroyInstance(Object o) throws Exception {
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) o;
         executor.shutdown();
     }
 
-    public Class getObjectType()
-    {
+    public Class getObjectType() {
         return ThreadPoolExecutor.class;
     }
 

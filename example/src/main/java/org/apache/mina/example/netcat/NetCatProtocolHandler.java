@@ -32,41 +32,35 @@ import org.apache.mina.common.IoSession;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class NetCatProtocolHandler extends IoHandlerAdapter
-{
+public class NetCatProtocolHandler extends IoHandlerAdapter {
     @Override
-    public void sessionOpened( IoSession session )
-    {
+    public void sessionOpened(IoSession session) {
         // Set reader idle time to 10 seconds.
         // sessionIdle(...) method will be invoked when no data is read
         // for 10 seconds.
-        session.setIdleTime( IdleStatus.READER_IDLE, 10 );
+        session.setIdleTime(IdleStatus.READER_IDLE, 10);
     }
 
     @Override
-    public void sessionClosed( IoSession session )
-    {
+    public void sessionClosed(IoSession session) {
         // Print out total number of bytes read from the remote peer.
-        System.err.println( "Total " + session.getReadBytes() + " byte(s)" );
+        System.err.println("Total " + session.getReadBytes() + " byte(s)");
     }
 
     @Override
-    public void sessionIdle( IoSession session, IdleStatus status )
-    {
+    public void sessionIdle(IoSession session, IdleStatus status) {
         // Close the connection if reader is idle.
-        if( status == IdleStatus.READER_IDLE ) {
+        if (status == IdleStatus.READER_IDLE) {
             session.close();
         }
     }
 
     @Override
-    public void messageReceived( IoSession session, Object message )
-    {
-        ByteBuffer buf = ( ByteBuffer ) message;
+    public void messageReceived(IoSession session, Object message) {
+        ByteBuffer buf = (ByteBuffer) message;
         // Print out read buffer content.
-        while( buf.hasRemaining() )
-        {
-            System.out.print( ( char ) buf.get() );
+        while (buf.hasRemaining()) {
+            System.out.print((char) buf.get());
         }
         System.out.flush();
     }

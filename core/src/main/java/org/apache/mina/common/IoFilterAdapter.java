@@ -19,7 +19,6 @@
  */
 package org.apache.mina.common;
 
-
 /**
  * An abstract adapter class for {@link IoFilter}.  You can extend
  * this class and selectively override required event filter methods only.  All
@@ -28,74 +27,71 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoFilterAdapter implements IoFilter
-{
-    public void init() throws Exception
-    {
-    }
-    
-    public void destroy() throws Exception
-    {
+public class IoFilterAdapter implements IoFilter {
+    public void init() throws Exception {
     }
 
-    public void onPreAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-    }
-    
-    public void onPostAdd( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-    }
-    
-    public void onPreRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-    }
-    
-    public void onPostRemove( IoFilterChain parent, String name, NextFilter nextFilter ) throws Exception
-    {
-    }
-    
-    public void sessionCreated( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        nextFilter.sessionCreated( session );
+    public void destroy() throws Exception {
     }
 
-    public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        nextFilter.sessionOpened( session );
+    public void onPreAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
     }
 
-    public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        nextFilter.sessionClosed( session );
+    public void onPostAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
     }
 
-    public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status ) throws Exception
-    {
-        nextFilter.sessionIdle( session, status );
+    public void onPreRemove(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
     }
 
-    public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause ) throws Exception
-    {
-        nextFilter.exceptionCaught( session, cause );
+    public void onPostRemove(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
     }
 
-    public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
-    {
-        nextFilter.messageReceived( session, message );
+    public void sessionCreated(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        nextFilter.sessionCreated(session);
     }
 
-    public void messageSent( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
-    {
-        nextFilter.messageSent( session, writeRequest );
+    public void sessionOpened(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        nextFilter.sessionOpened(session);
     }
 
-    public void filterWrite( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
-    {
-        nextFilter.filterWrite( session, writeRequest );
+    public void sessionClosed(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        nextFilter.sessionClosed(session);
     }
 
-    public void filterClose( NextFilter nextFilter, IoSession session ) throws Exception
-    {
-        nextFilter.filterClose( session );
+    public void sessionIdle(NextFilter nextFilter, IoSession session,
+            IdleStatus status) throws Exception {
+        nextFilter.sessionIdle(session, status);
+    }
+
+    public void exceptionCaught(NextFilter nextFilter, IoSession session,
+            Throwable cause) throws Exception {
+        nextFilter.exceptionCaught(session, cause);
+    }
+
+    public void messageReceived(NextFilter nextFilter, IoSession session,
+            Object message) throws Exception {
+        nextFilter.messageReceived(session, message);
+    }
+
+    public void messageSent(NextFilter nextFilter, IoSession session,
+            WriteRequest writeRequest) throws Exception {
+        nextFilter.messageSent(session, writeRequest);
+    }
+
+    public void filterWrite(NextFilter nextFilter, IoSession session,
+            WriteRequest writeRequest) throws Exception {
+        nextFilter.filterWrite(session, writeRequest);
+    }
+
+    public void filterClose(NextFilter nextFilter, IoSession session)
+            throws Exception {
+        nextFilter.filterClose(session);
     }
 }
