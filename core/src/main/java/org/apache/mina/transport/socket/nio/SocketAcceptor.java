@@ -44,7 +44,8 @@ import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
 /**
- * {@link IoAcceptor} for socket transport (TCP/IP).
+ * {@link IoAcceptor} for socket transport (TCP/IP).  This class
+ * handles incoming TCP/IP based socket connections.   
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
@@ -147,6 +148,8 @@ public class SocketAcceptor extends BaseIoAcceptor {
         this.processorCount = processorCount;
         ioProcessors = new SocketIoProcessor[processorCount];
 
+        // create an array of SocketIoProcessors that will be used for
+        // handling sessions.
         for (int i = 0; i < processorCount; i++) {
             ioProcessors[i] = new SocketIoProcessor(
                     "SocketAcceptorIoProcessor-" + id + "." + i, executor);
@@ -163,15 +166,24 @@ public class SocketAcceptor extends BaseIoAcceptor {
         }
     }
 
+    /**
+     * @see org.apache.mina.common.IoService#getTransportType()
+     */
     public TransportType getTransportType() {
         return TransportType.SOCKET;
     }
 
+    /**
+     * @see org.apache.mina.common.support.BaseIoService#getSessionConfig()
+     */
     @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
 
+    /**
+     * @see org.apache.mina.common.support.BaseIoAcceptor#getLocalAddress()
+     */
     @Override
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
@@ -180,6 +192,9 @@ public class SocketAcceptor extends BaseIoAcceptor {
     // This method is overriden to work around a problem with
     // bean property access mechanism.
 
+    /**
+     * @see org.apache.mina.common.support.BaseIoAcceptor#setLocalAddress(java.net.SocketAddress)
+     */
     @Override
     public void setLocalAddress(SocketAddress localAddress) {
         super.setLocalAddress(localAddress);
@@ -206,10 +221,21 @@ public class SocketAcceptor extends BaseIoAcceptor {
         }
     }
 
+    /**
+     * Returns the size of the backlog.
+     *
+     * @return
+     */
     public int getBacklog() {
         return backlog;
     }
 
+    /**
+     * Sets the size of the backlog.  This can only be done when this
+     * class is not bound
+     *
+     * @param backlog
+     */
     public void setBacklog(int backlog) {
         synchronized (bindLock) {
             if (isBound()) {
@@ -225,7 +251,12 @@ public class SocketAcceptor extends BaseIoAcceptor {
     protected void doBind() throws IOException {
         RegistrationRequest request = new RegistrationRequest();
 
+        // adds the Registration request to the queue for the Workers 
+        // to handle
         registerQueue.offer(request);
+        
+        // creates an instance of a Worker and has the local 
+        // executor kick it off.
         startupWorker();
         selector.wakeup();
 
@@ -257,6 +288,15 @@ public class SocketAcceptor extends BaseIoAcceptor {
         }
     }
 
+    /**
+     * This method is called by the doBind() and doUnbind() 
+     * methods.  If the worker object is not null, presumably
+     * the acceptor is starting up, then the worker object will
+     * be created and kicked off by the executor.  If the worker
+     * object is not null, probably already created and this class
+     * is now working, then nothing will happen and the method
+     * will just return.
+     */
     private synchronized void startupWorker() {
         synchronized (lock) {
             if (worker == null) {
@@ -292,20 +332,29 @@ public class SocketAcceptor extends BaseIoAcceptor {
         }
     }
 
+    /**
+     * This class is called by the startupWorker() method and is
+     * placed into a NamePreservingRunnable class.
+     */
     private class Worker implements Runnable {
         public void run() {
             Thread.currentThread().setName(SocketAcceptor.this.threadName);
 
             for (;;) {
                 try {
+                    // gets the number of keys that are ready to go
                     int nKeys = selector.select();
 
+                    // this actually sets the selector to OP_ACCEPT,
+                    // and binds to the port in which this class will
+                    // listen on
                     registerNew();
 
                     if (nKeys > 0) {
                         processSessions(selector.selectedKeys());
                     }
 
+                    // check to see if any cancellation request has been made.
                     cancelKeys();
 
                     if (selector.keys().isEmpty()) {
@@ -330,6 +379,16 @@ public class SocketAcceptor extends BaseIoAcceptor {
             }
         }
 
+        /**
+         * This method will process new sessions for the Worker class.  All
+         * keys that have had their status updates as per the Selector.selectedKeys()
+         * method will be processed here.  Only keys that are ready to accept 
+         * connections are handled here.  
+         * 
+         * Session objects are created by making new instances of SocketSessionImpl
+         * and passing the session object to the SocketIoProcessor class.
+         *
+         */
         private void processSessions(Set<SelectionKey> keys) throws IOException {
             Iterator<SelectionKey> it = keys.iterator();
             while (it.hasNext()) {
@@ -343,6 +402,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
 
                 ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
 
+                // accept the connection from the client
                 SocketChannel ch = ssc.accept();
 
                 if (ch == null) {
@@ -351,10 +411,16 @@ public class SocketAcceptor extends BaseIoAcceptor {
 
                 boolean success = false;
                 try {
+                    // Create a new session object.  This class extends 
+                    // BaseIoSession and is custom for socket-based sessions.
                     SocketSessionImpl session = new SocketSessionImpl(
                             SocketAcceptor.this, nextProcessor(), ch);
+                    
+                    // build the list of filters for this session.  
                     getFilterChainBuilder().buildFilterChain(
                             session.getFilterChain());
+                    
+                    // add the session to the SocketIoProcessor
                     session.getIoProcessor().addNew(session);
                     success = true;
                 } catch (Throwable t) {
@@ -376,6 +442,15 @@ public class SocketAcceptor extends BaseIoAcceptor {
         return ioProcessors[processorDistributor++ % processorCount];
     }
 
+    /**
+     * Sets up the socket communications.  Sets items such as:
+     * 
+     * Blocking
+     * Reuse address
+     * Receive buffer size
+     * Bind to listen port
+     * Registers OP_ACCEPT for selector
+     */
     private void registerNew() {
         for (;;) {
             RegistrationRequest req = registerQueue.poll();
@@ -423,6 +498,12 @@ public class SocketAcceptor extends BaseIoAcceptor {
         }
     }
 
+    /**
+     * This method just checks to see if anything has been placed into the
+     * cancellation queue.  The only thing that should be in the cancelQueue
+     * is CancellationRequest objects and the only place this happens is in
+     * the doUnbind() method.
+     */
     private void cancelKeys() {
         for (;;) {
             CancellationRequest request = cancelQueue.poll();
@@ -454,18 +535,27 @@ public class SocketAcceptor extends BaseIoAcceptor {
         }
     }
 
+    /**
+     * Class that triggers registration, or startup, of this class
+     */
     private static class RegistrationRequest {
         private Throwable exception;
 
         private boolean done;
     }
 
+    /**
+     * Class that triggers a signal to unbind.
+     */
     private static class CancellationRequest {
         private boolean done;
 
         private RuntimeException exception;
     }
 
+    /**
+     * @see org.apache.mina.common.IoAcceptor#newSession(java.net.SocketAddress)
+     */
     public IoSession newSession(SocketAddress remoteAddress) {
         throw new UnsupportedOperationException();
     }
