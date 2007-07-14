@@ -27,9 +27,9 @@ package org.apache.mina.filter.codec.demux;
  * 
  * @see DemuxingProtocolCodecFactory
  */
-public interface MessageEncoderFactory {
+public interface MessageEncoderFactory<T> {
     /**
      * Creates a new message encoder.
      */
-    MessageEncoder getEncoder() throws Exception;
+    MessageEncoder<T> getEncoder() throws Exception;
 }

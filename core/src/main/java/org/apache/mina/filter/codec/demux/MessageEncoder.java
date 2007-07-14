@@ -34,11 +34,11 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @see DemuxingProtocolCodecFactory
  * @see MessageEncoderFactory
  */
-public interface MessageEncoder {
+public interface MessageEncoder<T> {
     /**
      * Returns the set of message classes this encoder can encode.
      */
-    Set<Class<?>> getMessageTypes();
+    Set<Class<T>> getMessageTypes();
 
     /**
      * Encodes higher-level message objects into binary or protocol-specific data.
@@ -49,6 +49,6 @@ public interface MessageEncoder {
      * 
      * @throws Exception if the message violated protocol specification
      */
-    void encode(IoSession session, Object message, ProtocolEncoderOutput out)
+    void encode(IoSession session, T message, ProtocolEncoderOutput out)
             throws Exception;
 }

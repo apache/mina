@@ -63,7 +63,7 @@ import org.apache.mina.util.IdentityHashSet;
 public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     private MessageDecoderFactory[] decoderFactories = new MessageDecoderFactory[0];
 
-    private MessageEncoderFactory[] encoderFactories = new MessageEncoderFactory[0];
+    private MessageEncoderFactory<?>[] encoderFactories = new MessageEncoderFactory[0];
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
@@ -84,8 +84,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
 
         boolean registered = false;
         if (MessageEncoder.class.isAssignableFrom(encoderOrDecoderClass)) {
-            register(new DefaultConstructorMessageEncoderFactory(
-                    encoderOrDecoderClass));
+            register(new DefaultConstructorMessageEncoderFactory(encoderOrDecoderClass));
             registered = true;
         }
 
@@ -101,16 +100,16 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
-    public void register(MessageEncoder encoder) {
-        register(new SingletonMessageEncoderFactory(encoder));
+    public <T> void register(MessageEncoder<T> encoder) {
+        register(new SingletonMessageEncoderFactory<T>(encoder));
     }
 
-    public void register(MessageEncoderFactory factory) {
+    public void register(MessageEncoderFactory<?> factory) {
         if (factory == null) {
             throw new NullPointerException("factory");
         }
-        MessageEncoderFactory[] encoderFactories = this.encoderFactories;
-        MessageEncoderFactory[] newEncoderFactories = new MessageEncoderFactory[encoderFactories.length + 1];
+        MessageEncoderFactory<?>[] encoderFactories = this.encoderFactories;
+        MessageEncoderFactory<?>[] newEncoderFactories = new MessageEncoderFactory[encoderFactories.length + 1];
         System.arraycopy(encoderFactories, 0, newEncoderFactories, 0,
                 encoderFactories.length);
         newEncoderFactories[encoderFactories.length] = factory;
@@ -327,18 +326,18 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
-    private static class SingletonMessageEncoderFactory implements
-            MessageEncoderFactory {
-        private final MessageEncoder encoder;
+    private static class SingletonMessageEncoderFactory<T> implements
+            MessageEncoderFactory<T> {
+        private final MessageEncoder<T> encoder;
 
-        private SingletonMessageEncoderFactory(MessageEncoder encoder) {
+        private SingletonMessageEncoderFactory(MessageEncoder<T> encoder) {
             if (encoder == null) {
                 throw new NullPointerException("encoder");
             }
             this.encoder = encoder;
         }
 
-        public MessageEncoder getEncoder() {
+        public MessageEncoder<T> getEncoder() {
             return encoder;
         }
     }
@@ -359,11 +358,11 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
-    private static class DefaultConstructorMessageEncoderFactory implements
-            MessageEncoderFactory {
-        private final Class<?> encoderClass;
+    private static class DefaultConstructorMessageEncoderFactory<T> implements
+            MessageEncoderFactory<T> {
+        private final Class<MessageEncoder<T>> encoderClass;
 
-        private DefaultConstructorMessageEncoderFactory(Class<?> encoderClass) {
+        private DefaultConstructorMessageEncoderFactory(Class<MessageEncoder<T>> encoderClass) {
             if (encoderClass == null) {
                 throw new NullPointerException("encoderClass");
             }
@@ -375,8 +374,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             this.encoderClass = encoderClass;
         }
 
-        public MessageEncoder getEncoder() throws Exception {
-            return (MessageEncoder) encoderClass.newInstance();
+        public MessageEncoder<T> getEncoder() throws Exception {
+            return encoderClass.newInstance();
         }
     }
 
