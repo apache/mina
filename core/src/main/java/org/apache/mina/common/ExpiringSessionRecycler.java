@@ -36,8 +36,8 @@ import org.apache.mina.util.ExpiringMap;
  */
 public class ExpiringSessionRecycler implements IoSessionRecycler {
     private ExpiringMap<Object, IoSession> sessionMap;
-
-    private ExpiringMap.Expirer mapExpirer;
+    
+    private ExpiringMap<Object, IoSession>.Expirer mapExpirer;
 
     public ExpiringSessionRecycler() {
         this(ExpiringMap.DEFAULT_TIME_TO_LIVE);

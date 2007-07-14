@@ -39,7 +39,7 @@ public interface WriteRequest {
     Object getMessage();
 
     /**
-     * Returne the destination of this write request.
+     * Returns the destination of this write request.
      * 
      * @return <tt>null</tt> for the default destination
      */

@@ -23,7 +23,7 @@ import java.net.SocketAddress;
 import java.util.Set;
 
 /**
- * A handle which represents connection between two endpoints regardless of 
+ * A handle which represents connection between two end-points regardless of 
  * transport types.
  * <p>
  * {@link IoSession} provides user-defined attributes.  User-defined attributes
@@ -41,7 +41,7 @@ import java.util.Set;
  * {@link IoSession} is thread-safe.  But please note that performing
  * more than one {@link #write(Object)} calls at the same time will
  * cause the {@link IoFilter#filterWrite(IoFilter.NextFilter, IoSession, IoFilter.WriteRequest)}
- * is executed simnutaneously, and therefore you have to make sure the
+ * is executed simultaneously, and therefore you have to make sure the
  * {@link IoFilter} implementations you're using are thread-safe, too. 
  * </p>
  *   
@@ -80,7 +80,7 @@ public interface IoSession {
     WriteFuture write(Object message);
 
     /**
-     * Closes this session immediately.  This operation is asynthronous.
+     * Closes this session immediately.  This operation is asynchronous.
      * Wait for the returned {@link CloseFuture} if you want to wait for
      * the session actually closed.
      */
@@ -387,7 +387,7 @@ public interface IoSession {
     int getIdleCount(IdleStatus status);
 
     /**
-     * Returns the time in millis when the last <tt>sessionIdle</tt> event
+     * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for the specified {@link IdleStatus}.
      */
     long getLastIdleTime(IdleStatus status);

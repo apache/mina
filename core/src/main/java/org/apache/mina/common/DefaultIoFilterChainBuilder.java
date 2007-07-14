@@ -161,8 +161,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
             IoFilter filter) {
         checkBaseName(baseName);
 
-        for (ListIterator i = entries.listIterator(); i.hasNext();) {
-            Entry base = (Entry) i.next();
+        for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
+            Entry base = i.next();
             if (base.getName().equals(baseName)) {
                 register(i.previousIndex(), new EntryImpl(name, filter));
                 break;
