@@ -71,6 +71,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
         super(executor, eventTypes);
     }
 
+    @Override
     protected void fireEvent(IoFilterEvent event) {
         IoSession session = event.getSession();
         SessionBuffer buf = SessionBuffer.getSessionBuffer(session);
