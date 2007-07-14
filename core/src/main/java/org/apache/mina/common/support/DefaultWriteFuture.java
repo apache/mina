@@ -54,17 +54,16 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     public DefaultWriteFuture(IoSession session) {
         super(session);
     }
-
+    
     public boolean isWritten() {
         if (isReady()) {
             return ((Boolean) getValue()).booleanValue();
-        } else {
-            return false;
         }
+        return false;
     }
 
     public void setWritten(boolean written) {
-        setValue(written ? Boolean.TRUE : Boolean.FALSE);
+        setValue(written);
     }
 
     @Override
