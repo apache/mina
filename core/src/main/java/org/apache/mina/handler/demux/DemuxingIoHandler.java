@@ -77,9 +77,11 @@ import org.apache.mina.util.IdentityHashSet;
  * @version $Rev$, $Date$
  */
 public class DemuxingIoHandler extends IoHandlerAdapter {
-    private final Map<Class, MessageHandler> findHandlerCache = new ConcurrentHashMap<Class, MessageHandler>();
+    @SuppressWarnings("unchecked")
+    private final Map<Class<?>, MessageHandler> findHandlerCache = new ConcurrentHashMap<Class<?>, MessageHandler>();
 
-    private final Map<Class, MessageHandler> type2handler = new ConcurrentHashMap<Class, MessageHandler>();
+    @SuppressWarnings("unchecked")
+    private final Map<Class<?>, MessageHandler> type2handler = new ConcurrentHashMap<Class<?>, MessageHandler>();
 
     /**
      * Creates a new instance with no registered {@link MessageHandler}s.
@@ -95,8 +97,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? super E> addMessageHandler(Class<E> type,
-            MessageHandler<? super E> handler) {
+    public <E> MessageHandler<? extends E> addMessageHandler(Class<E> type,
+            MessageHandler<? extends E> handler) {
         findHandlerCache.clear();
         return type2handler.put(type, handler);
     }
@@ -108,7 +110,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? super E> removeMessageHandler(Class<E> type) {
+    public <E> MessageHandler<? extends E> removeMessageHandler(Class<E> type) {
         findHandlerCache.clear();
         return type2handler.remove(type);
     }
@@ -118,7 +120,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * the specified <code>type</code>. 
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? super E> getMessageHandler(Class<E> type) {
+    public <E> MessageHandler<? extends E> getMessageHandler(Class<E> type) {
         return type2handler.get(type);
     }
 
@@ -126,7 +128,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * Returns the {@link Map} which contains all messageType-{@link MessageHandler}
      * pairs registered to this handler.
      */
-    public Map<Class, MessageHandler> getMessageHandlerMap() {
+    @SuppressWarnings("unchecked")
+    public Map<Class<?>, MessageHandler> getMessageHandlerMap() {
         return Collections.unmodifiableMap(type2handler);
     }
 
@@ -146,7 +149,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
         }
     }
 
-    protected MessageHandler<Object> findHandler(Class type) {
+    protected MessageHandler<Object> findHandler(Class<?> type) {
         return findHandler(type, null);
     }
 
