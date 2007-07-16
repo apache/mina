@@ -19,12 +19,14 @@
  */
 package org.apache.mina.filter.codec.textline;
 
+
 import java.nio.charset.Charset;
 
 import org.apache.mina.common.BufferDataException;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
+
 
 /**
  * A {@link ProtocolCodecFactory} that performs encoding and decoding between
@@ -34,33 +36,66 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class TextLineCodecFactory implements ProtocolCodecFactory {
+public class TextLineCodecFactory implements ProtocolCodecFactory
+{
     private final TextLineEncoder encoder;
 
     private final TextLineDecoder decoder;
 
+
     /**
      * Creates a new instance with the current default {@link Charset}.
      */
-    public TextLineCodecFactory() {
-        this(Charset.defaultCharset());
+    public TextLineCodecFactory()
+    {
+        this( Charset.defaultCharset() );
     }
+
 
     /**
-     * Creates a new instance with the specified {@link Charset}.
+     * Creates a new instance with the specified {@link Charset}.  The 
+     * encoder uses a UNIX {@link LineDelimeter} and the decoder uses 
+     * the AUTO {@link LineDelimeter}.
+     * 
+     * @param charset
+     *  The charset to use in the encoding and decoding
      */
-    public TextLineCodecFactory(Charset charset) {
-        encoder = new TextLineEncoder(charset, LineDelimiter.UNIX);
-        decoder = new TextLineDecoder(charset, LineDelimiter.AUTO);
+    public TextLineCodecFactory( Charset charset )
+    {
+        encoder = new TextLineEncoder( charset, LineDelimiter.UNIX );
+        decoder = new TextLineDecoder( charset, LineDelimiter.AUTO );
     }
 
-    public ProtocolEncoder getEncoder() {
+
+    /**
+     * Creates a new instance of TextLineCodecFactory.  This constructor 
+     * provides more flexibility for the developer.  
+     *
+     * @param charset
+     *  The charset to use in the encoding and decoding
+     * @param encodingDelimiter
+     *  The line delimeter for the encoder
+     * @param decodingDelimiter
+     *  The line delimeter for the decoder
+     */
+    public TextLineCodecFactory( Charset charset, LineDelimiter encodingDelimiter, LineDelimiter decodingDelimiter )
+    {
+        encoder = new TextLineEncoder( charset, encodingDelimiter );
+        decoder = new TextLineDecoder( charset, decodingDelimiter );
+    }
+
+
+    public ProtocolEncoder getEncoder()
+    {
         return encoder;
     }
 
-    public ProtocolDecoder getDecoder() {
+
+    public ProtocolDecoder getDecoder()
+    {
         return decoder;
     }
+
 
     /**
      * Returns the allowed maximum size of the encoded line.
@@ -70,9 +105,11 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * <p>
      * This method does the same job with {@link TextLineEncoder#getMaxLineLength()}.
      */
-    public int getEncoderMaxLineLength() {
+    public int getEncoderMaxLineLength()
+    {
         return encoder.getMaxLineLength();
     }
+
 
     /**
      * Sets the allowed maximum size of the encoded line.
@@ -82,9 +119,11 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * <p>
      * This method does the same job with {@link TextLineEncoder#setMaxLineLength(int)}.
      */
-    public void setEncoderMaxLineLength(int maxLineLength) {
-        encoder.setMaxLineLength(maxLineLength);
+    public void setEncoderMaxLineLength( int maxLineLength )
+    {
+        encoder.setMaxLineLength( maxLineLength );
     }
+
 
     /**
      * Returns the allowed maximum size of the line to be decoded.
@@ -94,9 +133,11 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * <p>
      * This method does the same job with {@link TextLineDecoder#getMaxLineLength()}.
      */
-    public int getDecoderMaxLineLength() {
+    public int getDecoderMaxLineLength()
+    {
         return decoder.getMaxLineLength();
     }
+
 
     /**
      * Sets the allowed maximum size of the line to be decoded.
@@ -106,7 +147,8 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * <p>
      * This method does the same job with {@link TextLineDecoder#setMaxLineLength(int)}.
      */
-    public void setDecoderMaxLineLength(int maxLineLength) {
-        decoder.setMaxLineLength(maxLineLength);
+    public void setDecoderMaxLineLength( int maxLineLength )
+    {
+        decoder.setMaxLineLength( maxLineLength );
     }
 }
