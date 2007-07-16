@@ -329,8 +329,6 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession {
             if (DefaultSocketSessionConfig.isSetReceiveBufferSizeAvailable()) {
                 try {
                     ch.socket().setReceiveBufferSize(size);
-                    // Re-retrieve the effective receive buffer size.
-                    size = ch.socket().getReceiveBufferSize();
                 } catch (SocketException e) {
                     throw new RuntimeIOException(e);
                 }
