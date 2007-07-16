@@ -193,8 +193,6 @@ class SocketIoProcessor {
         SocketChannel ch = session.getChannel();
 
         try {
-            buf.clear();
-
             int readBytes = 0;
             int ret;
 
@@ -211,6 +209,14 @@ class SocketIoProcessor {
             if (readBytes > 0) {
                 session.getFilterChain().fireMessageReceived(session, buf);
                 buf = null;
+                
+                if (readBytes * 2 < session.getReadBufferSize()) {
+                    if (session.getReadBufferSize() > 64) {
+                        session.setReadBufferSize(session.getReadBufferSize() >>> 1);
+                    }
+                } else if (readBytes == session.getReadBufferSize()) {
+                    session.setReadBufferSize(session.getReadBufferSize() << 1);
+                }
             }
             if (ret < 0) {
                 scheduleRemove(session);
