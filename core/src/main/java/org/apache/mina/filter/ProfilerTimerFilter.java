@@ -99,13 +99,12 @@ public class ProfilerTimerFilter extends IoFilterAdapter
         }
         
         timerManager = new HashMap<IoEventType,TimerWorker>();
-        timerManager.put( IoEventType.MESSAGE_RECEIVED, new TimerWorker() );
-        timerManager.put( IoEventType.MESSAGE_SENT, new TimerWorker() );
-        timerManager.put( IoEventType.SESSION_CREATED, new TimerWorker() );
-        timerManager.put( IoEventType.SESSION_OPENED, new TimerWorker() );
-        timerManager.put( IoEventType.SESSION_IDLE, new TimerWorker() );
-        timerManager.put( IoEventType.SESSION_CLOSED, new TimerWorker() );
+        
+        for( IoEventType type : eventsToProfile ){
+            timerManager.put(  type, new TimerWorker() );
+        }
     }
+
 
     /**
      * Returns the {@link ProfilerTimerUnit} being used.
@@ -130,7 +129,28 @@ public class ProfilerTimerFilter extends IoFilterAdapter
         this.timeUnit = timeUnit;
     }
 
-
+    /**
+     * Add an {@link IoEventType} to profile
+     *
+     * @param type
+     *  The {@link IoEventType} to profile
+     */
+    public void addEventToProfile( IoEventType type ){
+        if( !timerManager.containsKey( type )){
+            timerManager.put( type, new TimerWorker() );
+        }
+    }
+    
+    /**
+     * Remove an {@link IoEventType} to profile
+     *
+     * @param type
+     *  The {@link IoEventType} to profile
+     */
+    public void removeEventToProfile( IoEventType type ){
+        timerManager.remove( type );
+    }
+    
     /**
      * Return the bitmask that is being used to display 
      * timing information for this filter.
@@ -237,6 +257,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter
      *  The average time it took to execute the method represented by the {@link IoEventType}
      */
     public double getAverageTime( IoEventType type ){
+        if( !timerManager.containsKey( type )){
+            throw new IllegalArgumentException("You are not monitoring this event.  Please add this event first.");
+        }
+        
         return timerManager.get( type ).getAverage();
     }
     
@@ -250,6 +274,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter
      *  The total number of method calls for the method represented by the {@link IoEventType}
      */
     public long getTotalCalls( IoEventType type ){
+        if( !timerManager.containsKey( type )){
+            throw new IllegalArgumentException("You are not monitoring this event.  Please add this event first.");
+        }
+        
         return timerManager.get( type ).getCalls();
     }
     
@@ -263,6 +291,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter
      *  The total time for the method represented by the {@link IoEventType}
      */
     public long getTotalTime( IoEventType type ){
+        if( !timerManager.containsKey( type )){
+            throw new IllegalArgumentException("You are not monitoring this event.  Please add this event first.");
+        }
+        
         return timerManager.get( type ).getTotal();
     }
     
@@ -276,6 +308,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter
      *  The minimum time this method has executed represented by the {@link IoEventType}
      */
     public long getMinValue( IoEventType type ){
+        if( !timerManager.containsKey( type )){
+            throw new IllegalArgumentException("You are not monitoring this event.  Please add this event first.");
+        }
+        
         return timerManager.get( type ).getMin();
     }
     
@@ -289,6 +325,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter
      *  The maximum time this method has executed represented by the {@link IoEventType}
      */
     public long getMaxValue( IoEventType type ){
+        if( !timerManager.containsKey( type )){
+            throw new IllegalArgumentException("You are not monitoring this event.  Please add this event first.");
+        }
+        
         return timerManager.get( type ).getMax();
     }
     
