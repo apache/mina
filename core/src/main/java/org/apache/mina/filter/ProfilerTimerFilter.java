@@ -37,13 +37,11 @@ import org.apache.mina.common.WriteRequest;
  * method in the {@link IoFilterAdapter} class to execute.  The basic
  * premise of the logic in this class is to get the current time
  * at the beginning of the method, call method on nextFilter, and 
- * then get the current time again.  The result will then be sent to 
- * the <tt>SessionLog.debug()</tt> method.  An example of how to use 
+ * then get the current time again.  An example of how to use 
  * the filter is:
  * 
  * <pre>
  *  ProfilerTimerFilter profiler = new ProfilerTimerFilter( ProfilerTimerFilter.MSG_RCV, ProfilerTimerUnit.MILLISECOND );
- *  profiler.setLogLevel( 6 );
  *  chain.addFirst( "Profiler", profiler);
  * </pre>
  *
@@ -88,15 +86,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter
     {
         this.eventsToProfile = eventsToProfile;
         
-        if( unit == TimeUnit.MILLISECONDS ){
-            this.timeUnit = ProfilerTimerUnit.MILLISECONDS;
-        } else if( unit == TimeUnit.NANOSECONDS ){
-            this.timeUnit = ProfilerTimerUnit.NANOSECONDS;
-        } else if( unit == TimeUnit.SECONDS ){
-            this.timeUnit = ProfilerTimerUnit.SECONDS;
-        } else {
-            throw new IllegalArgumentException( "Invalid Time specified" );
-        }
+        setTimeUnit( unit );
         
         timerManager = new HashMap<IoEventType,TimerWorker>();
         
@@ -107,26 +97,22 @@ public class ProfilerTimerFilter extends IoFilterAdapter
 
 
     /**
-     * Returns the {@link ProfilerTimerUnit} being used.
-     *
-     * @return
-     *  The {@link ProfilerTimerUnit} being used.
-     */
-    public ProfilerTimerUnit getTimeUnit()
-    {
-        return timeUnit;
-    }
-
-
-    /**
      * Sets the {@link ProfilerTimerUnit} being used.
      *
      * @param timeUnit
      *  Sets the new {@link ProfilerTimerUnit} to be used.
      */
-    public void setTimeUnit( ProfilerTimerUnit timeUnit )
+    public void setTimeUnit( TimeUnit unit )
     {
-        this.timeUnit = timeUnit;
+        if( unit == TimeUnit.MILLISECONDS ){
+            this.timeUnit = ProfilerTimerUnit.MILLISECONDS;
+        } else if( unit == TimeUnit.NANOSECONDS ){
+            this.timeUnit = ProfilerTimerUnit.NANOSECONDS;
+        } else if( unit == TimeUnit.SECONDS ){
+            this.timeUnit = ProfilerTimerUnit.SECONDS;
+        } else {
+            throw new IllegalArgumentException( "Invalid Time specified" );
+        }
     }
 
     /**
