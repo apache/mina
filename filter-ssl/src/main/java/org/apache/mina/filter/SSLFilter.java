@@ -46,7 +46,9 @@ import org.apache.mina.util.SessionLog;
  * Adding this filter triggers SSL handshake procedure immediately by sending
  * a SSL 'hello' message, so you don't need to call
  * {@link #startSSL(IoSession)} manually unless you are implementing StartTLS
- * (see below).
+ * (see below).  If you don't want the handshake procedure to start
+ * immediately, please specify {@code true} as {@code autoStart} parameter in
+ * the constructor.
  * <p>
  * This filter uses an {@link SSLEngine} which was introduced in Java 5, so 
  * Java version 5 or above is mandatory to use this filter. And please note that
@@ -152,7 +154,9 @@ public class SSLFilter extends IoFilterAdapter {
             + ".SSLHandler";
 
     // SSL Context
-    private SSLContext sslContext;
+    private final SSLContext sslContext;
+    
+    private final boolean autoStart;
 
     private boolean client;
 
@@ -168,11 +172,19 @@ public class SSLFilter extends IoFilterAdapter {
      * Creates a new SSL filter using the specified {@link SSLContext}.
      */
     public SSLFilter(SSLContext sslContext) {
+        this(sslContext, true);
+    }
+    
+    /**
+     * Creates a new SSL filter using the specified {@link SSLContext}.
+     */
+    public SSLFilter(SSLContext sslContext, boolean autoStart) {
         if (sslContext == null) {
             throw new NullPointerException("sslContext");
         }
 
         this.sslContext = sslContext;
+        this.autoStart = autoStart;
     }
 
     /**
@@ -356,11 +368,9 @@ public class SSLFilter extends IoFilterAdapter {
     @Override
     public void onPostAdd(IoFilterChain parent, String name,
             NextFilter nextFilter) throws SSLException {
-        SSLHandler handler = getSSLSessionHandler(parent.getSession());
-        synchronized (handler) {
-            handler.handshake(nextFilter);
+        if (autoStart) {
+            initiateHandshake(nextFilter, parent.getSession());
         }
-        handler.flushPostHandshakeEvents();
     }
 
     @Override
@@ -571,6 +581,15 @@ public class SSLFilter extends IoFilterAdapter {
         }
     }
 
+    private void initiateHandshake(NextFilter nextFilter, IoSession session)
+            throws SSLException {
+        SSLHandler handler = getSSLSessionHandler(session);
+        synchronized (handler) {
+            handler.handshake(nextFilter);
+        }
+        handler.flushPostHandshakeEvents();
+    }
+    
     private WriteFuture initiateClosure(NextFilter nextFilter, IoSession session)
             throws SSLException {
         SSLHandler handler = getSSLSessionHandler(session);
