@@ -75,8 +75,8 @@ public class LoggingFilter extends IoFilterAdapter {
 
     public void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) {
-        if (SessionLog.isInfoEnabled(session)) {
-            SessionLog.info(session, "EXCEPTION:", cause);
+        if (SessionLog.isWarnEnabled(session)) {
+            SessionLog.warn(session, "EXCEPTION:", cause);
         }
         nextFilter.exceptionCaught(session, cause);
     }
