@@ -190,7 +190,7 @@ public class LoggingFilter extends IoFilterAdapter {
 
     private LogLevel defaultLogLevel = INFO;
 
-    private LogLevel exceptionCaughtLogLevel = INFO;
+    private LogLevel exceptionCaughtLogLevel = WARN;
 
     /**
      * Creates a new instance.
