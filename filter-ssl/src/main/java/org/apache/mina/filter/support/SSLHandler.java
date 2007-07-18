@@ -63,7 +63,9 @@ public class SSLHandler {
 
     private final Queue<IoFilterEvent> preHandshakeEventQueue = new LinkedList<IoFilterEvent>();
 
-    private final Queue<IoFilterEvent> postHandshakeEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
+    private final Queue<IoFilterEvent> filterWriteEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
+    
+    private final Queue<IoFilterEvent> messageReceivedEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
 
     private SSLEngine sslEngine;
 
@@ -246,33 +248,36 @@ public class SSLHandler {
         }
     }
 
-    public void schedulePostHandshakeWriteRequest(NextFilter nextFilter,
+    public void scheduleFilterWrite(NextFilter nextFilter,
             WriteRequest writeRequest) {
-        postHandshakeEventQueue.offer(new IoFilterEvent(nextFilter,
+        filterWriteEventQueue.offer(new IoFilterEvent(nextFilter,
                 IoEventType.WRITE, session, writeRequest));
     }
 
-    public void schedulePostHandshakeMessage(NextFilter nextFilter,
+    public void scheduleMessageReceived(NextFilter nextFilter,
             Object message) {
-        postHandshakeEventQueue.offer(new IoFilterEvent(nextFilter,
+        messageReceivedEventQueue.offer(new IoFilterEvent(nextFilter,
                 IoEventType.MESSAGE_RECEIVED, session, message));
     }
 
-    public void flushPostHandshakeEvents() {
+    public void flushScheduledEvents() {
         // Fire events only when no lock is hold for this handler.
         if (Thread.holdsLock(this)) {
             return;
         }
 
         IoFilterEvent e;
-
-        while ((e = postHandshakeEventQueue.poll()) != null) {
-            if (IoEventType.MESSAGE_RECEIVED == e.getType()) {
-                e.getNextFilter().messageReceived(session, e.getParameter());
-            } else {
-                e.getNextFilter().filterWrite(session,
-                        (WriteRequest) e.getParameter());
+        
+        // We need synchronization here inevitably because filterWrite can be
+        // called simultaneously and cause 'bad record MAC' integrity error.
+        synchronized (this) {
+            while ((e = filterWriteEventQueue.poll()) != null) {
+                e.getNextFilter().filterWrite(session, (WriteRequest) e.getParameter());
             }
+        }
+
+        while ((e = messageReceivedEventQueue.poll()) != null) {
+            e.getNextFilter().messageReceived(session, e.getParameter());
         }
     }
 
@@ -471,7 +476,7 @@ public class SSLHandler {
                 }
                 initialHandshakeComplete = true;
                 if (session.containsAttribute(SSLFilter.USE_NOTIFICATION)) {
-                    schedulePostHandshakeMessage(nextFilter,
+                    scheduleMessageReceived(nextFilter,
                             SSLFilter.SESSION_SECURED);
                 }
                 break;

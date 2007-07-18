@@ -220,7 +220,7 @@ public class SSLFilter extends IoFilterAdapter {
             }
         }
 
-        handler.flushPostHandshakeEvents();
+        handler.flushScheduledEvents();
         return started;
     }
 
@@ -257,7 +257,7 @@ public class SSLFilter extends IoFilterAdapter {
             future = initiateClosure(nextFilter, session);
         }
 
-        handler.flushPostHandshakeEvents();
+        handler.flushScheduledEvents();
 
         return future;
     }
@@ -400,7 +400,7 @@ public class SSLFilter extends IoFilterAdapter {
                 handler.destroy();
             }
 
-            handler.flushPostHandshakeEvents();
+            handler.flushScheduledEvents();
         } finally {
             // notify closed session
             nextFilter.sessionClosed(session);
@@ -413,7 +413,7 @@ public class SSLFilter extends IoFilterAdapter {
         SSLHandler handler = getSSLSessionHandler(session);
         synchronized (handler) {
             if (!isSSLStarted(session) && handler.isInboundDone()) {
-                handler.schedulePostHandshakeMessage(nextFilter, message);
+                handler.scheduleMessageReceived(nextFilter, message);
             } else {
                 ByteBuffer buf = (ByteBuffer) message;
                 if (SessionLog.isDebugEnabled(session)) {
@@ -441,7 +441,7 @@ public class SSLFilter extends IoFilterAdapter {
                         }
 
                         if (buf.hasRemaining()) {
-                            handler.schedulePostHandshakeMessage(nextFilter,
+                            handler.scheduleMessageReceived(nextFilter,
                                     buf);
                         }
                     }
@@ -458,7 +458,7 @@ public class SSLFilter extends IoFilterAdapter {
             }
         }
 
-        handler.flushPostHandshakeEvents();
+        handler.flushScheduledEvents();
     }
 
     @Override
@@ -479,14 +479,14 @@ public class SSLFilter extends IoFilterAdapter {
         SSLHandler handler = getSSLSessionHandler(session);
         synchronized (handler) {
             if (!isSSLStarted(session)) {
-                handler.schedulePostHandshakeWriteRequest(nextFilter,
+                handler.scheduleFilterWrite(nextFilter,
                         writeRequest);
             }
             // Don't encrypt the data if encryption is disabled.
             else if (session.containsAttribute(DISABLE_ENCRYPTION_ONCE)) {
                 // Remove the marker attribute because it is temporary.
                 session.removeAttribute(DISABLE_ENCRYPTION_ONCE);
-                handler.schedulePostHandshakeWriteRequest(nextFilter,
+                handler.scheduleFilterWrite(nextFilter,
                         writeRequest);
             } else {
                 // Otherwise, encrypt the buffer.
@@ -502,7 +502,7 @@ public class SSLFilter extends IoFilterAdapter {
                         SessionLog.debug(session, "   already encrypted: "
                                 + buf);
                     }
-                    handler.schedulePostHandshakeWriteRequest(nextFilter,
+                    handler.scheduleFilterWrite(nextFilter,
                             writeRequest);
                 } else if (handler.isInitialHandshakeComplete()) {
                     // SSL encrypt
@@ -520,7 +520,7 @@ public class SSLFilter extends IoFilterAdapter {
                         SessionLog.debug(session, " encrypted buf: "
                                 + encryptedBuffer);
                     }
-                    handler.schedulePostHandshakeWriteRequest(nextFilter,
+                    handler.scheduleFilterWrite(nextFilter,
                             new EncryptedWriteRequest(writeRequest,
                                     encryptedBuffer));
                 } else {
@@ -544,7 +544,7 @@ public class SSLFilter extends IoFilterAdapter {
         }
 
         if (needsFlush) {
-            handler.flushPostHandshakeEvents();
+            handler.flushScheduledEvents();
         }
     }
 
@@ -567,7 +567,7 @@ public class SSLFilter extends IoFilterAdapter {
                 }
             }
 
-            handler.flushPostHandshakeEvents();
+            handler.flushScheduledEvents();
         } finally {
             if (future == null) {
                 nextFilter.filterClose(session);
@@ -587,7 +587,7 @@ public class SSLFilter extends IoFilterAdapter {
         synchronized (handler) {
             handler.handshake(nextFilter);
         }
-        handler.flushPostHandshakeEvents();
+        handler.flushScheduledEvents();
     }
     
     private WriteFuture initiateClosure(NextFilter nextFilter, IoSession session)
@@ -606,7 +606,7 @@ public class SSLFilter extends IoFilterAdapter {
         }
 
         if (session.containsAttribute(USE_NOTIFICATION)) {
-            handler.schedulePostHandshakeMessage(nextFilter, SESSION_UNSECURED);
+            handler.scheduleMessageReceived(nextFilter, SESSION_UNSECURED);
         }
 
         return future;
@@ -645,7 +645,7 @@ public class SSLFilter extends IoFilterAdapter {
                     + readBuffer.getHexDump() + ')');
         }
 
-        handler.schedulePostHandshakeMessage(nextFilter, readBuffer);
+        handler.scheduleMessageReceived(nextFilter, readBuffer);
     }
 
     private SSLHandler getSSLSessionHandler(IoSession session) {
