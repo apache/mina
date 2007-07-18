@@ -59,7 +59,9 @@ public class SSLHandler {
 
     private final Queue<Event> preHandshakeEventQueue = new LinkedList<Event>();
 
-    private final Queue<Event> postHandshakeEventQueue = new ConcurrentLinkedQueue<Event>();
+    private final Queue<Event> filterWriteEventQueue = new ConcurrentLinkedQueue<Event>();
+
+    private final Queue<Event> messageReceivedEventQueue = new ConcurrentLinkedQueue<Event>();
 
     private SSLEngine sslEngine;
 
@@ -239,32 +241,36 @@ public class SSLHandler {
         }
     }
 
-    public void schedulePostHandshakeWriteRequest(NextFilter nextFilter,
+    public void scheduleFilterWrite(NextFilter nextFilter,
             WriteRequest writeRequest) {
-        postHandshakeEventQueue.offer(new Event(EventType.FILTER_WRITE,
+        filterWriteEventQueue.offer(new Event(EventType.FILTER_WRITE,
                 nextFilter, writeRequest));
     }
 
-    public void schedulePostHandshakeMessage(NextFilter nextFilter,
+    public void scheduleMessageReceived(NextFilter nextFilter,
             Object message) {
-        postHandshakeEventQueue.offer(new Event(EventType.RECEIVED, nextFilter,
+        messageReceivedEventQueue.offer(new Event(EventType.RECEIVED, nextFilter,
                 message));
     }
-
-    public void flushPostHandshakeEvents() {
+    
+    public void flushScheduledEvents() {
         // Fire events only when no lock is hold for this handler.
         if (Thread.holdsLock(this)) {
             return;
         }
 
         Event e;
-
-        while ((e = postHandshakeEventQueue.poll()) != null) {
-            if (EventType.RECEIVED == e.type) {
-                e.nextFilter.messageReceived(session, e.data);
-            } else {
+        
+        // We need synchronization here inevitably because filterWrite can be
+        // called simultaneously and cause 'bad record MAC' integrity error.
+        synchronized (this) {
+            while ((e = filterWriteEventQueue.poll()) != null) {
                 e.nextFilter.filterWrite(session, (WriteRequest) e.data);
             }
+        }
+
+        while ((e = messageReceivedEventQueue.poll()) != null) {
+            e.nextFilter.messageReceived(session, e.data);
         }
     }
 
@@ -463,7 +469,7 @@ public class SSLHandler {
                 }
                 initialHandshakeComplete = true;
                 if (session.containsAttribute(SSLFilter.USE_NOTIFICATION)) {
-                    schedulePostHandshakeMessage(nextFilter,
+                    scheduleMessageReceived(nextFilter,
                             SSLFilter.SESSION_SECURED);
                 }
                 break;
