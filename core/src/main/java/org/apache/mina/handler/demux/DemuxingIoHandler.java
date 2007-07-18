@@ -97,8 +97,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? extends E> addMessageHandler(Class<E> type,
-            MessageHandler<? extends E> handler) {
+    public <E> MessageHandler<? super E> addMessageHandler(Class<E> type,
+            MessageHandler<? super E> handler) {
         findHandlerCache.clear();
         return type2handler.put(type, handler);
     }
@@ -110,7 +110,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? extends E> removeMessageHandler(Class<E> type) {
+    public <E> MessageHandler<? super E> removeMessageHandler(Class<E> type) {
         findHandlerCache.clear();
         return type2handler.remove(type);
     }
@@ -120,7 +120,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * the specified <code>type</code>. 
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? extends E> getMessageHandler(Class<E> type) {
+    public <E> MessageHandler<? super E> getMessageHandler(Class<E> type) {
         return type2handler.get(type);
     }
 
