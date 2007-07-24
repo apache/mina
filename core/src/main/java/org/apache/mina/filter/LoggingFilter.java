@@ -19,371 +19,447 @@
  */
 package org.apache.mina.filter;
 
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.SessionLog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 /**
- * Logs all MINA protocol events using the {@link SessionLog}. Each event will
- * be logged to its own {@link Logger}. The names of these loggers will share a 
- * common prefix. By default the name of the logger used by {@link SessionLog}
- * will be used as prefix. Use {@link #setLoggerNamePrefix(String)} to override
- * the default prefix.
- * <p>
- * For most of the events the name of the corresponding {@link IoHandler} method
- * which handles that event will be added to the prefix to form the logger name.
- * Here's a complete list of the logger names for each event:
- * <table>
- *   <tr><th>Event</th><th>Name of logger</th></tr>
- *   <tr><td>sessionCreated</td><td>&lt;prefix&gt;.sessionCreated</td></tr>
- *   <tr><td>sessionOpened</td><td>&lt;prefix&gt;.sessionOpened</td></tr>
- *   <tr><td>sessionClosed</td><td>&lt;prefix&gt;.sessionClosed</td></tr>
- *   <tr><td>sessionIdle</td><td>&lt;prefix&gt;.sessionIdle</td></tr>
- *   <tr><td>exceptionCaught</td><td>&lt;prefix&gt;.exceptionCaught</td></tr>
- *   <tr><td>messageReceived</td><td>&lt;prefix&gt;.messageReceived</td></tr>
- *   <tr><td>messageSent</td><td>&lt;prefix&gt;.messageSent</td></tr>
- *   <tr><td>{@link IoSession#write(Object)}</td><td>&lt;prefix&gt;.write</td></tr>
- *   <tr><td>{@link IoSession#close()}</td><td>&lt;prefix&gt;.close</td></tr>
- * </table>
- * </p>
- * <p>
- * By default all events will be logged on the INFO level. Use 
- * {@link #setDefaultLogLevel(org.apache.mina.filter.LoggingFilter.LogLevel)} to change
- * the level to one of {@link #DEBUG}, {@link #INFO}, {@link #WARN} or
- * {@link #ERROR}..
- * </p>
- * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * Logs all MINA protocol events using the {@link SessionLog}.  Each event can be 
+ * tuned to use a different level based on the user's specific requirements.  Methods
+ * are in place that allow the user to use either the get or set method for each event
+ * and pass in the {@link IoEventType} and the {@link LogLevel}.
+ *
+ * By default, all events are logged to the {@link IoEventType.INFO} level except 
+ * {@link IoFilterAdapter.exceptionCaught()}, which is logged to {@link IoEventType.WARN}. 
+ *
+ * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
- * 
- * @see SessionLog
  */
-public class LoggingFilter extends IoFilterAdapter {
-    /**
-     * Session attribute key: prefix string
-     */
-    public static final String PREFIX = SessionLog.PREFIX;
+public class LoggingFilter extends IoFilterAdapter
+{
 
     /**
-     * Session attribute key: {@link Logger}
+     * {@link LogLevel} which will not log any information
      */
-    public static final String LOGGER = SessionLog.LOGGER;
+    public static final LogLevel NONE = new LogLevel()
+    {
+
+        @Override
+        public void log( IoSession session, String message )
+        {
+        }
+
+
+        @Override
+        public void log( IoSession session, String message, Throwable cause )
+        {
+        }
+
+
+        @Override
+        public String toString()
+        {
+            return "NONE";
+        }
+    };
 
     /**
      * {@link LogLevel} which logs messages on the DEBUG level.
      */
-    public static final LogLevel DEBUG = new LogLevel() {
-        @Override
-        public boolean isEnabled(Logger log) {
-            return log.isDebugEnabled();
-        }
+    public static final LogLevel DEBUG = new LogLevel()
+    {
 
         @Override
-        public void log(Logger log, IoSession session, String message) {
-            SessionLog.debug(log, session, message);
+        public void log( IoSession session, String message )
+        {
+            SessionLog.debug( session, message );
         }
 
+
         @Override
-        public void log(Logger log, IoSession session, String message,
-                Throwable cause) {
-            SessionLog.debug(log, session, message, cause);
+        public void log( IoSession session, String message, Throwable cause )
+        {
+            SessionLog.debug( session, message, cause );
+        }
+
+
+        @Override
+        public String toString()
+        {
+            return "DEBUG";
         }
     };
 
     /**
      * {@link LogLevel} which logs messages on the INFO level.
      */
-    public static final LogLevel INFO = new LogLevel() {
+    public static final LogLevel INFO = new LogLevel()
+    {
         @Override
-        public boolean isEnabled(Logger log) {
-            return log.isInfoEnabled();
+        public void log( IoSession session, String message )
+        {
+            SessionLog.info( session, message );
         }
 
-        @Override
-        public void log(Logger log, IoSession session, String message) {
-            SessionLog.info(log, session, message);
-        }
 
         @Override
-        public void log(Logger log, IoSession session, String message,
-                Throwable cause) {
-            SessionLog.info(log, session, message, cause);
+        public void log( IoSession session, String message, Throwable cause )
+        {
+            SessionLog.info( session, message, cause );
+        }
+
+
+        @Override
+        public String toString()
+        {
+            return "INFO";
         }
     };
 
     /**
      * {@link LogLevel} which logs messages on the WARN level.
      */
-    public static final LogLevel WARN = new LogLevel() {
+    public static final LogLevel WARN = new LogLevel()
+    {
         @Override
-        public boolean isEnabled(Logger log) {
-            return log.isWarnEnabled();
+        public void log( IoSession session, String message )
+        {
+            SessionLog.warn( session, message );
         }
 
-        @Override
-        public void log(Logger log, IoSession session, String message) {
-            SessionLog.warn(log, session, message);
-        }
 
         @Override
-        public void log(Logger log, IoSession session, String message,
-                Throwable cause) {
-            SessionLog.warn(log, session, message, cause);
+        public void log( IoSession session, String message, Throwable cause )
+        {
+            SessionLog.warn( session, message, cause );
+        }
+
+
+        @Override
+        public String toString()
+        {
+            return "WARN";
         }
     };
 
     /**
      * {@link LogLevel} which logs messages on the ERROR level.
      */
-    public static final LogLevel ERROR = new LogLevel() {
+    public static final LogLevel ERROR = new LogLevel()
+    {
         @Override
-        public boolean isEnabled(Logger log) {
-            return log.isErrorEnabled();
+        public void log( IoSession session, String message )
+        {
+            SessionLog.error( session, message );
         }
 
-        @Override
-        public void log(Logger log, IoSession session, String message) {
-            SessionLog.error(log, session, message);
-        }
 
         @Override
-        public void log(Logger log, IoSession session, String message,
-                Throwable cause) {
-            SessionLog.error(log, session, message, cause);
+        public void log( IoSession session, String message, Throwable cause )
+        {
+            SessionLog.error( session, message, cause );
+        }
+
+
+        @Override
+        public String toString()
+        {
+            return "ERROR";
         }
     };
 
-    private static final String EVENT_LOGGER = LoggingFilter.class.getName()
-            + ".event";
+    private final Map<IoEventType, LogLevel> logSettings;
 
-    private static final String SESSION_CREATED_LOGGER = EVENT_LOGGER
-            + ".sessionCreated";
-
-    private static final String SESSION_OPENED_LOGGER = EVENT_LOGGER
-            + ".sessionOpened";
-
-    private static final String SESSION_CLOSED_LOGGER = EVENT_LOGGER
-            + ".sessionClosed";
-
-    private static final String SESSION_IDLE_LOGGER = EVENT_LOGGER
-            + ".sessionIdle";
-
-    private static final String EXCEPTION_CAUGHT_LOGGER = EVENT_LOGGER
-            + ".exceptionCaught";
-
-    private static final String MESSAGE_RECEIVED_LOGGER = EVENT_LOGGER
-            + ".messageReceived";
-
-    private static final String MESSAGE_SENT_LOGGER = EVENT_LOGGER
-            + ".messageSent";
-
-    private static final String WRITE_LOGGER = EVENT_LOGGER + ".write";
-
-    private static final String CLOSE_LOGGER = EVENT_LOGGER + ".close";
-
-    private String loggerNamePrefix = null;
-
-    private LogLevel defaultLogLevel = INFO;
-
-    private LogLevel exceptionCaughtLogLevel = WARN;
 
     /**
-     * Creates a new instance.
+     * Default Constructor. 
      */
-    public LoggingFilter() {
+    public LoggingFilter()
+    {
+        logSettings = Collections.synchronizedMap( new HashMap<IoEventType, LogLevel>() );
+
+        // Exceptions will be logged to WARN as default...
+        logSettings.put( IoEventType.EXCEPTION_CAUGHT, WARN );
+
+        setLogLevel( IoEventType.MESSAGE_RECEIVED, INFO );
+        setLogLevel( IoEventType.MESSAGE_SENT, INFO );
+        setLogLevel( IoEventType.SESSION_CLOSED, INFO );
+        setLogLevel( IoEventType.SESSION_CREATED, INFO );
+        setLogLevel( IoEventType.SESSION_IDLE, INFO );
+        setLogLevel( IoEventType.SESSION_OPENED, INFO );
     }
 
-    /**
-     * Returns the prefix used for the names of the loggers used to log the different 
-     * events. If <code>null</code> the name of the {@link Logger} used by
-     * {@link SessionLog} will be used for the prefix. The default value is 
-     * <code>null</code>.
-     *
-     * @return the prefix or <code>null</code>.
-     */
-    public String getLoggerNamePrefix() {
-        return loggerNamePrefix;
+
+    @Override
+    public void exceptionCaught( NextFilter nextFilter, IoSession session, Throwable cause ) throws Exception
+    {
+        logSettings.get( IoEventType.EXCEPTION_CAUGHT ).log( session, "EXCEPTION: ", cause );
+        nextFilter.exceptionCaught( session, cause );
     }
 
-    /**
-     * Sets the prefix used for the names of the loggers used to log the different 
-     * events. If set to <code>null</code> the name of the {@link Logger} used by
-     * {@link SessionLog} will be used for the prefix.
-     *
-     * @param loggerNamePrefix the new prefix.
-     */
-    public void setLoggerNamePrefix(String loggerNamePrefix) {
-        this.loggerNamePrefix = loggerNamePrefix;
+
+    @Override
+    public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
+    {
+        logSettings.get( IoEventType.MESSAGE_RECEIVED ).log( session, "RECEIVED: " + message );
+        nextFilter.messageReceived( session, message );
     }
 
+
+    @Override
+    public void messageSent( NextFilter nextFilter, IoSession session, WriteRequest writeRequest ) throws Exception
+    {
+        logSettings.get( IoEventType.MESSAGE_SENT ).log( session, "SENT: " + writeRequest.getMessage() );
+        nextFilter.messageSent( session, writeRequest );
+    }
+
+
+    @Override
+    public void sessionClosed( NextFilter nextFilter, IoSession session ) throws Exception
+    {
+        logSettings.get( IoEventType.SESSION_CLOSED ).log( session, "CLOSED" );
+        nextFilter.sessionClosed( session );
+    }
+
+
+    @Override
+    public void sessionCreated( NextFilter nextFilter, IoSession session ) throws Exception
+    {
+        logSettings.get( IoEventType.SESSION_CREATED ).log( session, "CREATED" );
+        nextFilter.sessionCreated( session );
+    }
+
+
+    @Override
+    public void sessionIdle( NextFilter nextFilter, IoSession session, IdleStatus status ) throws Exception
+    {
+        logSettings.get( IoEventType.SESSION_IDLE ).log( session, "IDLE: " + status );
+        nextFilter.sessionIdle( session, status );
+    }
+
+
+    @Override
+    public void sessionOpened( NextFilter nextFilter, IoSession session ) throws Exception
+    {
+        logSettings.get( IoEventType.SESSION_OPENED ).log( session, "OPENED" );
+        nextFilter.sessionOpened( session );
+    }
+
+
     /**
-     * Returns the current {@link LogLevel} which is used when this filter logs all 
-     * events but the <code>exceptionCaught</code> event. The default is 
-     * {@link #INFO}.
+     * Sets the {@link LogLevel} to be used when exceptions are logged.
      * 
-     * @return the current {@link LogLevel}.
-     * @see #getExceptionCaughtLogLevel()
+     * @param logLevel
+     * 	The {@link LogLevel} to be used when exceptions are logged.
      */
-    public LogLevel getDefaultLogLevel() {
-        return defaultLogLevel;
+    public void setExceptionCaughtLogLevel( LogLevel logLevel )
+    {
+        setLogLevel( IoEventType.EXCEPTION_CAUGHT, logLevel );
     }
+
 
     /**
-     * Sets the {@link LogLevel} which will be used when this filter logs all events
-     * but the <code>exceptionCaught</code> event.
+     * Sets the {@link LogLevel} to be used when message received events are logged.
      * 
-     * @param logLevel the new {@link LogLevel}.
-     * @throws NullPointerException if the specified {@link LogLevel} is 
-     *                <code>null</code>. 
-     * @see #setExceptionCaughtLogLevel(org.apache.mina.filter.LoggingFilter.LogLevel)
+     * @param logLevel
+     * 	The {@link LogLevel} to be used when message received events are logged.
      */
-    public void setDefaultLogLevel(LogLevel logLevel) {
-        if (logLevel == null) {
-            throw new NullPointerException("defaultLogLevel");
-        }
-        this.defaultLogLevel = logLevel;
+    public void setMessageReceivedLogLevel( LogLevel logLevel )
+    {
+        setLogLevel( IoEventType.MESSAGE_RECEIVED, logLevel );
     }
+
 
     /**
-     * Returns the current {@link LogLevel} which is used when this filter logs 
-     * <code>exceptionCaught</code> events. The default is {@link #INFO}.
+     * Sets the {@link LogLevel} to be used when message sent events are logged.
      * 
-     * @return the current {@link LogLevel}.
-     * @see #getDefaultLogLevel()
+     * @param logLevel
+     * 	The {@link LogLevel} to be used when message sent events are logged.
      */
-    public LogLevel getExceptionCaughtLogLevel() {
-        return exceptionCaughtLogLevel;
+    public void setMessageSentLogLevel( LogLevel logLevel )
+    {
+        setLogLevel( IoEventType.MESSAGE_SENT, logLevel );
     }
+
 
     /**
-     * Sets the {@link LogLevel} which will be used when this filter logs 
-     * <code>exceptionCaught</code> events.
+     * Sets the {@link LogLevel} to be used when session closed events are logged.
      * 
-     * @param logLevel the new {@link LogLevel}.
-     * @throws NullPointerException if the specified {@link LogLevel} is 
-     *                <code>null</code>. 
-     * @see #setDefaultLogLevel(org.apache.mina.filter.LoggingFilter.LogLevel)
+     * @param logLevel
+     * 	The {@link LogLevel} to be used when session closed events are logged.
      */
-    public void setExceptionCaughtLogLevel(LogLevel logLevel) {
-        if (logLevel == null) {
-            throw new NullPointerException("exceptionCaughtLogLevel");
-        }
-        this.exceptionCaughtLogLevel = logLevel;
+    public void setSessionClosedLogLevel( LogLevel logLevel )
+    {
+        setLogLevel( IoEventType.SESSION_CLOSED, logLevel );
     }
 
-    @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session) {
-        defaultLogLevel.log(getLogger(session, SESSION_CREATED_LOGGER,
-                "sessionCreated"), session, "CREATED");
-        nextFilter.sessionCreated(session);
+
+    /**
+     * Sets the {@link LogLevel} to be used when session created events are logged.
+     * 
+     * @param logLevel
+     * 	The {@link LogLevel} to be used when session created events are logged.
+     */
+    public void setSessionCreatedLogLevel( LogLevel logLevel )
+    {
+        setLogLevel( IoEventType.SESSION_CREATED, logLevel );
     }
 
-    @Override
-    public void sessionOpened(NextFilter nextFilter, IoSession session) {
-        defaultLogLevel.log(getLogger(session, SESSION_OPENED_LOGGER,
-                "sessionOpened"), session, "OPENED");
-        nextFilter.sessionOpened(session);
+
+    /**
+     * Sets the {@link LogLevel} to be used when session idle events are logged.
+     * 
+     * @param logLevel
+     * 	The {@link LogLevel} to be used when session idle events are logged.
+     */
+    public void setSessionIdleLogLevel( LogLevel logLevel )
+    {
+        setLogLevel( IoEventType.SESSION_IDLE, logLevel );
     }
 
-    @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session) {
-        defaultLogLevel.log(getLogger(session, SESSION_CLOSED_LOGGER,
-                "sessionClosed"), session, "CLOSED");
-        nextFilter.sessionClosed(session);
+
+    /**
+     * Sets the {@link LogLevel} to be used when session opened events are logged.
+     * 
+     * @param logLevel
+     * 	The {@link LogLevel} to be used when session opened events are logged.
+     */
+    public void setSessionOpenedLogLevel( LogLevel logLevel )
+    {
+        setLogLevel( IoEventType.SESSION_OPENED, logLevel );
     }
 
-    @Override
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) {
-        Logger log = getLogger(session, SESSION_IDLE_LOGGER, "sessionIdle");
-        if (defaultLogLevel.isEnabled(log)) {
-            defaultLogLevel.log(log, session, "IDLE: " + status);
-        }
-        nextFilter.sessionIdle(session, status);
+
+    /**
+     * This method sets the log level for the suppliend {@link LogLevel}
+     * event.
+     * 
+     * @param event
+     * 	The event that is to be updated with the new {@link LogLevel}
+     * @param logLevel
+     * 	The new {@link LogLevel} to be used to log the specified event
+     */
+    public void setLogLevel( IoEventType event, LogLevel logLevel )
+    {
+        logSettings.put( event, logLevel );
     }
 
-    @Override
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) {
-        Logger log = getLogger(session, EXCEPTION_CAUGHT_LOGGER,
-                "exceptionCaught");
-        if (exceptionCaughtLogLevel.isEnabled(log)) {
-            exceptionCaughtLogLevel.log(log, session, "EXCEPTION:", cause);
-        }
-        nextFilter.exceptionCaught(session, cause);
+
+    /**
+     * This method returns the {@link LogLevel} that is used to log 
+     * exception caught events.
+     * 
+     * @return
+     * 	The {@link LogLevel} used when logging exception caught events
+     */
+    public String getExceptionCaughtLogLevel()
+    {
+        return logSettings.get( IoEventType.EXCEPTION_CAUGHT ).toString();
     }
 
-    @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) {
-        Logger log = getLogger(session, MESSAGE_RECEIVED_LOGGER,
-                "messageReceived");
-        if (defaultLogLevel.isEnabled(log)) {
-            defaultLogLevel.log(log, session, "RECEIVED: " + message);
-        }
-        nextFilter.messageReceived(session, message);
+
+    /**
+     * This method returns the {@link LogLevel} that is used to log 
+     * message received events.
+     * 
+     * @return
+     * 	The {@link LogLevel} used when logging message received events
+     */
+    public String getMessageReceivedLogLevel()
+    {
+        return logSettings.get( IoEventType.MESSAGE_RECEIVED ).toString();
     }
 
-    @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) {
-        Logger log = getLogger(session, MESSAGE_SENT_LOGGER, "messageSent");
-        if (defaultLogLevel.isEnabled(log)) {
-            defaultLogLevel.log(log, session, "SENT: "
-                    + writeRequest.getMessage());
-        }
-        nextFilter.messageSent(session, writeRequest);
+
+    /**
+     * This method returns the {@link LogLevel} that is used to log 
+     * message sent events.
+     * 
+     * @return
+     * 	The {@link LogLevel} used when logging message sent events
+     */
+    public String getMessageSentLogLevel()
+    {
+        return logSettings.get( IoEventType.MESSAGE_SENT ).toString();
     }
 
-    @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) {
-        Logger log = getLogger(session, WRITE_LOGGER, "write");
-        if (defaultLogLevel.isEnabled(log)) {
-            defaultLogLevel.log(log, session, "WRITE: "
-                    + writeRequest.getMessage());
-        }
-        nextFilter.filterWrite(session, writeRequest);
+
+    /**
+     * This method returns the {@link LogLevel} that is used to log 
+     * session closed events.
+     * 
+     * @return
+     * 	The {@link LogLevel} used when logging session closed events
+     */
+    public String getSessionClosedLogLevel()
+    {
+        return logSettings.get( IoEventType.SESSION_CLOSED ).toString();
     }
 
-    @Override
-    public void filterClose(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        defaultLogLevel.log(getLogger(session, CLOSE_LOGGER, "close"), session,
-                "CLOSE");
-        nextFilter.filterClose(session);
+
+    /**
+     * This method returns the {@link LogLevel} that is used to log 
+     * session created events.
+     * 
+     * @return
+     * 	The {@link LogLevel} used when logging session created events
+     */
+    public String getSessionCreatedLogLevel()
+    {
+        return logSettings.get( IoEventType.SESSION_CREATED ).toString();
     }
 
-    private Logger getLogger(IoSession session, String attribute, String event) {
-        Logger log = (Logger) session.getAttribute(attribute);
-        if (log == null) {
-            String prefix = loggerNamePrefix;
-            if (prefix == null) {
-                prefix = SessionLog.getLogger(session).getName();
-            }
-            log = LoggerFactory.getLogger(prefix + "." + event);
-            session.setAttribute(attribute, log);
-        }
-        return log;
+
+    /**
+     * This method returns the {@link LogLevel} that is used to log 
+     * session idle events.
+     * 
+     * @return
+     * 	The {@link LogLevel} used when logging session idle events
+     */
+    public String getSessionIdleLogLevel()
+    {
+        return logSettings.get( IoEventType.SESSION_IDLE ).toString();
+    }
+
+
+    /**
+     * This method returns the {@link LogLevel} that is used to log 
+     * session opened events.
+     * 
+     * @return
+     * 	The {@link LogLevel} used when logging session opened events
+     */
+    public String getSessionOpenedLogLevel()
+    {
+        return logSettings.get( IoEventType.SESSION_OPENED ).toString();
     }
 
     /**
      * Defines a logging level.
      */
-    public static abstract class LogLevel {
-        LogLevel() {
+    public static abstract class LogLevel
+    {
+        LogLevel()
+        {
         }
 
-        public abstract boolean isEnabled(Logger log);
 
-        public abstract void log(Logger log, IoSession session, String message);
+        public abstract void log( IoSession session, String message );
 
-        public abstract void log(Logger log, IoSession session, String message,
-                Throwable cause);
+
+        public abstract void log( IoSession session, String message, Throwable cause );
+
+
+        public abstract String toString();
     }
 }
