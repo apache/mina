@@ -20,9 +20,8 @@
 package org.apache.mina.filter;
 
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEventType;
@@ -185,10 +184,10 @@ public class LoggingFilter extends IoFilterAdapter
      */
     public LoggingFilter()
     {
-        logSettings = Collections.synchronizedMap( new HashMap<IoEventType, LogLevel>() );
+        logSettings = new ConcurrentHashMap<IoEventType,LogLevel>(7);
 
         // Exceptions will be logged to WARN as default...
-        logSettings.put( IoEventType.EXCEPTION_CAUGHT, WARN );
+        setLogLevel( IoEventType.EXCEPTION_CAUGHT, WARN );
 
         setLogLevel( IoEventType.MESSAGE_RECEIVED, INFO );
         setLogLevel( IoEventType.MESSAGE_SENT, INFO );
