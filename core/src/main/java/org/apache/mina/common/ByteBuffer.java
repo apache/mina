@@ -138,6 +138,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     private static ByteBufferAllocator allocator = new SimpleByteBufferAllocator();
 
     private static boolean preferDirectBuffers = false;
+    
+    /**
+     * An immutable empty buffer.
+     */
+    public static final ByteBuffer EMPTY_BUFFER = wrap(new byte[0]);
 
     /**
      * Returns the allocator used by existing and new buffers
