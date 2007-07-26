@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterAdapter;
@@ -166,6 +167,12 @@ public class ProfilerTimerFilter extends IoFilterAdapter
     @Override
     public void messageReceived( NextFilter nextFilter, IoSession session, Object message ) throws Exception
     {
+        if (message instanceof ByteBuffer && !((ByteBuffer) message).hasRemaining()) {
+            // Ignore the special signal.
+            nextFilter.messageReceived(session, message);
+            return;
+        }
+        
         long start = timeUnit.timeNow();
         nextFilter.messageReceived( session, message );
         long end = timeUnit.timeNow();
