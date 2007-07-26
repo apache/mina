@@ -407,8 +407,8 @@ public class SSLFilter extends IoFilterAdapter {
                         }
 
                         if (buf.hasRemaining()) {
-                            handler.scheduleMessageReceived(nextFilter,
-                                    buf);
+                            // Forward the data received after closure.
+                            handler.scheduleMessageReceived(nextFilter, buf);
                         }
                     }
                 } catch (SSLException ssle) {
