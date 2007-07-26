@@ -45,7 +45,7 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
         this.nextFilter = nextFilter;
         this.session = session;
     }
-
+    
     public void write(Object message) {
         if (message == null) {
             throw new NullPointerException("message");
@@ -59,7 +59,11 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
 
     public void flush() {
         while (!messageQueue.isEmpty()) {
-            nextFilter.messageReceived(session, messageQueue.poll());
+            if (session.getTrafficMask().isReadable()) {
+                nextFilter.messageReceived(session, messageQueue.poll());
+            } else {
+                break;
+            }
         }
 
     }
