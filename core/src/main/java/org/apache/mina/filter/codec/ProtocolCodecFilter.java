@@ -170,11 +170,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             pde.setHexdump(in.getHexDump());
             throw pde;
         } finally {
-            // Dispose the decoder if this session is connectionless.
-            if (session.getTransportType().isConnectionless()) {
-                disposeDecoder(session);
-            }
-
             decoderOut.flush();
         }
     }
