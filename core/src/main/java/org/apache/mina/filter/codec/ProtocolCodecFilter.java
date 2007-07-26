@@ -46,9 +46,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public static final String DECODER = ProtocolCodecFilter.class.getName()
             + ".decoder";
 
-    private static final String DECODER_LOCK = ProtocolCodecFilter.class
-            .getName()
-            + ".decoderLock";
+    private static final String DECODER_OUT = ProtocolCodecFilter.class.getName()
+            + ".decoderOut";
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
@@ -137,6 +136,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             NextFilter nextFilter) throws Exception {
         disposeEncoder(parent.getSession());
         disposeDecoder(parent.getSession());
+        disposeDecoderOut(parent.getSession());
     }
 
     @Override
@@ -149,11 +149,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         ByteBuffer in = (ByteBuffer) message;
         ProtocolDecoder decoder = getDecoder(session);
-        Object decoderLock = getDecoderLock(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
         try {
-            synchronized (decoderLock) {
+            synchronized (decoderOut) {
                 decoder.decode(session, in, decoderOut);
             }
         } catch (Throwable t) {
@@ -248,7 +247,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             // Dispose all.
             disposeEncoder(session);
             disposeDecoder(session);
-
+            disposeDecoderOut(session);
             decoderOut.flush();
         }
 
@@ -280,19 +279,14 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         return decoder;
     }
 
-    private Object getDecoderLock(IoSession session) {
-        Object lock = session.getAttribute(DECODER_LOCK);
-        if (lock == null) {
-            lock = new Object();
-            session.setAttribute(DECODER_LOCK, lock);
-        }
-
-        return lock;
-    }
-
     private ProtocolDecoderOutput getDecoderOut(IoSession session,
             NextFilter nextFilter) {
-        return new SimpleProtocolDecoderOutput(session, nextFilter);
+        ProtocolDecoderOutput out = (ProtocolDecoderOutput) session.getAttribute(DECODER_OUT);
+        if (out == null) {
+            out = new SimpleProtocolDecoderOutput(session, nextFilter);
+            session.setAttribute(DECODER_OUT, out);
+        }
+        return out;
     }
 
     private void disposeEncoder(IoSession session) {
@@ -324,7 +318,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }
-
+    
+    private void disposeDecoderOut(IoSession session) {
+        session.removeAttribute(DECODER_OUT);
+    }
+    
     private static class HiddenByteBuffer extends ByteBufferProxy {
         private HiddenByteBuffer(ByteBuffer buf) {
             super(buf);
