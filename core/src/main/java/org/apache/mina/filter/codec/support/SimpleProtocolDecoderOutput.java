@@ -43,7 +43,7 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
         this.nextFilter = nextFilter;
         this.session = session;
     }
-
+    
     public void write(Object message) {
         messageQueue.push(message);
         if (session instanceof BaseIoSession) {
@@ -53,8 +53,11 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
 
     public void flush() {
         while (!messageQueue.isEmpty()) {
-            nextFilter.messageReceived(session, messageQueue.pop());
+            if (session.getTrafficMask().isReadable()) {
+                nextFilter.messageReceived(session, messageQueue.pop());
+            } else {
+                break;
+            }
         }
-
     }
 }
