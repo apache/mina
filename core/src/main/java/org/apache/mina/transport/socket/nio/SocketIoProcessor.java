@@ -31,6 +31,7 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.WriteTimeoutException;
 import org.apache.mina.util.NamePreservingRunnable;
@@ -409,8 +410,19 @@ class SocketIoProcessor {
             }
 
             // Now mask the preferred ops with the mask of the current session
-            int mask = session.getTrafficMask().getInterestOps();
-            key.interestOps(ops & mask);
+            TrafficMask trafficMask = session.getTrafficMask();
+            int opsMask = trafficMask.getInterestOps();
+            if ((key.interestOps() & SelectionKey.OP_READ) == 0 &&
+                    trafficMask.isReadable()) {
+                // This is a somewhat ugly workaround for the case that
+                // ProtocolCodecFilter is in the filter chain.
+                // Firing messageReceived() event with an empty buffer
+                // triggers ProtocolCodecFilter to flush any queued
+                // messageReceived() events on resumeRead().
+                session.getFilterChain().fireMessageReceived(
+                        session, ByteBuffer.wrap(new byte[0]));
+            }
+            key.interestOps(ops & opsMask);
         }
     }
 
