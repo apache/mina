@@ -25,9 +25,9 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
-import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
+import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 /**

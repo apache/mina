@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.firewall;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;

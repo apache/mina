@@ -24,8 +24,8 @@ import java.net.InetSocketAddress;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.LoggingFilter;
-import org.apache.mina.filter.SSLFilter;
+import org.apache.mina.filter.logging.LoggingFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 /**

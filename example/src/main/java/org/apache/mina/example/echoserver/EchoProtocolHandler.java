@@ -25,7 +25,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.filter.SSLFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

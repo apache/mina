@@ -21,8 +21,8 @@ package org.apache.mina.example.httpserver.codec;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 /**

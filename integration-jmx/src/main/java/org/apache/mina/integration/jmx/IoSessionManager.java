@@ -26,7 +26,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.filter.LoggingFilter;
+import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.management.IoSessionStat;
 import org.apache.mina.management.StatCollector;
 

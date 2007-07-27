@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -47,6 +47,7 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.support.BaseIoSession;
+import org.apache.mina.filter.stream.StreamWriteFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;

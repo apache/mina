@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.ssl;
 
 import java.net.InetSocketAddress;
 
@@ -38,7 +38,6 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestWrapper;
 import org.apache.mina.common.support.DefaultWriteFuture;
-import org.apache.mina.filter.support.SSLHandler;
 import org.apache.mina.util.SessionLog;
 
 /**

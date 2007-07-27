@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.traffic;
 
 import java.util.Iterator;
 import java.util.List;

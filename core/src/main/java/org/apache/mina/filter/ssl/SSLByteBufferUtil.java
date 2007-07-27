@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.support;
+package org.apache.mina.filter.ssl;
 
 import java.nio.ByteBuffer;
 
@@ -123,5 +123,4 @@ class SSLByteBufferUtil {
             }
         }
     }
-
 }

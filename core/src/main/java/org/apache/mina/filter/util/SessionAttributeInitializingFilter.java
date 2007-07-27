@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.util;
 
 import java.util.HashMap;
 import java.util.Map;

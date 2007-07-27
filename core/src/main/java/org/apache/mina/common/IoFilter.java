@@ -19,7 +19,7 @@
  */
 package org.apache.mina.common;
 
-import org.apache.mina.filter.ReferenceCountingIoFilter;
+import org.apache.mina.filter.util.ReferenceCountingIoFilter;
 
 /**
  * A filter which intercepts {@link IoHandler} events like Servlet

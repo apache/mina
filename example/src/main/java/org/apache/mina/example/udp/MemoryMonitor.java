@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
-import org.apache.mina.filter.LoggingFilter;
+import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 

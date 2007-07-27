@@ -22,9 +22,9 @@ package org.apache.mina.example.sumup;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
-import org.apache.mina.filter.LoggingFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
+import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 /**

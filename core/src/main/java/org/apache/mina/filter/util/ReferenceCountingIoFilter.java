@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.util;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;

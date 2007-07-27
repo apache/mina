@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.filter.support;
+package org.apache.mina.filter.ssl;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -40,7 +40,6 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.support.DefaultWriteFuture;
-import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.util.SessionLog;
 
 /**
@@ -54,7 +53,7 @@ import org.apache.mina.util.SessionLog;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SSLHandler {
+class SSLHandler {
     private final SSLFilter parent;
 
     private final SSLContext ctx;

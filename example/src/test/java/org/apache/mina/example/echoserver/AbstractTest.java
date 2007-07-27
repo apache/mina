@@ -29,7 +29,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.SSLFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;

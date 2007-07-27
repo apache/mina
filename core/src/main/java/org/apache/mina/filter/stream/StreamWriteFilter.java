@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
