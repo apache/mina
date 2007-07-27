@@ -33,7 +33,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.mina.common.IoSession;
-import org.apache.mina.handler.StreamIoHandler;
+import org.apache.mina.handler.stream.StreamIoHandler;
 
 /**
  * A simplistic HTTP protocol handler that replies back the URL and headers
