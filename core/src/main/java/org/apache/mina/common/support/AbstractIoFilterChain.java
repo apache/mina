@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
@@ -610,10 +609,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
         @Override
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) throws Exception {
-            if (!(message instanceof ByteBuffer) || ((ByteBuffer) message).hasRemaining()) {
-                // Empty buffers are used as a special internal signal, so ignore it.
-                session.getHandler().messageReceived(session, message);
-            }
+            session.getHandler().messageReceived(session, message);
         }
 
         @Override
