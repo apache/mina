@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.handler;
+package org.apache.mina.handler.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +29,6 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.handler.support.IoSessionInputStream;
-import org.apache.mina.handler.support.IoSessionOutputStream;
 import org.apache.mina.util.SessionLog;
 
 /**

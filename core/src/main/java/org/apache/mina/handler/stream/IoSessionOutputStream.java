@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.handler.support;
+package org.apache.mina.handler.stream;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,7 +34,7 @@ import org.apache.mina.common.WriteFuture;
  * @version $Rev$, $Date$
  *
  */
-public class IoSessionOutputStream extends OutputStream {
+class IoSessionOutputStream extends OutputStream {
     private final IoSession session;
 
     private WriteFuture lastWriteFuture;

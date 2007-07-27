@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.handler.support;
+package org.apache.mina.handler.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ import org.apache.mina.common.IoSession;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoSessionInputStream extends InputStream {
+class IoSessionInputStream extends InputStream {
     private final Object mutex = new Object();
 
     private final ByteBuffer buf;
