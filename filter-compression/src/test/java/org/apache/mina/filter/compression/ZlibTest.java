@@ -17,12 +17,13 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.support;
+package org.apache.mina.filter.compression;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.filter.compression.Zlib;
 
 import junit.framework.TestCase;
 

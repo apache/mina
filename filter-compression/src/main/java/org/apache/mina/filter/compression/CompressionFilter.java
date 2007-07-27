@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.compression;
 
 import java.io.IOException;
 
@@ -28,7 +28,6 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.filter.support.Zlib;
 
 /**
  * An {@link IoFilter} which compresses all data using

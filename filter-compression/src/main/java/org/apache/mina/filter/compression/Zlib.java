@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.support;
+package org.apache.mina.filter.compression;
 
 import java.io.IOException;
 
@@ -34,7 +34,7 @@ import com.jcraft.jzlib.ZStream;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class Zlib {
+class Zlib {
     public static final int COMPRESSION_MAX = JZlib.Z_BEST_COMPRESSION;
 
     public static final int COMPRESSION_MIN = JZlib.Z_BEST_SPEED;

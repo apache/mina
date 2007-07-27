@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter;
+package org.apache.mina.filter.compression;
 
 import junit.framework.TestCase;
 
@@ -27,7 +27,8 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.filter.support.Zlib;
+import org.apache.mina.filter.compression.CompressionFilter;
+import org.apache.mina.filter.compression.Zlib;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 
