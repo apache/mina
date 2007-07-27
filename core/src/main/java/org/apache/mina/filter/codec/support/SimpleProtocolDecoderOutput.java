@@ -61,6 +61,5 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
         while (!messageQueue.isEmpty()) {
             nextFilter.messageReceived(session, messageQueue.poll());
         }
-
     }
 }
