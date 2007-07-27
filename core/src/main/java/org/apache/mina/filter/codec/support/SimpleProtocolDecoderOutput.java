@@ -45,22 +45,17 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
         this.nextFilter = nextFilter;
         this.session = session;
     }
-    
+
     public void write(Object message) {
         messageQueue.add(message);
+        if (session instanceof BaseIoSession) {
+            ((BaseIoSession) session).increaseReadMessages();
+        }
     }
 
     public void flush() {
         while (!messageQueue.isEmpty()) {
-            if (session.getTrafficMask().isReadable()) {
-                if (session instanceof BaseIoSession) {
-                    ((BaseIoSession) session).increaseReadMessages();
-                }
-                nextFilter.messageReceived(session, messageQueue.remove(0));
-            } else {
-                break;
-            }
+            nextFilter.messageReceived(session, messageQueue.remove(0));
         }
-
     }
 }

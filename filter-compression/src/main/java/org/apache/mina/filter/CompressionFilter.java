@@ -156,14 +156,9 @@ public class CompressionFilter extends IoFilterAdapter {
         }
 
         ByteBuffer inBuffer = (ByteBuffer) message;
-        if (!inBuffer.hasRemaining()) {
-            // Ignore empty buffers
-            nextFilter.messageReceived(session, inBuffer);
-        } else {
-            ByteBuffer outBuffer = inflater.inflate(inBuffer);
-            inBuffer.release();
-            nextFilter.messageReceived(session, outBuffer);
-        }
+        ByteBuffer outBuffer = inflater.inflate(inBuffer);
+        inBuffer.release();
+        nextFilter.messageReceived(session, outBuffer);
     }
 
     /*

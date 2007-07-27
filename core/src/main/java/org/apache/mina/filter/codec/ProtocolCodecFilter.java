@@ -152,10 +152,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
         try {
-            if (in.hasRemaining()) {
-                synchronized (decoderOut) {
-                    decoder.decode(session, in, decoderOut);
-                }
+            synchronized (decoderOut) {
+                decoder.decode(session, in, decoderOut);
             }
         } catch (Throwable t) {
             ProtocolDecoderException pde;
@@ -167,6 +165,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             pde.setHexdump(in.getHexDump());
             throw pde;
         } finally {
+            // Dispose the decoder if this session is connectionless.
+            if (session.getTransportType().isConnectionless()) {
+                disposeDecoder(session);
+            }
+
             // Release the read buffer.
             in.release();
 
