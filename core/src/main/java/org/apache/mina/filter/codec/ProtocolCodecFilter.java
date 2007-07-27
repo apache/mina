@@ -149,10 +149,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
         try {
-            if (in.hasRemaining()) {
-                synchronized (decoderOut) {
-                    decoder.decode(session, in, decoderOut);
-                }
+            synchronized (decoderOut) {
+                decoder.decode(session, in, decoderOut);
             }
         } catch (Throwable t) {
             ProtocolDecoderException pde;

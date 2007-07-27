@@ -565,9 +565,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) throws Exception {
             try {
-                if (!ByteBufferUtil.isEmpty(message)) {
-                    session.getHandler().messageReceived(session, message);
-                }
+                session.getHandler().messageReceived(session, message);
             } finally {
                 ByteBufferUtil.releaseIfPossible(message);
             }

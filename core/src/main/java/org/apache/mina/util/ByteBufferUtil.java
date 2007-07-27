@@ -39,14 +39,6 @@ public class ByteBufferUtil {
             ((ByteBuffer) message).release();
         }
     }
-    
-    public static boolean isEmpty(Object message) {
-        if (message instanceof ByteBuffer) {
-            return !((ByteBuffer) message).hasRemaining();
-        } else {
-            return false;
-        }
-    }
 
     private ByteBufferUtil() {
     }
