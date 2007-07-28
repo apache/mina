@@ -19,7 +19,11 @@
  */
 package org.apache.mina.common.support;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +33,7 @@ import java.util.Set;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoService;
@@ -148,6 +153,19 @@ public abstract class BaseIoSession implements IoSession {
                 && !((ByteBuffer) message).hasRemaining()) {
             throw new IllegalArgumentException(
                     "message is empty. Forgot to call flip()?");
+        } else if (message instanceof File || message instanceof FileChannel) {
+            try {
+                FileChannel channel;
+                if (message instanceof File) {
+                    File file = (File) message;
+                    channel = new FileInputStream(file).getChannel();
+                } else {
+                    channel = (FileChannel) message;
+                }
+                message = new DefaultSendFileRegion(channel, 0, channel.size());
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
         }
 
         synchronized (lock) {
@@ -407,7 +425,7 @@ public abstract class BaseIoSession implements IoSession {
         idleCountForRead = 0;
     }
 
-    public void increaseWrittenBytes(int increment) {
+    public void increaseWrittenBytes(long increment) {
         writtenBytes += increment;
         lastWriteTime = System.currentTimeMillis();
         idleCountForBoth = 0;

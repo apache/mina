@@ -35,6 +35,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.SendFileRegion;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteTimeoutException;
 import org.apache.mina.common.support.IoServiceListenerSupport;
@@ -112,19 +113,13 @@ class SocketIoProcessor {
         boolean needsWakeup = flushingSessions.isEmpty();
         scheduleFlush(session);
         if (needsWakeup) {
-            Selector selector = this.selector;
-            if (selector != null) {
-                selector.wakeup();
-            }
+            selector.wakeup();
         }
     }
 
     void updateTrafficMask(SocketSessionImpl session) {
         scheduleTrafficControl(session);
-        Selector selector = this.selector;
-        if (selector != null) {
-            selector.wakeup();
-        }
+        selector.wakeup();
     }
 
     private void scheduleRemove(SocketSessionImpl session) {
@@ -379,6 +374,7 @@ class SocketIoProcessor {
         for (;;) {
             WriteRequest req;
 
+            // Check for pending writes.
             synchronized (writeRequestQueue) {
                 req = writeRequestQueue.peek();
             }
@@ -387,30 +383,61 @@ class SocketIoProcessor {
                 break;
             }
 
-            ByteBuffer buf = (ByteBuffer) req.getMessage();
-            if (buf.remaining() == 0) {
-                synchronized (writeRequestQueue) {
-                    writeRequestQueue.poll();
+            Object message = req.getMessage();
+            if (message instanceof SendFileRegion) {
+                SendFileRegion region = (SendFileRegion) message; 
+
+                if (region.getCount() <= 0) {
+                    // File has been sent, remove from queue
+                    synchronized (writeRequestQueue) {
+                        writeRequestQueue.poll();
+                    }
+                    session.increaseWrittenMessages();
+                    session.getFilterChain().fireMessageSent(session, req);
+                    continue;
+                }
+                
+                if (key.isWritable()) {
+                    long writtenBytes = region.getFileChannel().transferTo(region.getPosition(), region.getCount(), ch);
+                    region.setPosition(region.getPosition() + writtenBytes);
+                    
+                    if (writtenBytes > 0) {
+                        session.increaseWrittenBytes(writtenBytes);
+                    }
+                }
+                
+                if (region.getCount() > 0) {
+                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                    break;
                 }
 
-                session.increaseWrittenMessages();
+            } else {
+                ByteBuffer buf = (ByteBuffer) message;
+                if (buf.remaining() == 0) {
+                    // Buffer has been completely sent, remove request form queue
+                    synchronized (writeRequestQueue) {
+                        writeRequestQueue.poll();
+                    }
 
-                buf.reset();
-                session.getFilterChain().fireMessageSent(session, req);
-                continue;
-            }
+                    session.increaseWrittenMessages();
 
-            if (key.isWritable()) {
-                int writtenBytes = ch.write(buf.buf());
-                if (writtenBytes > 0) {
-                    session.increaseWrittenBytes(writtenBytes);
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(session, req);
+                    continue;
                 }
-            }
 
-            if (buf.hasRemaining()) {
-                // Kernel buffer is full
-                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                break;
+                if (key.isWritable()) {
+                    int writtenBytes = ch.write(buf.buf());
+                    if (writtenBytes > 0) {
+                        session.increaseWrittenBytes(writtenBytes);
+                    }
+                }
+
+                if (buf.hasRemaining()) {
+                    // Kernel buffer is full
+                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                    break;
+                }
             }
         }
     }
