@@ -13,7 +13,7 @@
 
     <dependency>
       <groupId>org.apache.mina</groupId>
-      <artifactId>mina-filter-ssl</artifactId>
+      <artifactId>mina-core</artifactId>
       <version>${pom.version}</version>
       <scope>compile</scope>
     </dependency>
