@@ -471,7 +471,7 @@ class SSLHandler {
             SessionLog.debug(session, " doHandshake()");
         }
 
-        while (!initialHandshakeComplete) {
+        for (;;) {
             if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED) {
                 session.setAttribute(SSLFilter.SSL_SESSION, sslEngine
                         .getSession());
