@@ -35,7 +35,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.SendFileRegion;
+import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteTimeoutException;
 import org.apache.mina.common.support.IoServiceListenerSupport;
@@ -384,8 +384,8 @@ class SocketIoProcessor {
             }
 
             Object message = req.getMessage();
-            if (message instanceof SendFileRegion) {
-                SendFileRegion region = (SendFileRegion) message; 
+            if (message instanceof FileRegion) {
+                FileRegion region = (FileRegion) message; 
 
                 if (region.getCount() <= 0) {
                     // File has been sent, remove from queue

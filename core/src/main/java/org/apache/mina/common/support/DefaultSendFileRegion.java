@@ -2,9 +2,9 @@ package org.apache.mina.common.support;
 
 import java.nio.channels.FileChannel;
 
-import org.apache.mina.common.SendFileRegion;
+import org.apache.mina.common.FileRegion;
 
-public class DefaultSendFileRegion implements SendFileRegion {
+public class DefaultSendFileRegion implements FileRegion {
 
     private final FileChannel channel;
     
@@ -28,7 +28,7 @@ public class DefaultSendFileRegion implements SendFileRegion {
         this.count = count;
     }
     
-    public long getBytesWritten() {
+    public long getWrittenBytes() {
         return position - originalPosition;
     }
 
