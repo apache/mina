@@ -311,7 +311,7 @@ class SSLHandler {
         if (!initialHandshakeComplete) {
             handshake(nextFilter);
         } else {
-            decrypt();
+            decrypt(nextFilter);
         }
 
         if (isInboundDone()) {
@@ -420,7 +420,7 @@ class SSLHandler {
      *
      * @throws SSLException
      */
-    private void decrypt() throws SSLException {
+    private void decrypt(NextFilter nextFilter) throws SSLException {
 
         if (!initialHandshakeComplete) {
             throw new IllegalStateException();
@@ -434,7 +434,7 @@ class SSLHandler {
             throw new IllegalStateException();
         }
 
-        unwrap();
+        unwrap(nextFilter);
     }
 
     /**
@@ -443,6 +443,14 @@ class SSLHandler {
      */
     private SSLEngineResult.Status checkStatus(SSLEngineResult.Status status)
             throws SSLException {
+        /*
+         * The status may be:
+         * OK - Normal operation
+         * OVERFLOW - Should never happen since the application buffer is
+         *      sized to hold the maximum packet size.
+         * UNDERFLOW - Need to read more data from the socket. It's normal.
+         * CLOSED - The other peer closed the socket. Also normal.
+         */
         if (status != SSLEngineResult.Status.OK
                 && status != SSLEngineResult.Status.CLOSED
                 && status != SSLEngineResult.Status.BUFFER_UNDERFLOW) {
@@ -491,7 +499,7 @@ class SSLHandler {
                     SessionLog.debug(session,
                             "  initialHandshakeStatus=NEED_UNWRAP");
                 }
-                SSLEngineResult.Status status = unwrapHandshake();
+                SSLEngineResult.Status status = unwrapHandshake(nextFilter);
                 if ((initialHandshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED && status == SSLEngineResult.Status.BUFFER_UNDERFLOW)
                         || isInboundDone()) {
                     // We need more data or the session is closed
@@ -589,7 +597,7 @@ class SSLHandler {
         }
     }
 
-    private SSLEngineResult.Status unwrap() throws SSLException {
+    private SSLEngineResult.Status unwrap(NextFilter nextFilter) throws SSLException {
         if (SessionLog.isDebugEnabled(session)) {
             SessionLog.debug(session, " unwrap()");
         }
@@ -599,35 +607,25 @@ class SSLHandler {
         // Prepare the net data for reading.
         inNetBuffer.flip();
 
-        SSLEngineResult res;
-        do {
-            if (SessionLog.isDebugEnabled(session)) {
-                SessionLog.debug(session, "   inNetBuffer: " + inNetBuffer);
-                SessionLog.debug(session, "   appBuffer: " + appBuffer);
-            }
-            res = sslEngine.unwrap(inNetBuffer, appBuffer);
-            if (SessionLog.isDebugEnabled(session)) {
-                SessionLog.debug(session, " Unwrap res:" + res);
-            }
-        } while (res.getStatus() == SSLEngineResult.Status.OK);
+        SSLEngineResult res = unwrap0();
 
         // prepare to be written again
         inNetBuffer.compact();
         // prepare app data to be read
         appBuffer.flip();
+        
+        checkStatus(res.getStatus());
+        
+        if (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
+            // Renegotiation required.
+            SessionLog.debug(session, " Renegotiating...");
+            handshake(nextFilter);
+        }
 
-        /*
-         * The status may be:
-         * OK - Normal operation
-         * OVERFLOW - Should never happen since the application buffer is
-         *      sized to hold the maximum packet size.
-         * UNDERFLOW - Need to read more data from the socket. It's normal.
-         * CLOSED - The other peer closed the socket. Also normal.
-         */
-        return checkStatus(res.getStatus());
+        return res.getStatus();
     }
 
-    private SSLEngineResult.Status unwrapHandshake() throws SSLException {
+    private SSLEngineResult.Status unwrapHandshake(NextFilter nextFilter) throws SSLException {
         if (SessionLog.isDebugEnabled(session)) {
             SessionLog.debug(session, " unwrapHandshake()");
         }
@@ -637,6 +635,29 @@ class SSLHandler {
         // Prepare the net data for reading.
         inNetBuffer.flip();
 
+        SSLEngineResult res = unwrap0();
+        initialHandshakeStatus = res.getHandshakeStatus();
+
+        // If handshake finished, no data was produced, and the status is still ok,
+        // try to unwrap more
+        if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED
+                && appBuffer.position() == 0
+                && res.getStatus() == SSLEngineResult.Status.OK
+                && inNetBuffer.hasRemaining()) {
+            res = unwrap0();
+        }
+
+        // prepare to be written again
+        inNetBuffer.compact();
+
+        // prepare app data to be read
+        appBuffer.flip();
+
+        //initialHandshakeStatus = res.getHandshakeStatus();
+        return checkStatus(res.getStatus());
+    }
+
+    private SSLEngineResult unwrap0() throws SSLException {
         SSLEngineResult res;
         do {
             if (SessionLog.isDebugEnabled(session)) {
@@ -649,45 +670,10 @@ class SSLHandler {
             }
 
         } while (res.getStatus() == SSLEngineResult.Status.OK
-                && res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP);
-
-        initialHandshakeStatus = res.getHandshakeStatus();
-
-        // If handshake finished, no data was produced, and the status is still ok,
-        // try to unwrap more
-        if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED
-                && appBuffer.position() == 0
-                && res.getStatus() == SSLEngineResult.Status.OK
-                && inNetBuffer.hasRemaining()) {
-            do {
-                if (SessionLog.isDebugEnabled(session)) {
-                    SessionLog.debug(session, "  extra handshake unwrap");
-                    SessionLog.debug(session, "   inNetBuffer: " + inNetBuffer);
-                    SessionLog.debug(session, "   appBuffer: " + appBuffer);
-                }
-                res = sslEngine.unwrap(inNetBuffer, appBuffer);
-                if (SessionLog.isDebugEnabled(session)) {
-                    SessionLog.debug(session, " Unwrap res:" + res);
-                }
-            } while (res.getStatus() == SSLEngineResult.Status.OK);
-        }
-
-        // prepare to be written again
-        inNetBuffer.compact();
-
-        // prepare app data to be read
-        appBuffer.flip();
-
-        /*
-         * The status may be:
-         * OK - Normal operation
-         * OVERFLOW - Should never happen since the application buffer is
-         *      sized to hold the maximum packet size.
-         * UNDERFLOW - Need to read more data from the socket. It's normal.
-         * CLOSED - The other peer closed the socket. Also normal.
-         */
-        //initialHandshakeStatus = res.getHandshakeStatus();
-        return checkStatus(res.getStatus());
+                && (initialHandshakeComplete && res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING
+                        || res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP));
+        
+        return res;
     }
 
     /**
