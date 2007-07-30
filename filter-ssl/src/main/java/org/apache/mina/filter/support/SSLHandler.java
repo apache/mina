@@ -438,7 +438,7 @@ public class SSLHandler {
      * @param status
      * @throws SSLException
      */
-    private void checkStatus(NextFilter nextFilter, SSLEngineResult res)
+    private void checkStatus(SSLEngineResult res)
             throws SSLException {
         
         SSLEngineResult.Status status = res.getStatus();
@@ -457,12 +457,6 @@ public class SSLHandler {
             throw new SSLException("SSLEngine error during decrypt: " + status
                     + " inNetBuffer: " + inNetBuffer + "appBuffer: "
                     + appBuffer);
-        }
-
-        if (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
-            // Renegotiation required.
-            SessionLog.debug(session, " Renegotiating...");
-            handshake(nextFilter);
         }
     }
 
@@ -619,7 +613,14 @@ public class SSLHandler {
         // prepare app data to be read
         appBuffer.flip();
         
-        checkStatus(nextFilter, res);
+        checkStatus(res);
+        
+
+        if (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
+            // Renegotiation required.
+            SessionLog.debug(session, " Renegotiating...");
+            handshake(nextFilter);
+        }
     }
 
     private SSLEngineResult.Status unwrapHandshake(NextFilter nextFilter) throws SSLException {
@@ -635,6 +636,8 @@ public class SSLHandler {
         SSLEngineResult res = unwrap0();
         initialHandshakeStatus = res.getHandshakeStatus();
 
+        checkStatus(res);
+
         // If handshake finished, no data was produced, and the status is still ok,
         // try to unwrap more
         if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED
@@ -642,15 +645,26 @@ public class SSLHandler {
                 && res.getStatus() == SSLEngineResult.Status.OK
                 && inNetBuffer.hasRemaining()) {
             res = unwrap0();
+            
+            // prepare to be written again
+            inNetBuffer.compact();
+
+            // prepare app data to be read
+            appBuffer.flip();
+
+            if (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
+                // Renegotiation required.
+                SessionLog.debug(session, " Renegotiating...");
+                handshake(nextFilter);
+            }
+        } else {
+            // prepare to be written again
+            inNetBuffer.compact();
+
+            // prepare app data to be read
+            appBuffer.flip();
         }
 
-        // prepare to be written again
-        inNetBuffer.compact();
-
-        // prepare app data to be read
-        appBuffer.flip();
-
-        checkStatus(nextFilter, res);
         return res.getStatus();
     }
 
