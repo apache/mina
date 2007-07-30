@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -49,10 +50,9 @@ public class SSLFilterTest extends TestCase {
     }
 
     private void testMessageSentIsCalled(boolean useSSL) throws Exception {
-
+        SSLFilter sslFilter = null;
         if (useSSL) {
-            SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
-                    .getInstance(true));
+            sslFilter = new SSLFilter(BogusSSLContextFactory.getInstance(true));
             acceptor.getFilterChain().addLast("sslFilter", sslFilter);
         }
         acceptor.getFilterChain().addLast(
@@ -67,11 +67,29 @@ public class SSLFilterTest extends TestCase {
         Socket socket = getClientSocket(useSSL);
         int bytesSent = 0;
         bytesSent += writeMessage(socket, "test-1\n");
+
+        if (useSSL) {
+            // Test renegotiation
+            SSLSocket ss = (SSLSocket) socket;
+            //ss.getSession().invalidate();
+            ss.startHandshake();
+        }
+
         bytesSent += writeMessage(socket, "test-2\n");
         byte[] response = new byte[bytesSent];
         for (int i = 0; i < response.length; i++) {
             response[i] = (byte) socket.getInputStream().read();
         }
+        
+        if (useSSL) {
+            // Read SSL close notify.
+            while (socket.getInputStream().read() >= 0) {
+                continue;
+            }
+        }
+        
+        socket.close();
+        
         long millis = System.currentTimeMillis();
         while (handler.sentMessages.size() < 2
                 && System.currentTimeMillis() < millis + 5000) {
@@ -108,6 +126,7 @@ public class SSLFilterTest extends TestCase {
 
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
+            cause.printStackTrace();
         }
 
         public void messageReceived(IoSession session, Object message)
@@ -118,6 +137,7 @@ public class SSLFilterTest extends TestCase {
         public void messageSent(IoSession session, Object message)
                 throws Exception {
             sentMessages.add(message.toString());
+            System.out.println(message);
             if (sentMessages.size() >= 2) {
                 session.close();
             }

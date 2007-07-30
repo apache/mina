@@ -89,12 +89,12 @@ public class SSLHandler {
     /**
      * Handshake status
      */
-    private SSLEngineResult.HandshakeStatus initialHandshakeStatus;
+    private SSLEngineResult.HandshakeStatus handshakeStatus;
 
     /**
      * Initial handshake complete?
      */
-    private boolean initialHandshakeComplete;
+    private boolean handshakeComplete;
 
     private boolean writingEncryptedData;
 
@@ -137,8 +137,8 @@ public class SSLHandler {
         }
 
         sslEngine.beginHandshake();
-        initialHandshakeStatus = sslEngine.getHandshakeStatus();//SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
-        initialHandshakeComplete = false;
+        handshakeStatus = sslEngine.getHandshakeStatus();//SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+        handshakeComplete = false;
 
         SSLByteBufferPool.initiate(sslEngine);
 
@@ -202,10 +202,10 @@ public class SSLHandler {
     }
 
     /**
-     * Check if initial handshake is completed.
+     * Check if handshake is completed.
      */
-    public boolean isInitialHandshakeComplete() {
-        return initialHandshakeComplete;
+    public boolean isHandshakeComplete() {
+        return handshakeComplete;
     }
 
     public boolean isInboundDone() {
@@ -217,10 +217,10 @@ public class SSLHandler {
     }
 
     /**
-     * Check if there is any need to complete initial handshake.
+     * Check if there is any need to complete handshake.
      */
-    public boolean needToCompleteInitialHandshake() {
-        return (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone());
+    public boolean needToCompleteHandshake() {
+        return (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone());
     }
 
     public void schedulePreHandshakeWriteRequest(NextFilter nextFilter,
@@ -292,8 +292,6 @@ public class SSLHandler {
             // We also expand app. buffer (twice the size of in net. buffer)
             appBuffer = SSLByteBufferPool.expandBuffer(appBuffer, inNetBuffer
                     .capacity() * 2);
-            appBuffer.position(0);
-            appBuffer.limit(0);
             if (SessionLog.isDebugEnabled(session)) {
                 SessionLog.debug(session, " expanded inNetBuffer:"
                         + inNetBuffer);
@@ -303,7 +301,7 @@ public class SSLHandler {
 
         // append buf to inNetBuffer
         inNetBuffer.put(buf);
-        if (!initialHandshakeComplete) {
+        if (!handshakeComplete) {
             handshake(nextFilter);
         } else {
             decrypt(nextFilter);
@@ -341,7 +339,7 @@ public class SSLHandler {
      * @throws SSLException on errors
      */
     public void encrypt(ByteBuffer src) throws SSLException {
-        if (!initialHandshakeComplete) {
+        if (!handshakeComplete) {
             throw new IllegalStateException();
         }
 
@@ -419,15 +417,7 @@ public class SSLHandler {
      */
     private void decrypt(NextFilter nextFilter) throws SSLException {
 
-        if (!initialHandshakeComplete) {
-            throw new IllegalStateException();
-        }
-
-        if (appBuffer.hasRemaining()) {
-            if (SessionLog.isDebugEnabled(session)) {
-                SessionLog.debug(session, " Error: appBuffer not empty!");
-            }
-            //still app data in buffer!?
+        if (!handshakeComplete) {
             throw new IllegalStateException();
         }
 
@@ -469,44 +459,44 @@ public class SSLHandler {
         }
 
         for (;;) {
-            if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED) {
+            if (handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED) {
                 session.setAttribute(SSLFilter.SSL_SESSION, sslEngine
                         .getSession());
                 if (SessionLog.isDebugEnabled(session)) {
                     SSLSession sslSession = sslEngine.getSession();
                     SessionLog.debug(session,
-                            "  initialHandshakeStatus=FINISHED");
+                            "  handshakeStatus=FINISHED");
                     SessionLog.debug(session, "  sslSession CipherSuite used "
                             + sslSession.getCipherSuite());
                 }
-                initialHandshakeComplete = true;
+                handshakeComplete = true;
                 if (session.containsAttribute(SSLFilter.USE_NOTIFICATION)) {
                     scheduleMessageReceived(nextFilter,
                             SSLFilter.SESSION_SECURED);
                 }
                 break;
-            } else if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_TASK) {
+            } else if (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_TASK) {
                 if (SessionLog.isDebugEnabled(session)) {
                     SessionLog.debug(session,
-                            "  initialHandshakeStatus=NEED_TASK");
+                            "  handshakeStatus=NEED_TASK");
                 }
-                initialHandshakeStatus = doTasks();
-            } else if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP) {
+                handshakeStatus = doTasks();
+            } else if (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP) {
                 // we need more data read
                 if (SessionLog.isDebugEnabled(session)) {
                     SessionLog.debug(session,
-                            "  initialHandshakeStatus=NEED_UNWRAP");
+                            "  handshakeStatus=NEED_UNWRAP");
                 }
                 SSLEngineResult.Status status = unwrapHandshake(nextFilter);
-                if ((initialHandshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED && status == SSLEngineResult.Status.BUFFER_UNDERFLOW)
+                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW
                         || isInboundDone()) {
                     // We need more data or the session is closed
                     break;
                 }
-            } else if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP) {
+            } else if (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP) {
                 if (SessionLog.isDebugEnabled(session)) {
                     SessionLog.debug(session,
-                            "  initialHandshakeStatus=NEED_WRAP");
+                            "  handshakeStatus=NEED_WRAP");
                 }
                 // First make sure that the out buffer is completely empty. Since we
                 // cannot call wrap with data left on the buffer
@@ -524,11 +514,11 @@ public class SSLHandler {
                 }
 
                 outNetBuffer.flip();
-                initialHandshakeStatus = result.getHandshakeStatus();
+                handshakeStatus = result.getHandshakeStatus();
                 writeNetBuffer(nextFilter);
             } else {
                 throw new IllegalStateException("Invalid Handshaking State"
-                        + initialHandshakeStatus);
+                        + handshakeStatus);
             }
         }
     }
@@ -565,12 +555,12 @@ public class SSLHandler {
                     writeBuffer, writeFuture));
 
             // loop while more writes required to complete handshake
-            while (needToCompleteInitialHandshake()) {
+            while (needToCompleteHandshake()) {
                 try {
                     handshake(nextFilter);
                 } catch (SSLException ssle) {
                     SSLException newSSLE = new SSLHandshakeException(
-                            "Initial SSL handshake failed.");
+                            "SSL handshake failed.");
                     newSSLE.initCause(ssle);
                     throw newSSLE;
                 }
@@ -600,8 +590,6 @@ public class SSLHandler {
         if (SessionLog.isDebugEnabled(session)) {
             SessionLog.debug(session, " unwrap()");
         }
-        // Prepare the application buffer to receive decrypted data
-        appBuffer.clear();
 
         // Prepare the net data for reading.
         inNetBuffer.flip();
@@ -610,38 +598,28 @@ public class SSLHandler {
 
         // prepare to be written again
         inNetBuffer.compact();
-        // prepare app data to be read
-        appBuffer.flip();
         
         checkStatus(res);
         
-
-        if (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
-            // Renegotiation required.
-            SessionLog.debug(session, " Renegotiating...");
-            handshake(nextFilter);
-        }
+        renegotiateIfNeeded(nextFilter, res);
     }
 
     private SSLEngineResult.Status unwrapHandshake(NextFilter nextFilter) throws SSLException {
         if (SessionLog.isDebugEnabled(session)) {
             SessionLog.debug(session, " unwrapHandshake()");
         }
-        // Prepare the application buffer to receive decrypted data
-        appBuffer.clear();
 
         // Prepare the net data for reading.
         inNetBuffer.flip();
 
         SSLEngineResult res = unwrap0();
-        initialHandshakeStatus = res.getHandshakeStatus();
+        handshakeStatus = res.getHandshakeStatus();
 
         checkStatus(res);
 
         // If handshake finished, no data was produced, and the status is still ok,
         // try to unwrap more
-        if (initialHandshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED
-                && appBuffer.position() == 0
+        if (handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED
                 && res.getStatus() == SSLEngineResult.Status.OK
                 && inNetBuffer.hasRemaining()) {
             res = unwrap0();
@@ -649,23 +627,26 @@ public class SSLHandler {
             // prepare to be written again
             inNetBuffer.compact();
 
-            // prepare app data to be read
-            appBuffer.flip();
-
-            if (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
-                // Renegotiation required.
-                SessionLog.debug(session, " Renegotiating...");
-                handshake(nextFilter);
-            }
+            renegotiateIfNeeded(nextFilter, res);
         } else {
             // prepare to be written again
             inNetBuffer.compact();
-
-            // prepare app data to be read
-            appBuffer.flip();
         }
 
         return res.getStatus();
+    }
+
+    private void renegotiateIfNeeded(NextFilter nextFilter, SSLEngineResult res)
+            throws SSLException {
+        if (res.getStatus() != SSLEngineResult.Status.CLOSED
+                && res.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW
+                && res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
+            // Renegotiation required.
+            SessionLog.debug(session, " Renegotiating...");
+            handshakeComplete = false;
+            handshakeStatus = res.getHandshakeStatus();
+            handshake(nextFilter);
+        }
     }
 
     private SSLEngineResult unwrap0() throws SSLException {
@@ -679,9 +660,8 @@ public class SSLHandler {
             if (SessionLog.isDebugEnabled(session)) {
                 SessionLog.debug(session, " Unwrap res:" + res);
             }
-
         } while (res.getStatus() == SSLEngineResult.Status.OK
-                && (initialHandshakeComplete && res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING
+                && (handshakeComplete && res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING
                         || res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP));
         
         return res;
