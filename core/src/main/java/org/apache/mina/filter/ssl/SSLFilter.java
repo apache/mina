@@ -152,9 +152,6 @@ public class SSLFilter extends IoFilterAdapter {
     private static final String SSL_HANDLER = SSLFilter.class.getName()
             + ".SSLHandler";
     
-    private static final String WAITING_FOR_LAST_CLOSE_NOTIFY = SSLFilter.class.getName()
-            + ".WaitingForLastCloseNotify";
-
     // SSL Context
     private final SSLContext sslContext;
     
@@ -438,9 +435,6 @@ public class SSLFilter extends IoFilterAdapter {
                             }
 
                             handler.destroy();
-                            if (session.containsAttribute(WAITING_FOR_LAST_CLOSE_NOTIFY)) {
-                                nextFilter.filterClose(session);
-                            }
                         } else {
                             initiateClosure(nextFilter, session);
                         }
