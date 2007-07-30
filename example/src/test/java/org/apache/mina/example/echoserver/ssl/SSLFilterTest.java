@@ -1,24 +1,26 @@
 package org.apache.mina.example.echoserver.ssl;
 
-import junit.framework.TestCase;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import junit.framework.TestCase;
+
+import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoHandlerAdapter;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 public class SSLFilterTest extends TestCase {
 
@@ -46,10 +48,9 @@ public class SSLFilterTest extends TestCase {
     }
 
     private void testMessageSentIsCalled(boolean useSSL) throws Exception {
-
+        SSLFilter sslFilter = null;
         if (useSSL) {
-            SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
-                    .getInstance(true));
+            sslFilter = new SSLFilter(BogusSSLContextFactory.getInstance(true));
             acceptor.getFilterChain().addLast("sslFilter", sslFilter);
         }
         acceptor.getFilterChain().addLast(
@@ -67,12 +68,28 @@ public class SSLFilterTest extends TestCase {
         Socket socket = getClientSocket(useSSL);
         int bytesSent = 0;
         bytesSent += writeMessage(socket, "test-1\n");
-        Thread.sleep(2000);
+
+        if (useSSL) {
+            // Test renegotiation
+            SSLSocket ss = (SSLSocket) socket;
+            //ss.getSession().invalidate();
+            ss.startHandshake();
+        }
+        
         bytesSent += writeMessage(socket, "test-2\n");
+        
         int[] response = new int[bytesSent];
         for (int i = 0; i < response.length; i++) {
             response[i] = socket.getInputStream().read();
         }
+        
+        if (useSSL) {
+            // Read SSL close notify.
+            while (socket.getInputStream().read() >= 0) {
+                continue;
+            }
+        }
+        
         socket.close();
         while (acceptor.getManagedSessions().size() != 0) {
             Thread.sleep(100);
@@ -106,6 +123,7 @@ public class SSLFilterTest extends TestCase {
 
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
+            cause.printStackTrace();
         }
 
         public void messageReceived(IoSession session, Object message)
@@ -116,6 +134,7 @@ public class SSLFilterTest extends TestCase {
         public void messageSent(IoSession session, Object message)
                 throws Exception {
             sentMessages.add(message.toString());
+            System.out.println(message);
             if (sentMessages.size() >= 2) {
                 session.close();
             }

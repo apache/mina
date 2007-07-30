@@ -151,6 +151,9 @@ public class SSLFilter extends IoFilterAdapter {
 
     private static final String SSL_HANDLER = SSLFilter.class.getName()
             + ".SSLHandler";
+    
+    private static final String WAITING_FOR_LAST_CLOSE_NOTIFY = SSLFilter.class.getName()
+            + ".WaitingForLastCloseNotify";
 
     // SSL Context
     private final SSLContext sslContext;
@@ -435,6 +438,9 @@ public class SSLFilter extends IoFilterAdapter {
                             }
 
                             handler.destroy();
+                            if (session.containsAttribute(WAITING_FOR_LAST_CLOSE_NOTIFY)) {
+                                nextFilter.filterClose(session);
+                            }
                         } else {
                             initiateClosure(nextFilter, session);
                         }
@@ -445,13 +451,13 @@ public class SSLFilter extends IoFilterAdapter {
                         }
                     }
                 } catch (SSLException ssle) {
-                    if (!handler.isInitialHandshakeComplete()) {
+                    if (!handler.isHandshakeComplete()) {
                         SSLException newSSLE = new SSLHandshakeException(
-                                "Initial SSL handshake failed.");
+                                "SSL handshake failed.");
                         newSSLE.initCause(ssle);
                         ssle = newSSLE;
                     }
-
+                    
                     throw ssle;
                 }
             }
@@ -503,7 +509,7 @@ public class SSLFilter extends IoFilterAdapter {
                     }
                     handler.scheduleFilterWrite(nextFilter,
                             writeRequest);
-                } else if (handler.isInitialHandshakeComplete()) {
+                } else if (handler.isHandshakeComplete()) {
                     // SSL encrypt
                     if (SessionLog.isDebugEnabled(session)) {
                         SessionLog.debug(session, " encrypt: " + buf);
@@ -563,6 +569,11 @@ public class SSLFilter extends IoFilterAdapter {
             synchronized (handler) {
                 if (isSSLStarted(session)) {
                     future = initiateClosure(nextFilter, session);
+                    future.addListener(new IoFutureListener() {
+                        public void operationComplete(IoFuture future) {
+                            nextFilter.filterClose(session);
+                        }
+                    });
                 }
             }
 
@@ -570,12 +581,6 @@ public class SSLFilter extends IoFilterAdapter {
         } finally {
             if (future == null) {
                 nextFilter.filterClose(session);
-            } else {
-                future.addListener(new IoFutureListener() {
-                    public void operationComplete(IoFuture future) {
-                        nextFilter.filterClose(session);
-                    }
-                });
             }
         }
     }
@@ -616,7 +621,7 @@ public class SSLFilter extends IoFilterAdapter {
     private void handleSSLData(NextFilter nextFilter, SSLHandler handler)
             throws SSLException {
         // Flush any buffered write requests occurred before handshaking.
-        if (handler.isInitialHandshakeComplete()) {
+        if (handler.isHandshakeComplete()) {
             handler.flushPreHandshakeEvents();
         }
 
@@ -629,7 +634,9 @@ public class SSLFilter extends IoFilterAdapter {
 
     private void handleAppDataRead(NextFilter nextFilter, SSLHandler handler) {
         IoSession session = handler.getSession();
+        handler.getAppBuffer().flip();
         if (!handler.getAppBuffer().hasRemaining()) {
+            handler.getAppBuffer().clear();
             return;
         }
 
@@ -639,6 +646,7 @@ public class SSLFilter extends IoFilterAdapter {
 
         // forward read app data
         ByteBuffer readBuffer = SSLHandler.copy(handler.getAppBuffer());
+        handler.getAppBuffer().clear();
         if (SessionLog.isDebugEnabled(session)) {
             SessionLog.debug(session, " app data read: " + readBuffer + " ("
                     + readBuffer.getHexDump() + ')');
