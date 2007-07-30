@@ -438,8 +438,11 @@ public class SSLHandler {
      * @param status
      * @throws SSLException
      */
-    private SSLEngineResult.Status checkStatus(SSLEngineResult.Status status)
+    private void checkStatus(NextFilter nextFilter, SSLEngineResult res)
             throws SSLException {
+        
+        SSLEngineResult.Status status = res.getStatus();
+        
         /*
          * The status may be:
          * OK - Normal operation
@@ -456,7 +459,11 @@ public class SSLHandler {
                     + appBuffer);
         }
 
-        return status;
+        if (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
+            // Renegotiation required.
+            SessionLog.debug(session, " Renegotiating...");
+            handshake(nextFilter);
+        }
     }
 
     /**
@@ -595,7 +602,7 @@ public class SSLHandler {
         }
     }
 
-    private SSLEngineResult.Status unwrap(NextFilter nextFilter) throws SSLException {
+    private void unwrap(NextFilter nextFilter) throws SSLException {
         if (SessionLog.isDebugEnabled(session)) {
             SessionLog.debug(session, " unwrap()");
         }
@@ -612,15 +619,7 @@ public class SSLHandler {
         // prepare app data to be read
         appBuffer.flip();
         
-        checkStatus(res.getStatus());
-        
-        if (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
-            // Renegotiation required.
-            SessionLog.debug(session, " Renegotiating...");
-            handshake(nextFilter);
-        }
-
-        return res.getStatus();
+        checkStatus(nextFilter, res);
     }
 
     private SSLEngineResult.Status unwrapHandshake(NextFilter nextFilter) throws SSLException {
@@ -651,8 +650,8 @@ public class SSLHandler {
         // prepare app data to be read
         appBuffer.flip();
 
-        //initialHandshakeStatus = res.getHandshakeStatus();
-        return checkStatus(res.getStatus());
+        checkStatus(nextFilter, res);
+        return res.getStatus();
     }
 
     private SSLEngineResult unwrap0() throws SSLException {
