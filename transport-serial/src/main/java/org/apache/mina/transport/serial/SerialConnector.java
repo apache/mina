@@ -66,7 +66,7 @@ public class SerialConnector extends BaseIoConnector {
         }
 
         CommPortIdentifier portId;
-        Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+        Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
 
         SerialAddress portAddress = (SerialAddress) remoteAddress;
 
