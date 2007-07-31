@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
@@ -215,7 +216,7 @@ public class DefaultIoFuture implements IoFuture {
         }
 
         if (notifyNow) {
-            listener.operationComplete(this);
+            notifyListener(listener);
         }
         return this;
     }
@@ -247,15 +248,23 @@ public class DefaultIoFuture implements IoFuture {
         // because 'ready' flag will be checked against both addListener and
         // removeListener calls.
         if (firstListener != null) {
-            firstListener.operationComplete(this);
+            notifyListener(firstListener);
             firstListener = null;
 
             if (otherListeners != null) {
                 for (IoFutureListener l : otherListeners) {
-                    l.operationComplete(this);
+                    notifyListener(l);
                 }
                 otherListeners = null;
             }
+        }
+    }
+    
+    private void notifyListener(IoFutureListener l) {
+        try {
+            l.operationComplete(this);
+        } catch (Throwable t) {
+            ExceptionMonitor.getInstance().exceptionCaught(t);
         }
     }
 }
