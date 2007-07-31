@@ -297,7 +297,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
      * is now working, then nothing will happen and the method
      * will just return.
      */
-    private synchronized void startupWorker() {
+    private void startupWorker() {
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
