@@ -22,6 +22,7 @@ package org.apache.mina.common.support;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
@@ -139,16 +140,17 @@ public class DefaultIoFuture implements IoFuture {
         }
 
         synchronized (lock) {
-            if (firstListener == null) {
-                firstListener = listener;
-            } else {
-                if (otherListeners == null) {
-                    otherListeners = new ArrayList<IoFutureListener>(1);
+            if (!ready) {
+                if (firstListener == null) {
+                    firstListener = listener;
+                } else {
+                    if (otherListeners == null) {
+                        otherListeners = new ArrayList<IoFutureListener>(1);
+                    }
+                    otherListeners.add(listener);
                 }
-                otherListeners.add(listener);
-            }
-            if (ready) {
-                listener.operationComplete(this);
+            } else {
+                notifyListener(listener);
             }
         }
     }
@@ -174,13 +176,21 @@ public class DefaultIoFuture implements IoFuture {
     private void notifyListeners() {
         synchronized (lock) {
             if (firstListener != null) {
-                firstListener.operationComplete(this);
+                notifyListener(firstListener);
                 if (otherListeners != null) {
                     for (IoFutureListener l : otherListeners) {
-                        l.operationComplete(this);
+                        notifyListener(l);
                     }
                 }
             }
+        }
+    }
+    
+    private void notifyListener(IoFutureListener l) {
+        try {
+            l.operationComplete(this);
+        } catch (Throwable t) {
+            ExceptionMonitor.getInstance().exceptionCaught(t);
         }
     }
 }
