@@ -93,8 +93,10 @@ class SSLHandler {
      */
     private SSLEngineResult.HandshakeStatus handshakeStatus;
 
+    private boolean initialHandshakeComplete;
+    
     /**
-     * Initial handshake complete?
+     * Handshake complete?
      */
     private boolean handshakeComplete;
 
@@ -147,6 +149,7 @@ class SSLHandler {
         sslEngine.beginHandshake();
         handshakeStatus = sslEngine.getHandshakeStatus();//SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
         handshakeComplete = false;
+        initialHandshakeComplete = false;
 
         SSLByteBufferUtil.initiate(sslEngine);
 
@@ -188,7 +191,6 @@ class SSLHandler {
         sslEngine = null;
 
         preHandshakeEventQueue.clear();
-        //postHandshakeEventQueue.clear();
     }
 
     public SSLFilter getParent() {
@@ -473,7 +475,11 @@ class SSLHandler {
                             + sslSession.getCipherSuite());
                 }
                 handshakeComplete = true;
-                if (session.containsAttribute(SSLFilter.USE_NOTIFICATION)) {
+                if (!initialHandshakeComplete
+                        && session.containsAttribute(SSLFilter.USE_NOTIFICATION)) {
+                    // SESSION_SECURED is fired only when it's the first handshake.
+                    // (i.e. renegotiation shouldn't trigger SESSION_SECURED.)
+                    initialHandshakeComplete = true;
                     scheduleMessageReceived(nextFilter,
                             SSLFilter.SESSION_SECURED);
                 }
