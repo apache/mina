@@ -43,7 +43,7 @@ import java.nio.charset.CharsetEncoder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ByteBufferProxy extends ByteBuffer {
+public class ByteBufferWrapper extends ByteBuffer {
 
     /**
      * The buffer proxied by this proxy.
@@ -54,7 +54,7 @@ public class ByteBufferProxy extends ByteBuffer {
      * Create a new instance.
      * @param buf the buffer to be proxied
      */
-    protected ByteBufferProxy(ByteBuffer buf) {
+    protected ByteBufferWrapper(ByteBuffer buf) {
         if (buf == null) {
             throw new NullPointerException("buf");
         }
