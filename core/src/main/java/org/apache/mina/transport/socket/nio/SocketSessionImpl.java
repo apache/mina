@@ -135,9 +135,21 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession {
     }
 
     public int getScheduledWriteMessages() {
+        int size = 0;
         synchronized (writeRequestQueue) {
-            return writeRequestQueue.size();
+            for (WriteRequest request : writeRequestQueue) {
+                Object message = request.getMessage();
+                if (message instanceof ByteBuffer) {
+                    if (((ByteBuffer) message).hasRemaining()) {
+                        size ++;
+                    }
+                } else {
+                    size ++;
+                }
+            }
         }
+
+        return size;
     }
 
     public int getScheduledWriteBytes() {

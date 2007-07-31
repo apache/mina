@@ -27,7 +27,7 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAddress extends SocketAddress implements Comparable {
+public class VmPipeAddress extends SocketAddress implements Comparable<VmPipeAddress> {
     private static final long serialVersionUID = 3257844376976830515L;
 
     private final int port;
@@ -67,8 +67,8 @@ public class VmPipeAddress extends SocketAddress implements Comparable {
         return false;
     }
 
-    public int compareTo(Object o) {
-        return this.port - ((VmPipeAddress) o).port;
+    public int compareTo(VmPipeAddress o) {
+        return this.port - o.port;
     }
 
     @Override
