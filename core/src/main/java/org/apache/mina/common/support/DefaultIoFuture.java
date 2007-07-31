@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
@@ -156,16 +157,17 @@ public class DefaultIoFuture implements IoFuture {
         }
 
         synchronized (lock) {
-            if (firstListener == null) {
-                firstListener = listener;
-            } else {
-                if (otherListeners == null) {
-                    otherListeners = new ArrayList(1);
+            if (!ready) {
+                if (firstListener == null) {
+                    firstListener = listener;
+                } else {
+                    if (otherListeners == null) {
+                        otherListeners = new ArrayList(1);
+                    }
+                    otherListeners.add(listener);
                 }
-                otherListeners.add(listener);
-            }
-            if (ready) {
-                listener.operationComplete(this);
+            } else {
+                notifyListener(listener);
             }
         }
     }
@@ -191,13 +193,21 @@ public class DefaultIoFuture implements IoFuture {
     private void notifyListeners() {
         synchronized (lock) {
             if (firstListener != null) {
-                firstListener.operationComplete(this);
+                notifyListener(firstListener);
                 if (otherListeners != null) {
                     for (Iterator i = otherListeners.iterator(); i.hasNext();) {
-                        ((IoFutureListener) i.next()).operationComplete(this);
+                        notifyListener((IoFutureListener) i.next());
                     }
                 }
             }
+        }
+    }
+
+    private void notifyListener(IoFutureListener l) {
+        try {
+            l.operationComplete(this);
+        } catch (Throwable t) {
+            ExceptionMonitor.getInstance().exceptionCaught(t);
         }
     }
 }

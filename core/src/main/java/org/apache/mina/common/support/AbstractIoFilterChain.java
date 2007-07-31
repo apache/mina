@@ -360,6 +360,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
             entry.getFilter().filterWrite(entry.getNextFilter(), session,
                     writeRequest);
         } catch (Throwable e) {
+            writeRequest.getFuture().setWritten(false);
             fireExceptionCaught(session, e);
         }
     }
