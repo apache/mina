@@ -154,7 +154,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
         }
     }
 
-    private synchronized void startupWorker() throws IOException {
+    private void startupWorker() throws IOException {
         synchronized (lock) {
             if (worker == null) {
                 selector = Selector.open();
