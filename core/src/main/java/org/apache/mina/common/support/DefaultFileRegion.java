@@ -4,7 +4,7 @@ import java.nio.channels.FileChannel;
 
 import org.apache.mina.common.FileRegion;
 
-public class DefaultSendFileRegion implements FileRegion {
+public class DefaultFileRegion implements FileRegion {
 
     private final FileChannel channel;
     
@@ -12,7 +12,7 @@ public class DefaultSendFileRegion implements FileRegion {
     private long position;
     private long count;
     
-    public DefaultSendFileRegion(FileChannel channel, long position, long count) {
+    public DefaultFileRegion(FileChannel channel, long position, long count) {
         if (channel == null) {
             throw new IllegalArgumentException("channel can not be null");
         }

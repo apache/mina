@@ -36,6 +36,8 @@ import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TrafficMask;
@@ -149,33 +151,50 @@ public abstract class BaseIoSession implements IoSession {
             throw new NullPointerException("message");
         }
 
-        if (message instanceof ByteBuffer
-                && !((ByteBuffer) message).hasRemaining()) {
-            throw new IllegalArgumentException(
-                    "message is empty. Forgot to call flip()?");
-        } else if (message instanceof File || message instanceof FileChannel) {
-            try {
-                FileChannel channel;
-                if (message instanceof File) {
-                    File file = (File) message;
-                    channel = new FileInputStream(file).getChannel();
-                } else {
-                    channel = (FileChannel) message;
-                }
-                message = new DefaultSendFileRegion(channel, 0, channel.size());
-            } catch (IOException e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-            }
-        }
-
         synchronized (lock) {
             if (isClosing() || !isConnected()) {
                 return DefaultWriteFuture.newNotWrittenFuture(this);
             }
         }
 
+        FileChannel channel = null;
+        if (message instanceof ByteBuffer
+                && !((ByteBuffer) message).hasRemaining()) {
+            throw new IllegalArgumentException(
+                    "message is empty. Forgot to call flip()?");
+        } else if (message instanceof FileChannel) {
+            channel = (FileChannel) message;
+            try {
+                message = new DefaultFileRegion(channel, 0, channel.size());
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+                return DefaultWriteFuture.newNotWrittenFuture(this);
+            }
+        } else if (message instanceof File) {
+            File file = (File) message;
+            try {
+                channel = new FileInputStream(file).getChannel();
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+                return DefaultWriteFuture.newNotWrittenFuture(this);
+            }
+        }
+        
         WriteFuture future = new DefaultWriteFuture(this);
         write0(new DefaultWriteRequest(message, future, remoteAddress));
+        
+        if (message instanceof File) {
+            final FileChannel finalChannel = channel;
+            future.addListener(new IoFutureListener() {
+                public void operationComplete(IoFuture future) {
+                    try {
+                        finalChannel.close();
+                    } catch (IOException e) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e);
+                    }
+                }
+            });
+        }
 
         return future;
     }
