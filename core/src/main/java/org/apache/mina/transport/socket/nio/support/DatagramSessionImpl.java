@@ -173,7 +173,21 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession {
     }
 
     public int getScheduledWriteRequests() {
-        return writeRequestQueue.size();
+        int size = 0;
+        synchronized (writeRequestQueue) {
+            for (WriteRequest request : writeRequestQueue) {
+                Object message = request.getMessage();
+                if (message instanceof ByteBuffer) {
+                    if (((ByteBuffer) message).hasRemaining()) {
+                        size ++;
+                    }
+                } else {
+                    size ++;
+                }
+            }
+        }
+
+        return size;
     }
 
     public int getScheduledWriteBytes() {
