@@ -322,14 +322,32 @@ class SocketIoProcessor {
     private void releaseWriteBuffers(SocketSessionImpl session) {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
-
-        while ((req = writeRequestQueue.poll()) != null) {
+        
+        if ((req = writeRequestQueue.poll()) != null) {
+            ByteBuffer buf = (ByteBuffer) req.getMessage();
             try {
-                ((ByteBuffer) req.getMessage()).release();
+                buf.release();
             } catch (IllegalStateException e) {
                 session.getFilterChain().fireExceptionCaught(session, e);
             } finally {
-                req.getFuture().setWritten(false);
+                // The first unwritten empty buffer must be
+                // forwarded to the filter chain.
+                if (buf.hasRemaining()) {
+                    req.getFuture().setWritten(false);
+                } else {
+                    session.getFilterChain().fireMessageSent(session, req);                    
+                }
+            }
+
+            // Discard others.
+            while ((req = writeRequestQueue.poll()) != null) {
+                try {
+                    ((ByteBuffer) req.getMessage()).release();
+                } catch (IllegalStateException e) {
+                    session.getFilterChain().fireExceptionCaught(session, e);
+                } finally {
+                    req.getFuture().setWritten(false);
+                }
             }
         }
     }
