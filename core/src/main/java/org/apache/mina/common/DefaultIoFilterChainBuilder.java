@@ -52,8 +52,7 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
-        Cloneable {
+public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     private final List<Entry> entries;
 
     /**
@@ -61,6 +60,16 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
      */
     public DefaultIoFilterChainBuilder() {
         entries = new CopyOnWriteArrayList<Entry>();
+    }
+    
+    /**
+     * Creates a new copy of the specified {@link DefaultFilterChainBuilder}.
+     */
+    public DefaultIoFilterChainBuilder(DefaultIoFilterChainBuilder filterChain) {
+        if (filterChain == null) {
+            throw new NullPointerException("filterChain");
+        }
+        entries = new CopyOnWriteArrayList<Entry>(filterChain.entries);
     }
 
     /**
@@ -312,15 +321,6 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
         buf.append(" }");
 
         return buf.toString();
-    }
-
-    @Override
-    public Object clone() {
-        DefaultIoFilterChainBuilder ret = new DefaultIoFilterChainBuilder();
-        for (Entry e : entries) {
-            ret.addLast(e.getName(), e.getFilter());
-        }
-        return ret;
     }
 
     private void checkBaseName(String baseName) {
