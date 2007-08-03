@@ -21,14 +21,14 @@ package org.apache.mina.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilterChain.Entry;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The default implementation of {@link IoFilterChainBuilder} which is useful
@@ -56,33 +56,33 @@ import org.apache.mina.common.IoFilterChain.Entry;
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
         Cloneable {
-    private List entries;
-
-    private Map entriesByName;
+    private final List entries;
 
     /**
      * Creates a new instance with an empty filter list.
      */
     public DefaultIoFilterChainBuilder() {
-        init();
-    }
-
-    private void init() {
-        entries = new ArrayList();
-        entriesByName = new HashMap();
+        entries = new CopyOnWriteArrayList();
     }
 
     /**
      * @see IoFilterChain#getEntry(String)
      */
-    public synchronized Entry getEntry(String name) {
-        return (Entry) entriesByName.get(name);
+    public Entry getEntry(String name) {
+        for (Iterator i = entries.iterator(); i.hasNext(); ) {
+            Entry e = (Entry) i.next();
+            if (e.getName().equals(name)) {
+                return e;
+            }
+        }
+        
+        return null;
     }
 
     /**
      * @see IoFilterChain#get(String)
      */
-    public synchronized IoFilter get(String name) {
+    public IoFilter get(String name) {
         Entry e = getEntry(name);
         if (e == null) {
             return null;
@@ -179,8 +179,6 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
             IoFilter filter) {
         checkBaseName(baseName);
 
-        List entries = new ArrayList(this.entries);
-
         for (ListIterator i = entries.listIterator(); i.hasNext();) {
             Entry base = (Entry) i.next();
             if (base.getName().equals(baseName)) {
@@ -201,7 +199,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
         for (ListIterator i = entries.listIterator(); i.hasNext();) {
             Entry e = (Entry) i.next();
             if (e.getName().equals(name)) {
-                deregister(i.previousIndex(), e);
+                entries.remove(i.previousIndex());
                 return e.getFilter();
             }
         }
@@ -213,7 +211,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
      * @see IoFilterChain#clear()
      */
     public synchronized void clear() throws Exception {
-        init();
+        entries.clear();
     }
 
     public void buildFilterChain(IoFilterChain chain) throws Exception {
@@ -254,15 +252,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
     }
 
     public Object clone() {
-        DefaultIoFilterChainBuilder ret;
-        try {
-            ret = (DefaultIoFilterChainBuilder) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw (InternalError) new InternalError().initCause(e);
-        }
-
-        ret.init();
-
+        DefaultIoFilterChainBuilder ret = new DefaultIoFilterChainBuilder();
         for (Iterator i = entries.iterator(); i.hasNext();) {
             Entry e = (Entry) i.next();
             ret.addLast(e.getName(), e.getFilter());
@@ -274,29 +264,20 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder,
         if (baseName == null) {
             throw new NullPointerException("baseName");
         }
-        if (!entriesByName.containsKey(baseName)) {
+        
+        if (!contains(baseName)) {
             throw new IllegalArgumentException("Unknown filter name: "
                     + baseName);
         }
     }
 
     private void register(int index, Entry e) {
-        if (entriesByName.containsKey(e.getName())) {
+        if (contains(e.getName())) {
             throw new IllegalArgumentException(
                     "Other filter is using the same name: " + e.getName());
         }
 
-        List newEntries = new ArrayList(entries);
-        newEntries.add(index, e);
-        this.entries = newEntries;
-        entriesByName.put(e.getName(), e);
-    }
-
-    private void deregister(int index, Entry e) {
-        List newEntries = new ArrayList(entries);
-        newEntries.remove(index);
-        this.entries = newEntries;
-        entriesByName.remove(e.getName());
+        entries.add(index, e);
     }
 
     private static class EntryImpl implements Entry {
