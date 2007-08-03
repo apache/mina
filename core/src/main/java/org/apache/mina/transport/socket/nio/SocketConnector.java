@@ -190,18 +190,16 @@ public class SocketConnector extends BaseIoConnector {
         }
 
         ConnectionRequest request = new ConnectionRequest(ch, handler, config);
-        synchronized (lock) {
+        try {
+            startupWorker();
+        } catch (IOException e) {
             try {
-                startupWorker();
-            } catch (IOException e) {
-                try {
-                    ch.close();
-                } catch (IOException e2) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e2);
-                }
-
-                return DefaultConnectFuture.newFailedFuture(e);
+                ch.close();
+            } catch (IOException e2) {
+                ExceptionMonitor.getInstance().exceptionCaught(e2);
             }
+
+            return DefaultConnectFuture.newFailedFuture(e);
         }
 
         synchronized (connectQueue) {
@@ -229,11 +227,13 @@ public class SocketConnector extends BaseIoConnector {
         this.defaultConfig = defaultConfig;
     }
 
-    private synchronized void startupWorker() throws IOException {
-        if (worker == null) {
-            selector = Selector.open();
-            worker = new Worker();
-            executor.execute(new NamePreservingRunnable(worker));
+    private void startupWorker() throws IOException {
+        synchronized (lock) {
+            if (worker == null) {
+                selector = Selector.open();
+                worker = new Worker();
+                executor.execute(new NamePreservingRunnable(worker));
+            }
         }
     }
 
