@@ -139,6 +139,33 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
         return entry.getFilter();
     }
 
+    public synchronized void remove(IoFilter filter) {
+        EntryImpl e = head.nextEntry;
+        while (e != tail) {
+            if (e.getFilter() == filter) {
+                deregister(e);
+                return;
+            }
+            e = e.nextEntry;
+        }
+        throw new IllegalArgumentException("Filter not found: "
+                + filter.getClass().getName());
+    }
+
+    public synchronized IoFilter remove(Class<? extends IoFilter> filterType) {
+        EntryImpl e = head.nextEntry;
+        while (e != tail) {
+            if (filterType.isAssignableFrom(e.getFilter().getClass())) {
+                IoFilter oldFilter = e.getFilter();
+                deregister(e);
+                return oldFilter;
+            }
+            e = e.nextEntry;
+        }
+        throw new IllegalArgumentException("Filter not found: "
+                + filterType.getName());
+    }
+
     public synchronized IoFilter replace(String name, IoFilter newFilter) {
         EntryImpl entry = checkOldName(name);
         IoFilter oldFilter = entry.getFilter();
@@ -159,13 +186,14 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
                 + oldFilter.getClass().getName());
     }
 
-    public synchronized void replace(Class<? extends IoFilter> oldFilterType,
+    public synchronized IoFilter replace(Class<? extends IoFilter> oldFilterType,
             IoFilter newFilter) {
         EntryImpl e = head.nextEntry;
         while (e != tail) {
             if (oldFilterType.isAssignableFrom(e.getFilter().getClass())) {
+                IoFilter oldFilter = e.getFilter();
                 e.setFilter(newFilter);
-                return;
+                return oldFilter;
             }
             e = e.nextEntry;
         }
