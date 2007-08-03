@@ -164,6 +164,12 @@ public class SocketAcceptor extends BaseIoAcceptor {
             throw request.exception;
         }
     }
+    
+    private Selector getSelector() {
+        synchronized (lock) {
+            return this.selector;
+        }
+    }
 
     private void startupWorker() throws IOException {
         synchronized (lock) {
@@ -231,6 +237,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
         public void run() {
             Thread.currentThread().setName(SocketAcceptor.this.threadName);
 
+            Selector selector = getSelector();
             for (;;) {
                 try {
                     int nKeys = selector.select();
@@ -349,6 +356,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
             return;
         }
 
+        Selector selector = getSelector();
         for (;;) {
             RegistrationRequest req;
 
@@ -418,6 +426,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
             return;
         }
 
+        Selector selector = getSelector();
         for (;;) {
             CancellationRequest request;
 

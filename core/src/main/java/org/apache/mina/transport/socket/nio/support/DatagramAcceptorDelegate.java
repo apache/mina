@@ -186,7 +186,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
             throw new NullPointerException("localAddress");
         }
 
-        Selector selector = this.selector;
+        Selector selector = getSelector();
         DatagramChannel ch = (DatagramChannel) channels.get(localAddress);
         if (selector == null || ch == null) {
             throw new IllegalArgumentException("Unknown localAddress: "
@@ -273,6 +273,10 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         }
         this.defaultConfig = defaultConfig;
     }
+    
+    private synchronized Selector getSelector() {
+        return this.selector;
+    }
 
     private synchronized void startupWorker() throws IOException {
         if (worker == null) {
@@ -284,7 +288,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
 
     public void flushSession(DatagramSessionImpl session) {
         scheduleFlush(session);
-        Selector selector = this.selector;
+        Selector selector = getSelector();
         if (selector != null) {
             selector.wakeup();
         }
@@ -303,6 +307,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         public void run() {
             Thread.currentThread().setName("DatagramAcceptor-" + id);
 
+            Selector selector = DatagramAcceptorDelegate.this.getSelector();
             for (;;) {
                 try {
                     int nKeys = selector.select();
@@ -486,6 +491,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         if (registerQueue.isEmpty())
             return;
 
+        Selector selector = getSelector();
         for (;;) {
             RegistrationRequest req;
             synchronized (registerQueue) {
@@ -552,6 +558,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         if (cancelQueue.isEmpty())
             return;
 
+        Selector selector = getSelector();
         for (;;) {
             CancellationRequest request;
             synchronized (cancelQueue) {

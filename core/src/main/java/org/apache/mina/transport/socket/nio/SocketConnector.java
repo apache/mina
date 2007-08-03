@@ -226,6 +226,12 @@ public class SocketConnector extends BaseIoConnector {
         }
         this.defaultConfig = defaultConfig;
     }
+    
+    private Selector getSelector() {
+        synchronized (lock) {
+            return this.selector;
+        }
+    }
 
     private void startupWorker() throws IOException {
         synchronized (lock) {
@@ -241,6 +247,7 @@ public class SocketConnector extends BaseIoConnector {
         if (connectQueue.isEmpty())
             return;
 
+        Selector selector = getSelector();
         for (;;) {
             ConnectionRequest req;
             synchronized (connectQueue) {
@@ -357,6 +364,7 @@ public class SocketConnector extends BaseIoConnector {
         public void run() {
             Thread.currentThread().setName(SocketConnector.this.threadName);
 
+            Selector selector = getSelector();
             for (;;) {
                 try {
                     int nKeys = selector.select(1000);

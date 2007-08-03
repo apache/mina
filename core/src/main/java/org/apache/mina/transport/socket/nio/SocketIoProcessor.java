@@ -83,6 +83,12 @@ class SocketIoProcessor {
         startupWorker();
     }
 
+    private Selector getSelector() {
+        synchronized (lock) {
+            return this.selector;
+        }
+    }
+    
     private void startupWorker() throws IOException {
         synchronized (lock) {
             if (worker == null) {
@@ -96,7 +102,7 @@ class SocketIoProcessor {
 
     void flush(SocketSessionImpl session) {
         scheduleFlush(session);
-        Selector selector = this.selector;
+        Selector selector = getSelector();
         if (selector != null) {
             selector.wakeup();
         }
@@ -104,7 +110,7 @@ class SocketIoProcessor {
 
     void updateTrafficMask(SocketSessionImpl session) {
         scheduleTrafficControl(session);
-        Selector selector = this.selector;
+        Selector selector = getSelector();
         if (selector != null) {
             selector.wakeup();
         }
@@ -132,6 +138,7 @@ class SocketIoProcessor {
         if (newSessions.isEmpty())
             return;
 
+        Selector selector = getSelector();
         for (;;) {
             SocketSessionImpl session;
 
@@ -265,6 +272,7 @@ class SocketIoProcessor {
         long currentTime = System.currentTimeMillis();
         if ((currentTime - lastIdleCheckTime) >= 1000) {
             lastIdleCheckTime = currentTime;
+            Selector selector = getSelector();
             Set keys = selector.keys();
             if (keys != null) {
                 for (Iterator it = keys.iterator(); it.hasNext();) {
@@ -482,6 +490,7 @@ class SocketIoProcessor {
         public void run() {
             Thread.currentThread().setName(SocketIoProcessor.this.threadName);
 
+            Selector selector = getSelector();
             for (;;) {
                 try {
                     int nKeys = selector.select(1000);
@@ -527,5 +536,4 @@ class SocketIoProcessor {
             }
         }
     }
-
 }

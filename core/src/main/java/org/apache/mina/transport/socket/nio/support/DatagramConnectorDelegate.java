@@ -194,6 +194,10 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
         }
         this.defaultConfig = defaultConfig;
     }
+    
+    private synchronized Selector getSelector() {
+        return this.selector;
+    }
 
     private synchronized void startupWorker() throws IOException {
         if (worker == null) {
@@ -226,7 +230,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
 
     public void flushSession(DatagramSessionImpl session) {
         scheduleFlush(session);
-        Selector selector = this.selector;
+        Selector selector = getSelector();
         if (selector != null) {
             selector.wakeup();
         }
@@ -240,7 +244,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
 
     public void updateTrafficMask(DatagramSessionImpl session) {
         scheduleTrafficControl(session);
-        Selector selector = this.selector;
+        Selector selector = getSelector();
         if (selector != null) {
             selector.wakeup();
         }
@@ -300,6 +304,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
         public void run() {
             Thread.currentThread().setName("DatagramConnector-" + id);
 
+            Selector selector = getSelector();
             for (;;) {
                 try {
                     int nKeys = selector.select();
@@ -483,6 +488,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
         if (registerQueue.isEmpty())
             return;
 
+        Selector selector = getSelector();
         for (;;) {
             RegistrationRequest req;
             synchronized (registerQueue) {
@@ -540,6 +546,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
         if (cancelQueue.isEmpty())
             return;
 
+        Selector selector = getSelector();
         for (;;) {
             DatagramSessionImpl session;
             synchronized (cancelQueue) {
