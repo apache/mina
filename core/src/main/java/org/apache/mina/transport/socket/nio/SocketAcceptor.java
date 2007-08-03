@@ -75,7 +75,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
 
     private final int processorCount;
 
-    private Selector selector;
+    private volatile Selector selector;
 
     private Worker worker;
 
@@ -212,6 +212,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
         public void run() {
             Thread.currentThread().setName(SocketAcceptor.this.threadName);
 
+            Selector selector = SocketAcceptor.this.selector;
             for (;;) {
                 try {
                     int nKeys = selector.select();
@@ -330,6 +331,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
             return;
         }
 
+        Selector selector = this.selector;
         for (;;) {
             RegistrationRequest req = registerQueue.poll();
 
@@ -388,6 +390,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
             return;
         }
 
+        Selector selector = this.selector;
         for (;;) {
             CancellationRequest request = cancelQueue.poll();
 

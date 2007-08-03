@@ -48,7 +48,7 @@ class SocketIoProcessor {
 
     private final Executor executor;
 
-    private Selector selector;
+    private volatile Selector selector;
 
     private final Queue<SocketSessionImpl> newSessions = new ConcurrentLinkedQueue<SocketSessionImpl>();
 
@@ -117,6 +117,7 @@ class SocketIoProcessor {
     }
 
     private void doAddNew() {
+        Selector selector = this.selector;
         for (;;) {
             SocketSessionImpl session = newSessions.poll();
 
@@ -436,6 +437,7 @@ class SocketIoProcessor {
         public void run() {
             Thread.currentThread().setName(SocketIoProcessor.this.threadName);
 
+            Selector selector = SocketIoProcessor.this.selector;
             for (;;) {
                 try {
                     int nKeys = selector.select(1000);
@@ -481,5 +483,4 @@ class SocketIoProcessor {
             }
         }
     }
-
 }

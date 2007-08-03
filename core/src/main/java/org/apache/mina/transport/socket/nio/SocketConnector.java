@@ -69,7 +69,7 @@ public class SocketConnector extends BaseIoConnector {
 
     private final Executor executor;
 
-    private Selector selector;
+    private volatile Selector selector;
 
     private Worker worker;
 
@@ -234,6 +234,7 @@ public class SocketConnector extends BaseIoConnector {
         if (connectQueue.isEmpty())
             return;
 
+        Selector selector = this.selector;
         for (;;) {
             ConnectionRequest req = connectQueue.poll();
 
@@ -340,6 +341,7 @@ public class SocketConnector extends BaseIoConnector {
         public void run() {
             Thread.currentThread().setName(SocketConnector.this.threadName);
 
+            Selector selector = SocketConnector.this.selector;
             for (;;) {
                 try {
                     int nKeys = selector.select(1000);

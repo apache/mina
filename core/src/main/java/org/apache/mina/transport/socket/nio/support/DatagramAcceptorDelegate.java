@@ -70,7 +70,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
 
     private final int id = nextId.getAndIncrement();
 
-    private Selector selector;
+    private volatile Selector selector;
 
     private DatagramAcceptorConfig defaultConfig = new DatagramAcceptorConfig();
 
@@ -300,6 +300,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         public void run() {
             Thread.currentThread().setName("DatagramAcceptor-" + id);
 
+            Selector selector = DatagramAcceptorDelegate.this.selector;
             for (;;) {
                 try {
                     int nKeys = selector.select();

@@ -67,7 +67,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
 
     private final int id = nextId.getAndIncrement();
 
-    private Selector selector;
+    private volatile Selector selector;
 
     private DatagramConnectorConfig defaultConfig = new DatagramConnectorConfig();
 
@@ -284,6 +284,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
         public void run() {
             Thread.currentThread().setName("DatagramConnector-" + id);
 
+            Selector selector = DatagramConnectorDelegate.this.selector;
             for (;;) {
                 try {
                     int nKeys = selector.select();
