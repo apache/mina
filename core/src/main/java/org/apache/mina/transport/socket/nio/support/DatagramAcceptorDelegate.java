@@ -111,8 +111,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
                 registerQueue.push(request);
             }
             startupWorker();
+            selector.wakeup();
         }
-        selector.wakeup();
 
         synchronized (request) {
             while (!request.done) {
@@ -149,8 +149,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
             synchronized (cancelQueue) {
                 cancelQueue.push(request);
             }
+            selector.wakeup();
         }
-        selector.wakeup();
 
         synchronized (request) {
             while (!request.done) {
@@ -333,7 +333,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
                                     ExceptionMonitor.getInstance()
                                             .exceptionCaught(e);
                                 } finally {
-                                    selector = null;
+                                    DatagramAcceptorDelegate.this.selector = null;
                                 }
                                 break;
                             }

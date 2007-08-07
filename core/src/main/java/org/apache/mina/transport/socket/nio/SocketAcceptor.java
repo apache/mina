@@ -142,13 +142,15 @@ public class SocketAcceptor extends BaseIoAcceptor {
         RegistrationRequest request = new RegistrationRequest(address, handler,
                 config);
 
-        synchronized (registerQueue) {
-            registerQueue.push(request);
+        synchronized (lock) {
+            startupWorker();
+    
+            synchronized (registerQueue) {
+                registerQueue.push(request);
+            }
+    
+            selector.wakeup();
         }
-
-        startupWorker();
-
-        selector.wakeup();
 
         synchronized (request) {
             while (!request.done) {
@@ -262,7 +264,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
                                     ExceptionMonitor.getInstance()
                                             .exceptionCaught(e);
                                 } finally {
-                                    selector = null;
+                                    SocketAcceptor.this.selector = null;
                                 }
                                 break;
                             }

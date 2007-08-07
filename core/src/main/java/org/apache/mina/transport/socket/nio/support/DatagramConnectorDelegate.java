@@ -172,9 +172,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
             synchronized (registerQueue) {
                 registerQueue.push(request);
             }
+            selector.wakeup();
         }
 
-        selector.wakeup();
         return request;
     }
 
@@ -223,9 +223,9 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
             synchronized (cancelQueue) {
                 cancelQueue.push(session);
             }
-        }
 
-        selector.wakeup();
+            selector.wakeup();
+        }
     }
 
     public void flushSession(DatagramSessionImpl session) {
@@ -331,7 +331,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
                                     ExceptionMonitor.getInstance()
                                             .exceptionCaught(e);
                                 } finally {
-                                    selector = null;
+                                    DatagramConnectorDelegate.this.selector = null;
                                 }
                                 break;
                             }
