@@ -147,8 +147,8 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
 
         RegistrationRequest request = new RegistrationRequest(ch);
 
-        registerQueue.offer(request);
         startupWorker();
+        registerQueue.offer(request);
         selector.wakeup();
 
         return request;
@@ -162,8 +162,8 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
     }
 
     public void closeSession(DatagramSessionImpl session) {
-        cancelQueue.offer(session);
         startupWorker();
+        cancelQueue.offer(session);
         selector.wakeup();
     }
 

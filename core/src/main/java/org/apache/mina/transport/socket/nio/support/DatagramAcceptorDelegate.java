@@ -125,8 +125,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
     protected void doBind() throws IOException {
         RegistrationRequest request = new RegistrationRequest();
 
-        registerQueue.offer(request);
         startupWorker();
+        registerQueue.offer(request);
         selector.wakeup();
 
         synchronized (request) {
@@ -150,8 +150,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
     protected void doUnbind() {
         CancellationRequest request = new CancellationRequest();
 
-        cancelQueue.offer(request);
         startupWorker();
+        cancelQueue.offer(request);
         selector.wakeup();
 
         synchronized (request) {

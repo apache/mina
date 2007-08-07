@@ -251,13 +251,13 @@ public class SocketAcceptor extends BaseIoAcceptor {
     protected void doBind() throws IOException {
         RegistrationRequest request = new RegistrationRequest();
 
-        // adds the Registration request to the queue for the Workers 
-        // to handle
-        registerQueue.offer(request);
-        
         // creates an instance of a Worker and has the local 
         // executor kick it off.
         startupWorker();
+
+        // adds the Registration request to the queue for the Workers 
+        // to handle
+        registerQueue.offer(request);
         selector.wakeup();
 
         synchronized (request) {
