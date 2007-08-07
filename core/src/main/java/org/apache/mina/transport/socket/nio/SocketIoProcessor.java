@@ -359,13 +359,18 @@ class SocketIoProcessor {
         WriteRequest req;
 
         if ((req = writeRequestQueue.poll()) != null) {
-            ByteBuffer buf = (ByteBuffer) req.getMessage();
-            // The first unwritten empty buffer must be
-            // forwarded to the filter chain.
-            if (buf.hasRemaining()) {
-                req.getFuture().setWritten(false);
+            Object m = req.getMessage();
+            if (m instanceof ByteBuffer) {
+                ByteBuffer buf = (ByteBuffer) req.getMessage();
+                // The first unwritten empty buffer must be
+                // forwarded to the filter chain.
+                if (buf.hasRemaining()) {
+                    req.getFuture().setWritten(false);
+                } else {
+                    session.getFilterChain().fireMessageSent(session, req);                    
+                }
             } else {
-                session.getFilterChain().fireMessageSent(session, req);                    
+                req.getFuture().setWritten(false);
             }
 
             // Discard others.
