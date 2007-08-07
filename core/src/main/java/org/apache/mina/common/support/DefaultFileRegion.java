@@ -48,7 +48,7 @@ public class DefaultFileRegion implements FileRegion {
         if (value < position) {
             throw new IllegalArgumentException("New position value may not be less than old position value");
         }
-        count += value - position;
+        count -= value - position;
         position = value;
     }
 
