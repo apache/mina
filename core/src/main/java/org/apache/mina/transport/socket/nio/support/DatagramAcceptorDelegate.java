@@ -109,10 +109,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
 
         RegistrationRequest request = new RegistrationRequest(address, handler,
                 config);
-        registerQueue.add(request);
-        startupWorker();
-
-        selector.wakeup();
+        
+        synchronized (lock) {
+            startupWorker();
+            registerQueue.add(request);
+            selector.wakeup();
+        }
 
         synchronized (request) {
             while (!request.done) {
@@ -135,18 +137,20 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
             throw new NullPointerException("address");
 
         CancellationRequest request = new CancellationRequest(address);
-        try {
-            startupWorker();
-        } catch (IOException e) {
-            // IOException is thrown only when Worker thread is not
-            // running and failed to open a selector.  We simply throw
-            // IllegalArgumentException here because we can simply
-            // conclude that nothing is bound to the selector.
-            throw new IllegalArgumentException("Address not bound: " + address);
+        synchronized (lock) {
+            try {
+                startupWorker();
+            } catch (IOException e) {
+                // IOException is thrown only when Worker thread is not
+                // running and failed to open a selector.  We simply throw
+                // IllegalArgumentException here because we can simply
+                // conclude that nothing is bound to the selector.
+                throw new IllegalArgumentException("Address not bound: " + address);
+            }
+    
+            cancelQueue.add(request);
+            selector.wakeup();
         }
-
-        cancelQueue.add(request);
-        selector.wakeup();
 
         synchronized (request) {
             while (!request.done) {
@@ -326,7 +330,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
                                     ExceptionMonitor.getInstance()
                                             .exceptionCaught(e);
                                 } finally {
-                                    selector = null;
+                                    DatagramAcceptorDelegate.this.selector = null;
                                 }
                                 break;
                             }
@@ -472,6 +476,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         if (registerQueue.isEmpty())
             return;
 
+        Selector selector = this.selector;
         for (;;) {
             RegistrationRequest req = registerQueue.poll();
 
@@ -532,6 +537,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         if (cancelQueue.isEmpty())
             return;
 
+        Selector selector = this.selector;
         for (;;) {
             CancellationRequest request = cancelQueue.poll();
 

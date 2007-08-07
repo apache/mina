@@ -157,22 +157,24 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
 
         RegistrationRequest request = new RegistrationRequest(ch, handler,
                 config);
-        try {
-            startupWorker();
-        } catch (IOException e) {
+        synchronized (lock) {
             try {
-                ch.disconnect();
-                ch.close();
-            } catch (IOException e2) {
-                ExceptionMonitor.getInstance().exceptionCaught(e2);
+                startupWorker();
+            } catch (IOException e) {
+                try {
+                    ch.disconnect();
+                    ch.close();
+                } catch (IOException e2) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e2);
+                }
+    
+                return DefaultConnectFuture.newFailedFuture(e);
             }
-
-            return DefaultConnectFuture.newFailedFuture(e);
+    
+            registerQueue.add(request);
+    
+            selector.wakeup();
         }
-
-        registerQueue.add(request);
-
-        selector.wakeup();
         return request;
     }
 
@@ -204,20 +206,22 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
     }
 
     public void closeSession(DatagramSessionImpl session) {
-        try {
-            startupWorker();
-        } catch (IOException e) {
-            // IOException is thrown only when Worker thread is not
-            // running and failed to open a selector.  We simply return
-            // silently here because it we can simply conclude that
-            // this session is not managed by this connector or
-            // already closed.
-            return;
+        synchronized (lock) {
+            try {
+                startupWorker();
+            } catch (IOException e) {
+                // IOException is thrown only when Worker thread is not
+                // running and failed to open a selector.  We simply return
+                // silently here because it we can simply conclude that
+                // this session is not managed by this connector or
+                // already closed.
+                return;
+            }
+    
+            cancelQueue.add(session);
+    
+            selector.wakeup();
         }
-
-        cancelQueue.add(session);
-
-        selector.wakeup();
     }
 
     public void flushSession(DatagramSessionImpl session) {
@@ -311,7 +315,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
                                     ExceptionMonitor.getInstance()
                                             .exceptionCaught(e);
                                 } finally {
-                                    selector = null;
+                                    DatagramConnectorDelegate.this.selector = null;
                                 }
                                 break;
                             }
@@ -458,6 +462,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
         if (registerQueue.isEmpty())
             return;
 
+        Selector selector = this.selector;
         for (;;) {
             RegistrationRequest req = registerQueue.poll();
 
@@ -512,6 +517,7 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
         if (cancelQueue.isEmpty())
             return;
 
+        Selector selector = this.selector;
         for (;;) {
             DatagramSessionImpl session = cancelQueue.poll();
 
