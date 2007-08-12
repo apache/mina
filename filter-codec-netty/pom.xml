@@ -10,23 +10,10 @@
   <name>Apache MINA Netty Codec Filter</name>
   <packaging>jar</packaging>
 
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>safehauS-m1-repository</id>
-      <name>SafeHaus.org Maven 1.x Repository</name>
-      <url>http://maven.safehaus.org/</url>
-      <layout>legacy</layout>
-    </repository>
-  </repositories>
-
   <dependencies>
-
     <dependency>
-      <groupId>tl-netty2</groupId>
-      <artifactId>tl-netty2</artifactId>
+      <groupId>net.gleamynode</groupId>
+      <artifactId>netty2</artifactId>
       <version>1.9.2</version>
       <scope>compile</scope>
     </dependency>
