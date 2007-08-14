@@ -24,7 +24,7 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.DefaultCloseFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.DefaultWriteFuture;
@@ -71,7 +71,7 @@ public class FutureTest extends TestCase {
         TestThread thread = new TestThread(future);
         thread.start();
 
-        IoSession session = new BaseIoSession() {
+        IoSession session = new AbstractIoSession() {
             public IoHandler getHandler() {
                 return null;
             }

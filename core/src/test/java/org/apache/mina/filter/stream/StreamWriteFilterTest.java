@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IdleStatus;
@@ -542,7 +542,7 @@ public class StreamWriteFilterTest extends TestCase {
         }
     }
 
-    private static class DummySession extends BaseIoSession {
+    private static class DummySession extends AbstractIoSession {
 
         @Override
         protected void updateTrafficMask() {

@@ -44,8 +44,8 @@ public class IoHandlerAdapter implements IoHandler {
 
     public void exceptionCaught(IoSession session, Throwable cause)
             throws Exception {
-        if (SessionLog.isWarnEnabled(session)) {
-            SessionLog.warn(session, "EXCEPTION, please implement "
+        if (IoSessionLogger.isWarnEnabled(session)) {
+            IoSessionLogger.warn(session, "EXCEPTION, please implement "
                     + getClass().getName()
                     + ".exceptionCaught() for proper handling:", cause);
         }

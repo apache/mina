@@ -29,7 +29,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 
 /**
  * A {@link IoHandler} that adapts asynchronous MINA events to stream I/O.
@@ -155,7 +155,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
         if (e != null && in != null) {
             in.throwException(e);
         } else {
-            SessionLog.warn(session, "Unexpected exception.", cause);
+            IoSessionLogger.warn(session, "Unexpected exception.", cause);
             session.close();
         }
     }

@@ -22,7 +22,7 @@ package org.apache.mina.integration.jmx;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
@@ -68,11 +68,11 @@ public class IoSessionManager implements IoSessionManagerMBean {
     }
 
     public long getReadMessages() {
-        return ((BaseIoSession) session).getReadMessages();
+        return ((AbstractIoSession) session).getReadMessages();
     }
 
     public long getWrittenMessages() {
-        return ((BaseIoSession) session).getWrittenMessages();
+        return ((AbstractIoSession) session).getWrittenMessages();
     }
 
     /**

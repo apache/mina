@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
@@ -129,7 +129,7 @@ public abstract class AbstractTest extends TestCase {
                         if (session.getFilterChain().contains("SSL")
                                 && buf.remaining() == 1
                                 && buf.get() == (byte) '.') {
-                            SessionLog.info(session, "TLS Reentrance");
+                            IoSessionLogger.info(session, "TLS Reentrance");
                             ((SSLFilter) session.getFilterChain().get("SSL"))
                                     .startSSL(session);
 

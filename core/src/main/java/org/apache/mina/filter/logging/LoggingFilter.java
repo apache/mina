@@ -27,12 +27,12 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
 
 
 /**
- * Logs all MINA protocol events using the {@link SessionLog}.  Each event can be 
+ * Logs all MINA protocol events using the {@link IoSessionLogger}.  Each event can be 
  * tuned to use a different level based on the user's specific requirements.  Methods
  * are in place that allow the user to use either the get or set method for each event
  * and pass in the {@link IoEventType} and the {@link LogLevel}.
@@ -80,14 +80,14 @@ public class LoggingFilter extends IoFilterAdapter
         @Override
         public void log( IoSession session, String message )
         {
-            SessionLog.debug( session, message );
+            IoSessionLogger.debug( session, message );
         }
 
 
         @Override
         public void log( IoSession session, String message, Throwable cause )
         {
-            SessionLog.debug( session, message, cause );
+            IoSessionLogger.debug( session, message, cause );
         }
 
 
@@ -106,14 +106,14 @@ public class LoggingFilter extends IoFilterAdapter
         @Override
         public void log( IoSession session, String message )
         {
-            SessionLog.info( session, message );
+            IoSessionLogger.info( session, message );
         }
 
 
         @Override
         public void log( IoSession session, String message, Throwable cause )
         {
-            SessionLog.info( session, message, cause );
+            IoSessionLogger.info( session, message, cause );
         }
 
 
@@ -132,14 +132,14 @@ public class LoggingFilter extends IoFilterAdapter
         @Override
         public void log( IoSession session, String message )
         {
-            SessionLog.warn( session, message );
+            IoSessionLogger.warn( session, message );
         }
 
 
         @Override
         public void log( IoSession session, String message, Throwable cause )
         {
-            SessionLog.warn( session, message, cause );
+            IoSessionLogger.warn( session, message, cause );
         }
 
 
@@ -158,14 +158,14 @@ public class LoggingFilter extends IoFilterAdapter
         @Override
         public void log( IoSession session, String message )
         {
-            SessionLog.error( session, message );
+            IoSessionLogger.error( session, message );
         }
 
 
         @Override
         public void log( IoSession session, String message, Throwable cause )
         {
-            SessionLog.error( session, message, cause );
+            IoSessionLogger.error( session, message, cause );
         }
 
 

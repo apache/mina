@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.vmpipe;
 
-import org.apache.mina.common.BaseIoSessionConfig;
+import org.apache.mina.common.AbstractIoSessionConfig;
 
 /**
  * A default implementation of {@link VmPipeSessionConfig}.
@@ -27,6 +27,6 @@ import org.apache.mina.common.BaseIoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultVmPipeSessionConfig extends BaseIoSessionConfig implements
+public class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements
         VmPipeSessionConfig {
 }

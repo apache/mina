@@ -26,7 +26,7 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IoFilterChain;
@@ -163,7 +163,7 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         }
     }
 
-    private static class IoSessionImpl extends BaseIoSession implements
+    private static class IoSessionImpl extends AbstractIoSession implements
             IoSession {
 
         public IoHandler getHandler() {

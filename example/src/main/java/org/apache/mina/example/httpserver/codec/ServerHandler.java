@@ -24,7 +24,7 @@ import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 
 /**
  * An {@link IoHandler} for HTTP.
@@ -70,13 +70,13 @@ public class ServerHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
-        SessionLog.info(session, "Disconnecting the idle.");
+        IoSessionLogger.info(session, "Disconnecting the idle.");
         session.close();
     }
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        SessionLog.warn(session, cause);
+        IoSessionLogger.warn(session, cause);
         session.close();
     }
 }

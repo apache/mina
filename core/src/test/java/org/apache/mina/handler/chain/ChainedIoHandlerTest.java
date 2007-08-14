@@ -24,7 +24,7 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -50,7 +50,7 @@ public class ChainedIoHandlerTest extends TestCase {
         chain.addLast("B", new TestCommand(buf, 'B'));
         chain.addLast("C", new TestCommand(buf, 'C'));
 
-        new ChainedIoHandler(chain).messageReceived(new BaseIoSession() {
+        new ChainedIoHandler(chain).messageReceived(new AbstractIoSession() {
             @Override
             protected void updateTrafficMask() {
             }

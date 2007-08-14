@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoFilterChain;
-import org.apache.mina.common.BaseIoConnector;
+import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
@@ -51,7 +51,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnectorDelegate extends BaseIoConnector implements
+public class DatagramConnectorDelegate extends AbstractIoConnector implements
         DatagramService {
     private static volatile int nextId = 0;
 

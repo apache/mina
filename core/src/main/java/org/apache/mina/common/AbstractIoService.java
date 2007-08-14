@@ -28,7 +28,7 @@ import java.util.Set;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoService implements IoService {
+public abstract class AbstractIoService implements IoService {
     /**
      * Current filter chain builder.
      */
@@ -49,7 +49,7 @@ public abstract class BaseIoService implements IoService {
      */
     private IoSessionConfig sessionConfig;
 
-    protected BaseIoService(IoSessionConfig sessionConfig) {
+    protected AbstractIoService(IoSessionConfig sessionConfig) {
         if (sessionConfig == null) {
             throw new NullPointerException("sessionConfig");
         }

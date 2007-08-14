@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestWrapper;
 
@@ -152,8 +152,8 @@ public class RequestResponseFilter extends IoFilterAdapter {
         if (request == null) {
             // A response message without request. Swallow the event because
             // the response might have arrived too late.
-            if (SessionLog.isWarnEnabled(session)) {
-                SessionLog.warn(session, "Unknown request ID '" + requestId
+            if (IoSessionLogger.isWarnEnabled(session)) {
+                IoSessionLogger.warn(session, "Unknown request ID '" + requestId
                         + "' for the response message. Timed out already?: "
                         + message);
             }

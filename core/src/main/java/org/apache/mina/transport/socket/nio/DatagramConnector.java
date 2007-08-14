@@ -21,7 +21,7 @@ package org.apache.mina.transport.socket.nio;
 
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.DelegatedIoConnector;
+import org.apache.mina.common.IoConnectorWrapper;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.transport.socket.nio.support.DatagramConnectorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
@@ -32,7 +32,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends DelegatedIoConnector {
+public class DatagramConnector extends IoConnectorWrapper {
     /**
      * Creates a new instance using a NewThreadExecutor 
      */
@@ -51,6 +51,6 @@ public class DatagramConnector extends DelegatedIoConnector {
 
     @Override
     public DatagramSessionConfig getSessionConfig() {
-        return ((DatagramConnectorDelegate) delegate).getSessionConfig();
+        return ((DatagramConnectorDelegate) connector).getSessionConfig();
     }
 }

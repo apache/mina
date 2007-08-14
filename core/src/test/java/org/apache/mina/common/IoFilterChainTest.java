@@ -188,7 +188,7 @@ public class IoFilterChainTest extends TestCase {
         return buf.toString();
     }
 
-    private class TestSession extends BaseIoSession implements IoSession {
+    private class TestSession extends AbstractIoSession implements IoSession {
         private final IoHandler handler = new IoHandlerAdapter() {
             @Override
             public void sessionCreated(IoSession session) {
@@ -377,7 +377,7 @@ public class IoFilterChainTest extends TestCase {
 
     private static class IoFilterChainImpl extends AbstractIoFilterChain {
         protected IoFilterChainImpl() {
-            super(new BaseIoSession() {
+            super(new AbstractIoSession() {
                 @Override
                 protected void updateTrafficMask() {
                 }

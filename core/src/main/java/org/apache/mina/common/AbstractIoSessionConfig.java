@@ -26,19 +26,7 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable {
-    protected BaseIoSessionConfig() {
-    }
-
-    @Override
-    public Object clone() {
-        BaseIoSessionConfig ret;
-        try {
-            ret = (BaseIoSessionConfig) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw (InternalError) new InternalError().initCause(e);
-        }
-
-        return ret;
+public abstract class AbstractIoSessionConfig implements IoSessionConfig {
+    protected AbstractIoSessionConfig() {
     }
 }

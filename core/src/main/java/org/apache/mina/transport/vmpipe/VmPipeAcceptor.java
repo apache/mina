@@ -24,7 +24,7 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.mina.common.BaseIoAcceptor;
+import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportType;
@@ -37,7 +37,7 @@ import org.apache.mina.transport.vmpipe.support.VmPipe;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAcceptor extends BaseIoAcceptor {
+public class VmPipeAcceptor extends AbstractIoAcceptor {
     static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
 
     /**

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterChain;
@@ -88,7 +88,7 @@ public class ExecutorFilterRegressionTest extends TestCase {
         }
     }
 
-    private static class EventOrderCounter extends BaseIoSession {
+    private static class EventOrderCounter extends AbstractIoSession {
         private Integer lastCount = null;
 
         public synchronized void setLastCount(Integer newCount) {

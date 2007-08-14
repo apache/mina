@@ -34,18 +34,18 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  *
  */
-public class SessionLog {
+public class IoSessionLogger {
     /**
      * Session attribute key: prefix string
      */
-    public static final String PREFIX = SessionLog.class.getName() + ".prefix";
+    public static final String PREFIX = IoSessionLogger.class.getName() + ".prefix";
 
     /**
      * Session attribute key: {@link Logger}
      */
-    public static final String LOGGER = SessionLog.class.getName() + ".logger";
+    public static final String LOGGER = IoSessionLogger.class.getName() + ".logger";
 
-    private static Class getClass(IoSession session) {
+    private static Class<? extends IoHandler> getClass(IoSession session) {
         return session.getHandler().getClass();
     }
 
@@ -174,7 +174,7 @@ public class SessionLog {
         Logger log = (Logger) session.getAttribute(LOGGER);
         if (log == null) {
             log = LoggerFactory.getLogger(getClass(session).getName() + "."
-                    + SessionLog.class.getSimpleName());
+                    + IoSessionLogger.class.getSimpleName());
             setLogger(session, log);
         }
         return log;

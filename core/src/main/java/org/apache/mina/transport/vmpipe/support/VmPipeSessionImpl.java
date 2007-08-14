@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -43,7 +43,7 @@ import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeSessionImpl extends BaseIoSession implements VmPipeSession {
+public class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     private static final VmPipeSessionConfig CONFIG = new DefaultVmPipeSessionConfig();
 
     private final IoService service;

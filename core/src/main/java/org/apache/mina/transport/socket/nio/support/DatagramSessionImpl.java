@@ -27,7 +27,7 @@ import java.nio.channels.SelectionKey;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
@@ -50,7 +50,7 @@ import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DatagramSessionImpl extends BaseIoSession implements DatagramSession {
+class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     private final IoService service;
 
     private final DatagramSessionConfig config = new SessionConfigImpl();

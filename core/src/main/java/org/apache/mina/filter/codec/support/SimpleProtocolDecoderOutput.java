@@ -22,7 +22,7 @@ package org.apache.mina.filter.codec.support;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -52,8 +52,8 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
         }
 
         messageQueue.offer(message);
-        if (session instanceof BaseIoSession) {
-            ((BaseIoSession) session).increaseReadMessages();
+        if (session instanceof AbstractIoSession) {
+            ((AbstractIoSession) session).increaseReadMessages();
         }
     }
 

@@ -39,7 +39,7 @@ import java.nio.ShortBuffer;
  * @noinspection StaticNonFinalField
  * @see ByteBufferAllocator
  */
-public abstract class BaseByteBuffer extends ByteBuffer {
+public abstract class AbstractByteBuffer extends ByteBuffer {
     private boolean autoExpand;
 
     private boolean autoExpandAllowed = true;
@@ -50,11 +50,11 @@ public abstract class BaseByteBuffer extends ByteBuffer {
      */
     private int mark = -1;
 
-    protected BaseByteBuffer() {
+    protected AbstractByteBuffer() {
         this(true);
     }
 
-    protected BaseByteBuffer(boolean autoExpandAllowed) {
+    protected AbstractByteBuffer(boolean autoExpandAllowed) {
         this.autoExpandAllowed = autoExpandAllowed;
     }
 

@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.BaseIoAcceptor;
+import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoServiceListenerSupport;
@@ -50,7 +50,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
-public class SocketAcceptor extends BaseIoAcceptor {
+public class SocketAcceptor extends AbstractIoAcceptor {
     /**
      * @noinspection StaticNonFinalField
      */
@@ -174,7 +174,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
     }
 
     /**
-     * @see org.apache.mina.common.BaseIoService#getSessionConfig()
+     * @see org.apache.mina.common.AbstractIoService#getSessionConfig()
      */
     @Override
     public SocketSessionConfig getSessionConfig() {
@@ -182,7 +182,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
     }
 
     /**
-     * @see org.apache.mina.common.BaseIoAcceptor#getLocalAddress()
+     * @see org.apache.mina.common.AbstractIoAcceptor#getLocalAddress()
      */
     @Override
     public InetSocketAddress getLocalAddress() {
@@ -193,7 +193,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
     // bean property access mechanism.
 
     /**
-     * @see org.apache.mina.common.BaseIoAcceptor#setLocalAddress(java.net.SocketAddress)
+     * @see org.apache.mina.common.AbstractIoAcceptor#setLocalAddress(java.net.SocketAddress)
      */
     @Override
     public void setLocalAddress(SocketAddress localAddress) {

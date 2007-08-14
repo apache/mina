@@ -37,7 +37,7 @@ import java.util.Set;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoSession implements IoSession {
+public abstract class AbstractIoSession implements IoSession {
     private final Object lock = new Object();
 
     private final Map<String, Object> attributes = Collections
@@ -88,7 +88,7 @@ public abstract class BaseIoSession implements IoSession {
 
     private long lastIdleTimeForWrite;
 
-    protected BaseIoSession() {
+    protected AbstractIoSession() {
         creationTime = lastReadTime = lastWriteTime = lastIdleTimeForBoth = lastIdleTimeForRead = lastIdleTimeForWrite = System
                 .currentTimeMillis();
     }

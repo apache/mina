@@ -30,22 +30,22 @@ import org.apache.mina.util.IdentityHashSet;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 525369 $, $Date: 2007-04-04 05:05:11 +0200 (mer., 04 avr. 2007) $
  */
-public class SessionIdleStatusChecker {
-    private static final SessionIdleStatusChecker INSTANCE = new SessionIdleStatusChecker();
+public class IdleStatusChecker {
+    private static final IdleStatusChecker INSTANCE = new IdleStatusChecker();
 
-    public static SessionIdleStatusChecker getInstance() {
+    public static IdleStatusChecker getInstance() {
         return INSTANCE;
     }
 
-    private final Set<BaseIoSession> sessions = new IdentityHashSet<BaseIoSession>();
+    private final Set<AbstractIoSession> sessions = new IdentityHashSet<AbstractIoSession>();
 
     private final Worker worker = new Worker();
 
-    private SessionIdleStatusChecker() {
+    private IdleStatusChecker() {
         worker.start();
     }
 
-    public void addSession(BaseIoSession session) {
+    public void addSession(AbstractIoSession session) {
         synchronized (sessions) {
             sessions.add(session);
         }
@@ -68,9 +68,9 @@ public class SessionIdleStatusChecker {
                 long currentTime = System.currentTimeMillis();
 
                 synchronized (sessions) {
-                    Iterator<BaseIoSession> it = sessions.iterator();
+                    Iterator<AbstractIoSession> it = sessions.iterator();
                     while (it.hasNext()) {
-                        BaseIoSession session = it.next();
+                        AbstractIoSession session = it.next();
                         if (!session.isConnected()) {
                             it.remove();
                         } else {
@@ -82,7 +82,7 @@ public class SessionIdleStatusChecker {
         }
     }
 
-    private void notifyIdleSession(BaseIoSession session, long currentTime) {
+    private void notifyIdleSession(AbstractIoSession session, long currentTime) {
         notifyIdleSession0(session, currentTime, session
                 .getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
                 IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
@@ -97,7 +97,7 @@ public class SessionIdleStatusChecker {
                         session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
     }
 
-    private void notifyIdleSession0(BaseIoSession session, long currentTime,
+    private void notifyIdleSession0(AbstractIoSession session, long currentTime,
             long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
                 && (currentTime - lastIoTime) >= idleTime) {

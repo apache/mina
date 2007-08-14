@@ -52,7 +52,7 @@ public class SimpleByteBufferAllocator implements ByteBufferAllocator {
     public void dispose() {
     }
 
-    private static class SimpleByteBuffer extends BaseByteBuffer {
+    private static class SimpleByteBuffer extends AbstractByteBuffer {
         private java.nio.ByteBuffer buf;
 
         protected SimpleByteBuffer(java.nio.ByteBuffer buf,

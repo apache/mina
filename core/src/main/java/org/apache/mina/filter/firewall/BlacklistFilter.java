@@ -30,7 +30,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
 
 /**
@@ -180,7 +180,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     private void blockSession(IoSession session) {
-        SessionLog.info(session, "Remote address in the blacklist; closing.");
+        IoSessionLogger.info(session, "Remote address in the blacklist; closing.");
         session.close();
     }
 

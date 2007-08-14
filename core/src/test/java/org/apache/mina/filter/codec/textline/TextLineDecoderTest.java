@@ -28,7 +28,7 @@ import java.util.Queue;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -255,7 +255,7 @@ public class TextLineDecoderTest extends TestCase {
         Assert.assertEquals("STU", out.getMessageQueue().poll());
     }
 
-    private static class DummySession extends BaseIoSession {
+    private static class DummySession extends AbstractIoSession {
         @Override
         protected void updateTrafficMask() {
         }

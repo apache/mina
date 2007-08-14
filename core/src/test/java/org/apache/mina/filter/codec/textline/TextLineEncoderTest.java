@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -69,7 +69,7 @@ public class TextLineEncoderTest extends TestCase {
         Assert.assertEquals('\n', buf.get());
     }
 
-    private static class DummySession extends BaseIoSession {
+    private static class DummySession extends AbstractIoSession {
         @Override
         protected void updateTrafficMask() {
         }

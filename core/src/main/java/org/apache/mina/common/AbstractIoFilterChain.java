@@ -396,7 +396,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
             entry.getFilter().exceptionCaught(entry.getNextFilter(), session,
                     cause);
         } catch (Throwable e) {
-            SessionLog.warn(session,
+            IoSessionLogger.warn(session,
                     "Unexpected exception from exceptionCaught handler.", e);
         }
     }

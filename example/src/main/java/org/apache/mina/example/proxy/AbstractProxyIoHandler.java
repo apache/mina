@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.TrafficMask;
 
 /**
@@ -62,6 +62,6 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         wb.flip();
         ((IoSession) session.getAttachment()).write(wb);
         rb.reset();
-        SessionLog.info(session, rb.getString(CHARSET.newDecoder()));
+        IoSessionLogger.info(session, rb.getString(CHARSET.newDecoder()));
     }
 }

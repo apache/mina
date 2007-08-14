@@ -24,86 +24,86 @@ import java.util.Set;
 
 
 /**
- * A delegated {@link IoConnector} that wraps the other {@link IoConnector}.
+ * An {@link IoConnector} that wraps the other {@link IoConnector}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DelegatedIoConnector implements IoConnector {
-    protected IoConnector delegate;
+public class IoConnectorWrapper implements IoConnector {
+    protected IoConnector connector;
 
     /**
      * Creates a new instance.
      */
-    protected DelegatedIoConnector() {
+    protected IoConnectorWrapper() {
     }
 
     /**
-     * Sets the delegate.  This method should be invoked before any operation
+     * Sets the connector to be wrapped.  This method should be invoked before any operation
      * is requested.
      */
-    protected void init(IoConnector delegate) {
-        this.delegate = delegate;
+    protected void init(IoConnector connector) {
+        this.connector = connector;
     }
 
     public IoFilterChainBuilder getFilterChainBuilder() {
-        return delegate.getFilterChainBuilder();
+        return connector.getFilterChainBuilder();
     }
 
     public void setFilterChainBuilder(IoFilterChainBuilder builder) {
-        delegate.setFilterChainBuilder(builder);
+        connector.setFilterChainBuilder(builder);
     }
 
     public DefaultIoFilterChainBuilder getFilterChain() {
-        return delegate.getFilterChain();
+        return connector.getFilterChain();
     }
 
     public void addListener(IoServiceListener listener) {
-        delegate.addListener(listener);
+        connector.addListener(listener);
     }
 
     public void removeListener(IoServiceListener listener) {
-        delegate.removeListener(listener);
+        connector.removeListener(listener);
     }
 
     public ConnectFuture connect(SocketAddress remoteAddress) {
-        return delegate.connect(remoteAddress);
+        return connector.connect(remoteAddress);
     }
 
     public ConnectFuture connect(SocketAddress remoteAddress,
             SocketAddress localAddress) {
-        return delegate.connect(remoteAddress, localAddress);
+        return connector.connect(remoteAddress, localAddress);
     }
 
     public int getConnectTimeout() {
-        return delegate.getConnectTimeout();
+        return connector.getConnectTimeout();
     }
 
     public long getConnectTimeoutMillis() {
-        return delegate.getConnectTimeoutMillis();
+        return connector.getConnectTimeoutMillis();
     }
 
     public void setConnectTimeout(int connectTimeout) {
-        delegate.setConnectTimeout(connectTimeout);
+        connector.setConnectTimeout(connectTimeout);
     }
 
     public IoHandler getHandler() {
-        return delegate.getHandler();
+        return connector.getHandler();
     }
 
     public Set<IoSession> getManagedSessions() {
-        return delegate.getManagedSessions();
+        return connector.getManagedSessions();
     }
 
     public IoSessionConfig getSessionConfig() {
-        return delegate.getSessionConfig();
+        return connector.getSessionConfig();
     }
 
     public void setHandler(IoHandler handler) {
-        delegate.setHandler(handler);
+        connector.setHandler(handler);
     }
 
     public TransportType getTransportType() {
-        return delegate.getTransportType();
+        return connector.getTransportType();
     }
 }

@@ -25,97 +25,97 @@ import java.util.Set;
 
 
 /**
- * A delegated {@link IoAcceptor} that wraps the other {@link IoAcceptor}.
+ * An {@link IoAcceptor} that wraps the other {@link IoAcceptor}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DelegatedIoAcceptor implements IoAcceptor {
-    protected IoAcceptor delegate;
+public class IoAcceptorWrapper implements IoAcceptor {
+    protected IoAcceptor acceptor;
 
     /**
      * Creates a new instance.
      */
-    protected DelegatedIoAcceptor() {
+    protected IoAcceptorWrapper() {
     }
 
     /**
-     * Sets the delegate.  This method should be invoked before any operations
+     * Sets the acceptor to be wrapped.  This method should be invoked before any operations
      * is requested.
      */
-    protected void init(IoAcceptor delegate) {
-        this.delegate = delegate;
+    protected void init(IoAcceptor acceptor) {
+        this.acceptor = acceptor;
     }
 
     public IoFilterChainBuilder getFilterChainBuilder() {
-        return delegate.getFilterChainBuilder();
+        return acceptor.getFilterChainBuilder();
     }
 
     public void setFilterChainBuilder(IoFilterChainBuilder builder) {
-        delegate.setFilterChainBuilder(builder);
+        acceptor.setFilterChainBuilder(builder);
     }
 
     public DefaultIoFilterChainBuilder getFilterChain() {
-        return delegate.getFilterChain();
+        return acceptor.getFilterChain();
     }
 
     public void addListener(IoServiceListener listener) {
-        delegate.addListener(listener);
+        acceptor.addListener(listener);
     }
 
     public void removeListener(IoServiceListener listener) {
-        delegate.removeListener(listener);
+        acceptor.removeListener(listener);
     }
 
     public void bind() throws IOException {
-        delegate.bind();
+        acceptor.bind();
     }
 
     public SocketAddress getLocalAddress() {
-        return delegate.getLocalAddress();
+        return acceptor.getLocalAddress();
     }
 
     public boolean isDisconnectOnUnbind() {
-        return delegate.isDisconnectOnUnbind();
+        return acceptor.isDisconnectOnUnbind();
     }
 
     public IoSession newSession(SocketAddress remoteAddress) {
-        return delegate.newSession(remoteAddress);
+        return acceptor.newSession(remoteAddress);
     }
 
     public void setDisconnectOnUnbind(boolean disconnectOnUnbind) {
-        delegate.setDisconnectOnUnbind(disconnectOnUnbind);
+        acceptor.setDisconnectOnUnbind(disconnectOnUnbind);
     }
 
     public void setLocalAddress(SocketAddress localAddress) {
-        delegate.setLocalAddress(localAddress);
+        acceptor.setLocalAddress(localAddress);
     }
 
     public void unbind() {
-        delegate.unbind();
+        acceptor.unbind();
     }
 
     public IoHandler getHandler() {
-        return delegate.getHandler();
+        return acceptor.getHandler();
     }
 
     public Set<IoSession> getManagedSessions() {
-        return delegate.getManagedSessions();
+        return acceptor.getManagedSessions();
     }
 
     public IoSessionConfig getSessionConfig() {
-        return delegate.getSessionConfig();
+        return acceptor.getSessionConfig();
     }
 
     public void setHandler(IoHandler handler) {
-        delegate.setHandler(handler);
+        acceptor.setHandler(handler);
     }
 
     public boolean isBound() {
-        return delegate.isBound();
+        return acceptor.isBound();
     }
 
     public TransportType getTransportType() {
-        return delegate.getTransportType();
+        return acceptor.getTransportType();
     }
 }

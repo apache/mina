@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.BaseIoAcceptor;
+import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.ExpiringSessionRecycler;
@@ -52,7 +52,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
+public class DatagramAcceptorDelegate extends AbstractIoAcceptor implements
         IoAcceptor, DatagramService {
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
 

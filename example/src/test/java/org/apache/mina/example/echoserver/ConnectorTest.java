@@ -29,7 +29,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.ssl.SSLFilter;
@@ -193,7 +193,7 @@ public class ConnectorTest extends AbstractTest {
         //// in SocketIoProcessor if there was a read timeout because
         //// we share readBuf.
         readBuf.flip();
-        SessionLog.info(session, "readBuf: " + readBuf);
+        IoSessionLogger.info(session, "readBuf: " + readBuf);
         Assert.assertEquals(DATA_SIZE * COUNT, readBuf.remaining());
         ByteBuffer expectedBuf = ByteBuffer.allocate(DATA_SIZE * COUNT);
         for (int i = 0; i < COUNT; i++) {

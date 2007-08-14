@@ -29,7 +29,7 @@ import java.net.SocketAddress;
 import java.util.Enumeration;
 import java.util.TooManyListenersException;
 
-import org.apache.mina.common.BaseIoConnector;
+import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.IoConnector;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 529576 $, $Date: 2007-04-17 14:25:07 +0200 (mar., 17 avr. 2007) $
  */
-public class SerialConnector extends BaseIoConnector {
+public class SerialConnector extends AbstractIoConnector {
     private Logger log;
 
     public SerialConnector() {

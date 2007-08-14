@@ -30,7 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.mina.common.BaseIoSessionConfig;
+import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.ExceptionMonitor;
 
 /**
@@ -39,7 +39,7 @@ import org.apache.mina.common.ExceptionMonitor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultSocketSessionConfig extends BaseIoSessionConfig implements
+public class DefaultSocketSessionConfig extends AbstractIoSessionConfig implements
         SocketSessionConfig {
     private static Map<InetSocketAddress, InetAddress> TEST_ADDRESSES = new LinkedHashMap<InetSocketAddress, InetAddress>();
 

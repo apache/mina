@@ -29,7 +29,7 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoAcceptor extends BaseIoService implements
+public abstract class AbstractIoAcceptor extends AbstractIoService implements
         IoAcceptor {
     private SocketAddress localAddress;
 
@@ -44,7 +44,7 @@ public abstract class BaseIoAcceptor extends BaseIoService implements
      */
     protected final Object bindLock = new Object();
 
-    protected BaseIoAcceptor(IoSessionConfig sessionConfig) {
+    protected AbstractIoAcceptor(IoSessionConfig sessionConfig) {
         super(sessionConfig);
     }
 

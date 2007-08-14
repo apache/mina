@@ -27,7 +27,7 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -100,7 +100,7 @@ public class ObjectSerializationTest extends TestCase {
         Assert.assertEquals(1, decoderOut.result.size());
     }
 
-    private static class MockIoSession extends BaseIoSession {
+    private static class MockIoSession extends AbstractIoSession {
         @Override
         protected void updateTrafficMask() {
         }

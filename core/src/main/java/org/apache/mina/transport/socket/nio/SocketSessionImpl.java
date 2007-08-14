@@ -26,8 +26,8 @@ import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.apache.mina.common.BaseIoSession;
-import org.apache.mina.common.BaseIoSessionConfig;
+import org.apache.mina.common.AbstractIoSession;
+import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -44,7 +44,7 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class SocketSessionImpl extends BaseIoSession implements SocketSession {
+class SocketSessionImpl extends AbstractIoSession implements SocketSession {
     private final IoService service;
 
     private final SocketSessionConfig config = new SessionConfigImpl();
@@ -200,7 +200,7 @@ class SocketSessionImpl extends BaseIoSession implements SocketSession {
         this.readBufferSize = readBufferSize;
     }
 
-    private class SessionConfigImpl extends BaseIoSessionConfig implements
+    private class SessionConfigImpl extends AbstractIoSessionConfig implements
             SocketSessionConfig {
         public boolean isKeepAlive() {
             try {

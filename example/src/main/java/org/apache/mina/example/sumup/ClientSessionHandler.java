@@ -22,7 +22,7 @@ package org.apache.mina.example.sumup;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.example.sumup.message.AddMessage;
 import org.apache.mina.example.sumup.message.ResultMessage;
 
@@ -68,13 +68,13 @@ public class ClientSessionHandler extends IoHandlerAdapter {
             // it is time to disconnect.
             if (rm.getSequence() == values.length - 1) {
                 // print the sum and disconnect.
-                SessionLog.info(session, "The sum: " + rm.getValue());
+                IoSessionLogger.info(session, "The sum: " + rm.getValue());
                 session.close();
                 finished = true;
             }
         } else {
             // seever returned error code because of overflow, etc.
-            SessionLog.warn(session, "Server error, disconnecting...");
+            IoSessionLogger.warn(session, "Server error, disconnecting...");
             session.close();
             finished = true;
         }

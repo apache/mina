@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.mina.common.AbstractIoFilterChain;
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -33,7 +33,7 @@ import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
@@ -98,8 +98,8 @@ public class RequestResponseFilterTest extends TestCase {
         // Destroy the filter.
         filter.onPreRemove(chain, "reqres", nextFilter);
         filter.onPostRemove(chain, "reqres", nextFilter);
-        session.removeAttribute(SessionLog.LOGGER);
-        session.removeAttribute(SessionLog.PREFIX);
+        session.removeAttribute(IoSessionLogger.LOGGER);
+        session.removeAttribute(IoSessionLogger.PREFIX);
         Assert.assertTrue(session.getAttributeKeys().isEmpty());
         filter.destroy();
         filter = null;
@@ -326,7 +326,7 @@ public class RequestResponseFilterTest extends TestCase {
         }
     }
 
-    private static class DummySession extends BaseIoSession {
+    private static class DummySession extends AbstractIoSession {
 
         @Override
         protected void updateTrafficMask() {

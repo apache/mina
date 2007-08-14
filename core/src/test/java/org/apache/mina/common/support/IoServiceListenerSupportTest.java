@@ -25,7 +25,7 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChain;
@@ -263,7 +263,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         Assert.assertFalse(support.getManagedSessions().contains(session));
     }
 
-    private static class TestSession extends BaseIoSession {
+    private static class TestSession extends AbstractIoSession {
         private final IoService service;
 
         private final SocketAddress serviceAddress;

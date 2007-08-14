@@ -23,7 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.DelegatedIoAcceptor;
+import org.apache.mina.common.IoAcceptorWrapper;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
@@ -35,7 +35,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptor extends DelegatedIoAcceptor {
+public class DatagramAcceptor extends IoAcceptorWrapper {
     /**
      * Creates a new instance using a NewThreadExecutor
      */
@@ -54,12 +54,12 @@ public class DatagramAcceptor extends DelegatedIoAcceptor {
 
     @Override
     public DatagramSessionConfig getSessionConfig() {
-        return ((DatagramAcceptorDelegate) delegate).getSessionConfig();
+        return ((DatagramAcceptorDelegate) acceptor).getSessionConfig();
     }
 
     @Override
     public InetSocketAddress getLocalAddress() {
-        return ((DatagramAcceptorDelegate) delegate).getLocalAddress();
+        return ((DatagramAcceptorDelegate) acceptor).getLocalAddress();
     }
 
     // This method is overriden to work around a problem with
@@ -74,7 +74,7 @@ public class DatagramAcceptor extends DelegatedIoAcceptor {
      * Returns the {@link IoSessionRecycler} for this service.
      */
     public IoSessionRecycler getSessionRecycler() {
-        return ((DatagramAcceptorDelegate) delegate).getSessionRecycler();
+        return ((DatagramAcceptorDelegate) acceptor).getSessionRecycler();
     }
 
     /**
@@ -83,7 +83,7 @@ public class DatagramAcceptor extends DelegatedIoAcceptor {
      * @param sessionRecycler <tt>null</tt> to use the default recycler
      */
     public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
-        ((DatagramAcceptorDelegate) delegate)
+        ((DatagramAcceptorDelegate) acceptor)
                 .setSessionRecycler(sessionRecycler);
     }
 }

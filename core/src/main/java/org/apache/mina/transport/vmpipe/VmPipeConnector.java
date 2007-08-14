@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.mina.common.AbstractIoFilterChain;
-import org.apache.mina.common.BaseIoConnector;
+import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
@@ -33,7 +33,7 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.SessionIdleStatusChecker;
+import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 import org.apache.mina.transport.vmpipe.support.VmPipeFilterChain;
@@ -46,7 +46,7 @@ import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeConnector extends BaseIoConnector {
+public class VmPipeConnector extends AbstractIoConnector {
 
     /**
      * Creates a new instance.
@@ -98,7 +98,7 @@ public class VmPipeConnector extends BaseIoConnector {
             localSession.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE,
                     future);
             getListeners().fireSessionCreated(localSession);
-            SessionIdleStatusChecker.getInstance().addSession(localSession);
+            IdleStatusChecker.getInstance().addSession(localSession);
         } catch (Throwable t) {
             future.setException(t);
             return future;
@@ -113,7 +113,7 @@ public class VmPipeConnector extends BaseIoConnector {
 
             // The following sentences don't throw any exceptions.
             entry.getListeners().fireSessionCreated(remoteSession);
-            SessionIdleStatusChecker.getInstance().addSession(remoteSession);
+            IdleStatusChecker.getInstance().addSession(remoteSession);
         } catch (Throwable t) {
             ExceptionMonitor.getInstance().exceptionCaught(t);
             remoteSession.close();

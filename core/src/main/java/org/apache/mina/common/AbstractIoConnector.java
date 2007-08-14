@@ -28,11 +28,11 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoConnector extends BaseIoService implements
+public abstract class AbstractIoConnector extends AbstractIoService implements
         IoConnector {
     private int connectTimeout = 60; // 1 minute
 
-    protected BaseIoConnector(IoSessionConfig sessionConfig) {
+    protected AbstractIoConnector(IoSessionConfig sessionConfig) {
         super(sessionConfig);
     }
 

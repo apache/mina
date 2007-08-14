@@ -27,7 +27,7 @@ import java.util.Set;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 
 /**
  * {@link IoHandler} implementation of a simple chat server protocol.
@@ -44,7 +44,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        SessionLog.error(session, "", cause);
+        IoSessionLogger.error(session, "", cause);
         // Close connection when unexpected exception is caught.
         session.close();
     }
@@ -104,12 +104,12 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
                 }
                 break;
             default:
-                SessionLog.info(session, "Unhandled command: " + command);
+                IoSessionLogger.info(session, "Unhandled command: " + command);
                 break;
             }
 
         } catch (IllegalArgumentException e) {
-            SessionLog.debug(session, e.getMessage());
+            IoSessionLogger.debug(session, e.getMessage());
         }
     }
 

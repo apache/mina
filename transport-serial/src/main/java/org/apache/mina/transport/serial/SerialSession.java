@@ -31,7 +31,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TooManyListenersException;
 
-import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultTransportType;
 import org.apache.mina.common.ExceptionMonitor;
@@ -40,7 +40,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.SessionIdleStatusChecker;
+import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteRequest;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 529590 $, $Date: 2007-04-17 15:14:17 +0200 (mar., 17 avr. 2007) $
  */
-public class SerialSession extends BaseIoSession implements
+public class SerialSession extends AbstractIoSession implements
         SerialPortEventListener {
 
     private SerialSessionConfig config;
@@ -177,7 +177,7 @@ public class SerialSession extends BaseIoSession implements
         ReadWorker w = new ReadWorker();
         w.start();
         port.addEventListener(this);
-        SessionIdleStatusChecker.getInstance().addSession(this);
+        IdleStatusChecker.getInstance().addSession(this);
         ((SerialConnector) getService()).getListeners()
                 .fireSessionCreated(this);
     }

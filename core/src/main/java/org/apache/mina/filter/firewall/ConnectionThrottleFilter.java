@@ -28,7 +28,7 @@ import java.util.Map;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SessionLog;
+import org.apache.mina.common.IoSessionLogger;
 
 /**
  * A {@link IoFilter} which blocks connections from connecting
@@ -94,14 +94,14 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
             if (clients.containsKey(addr.getAddress().getHostAddress())) {
 
                 clients.put(addr.getAddress().getHostAddress(), now);
-                SessionLog.info(session, "This is not a new client");
+                IoSessionLogger.info(session, "This is not a new client");
                 Long lastConnTime = clients.get(addr.getAddress()
                         .getHostAddress());
 
                 // if the interval between now and the last connection is 
                 // less than the allowed interval, return false
                 if ((now - lastConnTime) < allowedInterval) {
-                    SessionLog.error(session,
+                    IoSessionLogger.error(session,
                             "Session connection interval too short");
                     return false;
                 } else {
@@ -120,7 +120,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     public void sessionCreated(NextFilter nextFilter, IoSession session)
             throws Exception {
         if (!isConnectionOk(session)) {
-            SessionLog
+            IoSessionLogger
                     .info(session, "Connections coming in too fast; closing.");
             session.close();
         }
