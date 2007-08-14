@@ -26,7 +26,7 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ByteBufferHexDumper {
+class ByteBufferHexDumper {
     private static final byte[] highDigits;
 
     private static final byte[] lowDigits;
