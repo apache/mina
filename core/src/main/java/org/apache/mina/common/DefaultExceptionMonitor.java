@@ -17,29 +17,29 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
-import org.apache.mina.common.IoSessionConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A base implementation of {@link IoSessionConfig}.
+ * A default {@link ExceptionMonitor} implementation that logs uncaught
+ * exceptions using {@link Logger}.
+ * <p>
+ * All {@link IoService}s have this implementation as a default exception
+ * monitor.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class BaseIoSessionConfig implements IoSessionConfig, Cloneable {
-    protected BaseIoSessionConfig() {
-    }
+public class DefaultExceptionMonitor extends ExceptionMonitor {
+    private final Logger log = LoggerFactory
+            .getLogger(DefaultExceptionMonitor.class);
 
     @Override
-    public Object clone() {
-        BaseIoSessionConfig ret;
-        try {
-            ret = (BaseIoSessionConfig) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw (InternalError) new InternalError().initCause(e);
+    public void exceptionCaught(Throwable cause) {
+        if (log.isWarnEnabled()) {
+            log.warn("Unexpected exception.", cause);
         }
-
-        return ret;
     }
 }

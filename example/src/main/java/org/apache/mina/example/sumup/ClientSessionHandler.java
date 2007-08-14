@@ -22,9 +22,9 @@ package org.apache.mina.example.sumup;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.SessionLog;
 import org.apache.mina.example.sumup.message.AddMessage;
 import org.apache.mina.example.sumup.message.ResultMessage;
-import org.apache.mina.util.SessionLog;
 
 /**
  * {@link IoHandler} for SumUp client.

@@ -25,12 +25,14 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.mina.common.BaseIoSession;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListener;
+import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
 import org.easymock.MockControl;

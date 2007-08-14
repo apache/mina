@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.serial;
 
-import org.apache.mina.common.support.BaseIoSessionConfig;
+import org.apache.mina.common.BaseIoSessionConfig;
 
 /**
  * The default configuration for a serial session {@link SerialSessionConfig}.

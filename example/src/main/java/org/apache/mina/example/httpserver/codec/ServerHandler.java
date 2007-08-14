@@ -24,7 +24,7 @@ import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.util.SessionLog;
+import org.apache.mina.common.SessionLog;
 
 /**
  * An {@link IoHandler} for HTTP.

@@ -17,9 +17,8 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
-import org.apache.mina.common.ByteBuffer;
 
 /**
  * Provides utility methods for ByteBuffers.

@@ -20,7 +20,7 @@
 package org.apache.mina.transport.vmpipe.support;
 
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.support.IoServiceListenerSupport;
+import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.transport.vmpipe.VmPipeAcceptor;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
 

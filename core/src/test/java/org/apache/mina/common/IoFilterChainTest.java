@@ -25,8 +25,6 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.IoFilterChain.Entry;
-import org.apache.mina.common.support.AbstractIoFilterChain;
-import org.apache.mina.common.support.BaseIoSession;
 
 /**
  * Tests {@link AbstractIoFilterChain}.

@@ -24,8 +24,8 @@ import java.nio.charset.Charset;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.SessionLog;
 import org.apache.mina.common.TrafficMask;
-import org.apache.mina.util.SessionLog;
 
 /**
  * Base class of {@link org.apache.mina.common.IoHandler} classes which handle

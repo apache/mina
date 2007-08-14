@@ -21,10 +21,10 @@ package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
 
+import org.apache.mina.common.AbstractIoFilterChain;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.support.AbstractIoFilterChain;
 
 /**
  * An {@link IoFilterChain} for socket transport (TCP/IP).

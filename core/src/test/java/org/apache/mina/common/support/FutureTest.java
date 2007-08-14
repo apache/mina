@@ -24,6 +24,10 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
+import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.DefaultCloseFuture;
+import org.apache.mina.common.DefaultConnectFuture;
+import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;

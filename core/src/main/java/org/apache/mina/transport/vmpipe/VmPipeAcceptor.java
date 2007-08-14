@@ -24,10 +24,10 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.mina.common.BaseIoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 
 /**

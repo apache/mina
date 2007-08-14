@@ -19,7 +19,6 @@
  */
 package org.apache.mina.common;
 
-import org.apache.mina.common.support.DefaultExceptionMonitor;
 
 /**
  * Monitors uncaught exceptions.  {@link #exceptionCaught(Throwable)} is

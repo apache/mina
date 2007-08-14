@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
+import org.apache.mina.common.BaseIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IdleStatus;
@@ -46,7 +47,6 @@ import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.stream.StreamWriteFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketConnector;

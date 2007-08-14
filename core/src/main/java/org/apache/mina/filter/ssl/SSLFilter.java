@@ -28,17 +28,17 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.SessionLog;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestWrapper;
-import org.apache.mina.common.support.DefaultWriteFuture;
-import org.apache.mina.util.SessionLog;
 
 /**
  * An SSL filter that encrypts and decrypts the data exchanged in the session.

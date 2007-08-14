@@ -17,11 +17,8 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
-import org.apache.mina.common.CloseFuture;
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoSession;
 
 /**
  * A default implementation of {@link CloseFuture}.

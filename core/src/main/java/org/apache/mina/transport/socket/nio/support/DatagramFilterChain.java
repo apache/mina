@@ -21,11 +21,11 @@ package org.apache.mina.transport.socket.nio.support;
 
 import java.util.Queue;
 
+import org.apache.mina.common.AbstractIoFilterChain;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.support.AbstractIoFilterChain;
 
 /**
  * An {@link IoFilterChain} for datagram transport (UDP/IP).

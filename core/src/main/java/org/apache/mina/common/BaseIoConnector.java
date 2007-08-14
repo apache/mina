@@ -17,13 +17,10 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
 import java.net.SocketAddress;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoSessionConfig;
 
 /**
  * A base implementation of {@link IoConnector}.

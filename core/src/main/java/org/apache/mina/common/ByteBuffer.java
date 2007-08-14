@@ -42,7 +42,6 @@ import java.nio.charset.CoderResult;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.apache.mina.common.support.ByteBufferHexDumper;
 
 /**
  * A byte buffer used by MINA applications.

@@ -31,18 +31,18 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TooManyListenersException;
 
+import org.apache.mina.common.BaseIoSession;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultTransportType;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.SessionIdleStatusChecker;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.common.support.DefaultTransportType;
-import org.apache.mina.common.support.SessionIdleStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

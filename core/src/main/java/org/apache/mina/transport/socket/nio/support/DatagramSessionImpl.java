@@ -27,6 +27,7 @@ import java.nio.channels.SelectionKey;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.mina.common.BaseIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
@@ -39,7 +40,6 @@ import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.transport.socket.nio.DatagramSession;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;

@@ -17,13 +17,11 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoSessionConfig;
 
 /**
  * A base implementation of {@link IoAcceptor}.

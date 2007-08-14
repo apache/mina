@@ -17,9 +17,8 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.util;
+package org.apache.mina.common;
 
-import org.apache.mina.common.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

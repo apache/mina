@@ -23,9 +23,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executor;
 
+import org.apache.mina.common.DelegatedIoAcceptor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSessionRecycler;
-import org.apache.mina.common.support.DelegatedIoAcceptor;
 import org.apache.mina.transport.socket.nio.support.DatagramAcceptorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
 

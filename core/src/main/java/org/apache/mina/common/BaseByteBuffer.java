@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
@@ -27,8 +27,6 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.ByteBufferAllocator;
 
 /**
  * A base implementation of {@link ByteBuffer}.  This implementation

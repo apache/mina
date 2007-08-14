@@ -1,8 +1,7 @@
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
 import java.nio.channels.FileChannel;
 
-import org.apache.mina.common.FileRegion;
 
 public class DefaultFileRegion implements FileRegion {
 

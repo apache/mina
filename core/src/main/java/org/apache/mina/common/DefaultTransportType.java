@@ -17,12 +17,10 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
 import java.net.SocketAddress;
 
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportType;
 
 /**
  * A default immutable implementation of {@link TransportType}.

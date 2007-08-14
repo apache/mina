@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.vmpipe;
 
-import org.apache.mina.common.support.BaseIoSessionConfig;
+import org.apache.mina.common.BaseIoSessionConfig;
 
 /**
  * A default implementation of {@link VmPipeSessionConfig}.

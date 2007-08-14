@@ -22,8 +22,8 @@ package org.apache.mina.transport.socket.nio;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import org.apache.mina.common.BaseIoSessionConfig;
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.support.BaseIoSessionConfig;
 
 /**
  * A default implementation of {@link DatagramSessionConfig}.

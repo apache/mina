@@ -28,7 +28,7 @@ import java.util.Map;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.util.SessionLog;
+import org.apache.mina.common.SessionLog;
 
 /**
  * A {@link IoFilter} which blocks connections from connecting

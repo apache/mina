@@ -30,8 +30,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.mina.common.BaseIoSessionConfig;
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.support.BaseIoSessionConfig;
 
 /**
  * A default implementation of {@link SocketSessionConfig}.

@@ -26,6 +26,8 @@ import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.mina.common.BaseIoSession;
+import org.apache.mina.common.BaseIoSessionConfig;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -35,8 +37,6 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.common.support.BaseIoSessionConfig;
 
 /**
  * An {@link IoSession} for socket transport (TCP/IP).

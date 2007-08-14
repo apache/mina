@@ -21,7 +21,6 @@ package org.apache.mina.common;
 
 import java.nio.ByteOrder;
 
-import org.apache.mina.common.support.BaseByteBuffer;
 
 /**
  * A simplistic {@link ByteBufferAllocator} which simply allocates a new

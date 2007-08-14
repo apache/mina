@@ -19,7 +19,6 @@
  */
 package org.apache.mina.common;
 
-import org.apache.mina.util.SessionLog;
 
 /**
  * An abstract adapter class for {@link IoHandler}.  You can extend this

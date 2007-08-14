@@ -32,15 +32,15 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
+import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.SessionLog;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.support.DefaultWriteFuture;
-import org.apache.mina.util.SessionLog;
 
 /**
  * A helper class using the SSLEngine API to decrypt/encrypt data.

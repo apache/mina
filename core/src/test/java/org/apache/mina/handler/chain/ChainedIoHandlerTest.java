@@ -24,13 +24,13 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.mina.common.BaseIoSession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.support.BaseIoSession;
 
 /**
  * A test case for {@link ChainedIoHandler}.

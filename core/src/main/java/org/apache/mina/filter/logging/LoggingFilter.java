@@ -27,8 +27,8 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.SessionLog;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.util.SessionLog;
 
 
 /**

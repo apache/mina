@@ -22,7 +22,6 @@ package org.apache.mina.common;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.support.DefaultTransportType;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;

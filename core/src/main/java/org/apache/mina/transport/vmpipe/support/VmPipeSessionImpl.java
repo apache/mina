@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.mina.common.BaseIoSession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.support.BaseIoSession;
-import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.vmpipe.DefaultVmPipeSessionConfig;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
 import org.apache.mina.transport.vmpipe.VmPipeSession;

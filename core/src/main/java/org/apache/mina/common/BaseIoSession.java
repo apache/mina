@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,19 +30,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.CloseFuture;
-import org.apache.mina.common.DefaultWriteRequest;
-import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TrafficMask;
-import org.apache.mina.common.WriteFuture;
-import org.apache.mina.common.WriteRequest;
 
 /**
  * Base implementation of {@link IoSession}.

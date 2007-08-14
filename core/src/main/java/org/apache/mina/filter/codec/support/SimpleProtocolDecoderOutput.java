@@ -22,9 +22,9 @@ package org.apache.mina.filter.codec.support;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.mina.common.BaseIoSession;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**

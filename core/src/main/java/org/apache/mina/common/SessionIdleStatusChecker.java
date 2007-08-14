@@ -17,12 +17,11 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.mina.common.IdleStatus;
 import org.apache.mina.util.IdentityHashSet;
 
 /**

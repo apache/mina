@@ -21,8 +21,8 @@ package org.apache.mina.transport.socket.nio;
 
 import java.util.concurrent.Executor;
 
+import org.apache.mina.common.DelegatedIoConnector;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.support.DelegatedIoConnector;
 import org.apache.mina.transport.socket.nio.support.DatagramConnectorDelegate;
 import org.apache.mina.util.NewThreadExecutor;
 
