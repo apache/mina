@@ -17,14 +17,13 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.codec.support;
+package org.apache.mina.filter.codec;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
  * A {@link ProtocolEncoderOutput} based on queue.
@@ -32,11 +31,11 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class SimpleProtocolEncoderOutput implements
+public abstract class AbstractProtocolEncoderOutput implements
         ProtocolEncoderOutput {
     private final Queue<ByteBuffer> bufferQueue = new LinkedList<ByteBuffer>();
 
-    public SimpleProtocolEncoderOutput() {
+    public AbstractProtocolEncoderOutput() {
     }
 
     public Queue<ByteBuffer> getBufferQueue() {

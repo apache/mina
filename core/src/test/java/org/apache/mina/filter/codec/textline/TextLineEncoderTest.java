@@ -34,7 +34,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
+import org.apache.mina.filter.codec.AbstractProtocolEncoderOutput;
 
 /**
  * Tests {@link TextLineEncoder}.
@@ -51,7 +51,7 @@ public class TextLineEncoderTest extends TestCase {
         TextLineEncoder encoder = new TextLineEncoder(Charset.forName("UTF-8"),
                 LineDelimiter.WINDOWS);
         IoSession session = new DummySession();
-        SimpleProtocolEncoderOutput out = new SimpleProtocolEncoderOutput() {
+        AbstractProtocolEncoderOutput out = new AbstractProtocolEncoderOutput() {
             @Override
             protected WriteFuture doFlush(ByteBuffer buf) {
                 return null;

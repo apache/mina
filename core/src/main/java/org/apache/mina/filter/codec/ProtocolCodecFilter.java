@@ -20,7 +20,9 @@
 package org.apache.mina.filter.codec;
 
 import java.net.SocketAddress;
+import java.util.Queue;
 
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
@@ -32,8 +34,6 @@ import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestWrapper;
-import org.apache.mina.filter.codec.support.SimpleProtocolDecoderOutput;
-import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
 
 /**
  * An {@link IoFilter} which translates binary or protocol specific data into
@@ -280,7 +280,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             NextFilter nextFilter) {
         ProtocolDecoderOutput out = (ProtocolDecoderOutput) session.getAttribute(DECODER_OUT);
         if (out == null) {
-            out = new SimpleProtocolDecoderOutput(session, nextFilter);
+            out = new ProtocolDecoderOutputImpl(session, nextFilter);
             session.setAttribute(DECODER_OUT, out);
         }
         return out;
@@ -337,9 +337,36 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             return EMPTY_BUFFER;
         }
     }
+    
+    private static class ProtocolDecoderOutputImpl extends
+            AbstractProtocolDecoderOutput {
+        private final IoSession session;
+        private final NextFilter nextFilter;
+
+        public ProtocolDecoderOutputImpl(
+                IoSession session, NextFilter nextFilter) {
+            this.session = session;
+            this.nextFilter = nextFilter;
+        }
+
+        @Override
+        public void write(Object message) {
+            super.write(message);
+            if (session instanceof AbstractIoSession) {
+                ((AbstractIoSession) session).increaseReadMessages();
+            }
+        }
+
+        public void flush() {
+            Queue<Object> messageQueue = getMessageQueue();
+            while (!messageQueue.isEmpty()) {
+                nextFilter.messageReceived(session, messageQueue.poll());
+            }
+        }
+    }
 
     private static class ProtocolEncoderOutputImpl extends
-            SimpleProtocolEncoderOutput {
+            AbstractProtocolEncoderOutput {
         private final IoSession session;
 
         private final NextFilter nextFilter;

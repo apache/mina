@@ -17,15 +17,10 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.filter.codec.support;
+package org.apache.mina.filter.codec;
 
 import java.util.LinkedList;
 import java.util.Queue;
-
-import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
  * A {@link ProtocolDecoderOutput} based on queue.
@@ -34,16 +29,14 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @version $Rev$, $Date$
  *
  */
-public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
-    private final NextFilter nextFilter;
-
-    private final IoSession session;
-
+public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOutput {
     private final Queue<Object> messageQueue = new LinkedList<Object>();
 
-    public SimpleProtocolDecoderOutput(IoSession session, NextFilter nextFilter) {
-        this.nextFilter = nextFilter;
-        this.session = session;
+    public AbstractProtocolDecoderOutput() {
+    }
+    
+    public Queue<Object> getMessageQueue() {
+        return messageQueue;
     }
 
     public void write(Object message) {
@@ -52,14 +45,5 @@ public class SimpleProtocolDecoderOutput implements ProtocolDecoderOutput {
         }
 
         messageQueue.offer(message);
-        if (session instanceof AbstractIoSession) {
-            ((AbstractIoSession) session).increaseReadMessages();
-        }
-    }
-
-    public void flush() {
-        while (!messageQueue.isEmpty()) {
-            nextFilter.messageReceived(session, messageQueue.poll());
-        }
     }
 }

@@ -39,7 +39,7 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.filter.codec.support.SimpleProtocolEncoderOutput;
+import org.apache.mina.filter.codec.AbstractProtocolEncoderOutput;
 
 /**
  * Tests object serialization codec and streams.
@@ -52,7 +52,7 @@ public class ObjectSerializationTest extends TestCase {
         final String expected = "1234";
 
         IoSession session = new MockIoSession();
-        SimpleProtocolEncoderOutput out = new SimpleProtocolEncoderOutput() {
+        AbstractProtocolEncoderOutput out = new AbstractProtocolEncoderOutput() {
             @Override
             protected WriteFuture doFlush(ByteBuffer buf) {
                 return null;
