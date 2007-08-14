@@ -34,20 +34,20 @@ import org.apache.mina.util.ExpiringMap;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ExpiringSessionRecycler implements IoSessionRecycler {
+public class ExpiringIoSessionRecycler implements IoSessionRecycler {
     private ExpiringMap<Object, IoSession> sessionMap;
     
     private ExpiringMap<Object, IoSession>.Expirer mapExpirer;
 
-    public ExpiringSessionRecycler() {
+    public ExpiringIoSessionRecycler() {
         this(ExpiringMap.DEFAULT_TIME_TO_LIVE);
     }
 
-    public ExpiringSessionRecycler(int timeToLive) {
+    public ExpiringIoSessionRecycler(int timeToLive) {
         this(timeToLive, ExpiringMap.DEFAULT_EXPIRATION_INTERVAL);
     }
 
-    public ExpiringSessionRecycler(int timeToLive, int expirationInterval) {
+    public ExpiringIoSessionRecycler(int timeToLive, int expirationInterval) {
         sessionMap = new ExpiringMap<Object, IoSession>(timeToLive,
                 expirationInterval);
         mapExpirer = sessionMap.getExpirer();

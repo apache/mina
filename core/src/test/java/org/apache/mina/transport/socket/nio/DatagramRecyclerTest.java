@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.ExpiringSessionRecycler;
+import org.apache.mina.common.ExpiringIoSessionRecycler;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -48,7 +48,7 @@ public class DatagramRecyclerTest extends TestCase {
 
     public void testDatagramRecycler() throws Exception {
         int port = AvailablePortFinder.getNextAvailable(1024);
-        ExpiringSessionRecycler recycler = new ExpiringSessionRecycler(1, 1);
+        ExpiringIoSessionRecycler recycler = new ExpiringIoSessionRecycler(1, 1);
 
         MockHandler acceptorHandler = new MockHandler();
         MockHandler connectorHandler = new MockHandler();

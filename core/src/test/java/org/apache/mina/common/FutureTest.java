@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.common.support;
+package org.apache.mina.common;
 
 import java.io.IOException;
 import java.net.SocketAddress;
