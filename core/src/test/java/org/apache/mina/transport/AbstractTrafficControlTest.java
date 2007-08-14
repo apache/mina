@@ -29,7 +29,7 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -44,7 +44,7 @@ public abstract class AbstractTrafficControlTest extends TestCase {
 
     protected IoAcceptor acceptor;
 
-    protected TransportType transportType;
+    protected IoServiceMetadata transportType;
 
     public AbstractTrafficControlTest(IoAcceptor acceptor) {
         this.acceptor = acceptor;

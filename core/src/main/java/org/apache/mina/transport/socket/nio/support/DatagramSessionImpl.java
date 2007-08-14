@@ -37,7 +37,7 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.transport.socket.nio.DatagramSession;
@@ -217,8 +217,8 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         return size;
     }
 
-    public TransportType getTransportType() {
-        return TransportType.DATAGRAM;
+    public IoServiceMetadata getTransportType() {
+        return IoServiceMetadata.DATAGRAM;
     }
 
     public InetSocketAddress getRemoteAddress() {

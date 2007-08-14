@@ -34,7 +34,7 @@ import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IdleStatusChecker;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.transport.vmpipe.support.VmPipe;
 import org.apache.mina.transport.vmpipe.support.VmPipeFilterChain;
 import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
@@ -55,8 +55,8 @@ public class VmPipeConnector extends AbstractIoConnector {
         super(new DefaultVmPipeSessionConfig());
     }
 
-    public TransportType getTransportType() {
-        return TransportType.VM_PIPE;
+    public IoServiceMetadata getMetadata() {
+        return IoServiceMetadata.VM_PIPE;
     }
 
     @Override

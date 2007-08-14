@@ -39,7 +39,7 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
@@ -99,8 +99,8 @@ public class DatagramConnectorDelegate extends AbstractIoConnector implements
         }
     }
 
-    public TransportType getTransportType() {
-        return TransportType.DATAGRAM;
+    public IoServiceMetadata getMetadata() {
+        return IoServiceMetadata.DATAGRAM;
     }
 
     @Override

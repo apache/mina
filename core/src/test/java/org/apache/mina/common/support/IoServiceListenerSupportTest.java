@@ -34,7 +34,7 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.easymock.MockControl;
 
 /**
@@ -324,7 +324,7 @@ public class IoServiceListenerSupportTest extends TestCase {
             return serviceAddress;
         }
 
-        public TransportType getTransportType() {
+        public IoServiceMetadata getTransportType() {
             return null;
         }
     }

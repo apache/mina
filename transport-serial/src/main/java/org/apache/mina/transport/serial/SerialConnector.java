@@ -34,7 +34,7 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoServiceListenerSupport;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +120,7 @@ public class SerialConnector extends AbstractIoConnector {
                         "Serial port not found"));
     }
 
-    public TransportType getTransportType() {
+    public IoServiceMetadata getMetadata() {
         return SerialSession.serialTransportType;
     }
 

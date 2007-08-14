@@ -30,7 +30,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 
 /**
  * A test case for {@link ChainedIoHandler}.
@@ -67,7 +67,7 @@ public class ChainedIoHandlerTest extends TestCase {
                 return null;
             }
 
-            public TransportType getTransportType() {
+            public IoServiceMetadata getTransportType() {
                 return null;
             }
 

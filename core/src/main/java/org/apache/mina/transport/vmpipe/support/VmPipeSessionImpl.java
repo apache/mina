@@ -30,7 +30,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.transport.vmpipe.DefaultVmPipeSessionConfig;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
@@ -141,8 +141,8 @@ public class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSessio
         return 0;
     }
 
-    public TransportType getTransportType() {
-        return TransportType.VM_PIPE;
+    public IoServiceMetadata getTransportType() {
+        return IoServiceMetadata.VM_PIPE;
     }
 
     public VmPipeAddress getRemoteAddress() {

@@ -115,7 +115,7 @@ public class IoAcceptorWrapper implements IoAcceptor {
         return acceptor.isBound();
     }
 
-    public TransportType getTransportType() {
-        return acceptor.getTransportType();
+    public IoServiceMetadata getMetadata() {
+        return acceptor.getMetadata();
     }
 }

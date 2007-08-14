@@ -211,7 +211,7 @@ public interface IoSession {
     /**
      * Returns transport type of this session.
      */
-    TransportType getTransportType();
+    IoServiceMetadata getTransportType();
 
     /**
      * Returns <code>true</code> if this session is connected with remote peer.

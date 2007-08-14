@@ -35,7 +35,7 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.WriteRequest;
 
 /**
@@ -170,8 +170,8 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public TransportType getTransportType() {
-        return TransportType.SOCKET;
+    public IoServiceMetadata getTransportType() {
+        return IoServiceMetadata.SOCKET;
     }
 
     public InetSocketAddress getRemoteAddress() {

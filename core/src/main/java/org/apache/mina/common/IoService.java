@@ -30,9 +30,9 @@ import java.util.Set;
  */
 public interface IoService {
     /**
-     * Returns the {@link TransportType} that this service runs on.
+     * Returns the {@link IoServiceMetadata} that this service runs on.
      */
-    TransportType getTransportType();
+    IoServiceMetadata getMetadata();
 
     /**
      * Adds an {@link IoServiceListener} that listens any events related with

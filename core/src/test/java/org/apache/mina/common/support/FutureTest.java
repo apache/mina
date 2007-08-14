@@ -35,7 +35,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 
 /**
  * Tests {@link IoFuture} implementations.
@@ -80,7 +80,7 @@ public class FutureTest extends TestCase {
                 return null;
             }
 
-            public TransportType getTransportType() {
+            public IoServiceMetadata getTransportType() {
                 return null;
             }
 

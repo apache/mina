@@ -23,12 +23,12 @@ import java.net.SocketAddress;
 
 
 /**
- * A default immutable implementation of {@link TransportType}.
+ * A default immutable implementation of {@link IoServiceMetadata}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultTransportType implements TransportType {
+public class DefaultIoServiceMetadata implements IoServiceMetadata {
 
     private final String name;
 
@@ -40,7 +40,7 @@ public class DefaultTransportType implements TransportType {
 
     private final Class<? extends IoSessionConfig> sessionConfigType;
 
-    public DefaultTransportType(String name, boolean connectionless,
+    public DefaultIoServiceMetadata(String name, boolean connectionless,
             Class<? extends SocketAddress> addressType,
             Class<? extends Object> envelopeType,
             Class<? extends IoSessionConfig> sessionConfigType) {

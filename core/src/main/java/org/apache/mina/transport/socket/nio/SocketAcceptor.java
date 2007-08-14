@@ -39,7 +39,7 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
@@ -167,10 +167,10 @@ public class SocketAcceptor extends AbstractIoAcceptor {
     }
 
     /**
-     * @see org.apache.mina.common.IoService#getTransportType()
+     * @see org.apache.mina.common.IoService#getMetadata()
      */
-    public TransportType getTransportType() {
-        return TransportType.SOCKET;
+    public IoServiceMetadata getMetadata() {
+        return IoServiceMetadata.SOCKET;
     }
 
     /**

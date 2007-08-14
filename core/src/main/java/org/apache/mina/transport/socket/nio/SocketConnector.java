@@ -39,7 +39,7 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.TransportType;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
@@ -123,8 +123,8 @@ public class SocketConnector extends AbstractIoConnector {
         }
     }
 
-    public TransportType getTransportType() {
-        return TransportType.SOCKET;
+    public IoServiceMetadata getMetadata() {
+        return IoServiceMetadata.SOCKET;
     }
 
     @Override

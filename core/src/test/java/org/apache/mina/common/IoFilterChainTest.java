@@ -238,8 +238,8 @@ public class IoFilterChainTest extends TestCase {
             return null;
         }
 
-        public TransportType getTransportType() {
-            return TransportType.VM_PIPE;
+        public IoServiceMetadata getTransportType() {
+            return IoServiceMetadata.VM_PIPE;
         }
 
         public SocketAddress getRemoteAddress() {
@@ -394,7 +394,7 @@ public class IoFilterChainTest extends TestCase {
                     return null;
                 }
 
-                public TransportType getTransportType() {
+                public IoServiceMetadata getTransportType() {
                     return null;
                 }
 

@@ -33,26 +33,26 @@ import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface TransportType {
+public interface IoServiceMetadata {
 
     /**
      * A pre-defined transport type for TCP/IP socket transport.
      */
-    static TransportType SOCKET = new DefaultTransportType("socket", false,
+    static IoServiceMetadata SOCKET = new DefaultIoServiceMetadata("socket", false,
             InetSocketAddress.class, ByteBuffer.class,
             SocketSessionConfig.class);
 
     /**
      * A pre-defined transport type for UDP/IP datagram transport.
      */
-    static TransportType DATAGRAM = new DefaultTransportType("datagram", true,
+    static IoServiceMetadata DATAGRAM = new DefaultIoServiceMetadata("datagram", true,
             InetSocketAddress.class, ByteBuffer.class,
             DatagramSessionConfig.class);
 
     /**
      * A pre-defined transport type for in-VM pipe transport.
      */
-    static TransportType VM_PIPE = new DefaultTransportType("vmpipe", false,
+    static IoServiceMetadata VM_PIPE = new DefaultIoServiceMetadata("vmpipe", false,
             VmPipeAddress.class, Object.class, VmPipeSessionConfig.class);
 
     /**
