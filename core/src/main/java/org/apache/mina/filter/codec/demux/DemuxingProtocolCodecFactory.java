@@ -151,7 +151,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         // Do nothing by default; let users implement it as they want.
 
         // This statement is just to avoid compiler warning.  Please ignore. 
-        session.getTransportType();
+        session.getService();
     }
 
     private class ProtocolEncoderImpl implements ProtocolEncoder {

@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.socket.nio.support;
+package org.apache.mina.transport.socket.nio;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -30,19 +30,14 @@ import java.util.Queue;
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.transport.socket.nio.DatagramSession;
-import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
-import org.apache.mina.transport.socket.nio.DefaultDatagramSessionConfig;
 
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
@@ -54,8 +49,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     private final IoService service;
 
     private final DatagramSessionConfig config = new SessionConfigImpl();
-
-    private final DatagramService managerDelegate;
 
     private final DatagramFilterChain filterChain = new DatagramFilterChain(
             this);
@@ -77,11 +70,11 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     /**
      * Creates a new acceptor instance.
      */
-    DatagramSessionImpl(IoAcceptor service, DatagramService managerDelegate,
+    DatagramSessionImpl(
+            DatagramAcceptor service,
             DatagramChannel ch, IoHandler defaultHandler,
             InetSocketAddress remoteAddress) {
         this.service = service;
-        this.managerDelegate = managerDelegate;
         this.ch = ch;
         this.handler = defaultHandler;
         this.remoteAddress = remoteAddress;
@@ -89,7 +82,7 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         // We didn't set the localAddress by calling getLocalSocketAddress() to avoid
         // the case that getLocalSocketAddress() returns IPv6 address while
         // serviceAddress represents the same address in IPv4.
-        this.localAddress = (InetSocketAddress) service.getLocalAddress();
+        this.localAddress = service.getLocalAddress();
 
         applySettings();
     }
@@ -97,10 +90,9 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     /**
      * Creates a new connector instance.
      */
-    DatagramSessionImpl(IoConnector service, DatagramService managerDelegate,
+    DatagramSessionImpl(DatagramConnector service,
             DatagramChannel ch, IoHandler defaultHandler) {
         this.service = service;
-        this.managerDelegate = managerDelegate;
         this.ch = ch;
         this.handler = defaultHandler;
         this.remoteAddress = (InetSocketAddress) ch.socket()
@@ -135,10 +127,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         return config;
     }
 
-    DatagramService getManagerDelegate() {
-        return managerDelegate;
-    }
-
     public IoFilterChain getFilterChain() {
         return filterChain;
     }
@@ -161,8 +149,8 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
 
     @Override
     protected void close0() {
-        if (managerDelegate instanceof IoAcceptor) {
-            ((DatagramAcceptorDelegate) managerDelegate).getSessionRecycler()
+        if (service instanceof IoAcceptor) {
+            ((DatagramAcceptor) service).getSessionRecycler()
                     .remove(this);
         }
         filterChain.fireFilterClose(this);
@@ -217,10 +205,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         return size;
     }
 
-    public IoServiceMetadata getTransportType() {
-        return IoServiceMetadata.DATAGRAM;
-    }
-
     public InetSocketAddress getRemoteAddress() {
         return remoteAddress;
     }
@@ -236,7 +220,9 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
 
     @Override
     protected void updateTrafficMask() {
-        managerDelegate.updateTrafficMask(this);
+        if (service instanceof DatagramConnector) {
+            ((DatagramConnector) service).updateTrafficMask(this);
+        }
     }
 
     int getReadBufferSize() {

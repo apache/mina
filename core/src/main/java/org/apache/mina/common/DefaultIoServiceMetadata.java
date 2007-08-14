@@ -31,16 +31,16 @@ import java.net.SocketAddress;
 public class DefaultIoServiceMetadata implements IoServiceMetadata {
 
     private final String name;
-
     private final boolean connectionless;
-
+    private final boolean fragmentation;
     private final Class<? extends SocketAddress> addressType;
-
     private final Class<? extends Object> envelopeType;
-
     private final Class<? extends IoSessionConfig> sessionConfigType;
 
-    public DefaultIoServiceMetadata(String name, boolean connectionless,
+    public DefaultIoServiceMetadata(
+            String name,
+            boolean connectionless,
+            boolean fragmentation,
             Class<? extends SocketAddress> addressType,
             Class<? extends Object> envelopeType,
             Class<? extends IoSessionConfig> sessionConfigType) {
@@ -62,13 +62,14 @@ public class DefaultIoServiceMetadata implements IoServiceMetadata {
         if (envelopeType == null) {
             throw new NullPointerException("envelopeType");
         }
-
+        
         if (sessionConfigType == null) {
             throw new NullPointerException("sessionConfigType");
         }
 
         this.name = name;
         this.connectionless = connectionless;
+        this.fragmentation = fragmentation;
         this.addressType = addressType;
         this.envelopeType = envelopeType;
         this.sessionConfigType = sessionConfigType;
@@ -92,6 +93,10 @@ public class DefaultIoServiceMetadata implements IoServiceMetadata {
 
     public boolean isConnectionless() {
         return connectionless;
+    }
+    
+    public boolean hasFragmentation() {
+        return fragmentation;
     }
 
     @Override

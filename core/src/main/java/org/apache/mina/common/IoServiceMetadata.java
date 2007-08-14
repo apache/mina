@@ -19,16 +19,10 @@
  */
 package org.apache.mina.common;
 
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
-import org.apache.mina.transport.socket.nio.SocketSessionConfig;
-import org.apache.mina.transport.vmpipe.VmPipeAddress;
-import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
-
 /**
- * Represents a network transport type and its related metadata.
+ * Provides meta-information that describes an {@link IoService}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -36,48 +30,36 @@ import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
 public interface IoServiceMetadata {
 
     /**
-     * A pre-defined transport type for TCP/IP socket transport.
-     */
-    static IoServiceMetadata SOCKET = new DefaultIoServiceMetadata("socket", false,
-            InetSocketAddress.class, ByteBuffer.class,
-            SocketSessionConfig.class);
-
-    /**
-     * A pre-defined transport type for UDP/IP datagram transport.
-     */
-    static IoServiceMetadata DATAGRAM = new DefaultIoServiceMetadata("datagram", true,
-            InetSocketAddress.class, ByteBuffer.class,
-            DatagramSessionConfig.class);
-
-    /**
-     * A pre-defined transport type for in-VM pipe transport.
-     */
-    static IoServiceMetadata VM_PIPE = new DefaultIoServiceMetadata("vmpipe", false,
-            VmPipeAddress.class, Object.class, VmPipeSessionConfig.class);
-
-    /**
-     * Returns the name of this transport type.
+     * Returns the name of the service.
      */
     String getName();
 
     /**
      * Returns <code>true</code> if the session of this transport type is
-     * connectionless.
+     * <a href="http://en.wikipedia.org/wiki/Connectionless">connectionless</a>.
      */
     boolean isConnectionless();
+    
+    /**
+     * Returns {@code true} if the messages exchanged by the service can be
+     * <a href="http://en.wikipedia.org/wiki/IPv4#Fragmentation_and_reassembly">fragmented
+     * or reassembled</a> by its underlying transport. 
+     */
+    boolean hasFragmentation();
 
     /**
-     * Returns the address type of this transport type.
+     * Returns the address type of the service.
      */
     Class<? extends SocketAddress> getAddressType();
 
     /**
-     * Returns the type of the envelope message of this transport type.
+     * Returns the allowed message type when you write to an
+     * {@link IoSession} that is managed by the service.
      */
     Class<? extends Object> getEnvelopeType();
 
     /**
-     * Returns the type of the {@link IoSessionConfig} of this transport type.
+     * Returns the type of the {@link IoSessionConfig} of the service
      */
     Class<? extends IoSessionConfig> getSessionConfigType();
 }

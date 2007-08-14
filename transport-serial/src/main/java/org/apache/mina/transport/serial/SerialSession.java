@@ -35,13 +35,13 @@ import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultIoServiceMetadata;
 import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.IdleStatusChecker;
-import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +75,9 @@ public class SerialSession extends AbstractIoSession implements
 
     private final Logger log;
 
-    public static final IoServiceMetadata serialTransportType = new DefaultIoServiceMetadata(
-            "serial communication", false, SerialAddress.class,
+    static final IoServiceMetadata METADATA =
+        new DefaultIoServiceMetadata(
+            "serial", false, true, SerialAddress.class,
             ByteBuffer.class, SerialSessionConfig.class);
 
     SerialSession(IoService service, SerialAddress address, SerialPort port) {
@@ -151,10 +152,6 @@ public class SerialSession extends AbstractIoSession implements
 
     public IoService getService() {
         return service;
-    }
-
-    public IoServiceMetadata getTransportType() {
-        return serialTransportType;
     }
 
     protected void close0() {

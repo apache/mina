@@ -536,8 +536,22 @@ public abstract class AbstractIoSession implements IoSession {
 
     @Override
     public String toString() {
-        return "(" + getTransportType() + ", R: " + getRemoteAddress()
-                + ", L: " + getLocalAddress() + ", S: " + getServiceAddress()
+        return "(" + getServiceName()
+                + ", R: " + getRemoteAddress()
+                + ", L: " + getLocalAddress()
+                + ", S: " + getServiceAddress()
                 + ')';
+    }
+    
+    private String getServiceName() {
+        if (getService() == null) {
+            return "null";
+        }
+        
+        if (getService().getMetadata() == null) {
+            return "null";
+        }
+        
+        return getService().getMetadata().getName();
     }
 }

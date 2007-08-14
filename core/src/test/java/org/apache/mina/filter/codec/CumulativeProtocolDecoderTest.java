@@ -34,7 +34,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.IoServiceMetadata;
 
 /**
  * Tests {@link CumulativeProtocolDecoder}.
@@ -181,10 +180,6 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         @Override
         public CloseFuture close() {
             return null;
-        }
-
-        public IoServiceMetadata getTransportType() {
-            return IoServiceMetadata.SOCKET;
         }
 
         public SocketAddress getRemoteAddress() {

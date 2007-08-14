@@ -17,16 +17,21 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.vmpipe;
+package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.IoSession;
+import java.net.InetSocketAddress;
 
-public interface VmPipeSession extends IoSession {
-    VmPipeSessionConfig getConfig();
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultIoServiceMetadata;
 
-    VmPipeAddress getRemoteAddress();
-
-    VmPipeAddress getLocalAddress();
-
-    VmPipeAddress getServiceAddress();
+class DatagramServiceMetadata extends DefaultIoServiceMetadata {
+    static final DatagramServiceMetadata INSTANCE = new DatagramServiceMetadata();
+    
+    private DatagramServiceMetadata() {
+        super(
+                "datagram", true, false,
+                InetSocketAddress.class,
+                ByteBuffer.class,
+                DatagramSessionConfig.class);
+    }
 }

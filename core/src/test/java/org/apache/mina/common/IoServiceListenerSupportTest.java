@@ -327,5 +327,10 @@ public class IoServiceListenerSupportTest extends TestCase {
         public IoServiceMetadata getTransportType() {
             return null;
         }
+        
+        @Override
+        public String toString() {
+            return String.valueOf(serviceAddress);
+        }
     }
 }

@@ -17,13 +17,14 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.socket.nio.support;
+package org.apache.mina.transport.socket.nio;
 
 import java.util.Queue;
 
 import org.apache.mina.common.AbstractIoFilterChain;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
@@ -42,16 +43,21 @@ class DatagramFilterChain extends AbstractIoFilterChain {
     protected void doWrite(IoSession session, WriteRequest writeRequest) {
         DatagramSessionImpl s = (DatagramSessionImpl) session;
         Queue<WriteRequest> writeRequestQueue = s.getWriteRequestQueue();
-
-        // SocketIoProcessor.doFlush() will reset it after write is finished
-        // because the buffer will be passed with messageSent event. 
         ((ByteBuffer) writeRequest.getMessage()).mark();
+
+        int writeRequestQueueSize;
         synchronized (writeRequestQueue) {
             writeRequestQueue.offer(writeRequest);
-            if (writeRequestQueue.size() == 1
-                    && session.getTrafficMask().isWritable()) {
-                // Notify DatagramService only when writeRequestQueue was empty.
-                s.getManagerDelegate().flushSession(s);
+            writeRequestQueueSize = writeRequestQueue.size();
+        }
+
+        if (writeRequestQueueSize == 1 && session.getTrafficMask().isWritable()) {
+            // Notify SocketIoProcessor only when writeRequestQueue was empty.
+            IoService service = s.getService();
+            if (service instanceof DatagramAcceptor) {
+                ((DatagramAcceptor) service).flushSession(s);
+            } else {
+                ((DatagramConnector) service).flushSession(s);
             }
         }
     }
@@ -59,11 +65,11 @@ class DatagramFilterChain extends AbstractIoFilterChain {
     @Override
     protected void doClose(IoSession session) {
         DatagramSessionImpl s = (DatagramSessionImpl) session;
-        DatagramService manager = s.getManagerDelegate();
-        if (manager instanceof DatagramConnectorDelegate) {
-            ((DatagramConnectorDelegate) manager).closeSession(s);
+        IoService service = s.getService();
+        if (service instanceof DatagramConnector) {
+            ((DatagramConnector) service).closeSession(s);
         } else {
-            ((DatagramAcceptorDelegate) manager).getListeners()
+            ((DatagramAcceptor) service).getListeners()
                     .fireSessionDestroyed(session);
             session.getCloseFuture().setClosed();
         }

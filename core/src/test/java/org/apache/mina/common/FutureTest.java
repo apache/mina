@@ -24,19 +24,6 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.DefaultCloseFuture;
-import org.apache.mina.common.DefaultConnectFuture;
-import org.apache.mina.common.DefaultWriteFuture;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.IoServiceMetadata;
-
 /**
  * Tests {@link IoFuture} implementations.
  * 
@@ -77,10 +64,6 @@ public class FutureTest extends TestCase {
             }
 
             public IoFilterChain getFilterChain() {
-                return null;
-            }
-
-            public IoServiceMetadata getTransportType() {
                 return null;
             }
 

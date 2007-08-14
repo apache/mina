@@ -121,7 +121,7 @@ public class SerialConnector extends AbstractIoConnector {
     }
 
     public IoServiceMetadata getMetadata() {
-        return SerialSession.serialTransportType;
+        return SerialSession.METADATA;
     }
 
     private SerialPort initializePort(String user, CommPortIdentifier portId,

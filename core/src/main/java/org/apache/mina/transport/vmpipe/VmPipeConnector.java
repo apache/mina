@@ -56,7 +56,7 @@ public class VmPipeConnector extends AbstractIoConnector {
     }
 
     public IoServiceMetadata getMetadata() {
-        return IoServiceMetadata.VM_PIPE;
+        return VmPipeServiceMetadata.INSTANCE;
     }
 
     @Override

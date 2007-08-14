@@ -209,11 +209,6 @@ public interface IoSession {
     Set<String> getAttributeKeys();
 
     /**
-     * Returns transport type of this session.
-     */
-    IoServiceMetadata getTransportType();
-
-    /**
      * Returns <code>true</code> if this session is connected with remote peer.
      */
     boolean isConnected();

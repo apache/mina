@@ -567,9 +567,6 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
         @Override
         public void filterWrite(NextFilter nextFilter, IoSession session,
                 WriteRequest writeRequest) throws Exception {
-            // I used assertion here because isAssignableFrom takes a lot of CPU.
-            assert session.getTransportType().getEnvelopeType()
-                    .isAssignableFrom(writeRequest.getMessage().getClass());
             doWrite(session, writeRequest);
         }
 

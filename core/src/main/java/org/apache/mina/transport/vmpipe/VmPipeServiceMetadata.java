@@ -19,14 +19,16 @@
  */
 package org.apache.mina.transport.vmpipe;
 
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.DefaultIoServiceMetadata;
 
-public interface VmPipeSession extends IoSession {
-    VmPipeSessionConfig getConfig();
-
-    VmPipeAddress getRemoteAddress();
-
-    VmPipeAddress getLocalAddress();
-
-    VmPipeAddress getServiceAddress();
+class VmPipeServiceMetadata extends DefaultIoServiceMetadata {
+    static final VmPipeServiceMetadata INSTANCE = new VmPipeServiceMetadata();
+    
+    private VmPipeServiceMetadata() {
+        super(
+                "vm", false, false,
+                VmPipeAddress.class,
+                Object.class,
+                VmPipeSessionConfig.class);
+    }
 }

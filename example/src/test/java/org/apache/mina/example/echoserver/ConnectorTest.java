@@ -28,8 +28,8 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.IoSessionLogger;
+import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.ssl.SSLFilter;
@@ -178,7 +178,7 @@ public class ConnectorTest extends AbstractTest {
 
             writeFuture = session.write(buf);
 
-            if (session.getTransportType().isConnectionless()) {
+            if (session.getService().getMetadata().isConnectionless()) {
                 // This will align message arrival order in connectionless transport types
                 waitForResponse(handler, (i + 1) * DATA_SIZE);
             }
