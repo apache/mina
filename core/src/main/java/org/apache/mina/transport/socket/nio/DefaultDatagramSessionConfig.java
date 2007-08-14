@@ -31,7 +31,7 @@ import org.apache.mina.common.ExceptionMonitor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 439913 $, $Date: 2006-09-04 05:12:43 +0200 (mån, 04 sep 2006) $
  */
-public class DefaultDatagramSessionConfig extends AbstractIoSessionConfig implements
+class DefaultDatagramSessionConfig extends AbstractIoSessionConfig implements
         DatagramSessionConfig {
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
 
@@ -127,7 +127,7 @@ public class DefaultDatagramSessionConfig extends AbstractIoSessionConfig implem
     /**
      * Creates a new instance.
      */
-    public DefaultDatagramSessionConfig() {
+    DefaultDatagramSessionConfig() {
     }
 
     /**

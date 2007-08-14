@@ -28,7 +28,6 @@ import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoServiceMetadata;
-import org.apache.mina.transport.vmpipe.support.VmPipe;
 
 /**
  * Binds the specified {@link IoHandler} to the specified

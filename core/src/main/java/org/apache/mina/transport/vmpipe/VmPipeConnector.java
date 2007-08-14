@@ -35,9 +35,6 @@ import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoServiceMetadata;
-import org.apache.mina.transport.vmpipe.support.VmPipe;
-import org.apache.mina.transport.vmpipe.support.VmPipeFilterChain;
-import org.apache.mina.transport.vmpipe.support.VmPipeSessionImpl;
 
 /**
  * Connects to {@link IoHandler}s which is bound on the specified

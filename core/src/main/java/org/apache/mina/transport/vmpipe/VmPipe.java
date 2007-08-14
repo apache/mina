@@ -17,18 +17,16 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.vmpipe.support;
+package org.apache.mina.transport.vmpipe;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceListenerSupport;
-import org.apache.mina.transport.vmpipe.VmPipeAcceptor;
-import org.apache.mina.transport.vmpipe.VmPipeAddress;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipe {
+class VmPipe {
     private final VmPipeAcceptor acceptor;
 
     private final VmPipeAddress address;
@@ -37,7 +35,7 @@ public class VmPipe {
 
     private final IoServiceListenerSupport listeners;
 
-    public VmPipe(VmPipeAcceptor acceptor, VmPipeAddress address,
+    VmPipe(VmPipeAcceptor acceptor, VmPipeAddress address,
             IoHandler handler, IoServiceListenerSupport listeners) {
         this.acceptor = acceptor;
         this.address = address;

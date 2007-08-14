@@ -39,7 +39,7 @@ import org.apache.mina.common.ExceptionMonitor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultSocketSessionConfig extends AbstractIoSessionConfig implements
+class DefaultSocketSessionConfig extends AbstractIoSessionConfig implements
         SocketSessionConfig {
     private static Map<InetSocketAddress, InetAddress> TEST_ADDRESSES = new LinkedHashMap<InetSocketAddress, InetAddress>();
 
@@ -237,7 +237,7 @@ public class DefaultSocketSessionConfig extends AbstractIoSessionConfig implemen
     /**
      * Creates a new instance.
      */
-    public DefaultSocketSessionConfig() {
+    DefaultSocketSessionConfig() {
     }
 
     public boolean isReuseAddress() {

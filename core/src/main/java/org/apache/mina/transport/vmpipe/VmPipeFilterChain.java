@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.vmpipe.support;
+package org.apache.mina.transport.vmpipe;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -32,13 +32,13 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeFilterChain extends AbstractIoFilterChain {
+class VmPipeFilterChain extends AbstractIoFilterChain {
 
     private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<Event>();
 
     private boolean flushEnabled;
 
-    public VmPipeFilterChain(IoSession session) {
+    VmPipeFilterChain(IoSession session) {
         super(session);
     }
 

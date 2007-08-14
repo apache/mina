@@ -27,6 +27,8 @@ import org.apache.mina.common.AbstractIoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements
+class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements
         VmPipeSessionConfig {
+    DefaultVmPipeSessionConfig() {
+    }
 }

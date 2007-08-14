@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.vmpipe.support;
+package org.apache.mina.transport.vmpipe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +31,6 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.transport.vmpipe.DefaultVmPipeSessionConfig;
-import org.apache.mina.transport.vmpipe.VmPipeAddress;
-import org.apache.mina.transport.vmpipe.VmPipeSession;
-import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
 
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
@@ -42,7 +38,7 @@ import org.apache.mina.transport.vmpipe.VmPipeSessionConfig;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
+class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     private static final VmPipeSessionConfig CONFIG = new DefaultVmPipeSessionConfig();
 
     private final IoService service;
@@ -68,7 +64,7 @@ public class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSessio
     /**
      * Constructor for client-side session.
      */
-    public VmPipeSessionImpl(IoService service,
+    VmPipeSessionImpl(IoService service,
             IoServiceListenerSupport serviceListeners,
             VmPipeAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
         this.service = service;
