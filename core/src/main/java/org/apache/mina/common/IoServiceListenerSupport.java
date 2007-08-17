@@ -45,7 +45,7 @@ public class IoServiceListenerSupport {
     private final List<IoServiceListener> listeners = new ArrayList<IoServiceListener>();
 
     /**
-     * Tracks managed sesssions.
+     * Tracks managed sessions.
      */
     private final Set<IoSession> managedSessions = new ConcurrentHashSet<IoSession>();
 
