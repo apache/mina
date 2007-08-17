@@ -546,11 +546,15 @@ public abstract class AbstractIoSession implements IoSession {
 
     @Override
     public String toString() {
-        return "(" + getServiceName()
-                + ", R: " + getRemoteAddress()
-                + ", L: " + getLocalAddress()
-                + ", S: " + getServiceAddress()
-                + ')';
+        if (getService() instanceof IoAcceptor) {
+            return "(" + getServiceName() + ", server, " +
+                   getRemoteAddress() + " => " +
+                   getLocalAddress() + ')';
+        } else {
+            return "(" + getServiceName() + ", client, " +
+                   getLocalAddress() + " => " +
+                   getRemoteAddress() + ')';
+        }
     }
     
     private String getServiceName() {
