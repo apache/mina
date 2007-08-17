@@ -49,6 +49,27 @@ public class IoSessionLogger {
         return session.getHandler().getClass();
     }
 
+    public static void trace(IoSession session, String message) {
+        trace(getLogger(session), session, message);
+    }
+
+    public static void trace(Logger log, IoSession session, String message) {
+        if (log.isTraceEnabled()) {
+            log.trace(String.valueOf(getPrefix(session)) + message);
+        }
+    }
+
+    public static void trace(IoSession session, String message, Throwable cause) {
+        trace(getLogger(session), session, message, cause);
+    }
+
+    public static void trace(Logger log, IoSession session, String message,
+            Throwable cause) {
+        if (log.isTraceEnabled()) {
+            log.trace(String.valueOf(getPrefix(session)) + message, cause);
+        }
+    }
+
     public static void debug(IoSession session, String message) {
         debug(getLogger(session), session, message);
     }
