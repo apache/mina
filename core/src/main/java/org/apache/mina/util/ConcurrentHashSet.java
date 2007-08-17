@@ -41,6 +41,7 @@ public class ConcurrentHashSet<E> extends MapBackedSet<E> {
 
     @Override
     public boolean add(E o) {
-        return ((ConcurrentMap<E, Boolean>) map).putIfAbsent(o, Boolean.TRUE);
+        Boolean answer = ((ConcurrentMap<E, Boolean>) map).putIfAbsent(o, Boolean.TRUE);
+        return (answer == null);
     }
 }
