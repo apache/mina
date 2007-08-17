@@ -20,21 +20,21 @@
 package org.apache.mina.util;
 
 import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * An {@link IdentityHashMap}-backed {@link Set}.
+ * A {@link ConcurrentHashMap}-backed {@link Set}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IdentityHashSet<E> extends MapBackedSet<E> {
-    public IdentityHashSet() {
-        super(new IdentityHashMap<E, Boolean>());
+public class ConcurrentHashSet<E> extends MapBackedSet<E> {
+    public ConcurrentHashSet() {
+        super(new ConcurrentHashMap<E, Boolean>());
     }
 
-    public IdentityHashSet(Collection<E> c) {
-        super(new IdentityHashMap<E, Boolean>(), c);
+    public ConcurrentHashSet(Collection<E> c) {
+        super(new ConcurrentHashMap<E, Boolean>(), c);
     }
 }

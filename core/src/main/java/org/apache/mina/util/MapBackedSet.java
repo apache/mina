@@ -19,22 +19,57 @@
  */
 package org.apache.mina.util;
 
+import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * An {@link IdentityHashMap}-backed {@link Set}.
+ * A {@link Map}-backed {@link Set}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IdentityHashSet<E> extends MapBackedSet<E> {
-    public IdentityHashSet() {
-        super(new IdentityHashMap<E, Boolean>());
+public class MapBackedSet<E> extends AbstractSet<E> {
+    private final Map<E, Boolean> delegate;
+
+    public MapBackedSet(Map<E, Boolean> map) {
+        this.delegate = map;
     }
 
-    public IdentityHashSet(Collection<E> c) {
-        super(new IdentityHashMap<E, Boolean>(), c);
+    public MapBackedSet(Map<E, Boolean> map, Collection<E> c) {
+        this. delegate = map;
+        addAll(c);
+    }
+
+    @Override
+    public int size() {
+        return delegate.size();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return delegate.containsKey(o);
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return delegate.keySet().iterator();
+    }
+
+    @Override
+    public boolean add(E arg0) {
+        return delegate.put(arg0, Boolean.TRUE) == null;
+    }
+
+    @Override
+    public boolean remove(Object arg0) {
+        return delegate.remove(arg0) != null;
+    }
+
+    @Override
+    public void clear() {
+        delegate.clear();
     }
 }
