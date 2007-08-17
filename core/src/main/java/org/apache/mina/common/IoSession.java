@@ -44,6 +44,10 @@ import java.util.Set;
  * is executed simultaneously, and therefore you have to make sure the
  * {@link IoFilter} implementations you're using are thread-safe, too. 
  * </p>
+ * 
+ * <h3>Equality of Sessions</h3>
+ * {@link #equals(Object)} and {@link #hashCode()} shall not be overriden
+ * to the default behavior that is defined in {@link Object}.
  *   
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

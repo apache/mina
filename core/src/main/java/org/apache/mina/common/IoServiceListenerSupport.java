@@ -20,10 +20,11 @@
 package org.apache.mina.common;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.mina.util.IdentityHashSet;
+import org.apache.mina.util.ConcurrentHashSet;
 
 /**
  * A helper which provides addition and removal of {@link IoServiceListener}s and firing
@@ -46,7 +47,12 @@ public class IoServiceListenerSupport {
     /**
      * Tracks managed sesssions.
      */
-    private final Set<IoSession> managedSessions = new IdentityHashSet<IoSession>();
+    private final Set<IoSession> managedSessions = new ConcurrentHashSet<IoSession>();
+
+    /**
+     * Read only version of {@link #managedSessions}.
+     */
+    private final Set<IoSession> readOnlyManagedSessions = Collections.unmodifiableSet(managedSessions);
 
     private boolean activated;
 
@@ -79,9 +85,7 @@ public class IoServiceListenerSupport {
     }
 
     public Set<IoSession> getManagedSessions() {
-        synchronized (managedSessions) {
-            return new IdentityHashSet<IoSession>(managedSessions);
-        }
+        return readOnlyManagedSessions;
     }
 
     /**
@@ -140,11 +144,11 @@ public class IoServiceListenerSupport {
         boolean firstSession = false;
         synchronized (managedSessions) {
             firstSession = managedSessions.isEmpty();
+        }
 
-            // If already registered, ignore.
-            if (!managedSessions.add(session)) {
-                return;
-            }
+        // If already registered, ignore.
+        if (!managedSessions.add(session)) {
+            return;
         }
 
         // If the first connector session, fire a virtual service activation event.
@@ -168,13 +172,13 @@ public class IoServiceListenerSupport {
      * Calls {@link IoServiceListener#sessionDestroyed(IoSession)} for all registered listeners.
      */
     public void fireSessionDestroyed(IoSession session) {
+        // Try to remove the remaining empty session set after removal.
+        if (!managedSessions.remove(session)) {
+            return;
+        }
+
         boolean lastSession = false;
         synchronized (managedSessions) {
-            // Try to remove the remaining empty seession set after removal.
-            if (!managedSessions.remove(session)) {
-                return;
-            }
-
             lastSession = managedSessions.isEmpty();
         }
 
@@ -205,20 +209,11 @@ public class IoServiceListenerSupport {
             return;
         }
 
-        final Object lock = new Object();
-        Set<IoSession> sessionsCopy;
-        synchronized (managedSessions) {
-            sessionsCopy = new IdentityHashSet<IoSession>(managedSessions);
-        }
-
-        for (IoSession s : sessionsCopy) {
-            s.close().addListener(new IoFutureListener() {
-                public void operationComplete(IoFuture future) {
-                    synchronized (lock) {
-                        lock.notifyAll();
-                    }
-                }
-            });
+        Object lock = new Object();
+        IoFutureListener listener = new LockNotifyingListener(lock);
+        
+        for (IoSession s : managedSessions) {
+            s.close().addListener(listener);
         }
 
         try {
@@ -229,6 +224,20 @@ public class IoServiceListenerSupport {
             }
         } catch (InterruptedException ie) {
             // Ignored
+        }
+    }
+    
+    private static class LockNotifyingListener implements IoFutureListener {
+        private final Object lock;
+        
+        public LockNotifyingListener(Object lock) {
+            this.lock = lock;
+        }
+        
+        public void operationComplete(IoFuture future) {
+            synchronized (lock) {
+                lock.notifyAll();
+            }
         }
     }
 }

@@ -533,6 +533,16 @@ public abstract class AbstractIoSession implements IoSession {
             return getRemoteAddress();
         }
     }
+    
+    @Override
+    public final int hashCode() {
+        return System.identityHashCode(this);
+    }
+    
+    @Override
+    public final boolean equals(Object o) {
+        return this == o;
+    }
 
     @Override
     public String toString() {
