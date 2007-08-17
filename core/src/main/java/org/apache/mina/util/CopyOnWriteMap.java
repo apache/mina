@@ -48,6 +48,16 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     }
 
     /**
+     * Creates a new instance of CopyOnWriteMap with the specified initial size
+     *
+     * @param initialCapacity
+     *  The initial size of the Map.
+     */
+    public CopyOnWriteMap(int initialCapacity) {
+        internalMap = new HashMap<K, V>(initialCapacity);
+    }
+    
+    /**
      * Creates a new instance of CopyOnWriteMap in which the
      * initial data being held by this map is contained in
      * the supplied map.
