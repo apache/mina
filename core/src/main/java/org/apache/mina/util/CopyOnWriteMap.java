@@ -19,12 +19,10 @@
  */
 package org.apache.mina.util;
 
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * A thread-safe version of {@link Map} in which all operations that change the 
@@ -35,22 +33,19 @@ import java.util.Set;
  * modify the Map.  Therefore the operations that do not cause a change to this 
  * class happen quickly and concurrently.
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
-{
-    private HashMap<K, V> internalMap;
+public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
+    private volatile Map<K, V> internalMap;
 
     /**
      * Creates a new instance of CopyOnWriteMap.
      *
      */
-    public CopyOnWriteMap()
-    {
-        internalMap = new HashMap<K,V>();
+    public CopyOnWriteMap() {
+        internalMap = new HashMap<K, V>();
     }
-
 
     /**
      * Creates a new instance of CopyOnWriteMap in which the
@@ -61,9 +56,8 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
      *  A Map containing the initial contents to be placed into
      *  this class.
      */
-    public CopyOnWriteMap( Map<K, V> data )
-    {
-        internalMap = new HashMap<K,V>( data );
+    public CopyOnWriteMap(Map<K, V> data) {
+        internalMap = new HashMap<K, V>(data);
     }
 
     /**
@@ -71,17 +65,14 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
      * 
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
-    @SuppressWarnings("unchecked")
-    public V put( K key, V value )
-    {
-        synchronized( this ){
-            HashMap<K,V> newMap = (HashMap<K, V>)internalMap.clone();
-            V val = newMap.put( key, value );
+    public V put(K key, V value) {
+        synchronized (this) {
+            Map<K, V> newMap = new HashMap<K, V>(internalMap);
+            V val = newMap.put(key, value);
             internalMap = newMap;
             return val;
         }
     }
-
 
     /**
      * Removed the value and key from this map based on the
@@ -89,17 +80,14 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
      * 
      * @see java.util.Map#remove(java.lang.Object)
      */
-    @SuppressWarnings("unchecked")
-    public V remove( Object key )
-    {
-        synchronized( this ){
-            HashMap<K,V> newMap = (HashMap<K,V>)internalMap.clone();
-            V val = newMap.remove( key );
+    public V remove(Object key) {
+        synchronized (this) {
+            Map<K, V> newMap = new HashMap<K, V>(internalMap);
+            V val = newMap.remove(key);
             internalMap = newMap;
             return val;
         }
     }
-
 
     /**
      * Inserts all the keys and values contained in the
@@ -107,32 +95,24 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
      * 
      * @see java.util.Map#putAll(java.util.Map)
      */
-    @SuppressWarnings("unchecked")
-    public void putAll( Map<? extends K, ? extends V> newData )
-    {
-        synchronized( this ){
-            HashMap<K,V> newMap = (HashMap<K,V>)internalMap.clone();
-            newMap.putAll( newData );
+    public void putAll(Map<? extends K, ? extends V> newData) {
+        synchronized (this) {
+            Map<K, V> newMap = new HashMap<K, V>(internalMap);
+            newMap.putAll(newData);
             internalMap = newMap;
         }
     }
-
 
     /**
      * Removes all entries in this map.
      * 
      * @see java.util.Map#clear()
      */
-    @SuppressWarnings("unchecked")
-    public void clear()
-    {
-        synchronized( this ){
-            HashMap<K,V> newMap = (HashMap<K,V>)internalMap.clone();
-            newMap.clear();
-            internalMap = newMap;
+    public void clear() {
+        synchronized (this) {
+            internalMap = new HashMap<K, V>();
         }
     }
-
 
     // ==============================================
     // ==== Below are methods that do not modify ====
@@ -143,22 +123,18 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
      * 
      * @see java.util.Map#size()
      */
-    public int size()
-    {
+    public int size() {
         return internalMap.size();
     }
-
 
     /**
      * Returns true if this map is empty, otherwise false.
      * 
      * @see java.util.Map#isEmpty()
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return internalMap.isEmpty();
     }
-
 
     /**
      * Returns true if this map contains the provided key, otherwise
@@ -166,11 +142,9 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
      * 
      * @see java.util.Map#containsKey(java.lang.Object)
      */
-    public boolean containsKey( Object key )
-    {
-        return internalMap.containsKey( key );
+    public boolean containsKey(Object key) {
+        return internalMap.containsKey(key);
     }
-
 
     /**
      * Returns true if this map contains the provided value, otherwise
@@ -178,11 +152,9 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
      * 
      * @see java.util.Map#containsValue(java.lang.Object)
      */
-    public boolean containsValue( Object value )
-    {
-        return internalMap.containsValue( value );
+    public boolean containsValue(Object value) {
+        return internalMap.containsValue(value);
     }
-
 
     /**
      * Returns the value associated with the provided key from this
@@ -190,35 +162,37 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable
      * 
      * @see java.util.Map#get(java.lang.Object)
      */
-    public V get( Object key )
-    {
-        return internalMap.get( key );
+    public V get(Object key) {
+        return internalMap.get(key);
     }
-
 
     /**
      * This method will return a read-only {@link Set}.
      */
-    public Set<K> keySet()
-    {
+    public Set<K> keySet() {
         return internalMap.keySet();
     }
-
 
     /**
      * This method will return a read-only {@link Collection}.
      */
-    public Collection<V> values()
-    {
+    public Collection<V> values() {
         return internalMap.values();
     }
-
 
     /**
      * This method will return a read-only {@link Set}.
      */
-    public Set<Entry<K, V>> entrySet()
-    {
+    public Set<Entry<K, V>> entrySet() {
         return internalMap.entrySet();
+    }
+    
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
     }
 }
