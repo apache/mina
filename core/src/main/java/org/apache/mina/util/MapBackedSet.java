@@ -39,7 +39,7 @@ public class MapBackedSet<E> extends AbstractSet<E> {
     }
 
     public MapBackedSet(Map<E, Boolean> map, Collection<E> c) {
-        this. map = map;
+        this.map = map;
         addAll(c);
     }
 
