@@ -32,44 +32,49 @@ import java.util.Set;
  * @version $Rev$, $Date$
  */
 public class MapBackedSet<E> extends AbstractSet<E> {
-    private final Map<E, Boolean> delegate;
+    protected final Map<E, Boolean> map;
 
     public MapBackedSet(Map<E, Boolean> map) {
-        this.delegate = map;
+        this.map = map;
     }
 
     public MapBackedSet(Map<E, Boolean> map, Collection<E> c) {
-        this. delegate = map;
+        this. map = map;
         addAll(c);
     }
 
     @Override
     public int size() {
-        return delegate.size();
+        return map.size();
     }
 
     @Override
     public boolean contains(Object o) {
-        return delegate.containsKey(o);
+        return map.containsKey(o);
     }
 
     @Override
     public Iterator<E> iterator() {
-        return delegate.keySet().iterator();
+        return map.keySet().iterator();
     }
 
     @Override
-    public boolean add(E arg0) {
-        return delegate.put(arg0, Boolean.TRUE) == null;
+    public boolean add(E o) {
+        if (map.containsKey(o)) {
+            return false;
+        }
+        
+        map.put(o, Boolean.TRUE);
+        return true;
     }
 
     @Override
-    public boolean remove(Object arg0) {
-        return delegate.remove(arg0) != null;
+    public boolean remove(Object o) {
+        return map.remove(o) != null;
     }
 
     @Override
     public void clear() {
-        delegate.clear();
+        map.clear();
     }
 }
