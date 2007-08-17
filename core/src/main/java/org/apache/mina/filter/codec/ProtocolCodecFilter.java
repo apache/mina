@@ -216,11 +216,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 pee = new ProtocolEncoderException(t);
             }
             throw pee;
-        } finally {
-            // Dispose the encoder if this session is connectionless.
-            if (session.getService().getMetadata().isConnectionless()) {
-                disposeEncoder(session);
-            }
         }
     }
 
