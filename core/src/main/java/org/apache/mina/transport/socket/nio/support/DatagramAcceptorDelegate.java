@@ -39,12 +39,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoAcceptor;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.transport.socket.nio.DatagramAcceptorConfig;
@@ -418,57 +418,63 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
     }
 
     private void flush(DatagramSessionImpl session) throws IOException {
-        DatagramChannel ch = session.getChannel();
+        // Clear OP_WRITE
+        SelectionKey key = session.getSelectionKey();
+        if (key == null) {
+            scheduleFlush(session);
+            return;
+        }
+        if (!key.isValid()) {
+            return;
+        }
+        key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
 
+        DatagramChannel ch = session.getChannel();
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
-        for (;;) {
-            WriteRequest req = writeRequestQueue.peek();
-
-            if (req == null)
-                break;
-
-            ByteBuffer buf = (ByteBuffer) req.getMessage();
-            if (buf.remaining() == 0) {
-                // pop and fire event
-                writeRequestQueue.poll();
-
-                session.increaseWrittenMessages();
-                buf.reset();
-                session.getFilterChain().fireMessageSent(session, req);
-                continue;
+        int writtenBytes = 0;
+        int maxWrittenBytes = ((DatagramSessionConfig) session.getConfig()).getSendBufferSize() << 1;
+        try {
+            for (;;) {
+                WriteRequest req = writeRequestQueue.peek();
+    
+                if (req == null)
+                    break;
+    
+                ByteBuffer buf = (ByteBuffer) req.getMessage();
+                if (buf.remaining() == 0) {
+                    // pop and fire event
+                    writeRequestQueue.poll();
+    
+                    session.increaseWrittenMessages();
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(session, req);
+                    continue;
+                }
+    
+                SocketAddress destination = req.getDestination();
+                if (destination == null) {
+                    destination = session.getRemoteAddress();
+                }
+    
+                int localWrittenBytes = ch.send(buf.buf(), destination);
+                writtenBytes += localWrittenBytes;
+    
+                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
+                    // Kernel buffer is full or wrote too much
+                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                    break;
+                } else {
+                    // pop and fire event
+                    writeRequestQueue.poll();
+    
+                    session.increaseWrittenMessages();
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(session, req);
+                }
             }
-
-            SelectionKey key = session.getSelectionKey();
-            if (key == null) {
-                scheduleFlush(session);
-                break;
-            }
-            if (!key.isValid()) {
-                continue;
-            }
-
-            SocketAddress destination = req.getDestination();
-            if (destination == null) {
-                destination = session.getRemoteAddress();
-            }
-
-            int writtenBytes = ch.send(buf.buf(), destination);
-
-            if (writtenBytes == 0) {
-                // Kernel buffer is full
-                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-            } else if (writtenBytes > 0) {
-                key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
-
-                // pop and fire event
-                writeRequestQueue.poll();
-
-                session.increaseWrittenBytes(writtenBytes);
-                session.increaseWrittenMessages();
-                buf.reset();
-                session.getFilterChain().fireMessageSent(session, req);
-            }
+        } finally {
+            session.increaseWrittenBytes(writtenBytes);
         }
     }
 

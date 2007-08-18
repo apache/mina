@@ -361,35 +361,38 @@ class SocketIoProcessor {
         SocketChannel ch = session.getChannel();
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
-        for (;;) {
-            WriteRequest req = writeRequestQueue.peek();
-
-            if (req == null)
-                break;
-
-            ByteBuffer buf = (ByteBuffer) req.getMessage();
-            if (buf.remaining() == 0) {
-                writeRequestQueue.poll();
-
-                session.increaseWrittenMessages();
-
-                buf.reset();
-                session.getFilterChain().fireMessageSent(session, req);
-                continue;
-            }
-
-            if (key.isWritable()) {
-                int writtenBytes = ch.write(buf.buf());
-                if (writtenBytes > 0) {
-                    session.increaseWrittenBytes(writtenBytes);
+        int writtenBytes = 0;
+        int maxWrittenBytes = ((SocketSessionConfig) session.getConfig()).getSendBufferSize() << 1;
+        try {
+            for (;;) {
+                WriteRequest req = writeRequestQueue.peek();
+    
+                if (req == null)
+                    break;
+    
+                ByteBuffer buf = (ByteBuffer) req.getMessage();
+                if (buf.remaining() == 0) {
+                    writeRequestQueue.poll();
+    
+                    session.increaseWrittenMessages();
+    
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(session, req);
+                    continue;
+                }
+    
+                if (key.isWritable()) {
+                    writtenBytes += ch.write(buf.buf());
+                }
+    
+                if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
+                    // Kernel buffer is full or wrote too much.
+                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                    break;
                 }
             }
-
-            if (buf.hasRemaining()) {
-                // Kernel buffer is full
-                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                break;
-            }
+        } finally {
+            session.increaseWrittenBytes(writtenBytes);
         }
     }
 
