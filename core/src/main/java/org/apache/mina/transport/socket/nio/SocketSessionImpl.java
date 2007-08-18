@@ -30,6 +30,7 @@ import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultIoServiceMetadata;
+import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -52,7 +53,7 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
                 "socket", false, true,
                 InetSocketAddress.class,
                 SocketSessionConfig.class,
-                ByteBuffer.class);
+                ByteBuffer.class, FileRegion.class);
 
     private final IoService service;
 
