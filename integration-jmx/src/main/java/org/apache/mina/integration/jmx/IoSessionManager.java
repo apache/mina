@@ -151,29 +151,6 @@ public class IoSessionManager implements IoSessionManagerMBean {
         session.getFilterChain().remove("LoggerFirst");
     }
 
-    //  IDLE monitoring
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getReadIdleTime()
-     */
-    public long getReadIdleTime() {
-        return session.getIdleTimeInMillis(IdleStatus.READER_IDLE);
-    }
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getWriteIdleTime()
-     */
-    public long getWriteIdleTime() {
-        return session.getIdleTimeInMillis(IdleStatus.WRITER_IDLE);
-    }
-
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getBothIdleTime()
-     */
-    public long getBothIdleTime() {
-        return session.getIdleTimeInMillis(IdleStatus.BOTH_IDLE);
-    }
-
     public float getByteReadThroughtput() {
         IoSessionStat stats = (IoSessionStat) session
                 .getAttribute(StatCollector.KEY);

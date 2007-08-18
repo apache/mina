@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultIoServiceMetadata;
 import org.apache.mina.common.FileRegion;
@@ -36,7 +35,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteRequest;
 
@@ -84,23 +82,7 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         this.ch = ch;
         this.writeRequestQueue = new LinkedList<WriteRequest>();
         this.handler = service.getHandler();
-
-        // Apply the initial session settings
-        IoSessionConfig sessionConfig = service.getSessionConfig();
-        if (sessionConfig instanceof SocketSessionConfig) {
-            SocketSessionConfig cfg = (SocketSessionConfig) sessionConfig;
-            this.config.setKeepAlive(cfg.isKeepAlive());
-            this.config.setOobInline(cfg.isOobInline());
-            this.config.setReceiveBufferSize(cfg.getReceiveBufferSize());
-            this.config.setReuseAddress(cfg.isReuseAddress());
-            this.config.setSendBufferSize(cfg.getSendBufferSize());
-            this.config.setSoLinger(cfg.getSoLinger());
-            this.config.setTcpNoDelay(cfg.isTcpNoDelay());
-
-            if (this.config.getTrafficClass() != cfg.getTrafficClass()) {
-                this.config.setTrafficClass(cfg.getTrafficClass());
-            }
-        }
+        this.config.setAll(service.getSessionConfig());
     }
 
     public IoService getService() {
@@ -206,8 +188,7 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         this.readBufferSize = readBufferSize;
     }
 
-    private class SessionConfigImpl extends AbstractIoSessionConfig implements
-            SocketSessionConfig {
+    private class SessionConfigImpl extends AbstractSocketSessionConfig {
         public boolean isKeepAlive() {
             try {
                 return ch.socket().getKeepAlive();

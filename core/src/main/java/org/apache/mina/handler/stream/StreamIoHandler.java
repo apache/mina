@@ -102,8 +102,8 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
     @Override
     public void sessionOpened(IoSession session) {
         // Set timeouts
-        session.setWriteTimeout(writeTimeout);
-        session.setIdleTime(IdleStatus.READER_IDLE, readTimeout);
+        session.getConfig().setWriteTimeout(writeTimeout);
+        session.getConfig().setIdleTime(IdleStatus.READER_IDLE, readTimeout);
 
         // Create streams
         InputStream in = new IoSessionInputStream();

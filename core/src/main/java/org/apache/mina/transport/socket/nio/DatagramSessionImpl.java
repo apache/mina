@@ -36,7 +36,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
@@ -93,7 +92,7 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         // serviceAddress represents the same address in IPv4.
         this.localAddress = service.getLocalAddress();
 
-        applySettings();
+        this.config.setAll(service.getSessionConfig());
     }
 
     /**
@@ -109,23 +108,7 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         this.localAddress = (InetSocketAddress) ch.socket()
                 .getLocalSocketAddress();
 
-        applySettings();
-    }
-
-    private void applySettings() {
-        // Apply the initial session settings
-        IoSessionConfig sessionConfig = getService().getSessionConfig();
-        if (sessionConfig instanceof DatagramSessionConfig) {
-            DatagramSessionConfig cfg = (DatagramSessionConfig) sessionConfig;
-            this.config.setBroadcast(cfg.isBroadcast());
-            this.config.setReceiveBufferSize(cfg.getReceiveBufferSize());
-            this.config.setReuseAddress(cfg.isReuseAddress());
-            this.config.setSendBufferSize(cfg.getSendBufferSize());
-
-            if (this.config.getTrafficClass() != cfg.getTrafficClass()) {
-                this.config.setTrafficClass(cfg.getTrafficClass());
-            }
-        }
+        this.config.setAll(service.getSessionConfig());
     }
 
     public IoService getService() {
@@ -238,9 +221,8 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         return readBufferSize;
     }
 
-    private class SessionConfigImpl extends DefaultDatagramSessionConfig
-            implements DatagramSessionConfig {
-        @Override
+    private class SessionConfigImpl extends AbstractDatagramSessionConfig {
+
         public int getReceiveBufferSize() {
             try {
                 return ch.socket().getReceiveBufferSize();
@@ -249,7 +231,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public void setReceiveBufferSize(int receiveBufferSize) {
             if (DefaultDatagramSessionConfig.isSetReceiveBufferSizeAvailable()) {
                 try {
@@ -263,7 +244,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public boolean isBroadcast() {
             try {
                 return ch.socket().getBroadcast();
@@ -272,7 +252,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public void setBroadcast(boolean broadcast) {
             try {
                 ch.socket().setBroadcast(broadcast);
@@ -281,7 +260,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public int getSendBufferSize() {
             try {
                 return ch.socket().getSendBufferSize();
@@ -290,7 +268,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public void setSendBufferSize(int sendBufferSize) {
             if (DefaultDatagramSessionConfig.isSetSendBufferSizeAvailable()) {
                 try {
@@ -301,7 +278,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public boolean isReuseAddress() {
             try {
                 return ch.socket().getReuseAddress();
@@ -310,7 +286,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public void setReuseAddress(boolean reuseAddress) {
             try {
                 ch.socket().setReuseAddress(reuseAddress);
@@ -319,7 +294,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public int getTrafficClass() {
             if (DefaultDatagramSessionConfig.isGetTrafficClassAvailable()) {
                 try {
@@ -332,7 +306,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             }
         }
 
-        @Override
         public void setTrafficClass(int trafficClass) {
             if (DefaultDatagramSessionConfig.isSetTrafficClassAvailable()) {
                 try {

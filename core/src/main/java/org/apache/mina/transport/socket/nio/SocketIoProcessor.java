@@ -279,20 +279,20 @@ class SocketIoProcessor {
 
     private void notifyIdleness(SocketSessionImpl session, long currentTime) {
         notifyIdleness0(session, currentTime, session
-                .getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                .getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
                 IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
                         .getLastIdleTime(IdleStatus.BOTH_IDLE)));
         notifyIdleness0(session, currentTime, session
-                .getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                .getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
                 IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(),
                         session.getLastIdleTime(IdleStatus.READER_IDLE)));
         notifyIdleness0(session, currentTime, session
-                .getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                .getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
                 IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(),
                         session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
 
         notifyWriteTimeout(session, currentTime, session
-                .getWriteTimeoutInMillis(), session.getLastWriteTime());
+                .getConfig().getWriteTimeoutInMillis(), session.getLastWriteTime());
     }
 
     private void notifyIdleness0(SocketSessionImpl session, long currentTime,

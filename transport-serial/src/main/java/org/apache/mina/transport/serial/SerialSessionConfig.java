@@ -31,18 +31,6 @@ import org.apache.mina.common.IoSessionConfig;
 public interface SerialSessionConfig extends IoSessionConfig {
 
     /**
-     * Gets the timeout for port opening in milliseconds.
-     * @return timeout for port opening in milliseconds
-     */
-    int getTimeout();
-
-    /**
-     * Sets the timeout for opening the port. Value in milliseconds.
-     * @param timeout the timeout value in millseconds
-     */
-    public void setTimeout(int timeout);
-
-    /**
      * Gets the input buffer size. Note that this method is advisory and the underlying OS 
      * may choose not to report correct values for the buffer size.
      * @return input buffer size in bytes

@@ -84,15 +84,15 @@ public class IdleStatusChecker {
 
     private void notifyIdleSession(AbstractIoSession session, long currentTime) {
         notifyIdleSession0(session, currentTime, session
-                .getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                .getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
                 IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
                         .getLastIdleTime(IdleStatus.BOTH_IDLE)));
         notifyIdleSession0(session, currentTime, session
-                .getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                .getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
                 IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(),
                         session.getLastIdleTime(IdleStatus.READER_IDLE)));
         notifyIdleSession0(session, currentTime, session
-                .getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                .getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
                 IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(),
                         session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
     }

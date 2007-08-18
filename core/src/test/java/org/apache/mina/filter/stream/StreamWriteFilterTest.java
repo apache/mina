@@ -488,7 +488,7 @@ public class StreamWriteFilterTest extends TestCase {
         public void sessionCreated(IoSession session) throws Exception {
             super.sessionCreated(session);
 
-            session.setIdleTime(IdleStatus.READER_IDLE, 5);
+            session.getConfig().setIdleTime(IdleStatus.READER_IDLE, 5);
         }
 
         @Override

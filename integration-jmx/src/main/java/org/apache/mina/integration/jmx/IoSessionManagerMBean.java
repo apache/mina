@@ -22,7 +22,8 @@ package org.apache.mina.integration.jmx;
 import java.util.Date;
 
 /**
- * MBean interface for the session manager, it's used for instrumenting IoSession 
+ * MBean interface for the session manager, it's used for instrumenting IoSession
+ *  
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -111,24 +112,6 @@ public interface IoSessionManagerMBean {
      * remove the logging filter at begining of the chain
      */
     public void removeFirstLoggingFilter();
-
-    /**
-     * read and write IDLE time
-     * @return idle time in milli-seconds
-     */
-    public long getBothIdleTime();
-
-    /**
-     * read IDLE time
-     * @return read idle time in milli-seconds
-     */
-    public long getReadIdleTime();
-
-    /**
-     * write IDLE time
-     * @return write idle time in milli-seconds
-     */
-    public long getWriteIdleTime();
 
     /**
      * get the read bytes per second throughput

@@ -26,4 +26,39 @@ package org.apache.mina.common;
  * @version $Rev$, $Date$
  */
 public interface IoSessionConfig {
+    /**
+     * Returns idle time for the specified type of idleness in seconds.
+     */
+    int getIdleTime(IdleStatus status);
+
+    /**
+     * Returns idle time for the specified type of idleness in milliseconds.
+     */
+    long getIdleTimeInMillis(IdleStatus status);
+
+    /**
+     * Sets idle time for the specified type of idleness in seconds.
+     */
+    void setIdleTime(IdleStatus status, int idleTime);
+
+    /**
+     * Returns write timeout in seconds.
+     */
+    int getWriteTimeout();
+
+    /**
+     * Returns write timeout in milliseconds.
+     */
+    long getWriteTimeoutInMillis();
+
+    /**
+     * Sets write timeout in seconds.
+     */
+    void setWriteTimeout(int writeTimeout);
+    
+    /**
+     * Sets all configuration properties retrieved from the specified
+     * <tt>config</tt>.
+     */
+    void setAll(IoSessionConfig config);
 }

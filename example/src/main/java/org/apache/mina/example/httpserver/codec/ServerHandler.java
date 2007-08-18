@@ -36,7 +36,7 @@ public class ServerHandler extends IoHandlerAdapter {
     @Override
     public void sessionOpened(IoSession session) {
         // set idle time to 60 seconds
-        session.setIdleTime(IdleStatus.BOTH_IDLE, 60);
+        session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 60);
     }
 
     @Override

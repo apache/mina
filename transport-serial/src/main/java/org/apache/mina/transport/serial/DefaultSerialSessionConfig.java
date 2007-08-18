@@ -20,6 +20,7 @@
 package org.apache.mina.transport.serial;
 
 import org.apache.mina.common.AbstractIoSessionConfig;
+import org.apache.mina.common.IoSessionConfig;
 
 /**
  * The default configuration for a serial session {@link SerialSessionConfig}.
@@ -29,8 +30,6 @@ import org.apache.mina.common.AbstractIoSessionConfig;
  */
 public class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements SerialSessionConfig {
 
-    private int timeout = 2000;
-
     private int receiveThreshold = -1;
 
     private int inputBufferSize = 8;
@@ -39,6 +38,14 @@ public class DefaultSerialSessionConfig extends AbstractIoSessionConfig implemen
 
     public DefaultSerialSessionConfig() {
 
+    }
+    
+    protected void doSetAll(IoSessionConfig config) {
+        if (config instanceof SerialSessionConfig) {
+            SerialSessionConfig cfg = (SerialSessionConfig) config;
+            setInputBufferSize(cfg.getInputBufferSize());
+            setReceiveThreshold(cfg.getReceiveThreshold());
+        }
     }
 
     public int getInputBufferSize() {
@@ -63,13 +70,5 @@ public class DefaultSerialSessionConfig extends AbstractIoSessionConfig implemen
 
     public void setReceiveThreshold(int bytes) {
         receiveThreshold = bytes;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
     }
 }

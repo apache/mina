@@ -251,36 +251,6 @@ public interface IoSession {
     SocketAddress getServiceAddress();
 
     /**
-     * Returns idle time for the specified type of idleness in seconds.
-     */
-    int getIdleTime(IdleStatus status);
-
-    /**
-     * Returns idle time for the specified type of idleness in milliseconds.
-     */
-    long getIdleTimeInMillis(IdleStatus status);
-
-    /**
-     * Sets idle time for the specified type of idleness in seconds.
-     */
-    void setIdleTime(IdleStatus status, int idleTime);
-
-    /**
-     * Returns write timeout in seconds.
-     */
-    int getWriteTimeout();
-
-    /**
-     * Returns write timeout in milliseconds.
-     */
-    long getWriteTimeoutInMillis();
-
-    /**
-     * Sets write timeout in seconds.
-     */
-    void setWriteTimeout(int writeTimeout);
-
-    /**
      * Returns the current {@link TrafficMask} of this session.
      */
     TrafficMask getTrafficMask();

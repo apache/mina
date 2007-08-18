@@ -178,7 +178,7 @@ public abstract class AbstractBindTest extends TestCase {
                         .setReceiveBufferSize(2048);
             }
 
-            session.setIdleTime(IdleStatus.BOTH_IDLE, 10);
+            session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
         }
 
         @Override

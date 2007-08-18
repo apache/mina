@@ -52,15 +52,6 @@ public abstract class AbstractIoSession implements IoSession {
 
     private boolean closing;
 
-    // Configuration variables
-    private int idleTimeForRead;
-
-    private int idleTimeForWrite;
-
-    private int idleTimeForBoth;
-
-    private int writeTimeout;
-
     private TrafficMask trafficMask = TrafficMask.ALL;
 
     // Status variables
@@ -315,58 +306,6 @@ public abstract class AbstractIoSession implements IoSession {
         synchronized (attributes) {
             return new HashSet<String>(attributes.keySet());
         }
-    }
-
-    public int getIdleTime(IdleStatus status) {
-        if (status == IdleStatus.BOTH_IDLE) {
-            return idleTimeForBoth;
-        }
-
-        if (status == IdleStatus.READER_IDLE) {
-            return idleTimeForRead;
-        }
-
-        if (status == IdleStatus.WRITER_IDLE) {
-            return idleTimeForWrite;
-        }
-
-        throw new IllegalArgumentException("Unknown idle status: " + status);
-    }
-
-    public long getIdleTimeInMillis(IdleStatus status) {
-        return getIdleTime(status) * 1000L;
-    }
-
-    public void setIdleTime(IdleStatus status, int idleTime) {
-        if (idleTime < 0) {
-            throw new IllegalArgumentException("Illegal idle time: " + idleTime);
-        }
-
-        if (status == IdleStatus.BOTH_IDLE) {
-            idleTimeForBoth = idleTime;
-        } else if (status == IdleStatus.READER_IDLE) {
-            idleTimeForRead = idleTime;
-        } else if (status == IdleStatus.WRITER_IDLE) {
-            idleTimeForWrite = idleTime;
-        } else {
-            throw new IllegalArgumentException("Unknown idle status: " + status);
-        }
-    }
-
-    public int getWriteTimeout() {
-        return writeTimeout;
-    }
-
-    public long getWriteTimeoutInMillis() {
-        return writeTimeout * 1000L;
-    }
-
-    public void setWriteTimeout(int writeTimeout) {
-        if (writeTimeout < 0) {
-            throw new IllegalArgumentException("Illegal write timeout: "
-                    + writeTimeout);
-        }
-        this.writeTimeout = writeTimeout;
     }
 
     public TrafficMask getTrafficMask() {

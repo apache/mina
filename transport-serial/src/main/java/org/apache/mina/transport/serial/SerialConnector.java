@@ -130,8 +130,13 @@ public class SerialConnector extends AbstractIoConnector {
 
         SerialSessionConfig config = (SerialSessionConfig) getSessionConfig();
 
-        SerialPort serialPort = (SerialPort) portId.open(user, config
-                .getTimeout());
+        long connectTimeout = getConnectTimeoutMillis();
+        if (connectTimeout > Integer.MAX_VALUE) {
+            connectTimeout = Integer.MAX_VALUE;
+        }
+        
+        SerialPort serialPort = (SerialPort) portId.open(
+                user, (int) connectTimeout);
 
         serialPort.setSerialPortParams(portAddress.getBauds(), portAddress
                 .getDataBitsForRXTX(), portAddress.getStopBitsForRXTX(),

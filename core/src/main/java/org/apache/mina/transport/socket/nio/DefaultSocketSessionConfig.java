@@ -30,7 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.ExceptionMonitor;
 
 /**
@@ -39,8 +38,8 @@ import org.apache.mina.common.ExceptionMonitor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DefaultSocketSessionConfig extends AbstractIoSessionConfig implements
-        SocketSessionConfig {
+class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
+
     private static Map<InetSocketAddress, InetAddress> TEST_ADDRESSES = new LinkedHashMap<InetSocketAddress, InetAddress>();
 
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;

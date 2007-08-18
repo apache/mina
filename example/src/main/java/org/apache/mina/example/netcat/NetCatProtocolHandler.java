@@ -38,7 +38,7 @@ public class NetCatProtocolHandler extends IoHandlerAdapter {
         // Set reader idle time to 10 seconds.
         // sessionIdle(...) method will be invoked when no data is read
         // for 10 seconds.
-        session.setIdleTime(IdleStatus.READER_IDLE, 10);
+        session.getConfig().setIdleTime(IdleStatus.READER_IDLE, 10);
     }
 
     @Override

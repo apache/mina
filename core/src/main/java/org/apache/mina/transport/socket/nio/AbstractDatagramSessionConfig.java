@@ -17,23 +17,33 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.vmpipe;
+package org.apache.mina.transport.socket.nio;
 
 import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.IoSessionConfig;
 
 /**
- * A default implementation of {@link VmPipeSessionConfig}.
- * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements
-        VmPipeSessionConfig {
-    DefaultVmPipeSessionConfig() {
+abstract class AbstractDatagramSessionConfig extends
+        AbstractIoSessionConfig implements DatagramSessionConfig {
+
+    protected AbstractDatagramSessionConfig() {
     }
 
-    @Override
     protected void doSetAll(IoSessionConfig config) {
+        if (config instanceof DatagramSessionConfig) {
+            DatagramSessionConfig cfg = (DatagramSessionConfig) config;
+            setBroadcast(cfg.isBroadcast());
+            setReceiveBufferSize(cfg.getReceiveBufferSize());
+            setReuseAddress(cfg.isReuseAddress());
+            setSendBufferSize(cfg.getSendBufferSize());
+    
+            if (getTrafficClass() != cfg.getTrafficClass()) {
+                setTrafficClass(cfg.getTrafficClass());
+            }
+        }
     }
+
 }

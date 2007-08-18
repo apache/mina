@@ -47,7 +47,7 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
             config.setReceiveBufferSize(2048);
         }
 
-        session.setIdleTime(IdleStatus.BOTH_IDLE, 10);
+        session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 
         // We're going to use SSL negotiation notification.
         session.setAttribute(SSLFilter.USE_NOTIFICATION);
