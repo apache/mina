@@ -20,6 +20,7 @@
 package org.apache.mina.common;
 
 import java.net.SocketAddress;
+import java.util.Set;
 
 /**
  * Provides meta-information that describes an {@link IoService}.
@@ -53,10 +54,10 @@ public interface IoServiceMetadata {
     Class<? extends SocketAddress> getAddressType();
 
     /**
-     * Returns the allowed message type when you write to an
+     * Returns the set of the allowed message type when you write to an
      * {@link IoSession} that is managed by the service.
      */
-    Class<? extends Object> getEnvelopeType();
+    Set<Class<? extends Object>> getEnvelopeTypes();
 
     /**
      * Returns the type of the {@link IoSessionConfig} of the service

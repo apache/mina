@@ -25,10 +25,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.mina.common.AbstractIoSession;
+import org.apache.mina.common.DefaultIoServiceMetadata;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
@@ -39,6 +41,14 @@ import org.apache.mina.common.WriteRequest;
  * @version $Rev$, $Date$
  */
 class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
+    
+    static final IoServiceMetadata METADATA = 
+        new DefaultIoServiceMetadata(
+            "vmpipe", false, false,
+            VmPipeAddress.class,
+            VmPipeSessionConfig.class,
+            Object.class);
+    
     private static final VmPipeSessionConfig CONFIG = new DefaultVmPipeSessionConfig();
 
     private final IoService service;

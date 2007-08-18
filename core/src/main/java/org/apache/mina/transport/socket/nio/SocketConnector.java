@@ -124,7 +124,7 @@ public class SocketConnector extends AbstractIoConnector {
     }
 
     public IoServiceMetadata getMetadata() {
-        return SocketServiceMetadata.INSTANCE;
+        return SocketSessionImpl.METADATA;
     }
 
     @Override

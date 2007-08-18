@@ -47,7 +47,7 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
     }
 
     public IoServiceMetadata getMetadata() {
-        return VmPipeServiceMetadata.INSTANCE;
+        return VmPipeSessionImpl.METADATA;
     }
 
     @Override

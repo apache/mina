@@ -111,7 +111,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     }
 
     public IoServiceMetadata getMetadata() {
-        return DatagramServiceMetadata.INSTANCE;
+        return DatagramSessionImpl.METADATA;
     }
 
     @Override

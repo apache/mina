@@ -78,7 +78,7 @@ public class SerialSession extends AbstractIoSession implements
     static final IoServiceMetadata METADATA =
         new DefaultIoServiceMetadata(
             "serial", false, true, SerialAddress.class,
-            ByteBuffer.class, SerialSessionConfig.class);
+            SerialSessionConfig.class, ByteBuffer.class);
 
     SerialSession(IoService service, SerialAddress address, SerialPort port) {
         this.service = service;

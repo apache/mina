@@ -102,7 +102,7 @@ public class DatagramConnector extends AbstractIoConnector {
     }
 
     public IoServiceMetadata getMetadata() {
-        return DatagramServiceMetadata.INSTANCE;
+        return DatagramSessionImpl.METADATA;
     }
 
     @Override

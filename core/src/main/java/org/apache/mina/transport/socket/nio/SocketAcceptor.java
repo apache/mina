@@ -170,7 +170,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
      * @see org.apache.mina.common.IoService#getMetadata()
      */
     public IoServiceMetadata getMetadata() {
-        return SocketServiceMetadata.INSTANCE;
+        return SocketSessionImpl.METADATA;
     }
 
     /**

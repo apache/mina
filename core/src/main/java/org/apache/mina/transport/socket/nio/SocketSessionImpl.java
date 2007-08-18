@@ -29,9 +29,11 @@ import java.util.Queue;
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultIoServiceMetadata;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
@@ -44,6 +46,14 @@ import org.apache.mina.common.WriteRequest;
  * @version $Rev$, $Date$
  */
 class SocketSessionImpl extends AbstractIoSession implements SocketSession {
+    
+    static final IoServiceMetadata METADATA = 
+        new DefaultIoServiceMetadata(
+                "socket", false, true,
+                InetSocketAddress.class,
+                SocketSessionConfig.class,
+                ByteBuffer.class);
+
     private final IoService service;
 
     private final SocketSessionConfig config = new SessionConfigImpl();

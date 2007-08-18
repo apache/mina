@@ -20,6 +20,10 @@
 package org.apache.mina.common;
 
 import java.net.SocketAddress;
+import java.util.Collections;
+import java.util.Set;
+
+import org.apache.mina.util.IdentityHashSet;
 
 
 /**
@@ -34,16 +38,16 @@ public class DefaultIoServiceMetadata implements IoServiceMetadata {
     private final boolean connectionless;
     private final boolean fragmentation;
     private final Class<? extends SocketAddress> addressType;
-    private final Class<? extends Object> envelopeType;
     private final Class<? extends IoSessionConfig> sessionConfigType;
+    private final Set<Class<? extends Object>> envelopeTypes;
 
     public DefaultIoServiceMetadata(
             String name,
             boolean connectionless,
             boolean fragmentation,
             Class<? extends SocketAddress> addressType,
-            Class<? extends Object> envelopeType,
-            Class<? extends IoSessionConfig> sessionConfigType) {
+            Class<? extends IoSessionConfig> sessionConfigType,
+            Class<?>... envelopeTypes) {
 
         if (name == null) {
             throw new NullPointerException("name");
@@ -59,8 +63,12 @@ public class DefaultIoServiceMetadata implements IoServiceMetadata {
             throw new NullPointerException("addressType");
         }
 
-        if (envelopeType == null) {
-            throw new NullPointerException("envelopeType");
+        if (envelopeTypes == null) {
+            throw new NullPointerException("envelopeTypes");
+        }
+        
+        if (envelopeTypes.length == 0) {
+            throw new NullPointerException("envelopeTypes is empty.");
         }
         
         if (sessionConfigType == null) {
@@ -71,16 +79,22 @@ public class DefaultIoServiceMetadata implements IoServiceMetadata {
         this.connectionless = connectionless;
         this.fragmentation = fragmentation;
         this.addressType = addressType;
-        this.envelopeType = envelopeType;
         this.sessionConfigType = sessionConfigType;
+        
+        Set<Class<? extends Object>> newEnvelopeTypes = 
+            new IdentityHashSet<Class<? extends Object>>();
+        for (Class<? extends Object> c: envelopeTypes) {
+            newEnvelopeTypes.add(c);
+        }
+        this.envelopeTypes = Collections.unmodifiableSet(newEnvelopeTypes);
     }
 
     public Class<? extends SocketAddress> getAddressType() {
         return addressType;
     }
 
-    public Class<? extends Object> getEnvelopeType() {
-        return envelopeType;
+    public Set<Class<? extends Object>> getEnvelopeTypes() {
+        return envelopeTypes;
     }
 
     public Class<? extends IoSessionConfig> getSessionConfigType() {

@@ -29,10 +29,12 @@ import java.util.Queue;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultIoServiceMetadata;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
@@ -46,6 +48,13 @@ import org.apache.mina.common.WriteRequest;
  * @version $Rev$, $Date$
  */
 class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
+    
+    static final IoServiceMetadata METADATA =
+        new DefaultIoServiceMetadata(
+                "datagram", true, false,
+                InetSocketAddress.class,
+                DatagramSessionConfig.class, ByteBuffer.class);
+    
     private final IoService service;
 
     private final DatagramSessionConfig config = new SessionConfigImpl();
