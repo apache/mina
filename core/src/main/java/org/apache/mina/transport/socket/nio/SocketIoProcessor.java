@@ -251,7 +251,13 @@ class SocketIoProcessor {
                         session.setReadBufferSize(session.getReadBufferSize() >>> 1);
                     }
                 } else if (readBytes == session.getReadBufferSize()) {
-                    session.setReadBufferSize(session.getReadBufferSize() << 1);
+                    int newReadBufferSize = session.getReadBufferSize() << 1;
+                    if (newReadBufferSize <= (((SocketSessionConfig) session.getConfig()).getReceiveBufferSize() << 1)) {
+                        // read buffer size shouldn't get bigger than
+                        // twice of the receive buffer size because of
+                        // read-write fairness.
+                        session.setReadBufferSize(newReadBufferSize);
+                    }
                 }
             }
             if (ret < 0) {
