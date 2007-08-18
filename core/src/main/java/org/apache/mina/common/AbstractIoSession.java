@@ -364,17 +364,21 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     public void increaseReadBytes(int increment) {
-        readBytes += increment;
-        lastReadTime = System.currentTimeMillis();
-        idleCountForBoth = 0;
-        idleCountForRead = 0;
+        if (increment > 0) {
+            readBytes += increment;
+            lastReadTime = System.currentTimeMillis();
+            idleCountForBoth = 0;
+            idleCountForRead = 0;
+        }
     }
 
     public void increaseWrittenBytes(long increment) {
-        writtenBytes += increment;
-        lastWriteTime = System.currentTimeMillis();
-        idleCountForBoth = 0;
-        idleCountForWrite = 0;
+        if (increment > 0) {
+            writtenBytes += increment;
+            lastWriteTime = System.currentTimeMillis();
+            idleCountForBoth = 0;
+            idleCountForWrite = 0;
+        }
     }
 
     public void increaseReadMessages() {

@@ -388,74 +388,76 @@ class SocketIoProcessor {
         SocketChannel ch = session.getChannel();
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
-        for (;;) {
-            WriteRequest req;
-
-            // Check for pending writes.
-            synchronized (writeRequestQueue) {
-                req = writeRequestQueue.peek();
-            }
-
-            if (req == null) {
-                break;
-            }
-
-            Object message = req.getMessage();
-            if (message instanceof FileRegion) {
-                FileRegion region = (FileRegion) message; 
-
-                if (region.getCount() <= 0) {
-                    // File has been sent, remove from queue
-                    synchronized (writeRequestQueue) {
-                        writeRequestQueue.poll();
-                    }
-                    session.increaseWrittenMessages();
-                    session.getFilterChain().fireMessageSent(session, req);
-                    continue;
+        int writtenBytes = 0;
+        int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
+        try {
+            do {
+                WriteRequest req;
+    
+                // Check for pending writes.
+                synchronized (writeRequestQueue) {
+                    req = writeRequestQueue.peek();
                 }
-                
-                if (key.isWritable()) {
-                    long writtenBytes = region.getFileChannel().transferTo(region.getPosition(), region.getCount(), ch);
-                    region.setPosition(region.getPosition() + writtenBytes);
+    
+                if (req == null) {
+                    break;
+                }
+    
+                Object message = req.getMessage();
+                if (message instanceof FileRegion) {
+                    FileRegion region = (FileRegion) message; 
+    
+                    if (region.getCount() <= 0) {
+                        // File has been sent, remove from queue
+                        synchronized (writeRequestQueue) {
+                            writeRequestQueue.poll();
+                        }
+                        session.increaseWrittenMessages();
+                        session.getFilterChain().fireMessageSent(session, req);
+                        continue;
+                    }
                     
-                    if (writtenBytes > 0) {
-                        session.increaseWrittenBytes(writtenBytes);
+                    if (key.isWritable()) {
+                        long localWrittenBytes = 
+                            region.getFileChannel().transferTo(region.getPosition(), region.getCount(), ch);
+                        region.setPosition(region.getPosition() + localWrittenBytes);
+                        writtenBytes += localWrittenBytes;
+                    }
+                    
+                    if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
+                        // Kernel buffer is full or wrote too much.
+                        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                        break;
+                    }
+    
+                } else {
+                    ByteBuffer buf = (ByteBuffer) message;
+                    if (buf.remaining() == 0) {
+                        // Buffer has been completely sent, remove request form queue
+                        synchronized (writeRequestQueue) {
+                            writeRequestQueue.poll();
+                        }
+    
+                        session.increaseWrittenMessages();
+    
+                        buf.reset();
+                        session.getFilterChain().fireMessageSent(session, req);
+                        continue;
+                    }
+    
+                    if (key.isWritable()) {
+                        writtenBytes += ch.write(buf.buf());
+                    }
+    
+                    if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
+                        // Kernel buffer is full or wrote too much.
+                        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                        break;
                     }
                 }
-                
-                if (region.getCount() > 0) {
-                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                    break;
-                }
-
-            } else {
-                ByteBuffer buf = (ByteBuffer) message;
-                if (buf.remaining() == 0) {
-                    // Buffer has been completely sent, remove request form queue
-                    synchronized (writeRequestQueue) {
-                        writeRequestQueue.poll();
-                    }
-
-                    session.increaseWrittenMessages();
-
-                    buf.reset();
-                    session.getFilterChain().fireMessageSent(session, req);
-                    continue;
-                }
-
-                if (key.isWritable()) {
-                    int writtenBytes = ch.write(buf.buf());
-                    if (writtenBytes > 0) {
-                        session.increaseWrittenBytes(writtenBytes);
-                    }
-                }
-
-                if (buf.hasRemaining()) {
-                    // Kernel buffer is full
-                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                    break;
-                }
-            }
+            } while (writtenBytes < maxWrittenBytes);
+        } finally {
+            session.increaseWrittenBytes(writtenBytes);
         }
     }
 

@@ -325,60 +325,67 @@ public class DatagramConnector extends AbstractIoConnector {
     }
 
     private void flush(DatagramSessionImpl session) throws IOException {
-        DatagramChannel ch = session.getChannel();
+        // Clear OP_WRITE
+        SelectionKey key = session.getSelectionKey();
+        if (key == null) {
+            scheduleFlush(session);
+            return;
+        }
+        if (!key.isValid()) {
+            return;
+        }
+        key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
 
+        DatagramChannel ch = session.getChannel();
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
-        WriteRequest req;
-        for (;;) {
-            synchronized (writeRequestQueue) {
-                req = writeRequestQueue.peek();
-            }
-
-            if (req == null) {
-                break;
-            }
-
-            ByteBuffer buf = (ByteBuffer) req.getMessage();
-            if (buf.remaining() == 0) {
-                // pop and fire event
+        int writtenBytes = 0;
+        int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
+        try {
+            for (;;) {
+                WriteRequest req;
                 synchronized (writeRequestQueue) {
-                    writeRequestQueue.poll();
+                    req = writeRequestQueue.peek();
                 }
-
-                session.increaseWrittenMessages();
-                buf.reset();
-                session.getFilterChain().fireMessageSent(session, req);
-                continue;
-            }
-
-            SelectionKey key = session.getSelectionKey();
-            if (key == null) {
-                scheduleFlush(session);
-                break;
-            }
-            if (!key.isValid()) {
-                continue;
-            }
-
-            int writtenBytes = ch.write(buf.buf());
-
-            if (writtenBytes == 0) {
-                // Kernel buffer is full
-                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-            } else if (writtenBytes > 0) {
-                key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
-
-                // pop and fire event
-                synchronized (writeRequestQueue) {
-                    writeRequestQueue.poll();
+    
+                if (req == null) {
+                    break;
                 }
-
-                session.increaseWrittenBytes(writtenBytes);
-                session.increaseWrittenMessages();
-                buf.reset();
-                session.getFilterChain().fireMessageSent(session, req);
+    
+                ByteBuffer buf = (ByteBuffer) req.getMessage();
+                if (buf.remaining() == 0) {
+                    // pop and fire event
+                    synchronized (writeRequestQueue) {
+                        writeRequestQueue.poll();
+                    }
+    
+                    session.increaseWrittenMessages();
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(session, req);
+                    continue;
+                }
+    
+                int localWrittenBytes = ch.write(buf.buf());
+                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
+                    // Kernel buffer is full or wrote too much
+                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                    break;
+                } else {
+                    key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
+    
+                    // pop and fire event
+                    synchronized (writeRequestQueue) {
+                        writeRequestQueue.poll();
+                    }
+    
+                    writtenBytes += localWrittenBytes;
+                    session.increaseWrittenMessages();
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(session, req);
+                }
             }
+        } finally {
+            session.increaseWrittenBytes(writtenBytes);
         }
     }
 
