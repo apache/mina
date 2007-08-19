@@ -26,6 +26,7 @@ import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
+import org.apache.mina.filter.logging.MdcLoggingFilter;
 import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
@@ -74,7 +75,8 @@ public class Main {
 
     private static void addLogger(DefaultIoFilterChainBuilder chain)
             throws Exception {
-        chain.addLast("logger", new LoggingFilter());
+        chain.addLast("mdc-logger", new MdcLoggingFilter());
+        chain.addLast("logger", new LoggingFilter());        
         System.out.println("Logging ON");
     }
 }

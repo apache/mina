@@ -21,13 +21,16 @@ package org.apache.mina.example.chat;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+import java.util.Map;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
+import org.apache.mina.filter.logging.MdcLoggingFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link IoHandler} implementation of a simple chat server protocol.
@@ -51,6 +54,8 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void messageReceived(IoSession session, Object message) {
+        Logger log = LoggerFactory.getLogger(ChatProtocolHandler.class);
+        log.info("received: " + message);
         String theMessage = (String) message;
         String[] result = theMessage.split(" ", 2);
         String theCommand = result[0];
@@ -90,6 +95,8 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
                 sessions.add(session);
                 session.setAttribute("user", user);
+                Map<String,String> context = (Map<String,String>) session.getAttribute(MdcLoggingFilter.CONTEXT_KEY);
+                context.put("user", user);
 
                 // Allow all users
                 users.add(user);
@@ -115,11 +122,9 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
     public void broadcast(String message) {
         synchronized (sessions) {
-            Iterator iter = sessions.iterator();
-            while (iter.hasNext()) {
-                IoSession s = (IoSession) iter.next();
-                if (s.isConnected()) {
-                    s.write("BROADCAST OK " + message);
+            for (IoSession session : sessions) {
+                if (session.isConnected()) {
+                    session.write("BROADCAST OK " + message);
                 }
             }
         }
@@ -143,11 +148,9 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
     public void kick(String name) {
         synchronized (sessions) {
-            Iterator iter = sessions.iterator();
-            while (iter.hasNext()) {
-                IoSession s = (IoSession) iter.next();
-                if (name.equals(s.getAttribute("user"))) {
-                    s.close();
+            for (IoSession session : sessions) {
+                if (name.equals(session.getAttribute("user"))) {
+                    session.close();
                     break;
                 }
             }
