@@ -32,25 +32,19 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.IoServiceMetadata;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
-import org.apache.mina.filter.stream.StreamWriteFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.DummySession;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 
@@ -118,6 +112,7 @@ public class StreamWriteFilterTest extends TestCase {
     /**
      * Tests that the filter just passes objects which aren't InputStreams
      * through to the next filter.
+     * @throws Exception when something goes wrong
      */
     public void testWriteNonStreamMessage() throws Exception {
         StreamWriteFilter filter = new StreamWriteFilter();
@@ -148,6 +143,7 @@ public class StreamWriteFilterTest extends TestCase {
 
     /**
      * Tests when the contents of the stream fits into one write buffer.
+     * @throws Exception when something goes wrong
      */
     public void testWriteSingleBufferStream() throws Exception {
         StreamWriteFilter filter = new StreamWriteFilter();
@@ -184,6 +180,7 @@ public class StreamWriteFilterTest extends TestCase {
 
     /**
      * Tests when the contents of the stream doesn't fit into one write buffer.
+     * @throws Exception when something goes wrong
      */
     public void testWriteSeveralBuffersStream() throws Exception {
         StreamWriteFilter filter = new StreamWriteFilter();
@@ -313,7 +310,7 @@ public class StreamWriteFilterTest extends TestCase {
      * Tests that {@link StreamWriteFilter#setWriteBufferSize(int)} checks the
      * specified size.
      */
-    public void testSetWriteBufferSize() throws Exception {
+    public void testSetWriteBufferSize() {
         StreamWriteFilter filter = new StreamWriteFilter();
 
         try {
@@ -415,7 +412,7 @@ public class StreamWriteFilterTest extends TestCase {
     }
 
     private static class SenderHandler extends IoHandlerAdapter {
-        Object lock = new Object();
+        final Object lock = new Object();
 
         InputStream inputStream;
 
@@ -471,7 +468,7 @@ public class StreamWriteFilterTest extends TestCase {
     }
 
     private static class ReceiverHandler extends IoHandlerAdapter {
-        Object lock = new Object();
+        final Object lock = new Object();
 
         long bytesRead = 0;
 
@@ -539,49 +536,6 @@ public class StreamWriteFilterTest extends TestCase {
                                 .isWritten();
             }
             return super.argumentMatches(expected, actual);
-        }
-    }
-
-    private static class DummySession extends AbstractIoSession {
-
-        @Override
-        protected void updateTrafficMask() {
-        }
-
-        public IoSessionConfig getConfig() {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain() {
-            return null;
-        }
-
-        public IoHandler getHandler() {
-            return null;
-        }
-
-        public SocketAddress getLocalAddress() {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteBytes() {
-            return 0;
-        }
-
-        public int getScheduledWriteMessages() {
-            return 0;
-        }
-
-        public IoService getService() {
-            return null;
-        }
-
-        public IoServiceMetadata getTransportType() {
-            return null;
         }
     }
 
