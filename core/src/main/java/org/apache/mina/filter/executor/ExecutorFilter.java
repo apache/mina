@@ -56,6 +56,17 @@ import org.slf4j.LoggerFactory;
 public class ExecutorFilter extends AbstractExecutorFilter {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    public ExecutorFilter() {
+        super(  IoEventType.SESSION_OPENED,
+                IoEventType.SESSION_IDLE,
+                IoEventType.SESSION_CLOSED,
+                IoEventType.MESSAGE_RECEIVED,
+                IoEventType.MESSAGE_SENT,
+                IoEventType.WRITE,
+                IoEventType.CLOSE,
+                IoEventType.EXCEPTION_CAUGHT);
+    }
+
     /**
      * Creates a new instance with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
