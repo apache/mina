@@ -40,7 +40,7 @@ import java.util.Set;
  * <p>
  * {@link IoSession} is thread-safe.  But please note that performing
  * more than one {@link #write(Object)} calls at the same time will
- * cause the {@link IoFilter#filterWrite(IoFilter.NextFilter, IoSession, IoFilter.WriteRequest)}
+ * cause the {@link IoFilter#filterWrite(IoFilter.NextFilter, IoSession, WriteRequest)}
  * is executed simultaneously, and therefore you have to make sure the
  * {@link IoFilter} implementations you're using are thread-safe, too. 
  * </p>
