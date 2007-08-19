@@ -45,7 +45,7 @@
             <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
           </constructor-arg>
         </bean>
-        <bean class="org.apache.mina.filter.LoggingFilter" />
+        <bean class="org.apache.mina.filter.logging.LoggingFilter" />
       </list>
     </property>
   </bean>
@@ -55,7 +55,7 @@
     <property name="filters">
       <list>
         <bean class="org.apache.mina.filter.executor.ExecutorFilter"/>
-        <bean class="org.apache.mina.filter.SSLFilter">
+        <bean class="org.apache.mina.filter.ssl.SSLFilter">
           <constructor-arg ref="sslContext"/>
         </bean>      
         <bean class="org.apache.mina.filter.codec.ProtocolCodecFilter">
@@ -63,7 +63,7 @@
             <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
           </constructor-arg>
         </bean>
-        <bean class="org.apache.mina.filter.LoggingFilter" />
+        <bean class="org.apache.mina.filter.logging.LoggingFilter" />
       </list>
     </property>
   </bean>
