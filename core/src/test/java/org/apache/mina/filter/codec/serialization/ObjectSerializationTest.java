@@ -53,8 +53,7 @@ public class ObjectSerializationTest extends TestCase {
 
         IoSession session = new MockIoSession();
         AbstractProtocolEncoderOutput out = new AbstractProtocolEncoderOutput() {
-            @Override
-            protected WriteFuture doFlush(ByteBuffer buf) {
+            public WriteFuture flush() {
                 return null;
             }
         };

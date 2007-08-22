@@ -52,8 +52,7 @@ public class TextLineEncoderTest extends TestCase {
                 LineDelimiter.WINDOWS);
         IoSession session = new DummySession();
         AbstractProtocolEncoderOutput out = new AbstractProtocolEncoderOutput() {
-            @Override
-            protected WriteFuture doFlush(ByteBuffer buf) {
+            public WriteFuture flush() {
                 return null;
             }
         };

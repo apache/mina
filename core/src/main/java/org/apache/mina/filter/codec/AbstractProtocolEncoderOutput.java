@@ -23,7 +23,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.WriteFuture;
 
 /**
  * A {@link ProtocolEncoderOutput} based on queue.
@@ -82,28 +81,4 @@ public abstract class AbstractProtocolEncoderOutput implements
         newBuf.flip();
         bufferQueue.offer(newBuf);
     }
-
-    public WriteFuture flush() {
-        Queue<ByteBuffer> bufferQueue = this.bufferQueue;
-        WriteFuture future = null;
-        if (bufferQueue.isEmpty()) {
-            return null;
-        } else {
-            for (;;) {
-                ByteBuffer buf = bufferQueue.poll();
-                if (buf == null) {
-                    break;
-                }
-
-                // Flush only when the buffer has remaining.
-                if (buf.hasRemaining()) {
-                    future = doFlush(buf);
-                }
-            }
-        }
-
-        return future;
-    }
-
-    protected abstract WriteFuture doFlush(ByteBuffer buf);
 }

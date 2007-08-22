@@ -375,11 +375,27 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             this.writeRequest = writeRequest;
         }
 
-        @Override
-        protected WriteFuture doFlush(ByteBuffer buf) {
-            WriteFuture future = new DefaultWriteFuture(session);
-            nextFilter.filterWrite(session, new EncodedWriteRequest(buf,
-                    future, writeRequest.getDestination()));
+        public WriteFuture flush() {
+            Queue<ByteBuffer> bufferQueue = getBufferQueue();
+            WriteFuture future = null;
+            for (;;) {
+                ByteBuffer buf = bufferQueue.poll();
+                if (buf == null) {
+                    break;
+                }
+
+                // Flush only when the buffer has remaining.
+                if (buf.hasRemaining()) {
+                    future = new DefaultWriteFuture(session);
+                    nextFilter.filterWrite(session, new EncodedWriteRequest(buf,
+                            future, writeRequest.getDestination()));
+                }
+            }
+
+            if (future == null) {
+                future = DefaultWriteFuture.newNotWrittenFuture(session);
+            }
+
             return future;
         }
     }
