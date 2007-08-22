@@ -178,7 +178,7 @@ public class ConnectorTest extends AbstractTest {
 
             writeFuture = session.write(buf);
 
-            if (session.getService().getTransportMetadata().isConnectionless()) {
+            if (session.getService().getMetadata().isConnectionless()) {
                 // This will align message arrival order in connectionless transport types
                 waitForResponse(handler, (i + 1) * DATA_SIZE);
             }
