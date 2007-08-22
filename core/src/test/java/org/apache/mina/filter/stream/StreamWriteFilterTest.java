@@ -34,6 +34,7 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandlerAdapter;
@@ -44,7 +45,6 @@ import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
-import org.apache.mina.util.DummySession;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 

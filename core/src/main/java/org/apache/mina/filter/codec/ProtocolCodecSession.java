@@ -19,43 +19,18 @@
  */
 package org.apache.mina.filter.codec;
 
-import java.io.IOException;
-import java.net.SocketAddress;
 import java.util.Queue;
 
-import org.apache.mina.common.AbstractIoAcceptor;
-import org.apache.mina.common.AbstractIoFilterChain;
-import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.DefaultWriteFuture;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoService;
+import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.common.WriteRequest;
 
 /**
  * A virtual {@link IoSession} that provides {@link ProtocolEncoderOutput}
- * and {@link ProtocolDecoderOutput}.  It is useful for unit testing
- * codec and reusing codec for non-network use (e.g. serialization).
- * 
- * <h2>Decoding</h2>
- * <pre>
- * ProtocolCodecSession session = new ProtocolCodecSession();
- * ProtocolDecoder decoder = ...;
- * ByteBuffer in = ...;
- * 
- * decoder.decode(session, in, session.getProtocolDecoderOutput());
- * 
- * Object message = session.getProtocolDecoderOutputQueue().poll();
- * </pre>
+ * and {@link ProtocolDecoderOutput}.  It is useful for unit-testing
+ * codec and reusing codec for non-network-use (e.g. serialization).
  * 
  * <h2>Encoding</h2>
  * <pre>
@@ -68,73 +43,21 @@ import org.apache.mina.common.WriteRequest;
  * ByteBuffer buffer = session.getProtocolDecoderOutputQueue().poll();
  * </pre>
  * 
+ * <h2>Decoding</h2>
+ * <pre>
+ * ProtocolCodecSession session = new ProtocolCodecSession();
+ * ProtocolDecoder decoder = ...;
+ * ByteBuffer in = ...;
+ * 
+ * decoder.decode(session, in, session.getProtocolDecoderOutput());
+ * 
+ * Object message = session.getProtocolDecoderOutputQueue().poll();
+ * </pre>
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ProtocolCodecSession extends AbstractIoSession {
-    
-    private static final TransportMetadata METADATA =
-        new DefaultTransportMetadata(
-                "codec", false, false,
-                SocketAddress.class, IoSessionConfig.class, Object.class);
-    
-    private static final IoSessionConfig SERVICE_CONFIG = new AbstractIoSessionConfig() {
-        @Override
-        protected void doSetAll(IoSessionConfig config) {
-        }
-    };
-    
-    private static final SocketAddress ANONYMOUS_ADDRESS = new SocketAddress() {
-        private static final long serialVersionUID = -496112902353454179L;
-
-        @Override
-        public String toString() {
-            return "?";
-        }
-    };
-    
-    private static final IoAcceptor SERVICE = new AbstractIoAcceptor(SERVICE_CONFIG) {
-        @Override
-        protected void doBind() throws IOException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        protected void doUnbind() {
-            throw new UnsupportedOperationException();
-        }
-
-        public IoSession newSession(SocketAddress remoteAddress) {
-            throw new UnsupportedOperationException();
-        }
-
-        public TransportMetadata getTransportMetadata() {
-            return METADATA;
-        }
-    };
-    
-    static {
-        // Set meaningless default values.
-        SERVICE.setHandler(new IoHandlerAdapter());
-        SERVICE.setLocalAddress(ANONYMOUS_ADDRESS);
-    }
-
-    private final IoSessionConfig config = new AbstractIoSessionConfig() {
-        @Override
-        protected void doSetAll(IoSessionConfig config) {
-        }
-    };
-    
-    private final IoFilterChain filterChain = new AbstractIoFilterChain(this) {
-        @Override
-        protected void doClose(IoSession session) throws Exception {
-        }
-
-        @Override
-        protected void doWrite(IoSession session, WriteRequest writeRequest)
-                throws Exception {
-        }
-    };
+public class ProtocolCodecSession extends DummySession {
     
     private final WriteFuture notWrittenFuture =
         DefaultWriteFuture.newNotWrittenFuture(this);
@@ -152,10 +75,6 @@ public class ProtocolCodecSession extends AbstractIoSession {
             }
     };
     
-    private volatile IoHandler handler = new IoHandlerAdapter();
-    private volatile SocketAddress localAddress = ANONYMOUS_ADDRESS;
-    private volatile SocketAddress remoteAddress = ANONYMOUS_ADDRESS;
-
     /**
      * Creates a new instance.
      */
@@ -190,79 +109,5 @@ public class ProtocolCodecSession extends AbstractIoSession {
      */
     public Queue<Object> getDecoderOutputQueue() {
         return decoderOutput.getMessageQueue();
-    }
-    
-    @Override
-    protected void updateTrafficMask() {
-    }
-
-    public IoSessionConfig getConfig() {
-        return config;
-    }
-
-    public IoFilterChain getFilterChain() {
-        return filterChain;
-    }
-
-    public IoHandler getHandler() {
-        return handler;
-    }
-    
-    /**
-     * Sets the {@link IoHandler} which handles this session.
-     */
-    public void setHandler(IoHandler handler) {
-        if (handler == null) {
-            throw new NullPointerException("handler");
-        }
-        
-        this.handler = handler;
-    }
-
-    public SocketAddress getLocalAddress() {
-        return localAddress;
-    }
-
-    public SocketAddress getRemoteAddress() {
-        return remoteAddress;
-    }
-    
-    /**
-     * Sets the socket address of local machine which is associated with
-     * this session.
-     */
-    public void setLocalAddress(SocketAddress localAddress) {
-        if (localAddress == null) {
-            throw new NullPointerException("localAddress");
-        }
-        
-        this.localAddress = localAddress;
-    }
-    
-    /**
-     * Sets the socket address of remote peer. 
-     */
-    public void setRemoteAddress(SocketAddress remoteAddress) {
-        if (remoteAddress == null) {
-            throw new NullPointerException("remoteAddress");
-        }
-        
-        this.remoteAddress = remoteAddress;
-    }
-
-    public int getScheduledWriteBytes() {
-        return 0;
-    }
-
-    public int getScheduledWriteMessages() {
-        return 0;
-    }
-
-    public IoService getService() {
-        return SERVICE;
-    }
-
-    public TransportMetadata getTransportMetadata() {
-        return METADATA;
     }
 }

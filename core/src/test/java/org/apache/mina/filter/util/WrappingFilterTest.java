@@ -1,12 +1,18 @@
 package org.apache.mina.filter.util;
 
-import junit.framework.TestCase;
-import org.apache.mina.common.*;
-import org.apache.mina.util.DummySession;
-import org.easymock.MockControl;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.DummySession;
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoEventType;
+import org.apache.mina.common.IoFilter;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
+import org.easymock.MockControl;
 
 /**
  * Tests {@link WrappingFilter}.
