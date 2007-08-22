@@ -41,7 +41,6 @@ public class Main {
         SocketAcceptor acceptor = new SocketAcceptor();
 
         // Prepare the configuration
-        acceptor.setReuseAddress(true);
         acceptor.getFilterChain().addLast("logger", new LoggingFilter());
         acceptor.getFilterChain().addLast(
                 "codec",

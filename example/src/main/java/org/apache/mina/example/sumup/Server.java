@@ -43,7 +43,6 @@ public class Server {
         SocketAcceptor acceptor = new SocketAcceptor();
 
         // Prepare the service configuration.
-        acceptor.setReuseAddress(true);
         if (USE_CUSTOM_CODEC) {
             acceptor.getFilterChain()
                     .addLast(

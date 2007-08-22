@@ -51,7 +51,6 @@ public class Main {
 
         // Create TCP/IP acceptor.
         SocketAcceptor acceptor = new SocketAcceptor();
-        acceptor.setReuseAddress(true);
 
         // Create TCP/IP connector.
         IoConnector connector = new SocketConnector();

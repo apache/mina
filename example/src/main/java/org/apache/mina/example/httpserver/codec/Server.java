@@ -52,7 +52,6 @@ public class Server {
             SocketAcceptor acceptor = new SocketAcceptor();
 
             // Create a service configuration
-            acceptor.setReuseAddress(true);
             acceptor.getFilterChain().addLast(
                     "protocolFilter",
                     new ProtocolCodecFilter(
