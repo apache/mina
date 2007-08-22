@@ -29,7 +29,7 @@ import java.util.Queue;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.DefaultIoServiceMetadata;
+import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -49,7 +49,7 @@ import org.apache.mina.common.WriteRequest;
 class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     
     static final TransportMetadata METADATA =
-        new DefaultIoServiceMetadata(
+        new DefaultTransportMetadata(
                 "datagram", true, false,
                 InetSocketAddress.class,
                 DatagramSessionConfig.class, ByteBuffer.class);

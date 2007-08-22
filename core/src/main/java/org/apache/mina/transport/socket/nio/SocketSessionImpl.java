@@ -28,7 +28,7 @@ import java.util.Queue;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.DefaultIoServiceMetadata;
+import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
@@ -47,7 +47,7 @@ import org.apache.mina.common.WriteRequest;
 class SocketSessionImpl extends AbstractIoSession implements SocketSession {
     
     static final TransportMetadata METADATA = 
-        new DefaultIoServiceMetadata(
+        new DefaultTransportMetadata(
                 "socket", false, true,
                 InetSocketAddress.class,
                 SocketSessionConfig.class,

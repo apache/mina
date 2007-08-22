@@ -32,7 +32,7 @@ import org.apache.mina.util.IdentityHashSet;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoServiceMetadata implements TransportMetadata {
+public class DefaultTransportMetadata implements TransportMetadata {
 
     private final String name;
     private final boolean connectionless;
@@ -41,7 +41,7 @@ public class DefaultIoServiceMetadata implements TransportMetadata {
     private final Class<? extends IoSessionConfig> sessionConfigType;
     private final Set<Class<? extends Object>> envelopeTypes;
 
-    public DefaultIoServiceMetadata(
+    public DefaultTransportMetadata(
             String name,
             boolean connectionless,
             boolean fragmentation,

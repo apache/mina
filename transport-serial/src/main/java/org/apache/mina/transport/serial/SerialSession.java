@@ -33,7 +33,7 @@ import java.util.TooManyListenersException;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.DefaultIoServiceMetadata;
+import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoFilterChain;
@@ -76,7 +76,7 @@ public class SerialSession extends AbstractIoSession implements
     private final Logger log;
 
     static final TransportMetadata METADATA =
-        new DefaultIoServiceMetadata(
+        new DefaultTransportMetadata(
             "serial", false, true, SerialAddress.class,
             SerialSessionConfig.class, ByteBuffer.class);
 
