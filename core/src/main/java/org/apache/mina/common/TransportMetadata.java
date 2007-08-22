@@ -28,7 +28,7 @@ import java.util.Set;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoServiceMetadata {
+public interface TransportMetadata {
 
     /**
      * Returns the name of the service.

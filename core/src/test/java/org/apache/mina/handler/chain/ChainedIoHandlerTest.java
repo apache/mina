@@ -30,6 +30,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportMetadata;
 
 /**
  * A test case for {@link ChainedIoHandler}.
@@ -89,6 +90,10 @@ public class ChainedIoHandlerTest extends TestCase {
 
             public int getScheduledWriteBytes() {
                 return 0;
+            }
+
+            public TransportMetadata getTransportMetadata() {
+                return null;
             }
         }, null);
 

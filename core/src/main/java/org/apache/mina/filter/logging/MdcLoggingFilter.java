@@ -57,7 +57,7 @@ public class MdcLoggingFilter extends WrappingFilter {
         context.put("IoHandlerClass", session.getHandler().getClass().toString());
         context.put("remoteAddress", session.getRemoteAddress().toString());
         context.put("localAddress", session.getLocalAddress().toString());
-        if (session.getService().getMetadata().getAddressType() == InetSocketAddress.class) {
+        if (session.getTransportMetadata().getAddressType() == InetSocketAddress.class) {
             InetSocketAddress remoteAddress = (InetSocketAddress) session.getRemoteAddress();
             InetSocketAddress localAddress  = (InetSocketAddress) session.getLocalAddress();
             context.put("remoteIp", remoteAddress.getAddress().getHostAddress());

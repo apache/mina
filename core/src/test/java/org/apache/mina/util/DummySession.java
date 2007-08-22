@@ -48,7 +48,7 @@ public class DummySession  extends AbstractIoSession {
         return null;
     }
 
-    public IoServiceMetadata getTransportType() {
+    public TransportMetadata getTransportMetadata() {
         return null;
     }
 }

@@ -505,10 +505,10 @@ public abstract class AbstractIoSession implements IoSession {
             return "null";
         }
         
-        if (getService().getMetadata() == null) {
+        if (getService().getTransportMetadata() == null) {
             return "null";
         }
         
-        return getService().getMetadata().getName();
+        return getService().getTransportMetadata().getName();
     }
 }

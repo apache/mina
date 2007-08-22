@@ -32,7 +32,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.filter.codec.AbstractProtocolEncoderOutput;
 
@@ -86,7 +86,7 @@ public class TextLineEncoderTest extends TestCase {
             return null;
         }
 
-        public IoServiceMetadata getTransportType() {
+        public TransportMetadata getTransportType() {
             return null;
         }
 
@@ -113,6 +113,10 @@ public class TextLineEncoderTest extends TestCase {
 
         public int getScheduledWriteBytes() {
             return 0;
+        }
+
+        public TransportMetadata getTransportMetadata() {
+            return null;
         }
     }
 }

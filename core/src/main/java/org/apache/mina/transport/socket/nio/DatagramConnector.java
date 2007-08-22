@@ -37,7 +37,7 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteRequest;
@@ -101,7 +101,7 @@ public class DatagramConnector extends AbstractIoConnector {
         }
     }
 
-    public IoServiceMetadata getMetadata() {
+    public TransportMetadata getTransportMetadata() {
         return DatagramSessionImpl.METADATA;
     }
 

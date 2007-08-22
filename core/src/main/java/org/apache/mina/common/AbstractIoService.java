@@ -54,11 +54,11 @@ public abstract class AbstractIoService implements IoService {
             throw new NullPointerException("sessionConfig");
         }
 
-        if (!getMetadata().getSessionConfigType().isAssignableFrom(
+        if (!getTransportMetadata().getSessionConfigType().isAssignableFrom(
                 sessionConfig.getClass())) {
             throw new IllegalArgumentException("sessionConfig type: "
                     + sessionConfig.getClass() + " (expected: "
-                    + getMetadata().getSessionConfigType() + ")");
+                    + getTransportMetadata().getSessionConfigType() + ")");
         }
 
         this.listeners = new IoServiceListenerSupport(this);

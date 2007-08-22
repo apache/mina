@@ -33,7 +33,7 @@ import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteRequest;
@@ -46,7 +46,7 @@ import org.apache.mina.common.WriteRequest;
  */
 class SocketSessionImpl extends AbstractIoSession implements SocketSession {
     
-    static final IoServiceMetadata METADATA = 
+    static final TransportMetadata METADATA = 
         new DefaultIoServiceMetadata(
                 "socket", false, true,
                 InetSocketAddress.class,
@@ -99,6 +99,10 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
 
     public IoFilterChain getFilterChain() {
         return filterChain;
+    }
+    
+    public TransportMetadata getTransportMetadata() {
+        return METADATA;
     }
 
     SocketChannel getChannel() {

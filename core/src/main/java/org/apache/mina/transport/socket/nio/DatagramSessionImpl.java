@@ -34,7 +34,7 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.WriteFuture;
@@ -48,7 +48,7 @@ import org.apache.mina.common.WriteRequest;
  */
 class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     
-    static final IoServiceMetadata METADATA =
+    static final TransportMetadata METADATA =
         new DefaultIoServiceMetadata(
                 "datagram", true, false,
                 InetSocketAddress.class,
@@ -137,6 +137,10 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
 
     public IoHandler getHandler() {
         return handler;
+    }
+    
+    public TransportMetadata getTransportMetadata() {
+        return METADATA;
     }
 
     @Override

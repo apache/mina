@@ -30,7 +30,7 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
@@ -42,7 +42,7 @@ import org.apache.mina.common.WriteRequest;
  */
 class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     
-    static final IoServiceMetadata METADATA = 
+    static final TransportMetadata METADATA = 
         new DefaultIoServiceMetadata(
             "vmpipe", false, false,
             VmPipeAddress.class,
@@ -126,6 +126,10 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
 
     public IoHandler getHandler() {
         return handler;
+    }
+    
+    public TransportMetadata getTransportMetadata() {
+        return METADATA;
     }
 
     @Override

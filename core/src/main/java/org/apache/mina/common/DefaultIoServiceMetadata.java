@@ -27,12 +27,12 @@ import org.apache.mina.util.IdentityHashSet;
 
 
 /**
- * A default immutable implementation of {@link IoServiceMetadata}.
+ * A default immutable implementation of {@link TransportMetadata}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoServiceMetadata implements IoServiceMetadata {
+public class DefaultIoServiceMetadata implements TransportMetadata {
 
     private final String name;
     private final boolean connectionless;

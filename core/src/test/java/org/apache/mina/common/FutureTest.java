@@ -104,6 +104,10 @@ public class FutureTest extends TestCase {
             public int getScheduledWriteBytes() {
                 return 0;
             }
+
+            public TransportMetadata getTransportMetadata() {
+                return null;
+            }
         };
 
         future.setSession(session);

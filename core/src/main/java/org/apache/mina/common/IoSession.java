@@ -73,6 +73,11 @@ public interface IoSession {
      * Returns the filter chain that only affects this session.
      */
     IoFilterChain getFilterChain();
+    
+    /**
+     * Returns the {@link TransportMetadata} that this session runs on.
+     */
+    TransportMetadata getTransportMetadata();
 
     /**
      * Writes the specified <code>message</code> to remote peer.  This

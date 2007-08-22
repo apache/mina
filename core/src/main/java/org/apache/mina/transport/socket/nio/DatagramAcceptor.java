@@ -37,7 +37,7 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.ExpiringIoSessionRecycler;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoServiceListenerSupport;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
@@ -110,7 +110,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         }
     }
 
-    public IoServiceMetadata getMetadata() {
+    public TransportMetadata getTransportMetadata() {
         return DatagramSessionImpl.METADATA;
     }
 

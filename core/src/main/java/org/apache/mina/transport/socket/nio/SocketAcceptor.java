@@ -39,7 +39,7 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
@@ -167,9 +167,9 @@ public class SocketAcceptor extends AbstractIoAcceptor {
     }
 
     /**
-     * @see org.apache.mina.common.IoService#getMetadata()
+     * @see org.apache.mina.common.IoService#getTransportMetadata()
      */
-    public IoServiceMetadata getMetadata() {
+    public TransportMetadata getTransportMetadata() {
         return SocketSessionImpl.METADATA;
     }
 

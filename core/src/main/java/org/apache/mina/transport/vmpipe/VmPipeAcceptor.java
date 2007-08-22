@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 
 /**
  * Binds the specified {@link IoHandler} to the specified
@@ -46,7 +46,7 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
         super(new DefaultVmPipeSessionConfig());
     }
 
-    public IoServiceMetadata getMetadata() {
+    public TransportMetadata getTransportMetadata() {
         return VmPipeSessionImpl.METADATA;
     }
 

@@ -34,7 +34,7 @@ import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IdleStatusChecker;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 
 /**
  * Connects to {@link IoHandler}s which is bound on the specified
@@ -52,7 +52,7 @@ public class VmPipeConnector extends AbstractIoConnector {
         super(new DefaultVmPipeSessionConfig());
     }
 
-    public IoServiceMetadata getMetadata() {
+    public TransportMetadata getTransportMetadata() {
         return VmPipeSessionImpl.METADATA;
     }
 

@@ -62,19 +62,19 @@ public abstract class AbstractIoConnector extends AbstractIoService implements
             throw new NullPointerException("remoteAddress");
         }
 
-        if (!getMetadata().getAddressType().isAssignableFrom(
+        if (!getTransportMetadata().getAddressType().isAssignableFrom(
                 remoteAddress.getClass())) {
             throw new IllegalArgumentException("remoteAddress type: "
                     + remoteAddress.getClass() + " (expected: "
-                    + getMetadata().getAddressType() + ")");
+                    + getTransportMetadata().getAddressType() + ")");
         }
 
         if (localAddress != null
-                && !getMetadata().getAddressType().isAssignableFrom(
+                && !getTransportMetadata().getAddressType().isAssignableFrom(
                         localAddress.getClass())) {
             throw new IllegalArgumentException("localAddress type: "
                     + localAddress.getClass() + " (expected: "
-                    + getMetadata().getAddressType() + ")");
+                    + getTransportMetadata().getAddressType() + ")");
         }
 
         if (getHandler() == null) {

@@ -103,7 +103,7 @@ public class IoConnectorWrapper implements IoConnector {
         connector.setHandler(handler);
     }
 
-    public IoServiceMetadata getMetadata() {
-        return connector.getMetadata();
+    public TransportMetadata getTransportMetadata() {
+        return connector.getTransportMetadata();
     }
 }

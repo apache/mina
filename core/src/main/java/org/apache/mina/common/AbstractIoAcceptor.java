@@ -54,11 +54,11 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
 
     public void setLocalAddress(SocketAddress localAddress) {
         if (localAddress != null
-                && !getMetadata().getAddressType().isAssignableFrom(
+                && !getTransportMetadata().getAddressType().isAssignableFrom(
                         localAddress.getClass())) {
             throw new IllegalArgumentException("localAddress type: "
                     + localAddress.getClass() + " (expected: "
-                    + getMetadata().getAddressType() + ")");
+                    + getTransportMetadata().getAddressType() + ")");
         }
 
         synchronized (bindLock) {

@@ -39,7 +39,7 @@ import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceMetadata;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.WriteRequest;
@@ -75,7 +75,7 @@ public class SerialSession extends AbstractIoSession implements
 
     private final Logger log;
 
-    static final IoServiceMetadata METADATA =
+    static final TransportMetadata METADATA =
         new DefaultIoServiceMetadata(
             "serial", false, true, SerialAddress.class,
             SerialSessionConfig.class, ByteBuffer.class);
@@ -106,6 +106,10 @@ public class SerialSession extends AbstractIoSession implements
 
     public IoHandler getHandler() {
         return ioHandler;
+    }
+    
+    public TransportMetadata getTransportMetadata() {
+        return METADATA;
     }
 
     public SocketAddress getLocalAddress() {
