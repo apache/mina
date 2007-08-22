@@ -19,22 +19,17 @@
  */
 package org.apache.mina.filter.reqres;
 
-import java.net.SocketAddress;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.apache.mina.common.AbstractIoFilterChain;
-import org.apache.mina.common.AbstractIoSession;
+import junit.framework.TestCase;
+
 import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.IoSessionLogger;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.easymock.AbstractMatcher;
@@ -43,7 +38,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import junit.framework.TestCase;
 
 /**
  * Tests {@link RequestResponseFilter}.
@@ -70,20 +64,11 @@ public class RequestResponseFilterTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         scheduler = Executors.newScheduledThreadPool(1);
-        session = new DummySession();
         filter = new RequestResponseFilter(new MessageInspector(), scheduler);
 
         // Set up mock objects.
-        chain = new AbstractIoFilterChain(session) {
-            @Override
-            protected void doClose(IoSession session) throws Exception {
-            }
-
-            @Override
-            protected void doWrite(IoSession session, WriteRequest writeRequest)
-                    throws Exception {
-            }
-        };
+        session = new DummySession();
+        chain = session.getFilterChain();
         nextFilterControl = MockControl.createControl(NextFilter.class);
         nextFilter = (NextFilter) nextFilterControl.getMock();
 
@@ -323,53 +308,6 @@ public class RequestResponseFilterTest extends TestCase {
             }
 
             return ((Message) message).getType();
-        }
-    }
-
-    private static class DummySession extends AbstractIoSession {
-
-        @Override
-        protected void updateTrafficMask() {
-        }
-
-        public IoSessionConfig getConfig() {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain() {
-            return null;
-        }
-
-        public IoHandler getHandler() {
-            return new IoHandlerAdapter();
-        }
-
-        public SocketAddress getLocalAddress() {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteBytes() {
-            return 0;
-        }
-
-        public int getScheduledWriteMessages() {
-            return 0;
-        }
-
-        public IoService getService() {
-            return null;
-        }
-
-        public TransportMetadata getTransportType() {
-            return null;
-        }
-
-        public TransportMetadata getTransportMetadata() {
-            return null;
         }
     }
 

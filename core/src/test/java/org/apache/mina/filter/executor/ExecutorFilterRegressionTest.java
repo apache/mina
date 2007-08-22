@@ -19,22 +19,15 @@
  */
 package org.apache.mina.filter.executor;
 
-import java.net.SocketAddress;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.CloseFuture;
+import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 
@@ -88,7 +81,7 @@ public class ExecutorFilterRegressionTest extends TestCase {
         }
     }
 
-    private static class EventOrderCounter extends AbstractIoSession {
+    private static class EventOrderCounter extends DummySession {
         private Integer lastCount = null;
 
         public synchronized void setLastCount(Integer newCount) {
@@ -98,65 +91,6 @@ public class ExecutorFilterRegressionTest extends TestCase {
             }
 
             lastCount = newCount;
-        }
-
-        public IoHandler getHandler() {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain() {
-            return null;
-        }
-
-        @Override
-        public CloseFuture close() {
-            return null;
-        }
-
-        public TransportMetadata getTransportType() {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress() {
-            return null;
-        }
-
-        public SocketAddress getLocalAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteMessages() {
-            return 0;
-        }
-
-        @Override
-        protected void updateTrafficMask() {
-        }
-
-        @Override
-        public boolean isClosing() {
-            return false;
-        }
-
-        public IoService getService() {
-            return null;
-        }
-
-        public IoSessionConfig getConfig() {
-            return null;
-        }
-
-        @Override
-        public SocketAddress getServiceAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteBytes() {
-            return 0;
-        }
-
-        public TransportMetadata getTransportMetadata() {
-            return null;
         }
     }
 

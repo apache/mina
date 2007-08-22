@@ -19,8 +19,6 @@
  */
 package org.apache.mina.common;
 
-import java.net.SocketAddress;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -33,16 +31,55 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * @version $Rev$, $Date$ 
  */
 public class IoFilterChainTest extends TestCase {
-    private IoFilterChainImpl chain;
-
-    private IoSession session;
-
+    private DummySession session;
+    private IoFilterChain chain;
     private String result;
 
+    private final IoHandler handler = new IoHandlerAdapter() {
+        @Override
+        public void sessionCreated(IoSession session) {
+            result += "HS0";
+        }
+
+        @Override
+        public void sessionOpened(IoSession session) {
+            result += "HSO";
+        }
+
+        @Override
+        public void sessionClosed(IoSession session) {
+            result += "HSC";
+        }
+
+        @Override
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            result += "HSI";
+        }
+
+        @Override
+        public void exceptionCaught(IoSession session, Throwable cause) {
+            result += "HEC";
+            if (cause.getClass() != Exception.class) {
+                cause.printStackTrace(System.out);
+            }
+        }
+
+        @Override
+        public void messageReceived(IoSession session, Object message) {
+            result += "HMR";
+        }
+
+        @Override
+        public void messageSent(IoSession session, Object message) {
+            result += "HMS";
+        }
+    };
+    
     @Override
     public void setUp() {
-        chain = new IoFilterChainImpl();
-        session = new TestSession();
+        session = new DummySession();
+        session.setHandler(handler);
+        chain = session.getFilterChain();
         result = "";
     }
 
@@ -188,112 +225,6 @@ public class IoFilterChainTest extends TestCase {
         return buf.toString();
     }
 
-    private class TestSession extends AbstractIoSession implements IoSession {
-        private final IoHandler handler = new IoHandlerAdapter() {
-            @Override
-            public void sessionCreated(IoSession session) {
-                result += "HS0";
-            }
-
-            @Override
-            public void sessionOpened(IoSession session) {
-                result += "HSO";
-            }
-
-            @Override
-            public void sessionClosed(IoSession session) {
-                result += "HSC";
-            }
-
-            @Override
-            public void sessionIdle(IoSession session, IdleStatus status) {
-                result += "HSI";
-            }
-
-            @Override
-            public void exceptionCaught(IoSession session, Throwable cause) {
-                result += "HEC";
-                if (cause.getClass() != Exception.class) {
-                    cause.printStackTrace(System.out);
-                }
-            }
-
-            @Override
-            public void messageReceived(IoSession session, Object message) {
-                result += "HMR";
-            }
-
-            @Override
-            public void messageSent(IoSession session, Object message) {
-                result += "HMS";
-            }
-        };
-
-        public IoHandler getHandler() {
-            return handler;
-        }
-
-        @Override
-        public CloseFuture close() {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress() {
-            return null;
-        }
-
-        public SocketAddress getLocalAddress() {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain() {
-            return new AbstractIoFilterChain(this) {
-                @Override
-                protected void doWrite(IoSession session,
-                        WriteRequest writeRequest) {
-                }
-
-                @Override
-                protected void doClose(IoSession session) {
-                }
-            };
-        }
-
-        public int getScheduledWriteMessages() {
-            return 0;
-        }
-
-        @Override
-        protected void updateTrafficMask() {
-        }
-
-        @Override
-        public boolean isClosing() {
-            return false;
-        }
-
-        public IoService getService() {
-            return null;
-        }
-
-        public IoSessionConfig getConfig() {
-            return null;
-        }
-
-        @Override
-        public SocketAddress getServiceAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteBytes() {
-            return 0;
-        }
-
-        public TransportMetadata getTransportMetadata() {
-            return null;
-        }
-    }
-
     private class EventOrderTestFilter extends IoFilterAdapter {
         private final char id;
 
@@ -374,65 +305,4 @@ public class IoFilterChainTest extends TestCase {
             result += "REMOVED";
         }
     }
-
-    private static class IoFilterChainImpl extends AbstractIoFilterChain {
-        protected IoFilterChainImpl() {
-            super(new AbstractIoSession() {
-                @Override
-                protected void updateTrafficMask() {
-                }
-
-                public IoService getService() {
-                    return null;
-                }
-
-                public IoHandler getHandler() {
-                    return null;
-                }
-
-                public IoFilterChain getFilterChain() {
-                    return null;
-                }
-
-                public SocketAddress getRemoteAddress() {
-                    return null;
-                }
-
-                public SocketAddress getLocalAddress() {
-                    return null;
-                }
-
-                public int getScheduledWriteMessages() {
-                    return 0;
-                }
-
-                public IoSessionConfig getConfig() {
-                    return null;
-                }
-
-                @Override
-                public SocketAddress getServiceAddress() {
-                    return null;
-                }
-
-                public int getScheduledWriteBytes() {
-                    return 0;
-                }
-
-                public TransportMetadata getTransportMetadata() {
-                    return null;
-                }
-            });
-        }
-
-        @Override
-        protected void doWrite(IoSession session, WriteRequest writeRequest) {
-            fireMessageSent(session, writeRequest);
-        }
-
-        @Override
-        protected void doClose(IoSession session) {
-        }
-    }
-
 }

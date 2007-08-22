@@ -20,7 +20,6 @@
 package org.apache.mina.common;
 
 import java.io.IOException;
-import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
@@ -58,57 +57,7 @@ public class FutureTest extends TestCase {
         TestThread thread = new TestThread(future);
         thread.start();
 
-        IoSession session = new AbstractIoSession() {
-            public IoHandler getHandler() {
-                return null;
-            }
-
-            public IoFilterChain getFilterChain() {
-                return null;
-            }
-
-            public SocketAddress getRemoteAddress() {
-                return null;
-            }
-
-            public SocketAddress getLocalAddress() {
-                return null;
-            }
-
-            public int getScheduledWriteMessages() {
-                return 0;
-            }
-
-            @Override
-            protected void updateTrafficMask() {
-            }
-
-            @Override
-            public boolean isClosing() {
-                return false;
-            }
-
-            public IoService getService() {
-                return null;
-            }
-
-            public IoSessionConfig getConfig() {
-                return null;
-            }
-
-            @Override
-            public SocketAddress getServiceAddress() {
-                return null;
-            }
-
-            public int getScheduledWriteBytes() {
-                return 0;
-            }
-
-            public TransportMetadata getTransportMetadata() {
-                return null;
-            }
-        };
+        IoSession session = new DummySession();
 
         future.setSession(session);
         thread.join();

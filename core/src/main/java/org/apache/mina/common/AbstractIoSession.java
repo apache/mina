@@ -501,14 +501,11 @@ public abstract class AbstractIoSession implements IoSession {
     }
     
     private String getServiceName() {
-        if (getService() == null) {
+        TransportMetadata tm = getTransportMetadata();
+        if (tm == null) {
             return "null";
+        } else {
+            return tm.getName();
         }
-        
-        if (getService().getTransportMetadata() == null) {
-            return "null";
-        }
-        
-        return getService().getTransportMetadata().getName();
     }
 }

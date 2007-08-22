@@ -25,16 +25,6 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceListener;
-import org.apache.mina.common.IoServiceListenerSupport;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportMetadata;
 import org.easymock.MockControl;
 
 /**
@@ -87,7 +77,9 @@ public class IoServiceListenerSupportTest extends TestCase {
         IoServiceListenerSupport support = new IoServiceListenerSupport(
                 mockService);
 
-        TestSession session = new TestSession(mockService, ADDRESS);
+        DummySession session = new DummySession();
+        session.setService(mockService);
+        session.setLocalAddress(ADDRESS);
 
         MockControl chainControl = MockControl
                 .createStrictControl(IoFilterChain.class);
@@ -145,7 +137,9 @@ public class IoServiceListenerSupportTest extends TestCase {
         final IoServiceListenerSupport support = new IoServiceListenerSupport(
                 acceptor);
 
-        final TestSession session = new TestSession(acceptor, ADDRESS);
+        final DummySession session = new DummySession();
+        session.setService(acceptor);
+        session.setLocalAddress(ADDRESS);
 
         MockControl chainControl = MockControl
                 .createStrictControl(IoFilterChain.class);
@@ -217,7 +211,9 @@ public class IoServiceListenerSupportTest extends TestCase {
         IoServiceListenerSupport support = new IoServiceListenerSupport(
                 connector);
 
-        final TestSession session = new TestSession(connector, ADDRESS);
+        final DummySession session = new DummySession();
+        session.setService(connector);
+        session.setRemoteAddress(ADDRESS);
 
         MockControl chainControl = MockControl
                 .createStrictControl(IoFilterChain.class);
@@ -261,80 +257,5 @@ public class IoServiceListenerSupportTest extends TestCase {
 
         Assert.assertEquals(0, support.getManagedSessions().size());
         Assert.assertFalse(support.getManagedSessions().contains(session));
-    }
-
-    private static class TestSession extends AbstractIoSession {
-        private final IoService service;
-
-        private final SocketAddress serviceAddress;
-
-        private IoFilterChain filterChain;
-
-        TestSession(SocketAddress serviceAddress) {
-            this(null, serviceAddress);
-        }
-
-        TestSession(IoService service, SocketAddress serviceAddress) {
-            this.service = service;
-            this.serviceAddress = serviceAddress;
-        }
-
-        @Override
-        protected void updateTrafficMask() {
-        }
-
-        public IoSessionConfig getConfig() {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain() {
-            return filterChain;
-        }
-
-        public void setFilterChain(IoFilterChain filterChain) {
-            this.filterChain = filterChain;
-        }
-
-        public IoHandler getHandler() {
-            return null;
-        }
-
-        public SocketAddress getLocalAddress() {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteBytes() {
-            return 0;
-        }
-
-        public int getScheduledWriteMessages() {
-            return 0;
-        }
-
-        public IoService getService() {
-            return service;
-        }
-
-        @Override
-        public SocketAddress getServiceAddress() {
-            return serviceAddress;
-        }
-
-        public TransportMetadata getTransportType() {
-            return null;
-        }
-        
-        @Override
-        public String toString() {
-            return String.valueOf(serviceAddress);
-        }
-
-        public TransportMetadata getTransportMetadata() {
-            return null;
-        }
     }
 }

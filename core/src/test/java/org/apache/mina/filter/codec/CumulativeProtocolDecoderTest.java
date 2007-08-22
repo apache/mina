@@ -19,22 +19,14 @@
  */
 package org.apache.mina.filter.codec;
 
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.CloseFuture;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportMetadata;
 
 /**
  * Tests {@link CumulativeProtocolDecoder}.
@@ -43,13 +35,10 @@ import org.apache.mina.common.TransportMetadata;
  * @version $Rev$, $Date$ 
  */
 public class CumulativeProtocolDecoderTest extends TestCase {
-    private final IoSession session = new IoSessionImpl();
+    private final ProtocolCodecSession session = new ProtocolCodecSession();
 
     private ByteBuffer buf;
-
     private IntegerDecoder decoder;
-
-    private IntegerDecoderOutput output;
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(CumulativeProtocolDecoderTest.class);
@@ -59,7 +48,6 @@ public class CumulativeProtocolDecoderTest extends TestCase {
     protected void setUp() throws Exception {
         buf = ByteBuffer.allocate(16);
         decoder = new IntegerDecoder();
-        output = new IntegerDecoderOutput();
     }
 
     @Override
@@ -71,8 +59,8 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         buf.put((byte) 0);
         buf.flip();
 
-        decoder.decode(session, buf, output);
-        Assert.assertEquals(0, output.getValues().size());
+        decoder.decode(session, buf, session.getDecoderOutput());
+        Assert.assertEquals(0, session.getDecoderOutputQueue().size());
         Assert.assertEquals(buf.limit(), buf.position());
 
         buf.clear();
@@ -81,9 +69,9 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         buf.put((byte) 1);
         buf.flip();
 
-        decoder.decode(session, buf, output);
-        Assert.assertEquals(1, output.getValues().size());
-        Assert.assertEquals(new Integer(1), output.getValues().get(0));
+        decoder.decode(session, buf, session.getDecoderOutput());
+        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
+        Assert.assertEquals(new Integer(1), session.getDecoderOutputQueue().poll());
         Assert.assertEquals(buf.limit(), buf.position());
     }
 
@@ -93,20 +81,20 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         }
         buf.flip();
 
-        decoder.decode(session, buf, output);
-        Assert.assertEquals(4, output.getValues().size());
+        decoder.decode(session, buf, session.getDecoderOutput());
+        Assert.assertEquals(4, session.getDecoderOutputQueue().size());
         Assert.assertEquals(buf.limit(), buf.position());
 
         List<Object> expected = new ArrayList<Object>();
         for (int i = 0; i < 4; i++) {
             expected.add(new Integer(i));
         }
-        Assert.assertEquals(expected, output.getValues());
+        Assert.assertEquals(expected, session.getDecoderOutputQueue());
     }
 
     public void testWrongImplementationDetection() throws Exception {
         try {
-            new WrongDecoder().decode(session, buf, output);
+            new WrongDecoder().decode(session, buf, session.getDecoderOutput());
             Assert.fail();
         } catch (IllegalStateException e) {
             // OK
@@ -132,25 +120,6 @@ public class CumulativeProtocolDecoderTest extends TestCase {
 
     }
 
-    private static class IntegerDecoderOutput implements ProtocolDecoderOutput {
-        private final List<Object> values = new ArrayList<Object>();
-
-        public void write(Object message) {
-            values.add(message);
-        }
-
-        public List<Object> getValues() {
-            return values;
-        }
-
-        public void clear() {
-            values.clear();
-        }
-
-        public void flush() {
-        }
-    }
-
     private static class WrongDecoder extends CumulativeProtocolDecoder {
 
         @Override
@@ -160,73 +129,6 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         }
 
         public void dispose() throws Exception {
-        }
-    }
-
-    private static class IoSessionImpl extends AbstractIoSession implements
-            IoSession {
-
-        public IoHandler getHandler() {
-            return null;
-        }
-
-        public ProtocolEncoder getEncoder() {
-            return null;
-        }
-
-        public ProtocolDecoder getDecoder() {
-            return null;
-        }
-
-        @Override
-        public CloseFuture close() {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress() {
-            return null;
-        }
-
-        public SocketAddress getLocalAddress() {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain() {
-            return null;
-        }
-
-        public int getScheduledWriteMessages() {
-            return 0;
-        }
-
-        @Override
-        protected void updateTrafficMask() {
-        }
-
-        @Override
-        public boolean isClosing() {
-            return false;
-        }
-
-        public IoService getService() {
-            return null;
-        }
-
-        public IoSessionConfig getConfig() {
-            return null;
-        }
-
-        @Override
-        public SocketAddress getServiceAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteBytes() {
-            return 0;
-        }
-
-        public TransportMetadata getTransportMetadata() {
-            return null;
         }
     }
 }

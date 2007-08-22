@@ -19,22 +19,16 @@
  */
 package org.apache.mina.filter.codec.textline;
 
-import java.net.SocketAddress;
 import java.nio.charset.Charset;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.filter.codec.AbstractProtocolEncoderOutput;
+import org.apache.mina.filter.codec.ProtocolCodecSession;
+import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
  * Tests {@link TextLineEncoder}.
@@ -50,72 +44,17 @@ public class TextLineEncoderTest extends TestCase {
     public void testEncode() throws Exception {
         TextLineEncoder encoder = new TextLineEncoder(Charset.forName("UTF-8"),
                 LineDelimiter.WINDOWS);
-        IoSession session = new DummySession();
-        AbstractProtocolEncoderOutput out = new AbstractProtocolEncoderOutput() {
-            public WriteFuture flush() {
-                return null;
-            }
-        };
+        ProtocolCodecSession session = new ProtocolCodecSession();
+        ProtocolEncoderOutput out = session.getEncoderOutput();
 
         encoder.encode(session, "ABC", out);
-        Assert.assertEquals(1, out.getBufferQueue().size());
-        ByteBuffer buf = out.getBufferQueue().poll();
+        Assert.assertEquals(1, session.getEncoderOutputQueue().size());
+        ByteBuffer buf = session.getEncoderOutputQueue().poll();
         Assert.assertEquals(5, buf.remaining());
         Assert.assertEquals('A', buf.get());
         Assert.assertEquals('B', buf.get());
         Assert.assertEquals('C', buf.get());
         Assert.assertEquals('\r', buf.get());
         Assert.assertEquals('\n', buf.get());
-    }
-
-    private static class DummySession extends AbstractIoSession {
-        @Override
-        protected void updateTrafficMask() {
-        }
-
-        public IoService getService() {
-            return null;
-        }
-
-        public IoHandler getHandler() {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain() {
-            return null;
-        }
-
-        public TransportMetadata getTransportType() {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress() {
-            return null;
-        }
-
-        public SocketAddress getLocalAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteMessages() {
-            return 0;
-        }
-
-        public IoSessionConfig getConfig() {
-            return null;
-        }
-
-        @Override
-        public SocketAddress getServiceAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteBytes() {
-            return 0;
-        }
-
-        public TransportMetadata getTransportMetadata() {
-            return null;
-        }
     }
 }

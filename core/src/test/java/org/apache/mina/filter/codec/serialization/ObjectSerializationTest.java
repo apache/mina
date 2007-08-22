@@ -20,26 +20,16 @@
 package org.apache.mina.filter.codec.serialization;
 
 import java.io.ByteArrayOutputStream;
-import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.WriteFuture;
+import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.filter.codec.AbstractProtocolEncoderOutput;
+import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
  * Tests object serialization codec and streams.
@@ -51,18 +41,14 @@ public class ObjectSerializationTest extends TestCase {
     public void testEncoder() throws Exception {
         final String expected = "1234";
 
-        IoSession session = new MockIoSession();
-        AbstractProtocolEncoderOutput out = new AbstractProtocolEncoderOutput() {
-            public WriteFuture flush() {
-                return null;
-            }
-        };
+        ProtocolCodecSession session = new ProtocolCodecSession();
+        ProtocolEncoderOutput out = session.getEncoderOutput();
 
         ProtocolEncoder encoder = new ObjectSerializationEncoder();
         encoder.encode(session, expected, out);
 
-        Assert.assertEquals(1, out.getBufferQueue().size());
-        ByteBuffer buf = out.getBufferQueue().poll();
+        Assert.assertEquals(1, session.getEncoderOutputQueue().size());
+        ByteBuffer buf = session.getEncoderOutputQueue().poll();
 
         testDecoderAndInputStream(expected, buf);
     }
@@ -91,69 +77,11 @@ public class ObjectSerializationTest extends TestCase {
 
         // Test ProtocolDecoder
         ProtocolDecoder decoder = new ObjectSerializationDecoder();
-        MockProtocolDecoderOutput decoderOut = new MockProtocolDecoderOutput();
-        IoSession session = new MockIoSession();
+        ProtocolCodecSession session = new ProtocolCodecSession();
+        ProtocolDecoderOutput decoderOut = session.getDecoderOutput();
         decoder.decode(session, in.duplicate(), decoderOut);
 
-        Assert.assertEquals(expected, decoderOut.result.get(0));
-        Assert.assertEquals(1, decoderOut.result.size());
-    }
-
-    private static class MockIoSession extends AbstractIoSession {
-        @Override
-        protected void updateTrafficMask() {
-        }
-
-        public IoSessionConfig getConfig() {
-            return null;
-        }
-
-        public IoFilterChain getFilterChain() {
-            return null;
-        }
-
-        public IoHandler getHandler() {
-            return null;
-        }
-
-        public SocketAddress getLocalAddress() {
-            return null;
-        }
-
-        public SocketAddress getRemoteAddress() {
-            return null;
-        }
-
-        public int getScheduledWriteBytes() {
-            return 0;
-        }
-
-        public int getScheduledWriteMessages() {
-            return 0;
-        }
-
-        public IoService getService() {
-            return null;
-        }
-
-        public TransportMetadata getTransportType() {
-            return null;
-        }
-
-        public TransportMetadata getTransportMetadata() {
-            return null;
-        }
-    }
-
-    private static class MockProtocolDecoderOutput implements
-            ProtocolDecoderOutput {
-        private final List<Object> result = new ArrayList<Object>();
-
-        public void flush() {
-        }
-
-        public void write(Object message) {
-            result.add(message);
-        }
+        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
+        Assert.assertEquals(expected, session.getDecoderOutputQueue().poll());
     }
 }

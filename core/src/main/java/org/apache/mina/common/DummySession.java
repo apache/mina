@@ -47,13 +47,13 @@ public class DummySession extends AbstractIoSession {
     
     private volatile IoService service;
 
-    private final IoSessionConfig config = new AbstractIoSessionConfig() {
+    private volatile IoSessionConfig config = new AbstractIoSessionConfig() {
         @Override
         protected void doSetAll(IoSessionConfig config) {
         }
     };
     
-    private final IoFilterChain filterChain = new AbstractIoFilterChain(this) {
+    private volatile IoFilterChain filterChain = new AbstractIoFilterChain(this) {
         @Override
         protected void doClose(IoSession session) throws Exception {
         }
@@ -61,6 +61,7 @@ public class DummySession extends AbstractIoSession {
         @Override
         protected void doWrite(IoSession session, WriteRequest writeRequest)
                 throws Exception {
+            fireMessageSent(session, writeRequest);
         }
     };
     
@@ -114,9 +115,31 @@ public class DummySession extends AbstractIoSession {
     public IoSessionConfig getConfig() {
         return config;
     }
+    
+    /**
+     * Sets the configuration of this session.
+     */
+    public void setConfig(IoSessionConfig config) {
+        if (config == null) {
+            throw new NullPointerException("config");
+        }
+        
+        this.config = config;
+    }
 
     public IoFilterChain getFilterChain() {
         return filterChain;
+    }
+    
+    /**
+     * Sets the filter chain that affects this session.
+     */
+    public void setFilterChain(IoFilterChain filterChain) {
+        if (filterChain == null) {
+            throw new NullPointerException("filterChain");
+        }
+        
+        this.filterChain = filterChain;
     }
 
     public IoHandler getHandler() {

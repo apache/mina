@@ -19,18 +19,11 @@
  */
 package org.apache.mina.handler.chain;
 
-import java.net.SocketAddress;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
+import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TransportMetadata;
 
 /**
  * A test case for {@link ChainedIoHandler}.
@@ -50,52 +43,7 @@ public class ChainedIoHandlerTest extends TestCase {
         chain.addLast("B", new TestCommand(buf, 'B'));
         chain.addLast("C", new TestCommand(buf, 'C'));
 
-        new ChainedIoHandler(chain).messageReceived(new AbstractIoSession() {
-            @Override
-            protected void updateTrafficMask() {
-            }
-
-            public IoService getService() {
-                return null;
-            }
-
-            public IoHandler getHandler() {
-                return null;
-            }
-
-            public IoFilterChain getFilterChain() {
-                return null;
-            }
-
-            public SocketAddress getRemoteAddress() {
-                return null;
-            }
-
-            public SocketAddress getLocalAddress() {
-                return null;
-            }
-
-            public int getScheduledWriteMessages() {
-                return 0;
-            }
-
-            public IoSessionConfig getConfig() {
-                return null;
-            }
-
-            @Override
-            public SocketAddress getServiceAddress() {
-                return null;
-            }
-
-            public int getScheduledWriteBytes() {
-                return 0;
-            }
-
-            public TransportMetadata getTransportMetadata() {
-                return null;
-            }
-        }, null);
+        new ChainedIoHandler(chain).messageReceived(new DummySession(), null);
 
         Assert.assertEquals("ABC", buf.toString());
     }
