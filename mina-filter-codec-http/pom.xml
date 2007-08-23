@@ -1,0 +1,21 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>build</artifactId>
+    <groupId>org.apache.mina</groupId>
+    <version>2.0.0-M1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.mina.http.codec</groupId>
+  <artifactId>mina-filter-codec-http</artifactId>
+  <name>mina-filter-codec-http</name>
+  <version>1.0-SNAPSHOT</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
