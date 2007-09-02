@@ -25,6 +25,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain;
@@ -70,6 +72,10 @@ class SocketSessionImpl extends BaseIoSession {
     private final SocketAddress serviceAddress;
 
     private final IoServiceListenerSupport serviceListeners;
+
+    private final AtomicBoolean inFlushQueue = new AtomicBoolean( false );
+
+    private final AtomicInteger scheduledWriteBytes = new AtomicInteger();
 
     private SelectionKey key;
 
@@ -184,13 +190,18 @@ class SocketSessionImpl extends BaseIoSession {
      * @throws ClassCastException if an element is not a {@link ByteBuffer}
      */
     public int getScheduledWriteBytes() {
-        int byteSize = 0;
+        return scheduledWriteBytes.get();
+    }
 
-        for (WriteRequest request : writeRequestQueue) {
-            byteSize += ((ByteBuffer) request.getMessage()).remaining();
-        }
+    @Override
+    public void increaseWrittenBytes( int increment ) {
+        super.increaseWrittenBytes( increment );
 
-        return byteSize;
+        scheduledWriteBytes.addAndGet( -increment );
+    }
+
+    AtomicInteger getScheduledWriteBytesCounter() {
+        return scheduledWriteBytes;
     }
 
     @Override
@@ -222,9 +233,13 @@ class SocketSessionImpl extends BaseIoSession {
     int getReadBufferSize() {
         return readBufferSize;
     }
-    
+
     void setReadBufferSize(int readBufferSize) {
         this.readBufferSize = readBufferSize;
+    }
+
+    AtomicBoolean getInFlushQueue() {
+        return inFlushQueue;
     }
 
     private class SessionConfigImpl extends BaseIoSessionConfig implements

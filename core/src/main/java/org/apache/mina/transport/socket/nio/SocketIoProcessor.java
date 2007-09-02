@@ -89,10 +89,11 @@ class SocketIoProcessor {
     }
 
     void flush(SocketSessionImpl session) {
-        scheduleFlush(session);
-        Selector selector = this.selector;
-        if (selector != null) {
-            selector.wakeup();
+        if ( scheduleFlush(session) ) {
+            Selector selector = this.selector;
+            if (selector != null) {
+                selector.wakeup();
+            }
         }
     }
 
@@ -108,8 +109,14 @@ class SocketIoProcessor {
         removingSessions.add(session);
     }
 
-    private void scheduleFlush(SocketSessionImpl session) {
-        flushingSessions.add(session);
+    private boolean scheduleFlush(SocketSessionImpl session) {
+        if ( session.getInFlushQueue().compareAndSet( false, true ) ) {
+            flushingSessions.add(session);
+
+            return true;
+        }
+
+        return false;
     }
 
     private void scheduleTrafficControl(SocketSessionImpl session) {
@@ -210,7 +217,7 @@ class SocketIoProcessor {
             if (readBytes > 0) {
                 session.getFilterChain().fireMessageReceived(session, buf);
                 buf = null;
-                
+
                 if (readBytes * 2 < session.getReadBufferSize()) {
                     if (session.getReadBufferSize() > 64) {
                         session.setReadBufferSize(session.getReadBufferSize() >>> 1);
@@ -299,6 +306,8 @@ class SocketIoProcessor {
             if (session == null)
                 break;
 
+            session.getInFlushQueue().set( false );
+
             if (!session.isConnected()) {
                 releaseWriteBuffers(session);
                 continue;
@@ -318,7 +327,10 @@ class SocketIoProcessor {
             }
 
             try {
-                doFlush(session);
+                boolean flushedAll = doFlush(session);
+                if( flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.getInFlushQueue().get()) {
+                    scheduleFlush( session );
+                }
             } catch (IOException e) {
                 scheduleRemove(session);
                 session.getFilterChain().fireExceptionCaught(session, e);
@@ -329,11 +341,12 @@ class SocketIoProcessor {
     private void releaseWriteBuffers(SocketSessionImpl session) {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
-        
-        if ((req = writeRequestQueue.poll()) != null) {
+
+        while ((req = writeRequestQueue.poll()) != null) {
             ByteBuffer buf = (ByteBuffer) req.getMessage();
             try {
                 buf.release();
+                session.getScheduledWriteBytesCounter().addAndGet( -buf.remaining() );
             } catch (IllegalStateException e) {
                 session.getFilterChain().fireExceptionCaught(session, e);
             } finally {
@@ -342,7 +355,7 @@ class SocketIoProcessor {
                 if (buf.hasRemaining()) {
                     req.getFuture().setWritten(false);
                 } else {
-                    session.getFilterChain().fireMessageSent(session, req);                    
+                    session.getFilterChain().fireMessageSent(session, req);
                 }
             }
 
@@ -359,7 +372,7 @@ class SocketIoProcessor {
         }
     }
 
-    private void doFlush(SocketSessionImpl session) throws IOException {
+    private boolean doFlush(SocketSessionImpl session) throws IOException {
         // Clear OP_WRITE
         SelectionKey key = session.getSelectionKey();
         key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
@@ -372,34 +385,36 @@ class SocketIoProcessor {
         try {
             for (;;) {
                 WriteRequest req = writeRequestQueue.peek();
-    
+
                 if (req == null)
                     break;
-    
+
                 ByteBuffer buf = (ByteBuffer) req.getMessage();
                 if (buf.remaining() == 0) {
                     writeRequestQueue.poll();
-    
+
                     session.increaseWrittenMessages();
-    
+
                     buf.reset();
                     session.getFilterChain().fireMessageSent(session, req);
                     continue;
                 }
-    
+
                 if (key.isWritable()) {
                     writtenBytes += ch.write(buf.buf());
                 }
-    
+
                 if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                    break;
+                    return false;
                 }
             }
         } finally {
             session.increaseWrittenBytes(writtenBytes);
         }
+
+        return true;
     }
 
     private void doUpdateTrafficMask() {

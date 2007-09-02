@@ -46,14 +46,14 @@ class SocketFilterChain extends AbstractIoFilterChain {
 
         // SocketIoProcessor.doFlush() will reset it after write is finished
         // because the buffer will be passed with messageSent event.
-        ((ByteBuffer) writeRequest.getMessage()).mark();
-        synchronized (writeRequestQueue) {
-            writeRequestQueue.add(writeRequest);
-            if (writeRequestQueue.size() == 1
-                    && session.getTrafficMask().isWritable()) {
-                // Notify SocketIoProcessor only when writeRequestQueue was empty.
-                s.getIoProcessor().flush(s);
-            }
+        ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
+        buffer.mark();
+
+        s.getScheduledWriteBytesCounter().addAndGet(buffer.remaining());
+        writeRequestQueue.add(writeRequest);
+
+        if (session.getTrafficMask().isWritable()) {
+            s.getIoProcessor().flush(s);
         }
     }
 
