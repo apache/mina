@@ -53,7 +53,7 @@ public abstract class BaseIoSession implements IoSession {
      */
     private final CloseFuture closeFuture = new DefaultCloseFuture(this);
 
-    private boolean closing;
+    private volatile boolean closing;
 
     // Configuration variables
     private int idleTimeForRead;
@@ -101,9 +101,7 @@ public abstract class BaseIoSession implements IoSession {
     }
 
     public boolean isClosing() {
-        synchronized (lock) {
-            return closing || closeFuture.isClosed();
-        }
+        return closing || closeFuture.isClosed();
     }
 
     public CloseFuture getCloseFuture() {
@@ -137,10 +135,8 @@ public abstract class BaseIoSession implements IoSession {
     }
 
     public WriteFuture write(Object message, SocketAddress remoteAddress) {
-        synchronized (lock) {
-            if (isClosing() || !isConnected()) {
-                return DefaultWriteFuture.newNotWrittenFuture(this);
-            }
+        if (isClosing() ) {
+            return DefaultWriteFuture.newNotWrittenFuture(this);
         }
 
         WriteFuture future = new DefaultWriteFuture(this);
@@ -155,6 +151,8 @@ public abstract class BaseIoSession implements IoSession {
      *
      * By default, this method is implemented to set the future to
      * 'not written' immediately.
+     *
+     * @param writeRequest Write request to make
      */
     protected void write0(WriteRequest writeRequest) {
         writeRequest.getFuture().setWritten(false);
