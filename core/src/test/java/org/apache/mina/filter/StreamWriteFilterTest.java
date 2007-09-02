@@ -28,8 +28,8 @@ import java.security.MessageDigest;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
-import junit.framework.TestCase;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoAcceptor;
@@ -47,6 +47,8 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
+
+import junit.framework.TestCase;
 
 /**
  * Tests {@link StreamWriteFilter}.
@@ -393,14 +395,9 @@ public class StreamWriteFilterTest extends TestCase {
 
         acceptor.bind(address, sender);
 
-        synchronized (sender.lock) {
-            synchronized (receiver.lock) {
-                connector.connect(address, receiver);
-
-                sender.lock.wait();
-                receiver.lock.wait();
-            }
-        }
+        connector.connect(address, receiver);
+        sender.latch.await();
+        receiver.latch.await();
 
         acceptor.unbind(address);
 
@@ -452,7 +449,7 @@ public class StreamWriteFilterTest extends TestCase {
     }
 
     private static class SenderHandler extends IoHandlerAdapter {
-        final Object lock = new Object();
+        final CountDownLatch latch = new CountDownLatch( 1 );
 
         InputStream inputStream;
 
@@ -476,39 +473,31 @@ public class StreamWriteFilterTest extends TestCase {
         @Override
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
-            synchronized (lock) {
-                lock.notifyAll();
-            }
+            latch.countDown();
         }
 
         @Override
         public void sessionClosed(IoSession session) throws Exception {
-            synchronized (lock) {
-                lock.notifyAll();
-            }
+            latch.countDown();
         }
 
         @Override
         public void sessionIdle(IoSession session, IdleStatus status)
                 throws Exception {
-            synchronized (lock) {
-                lock.notifyAll();
-            }
+            latch.countDown();
         }
 
         @Override
         public void messageSent(IoSession session, Object message)
                 throws Exception {
             if (message == inputStream) {
-                synchronized (lock) {
-                    lock.notifyAll();
-                }
+                latch.countDown();
             }
         }
     }
 
     private static class ReceiverHandler extends IoHandlerAdapter {
-        final Object lock = new Object();
+        final CountDownLatch latch = new CountDownLatch( 1 );
 
         long bytesRead = 0;
 
@@ -537,16 +526,12 @@ public class StreamWriteFilterTest extends TestCase {
         @Override
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
-            synchronized (lock) {
-                lock.notifyAll();
-            }
+            latch.countDown();
         }
 
         @Override
         public void sessionClosed(IoSession session) throws Exception {
-            synchronized (lock) {
-                lock.notifyAll();
-            }
+            latch.countDown();
         }
 
         @Override
