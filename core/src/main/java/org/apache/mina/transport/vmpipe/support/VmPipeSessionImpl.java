@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain;
@@ -65,20 +67,20 @@ public class VmPipeSessionImpl extends BaseIoSession {
 
     private final VmPipeSessionImpl remoteSession;
 
-    final Object lock;
+    private final Lock lock;
 
     final BlockingQueue<Object> pendingDataQueue;
 
-    /**
+    /*
      * Constructor for client-side session.
      */
-    public VmPipeSessionImpl(IoService service, IoServiceConfig serviceConfig,
-            IoServiceListenerSupport serviceListeners, Object lock,
-            SocketAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
+    public VmPipeSessionImpl( IoService service, IoServiceConfig serviceConfig,
+                              IoServiceListenerSupport serviceListeners,
+                              SocketAddress localAddress, IoHandler handler, VmPipe remoteEntry ) {
         this.service = service;
         this.serviceConfig = serviceConfig;
         this.serviceListeners = serviceListeners;
-        this.lock = lock;
+        this.lock = new ReentrantLock();
         this.localAddress = localAddress;
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
@@ -88,7 +90,7 @@ public class VmPipeSessionImpl extends BaseIoSession {
         remoteSession = new VmPipeSessionImpl(this, remoteEntry);
     }
 
-    /**
+    /*
      * Constructor for server-side session.
      */
     private VmPipeSessionImpl(VmPipeSessionImpl remoteSession, VmPipe entry) {
@@ -188,5 +190,9 @@ public class VmPipeSessionImpl extends BaseIoSession {
                 }
             }
         }
+    }
+
+    Lock getLock() {
+        return lock;
     }
 }

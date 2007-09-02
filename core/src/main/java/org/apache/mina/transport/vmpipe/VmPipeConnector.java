@@ -88,9 +88,11 @@ public class VmPipeConnector extends BaseIoConnector {
         }
 
         DefaultConnectFuture future = new DefaultConnectFuture();
-        VmPipeSessionImpl localSession = new VmPipeSessionImpl(this, config,
-                getListeners(), new Object(), // lock
-                new AnonymousSocketAddress(), handler, entry);
+        VmPipeSessionImpl localSession = new VmPipeSessionImpl(this,
+                                                               config,getListeners(),
+                                                               new AnonymousSocketAddress(),
+                                                               handler,
+                                                               entry);
 
         // initialize connector session
         try {
@@ -100,8 +102,7 @@ public class VmPipeConnector extends BaseIoConnector {
             config.getThreadModel().buildFilterChain(filterChain);
 
             // The following sentences don't throw any exceptions.
-            localSession.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE,
-                    future);
+            localSession.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE, future);
             getListeners().fireSessionCreated(localSession);
             VmPipeIdleStatusChecker.getInstance().addSession(localSession);
         } catch (Throwable t) {
@@ -127,6 +128,9 @@ public class VmPipeConnector extends BaseIoConnector {
             remoteSession.close();
         }
 
+
+        // Start chains, and then allow and messages read/written to be processed. This is to ensure that
+        // sessionOpened gets received before a messageReceived
         ((VmPipeFilterChain) localSession.getFilterChain()).start();
         ((VmPipeFilterChain) remoteSession.getFilterChain()).start();
 
