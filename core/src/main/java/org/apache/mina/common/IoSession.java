@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -23,32 +23,32 @@ import java.net.SocketAddress;
 import java.util.Set;
 
 /**
- * A handle which represents connection between two end-points regardless of 
+ * A handle which represents connection between two end-points regardless of
  * transport types.
- * <p>
+ * <p/>
  * {@link IoSession} provides user-defined attributes.  User-defined attributes
  * are application-specific data which is associated with a session.
  * It often contains objects that represents the state of a higher-level protocol
  * and becomes a way to exchange data between filters and handlers.
- * 
+ * <p/>
  * <h3>Adjusting Transport Type Specific Properties</h3>
- * <p>
+ * <p/>
  * You can simply downcast the session to an appropriate subclass.
  * </p>
- * 
+ * <p/>
  * <h3>Thread Safety</h3>
- * <p>
+ * <p/>
  * {@link IoSession} is thread-safe.  But please note that performing
  * more than one {@link #write(Object)} calls at the same time will
- * cause the {@link IoFilter#filterWrite(IoFilter.NextFilter, IoSession, WriteRequest)}
+ * cause the {@link IoFilter#filterWrite(IoFilter.NextFilter,IoSession,WriteRequest)}
  * is executed simultaneously, and therefore you have to make sure the
- * {@link IoFilter} implementations you're using are thread-safe, too. 
+ * {@link IoFilter} implementations you're using are thread-safe, too.
  * </p>
- * 
+ * <p/>
  * <h3>Equality of Sessions</h3>
  * {@link #equals(Object)} and {@link #hashCode()} shall not be overriden
  * to the default behavior that is defined in {@link Object}.
- *   
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -73,7 +73,7 @@ public interface IoSession {
      * Returns the filter chain that only affects this session.
      */
     IoFilterChain getFilterChain();
-    
+
     /**
      * Returns the {@link TransportMetadata} that this session runs on.
      */
@@ -81,7 +81,7 @@ public interface IoSession {
 
     /**
      * Writes the specified <code>message</code> to remote peer.  This
-     * operation is asynchronous; {@link IoHandler#messageSent(IoSession, Object)}
+     * operation is asynchronous; {@link IoHandler#messageSent(IoSession,Object)}
      * will be invoked when the message is actually sent to remote peer.
      * You can also wait for the returned {@link WriteFuture} if you want
      * to wait for the message actually written.
@@ -104,14 +104,14 @@ public interface IoSession {
     /**
      * Sets an attachment of this session.
      * This method is identical with <tt>setAttribute( "", attachment )</tt>.
-     * 
+     *
      * @return Old attachment.  <tt>null</tt> if it is new.
      */
     Object setAttachment(Object attachment);
 
     /**
      * Returns the value of user-defined attribute of this session.
-     * 
+     *
      * @param key the key of the attribute
      * @return <tt>null</tt> if there is no attribute with the specified key
      */
@@ -136,8 +136,8 @@ public interface IoSession {
 
     /**
      * Sets a user-defined attribute.
-     * 
-     * @param key the key of the attribute
+     *
+     * @param key   the key of the attribute
      * @param value the value of the attribute
      * @return The old value of the attribute.  <tt>null</tt> if it is new.
      */
@@ -147,7 +147,7 @@ public interface IoSession {
      * Sets a user defined attribute without a value.  This is useful when
      * you just want to put a 'mark' attribute.  Its value is set to
      * {@link Boolean#TRUE}.
-     * 
+     *
      * @param key the key of the attribute
      * @return The old value of the attribute.  <tt>null</tt> if it is new.
      */
@@ -169,7 +169,7 @@ public interface IoSession {
 
     /**
      * Removes a user-defined attribute with the specified key.
-     * 
+     *
      * @return The old value of the attribute.  <tt>null</tt> if not found.
      */
     Object removeAttribute(String key);
@@ -235,7 +235,7 @@ public interface IoSession {
     CloseFuture getCloseFuture();
 
     /**
-     * Returns the socket address of remote peer. 
+     * Returns the socket address of remote peer.
      */
     SocketAddress getRemoteAddress();
 
@@ -251,7 +251,7 @@ public interface IoSession {
      * returns the {@link SocketAddress} which is specified as a parameter of
      * {@link IoAcceptor#bind()}.  If this session is managed by
      * {@link IoConnector}, this method returns the same address with
-     * that of {@link #getRemoteAddress()}.  
+     * that of {@link #getRemoteAddress()}.
      */
     SocketAddress getServiceAddress();
 
@@ -302,7 +302,7 @@ public interface IoSession {
     long getWrittenBytes();
 
     /**
-     * Returns the total number of messages which were read and decoded from this session. 
+     * Returns the total number of messages which were read and decoded from this session.
      */
     long getReadMessages();
 
@@ -320,7 +320,7 @@ public interface IoSession {
      * Returns the number of bytes which are scheduled to be written to this
      * session.
      */
-    int getScheduledWriteBytes();
+    long getScheduledWriteBytes();
 
     /**
      * Returns the time in millis when this session is created.
@@ -343,7 +343,7 @@ public interface IoSession {
     long getLastWriteTime();
 
     /**
-     * Returns <code>true</code> if this session is idle for the specified 
+     * Returns <code>true</code> if this session is idle for the specified
      * {@link IdleStatus}.
      */
     boolean isIdle(IdleStatus status);
@@ -351,7 +351,7 @@ public interface IoSession {
     /**
      * Returns the number of the fired continuous <tt>sessionIdle</tt> events
      * for the specified {@link IdleStatus}.
-     * <p>
+     * <p/>
      * If <tt>sessionIdle</tt> event is fired first after some time after I/O,
      * <tt>idleCount</tt> becomes <tt>1</tt>.  <tt>idleCount</tt> resets to
      * <tt>0</tt> if any I/O occurs again, otherwise it increases to

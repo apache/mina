@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -31,12 +30,12 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
-import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteTimeoutException;
 import org.apache.mina.util.NamePreservingRunnable;
@@ -111,8 +110,7 @@ class SocketIoProcessor {
 
     void flush(SocketSessionImpl session) {
         boolean needsWakeup = flushingSessions.isEmpty();
-        scheduleFlush(session);
-        if (needsWakeup) {
+        if (scheduleFlush(session) && needsWakeup) {
             selector.wakeup();
         }
     }
@@ -126,8 +124,14 @@ class SocketIoProcessor {
         removingSessions.offer(session);
     }
 
-    private void scheduleFlush(SocketSessionImpl session) {
-        flushingSessions.offer(session);
+    private boolean scheduleFlush(SocketSessionImpl session) {
+        if (session.getInFlushQueue().compareAndSet(false, true)) {
+            flushingSessions.add(session);
+
+            return true;
+        }
+
+        return false;
     }
 
     private void scheduleTrafficControl(SocketSessionImpl session) {
@@ -135,7 +139,7 @@ class SocketIoProcessor {
     }
 
     private void doAddNew() {
-        for (;;) {
+        for (; ;) {
             SocketSessionImpl session = newSessions.poll();
 
             if (session == null) {
@@ -169,7 +173,7 @@ class SocketIoProcessor {
     }
 
     private void doRemove() {
-        for (;;) {
+        for (; ;) {
             SocketSessionImpl session = removingSessions.poll();
 
             if (session == null) {
@@ -202,10 +206,7 @@ class SocketIoProcessor {
     }
 
     private void process(Set<SelectionKey> selectedKeys) {
-        Iterator<SelectionKey> it = selectedKeys.iterator();
-
-        while (it.hasNext()) {
-            SelectionKey key = it.next();
+        for (SelectionKey key : selectedKeys) {
             SocketSessionImpl session = (SocketSessionImpl) key.attachment();
 
             if (key.isReadable() && session.getTrafficMask().isReadable()) {
@@ -241,7 +242,7 @@ class SocketIoProcessor {
             if (readBytes > 0) {
                 session.getFilterChain().fireMessageReceived(session, buf);
                 buf = null;
-                
+
                 if (readBytes * 2 < session.getReadBufferSize()) {
                     if (session.getReadBufferSize() > 64) {
                         session.setReadBufferSize(session.getReadBufferSize() >>> 1);
@@ -259,10 +260,10 @@ class SocketIoProcessor {
             if (ret < 0) {
                 scheduleRemove(session);
             }
+        } catch (IOException e) {
+            scheduleRemove(session);
+            session.getFilterChain().fireExceptionCaught(session, e);
         } catch (Throwable e) {
-            if (e instanceof IOException) {
-                scheduleRemove(session);
-            }
             session.getFilterChain().fireExceptionCaught(session, e);
         }
     }
@@ -287,22 +288,22 @@ class SocketIoProcessor {
         notifyIdleness0(session, currentTime, session
                 .getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
                 IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
-                        .getLastIdleTime(IdleStatus.BOTH_IDLE)));
+                .getLastIdleTime(IdleStatus.BOTH_IDLE)));
         notifyIdleness0(session, currentTime, session
                 .getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
                 IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(),
-                        session.getLastIdleTime(IdleStatus.READER_IDLE)));
+                session.getLastIdleTime(IdleStatus.READER_IDLE)));
         notifyIdleness0(session, currentTime, session
                 .getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
                 IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(),
-                        session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
+                session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
 
         notifyWriteTimeout(session, currentTime, session
                 .getConfig().getWriteTimeoutInMillis(), session.getLastWriteTime());
     }
 
     private void notifyIdleness0(SocketSessionImpl session, long currentTime,
-            long idleTime, IdleStatus status, long lastIoTime) {
+                                 long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
                 && (currentTime - lastIoTime) >= idleTime) {
             session.increaseIdleCount(status);
@@ -311,7 +312,7 @@ class SocketIoProcessor {
     }
 
     private void notifyWriteTimeout(SocketSessionImpl session,
-            long currentTime, long writeTimeout, long lastIoTime) {
+                                    long currentTime, long writeTimeout, long lastIoTime) {
         SelectionKey key = session.getSelectionKey();
         if (writeTimeout > 0 && (currentTime - lastIoTime) >= writeTimeout
                 && key != null && key.isValid()
@@ -326,12 +327,14 @@ class SocketIoProcessor {
             return;
         }
 
-        for (;;) {
+        for (; ;) {
             SocketSessionImpl session = flushingSessions.poll();
 
             if (session == null) {
                 break;
             }
+
+            session.getInFlushQueue().set(false);
 
             if (!session.isConnected()) {
                 clearWriteRequestQueue(session);
@@ -352,7 +355,10 @@ class SocketIoProcessor {
             }
 
             try {
-                doFlush(session);
+                boolean flushedAll = doFlush(session);
+                if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.getInFlushQueue().get()) {
+                    scheduleFlush(session);
+                }
             } catch (IOException e) {
                 scheduleRemove(session);
                 session.getFilterChain().fireExceptionCaught(session, e);
@@ -364,16 +370,19 @@ class SocketIoProcessor {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
 
-        if ((req = writeRequestQueue.poll()) != null) {
+        while ((req = writeRequestQueue.poll()) != null) {
             Object m = req.getMessage();
             if (m instanceof ByteBuffer) {
                 ByteBuffer buf = (ByteBuffer) req.getMessage();
+
+                session.getScheduledWriteBytesCounter().addAndGet(-buf.remaining());
+
                 // The first unwritten empty buffer must be
                 // forwarded to the filter chain.
                 if (buf.hasRemaining()) {
                     req.getFuture().setWritten(false);
                 } else {
-                    session.getFilterChain().fireMessageSent(session, req);                    
+                    session.getFilterChain().fireMessageSent(session, req);
                 }
             } else {
                 req.getFuture().setWritten(false);
@@ -386,7 +395,7 @@ class SocketIoProcessor {
         }
     }
 
-    private void doFlush(SocketSessionImpl session) throws IOException {
+    private boolean doFlush(SocketSessionImpl session) throws IOException {
         // Clear OP_WRITE
         SelectionKey key = session.getSelectionKey();
         key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
@@ -398,80 +407,72 @@ class SocketIoProcessor {
         int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
         try {
             do {
-                WriteRequest req;
-    
                 // Check for pending writes.
-                synchronized (writeRequestQueue) {
-                    req = writeRequestQueue.peek();
-                }
-    
+                WriteRequest req = writeRequestQueue.peek();
+
                 if (req == null) {
                     break;
                 }
-    
+
                 Object message = req.getMessage();
                 if (message instanceof FileRegion) {
-                    FileRegion region = (FileRegion) message; 
-    
+                    FileRegion region = (FileRegion) message;
+
                     if (region.getCount() <= 0) {
                         // File has been sent, remove from queue
-                        synchronized (writeRequestQueue) {
-                            writeRequestQueue.poll();
-                        }
+                        writeRequestQueue.poll();
                         session.increaseWrittenMessages();
                         session.getFilterChain().fireMessageSent(session, req);
                         continue;
                     }
-                    
+
                     if (key.isWritable()) {
-                        long localWrittenBytes = 
-                            region.getFileChannel().transferTo(region.getPosition(), region.getCount(), ch);
+                        long localWrittenBytes =
+                                region.getFileChannel().transferTo(region.getPosition(), region.getCount(), ch);
                         region.setPosition(region.getPosition() + localWrittenBytes);
                         writtenBytes += localWrittenBytes;
                     }
-                    
+
                     if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
                         // Kernel buffer is full or wrote too much.
                         key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                        break;
+                        return false;
                     }
-    
+
                 } else {
                     ByteBuffer buf = (ByteBuffer) message;
                     if (buf.remaining() == 0) {
                         // Buffer has been completely sent, remove request form queue
-                        synchronized (writeRequestQueue) {
-                            writeRequestQueue.poll();
-                        }
-    
+                        writeRequestQueue.poll();
+
                         session.increaseWrittenMessages();
-    
+
                         buf.reset();
                         session.getFilterChain().fireMessageSent(session, req);
                         continue;
                     }
-    
+
                     if (key.isWritable()) {
                         writtenBytes += ch.write(buf.buf());
                     }
-    
+
                     if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
                         // Kernel buffer is full or wrote too much.
                         key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                        break;
+                        return false;
                     }
                 }
             } while (writtenBytes < maxWrittenBytes);
         } finally {
             session.increaseWrittenBytes(writtenBytes);
         }
+
+        return true;
     }
 
     private void doUpdateTrafficMask() {
-        for (;;) {
-            SocketSessionImpl session;
-
-            session = trafficControllingSessions.poll();
+        for (; ;) {
+            SocketSessionImpl session = trafficControllingSessions.poll();
 
             if (session == null) {
                 break;
@@ -479,7 +480,7 @@ class SocketIoProcessor {
 
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
-            // (In case that Session.suspend??() or session.resume??() is 
+            // (In case that Session.suspend??() or session.resume??() is
             // called before addSession() is processed)
             if (key == null) {
                 scheduleTrafficControl(session);
@@ -493,12 +494,8 @@ class SocketIoProcessor {
             // The normal is OP_READ and, if there are write requests in the
             // session's write queue, set OP_WRITE to trigger flushing.
             int ops = SelectionKey.OP_READ;
-            Queue<WriteRequest> writeRequestQueue = session
-                    .getWriteRequestQueue();
-            synchronized (writeRequestQueue) {
-                if (!writeRequestQueue.isEmpty()) {
-                    ops |= SelectionKey.OP_WRITE;
-                }
+            if (!session.getWriteRequestQueue().isEmpty()) {
+                ops |= SelectionKey.OP_WRITE;
             }
 
             // Now mask the preferred ops with the mask of the current session
@@ -511,7 +508,7 @@ class SocketIoProcessor {
         public void run() {
             Thread.currentThread().setName(SocketIoProcessor.this.threadName);
 
-            for (;;) {
+            for (; ;) {
                 try {
                     int nKeys = selector.select(1000);
                     doAddNew();
@@ -527,8 +524,7 @@ class SocketIoProcessor {
 
                     if (selector.keys().isEmpty()) {
                         synchronized (lock) {
-                            if (selector.keys().isEmpty()
-                                    && newSessions.isEmpty()) {
+                            if (selector.keys().isEmpty() && newSessions.isEmpty()) {
                                 worker = null;
                                 break;
                             }

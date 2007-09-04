@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -23,8 +23,10 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
@@ -33,9 +35,9 @@ import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 
 /**
@@ -45,13 +47,13 @@ import org.apache.mina.common.WriteRequest;
  * @version $Rev$, $Date$
  */
 class SocketSessionImpl extends AbstractIoSession implements SocketSession {
-    
-    static final TransportMetadata METADATA = 
-        new DefaultTransportMetadata(
-                "socket", false, true,
-                InetSocketAddress.class,
-                SocketSessionConfig.class,
-                ByteBuffer.class, FileRegion.class);
+
+    static final TransportMetadata METADATA =
+            new DefaultTransportMetadata(
+                    "socket", false, true,
+                    InetSocketAddress.class,
+                    SocketSessionConfig.class,
+                    ByteBuffer.class, FileRegion.class);
 
     private final IoService service;
 
@@ -67,20 +69,20 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
 
     private final IoHandler handler;
 
+    private final AtomicBoolean inFlushQueue = new AtomicBoolean(false);
+
+    private final AtomicLong scheduledWriteBytes = new AtomicLong();
+
     private SelectionKey key;
 
     private int readBufferSize = 1024;
 
-    /**
-     * Creates a new instance.
-     */
-    SocketSessionImpl(IoService service, SocketIoProcessor ioProcessor,
-            SocketChannel ch) {
+    SocketSessionImpl(IoService service, SocketIoProcessor ioProcessor, SocketChannel ch) {
         this.service = service;
         this.ioProcessor = ioProcessor;
         this.filterChain = new SocketFilterChain(this);
         this.ch = ch;
-        this.writeRequestQueue = new LinkedList<WriteRequest>();
+        this.writeRequestQueue = new ConcurrentLinkedQueue<WriteRequest>();
         this.handler = service.getHandler();
         this.config.setAll(service.getSessionConfig());
     }
@@ -100,7 +102,7 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
     public IoFilterChain getFilterChain() {
         return filterChain;
     }
-    
+
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
@@ -132,33 +134,34 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
 
     public int getScheduledWriteMessages() {
         int size = 0;
-        synchronized (writeRequestQueue) {
-            for (WriteRequest request : writeRequestQueue) {
-                Object message = request.getMessage();
-                if (message instanceof ByteBuffer) {
-                    if (((ByteBuffer) message).hasRemaining()) {
-                        size ++;
-                    }
-                } else {
-                    size ++;
+
+        for (WriteRequest request : writeRequestQueue) {
+            Object message = request.getMessage();
+            if (message instanceof ByteBuffer) {
+                if (((ByteBuffer) message).hasRemaining()) {
+                    size++;
                 }
+            } else {
+                size++;
             }
         }
 
         return size;
     }
 
-    public int getScheduledWriteBytes() {
-        int size = 0;
-        synchronized (writeRequestQueue) {
-            for (Object o : writeRequestQueue) {
-                if (o instanceof ByteBuffer) {
-                    size += ((ByteBuffer) o).remaining();
-                }
-            }
-        }
+    public long getScheduledWriteBytes() {
+        return scheduledWriteBytes.get();
+    }
 
-        return size;
+    @Override
+    public void increaseWrittenBytes(long increment) {
+        super.increaseWrittenBytes(increment);
+
+        scheduledWriteBytes.addAndGet(-increment);
+    }
+
+    AtomicLong getScheduledWriteBytesCounter() {
+        return scheduledWriteBytes;
     }
 
     @Override
@@ -187,12 +190,16 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
     int getReadBufferSize() {
         return readBufferSize;
     }
-    
+
     void setReadBufferSize(int readBufferSize) {
         this.readBufferSize = readBufferSize;
     }
 
-    private class SessionConfigImpl extends AbstractSocketSessionConfig {
+    AtomicBoolean getInFlushQueue() {
+        return inFlushQueue;
+    }
+
+    private class SessionConfigImpl extends AbstractSocketSessionConfig implements SocketSessionConfig {
         public boolean isKeepAlive() {
             try {
                 return ch.socket().getKeepAlive();
@@ -338,22 +345,19 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
             }
         }
     }
-    
+
     void queueWriteRequest(WriteRequest writeRequest) {
         if (writeRequest.getMessage() instanceof ByteBuffer) {
+            ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
             // SocketIoProcessor.doFlush() will reset it after write is finished
-            // because the buffer will be passed with messageSent event. 
-            ((ByteBuffer) writeRequest.getMessage()).mark();
+            // because the buffer will be passed with messageSent event.
+            buffer.mark();
+            scheduledWriteBytes.addAndGet(buffer.remaining());
         }
 
-        int writeRequestQueueSize;
-        synchronized (writeRequestQueue) {
-            writeRequestQueue.offer(writeRequest);
-            writeRequestQueueSize = writeRequestQueue.size();
-        }
+        writeRequestQueue.add(writeRequest);
 
-        if (writeRequestQueueSize == 1 && getTrafficMask().isWritable()) {
-            // Notify SocketIoProcessor only when writeRequestQueue was empty.
+        if (getTrafficMask().isWritable()) {
             getIoProcessor().flush(this);
         }
     }

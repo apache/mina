@@ -30,8 +30,8 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 
 /**
@@ -41,14 +41,14 @@ import org.apache.mina.common.WriteRequest;
  * @version $Rev$, $Date$
  */
 class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
-    
-    static final TransportMetadata METADATA = 
-        new DefaultTransportMetadata(
-            "vmpipe", false, false,
-            VmPipeAddress.class,
-            VmPipeSessionConfig.class,
-            Object.class);
-    
+
+    static final TransportMetadata METADATA =
+            new DefaultTransportMetadata(
+                    "vmpipe", false, false,
+                    VmPipeAddress.class,
+                    VmPipeSessionConfig.class,
+                    Object.class);
+
     private static final VmPipeSessionConfig CONFIG = new DefaultVmPipeSessionConfig();
 
     private final IoService service;
@@ -71,12 +71,12 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
 
     final BlockingQueue<Object> pendingDataQueue;
 
-    /**
+    /*
      * Constructor for client-side session.
      */
     VmPipeSessionImpl(IoService service,
-            IoServiceListenerSupport serviceListeners,
-            VmPipeAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
+                      IoServiceListenerSupport serviceListeners,
+                      VmPipeAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
         this.service = service;
         this.serviceListeners = serviceListeners;
         this.lock = new Object();
@@ -89,7 +89,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
         remoteSession = new VmPipeSessionImpl(this, remoteEntry);
     }
 
-    /**
+    /*
      * Constructor for server-side session.
      */
     private VmPipeSessionImpl(VmPipeSessionImpl remoteSession, VmPipe entry) {
@@ -127,7 +127,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     public IoHandler getHandler() {
         return handler;
     }
-    
+
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
@@ -146,7 +146,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
         return 0;
     }
 
-    public int getScheduledWriteBytes() {
+    public long getScheduledWriteBytes() {
         return 0;
     }
 

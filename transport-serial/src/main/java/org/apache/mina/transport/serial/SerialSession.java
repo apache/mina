@@ -6,22 +6,18 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.serial;
-
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +27,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TooManyListenersException;
 
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultTransportMetadata;
@@ -39,9 +38,9 @@ import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,9 +75,9 @@ public class SerialSession extends AbstractIoSession implements
     private final Logger log;
 
     static final TransportMetadata METADATA =
-        new DefaultTransportMetadata(
-            "serial", false, true, SerialAddress.class,
-            SerialSessionConfig.class, ByteBuffer.class);
+            new DefaultTransportMetadata(
+                    "serial", false, true, SerialAddress.class,
+                    SerialSessionConfig.class, ByteBuffer.class);
 
     SerialSession(IoService service, SerialAddress address, SerialPort port) {
         this.service = service;
@@ -107,7 +106,7 @@ public class SerialSession extends AbstractIoSession implements
     public IoHandler getHandler() {
         return ioHandler;
     }
-    
+
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
@@ -131,10 +130,10 @@ public class SerialSession extends AbstractIoSession implements
                 Object message = request.getMessage();
                 if (message instanceof ByteBuffer) {
                     if (((ByteBuffer) message).hasRemaining()) {
-                        size ++;
+                        size++;
                     }
                 } else {
-                    size ++;
+                    size++;
                 }
             }
         }
@@ -142,7 +141,7 @@ public class SerialSession extends AbstractIoSession implements
         return size;
     }
 
-    public int getScheduledWriteBytes() {
+    public long getScheduledWriteBytes() {
         int size = 0;
         synchronized (writeRequestQueue) {
             for (Object o : writeRequestQueue) {
@@ -168,7 +167,7 @@ public class SerialSession extends AbstractIoSession implements
 
     /**
      * start handling streams
-     * 
+     *
      * @throws IOException
      * @throws TooManyListenersException
      */
@@ -205,7 +204,7 @@ public class SerialSession extends AbstractIoSession implements
     }
 
     private void flushWrites() {
-        for (;;) {
+        for (; ;) {
             WriteRequest req;
 
             synchronized (writeRequestQueue) {

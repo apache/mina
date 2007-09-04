@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -34,26 +34,26 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
-    
+
     static final TransportMetadata METADATA =
-        new DefaultTransportMetadata(
-                "datagram", true, false,
-                InetSocketAddress.class,
-                DatagramSessionConfig.class, ByteBuffer.class);
-    
+            new DefaultTransportMetadata(
+                    "datagram", true, false,
+                    InetSocketAddress.class,
+                    DatagramSessionConfig.class, ByteBuffer.class);
+
     private final IoService service;
 
     private final DatagramSessionConfig config = new SessionConfigImpl();
@@ -99,7 +99,7 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
      * Creates a new connector instance.
      */
     DatagramSessionImpl(DatagramConnector service,
-            DatagramChannel ch, IoHandler defaultHandler) {
+                        DatagramChannel ch, IoHandler defaultHandler) {
         this.service = service;
         this.ch = ch;
         this.handler = defaultHandler;
@@ -138,7 +138,7 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     public IoHandler getHandler() {
         return handler;
     }
-    
+
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
@@ -177,10 +177,10 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
                 Object message = request.getMessage();
                 if (message instanceof ByteBuffer) {
                     if (((ByteBuffer) message).hasRemaining()) {
-                        size ++;
+                        size++;
                     }
                 } else {
-                    size ++;
+                    size++;
                 }
             }
         }
@@ -188,7 +188,7 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         return size;
     }
 
-    public int getScheduledWriteBytes() {
+    public long getScheduledWriteBytes() {
         int size = 0;
         synchronized (writeRequestQueue) {
             for (Object o : writeRequestQueue) {
