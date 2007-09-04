@@ -53,7 +53,7 @@ public class IdleStatusChecker {
 
     private class Worker extends Thread {
         private Worker() {
-            super("VmPipeIdleStatusChecker");
+            super("IdleStatusChecker");
             setDaemon(true);
         }
 
