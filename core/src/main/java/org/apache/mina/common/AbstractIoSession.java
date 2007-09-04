@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -33,7 +33,7 @@ import java.util.Set;
 
 /**
  * Base implementation of {@link IoSession}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -45,12 +45,12 @@ public abstract class AbstractIoSession implements IoSession {
 
     private final long creationTime;
 
-    /** 
+    /**
      * A future that will be set 'closed' when the connection is closed.
      */
     private final CloseFuture closeFuture = new DefaultCloseFuture(this);
 
-    private boolean closing;
+    private volatile boolean closing;
 
     private TrafficMask trafficMask = TrafficMask.ALL;
 
@@ -89,9 +89,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     public boolean isClosing() {
-        synchronized (lock) {
-            return closing || closeFuture.isClosed();
-        }
+        return closing || closeFuture.isClosed();
     }
 
     public CloseFuture getCloseFuture() {
@@ -129,10 +127,8 @@ public abstract class AbstractIoSession implements IoSession {
             throw new NullPointerException("message");
         }
 
-        synchronized (lock) {
-            if (isClosing() || !isConnected()) {
-                return DefaultWriteFuture.newNotWrittenFuture(this);
-            }
+        if (isClosing() || !isConnected()) {
+            return DefaultWriteFuture.newNotWrittenFuture(this);
         }
 
         FileChannel channel = null;
@@ -157,10 +153,10 @@ public abstract class AbstractIoSession implements IoSession {
                 return DefaultWriteFuture.newNotWrittenFuture(this);
             }
         }
-        
+
         WriteFuture future = new DefaultWriteFuture(this);
         write0(new DefaultWriteRequest(message, future, remoteAddress));
-        
+
         if (message instanceof File) {
             final FileChannel finalChannel = channel;
             future.addListener(new IoFutureListener() {
@@ -180,9 +176,11 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * Implement this method to perform real write operation with
      * the specified <code>writeRequest</code>.
-     * 
+     * <p/>
      * By default, this method is implemented to set the future to
      * 'not written' immediately.
+     *
+     * @param writeRequest Write request to make
      */
     protected void write0(WriteRequest writeRequest) {
         writeRequest.getFuture().setWritten(false);
@@ -476,12 +474,12 @@ public abstract class AbstractIoSession implements IoSession {
             return getRemoteAddress();
         }
     }
-    
+
     @Override
     public final int hashCode() {
         return System.identityHashCode(this);
     }
-    
+
     @Override
     public final boolean equals(Object o) {
         return this == o;
@@ -491,15 +489,15 @@ public abstract class AbstractIoSession implements IoSession {
     public String toString() {
         if (getService() instanceof IoAcceptor) {
             return "(" + getServiceName() + ", server, " +
-                   getRemoteAddress() + " => " +
-                   getLocalAddress() + ')';
+                    getRemoteAddress() + " => " +
+                    getLocalAddress() + ')';
         } else {
             return "(" + getServiceName() + ", client, " +
-                   getLocalAddress() + " => " +
-                   getRemoteAddress() + ')';
+                    getLocalAddress() + " => " +
+                    getRemoteAddress() + ')';
         }
     }
-    
+
     private String getServiceName() {
         TransportMetadata tm = getTransportMetadata();
         if (tm == null) {
