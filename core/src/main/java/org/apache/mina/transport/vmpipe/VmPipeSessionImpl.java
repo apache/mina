@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.DefaultTransportMetadata;
@@ -67,7 +69,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
 
     private final VmPipeSessionImpl remoteSession;
 
-    final Object lock;
+    private final Lock lock;
 
     final BlockingQueue<Object> pendingDataQueue;
 
@@ -79,7 +81,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
                       VmPipeAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
         this.service = service;
         this.serviceListeners = serviceListeners;
-        this.lock = new Object();
+        this.lock = new ReentrantLock();
         this.localAddress = localAddress;
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
@@ -185,5 +187,9 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
                 }
             }
         }
+    }
+
+    Lock getLock() {
+        return lock;
     }
 }

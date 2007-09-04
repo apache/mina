@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.vmpipe;
 
@@ -24,22 +24,22 @@ import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.mina.common.AbstractIoFilterChain;
 import org.apache.mina.common.AbstractIoConnector;
+import org.apache.mina.common.AbstractIoFilterChain;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.TransportMetadata;
 
 /**
  * Connects to {@link IoHandler}s which is bound on the specified
  * {@link VmPipeAddress}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -63,7 +63,7 @@ public class VmPipeConnector extends AbstractIoConnector {
 
     @Override
     protected ConnectFuture doConnect(SocketAddress remoteAddress,
-            SocketAddress localAddress) {
+                                      SocketAddress localAddress) {
         VmPipe entry = VmPipeAcceptor.boundHandlers.get(remoteAddress);
         if (entry == null) {
             return DefaultConnectFuture.newFailedFuture(new IOException(
@@ -92,8 +92,7 @@ public class VmPipeConnector extends AbstractIoConnector {
             this.getFilterChainBuilder().buildFilterChain(filterChain);
 
             // The following sentences don't throw any exceptions.
-            localSession.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE,
-                    future);
+            localSession.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE, future);
             getListeners().fireSessionCreated(localSession);
             IdleStatusChecker.getInstance().addSession(localSession);
         } catch (Throwable t) {
@@ -116,6 +115,8 @@ public class VmPipeConnector extends AbstractIoConnector {
             remoteSession.close();
         }
 
+        // Start chains, and then allow and messages read/written to be processed. This is to ensure that
+        // sessionOpened gets received before a messageReceived
         ((VmPipeFilterChain) localSession.getFilterChain()).start();
         ((VmPipeFilterChain) remoteSession.getFilterChain()).start();
 
