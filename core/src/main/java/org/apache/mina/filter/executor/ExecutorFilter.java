@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.executor;
 
@@ -34,18 +34,18 @@ import org.slf4j.LoggerFactory;
  * A filter that forwards I/O events to {@link Executor} to enforce a certain
  * thread model while maintaining the event order.
  * You can apply various thread model by inserting this filter to the {@link IoFilterChain}.
- * <p>
+ * <p/>
  * Please note that this filter doesn't manage the life cycle of the underlying
  * {@link Executor}.  You have to destroy or stop it by yourself.
- * <p>
+ * <p/>
  * This filter maintains the order of events per session and thus make sure
  * only one thread per session executes the event.  For example, let's assume
  * that messageReceived, messageSent, and sessionClosed events are fired.
  * <ul>
  * <li>All event handler methods are called exclusively.
- *     (e.g. messageReceived and messageSent can't be invoked at the same time.)</li>
+ * (e.g. messageReceived and messageSent can't be invoked at the same time.)</li>
  * <li>The event order is never mixed up.
- *     (e.g. messageReceived is always invoked before sessionClosed or messageSent.)</li>
+ * (e.g. messageReceived is always invoked before sessionClosed or messageSent.)</li>
  * </ul>
  * If you don't need to maintain the order of events per session, please use
  * {@link UnorderedExecutorFilter}.
@@ -57,7 +57,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExecutorFilter() {
-        super(  IoEventType.SESSION_OPENED,
+        super(IoEventType.SESSION_OPENED,
                 IoEventType.SESSION_IDLE,
                 IoEventType.SESSION_CLOSED,
                 IoEventType.MESSAGE_RECEIVED,
@@ -89,7 +89,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
 
         boolean execute;
         synchronized (buf.eventQueue) {
-            buf.eventQueue.offer(event);
+            buf.eventQueue.add(event);
             if (buf.processingCompleted) {
                 buf.processingCompleted = false;
                 execute = true;

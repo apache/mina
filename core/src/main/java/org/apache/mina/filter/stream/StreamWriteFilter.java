@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.stream;
 
@@ -32,26 +32,26 @@ import org.apache.mina.common.WriteRequest;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
- * objects directly using {@link IoSession#write(Object)}. When an 
+ * objects directly using {@link IoSession#write(Object)}. When an
  * {@link InputStream} is written to a session this filter will read the bytes
  * from the stream into {@link ByteBuffer} objects and write those buffers
  * to the next filter. When end of stream has been reached this filter will
- * call {@link NextFilter#messageSent(IoSession, WriteRequest)} using the original
- * {@link InputStream} written to the session and notifies 
- * {@link org.apache.mina.common.WriteFuture} on the 
+ * call {@link NextFilter#messageSent(IoSession,WriteRequest)} using the original
+ * {@link InputStream} written to the session and notifies
+ * {@link org.apache.mina.common.WriteFuture} on the
  * original {@link org.apache.mina.common.WriteRequest}.
- * <p>
+ * <p/>
  * This filter will ignore written messages which aren't {@link InputStream}
  * instances. Such messages will be passed to the next filter directly.
  * </p>
- * <p>
+ * <p/>
  * NOTE: this filter does not close the stream after all data from stream
  * has been written. The {@link org.apache.mina.common.IoHandler} should take
- * care of that in its 
- * {@link org.apache.mina.common.IoHandler#messageSent(IoSession, Object)} 
+ * care of that in its
+ * {@link org.apache.mina.common.IoHandler#messageSent(IoSession,Object)}
  * callback.
  * </p>
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -80,7 +80,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
 
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+                            WriteRequest writeRequest) throws Exception {
         // If we're already processing a stream we need to queue the WriteRequest.
         if (session.getAttribute(CURRENT_STREAM) != null) {
             Queue<WriteRequest> queue = getWriteRequestQueue(session);
@@ -88,7 +88,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
                 queue = new LinkedList<WriteRequest>();
                 session.setAttribute(WRITE_REQUEST_QUEUE, queue);
             }
-            queue.offer(writeRequest);
+            queue.add(writeRequest);
             return;
         }
 
@@ -123,7 +123,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
 
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+                            WriteRequest writeRequest) throws Exception {
         InputStream inputStream = (InputStream) session
                 .getAttribute(CURRENT_STREAM);
 
@@ -178,9 +178,9 @@ public class StreamWriteFilter extends IoFilterAdapter {
     }
 
     /**
-     * Returns the size of the write buffer in bytes. Data will be read from the 
+     * Returns the size of the write buffer in bytes. Data will be read from the
      * stream in chunks of this size and then written to the next filter.
-     * 
+     *
      * @return the write buffer size.
      */
     public int getWriteBufferSize() {
@@ -188,9 +188,9 @@ public class StreamWriteFilter extends IoFilterAdapter {
     }
 
     /**
-     * Sets the size of the write buffer in bytes. Data will be read from the 
+     * Sets the size of the write buffer in bytes. Data will be read from the
      * stream in chunks of this size and then written to the next filter.
-     * 
+     *
      * @throws IllegalArgumentException if the specified size is &lt; 1.
      */
     public void setWriteBufferSize(int writeBufferSize) {

@@ -19,32 +19,31 @@
  */
 package org.apache.mina.filter.ssl;
 
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoEventType;
+import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.IoFilter.NextFilter;
 
 /**
  * A helper class using the SSLEngine API to decrypt/encrypt data.
- * <p>
+ * <p/>
  * Each connection has a SSLEngine that is used through the lifetime of the connection.
  * We allocate byte buffers for use as the outbound and inbound network buffers.
  * These buffers handle all of the intermediary data for the SSL connection. To make things easy,
@@ -63,7 +62,7 @@ class SSLHandler {
     private final Queue<IoFilterEvent> preHandshakeEventQueue = new LinkedList<IoFilterEvent>();
 
     private final Queue<IoFilterEvent> filterWriteEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
-    
+
     private final Queue<IoFilterEvent> messageReceivedEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
 
     private SSLEngine sslEngine;
@@ -94,7 +93,7 @@ class SSLHandler {
     private SSLEngineResult.HandshakeStatus handshakeStatus;
 
     private boolean initialHandshakeComplete;
-    
+
     /**
      * Handshake complete?
      */
@@ -231,8 +230,8 @@ class SSLHandler {
     }
 
     public void schedulePreHandshakeWriteRequest(NextFilter nextFilter,
-            WriteRequest writeRequest) {
-        preHandshakeEventQueue.offer(new IoFilterEvent(nextFilter,
+                                                 WriteRequest writeRequest) {
+        preHandshakeEventQueue.add(new IoFilterEvent(nextFilter,
                 IoEventType.WRITE, session, writeRequest));
     }
 
@@ -249,16 +248,12 @@ class SSLHandler {
         }
     }
 
-    public void scheduleFilterWrite(NextFilter nextFilter,
-            WriteRequest writeRequest) {
-        filterWriteEventQueue.offer(new IoFilterEvent(nextFilter,
-                IoEventType.WRITE, session, writeRequest));
+    public void scheduleFilterWrite(NextFilter nextFilter, WriteRequest writeRequest) {
+        filterWriteEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
     }
 
-    public void scheduleMessageReceived(NextFilter nextFilter,
-            Object message) {
-        messageReceivedEventQueue.offer(new IoFilterEvent(nextFilter,
-                IoEventType.MESSAGE_RECEIVED, session, message));
+    public void scheduleMessageReceived(NextFilter nextFilter, Object message) {
+        messageReceivedEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
     }
 
     public void flushScheduledEvents() {
@@ -268,7 +263,7 @@ class SSLHandler {
         }
 
         IoFilterEvent e;
-        
+
         // We need synchronization here inevitably because filterWrite can be
         // called simultaneously and cause 'bad record MAC' integrity error.
         synchronized (this) {
@@ -287,11 +282,11 @@ class SSLHandler {
      * Buffer.
      * Decrytpted data reurned by getAppBuffer(), if any.
      *
-     * @param buf buffer to decrypt
+     * @param buf        buffer to decrypt
+     * @param nextFilter Next filter in chain
      * @throws SSLException on errors
      */
-    public void messageReceived(NextFilter nextFilter, ByteBuffer buf)
-            throws SSLException {
+    public void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
         if (buf.limit() > inNetBuffer.remaining()) {
             // We have to expand inNetBuffer
             inNetBuffer = SSLByteBufferUtil.expandBuffer(inNetBuffer,
@@ -394,7 +389,6 @@ class SSLHandler {
      *
      * @return <tt>true</tt> if shutdown process is started.
      *         <tt>false</tt> if shutdown process is already finished.
-     *
      * @throws SSLException on errors
      */
     public boolean closeOutbound() throws SSLException {
@@ -430,22 +424,22 @@ class SSLHandler {
     }
 
     /**
-     * @param status
+     * @param res
      * @throws SSLException
      */
     private void checkStatus(SSLEngineResult res)
             throws SSLException {
-        
+
         SSLEngineResult.Status status = res.getStatus();
-        
+
         /*
-         * The status may be:
-         * OK - Normal operation
-         * OVERFLOW - Should never happen since the application buffer is
-         *      sized to hold the maximum packet size.
-         * UNDERFLOW - Need to read more data from the socket. It's normal.
-         * CLOSED - The other peer closed the socket. Also normal.
-         */
+        * The status may be:
+        * OK - Normal operation
+        * OVERFLOW - Should never happen since the application buffer is
+        *      sized to hold the maximum packet size.
+        * UNDERFLOW - Need to read more data from the socket. It's normal.
+        * CLOSED - The other peer closed the socket. Also normal.
+        */
         if (status != SSLEngineResult.Status.OK
                 && status != SSLEngineResult.Status.CLOSED
                 && status != SSLEngineResult.Status.BUFFER_UNDERFLOW) {
@@ -463,7 +457,7 @@ class SSLHandler {
             IoSessionLogger.debug(session, " doHandshake()");
         }
 
-        for (;;) {
+        for (; ;) {
             if (handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED) {
                 session.setAttribute(SSLFilter.SSL_SESSION, sslEngine
                         .getSession());
@@ -606,9 +600,9 @@ class SSLHandler {
 
         // prepare to be written again
         inNetBuffer.compact();
-        
+
         checkStatus(res);
-        
+
         renegotiateIfNeeded(nextFilter, res);
     }
 
@@ -631,7 +625,7 @@ class SSLHandler {
                 && res.getStatus() == SSLEngineResult.Status.OK
                 && inNetBuffer.hasRemaining()) {
             res = unwrap0();
-            
+
             // prepare to be written again
             inNetBuffer.compact();
 
@@ -670,8 +664,8 @@ class SSLHandler {
             }
         } while (res.getStatus() == SSLEngineResult.Status.OK
                 && (handshakeComplete && res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING
-                        || res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP));
-        
+                || res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP));
+
         return res;
     }
 

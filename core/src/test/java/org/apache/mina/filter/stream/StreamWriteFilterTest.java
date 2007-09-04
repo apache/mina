@@ -275,9 +275,9 @@ public class StreamWriteFilterTest extends TestCase {
                 new DefaultWriteRequest(new Object(), new DummyWriteFuture()),
                 new DefaultWriteRequest(new Object(), new DummyWriteFuture()) };
         Queue<WriteRequest> queue = new LinkedList<WriteRequest>();
-        queue.offer(wrs[0]);
-        queue.offer(wrs[1]);
-        queue.offer(wrs[2]);
+        queue.add(wrs[0]);
+        queue.add(wrs[1]);
+        queue.add(wrs[2]);
         InputStream stream = new ByteArrayInputStream(BUF);
 
         /*

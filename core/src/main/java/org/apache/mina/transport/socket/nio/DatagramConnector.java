@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -37,16 +37,16 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -112,7 +112,7 @@ public class DatagramConnector extends AbstractIoConnector {
 
     @Override
     protected ConnectFuture doConnect(SocketAddress remoteAddress,
-            SocketAddress localAddress) {
+                                      SocketAddress localAddress) {
         DatagramChannel ch = null;
         boolean initialized = false;
         try {
@@ -150,7 +150,7 @@ public class DatagramConnector extends AbstractIoConnector {
         RegistrationRequest request = new RegistrationRequest(ch);
 
         startupWorker();
-        registerQueue.offer(request);
+        registerQueue.add(request);
         selector.wakeup();
 
         return request;
@@ -165,7 +165,7 @@ public class DatagramConnector extends AbstractIoConnector {
 
     void closeSession(DatagramSessionImpl session) {
         startupWorker();
-        cancelQueue.offer(session);
+        cancelQueue.add(session);
         selector.wakeup();
     }
 
@@ -178,7 +178,7 @@ public class DatagramConnector extends AbstractIoConnector {
     }
 
     private void scheduleFlush(DatagramSessionImpl session) {
-        flushingSessions.offer(session);
+        flushingSessions.add(session);
     }
 
     void updateTrafficMask(DatagramSessionImpl session) {
@@ -191,11 +191,11 @@ public class DatagramConnector extends AbstractIoConnector {
     }
 
     private void scheduleTrafficControl(DatagramSessionImpl session) {
-        trafficControllingSessions.offer(session);
+        trafficControllingSessions.add(session);
     }
 
     private void doUpdateTrafficMask() {
-        for (;;) {
+        for (; ;) {
             DatagramSessionImpl session = trafficControllingSessions.poll();
             if (session == null) {
                 break;
@@ -203,7 +203,7 @@ public class DatagramConnector extends AbstractIoConnector {
 
             SelectionKey key = session.getSelectionKey();
             // Retry later if session is not yet fully initialized.
-            // (In case that Session.suspend??() or session.resume??() is 
+            // (In case that Session.suspend??() or session.resume??() is
             // called before addSession() is processed)
             if (key == null) {
                 scheduleTrafficControl(session);
@@ -235,7 +235,7 @@ public class DatagramConnector extends AbstractIoConnector {
         public void run() {
             Thread.currentThread().setName("DatagramConnector-" + id);
 
-            for (;;) {
+            for (; ;) {
                 try {
                     int nKeys = selector.select();
 
@@ -310,7 +310,7 @@ public class DatagramConnector extends AbstractIoConnector {
     }
 
     private void flushSessions() {
-        for (;;) {
+        for (; ;) {
             DatagramSessionImpl session = flushingSessions.poll();
             if (session == null) {
                 break;
@@ -342,29 +342,29 @@ public class DatagramConnector extends AbstractIoConnector {
         int writtenBytes = 0;
         int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
         try {
-            for (;;) {
+            for (; ;) {
                 WriteRequest req;
                 synchronized (writeRequestQueue) {
                     req = writeRequestQueue.peek();
                 }
-    
+
                 if (req == null) {
                     break;
                 }
-    
+
                 ByteBuffer buf = (ByteBuffer) req.getMessage();
                 if (buf.remaining() == 0) {
                     // pop and fire event
                     synchronized (writeRequestQueue) {
                         writeRequestQueue.poll();
                     }
-    
+
                     session.increaseWrittenMessages();
                     buf.reset();
                     session.getFilterChain().fireMessageSent(session, req);
                     continue;
                 }
-    
+
                 int localWrittenBytes = ch.write(buf.buf());
                 if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much
@@ -372,12 +372,12 @@ public class DatagramConnector extends AbstractIoConnector {
                     break;
                 } else {
                     key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
-    
+
                     // pop and fire event
                     synchronized (writeRequestQueue) {
                         writeRequestQueue.poll();
                     }
-    
+
                     writtenBytes += localWrittenBytes;
                     session.increaseWrittenMessages();
                     buf.reset();
@@ -390,7 +390,7 @@ public class DatagramConnector extends AbstractIoConnector {
     }
 
     private void registerNew() {
-        for (;;) {
+        for (; ;) {
             RegistrationRequest req = registerQueue.poll();
             if (req == null) {
                 break;
@@ -433,7 +433,7 @@ public class DatagramConnector extends AbstractIoConnector {
     }
 
     private void cancelKeys() {
-        for (;;) {
+        for (; ;) {
             DatagramSessionImpl session = cancelQueue.poll();
             if (session == null) {
                 break;

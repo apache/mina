@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -45,7 +45,7 @@ import org.apache.mina.util.NewThreadExecutor;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).  This class
- * handles incoming TCP/IP based socket connections.   
+ * handles incoming TCP/IP based socket connections.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
@@ -92,11 +92,10 @@ public class SocketAcceptor extends AbstractIoAcceptor {
     }
 
     /**
-     * Creates an acceptor with a processing thread count set to the 
+     * Creates an acceptor with a processing thread count set to the
      * number of available processors + 1 and the submitted executor
-     * 
-     * @param executor 
-     * 	Executor to use for launching threads
+     *
+     * @param executor Executor to use for launching threads
      */
     public SocketAcceptor(Executor executor) {
         this(Runtime.getRuntime().availableProcessors() + 1, executor);
@@ -106,7 +105,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
      * Create an acceptor with the desired number of processing threads
      *
      * @param processorCount Number of processing threads
-     * @param executor Executor to use for launching threads
+     * @param executor       Executor to use for launching threads
      */
     public SocketAcceptor(int processorCount, Executor executor) {
         super(new DefaultSocketSessionConfig());
@@ -251,11 +250,11 @@ public class SocketAcceptor extends AbstractIoAcceptor {
     protected void doBind() throws IOException {
         RegistrationRequest request = new RegistrationRequest();
 
-        // adds the Registration request to the queue for the Workers 
+        // adds the Registration request to the queue for the Workers
         // to handle
-        registerQueue.offer(request);
+        registerQueue.add(request);
 
-        // creates an instance of a Worker and has the local 
+        // creates an instance of a Worker and has the local
         // executor kick it off.
         startupWorker();
 
@@ -290,7 +289,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
     }
 
     /**
-     * This method is called by the doBind() and doUnbind() 
+     * This method is called by the doBind() and doUnbind()
      * methods.  If the worker object is not null, presumably
      * the acceptor is starting up, then the worker object will
      * be created and kicked off by the executor.  If the worker
@@ -312,7 +311,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
     protected void doUnbind() {
         CancellationRequest request = new CancellationRequest();
 
-        cancelQueue.offer(request);
+        cancelQueue.add(request);
         startupWorker();
         selector.wakeup();
 
@@ -341,7 +340,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
         public void run() {
             Thread.currentThread().setName(SocketAcceptor.this.threadName);
 
-            for (;;) {
+            for (; ;) {
                 try {
                     // gets the number of keys that are ready to go
                     int nKeys = selector.select();
@@ -383,12 +382,11 @@ public class SocketAcceptor extends AbstractIoAcceptor {
         /**
          * This method will process new sessions for the Worker class.  All
          * keys that have had their status updates as per the Selector.selectedKeys()
-         * method will be processed here.  Only keys that are ready to accept 
-         * connections are handled here.  
-         * 
+         * method will be processed here.  Only keys that are ready to accept
+         * connections are handled here.
+         * <p/>
          * Session objects are created by making new instances of SocketSessionImpl
          * and passing the session object to the SocketIoProcessor class.
-         *
          */
         private void processSessions(Set<SelectionKey> keys) throws IOException {
             Iterator<SelectionKey> it = keys.iterator();
@@ -412,15 +410,15 @@ public class SocketAcceptor extends AbstractIoAcceptor {
 
                 boolean success = false;
                 try {
-                    // Create a new session object.  This class extends 
+                    // Create a new session object.  This class extends
                     // BaseIoSession and is custom for socket-based sessions.
                     SocketSessionImpl session = new SocketSessionImpl(
                             SocketAcceptor.this, nextProcessor(), ch);
-                    
-                    // build the list of filters for this session.  
+
+                    // build the list of filters for this session.
                     getFilterChainBuilder().buildFilterChain(
                             session.getFilterChain());
-                    
+
                     // add the session to the SocketIoProcessor
                     session.getIoProcessor().addNew(session);
                     success = true;
@@ -445,7 +443,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
 
     /**
      * Sets up the socket communications.  Sets items such as:
-     * 
+     * <p/>
      * Blocking
      * Reuse address
      * Receive buffer size
@@ -453,7 +451,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
      * Registers OP_ACCEPT for selector
      */
     private void registerNew() {
-        for (;;) {
+        for (; ;) {
             RegistrationRequest req = registerQueue.poll();
             if (req == null) {
                 break;
@@ -506,7 +504,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
      * the doUnbind() method.
      */
     private void cancelKeys() {
-        for (;;) {
+        for (; ;) {
             CancellationRequest request = cancelQueue.poll();
             if (request == null) {
                 break;

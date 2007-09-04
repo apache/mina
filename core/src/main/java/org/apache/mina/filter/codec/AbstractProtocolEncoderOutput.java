@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec;
 
@@ -43,7 +43,7 @@ public abstract class AbstractProtocolEncoderOutput implements
 
     public void write(ByteBuffer buf) {
         if (buf.hasRemaining()) {
-            bufferQueue.offer(buf);
+            bufferQueue.add(buf);
         } else {
             throw new IllegalArgumentException(
                     "buf is empty. Forgot to call flip()?");
@@ -51,7 +51,6 @@ public abstract class AbstractProtocolEncoderOutput implements
     }
 
     public void mergeAll() {
-        int sum = 0;
         final int size = bufferQueue.size();
 
         if (size < 2) {
@@ -60,6 +59,7 @@ public abstract class AbstractProtocolEncoderOutput implements
         }
 
         // Get the size of merged BB
+        int sum = 0;
         for (ByteBuffer b : bufferQueue) {
             sum += b.remaining();
         }
@@ -68,7 +68,7 @@ public abstract class AbstractProtocolEncoderOutput implements
         ByteBuffer newBuf = ByteBuffer.allocate(sum);
 
         // and merge all.
-        for (;;) {
+        for (; ;) {
             ByteBuffer buf = bufferQueue.poll();
             if (buf == null) {
                 break;
@@ -79,6 +79,6 @@ public abstract class AbstractProtocolEncoderOutput implements
 
         // Push the new buffer finally.
         newBuf.flip();
-        bufferQueue.offer(newBuf);
+        bufferQueue.add(newBuf);
     }
 }

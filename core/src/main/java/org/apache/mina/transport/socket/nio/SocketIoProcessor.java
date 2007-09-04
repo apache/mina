@@ -88,7 +88,7 @@ class SocketIoProcessor {
     }
 
     void addNew(SocketSessionImpl session) {
-        newSessions.offer(session);
+        newSessions.add(session);
 
         startupWorker();
     }
@@ -121,7 +121,7 @@ class SocketIoProcessor {
     }
 
     private void scheduleRemove(SocketSessionImpl session) {
-        removingSessions.offer(session);
+        removingSessions.add(session);
     }
 
     private boolean scheduleFlush(SocketSessionImpl session) {
@@ -135,7 +135,7 @@ class SocketIoProcessor {
     }
 
     private void scheduleTrafficControl(SocketSessionImpl session) {
-        trafficControllingSessions.offer(session);
+        trafficControllingSessions.add(session);
     }
 
     private void doAddNew() {

@@ -50,7 +50,7 @@ class VmPipeFilterChain extends AbstractIoFilterChain {
     }
 
     private void pushEvent(Event e) {
-        eventQueue.offer(e);
+        eventQueue.add(e);
         if (flushEnabled) {
             flushEvents();
         }
@@ -73,7 +73,7 @@ class VmPipeFilterChain extends AbstractIoFilterChain {
             if (sessionOpened && s.getTrafficMask().isReadable() && s.getLock().tryLock()) {
                 try {
                     if (!s.getTrafficMask().isReadable()) {
-                        s.pendingDataQueue.offer(data);
+                        s.pendingDataQueue.add(data);
                     } else {
                         int byteCount = 1;
                         if (data instanceof ByteBuffer) {
@@ -194,7 +194,7 @@ class VmPipeFilterChain extends AbstractIoFilterChain {
 
                 flushPendingDataQueues(s);
             } else {
-                s.pendingDataQueue.offer(writeRequest);
+                s.pendingDataQueue.add(writeRequest);
             }
         } else {
             writeRequest.getFuture().setWritten(false);

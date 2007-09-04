@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -25,14 +25,13 @@ import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.AbstractIoFilterChain;
 import org.apache.mina.common.AbstractIoConnector;
+import org.apache.mina.common.AbstractIoFilterChain;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
@@ -78,7 +77,7 @@ public class SocketConnector extends AbstractIoConnector {
     private int workerTimeout = 60; // 1 min.
 
     /**
-     * Create a connector with a single processing thread using a NewThreadExecutor 
+     * Create a connector with a single processing thread using a NewThreadExecutor
      */
     public SocketConnector() {
         this(1, new NewThreadExecutor());
@@ -88,7 +87,7 @@ public class SocketConnector extends AbstractIoConnector {
      * Create a connector with the desired number of processing threads
      *
      * @param processorCount Number of processing threads
-     * @param executor Executor to use for launching threads
+     * @param executor       Executor to use for launching threads
      */
     public SocketConnector(int processorCount, Executor executor) {
         super(new DefaultSocketSessionConfig());
@@ -155,7 +154,7 @@ public class SocketConnector extends AbstractIoConnector {
 
     @Override
     protected ConnectFuture doConnect(SocketAddress remoteAddress,
-            SocketAddress localAddress) {
+                                      SocketAddress localAddress) {
         SocketChannel ch = null;
         boolean success = false;
         try {
@@ -190,7 +189,7 @@ public class SocketConnector extends AbstractIoConnector {
         ConnectionRequest request = new ConnectionRequest(ch);
         startupWorker();
 
-        connectQueue.offer(request);
+        connectQueue.add(request);
         selector.wakeup();
 
         return request;
@@ -206,7 +205,7 @@ public class SocketConnector extends AbstractIoConnector {
     }
 
     private void registerNew() {
-        for (;;) {
+        for (; ;) {
             ConnectionRequest req = connectQueue.poll();
             if (req == null) {
                 break;
@@ -222,11 +221,7 @@ public class SocketConnector extends AbstractIoConnector {
     }
 
     private void processSessions(Set<SelectionKey> keys) {
-        Iterator<SelectionKey> it = keys.iterator();
-
-        while (it.hasNext()) {
-            SelectionKey key = it.next();
-
+        for (SelectionKey key : keys) {
             if (!key.isConnectable()) {
                 continue;
             }
@@ -258,11 +253,8 @@ public class SocketConnector extends AbstractIoConnector {
 
     private void processTimedOutSessions(Set<SelectionKey> keys) {
         long currentTime = System.currentTimeMillis();
-        Iterator<SelectionKey> it = keys.iterator();
 
-        while (it.hasNext()) {
-            SelectionKey key = it.next();
-
+        for (SelectionKey key : keys) {
             if (!key.isValid()) {
                 continue;
             }
@@ -317,7 +309,7 @@ public class SocketConnector extends AbstractIoConnector {
         public void run() {
             Thread.currentThread().setName(SocketConnector.this.threadName);
 
-            for (;;) {
+            for (; ;) {
                 try {
                     int nKeys = selector.select(1000);
 

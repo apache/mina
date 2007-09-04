@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -37,17 +37,17 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.ExpiringIoSessionRecycler;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoServiceListenerSupport;
-import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -74,7 +74,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     private final Queue<DatagramSessionImpl> flushingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
 
     private Worker worker;
-    
+
     /**
      * Creates a new instance.
      */
@@ -129,7 +129,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         RegistrationRequest request = new RegistrationRequest();
 
         startupWorker();
-        registerQueue.offer(request);
+        registerQueue.add(request);
         selector.wakeup();
 
         synchronized (request) {
@@ -154,7 +154,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         CancellationRequest request = new CancellationRequest();
 
         startupWorker();
-        cancelQueue.offer(request);
+        cancelQueue.add(request);
         selector.wakeup();
 
         synchronized (request) {
@@ -228,7 +228,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
     /**
      * Sets the {@link IoSessionRecycler} for this service.
-     * 
+     *
      * @param sessionRecycler <tt>null</tt> to use the default recycler
      */
     public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
@@ -270,14 +270,14 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     }
 
     private void scheduleFlush(DatagramSessionImpl session) {
-        flushingSessions.offer(session);
+        flushingSessions.add(session);
     }
 
     private class Worker implements Runnable {
         public void run() {
             Thread.currentThread().setName("DatagramAcceptor-" + id);
 
-            for (;;) {
+            for (; ;) {
                 try {
                     int nKeys = selector.select();
 
@@ -356,7 +356,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     }
 
     private void flushSessions() {
-        for (;;) {
+        for (; ;) {
             DatagramSessionImpl session = flushingSessions.poll();
             if (session == null) {
                 break;
@@ -388,35 +388,35 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         int writtenBytes = 0;
         int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
         try {
-            for (;;) {
+            for (; ;) {
                 WriteRequest req;
                 synchronized (writeRequestQueue) {
                     req = writeRequestQueue.peek();
                 }
-    
+
                 if (req == null) {
                     break;
                 }
-    
+
                 ByteBuffer buf = (ByteBuffer) req.getMessage();
                 if (buf.remaining() == 0) {
                     // pop and fire event
                     synchronized (writeRequestQueue) {
                         writeRequestQueue.poll();
                     }
-    
+
                     session.increaseWrittenMessages();
                     buf.reset();
                     ((DatagramFilterChain) session.getFilterChain())
                             .fireMessageSent(session, req);
                     continue;
                 }
-    
+
                 SocketAddress destination = req.getDestination();
                 if (destination == null) {
                     destination = session.getRemoteAddress();
                 }
-    
+
                 int localWrittenBytes = ch.send(buf.buf(), destination);
                 if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much
@@ -424,12 +424,12 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                     break;
                 } else {
                     key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
-    
+
                     // pop and fire event
                     synchronized (writeRequestQueue) {
                         writeRequestQueue.poll();
                     }
-    
+
                     writtenBytes += localWrittenBytes;
                     session.increaseWrittenMessages();
                     buf.reset();
@@ -446,7 +446,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
             return;
         }
 
-        for (;;) {
+        for (; ;) {
             RegistrationRequest req = registerQueue.poll();
             if (req == null) {
                 break;
@@ -492,7 +492,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     }
 
     private void cancelKeys() {
-        for (;;) {
+        for (; ;) {
             CancellationRequest request = cancelQueue.poll();
             if (request == null) {
                 break;
