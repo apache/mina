@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 public class SerialSession extends AbstractIoSession implements
         SerialPortEventListener {
 
-    private SerialSessionConfig config;
+    private SerialSessionConfig config = new DefaultSerialSessionConfig();
 
     private final IoHandler ioHandler;
 
