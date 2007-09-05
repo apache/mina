@@ -26,8 +26,6 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.DummySession;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
