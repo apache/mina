@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
