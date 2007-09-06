@@ -122,8 +122,11 @@ public class HttpRequestEncoder extends ProtocolEncoderAdapter
             //This header is required for HTTP/1.1
             buf.putString( "Host: ", encoder );
             buf.putString( url.getHost(), encoder );
-            buf.putString( ":", encoder );
-            buf.putString( url.getPort() + "", encoder );
+            if ((url.getProtocol().equals("http") && url.getPort() != 80 && url.getPort() != -1) &&
+                    (url.getProtocol().equals("https") && url.getPort() != 443 && url.getPort() != -1)) {
+                buf.putString(":", encoder);
+                buf.putString(url.getPort() + "", encoder);
+            }
             buf.put( CRLF );
 
             //Process any headers we have

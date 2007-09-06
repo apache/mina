@@ -243,6 +243,9 @@ public class HttpDecoder
                 cookie.setExpires( DateUtil.parseDate( nameValue[1] ) );
             }
 
+            if (name.equalsIgnoreCase(COOKIE_DOMAIN)) {
+                cookie.setDomain(nameValue[1]);
+            }
         }
 
         return cookie;
