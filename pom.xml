@@ -94,6 +94,9 @@
     <module>integration-jmx</module>
     <module>example</module>
     <module>transport-serial</module>
+    <module>mina-filter-codec-http</module>
+    <module>mina-protocol-client-http</module>
+    <module>mina-protocol-server-http</module>
   </modules>
   
   <build>

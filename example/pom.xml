@@ -23,6 +23,12 @@
       <version>${pom.version}</version>
       <scope>compile</scope>
     </dependency>
+
+   <dependency>
+     <groupId>org.apache.mina</groupId>
+     <artifactId>mina-protocol-client-http</artifactId>
+     <version>${pom.version}</version>
+   </dependency>
     
     <dependency>
       <groupId>org.slf4j</groupId>
