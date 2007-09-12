@@ -198,6 +198,22 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
     AtomicBoolean getInFlushQueue() {
         return inFlushQueue;
     }
+    
+    void queueWriteRequest(WriteRequest writeRequest) {
+        if (writeRequest.getMessage() instanceof ByteBuffer) {
+            ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
+            // SocketIoProcessor.doFlush() will reset it after write is finished
+            // because the buffer will be passed with messageSent event.
+            buffer.mark();
+            scheduledWriteBytes.addAndGet(buffer.remaining());
+        }
+
+        writeRequestQueue.add(writeRequest);
+
+        if (getTrafficMask().isWritable()) {
+            getIoProcessor().flush(this);
+        }
+    }
 
     private class SessionConfigImpl extends AbstractSocketSessionConfig implements SocketSessionConfig {
         public boolean isKeepAlive() {
@@ -343,22 +359,6 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
                     throw new RuntimeIOException(e);
                 }
             }
-        }
-    }
-
-    void queueWriteRequest(WriteRequest writeRequest) {
-        if (writeRequest.getMessage() instanceof ByteBuffer) {
-            ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
-            // SocketIoProcessor.doFlush() will reset it after write is finished
-            // because the buffer will be passed with messageSent event.
-            buffer.mark();
-            scheduledWriteBytes.addAndGet(buffer.remaining());
-        }
-
-        writeRequestQueue.add(writeRequest);
-
-        if (getTrafficMask().isWritable()) {
-            getIoProcessor().flush(this);
         }
     }
 }
