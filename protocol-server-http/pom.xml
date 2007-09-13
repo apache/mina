@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <artifactId>build</artifactId>
+    <groupId>org.apache.mina</groupId>
+    <version>2.0.0-M1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>mina-protocol-server-http</artifactId>
+  <name>mina-protocol-server-http</name>
+  <dependencies>
+  </dependencies>
+</project>

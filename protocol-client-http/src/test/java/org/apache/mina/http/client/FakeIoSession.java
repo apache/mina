@@ -258,13 +258,13 @@ public class FakeIoSession implements IoSession
     }
 
 
-    public int getScheduledWriteRequests()
+    public long getScheduledWriteRequests()
     {
         return 0;
     }
 
 
-    public int getScheduledWriteBytes()
+    public long getScheduledWriteBytes()
     {
         return 0;
     }

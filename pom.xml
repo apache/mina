@@ -88,15 +88,15 @@
 
   <modules>
     <module>core</module>
-    <module>filter-codec-netty</module>
+    <module>transport-serial</module>
     <module>filter-compression</module>
+    <module>filter-codec-netty</module>
+    <module>filter-codec-http</module>
+    <module>protocol-client-http</module>
+    <module>protocol-server-http</module>
     <module>integration-spring</module>
     <module>integration-jmx</module>
     <module>example</module>
-    <module>transport-serial</module>
-    <module>mina-filter-codec-http</module>
-    <module>mina-protocol-client-http</module>
-    <module>mina-protocol-server-http</module>
   </modules>
   
   <build>
