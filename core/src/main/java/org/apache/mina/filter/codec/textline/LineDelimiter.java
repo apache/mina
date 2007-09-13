@@ -65,6 +65,12 @@ public class LineDelimiter {
      */
     public static final LineDelimiter MAC = new LineDelimiter("\r");
 
+    /**
+     * The line delimiter constant for NUL-terminated text protocols
+     * such as Flash XML socket (<tt>"\0"</tt>)
+     */
+    public static final LineDelimiter NUL = new LineDelimiter("\0");
+
     private final String value;
 
     /**
