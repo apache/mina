@@ -21,6 +21,7 @@ package org.apache.mina.example.netcat;
 
 import java.net.InetSocketAddress;
 
+import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 /**
@@ -46,7 +47,11 @@ public class Main {
 
         // Start communication.
         connector.setHandler(new NetCatProtocolHandler());
-        connector.connect(new InetSocketAddress(args[0], Integer
-                .parseInt(args[1])));
+        ConnectFuture cf = connector.connect(
+                new InetSocketAddress(args[0], Integer.parseInt(args[1])));
+
+        // Wait for the connection attempt to be finished.
+        cf.await();
+        cf.getSession();
     }
 }
