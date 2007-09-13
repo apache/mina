@@ -293,9 +293,11 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             } else if (result == MessageDecoder.NEED_DATA) {
                 return false;
             } else if (result == MessageDecoder.NOT_OK) {
+                currentDecoder = null;
                 throw new ProtocolDecoderException(
                         "Message decoder returned NOT_OK.");
             } else {
+                currentDecoder = null;
                 throw new IllegalStateException(
                         "Unexpected decode result (see your decode()): "
                                 + result);
