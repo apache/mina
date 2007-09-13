@@ -1,0 +1,1 @@
+<%= request.getParameter("TEST1") %> <%= request.getParameter("TEST2") %>
