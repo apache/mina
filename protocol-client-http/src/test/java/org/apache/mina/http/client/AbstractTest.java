@@ -32,7 +32,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Embedded;
 
 
-public class AbstractTest extends TestCase
+public abstract class AbstractTest extends TestCase
 {
 
     protected final File BASEDIR = getBaseDir();

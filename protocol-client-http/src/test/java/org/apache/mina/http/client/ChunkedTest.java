@@ -25,7 +25,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.http.codec.HttpResponseDecoder;
 import org.apache.mina.http.codec.HttpResponseMessage;
 
@@ -48,12 +48,11 @@ public class ChunkedTest extends TestCase
         buffer.put( fakeHttp.getBytes() );
         buffer.flip();
 
-        IoSession session = new FakeIoSession();
+        ProtocolCodecSession session = new ProtocolCodecSession();
         HttpResponseDecoder decoder = new HttpResponseDecoder();
-        FakeProtocolDecoderOutput out = new FakeProtocolDecoderOutput();
-        decoder.decode( session, buffer, out );
+        decoder.decode( session, buffer, session.getDecoderOutput() );
 
-        HttpResponseMessage response = ( HttpResponseMessage ) out.getObject();
+        HttpResponseMessage response = (HttpResponseMessage) session.getDecoderOutputQueue().poll();
         assertTrue( Arrays.equals( response.getContent(), "abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes() ) );
     }
 
@@ -64,12 +63,11 @@ public class ChunkedTest extends TestCase
         buffer.put( fakeHttp.getBytes() );
         buffer.flip();
 
-        IoSession session = new FakeIoSession();
+        ProtocolCodecSession session = new ProtocolCodecSession();
         HttpResponseDecoder decoder = new HttpResponseDecoder();
-        FakeProtocolDecoderOutput out = new FakeProtocolDecoderOutput();
-        decoder.decode( session, buffer, out );
+        decoder.decode( session, buffer, session.getDecoderOutput() );
 
-        HttpResponseMessage response = ( HttpResponseMessage ) out.getObject();
+        HttpResponseMessage response = (HttpResponseMessage) session.getDecoderOutputQueue().poll();
         assertTrue( Arrays.equals( response.getContent(), "abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes() ) );
     }
 

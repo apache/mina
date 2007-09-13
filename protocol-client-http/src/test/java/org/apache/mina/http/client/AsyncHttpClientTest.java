@@ -117,7 +117,7 @@ public class AsyncHttpClientTest extends AbstractTest
         HttpRequestMessage request = new HttpRequestMessage( uri );
         request.setParameter( "TEST1", "Test One" );
         request.setParameter( "TEST2", "Test Two" );
-        doConnection( callback, url, request, false );
+        doConnection( callback, url, request, testForException );
     }
 
 
@@ -128,7 +128,7 @@ public class AsyncHttpClientTest extends AbstractTest
         request.setParameter( "TEST1", "Test One" );
         request.setParameter( "TEST2", "Test Two" );
         request.setRequestMethod( HttpRequestMessage.REQUEST_POST );
-        doConnection( callback, url, request, false );
+        doConnection( callback, url, request, testForException );
     }
 
 
