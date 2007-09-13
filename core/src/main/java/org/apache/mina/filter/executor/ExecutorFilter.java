@@ -61,7 +61,12 @@ public class ExecutorFilter extends AbstractExecutorFilter {
         super();
     }
 
-    /**
+    // a constructor that only takes an Executor (for IoC containers that don't understand the varargs)
+    public ExecutorFilter(Executor executor) {
+      super(executor);
+    }
+
+  /**
      * Creates a new instance with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
      */
