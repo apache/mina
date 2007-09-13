@@ -146,7 +146,7 @@ public class SocketSessionConfigImpl extends BaseIoSessionConfig implements
 
             initializeDefaultSocketParameters(socket);
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             return false;
         } finally {
             if (socket != null) {
