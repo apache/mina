@@ -56,7 +56,7 @@ public class DateUtil {
      */
     public static final String PATTERN_ASCTIME = "EEE MMM d HH:mm:ss yyyy";
 
-    private static final Collection DEFAULT_PATTERNS = Arrays.asList(
+    private static final Collection<String> DEFAULT_PATTERNS = Arrays.asList(
     		new String[] { PATTERN_ASCTIME, PATTERN_RFC1036, PATTERN_RFC1123 } );
 
     private static final Date DEFAULT_TWO_DIGIT_YEAR_START;
@@ -94,7 +94,7 @@ public class DateUtil {
      *
      * @throws DateParseException if none of the dataFormats could parse the dateValue
      */
-    public static Date parseDate(String dateValue, Collection dateFormats)
+    public static Date parseDate(String dateValue, Collection<String> dateFormats)
         throws DateParseException {
         return parseDate(dateValue, dateFormats, null);
     }
@@ -115,7 +115,7 @@ public class DateUtil {
      */
     public static Date parseDate(
         String dateValue,
-        Collection dateFormats,
+        Collection<String> dateFormats,
         Date startDate
     ) throws DateParseException {
 
@@ -138,10 +138,10 @@ public class DateUtil {
         }
 
         SimpleDateFormat dateParser = null;
-        Iterator formatIter = dateFormats.iterator();
+        Iterator<String> formatIter = dateFormats.iterator();
 
         while (formatIter.hasNext()) {
-            String format = (String) formatIter.next();
+            String format = formatIter.next();
             if (dateParser == null) {
                 dateParser = new SimpleDateFormat(format, Locale.US);
                 dateParser.setTimeZone(TimeZone.getTimeZone("GMT"));
