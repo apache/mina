@@ -17,7 +17,7 @@
  * under the License.
  *
  */
-package org.apache.mina.http.util;
+package org.apache.mina.filter.codec.http;
 
 import java.io.UnsupportedEncodingException;
 
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.0 final
  */
-public class EncodingUtil {
+class EncodingUtil {
 
     final static Logger LOG = LoggerFactory.getLogger(EncodingUtil.class);
 

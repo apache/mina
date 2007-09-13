@@ -17,7 +17,7 @@
  * under the License.
  *
  */
-package org.apache.mina.http.util;
+package org.apache.mina.filter.codec.http;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,7 +38,7 @@ import java.util.TimeZone;
  * @author Christopher Brown
  * @author Michael Becke
  */
-public class DateUtil {
+class DateUtil {
 
     /**
      * Date format pattern used to parse HTTP date headers in RFC 1123 format.

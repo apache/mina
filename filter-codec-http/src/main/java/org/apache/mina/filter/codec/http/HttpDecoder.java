@@ -17,7 +17,7 @@
  * under the License.
  *
  */
-package org.apache.mina.http.codec;
+package org.apache.mina.filter.codec.http;
 
 
 import java.io.IOException;
@@ -26,7 +26,6 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Date;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.http.util.DateUtil;
 
 
 /**

@@ -26,8 +26,8 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
-import org.apache.mina.http.codec.HttpResponseDecoder;
-import org.apache.mina.http.codec.HttpResponseMessage;
+import org.apache.mina.filter.codec.http.HttpResponseDecoder;
+import org.apache.mina.filter.codec.http.HttpResponseMessage;
 
 
 public class ChunkedTest extends TestCase

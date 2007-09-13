@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.http.codec;
+package org.apache.mina.filter.codec.http;
 
 
 import java.net.ProtocolException;

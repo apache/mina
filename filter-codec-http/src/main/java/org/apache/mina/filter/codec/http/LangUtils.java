@@ -17,7 +17,7 @@
  * under the License.
  *
  */
-package org.apache.mina.http.util;
+package org.apache.mina.filter.codec.http;
 
 /**
  * A set of utility methods to help produce consistent Object#equals(Object) and
@@ -26,7 +26,7 @@ package org.apache.mina.http.util;
  * @author <a href="mailto:oleg at ural.ru">Oleg Kalnichevski</a>
  *
  */
-public class LangUtils {
+class LangUtils {
 
     public static final int HASH_SEED = 17;
     public static final int HASH_OFFSET = 37;

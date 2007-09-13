@@ -17,7 +17,7 @@
  * under the License.
  *
  */
-package org.apache.mina.http.util;
+package org.apache.mina.filter.codec.http;
 
 
 /**

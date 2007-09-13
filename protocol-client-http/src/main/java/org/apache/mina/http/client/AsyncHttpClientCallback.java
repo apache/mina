@@ -20,7 +20,7 @@
 package org.apache.mina.http.client;
 
 
-import org.apache.mina.http.codec.HttpResponseMessage;
+import org.apache.mina.filter.codec.http.HttpResponseMessage;
 
 
 public interface AsyncHttpClientCallback

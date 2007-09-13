@@ -17,15 +17,13 @@
  *  under the License.
  *
  */
-package org.apache.mina.http.codec;
+package org.apache.mina.filter.codec.http;
 
 
 import java.net.URL;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,8 +32,6 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
-import org.apache.mina.http.util.EncodingUtil;
-import org.apache.mina.http.util.NameValuePair;
 
 
 /**
@@ -46,29 +42,14 @@ import org.apache.mina.http.util.NameValuePair;
  */
 public class HttpRequestEncoder extends ProtocolEncoderAdapter
 {
-    private static final Set<Class<HttpRequestMessage>> TYPES;
     private static final byte[] CRLF = new byte[]
         { 0x0D, 0x0A };
     private static final String POST_CONTENT_TYPE = "application/x-www-form-urlencoded";
     private URL url;
 
-    static
-    {
-        Set<Class<HttpRequestMessage>> types = new HashSet<Class<HttpRequestMessage>>();
-        types.add( HttpRequestMessage.class );
-        TYPES = Collections.unmodifiableSet( types );
-    }
-
-
     public HttpRequestEncoder( URL url )
     {
         this.url = url;
-    }
-
-
-    Set<Class<HttpRequestMessage>> getMessageTypes()
-    {
-        return TYPES;
     }
 
 

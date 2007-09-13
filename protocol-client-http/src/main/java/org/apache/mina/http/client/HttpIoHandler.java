@@ -22,8 +22,8 @@ package org.apache.mina.http.client;
 
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.http.codec.HttpResponseDecoder;
-import org.apache.mina.http.codec.HttpResponseMessage;
+import org.apache.mina.filter.codec.http.HttpResponseDecoder;
+import org.apache.mina.filter.codec.http.HttpResponseMessage;
 
 
 public class HttpIoHandler extends IoHandlerAdapter

@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.http.codec;
+package org.apache.mina.filter.codec.http;
 
 
 import java.io.ByteArrayOutputStream;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.mina.http.util.NameValuePair;
 
 
 /**

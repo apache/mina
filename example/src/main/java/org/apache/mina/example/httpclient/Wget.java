@@ -23,10 +23,10 @@ package org.apache.mina.example.httpclient;
 
 import java.net.URL;
 
+import org.apache.mina.filter.codec.http.HttpRequestMessage;
+import org.apache.mina.filter.codec.http.HttpResponseMessage;
 import org.apache.mina.http.client.AsyncHttpClient;
 import org.apache.mina.http.client.AsyncHttpClientCallback;
-import org.apache.mina.http.codec.HttpRequestMessage;
-import org.apache.mina.http.codec.HttpResponseMessage;
 
 
 /**
@@ -98,7 +98,7 @@ public class Wget
         /**
          * What to do when a response has come from the server
          * 
-         * @see org.apache.mina.http.client.AsyncHttpClientCallback#onResponse(org.apache.mina.http.codec.HttpResponseMessage)
+         * @see org.apache.mina.http.client.AsyncHttpClientCallback#onResponse(org.apache.mina.filter.codec.http.HttpResponseMessage)
          */
         public void onResponse( HttpResponseMessage message )
         {

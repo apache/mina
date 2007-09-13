@@ -30,10 +30,10 @@ import javax.net.ssl.SSLContext;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.http.HttpProtocolCodecFactory;
+import org.apache.mina.filter.codec.http.HttpRequestMessage;
 import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.http.client.ssl.TrustManagerFactoryImpl;
-import org.apache.mina.http.codec.HttpProtocolCodecFactory;
-import org.apache.mina.http.codec.HttpRequestMessage;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 
