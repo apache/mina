@@ -25,9 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoFilter.WriteRequest;
-
 /**
  * A unbounded circular queue.
  * 
@@ -153,116 +150,6 @@ public class Queue extends AbstractList implements List, Serializable {
         return size;
     }
     
-    /**
-     * Returns the sum of the '<tt>remaining</tt>' of all {@link ByteBuffer}s
-     * in this queue.
-     */
-    public int byteSize() {
-        if (isEmpty()) {
-            return 0;
-        }
-
-        int byteSize = 0;
-
-        if (first < last) {
-            for (int i = first; i < last; i++) {
-                if (items[i] instanceof ByteBuffer) {
-                    byteSize += ((ByteBuffer) items[i]).remaining();
-                } else if (items[i] instanceof WriteRequest) {
-                    Object message = ((WriteRequest) items[i]).getMessage();
-                    if (message instanceof ByteBuffer) {
-                        byteSize += ((ByteBuffer) message).remaining();
-                    }
-                }
-            }
-        } else {
-            for (int i = first; i < items.length; i++) {
-                if (items[i] instanceof ByteBuffer) {
-                    byteSize += ((ByteBuffer) items[i]).remaining();
-                } else if (items[i] instanceof WriteRequest) {
-                    Object message = ((WriteRequest) items[i]).getMessage();
-                    if (message instanceof ByteBuffer) {
-                        byteSize += ((ByteBuffer) message).remaining();
-                    }
-                }
-            }
-            for (int i = last - 1; i >= 0; i--) {
-                if (items[i] instanceof ByteBuffer) {
-                    byteSize += ((ByteBuffer) items[i]).remaining();
-                } else if (items[i] instanceof WriteRequest) {
-                    Object message = ((WriteRequest) items[i]).getMessage();
-                    if (message instanceof ByteBuffer) {
-                        byteSize += ((ByteBuffer) message).remaining();
-                    }
-                }
-            }
-        }
-
-        return byteSize;
-    }
-    
-    public int messageSize() {
-        if (isEmpty()) {
-            return 0;
-        }
-
-        int messageSize = 0;
-
-        if (first < last) {
-            for (int i = first; i < last; i++) {
-                if (items[i] instanceof WriteRequest) {
-                    Object message = ((WriteRequest) items[i]).getMessage();
-                    if (message instanceof ByteBuffer) {
-                        if (((ByteBuffer) message).hasRemaining()) {
-                            messageSize ++;
-                        }
-                    } else {
-                        messageSize ++;
-                    }
-                } else if (items[i] instanceof ByteBuffer) {
-                    if (((ByteBuffer) items[i]).hasRemaining()) {
-                        messageSize ++;
-                    }
-                }
-            }
-        } else {
-            for (int i = first; i < items.length; i++) {
-                if (items[i] instanceof WriteRequest) {
-                    Object message = ((WriteRequest) items[i]).getMessage();
-                    if (message instanceof ByteBuffer) {
-                        if (((ByteBuffer) message).hasRemaining()) {
-                            messageSize ++;
-                        }
-                    } else {
-                        messageSize ++;
-                    }
-                } else if (items[i] instanceof ByteBuffer) {
-                    if (((ByteBuffer) items[i]).hasRemaining()) {
-                        messageSize ++;
-                    }
-                }
-            }
-            for (int i = last - 1; i >= 0; i--) {
-                if (items[i] instanceof WriteRequest) {
-                    Object message = ((WriteRequest) items[i]).getMessage();
-                    if (message instanceof ByteBuffer) {
-                        if (((ByteBuffer) message).hasRemaining()) {
-                            messageSize ++;
-                        }
-                    } else {
-                        messageSize ++;
-                    }
-                } else if (items[i] instanceof ByteBuffer) {
-                    if (((ByteBuffer) items[i]).hasRemaining()) {
-                        messageSize ++;
-                    }
-                }
-            }
-        }
-
-        return messageSize;
-    }
-
     public String toString() {
         return "first=" + first + ", last=" + last + ", size=" + size
                 + ", mask = " + mask;

@@ -89,7 +89,7 @@ public class VmPipeConnector extends BaseIoConnector {
 
         DefaultConnectFuture future = new DefaultConnectFuture();
         VmPipeSessionImpl localSession = new VmPipeSessionImpl(this, config,
-                getListeners(), new Object(), // lock
+                getListeners(), // lock
                 new AnonymousSocketAddress(), handler, entry);
 
         // initialize connector session
@@ -127,6 +127,8 @@ public class VmPipeConnector extends BaseIoConnector {
             remoteSession.close();
         }
 
+        // Start chains, and then allow and messages read/written to be processed. This is to ensure that
+        // sessionOpened gets received before a messageReceived
         ((VmPipeFilterChain) localSession.getFilterChain()).start();
         ((VmPipeFilterChain) remoteSession.getFilterChain()).start();
 

@@ -34,6 +34,9 @@ import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.IoServiceListenerSupport;
 import org.apache.mina.util.Queue;
 
+import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
+
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
  * 
@@ -62,7 +65,7 @@ public class VmPipeSessionImpl extends BaseIoSession {
 
     private final VmPipeSessionImpl remoteSession;
 
-    final Object lock;
+    private final Lock lock;
 
     final Queue pendingDataQueue;
 
@@ -70,12 +73,12 @@ public class VmPipeSessionImpl extends BaseIoSession {
      * Constructor for client-side session.
      */
     public VmPipeSessionImpl(IoService service, IoServiceConfig serviceConfig,
-            IoServiceListenerSupport serviceListeners, Object lock,
+            IoServiceListenerSupport serviceListeners,
             SocketAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
         this.service = service;
         this.serviceConfig = serviceConfig;
         this.serviceListeners = serviceListeners;
-        this.lock = lock;
+        this.lock = new ReentrantLock();
         this.localAddress = localAddress;
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
@@ -137,14 +140,6 @@ public class VmPipeSessionImpl extends BaseIoSession {
         this.filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public int getScheduledWriteRequests() {
-        return 0;
-    }
-
-    public int getScheduledWriteBytes() {
-        return 0;
-    }
-
     public TransportType getTransportType() {
         return TransportType.VM_PIPE;
     }
@@ -184,5 +179,9 @@ public class VmPipeSessionImpl extends BaseIoSession {
                 }
             }
         }
+    }
+    
+    Lock getLock() {
+        return lock;
     }
 }

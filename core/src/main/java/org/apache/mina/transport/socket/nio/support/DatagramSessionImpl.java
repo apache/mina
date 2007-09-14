@@ -167,18 +167,6 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession {
         filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public int getScheduledWriteRequests() {
-        synchronized (writeRequestQueue) {
-            return writeRequestQueue.messageSize();
-        }
-    }
-
-    public int getScheduledWriteBytes() {
-        synchronized (writeRequestQueue) {
-            return writeRequestQueue.byteSize();
-        }
-    }
-
     public TransportType getTransportType() {
         return TransportType.DATAGRAM;
     }

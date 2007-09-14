@@ -101,10 +101,11 @@ class SocketIoProcessor {
     }
 
     void flush(SocketSessionImpl session) {
-        scheduleFlush(session);
-        Selector selector = getSelector();
-        if (selector != null) {
-            selector.wakeup();
+        if (scheduleFlush(session)) {
+            Selector selector = getSelector();
+            if (selector != null) {
+                selector.wakeup();
+            }
         }
     }
 
@@ -122,10 +123,16 @@ class SocketIoProcessor {
         }
     }
 
-    private void scheduleFlush(SocketSessionImpl session) {
-        synchronized (flushingSessions) {
-            flushingSessions.push(session);
+    private boolean scheduleFlush(SocketSessionImpl session) {
+        if (session.setScheduledForFlush(true)) {
+            synchronized (flushingSessions) {
+                flushingSessions.push(session);
+            }
+            
+            return true;
         }
+        
+        return false;
     }
 
     private void scheduleTrafficControl(SocketSessionImpl session) {
@@ -342,6 +349,8 @@ class SocketIoProcessor {
 
             if (session == null)
                 break;
+            
+            session.setScheduledForFlush(false);
 
             if (!session.isConnected()) {
                 releaseWriteBuffers(session);
@@ -362,7 +371,10 @@ class SocketIoProcessor {
             }
 
             try {
-                doFlush(session);
+                boolean flushedAll = doFlush(session);
+                if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.isScheduledForFlush()) {
+                    scheduleFlush(session);
+                }
             } catch (IOException e) {
                 scheduleRemove(session);
                 session.getFilterChain().fireExceptionCaught(session, e);
@@ -403,7 +415,7 @@ class SocketIoProcessor {
         }
     }
 
-    private void doFlush(SocketSessionImpl session) throws IOException {
+    private boolean doFlush(SocketSessionImpl session) throws IOException {
         // Clear OP_WRITE
         SelectionKey key = session.getSelectionKey();
         key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
@@ -444,12 +456,14 @@ class SocketIoProcessor {
                 if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                    break;
+                    return false;
                 }
             }
         } finally {
             session.increaseWrittenBytes(writtenBytes);
         }
+        
+        return true;
     }
 
     private void doUpdateTrafficMask() {

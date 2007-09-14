@@ -158,18 +158,6 @@ class SocketSessionImpl extends BaseIoSession {
         return writeRequestQueue;
     }
 
-    public int getScheduledWriteRequests() {
-        synchronized (writeRequestQueue) {
-            return writeRequestQueue.messageSize();
-        }
-    }
-
-    public int getScheduledWriteBytes() {
-        synchronized (writeRequestQueue) {
-            return writeRequestQueue.byteSize();
-        }
-    }
-
     protected void write0(WriteRequest writeRequest) {
         filterChain.fireFilterWrite(this, writeRequest);
     }

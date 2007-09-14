@@ -27,6 +27,7 @@ import org.apache.mina.common.support.AbstractIoFilterChain;
 
 import edu.emory.mathcs.backport.java.util.Queue;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
@@ -36,20 +37,22 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
 
     private final Queue eventQueue = new ConcurrentLinkedQueue();
 
-    private boolean flushEnabled;
+    private final AtomicBoolean flushEnabled = new AtomicBoolean();
+    private final AtomicBoolean sessionOpened = new AtomicBoolean();
 
     public VmPipeFilterChain(IoSession session) {
         super(session);
     }
 
     public void start() {
-        flushEnabled = true;
+        flushEnabled.set(true);
         flushEvents();
+        flushPendingDataQueues((VmPipeSessionImpl) getSession());
     }
 
     private void pushEvent(Event e) {
         eventQueue.offer(e);
-        if (flushEnabled) {
+        if (flushEnabled.get()) {
             flushEvents();
         }
     }
@@ -68,12 +71,8 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
 
         if (type == EventType.RECEIVED) {
             VmPipeSessionImpl s = (VmPipeSessionImpl) session;
-            synchronized (s.lock) {
-                if (!s.getTrafficMask().isReadable()) {
-                    synchronized (s.pendingDataQueue) {
-                        s.pendingDataQueue.push(data);
-                    }
-                } else {
+            if (sessionOpened.get() && s.getTrafficMask().isReadable() && s.getLock().tryLock()) {
+                try {
                     int byteCount = 1;
                     if (data instanceof ByteBuffer) {
                         byteCount = ((ByteBuffer) data).remaining();
@@ -82,7 +81,13 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                     s.increaseReadBytes(byteCount);
 
                     super.fireMessageReceived(s, data);
+                } finally {
+                    s.getLock().unlock();
                 }
+                
+                flushPendingDataQueues(s);
+            } else {
+                s.pendingDataQueue.add(data);
             }
         } else if (type == EventType.WRITE) {
             super.fireFilterWrite(session, (WriteRequest) data);
@@ -94,6 +99,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
             super.fireSessionIdle(session, (IdleStatus) data);
         } else if (type == EventType.OPENED) {
             super.fireSessionOpened(session);
+            sessionOpened.set(true);
         } else if (type == EventType.CREATED) {
             super.fireSessionCreated(session);
         } else if (type == EventType.CLOSED) {
@@ -103,6 +109,11 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
         }
     }
 
+    private static void flushPendingDataQueues( VmPipeSessionImpl s ) {
+        s.updateTrafficMask();
+        s.getRemoteSession().updateTrafficMask();
+    }
+    
     public void fireFilterClose(IoSession session) {
         pushEvent(new Event(EventType.CLOSE, null));
     }
@@ -141,14 +152,9 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
 
     protected void doWrite(IoSession session, WriteRequest writeRequest) {
         VmPipeSessionImpl s = (VmPipeSessionImpl) session;
-        synchronized (s.lock) {
-            if (s.isConnected()) {
-
-                if (!s.getTrafficMask().isWritable()) {
-                    synchronized (s.pendingDataQueue) {
-                        s.pendingDataQueue.push(writeRequest);
-                    }
-                } else {
+        if (s.isConnected()) {
+            if (s.getTrafficMask().isWritable() && s.getLock().tryLock()) {
+                try {
                     Object message = writeRequest.getMessage();
 
                     int byteCount = 1;
@@ -164,26 +170,40 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
                         messageCopy = wb;
                     }
 
+                    // Avoid unwanted side effect that scheduledWrite* becomes negative
+                    // by increasing them.
+                    s.increaseScheduledWriteBytes(byteCount);
+                    s.increaseScheduledWriteRequests();
+
                     s.increaseWrittenBytes(byteCount);
                     s.increaseWrittenMessages();
 
                     s.getRemoteSession().getFilterChain().fireMessageReceived(
                             s.getRemoteSession(), messageCopy);
                     s.getFilterChain().fireMessageSent(s, writeRequest);
+                } finally {
+                    s.getLock().unlock();
                 }
+                
+                flushPendingDataQueues( s );
             } else {
-                writeRequest.getFuture().setWritten(false);
+                s.pendingDataQueue.add(writeRequest);
             }
+        } else {
+            writeRequest.getFuture().setWritten(false);
         }
     }
 
     protected void doClose(IoSession session) {
         VmPipeSessionImpl s = (VmPipeSessionImpl) session;
-        synchronized (s.lock) {
+        s.getLock().lock();
+        try {
             if (!session.getCloseFuture().isClosed()) {
                 s.getServiceListeners().fireSessionDestroyed(s);
                 s.getRemoteSession().close();
             }
+        } finally {
+            s.getLock().unlock();
         }
     }
 
@@ -223,7 +243,7 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
 
         private final Object data;
 
-        public Event(EventType type, Object data) {
+        private Event(EventType type, Object data) {
             this.type = type;
             this.data = data;
         }

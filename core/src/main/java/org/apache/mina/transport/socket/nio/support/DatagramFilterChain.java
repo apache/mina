@@ -43,14 +43,22 @@ class DatagramFilterChain extends AbstractIoFilterChain {
 
         // SocketIoProcessor.doFlush() will reset it after write is finished
         // because the buffer will be passed with messageSent event. 
-        ((ByteBuffer) writeRequest.getMessage()).mark();
+        ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
+        buffer.mark();
+        
+        int remaining = buffer.remaining();
+        if (remaining == 0) {
+            s.increaseScheduledWriteRequests();            
+        } else {
+            s.increaseScheduledWriteBytes(buffer.remaining());
+        }
+
         synchronized (writeRequestQueue) {
             writeRequestQueue.push(writeRequest);
-            if (writeRequestQueue.size() == 1
-                    && session.getTrafficMask().isWritable()) {
-                // Notify DatagramService only when writeRequestQueue was empty.
-                s.getManagerDelegate().flushSession(s);
-            }
+        }
+        
+        if (session.getTrafficMask().isWritable()) {
+            s.getManagerDelegate().flushSession(s);
         }
     }
 
