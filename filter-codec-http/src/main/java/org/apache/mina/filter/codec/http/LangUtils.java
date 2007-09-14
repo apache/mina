@@ -29,6 +29,7 @@ package org.apache.mina.filter.codec.http;
 class LangUtils {
 
     public static final int HASH_SEED = 17;
+
     public static final int HASH_OFFSET = 37;
 
     private LangUtils() {
@@ -52,4 +53,3 @@ class LangUtils {
     }
 
 }
-

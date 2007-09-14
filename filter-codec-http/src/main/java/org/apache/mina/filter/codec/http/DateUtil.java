@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
-
 /**
  * A utility class for parsing and formatting HTTP dates as used in cookies and
  * other headers.  This class handles dates as defined by RFC 2616 section
@@ -56,8 +55,9 @@ class DateUtil {
      */
     public static final String PATTERN_ASCTIME = "EEE MMM d HH:mm:ss yyyy";
 
-    private static final Collection<String> DEFAULT_PATTERNS = Arrays.asList(
-    		new String[] { PATTERN_ASCTIME, PATTERN_RFC1036, PATTERN_RFC1123 } );
+    private static final Collection<String> DEFAULT_PATTERNS = Arrays
+            .asList(new String[] { PATTERN_ASCTIME, PATTERN_RFC1036,
+                    PATTERN_RFC1123 });
 
     private static final Date DEFAULT_TWO_DIGIT_YEAR_START;
 
@@ -94,8 +94,8 @@ class DateUtil {
      *
      * @throws DateParseException if none of the dataFormats could parse the dateValue
      */
-    public static Date parseDate(String dateValue, Collection<String> dateFormats)
-        throws DateParseException {
+    public static Date parseDate(String dateValue,
+            Collection<String> dateFormats) throws DateParseException {
         return parseDate(dateValue, dateFormats, null);
     }
 
@@ -113,28 +113,24 @@ class DateUtil {
      *
      * @throws DateParseException if none of the dataFormats could parse the dateValue
      */
-    public static Date parseDate(
-        String dateValue,
-        Collection<String> dateFormats,
-        Date startDate
-    ) throws DateParseException {
+    public static Date parseDate(String dateValue,
+            Collection<String> dateFormats, Date startDate)
+            throws DateParseException {
 
         if (dateValue == null) {
             throw new IllegalArgumentException("dateValue is null");
         }
         if (dateFormats == null) {
-        	dateFormats = DEFAULT_PATTERNS;
+            dateFormats = DEFAULT_PATTERNS;
         }
         if (startDate == null) {
             startDate = DEFAULT_TWO_DIGIT_YEAR_START;
         }
         // trim single quotes around date if present
         // see issue #5279
-        if (dateValue.length() > 1
-            && dateValue.startsWith("'")
-            && dateValue.endsWith("'")
-        ) {
-            dateValue = dateValue.substring (1, dateValue.length() - 1);
+        if (dateValue.length() > 1 && dateValue.startsWith("'")
+                && dateValue.endsWith("'")) {
+            dateValue = dateValue.substring(1, dateValue.length() - 1);
         }
 
         SimpleDateFormat dateParser = null;
@@ -186,8 +182,10 @@ class DateUtil {
      * @see SimpleDateFormat
      */
     public static String formatDate(Date date, String pattern) {
-        if (date == null) throw new IllegalArgumentException("date is null");
-        if (pattern == null) throw new IllegalArgumentException("pattern is null");
+        if (date == null)
+            throw new IllegalArgumentException("date is null");
+        if (pattern == null)
+            throw new IllegalArgumentException("pattern is null");
 
         SimpleDateFormat formatter = new SimpleDateFormat(pattern, Locale.US);
         formatter.setTimeZone(GMT);
@@ -195,6 +193,7 @@ class DateUtil {
     }
 
     /** This class should not be instantiated. */
-    private DateUtil() { }
+    private DateUtil() {
+    }
 
 }

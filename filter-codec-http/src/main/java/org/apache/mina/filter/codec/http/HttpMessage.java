@@ -19,13 +19,10 @@
  */
 package org.apache.mina.filter.codec.http;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 /**
  * TODO HttpMessage.
@@ -33,108 +30,84 @@ import java.util.List;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
-public class HttpMessage
-{
+public class HttpMessage {
 
     public final static String CONTENT_TYPE = "Content-Type";
+
     public final static String CONTENT_LENGTH = "Content-Length";
 
     protected List<NameValuePair> headers = new ArrayList<NameValuePair>();
+
     protected List<Cookie> cookies = new ArrayList<Cookie>();
+
     protected String contentType;
+
     protected int contentLength;
+
     protected ByteArrayOutputStream content;
 
-
-    public String getStringContent()
-    {
-        if ( content == null )
+    public String getStringContent() {
+        if (content == null)
             return null;
 
-        return new String( content.toByteArray() );
+        return new String(content.toByteArray());
     }
 
-
-    public byte[] getContent()
-    {
-        if ( content == null )
+    public byte[] getContent() {
+        if (content == null)
             return null;
 
         return content.toByteArray();
     }
 
-
-    public void addContent( byte[] content ) throws IOException
-    {
-        if ( this.content == null )
+    public void addContent(byte[] content) throws IOException {
+        if (this.content == null)
             this.content = new ByteArrayOutputStream();
 
-        this.content.write( content );
+        this.content.write(content);
     }
 
-
-    public List<Cookie> getCookies()
-    {
+    public List<Cookie> getCookies() {
         return cookies;
     }
 
-
-    public void setCookies( List<Cookie> cookies )
-    {
+    public void setCookies(List<Cookie> cookies) {
         this.cookies = cookies;
     }
 
-
-    public void addCookie( Cookie cookie )
-    {
-        this.cookies.add( cookie );
+    public void addCookie(Cookie cookie) {
+        this.cookies.add(cookie);
     }
 
-
-    public List<NameValuePair> getHeaders()
-    {
+    public List<NameValuePair> getHeaders() {
         return headers;
     }
 
-
-    public void setHeaders( List<NameValuePair> headers )
-    {
+    public void setHeaders(List<NameValuePair> headers) {
         this.headers = headers;
     }
 
-
-    public void addHeader( NameValuePair header )
-    {
-        headers.add( header );
+    public void addHeader(NameValuePair header) {
+        headers.add(header);
     }
 
-
-    public void addHeader( String name, String value )
-    {
-        headers.add( new NameValuePair( name, value ) );
+    public void addHeader(String name, String value) {
+        headers.add(new NameValuePair(name, value));
     }
 
-
-    public String getContentType()
-    {
+    public String getContentType() {
         return contentType;
     }
 
-
-    public void setContentType( String contentType )
-    {
+    public void setContentType(String contentType) {
         this.contentType = contentType;
     }
 
-
-    public int getContentLength()
-    {
+    public int getContentLength() {
         return contentLength;
     }
 
-
-    public void setContentLength( int contentLength )
-    {
+    public void setContentLength(int contentLength) {
         this.contentLength = contentLength;
     }
 

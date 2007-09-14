@@ -19,13 +19,11 @@
  */
 package org.apache.mina.filter.codec.http;
 
-
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 
 import java.net.URL;
-
 
 /**
  * TODO HttpProtocolCodecFactory.
@@ -33,28 +31,22 @@ import java.net.URL;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
-public class HttpProtocolCodecFactory implements ProtocolCodecFactory
-{
+public class HttpProtocolCodecFactory implements ProtocolCodecFactory {
 
     private final ProtocolEncoder encoder;
+
     private final ProtocolDecoder decoder;
 
-
-    public HttpProtocolCodecFactory( URL url )
-    {
-        encoder = new HttpRequestEncoder( url );
+    public HttpProtocolCodecFactory(URL url) {
+        encoder = new HttpRequestEncoder(url);
         decoder = new HttpResponseDecoder();
     }
 
-
-    public ProtocolEncoder getEncoder() throws Exception
-    {
+    public ProtocolEncoder getEncoder() throws Exception {
         return encoder;
     }
 
-
-    public ProtocolDecoder getDecoder() throws Exception
-    {
+    public ProtocolDecoder getDecoder() throws Exception {
         return decoder;
     }
 }

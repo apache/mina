@@ -21,11 +21,10 @@ package org.apache.mina.filter.codec.http;
 
 import java.io.Serializable;
 
-
-public class NameValuePair  implements Serializable {
+public class NameValuePair implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     // ----------------------------------------------------------- Constructors
 
     /**
@@ -33,7 +32,7 @@ public class NameValuePair  implements Serializable {
      *
      */
     public NameValuePair() {
-        this (null, null);
+        this(null, null);
     }
 
     /**
@@ -70,7 +69,6 @@ public class NameValuePair  implements Serializable {
         this.name = name;
     }
 
-
     /**
      * Return the name.
      *
@@ -81,7 +79,6 @@ public class NameValuePair  implements Serializable {
         return name;
     }
 
-
     /**
      * Set the value.
      *
@@ -90,7 +87,6 @@ public class NameValuePair  implements Serializable {
     public void setValue(String value) {
         this.value = value;
     }
-
 
     /**
      * Return the current value.
@@ -112,12 +108,14 @@ public class NameValuePair  implements Serializable {
     }
 
     public boolean equals(final Object object) {
-        if (object == null) return false;
-        if (this == object) return true;
+        if (object == null)
+            return false;
+        if (this == object)
+            return true;
         if (object instanceof NameValuePair) {
             NameValuePair that = (NameValuePair) object;
             return LangUtils.equals(this.name, that.name)
-                  && LangUtils.equals(this.value, that.value);
+                    && LangUtils.equals(this.value, that.value);
         } else {
             return false;
         }
@@ -130,4 +128,3 @@ public class NameValuePair  implements Serializable {
         return hash;
     }
 }
-

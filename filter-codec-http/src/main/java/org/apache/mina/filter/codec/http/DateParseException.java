@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filter.codec.http;
 
-
 /**
  * An exception to indicate an error parsing a date string.
  *
@@ -46,4 +45,3 @@ public class DateParseException extends Exception {
     }
 
 }
-

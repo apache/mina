@@ -19,9 +19,7 @@
  */
 package org.apache.mina.filter.codec.http;
 
-
 import java.util.Date;
-
 
 /**
  * TODO Cookie.
@@ -29,118 +27,90 @@ import java.util.Date;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
-public class Cookie
-{
+public class Cookie {
 
     private String comment;
+
     private String domain;
+
     private String name;
+
     private String value;
+
     private String path;
+
     private boolean secure;
+
     private int version = 0;
+
     private Date expires;
 
-
-    public Cookie( String name, String value )
-    {
+    public Cookie(String name, String value) {
         this.name = name;
         this.value = value;
     }
 
-
-    public String getComment()
-    {
+    public String getComment() {
         return comment;
     }
 
-
-    public void setComment( String comment )
-    {
+    public void setComment(String comment) {
         this.comment = comment;
     }
 
-
-    public String getDomain()
-    {
+    public String getDomain() {
         return domain;
     }
 
-
-    public void setDomain( String domain )
-    {
+    public void setDomain(String domain) {
         this.domain = domain;
     }
 
-
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-
-    public void setName( String name )
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
 
-
-    public void setValue( String value )
-    {
+    public void setValue(String value) {
         this.value = value;
     }
 
-
-    public String getPath()
-    {
+    public String getPath() {
         return path;
     }
 
-
-    public void setPath( String path )
-    {
+    public void setPath(String path) {
         this.path = path;
     }
 
-
-    public boolean isSecure()
-    {
+    public boolean isSecure() {
         return secure;
     }
 
-
-    public void setSecure( boolean secure )
-    {
+    public void setSecure(boolean secure) {
         this.secure = secure;
     }
 
-
-    public int getVersion()
-    {
+    public int getVersion() {
         return version;
     }
 
-
-    public void setVersion( int version )
-    {
+    public void setVersion(int version) {
         this.version = version;
     }
 
-
-    public Date getExpires()
-    {
+    public Date getExpires() {
         return expires;
     }
 
-
-    public void setExpires( Date expires )
-    {
+    public void setExpires(Date expires) {
         this.expires = expires;
     }
 }

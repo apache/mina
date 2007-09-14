@@ -19,37 +19,27 @@
  */
 package org.apache.mina.filter.codec.http;
 
-
 /**
  * TODO AsyncHttpClientException.
  *
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
-public class AsyncHttpClientException extends Error
-{
+public class AsyncHttpClientException extends Error {
     private static final long serialVersionUID = 1L;
 
-
-    public AsyncHttpClientException()
-    {
+    public AsyncHttpClientException() {
     }
 
-
-    public AsyncHttpClientException( String string )
-    {
-        super( string );
+    public AsyncHttpClientException(String string) {
+        super(string);
     }
 
-
-    public AsyncHttpClientException( String string, Throwable throwable )
-    {
-        super( string, throwable );
+    public AsyncHttpClientException(String string, Throwable throwable) {
+        super(string, throwable);
     }
 
-
-    public AsyncHttpClientException( Throwable throwable )
-    {
-        super( throwable );
+    public AsyncHttpClientException(Throwable throwable) {
+        super(throwable);
     }
 }

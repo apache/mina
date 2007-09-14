@@ -63,7 +63,7 @@ class EncodingUtil {
      *
      * @since 2.0 final
      */
-     public static String formUrlEncode(NameValuePair[] pairs, String charset) {
+    public static String formUrlEncode(NameValuePair[] pairs, String charset) {
         try {
             return doFormUrlEncode(pairs, charset);
         } catch (UnsupportedEncodingException e) {
@@ -72,8 +72,8 @@ class EncodingUtil {
                 return doFormUrlEncode(pairs, DEFAULT_CHARSET);
             } catch (UnsupportedEncodingException fatal) {
                 // Should never happen. ISO-8859-1 must be supported on all JVMs
-                throw new AsyncHttpClientException("Encoding not supported: " +
-                    DEFAULT_CHARSET);
+                throw new AsyncHttpClientException("Encoding not supported: "
+                        + DEFAULT_CHARSET);
             }
         }
     }
@@ -98,9 +98,8 @@ class EncodingUtil {
      *
      * @since 2.0 final
      */
-     private static String doFormUrlEncode(NameValuePair[] pairs, String charset)
-        throws UnsupportedEncodingException
-     {
+    private static String doFormUrlEncode(NameValuePair[] pairs, String charset)
+            throws UnsupportedEncodingException {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < pairs.length; i++) {
             URLCodec codec = new URLCodec();
@@ -132,19 +131,16 @@ class EncodingUtil {
      *
      * @since 3.0
      */
-    public static String getString(
-        final byte[] data,
-        int offset,
-        int length,
-        String charset
-    ) {
+    public static String getString(final byte[] data, int offset, int length,
+            String charset) {
 
         if (data == null) {
             throw new IllegalArgumentException("Parameter may not be null");
         }
 
         if (charset == null || charset.length() == 0) {
-            throw new IllegalArgumentException("charset may not be null or empty");
+            throw new IllegalArgumentException(
+                    "charset may not be null or empty");
         }
 
         try {
@@ -152,12 +148,12 @@ class EncodingUtil {
         } catch (UnsupportedEncodingException e) {
 
             if (LOG.isWarnEnabled()) {
-                LOG.warn("Unsupported encoding: " + charset + ". System encoding used");
+                LOG.warn("Unsupported encoding: " + charset
+                        + ". System encoding used");
             }
             return new String(data, offset, length);
         }
     }
-
 
     /**
      * Converts the byte array of HTTP content characters to a string. If
@@ -191,7 +187,8 @@ class EncodingUtil {
         }
 
         if (charset == null || charset.length() == 0) {
-            throw new IllegalArgumentException("charset may not be null or empty");
+            throw new IllegalArgumentException(
+                    "charset may not be null or empty");
         }
 
         try {
@@ -199,7 +196,8 @@ class EncodingUtil {
         } catch (UnsupportedEncodingException e) {
 
             if (LOG.isWarnEnabled()) {
-                LOG.warn("Unsupported encoding: " + charset + ". System encoding used.");
+                LOG.warn("Unsupported encoding: " + charset
+                        + ". System encoding used.");
             }
 
             return data.getBytes();
@@ -223,7 +221,8 @@ class EncodingUtil {
         try {
             return data.getBytes("US-ASCII");
         } catch (UnsupportedEncodingException e) {
-            throw new AsyncHttpClientException("HttpClient requires ASCII support");
+            throw new AsyncHttpClientException(
+                    "HttpClient requires ASCII support");
         }
     }
 
@@ -238,7 +237,8 @@ class EncodingUtil {
      * @return The string representation of the byte array
      *
      */
-    public static String getAsciiString(final byte[] data, int offset, int length) {
+    public static String getAsciiString(final byte[] data, int offset,
+            int length) {
 
         if (data == null) {
             throw new IllegalArgumentException("Parameter may not be null");
@@ -247,7 +247,8 @@ class EncodingUtil {
         try {
             return new String(data, offset, length, "US-ASCII");
         } catch (UnsupportedEncodingException e) {
-            throw new AsyncHttpClientException("HttpClient requires ASCII support");
+            throw new AsyncHttpClientException(
+                    "HttpClient requires ASCII support");
         }
     }
 
@@ -271,4 +272,3 @@ class EncodingUtil {
     }
 
 }
-
