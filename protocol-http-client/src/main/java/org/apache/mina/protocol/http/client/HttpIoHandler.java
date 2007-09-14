@@ -19,53 +19,42 @@
  */
 package org.apache.mina.protocol.http.client;
 
-
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.http.HttpResponseDecoder;
 import org.apache.mina.filter.codec.http.HttpResponseMessage;
 
-
-public class HttpIoHandler extends IoHandlerAdapter
-{
+public class HttpIoHandler extends IoHandlerAdapter {
     private AsyncHttpClientCallback callback;
 
-
-    public HttpIoHandler( AsyncHttpClientCallback callback )
-    {
+    public HttpIoHandler(AsyncHttpClientCallback callback) {
         this.callback = callback;
     }
 
-
     @Override
-    public void sessionOpened( IoSession ioSession ) throws Exception
-    {
-        super.sessionOpened( ioSession );
+    public void sessionOpened(IoSession ioSession) throws Exception {
+        super.sessionOpened(ioSession);
     }
 
-
     @Override
-    public void messageReceived( IoSession ioSession, Object object ) throws Exception
-    {
-        HttpResponseMessage message = ( HttpResponseMessage ) object;
-        callback.onResponse( message );
+    public void messageReceived(IoSession ioSession, Object object)
+            throws Exception {
+        HttpResponseMessage message = (HttpResponseMessage) object;
+        callback.onResponse(message);
     }
 
-
     @Override
-    public void exceptionCaught( IoSession ioSession, Throwable throwable ) throws Exception
-    {
+    public void exceptionCaught(IoSession ioSession, Throwable throwable)
+            throws Exception {
         //Clean up if any in-proccess decoding was occurring
-        ioSession.removeAttribute( HttpResponseDecoder.CURRENT_RESPONSE );
-        callback.onException( throwable );
+        ioSession.removeAttribute(HttpResponseDecoder.CURRENT_RESPONSE);
+        callback.onException(throwable);
     }
 
-
     @Override
-    public void sessionClosed( IoSession ioSession ) throws Exception
-    {
+    public void sessionClosed(IoSession ioSession) throws Exception {
         //Clean up if any in-proccess decoding was occurring
-        ioSession.removeAttribute( HttpResponseDecoder.CURRENT_RESPONSE );
+        ioSession.removeAttribute(HttpResponseDecoder.CURRENT_RESPONSE);
         callback.onClosed();
     }
 }

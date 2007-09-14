@@ -19,7 +19,6 @@
  */
 package org.apache.mina.protocol.http.client;
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -30,228 +29,185 @@ import org.apache.mina.filter.codec.http.HttpResponseMessage;
 import org.apache.mina.protocol.http.client.AsyncHttpClient;
 import org.apache.mina.protocol.http.client.AsyncHttpClientCallback;
 
-
-public class AsyncHttpClientTest extends AbstractTest
-{
+public class AsyncHttpClientTest extends AbstractTest {
 
     protected static final Object semaphore = new Object();
 
-
-    public void testHtmlConnection() throws Exception
-    {
+    public void testHtmlConnection() throws Exception {
         TestCallback callback = new TestCallback();
-        doGetConnection( callback, "http://localhost:8282", "/", false );
+        doGetConnection(callback, "http://localhost:8282", "/", false);
 
         HttpResponseMessage msg = callback.getMessage();
-        assertEquals( "\nHello World!", msg.getStringContent() );
+        assertEquals("\nHello World!", msg.getStringContent());
     }
 
-
-    public void testSSLHtmlConnection() throws Exception
-    {
+    public void testSSLHtmlConnection() throws Exception {
         TestCallback callback = new TestCallback();
-        doGetConnection( callback, "https://localhost:8383", "/", false );
+        doGetConnection(callback, "https://localhost:8383", "/", false);
 
         HttpResponseMessage msg = callback.getMessage();
-        assertEquals( "\nHello World!", msg.getStringContent() );
+        assertEquals("\nHello World!", msg.getStringContent());
     }
 
-
-    public void testBinaryRequest() throws Exception
-    {
+    public void testBinaryRequest() throws Exception {
 
         //Get the real file
-        File file = new File( ROOT, "pwrd_apache.gif" );
-        FileInputStream fis = new FileInputStream( file );
-        byte realFile[] = new byte[( int ) file.length()];
-        fis.read( realFile );
+        File file = new File(ROOT, "pwrd_apache.gif");
+        FileInputStream fis = new FileInputStream(file);
+        byte realFile[] = new byte[(int) file.length()];
+        fis.read(realFile);
 
         TestCallback callback = new TestCallback();
-        doGetConnection( callback, "http://localhost:8282", "/pwrd_apache.gif", false );
+        doGetConnection(callback, "http://localhost:8282", "/pwrd_apache.gif",
+                false);
 
         HttpResponseMessage msg = callback.getMessage();
 
-        assertTrue( Arrays.equals( realFile, msg.getContent() ) );
+        assertTrue(Arrays.equals(realFile, msg.getContent()));
     }
 
-
-    public void testSSLBinaryRequest() throws Exception
-    {
+    public void testSSLBinaryRequest() throws Exception {
 
         //Get the real file
-        File file = new File( ROOT, "pwrd_apache.gif" );
-        FileInputStream fis = new FileInputStream( file );
-        byte realFile[] = new byte[( int ) file.length()];
-        fis.read( realFile );
+        File file = new File(ROOT, "pwrd_apache.gif");
+        FileInputStream fis = new FileInputStream(file);
+        byte realFile[] = new byte[(int) file.length()];
+        fis.read(realFile);
 
         TestCallback callback = new TestCallback();
-        doGetConnection( callback, "https://localhost:8383", "/pwrd_apache.gif", false );
+        doGetConnection(callback, "https://localhost:8383", "/pwrd_apache.gif",
+                false);
 
         HttpResponseMessage msg = callback.getMessage();
 
-        assertTrue( Arrays.equals( realFile, msg.getContent() ) );
+        assertTrue(Arrays.equals(realFile, msg.getContent()));
     }
 
-
-    public void testGetParameters() throws Exception
-    {
+    public void testGetParameters() throws Exception {
         TestCallback callback = new TestCallback();
-        doGetConnection( callback, "http://localhost:8282", "/params.jsp", false );
+        doGetConnection(callback, "http://localhost:8282", "/params.jsp", false);
 
         HttpResponseMessage msg = callback.getMessage();
-        assertEquals( "Test One Test Two", msg.getStringContent() );
+        assertEquals("Test One Test Two", msg.getStringContent());
     }
 
-
-    public void testPostParameters() throws Exception
-    {
+    public void testPostParameters() throws Exception {
         TestCallback callback = new TestCallback();
-        doPostConnection( callback, "http://localhost:8282", "/params.jsp", false );
+        doPostConnection(callback, "http://localhost:8282", "/params.jsp",
+                false);
 
         HttpResponseMessage msg = callback.getMessage();
-        assertEquals( "Test One Test Two", msg.getStringContent() );
+        assertEquals("Test One Test Two", msg.getStringContent());
     }
 
-
-    private void doGetConnection( TestCallback callback, String url, String uri, boolean testForException )
-        throws Exception
-    {
-        HttpRequestMessage request = new HttpRequestMessage( uri );
-        request.setParameter( "TEST1", "Test One" );
-        request.setParameter( "TEST2", "Test Two" );
-        doConnection( callback, url, request, testForException );
+    private void doGetConnection(TestCallback callback, String url, String uri,
+            boolean testForException) throws Exception {
+        HttpRequestMessage request = new HttpRequestMessage(uri);
+        request.setParameter("TEST1", "Test One");
+        request.setParameter("TEST2", "Test Two");
+        doConnection(callback, url, request, testForException);
     }
 
-
-    private void doPostConnection( TestCallback callback, String url, String uri, boolean testForException )
-        throws Exception
-    {
-        HttpRequestMessage request = new HttpRequestMessage( uri );
-        request.setParameter( "TEST1", "Test One" );
-        request.setParameter( "TEST2", "Test Two" );
-        request.setRequestMethod( HttpRequestMessage.REQUEST_POST );
-        doConnection( callback, url, request, testForException );
+    private void doPostConnection(TestCallback callback, String url,
+            String uri, boolean testForException) throws Exception {
+        HttpRequestMessage request = new HttpRequestMessage(uri);
+        request.setParameter("TEST1", "Test One");
+        request.setParameter("TEST2", "Test Two");
+        request.setRequestMethod(HttpRequestMessage.REQUEST_POST);
+        doConnection(callback, url, request, testForException);
     }
 
+    private void doConnection(TestCallback callback, String url,
+            HttpRequestMessage request, boolean testForException)
+            throws Exception {
+        URL url_connect = new URL(url);
 
-    private void doConnection( TestCallback callback, String url, HttpRequestMessage request, boolean testForException )
-        throws Exception
-    {
-        URL url_connect = new URL( url );
-
-        AsyncHttpClient ahc = new AsyncHttpClient( url_connect, callback );
+        AsyncHttpClient ahc = new AsyncHttpClient(url_connect, callback);
         ahc.connect();
 
-        ahc.sendRequest( request );
+        ahc.sendRequest(request);
 
         //We are done...Thread would normally end...
         //So this little wait simulates the thread going back in the pool
-        synchronized ( semaphore )
-        {
+        synchronized (semaphore) {
             //5 second timeout due to no response
-            semaphore.wait( 5000 );
+            semaphore.wait(5000);
         }
 
-        if ( !testForException )
-        {
-            if ( callback.isException() )
-                throw new Exception( callback.getThrowable() );
+        if (!testForException) {
+            if (callback.isException())
+                throw new Exception(callback.getThrowable());
         }
 
     }
 
-    class TestCallback implements AsyncHttpClientCallback
-    {
+    class TestCallback implements AsyncHttpClientCallback {
 
         private boolean closed = false;
+
         private boolean exception = false;
+
         private Throwable throwable = null;
+
         private HttpResponseMessage message = null;
 
-
-        public TestCallback()
-        {
+        public TestCallback() {
             clear();
         }
 
-
-        public void onResponse( HttpResponseMessage message )
-        {
+        public void onResponse(HttpResponseMessage message) {
             this.message = message;
-            synchronized ( semaphore )
-            {
+            synchronized (semaphore) {
                 semaphore.notify();
             }
         }
 
-
-        public void onException( Throwable cause )
-        {
+        public void onException(Throwable cause) {
             throwable = cause;
             exception = true;
-            synchronized ( semaphore )
-            {
+            synchronized (semaphore) {
                 semaphore.notify();
             }
         }
 
-
-        public void onClosed()
-        {
+        public void onClosed() {
             closed = true;
-            synchronized ( semaphore )
-            {
+            synchronized (semaphore) {
                 semaphore.notify();
             }
         }
 
-
-        public Throwable getThrowable()
-        {
+        public Throwable getThrowable() {
             return throwable;
         }
 
-
-        public void clear()
-        {
+        public void clear() {
             closed = false;
             exception = false;
             message = null;
         }
 
-
-        public boolean isClosed()
-        {
+        public boolean isClosed() {
             return closed;
         }
 
-
-        public void setClosed( boolean closed )
-        {
+        public void setClosed(boolean closed) {
             this.closed = closed;
         }
 
-
-        public boolean isException()
-        {
+        public boolean isException() {
             return exception;
         }
 
-
-        public void setException( boolean exception )
-        {
+        public void setException(boolean exception) {
             this.exception = exception;
         }
 
-
-        public HttpResponseMessage getMessage()
-        {
+        public HttpResponseMessage getMessage() {
             return message;
         }
 
-
-        public void setMessage( HttpResponseMessage message )
-        {
+        public void setMessage(HttpResponseMessage message) {
             this.message = message;
         }
     }

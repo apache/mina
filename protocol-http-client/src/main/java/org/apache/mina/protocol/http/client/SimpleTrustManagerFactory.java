@@ -32,16 +32,15 @@ import java.security.InvalidAlgorithmParameterException;
 public class SimpleTrustManagerFactory extends TrustManagerFactorySpi {
     static final X509TrustManager X509 = new X509TrustManager() {
 
-
-        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-
-        }
-
-
-        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] x509Certificates,
+                String s) throws CertificateException {
 
         }
 
+        public void checkServerTrusted(X509Certificate[] x509Certificates,
+                String s) throws CertificateException {
+
+        }
 
         public X509Certificate[] getAcceptedIssuers() {
 
@@ -51,13 +50,13 @@ public class SimpleTrustManagerFactory extends TrustManagerFactorySpi {
 
     };
 
-    public static final TrustManager[] X509_MANAGERS = new TrustManager[]{X509};
-
+    public static final TrustManager[] X509_MANAGERS = new TrustManager[] { X509 };
 
     protected void engineInit(KeyStore keyStore) throws KeyStoreException {
     }
 
-    protected void engineInit(ManagerFactoryParameters managerFactoryParameters) throws InvalidAlgorithmParameterException {
+    protected void engineInit(ManagerFactoryParameters managerFactoryParameters)
+            throws InvalidAlgorithmParameterException {
     }
 
     protected TrustManager[] engineGetTrustManagers() {

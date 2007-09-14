@@ -19,17 +19,12 @@
  */
 package org.apache.mina.protocol.http.client;
 
-
 import org.apache.mina.filter.codec.http.HttpResponseMessage;
 
+public interface AsyncHttpClientCallback {
+    public void onResponse(HttpResponseMessage message);
 
-public interface AsyncHttpClientCallback
-{
-    public void onResponse( HttpResponseMessage message );
-
-
-    public void onException( Throwable cause );
-
+    public void onException(Throwable cause);
 
     public void onClosed();
 }

@@ -19,7 +19,6 @@
  */
 package org.apache.mina.protocol.http.client;
 
-
 import java.io.File;
 
 import junit.framework.TestCase;
@@ -31,77 +30,74 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Embedded;
 
-
-public abstract class AbstractTest extends TestCase
-{
+public abstract class AbstractTest extends TestCase {
 
     protected final File BASEDIR = getBaseDir();
-    protected final File CATALINAHOME = new File( BASEDIR, "src/test/catalina" );
-    protected final File WORK = new File( BASEDIR, "target/work" );
-    protected final File KEYSTORE = new File( CATALINAHOME, "conf/keystore" );
-    protected final File WEBAPPS = new File( CATALINAHOME, "webapps" );
-    protected final File ROOT = new File( WEBAPPS, "ROOT" );
+
+    protected final File CATALINAHOME = new File(BASEDIR, "src/test/catalina");
+
+    protected final File WORK = new File(BASEDIR, "target/work");
+
+    protected final File KEYSTORE = new File(CATALINAHOME, "conf/keystore");
+
+    protected final File WEBAPPS = new File(CATALINAHOME, "webapps");
+
+    protected final File ROOT = new File(WEBAPPS, "ROOT");
+
     protected Embedded server;
 
-
-    protected void setUp() throws Exception
-    {
-        System.out.println( "BASEDIR = " + BASEDIR.getAbsolutePath() );
+    protected void setUp() throws Exception {
+        System.out.println("BASEDIR = " + BASEDIR.getAbsolutePath());
         server = new Embedded();
-        server.setCatalinaHome( CATALINAHOME.getAbsolutePath() );
+        server.setCatalinaHome(CATALINAHOME.getAbsolutePath());
 
         Engine engine = server.createEngine();
-        engine.setDefaultHost( "localhost" );
+        engine.setDefaultHost("localhost");
 
-        Host host = server.createHost( "localhost", WEBAPPS.getAbsolutePath() );
-        ( ( StandardHost ) host ).setWorkDir( WORK.getAbsolutePath() );
-        engine.addChild( host );
+        Host host = server.createHost("localhost", WEBAPPS.getAbsolutePath());
+        ((StandardHost) host).setWorkDir(WORK.getAbsolutePath());
+        engine.addChild(host);
 
-        Context context = server.createContext( "", ROOT.getAbsolutePath() );
-        context.setParentClassLoader( Thread.currentThread().getContextClassLoader() );
-        host.addChild( context );
+        Context context = server.createContext("", ROOT.getAbsolutePath());
+        context.setParentClassLoader(Thread.currentThread()
+                .getContextClassLoader());
+        host.addChild(context);
 
-        server.addEngine( engine );
+        server.addEngine(engine);
 
         //Http
-        Connector http = server.createConnector( "localhost", 8282, false );
-        server.addConnector( http );
+        Connector http = server.createConnector("localhost", 8282, false);
+        server.addConnector(http);
 
         //Https
-        Connector https = server.createConnector( "localhost", 8383, true );
-        https.setAttribute( "keystoreFile", KEYSTORE.getAbsolutePath() );
-        server.addConnector( https );
+        Connector https = server.createConnector("localhost", 8383, true);
+        https.setAttribute("keystoreFile", KEYSTORE.getAbsolutePath());
+        server.addConnector(https);
         server.start();
     }
 
-
-    protected void tearDown() throws Exception
-    {
-        if ( server != null )
+    protected void tearDown() throws Exception {
+        if (server != null)
             server.stop();
     }
 
-
-    protected final File getBaseDir()
-    {
+    protected final File getBaseDir() {
         File dir;
 
         // If ${basedir} is set, then honor it
-        String tmp = System.getProperty( "basedir" );
-        if ( tmp != null )
-        {
-            dir = new File( tmp );
-        }
-        else
-        {
+        String tmp = System.getProperty("basedir");
+        if (tmp != null) {
+            dir = new File(tmp);
+        } else {
             // Find the directory which this class (or really the sub-class of TestSupport) is defined in.
-            String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+            String path = getClass().getProtectionDomain().getCodeSource()
+                    .getLocation().getFile();
 
             // We expect the file to be in target/test-classes, so go up 2 dirs
-            dir = new File( path ).getParentFile().getParentFile();
+            dir = new File(path).getParentFile().getParentFile();
 
             // Set ${basedir} which is needed by logging to initialize
-            System.setProperty( "basedir", dir.getPath() );
+            System.setProperty("basedir", dir.getPath());
         }
 
         return dir;

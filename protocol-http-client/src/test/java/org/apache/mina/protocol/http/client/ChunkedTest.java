@@ -19,7 +19,6 @@
  */
 package org.apache.mina.protocol.http.client;
 
-
 import java.util.Arrays;
 
 import junit.framework.TestCase;
@@ -29,46 +28,48 @@ import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.http.HttpResponseDecoder;
 import org.apache.mina.filter.codec.http.HttpResponseMessage;
 
+public class ChunkedTest extends TestCase {
 
-public class ChunkedTest extends TestCase
-{
-
-    private final static String fakeHttp = "HTTP/1.1 200 OK\r\n" + "Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n"
-        + "Content-Type: text/plain\r\n" + "Transfer-Encoding: chunked\r\n" + "\r\n" + "1a; ignore-stuff-here\r\n"
-        + "abcdefghijklmnopqrstuvwxyz\r\n" + "10\r\n" + "1234567890abcdef\r\n" + "0\r\n"
-        + "some-footer: some-value\r\n" + "another-footer: another-value\r\n\r\n";
+    private final static String fakeHttp = "HTTP/1.1 200 OK\r\n"
+            + "Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n"
+            + "Content-Type: text/plain\r\n" + "Transfer-Encoding: chunked\r\n"
+            + "\r\n" + "1a; ignore-stuff-here\r\n"
+            + "abcdefghijklmnopqrstuvwxyz\r\n" + "10\r\n"
+            + "1234567890abcdef\r\n" + "0\r\n" + "some-footer: some-value\r\n"
+            + "another-footer: another-value\r\n\r\n";
 
     private final static String fakeHttpContinue = "HTTP/1.1 100 Continue\r\n"
-        + "Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n" + "Content-Type: text/plain\r\n" + "\r\n" + fakeHttp;
+            + "Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n"
+            + "Content-Type: text/plain\r\n" + "\r\n" + fakeHttp;
 
-
-    public void testChunking() throws Exception
-    {
-        ByteBuffer buffer = ByteBuffer.allocate( fakeHttp.length() );
-        buffer.put( fakeHttp.getBytes() );
+    public void testChunking() throws Exception {
+        ByteBuffer buffer = ByteBuffer.allocate(fakeHttp.length());
+        buffer.put(fakeHttp.getBytes());
         buffer.flip();
 
         ProtocolCodecSession session = new ProtocolCodecSession();
         HttpResponseDecoder decoder = new HttpResponseDecoder();
-        decoder.decode( session, buffer, session.getDecoderOutput() );
+        decoder.decode(session, buffer, session.getDecoderOutput());
 
-        HttpResponseMessage response = (HttpResponseMessage) session.getDecoderOutputQueue().poll();
-        assertTrue( Arrays.equals( response.getContent(), "abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes() ) );
+        HttpResponseMessage response = (HttpResponseMessage) session
+                .getDecoderOutputQueue().poll();
+        assertTrue(Arrays.equals(response.getContent(),
+                "abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes()));
     }
 
-
-    public void testChunkingContinue() throws Exception
-    {
-        ByteBuffer buffer = ByteBuffer.allocate( fakeHttpContinue.length() );
-        buffer.put( fakeHttp.getBytes() );
+    public void testChunkingContinue() throws Exception {
+        ByteBuffer buffer = ByteBuffer.allocate(fakeHttpContinue.length());
+        buffer.put(fakeHttp.getBytes());
         buffer.flip();
 
         ProtocolCodecSession session = new ProtocolCodecSession();
         HttpResponseDecoder decoder = new HttpResponseDecoder();
-        decoder.decode( session, buffer, session.getDecoderOutput() );
+        decoder.decode(session, buffer, session.getDecoderOutput());
 
-        HttpResponseMessage response = (HttpResponseMessage) session.getDecoderOutputQueue().poll();
-        assertTrue( Arrays.equals( response.getContent(), "abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes() ) );
+        HttpResponseMessage response = (HttpResponseMessage) session
+                .getDecoderOutputQueue().poll();
+        assertTrue(Arrays.equals(response.getContent(),
+                "abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes()));
     }
 
 }
