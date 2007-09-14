@@ -25,8 +25,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
@@ -68,10 +66,6 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
     private final Queue<WriteRequest> writeRequestQueue;
 
     private final IoHandler handler;
-
-    private final AtomicBoolean inFlushQueue = new AtomicBoolean(false);
-
-    private final AtomicLong scheduledWriteBytes = new AtomicLong();
 
     private SelectionKey key;
 
@@ -149,21 +143,6 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         return size;
     }
 
-    public long getScheduledWriteBytes() {
-        return scheduledWriteBytes.get();
-    }
-
-    @Override
-    public void increaseWrittenBytes(long increment) {
-        super.increaseWrittenBytes(increment);
-
-        scheduledWriteBytes.addAndGet(-increment);
-    }
-
-    AtomicLong getScheduledWriteBytesCounter() {
-        return scheduledWriteBytes;
-    }
-
     @Override
     protected void write0(WriteRequest writeRequest) {
         filterChain.fireFilterWrite(this, writeRequest);
@@ -195,17 +174,18 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         this.readBufferSize = readBufferSize;
     }
 
-    AtomicBoolean getInFlushQueue() {
-        return inFlushQueue;
-    }
-    
     void queueWriteRequest(WriteRequest writeRequest) {
         if (writeRequest.getMessage() instanceof ByteBuffer) {
             ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
             // SocketIoProcessor.doFlush() will reset it after write is finished
             // because the buffer will be passed with messageSent event.
             buffer.mark();
-            scheduledWriteBytes.addAndGet(buffer.remaining());
+            int remaining = buffer.remaining();
+            if (remaining == 0) {
+                increaseScheduledWriteMessages();            
+            } else {
+                increaseScheduledWriteBytes(buffer.remaining());
+            }
         }
 
         writeRequestQueue.add(writeRequest);

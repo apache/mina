@@ -144,14 +144,6 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
         this.filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public int getScheduledWriteMessages() {
-        return 0;
-    }
-
-    public long getScheduledWriteBytes() {
-        return 0;
-    }
-
     public VmPipeAddress getRemoteAddress() {
         return remoteAddress;
     }

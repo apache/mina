@@ -182,6 +182,11 @@ class VmPipeFilterChain extends AbstractIoFilterChain {
                         messageCopy = wb;
                     }
 
+                    // Avoid unwanted side effect that scheduledWrite* becomes negative
+                    // by increasing them.
+                    s.increaseScheduledWriteBytes(byteCount);
+                    s.increaseScheduledWriteMessages();
+                    
                     s.increaseWrittenBytes(byteCount);
                     s.increaseWrittenMessages();
 

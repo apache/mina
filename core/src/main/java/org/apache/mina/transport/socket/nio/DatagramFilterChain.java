@@ -43,16 +43,22 @@ class DatagramFilterChain extends AbstractIoFilterChain {
     protected void doWrite(IoSession session, WriteRequest writeRequest) {
         DatagramSessionImpl s = (DatagramSessionImpl) session;
         Queue<WriteRequest> writeRequestQueue = s.getWriteRequestQueue();
-        ((ByteBuffer) writeRequest.getMessage()).mark();
 
-        int writeRequestQueueSize;
-        synchronized (writeRequestQueue) {
-            writeRequestQueue.add(writeRequest);
-            writeRequestQueueSize = writeRequestQueue.size();
+        ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
+        buffer.mark();
+        
+        int remaining = buffer.remaining();
+        if (remaining == 0) {
+            s.increaseScheduledWriteMessages();            
+        } else {
+            s.increaseScheduledWriteBytes(buffer.remaining());
         }
 
-        if (writeRequestQueueSize == 1 && session.getTrafficMask().isWritable()) {
-            // Notify SocketIoProcessor only when writeRequestQueue was empty.
+        synchronized (writeRequestQueue) {
+            writeRequestQueue.add(writeRequest);
+        }
+        
+        if (session.getTrafficMask().isWritable()) {
             IoService service = s.getService();
             if (service instanceof DatagramAcceptor) {
                 ((DatagramAcceptor) service).flushSession(s);

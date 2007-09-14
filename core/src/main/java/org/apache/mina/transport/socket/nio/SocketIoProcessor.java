@@ -125,7 +125,7 @@ class SocketIoProcessor {
     }
 
     private boolean scheduleFlush(SocketSessionImpl session) {
-        if (session.getInFlushQueue().compareAndSet(false, true)) {
+        if (session.setScheduledForFlush(true)) {
             flushingSessions.add(session);
 
             return true;
@@ -334,7 +334,7 @@ class SocketIoProcessor {
                 break;
             }
 
-            session.getInFlushQueue().set(false);
+            session.setScheduledForFlush(false);
 
             if (!session.isConnected()) {
                 clearWriteRequestQueue(session);
@@ -356,7 +356,7 @@ class SocketIoProcessor {
 
             try {
                 boolean flushedAll = doFlush(session);
-                if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.getInFlushQueue().get()) {
+                if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.isScheduledForFlush()) {
                     scheduleFlush(session);
                 }
             } catch (IOException e) {
@@ -370,12 +370,10 @@ class SocketIoProcessor {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
 
-        while ((req = writeRequestQueue.poll()) != null) {
+        if ((req = writeRequestQueue.poll()) != null) {
             Object m = req.getMessage();
             if (m instanceof ByteBuffer) {
                 ByteBuffer buf = (ByteBuffer) req.getMessage();
-
-                session.getScheduledWriteBytesCounter().addAndGet(-buf.remaining());
 
                 // The first unwritten empty buffer must be
                 // forwarded to the filter chain.

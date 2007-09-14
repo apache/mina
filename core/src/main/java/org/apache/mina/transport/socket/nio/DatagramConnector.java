@@ -170,15 +170,21 @@ public class DatagramConnector extends AbstractIoConnector {
     }
 
     void flushSession(DatagramSessionImpl session) {
-        scheduleFlush(session);
-        Selector selector = this.selector;
-        if (selector != null) {
-            selector.wakeup();
+        if (scheduleFlush(session)) {
+            Selector selector = this.selector;
+            if (selector != null) {
+                selector.wakeup();
+            }
         }
     }
 
-    private void scheduleFlush(DatagramSessionImpl session) {
-        flushingSessions.add(session);
+    private boolean scheduleFlush(DatagramSessionImpl session) {
+        if (session.setScheduledForFlush(true)) {
+            flushingSessions.add(session);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     void updateTrafficMask(DatagramSessionImpl session) {
@@ -315,24 +321,29 @@ public class DatagramConnector extends AbstractIoConnector {
             if (session == null) {
                 break;
             }
+            
+            session.setScheduledForFlush(false);
 
             try {
-                flush(session);
+                boolean flushedAll = flush(session);
+                if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.isScheduledForFlush()) {
+                    scheduleFlush(session);
+                }
             } catch (IOException e) {
                 session.getFilterChain().fireExceptionCaught(session, e);
             }
         }
     }
 
-    private void flush(DatagramSessionImpl session) throws IOException {
+    private boolean flush(DatagramSessionImpl session) throws IOException {
         // Clear OP_WRITE
         SelectionKey key = session.getSelectionKey();
         if (key == null) {
             scheduleFlush(session);
-            return;
+            return false;
         }
         if (!key.isValid()) {
-            return;
+            return false;
         }
         key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
 
@@ -369,7 +380,7 @@ public class DatagramConnector extends AbstractIoConnector {
                 if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                    break;
+                    return false;
                 } else {
                     key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
 
@@ -387,6 +398,8 @@ public class DatagramConnector extends AbstractIoConnector {
         } finally {
             session.increaseWrittenBytes(writtenBytes);
         }
+        
+        return true;
     }
 
     private void registerNew() {

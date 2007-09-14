@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -38,6 +41,16 @@ import java.util.Set;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoSession implements IoSession {
+
+    private static final IoFutureListener SCHEDULED_COUNTER_RESETTER =
+        new IoFutureListener() {
+            public void operationComplete(IoFuture future) {
+                AbstractIoSession s = (AbstractIoSession) future.getSession();
+                s.scheduledWriteBytes.set(0);
+                s.scheduledWriteMessages.set(0);
+            }
+        };
+    
     private final Object lock = new Object();
 
     private final Map<String, Object> attributes = Collections
@@ -49,6 +62,12 @@ public abstract class AbstractIoSession implements IoSession {
      * A future that will be set 'closed' when the connection is closed.
      */
     private final CloseFuture closeFuture = new DefaultCloseFuture(this);
+
+    private final AtomicBoolean scheduledForFlush = new AtomicBoolean();
+    
+    private final AtomicLong scheduledWriteBytes = new AtomicLong();
+
+    private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
 
     private volatile boolean closing;
 
@@ -82,6 +101,7 @@ public abstract class AbstractIoSession implements IoSession {
     protected AbstractIoSession() {
         creationTime = lastReadTime = lastWriteTime = lastIdleTimeForBoth = lastIdleTimeForRead = lastIdleTimeForWrite = System
                 .currentTimeMillis();
+        closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
 
     public boolean isConnected() {
@@ -94,6 +114,19 @@ public abstract class AbstractIoSession implements IoSession {
 
     public CloseFuture getCloseFuture() {
         return closeFuture;
+    }
+
+    public boolean isScheduledForFlush() {
+        return scheduledForFlush.get();
+    }
+    
+    public boolean setScheduledForFlush(boolean flag) {
+        if (flag) {
+            return scheduledForFlush.compareAndSet(false, true);
+        } else {
+            scheduledForFlush.set(false);
+            return true;
+        }
     }
 
     public CloseFuture close() {
@@ -360,6 +393,14 @@ public abstract class AbstractIoSession implements IoSession {
     public long getWrittenMessages() {
         return writtenMessages;
     }
+    
+    public long getScheduledWriteBytes() {
+        return scheduledWriteBytes.get();
+    }
+    
+    public int getScheduledWriteMessages() {
+        return scheduledWriteMessages.get();
+    }
 
     public void increaseReadBytes(int increment) {
         if (increment > 0) {
@@ -376,6 +417,8 @@ public abstract class AbstractIoSession implements IoSession {
             lastWriteTime = System.currentTimeMillis();
             idleCountForBoth = 0;
             idleCountForWrite = 0;
+            
+            scheduledWriteBytes.addAndGet(-increment);
         }
     }
 
@@ -385,6 +428,15 @@ public abstract class AbstractIoSession implements IoSession {
 
     public void increaseWrittenMessages() {
         writtenMessages++;
+        scheduledWriteMessages.decrementAndGet();
+    }
+
+    public void increaseScheduledWriteBytes(int increment) {
+        scheduledWriteBytes.addAndGet(increment);
+    }
+
+    public void increaseScheduledWriteMessages() {
+        scheduledWriteMessages.incrementAndGet();
     }
 
     public long getCreationTime() {

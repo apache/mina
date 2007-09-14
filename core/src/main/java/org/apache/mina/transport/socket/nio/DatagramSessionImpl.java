@@ -170,37 +170,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public int getScheduledWriteMessages() {
-        int size = 0;
-        synchronized (writeRequestQueue) {
-            for (WriteRequest request : writeRequestQueue) {
-                Object message = request.getMessage();
-                if (message instanceof ByteBuffer) {
-                    if (((ByteBuffer) message).hasRemaining()) {
-                        size++;
-                    }
-                } else {
-                    size++;
-                }
-            }
-        }
-
-        return size;
-    }
-
-    public long getScheduledWriteBytes() {
-        int size = 0;
-        synchronized (writeRequestQueue) {
-            for (Object o : writeRequestQueue) {
-                if (o instanceof ByteBuffer) {
-                    size += ((ByteBuffer) o).remaining();
-                }
-            }
-        }
-
-        return size;
-    }
-
     public InetSocketAddress getRemoteAddress() {
         return remoteAddress;
     }
