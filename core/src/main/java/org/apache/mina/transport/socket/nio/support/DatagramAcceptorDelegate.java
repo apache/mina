@@ -286,18 +286,24 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
     }
 
     public void flushSession(DatagramSessionImpl session) {
-        scheduleFlush(session);
-        Selector selector = this.selector;
-        if (selector != null) {
-            selector.wakeup();
+        if (scheduleFlush(session)) {
+            Selector selector = this.selector;
+            if (selector != null) {
+                selector.wakeup();
+            }
         }
     }
 
     public void closeSession(DatagramSessionImpl session) {
     }
 
-    private void scheduleFlush(DatagramSessionImpl session) {
-        flushingSessions.add(session);
+    private boolean scheduleFlush(DatagramSessionImpl session) {
+        if (session.setScheduledForFlush(true)) {
+            flushingSessions.add(session);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private class Worker implements Runnable {
@@ -409,23 +415,28 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
             if (session == null)
                 break;
 
+            session.setScheduledForFlush(false);
+
             try {
-                flush(session);
+                boolean flushedAll = flush(session);
+                if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.isScheduledForFlush()) {
+                    scheduleFlush(session);
+                }
             } catch (IOException e) {
                 session.getFilterChain().fireExceptionCaught(session, e);
             }
         }
     }
 
-    private void flush(DatagramSessionImpl session) throws IOException {
+    private boolean flush(DatagramSessionImpl session) throws IOException {
         // Clear OP_WRITE
         SelectionKey key = session.getSelectionKey();
         if (key == null) {
             scheduleFlush(session);
-            return;
+            return false;
         }
         if (!key.isValid()) {
-            return;
+            return false;
         }
         key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
 
@@ -463,7 +474,7 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
                 if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                    break;
+                    return false;
                 } else {
                     // pop and fire event
                     writeRequestQueue.poll();
@@ -476,6 +487,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         } finally {
             session.increaseWrittenBytes(writtenBytes);
         }
+        
+        return true;
     }
 
     private void registerNew() {

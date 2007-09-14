@@ -144,14 +144,6 @@ public class VmPipeSessionImpl extends BaseIoSession {
         this.filterChain.fireFilterWrite(this, writeRequest);
     }
 
-    public int getScheduledWriteRequests() {
-        return 0;
-    }
-
-    public int getScheduledWriteBytes() {
-        return 0;
-    }
-
     public TransportType getTransportType() {
         return TransportType.VM_PIPE;
     }

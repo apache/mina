@@ -25,10 +25,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -37,7 +34,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.common.support.BaseIoSessionConfig;
 import org.apache.mina.common.support.IoServiceListenerSupport;
@@ -72,10 +69,6 @@ class SocketSessionImpl extends BaseIoSession {
     private final SocketAddress serviceAddress;
 
     private final IoServiceListenerSupport serviceListeners;
-
-    private final AtomicBoolean inFlushQueue = new AtomicBoolean( false );
-
-    private final AtomicInteger scheduledWriteBytes = new AtomicInteger();
 
     private SelectionKey key;
 
@@ -167,43 +160,6 @@ class SocketSessionImpl extends BaseIoSession {
         return writeRequestQueue;
     }
 
-    public int getScheduledWriteRequests() {
-        int size = 0;
-        for (WriteRequest request : writeRequestQueue) {
-            Object message = request.getMessage();
-            if (message instanceof ByteBuffer) {
-                if (((ByteBuffer) message).hasRemaining()) {
-                    size ++;
-                }
-            } else {
-                size ++;
-            }
-        }
-
-        return size;
-    }
-
-    /**
-     * Returns the sum of the '<tt>remaining</tt>' of all {@link ByteBuffer}s
-     * in the writeRequestQueue queue.
-     *
-     * @throws ClassCastException if an element is not a {@link ByteBuffer}
-     */
-    public int getScheduledWriteBytes() {
-        return scheduledWriteBytes.get();
-    }
-
-    @Override
-    public void increaseWrittenBytes( int increment ) {
-        super.increaseWrittenBytes( increment );
-
-        scheduledWriteBytes.addAndGet( -increment );
-    }
-
-    AtomicInteger getScheduledWriteBytesCounter() {
-        return scheduledWriteBytes;
-    }
-
     @Override
     protected void write0(WriteRequest writeRequest) {
         filterChain.fireFilterWrite(this, writeRequest);
@@ -236,10 +192,6 @@ class SocketSessionImpl extends BaseIoSession {
 
     void setReadBufferSize(int readBufferSize) {
         this.readBufferSize = readBufferSize;
-    }
-
-    AtomicBoolean getInFlushQueue() {
-        return inFlushQueue;
     }
 
     private class SessionConfigImpl extends BaseIoSessionConfig implements

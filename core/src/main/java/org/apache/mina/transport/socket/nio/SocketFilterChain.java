@@ -49,7 +49,13 @@ class SocketFilterChain extends AbstractIoFilterChain {
         ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
         buffer.mark();
 
-        s.getScheduledWriteBytesCounter().addAndGet(buffer.remaining());
+        int remaining = buffer.remaining();
+        if (remaining == 0) {
+            s.increaseScheduledWriteRequests();            
+        } else {
+            s.increaseScheduledWriteBytes(buffer.remaining());
+        }
+
         writeRequestQueue.add(writeRequest);
 
         if (session.getTrafficMask().isWritable()) {

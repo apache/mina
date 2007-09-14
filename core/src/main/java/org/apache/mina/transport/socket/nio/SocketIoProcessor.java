@@ -110,7 +110,7 @@ class SocketIoProcessor {
     }
 
     private boolean scheduleFlush(SocketSessionImpl session) {
-        if ( session.getInFlushQueue().compareAndSet( false, true ) ) {
+        if (session.setScheduledForFlush(true)) {
             flushingSessions.add(session);
 
             return true;
@@ -306,7 +306,7 @@ class SocketIoProcessor {
             if (session == null)
                 break;
 
-            session.getInFlushQueue().set( false );
+            session.setScheduledForFlush(false);
 
             if (!session.isConnected()) {
                 releaseWriteBuffers(session);
@@ -328,7 +328,7 @@ class SocketIoProcessor {
 
             try {
                 boolean flushedAll = doFlush(session);
-                if( flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.getInFlushQueue().get()) {
+                if( flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.isScheduledForFlush()) {
                     scheduleFlush( session );
                 }
             } catch (IOException e) {
@@ -342,11 +342,10 @@ class SocketIoProcessor {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
 
-        while ((req = writeRequestQueue.poll()) != null) {
+        if ((req = writeRequestQueue.poll()) != null) {
             ByteBuffer buf = (ByteBuffer) req.getMessage();
             try {
                 buf.release();
-                session.getScheduledWriteBytesCounter().addAndGet( -buf.remaining() );
             } catch (IllegalStateException e) {
                 session.getFilterChain().fireExceptionCaught(session, e);
             } finally {

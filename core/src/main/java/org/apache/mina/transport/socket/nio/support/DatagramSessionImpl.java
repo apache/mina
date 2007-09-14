@@ -27,8 +27,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.common.BroadcastIoSession;
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -38,6 +36,7 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.support.BaseIoSession;
 import org.apache.mina.transport.socket.nio.DatagramServiceConfig;
 import org.apache.mina.transport.socket.nio.DatagramSessionConfig;
@@ -170,34 +169,6 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession {
     @Override
     protected void write0(WriteRequest writeRequest) {
         filterChain.fireFilterWrite(this, writeRequest);
-    }
-
-    public int getScheduledWriteRequests() {
-        int size = 0;
-        synchronized (writeRequestQueue) {
-            for (WriteRequest request : writeRequestQueue) {
-                Object message = request.getMessage();
-                if (message instanceof ByteBuffer) {
-                    if (((ByteBuffer) message).hasRemaining()) {
-                        size ++;
-                    }
-                } else {
-                    size ++;
-                }
-            }
-        }
-
-        return size;
-    }
-
-    public int getScheduledWriteBytes() {
-        int byteSize = 0;
-
-        for (WriteRequest request : writeRequestQueue) {
-            byteSize += ((ByteBuffer) request.getMessage()).remaining();
-        }
-
-        return byteSize;
     }
 
     public TransportType getTransportType() {
