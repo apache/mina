@@ -23,9 +23,9 @@
     <version>2.0.0-M1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>mina-protocol-client-http</artifactId>
+  <artifactId>mina-protocol-http-client</artifactId>
   <packaging>jar</packaging>
-  <name>Apache MINA Asynch HTTP Client</name>
+  <name>Apache MINA HTTP Client</name>
   <dependencies>
     <dependency>
       <groupId>org.apache.mina</groupId>

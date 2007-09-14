@@ -7,7 +7,7 @@
     <version>2.0.0-M1-SNAPSHOT</version>
   </parent>
   <artifactId>mina-core</artifactId>
-  <name>Apache MINA Core API</name>
+  <name>Apache MINA Core</name>
   <packaging>bundle</packaging>
 
   <build>

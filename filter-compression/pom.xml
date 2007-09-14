@@ -7,7 +7,7 @@
     <version>2.0.0-M1-SNAPSHOT</version>
   </parent>
   <artifactId>mina-filter-compression</artifactId>
-  <name>Apache MINA Stream Compression Filter</name>
+  <name>Apache MINA Compression Filter</name>
   <packaging>jar</packaging>  
 
   <dependencies>

@@ -7,7 +7,7 @@
     <version>2.0.0-M1-SNAPSHOT</version>
   </parent>
   <artifactId>mina-filter-codec-netty</artifactId>
-  <name>Apache MINA Netty Codec Filter</name>
+  <name>Apache MINA Netty Codec</name>
   <packaging>jar</packaging>
 
   <dependencies>

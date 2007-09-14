@@ -6,8 +6,8 @@
     <version>2.0.0-M1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>mina-protocol-server-http</artifactId>
-  <name>mina-protocol-server-http</name>
+  <artifactId>mina-protocol-http-server</artifactId>
+  <name>Apache MINA HTTP Server</name>
   <dependencies>
   </dependencies>
 </project>
