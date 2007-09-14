@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.http.client.ssl;
+package org.apache.mina.protocol.http.client;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactorySpi;
@@ -29,7 +29,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.InvalidAlgorithmParameterException;
 
-public class TrustManagerFactoryImpl extends TrustManagerFactorySpi {
+public class SimpleTrustManagerFactory extends TrustManagerFactorySpi {
     static final X509TrustManager X509 = new X509TrustManager() {
 
 

@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.http.client;
+package org.apache.mina.protocol.http.client;
 
 
 import java.io.File;
@@ -27,6 +27,8 @@ import java.util.Arrays;
 
 import org.apache.mina.filter.codec.http.HttpRequestMessage;
 import org.apache.mina.filter.codec.http.HttpResponseMessage;
+import org.apache.mina.protocol.http.client.AsyncHttpClient;
+import org.apache.mina.protocol.http.client.AsyncHttpClientCallback;
 
 
 public class AsyncHttpClientTest extends AbstractTest

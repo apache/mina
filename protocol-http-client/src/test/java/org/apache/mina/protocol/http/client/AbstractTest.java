@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.http.client;
+package org.apache.mina.protocol.http.client;
 
 
 import java.io.File;
