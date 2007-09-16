@@ -68,17 +68,17 @@ public abstract class AbstractIoSession implements IoSession {
      */
     private final CloseFuture closeFuture = new DefaultCloseFuture(this);
 
+    private volatile boolean closing;
+
+    private TrafficMask trafficMask = TrafficMask.ALL;
+
+    // Status variables
     private final AtomicBoolean scheduledForFlush = new AtomicBoolean();
     
     private final AtomicLong scheduledWriteBytes = new AtomicLong();
 
     private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
 
-    private volatile boolean closing;
-
-    private TrafficMask trafficMask = TrafficMask.ALL;
-
-    // Status variables
     private long readBytes;
 
     private long writtenBytes;

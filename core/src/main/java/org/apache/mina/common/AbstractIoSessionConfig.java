@@ -28,6 +28,9 @@ package org.apache.mina.common;
  */
 public abstract class AbstractIoSessionConfig implements IoSessionConfig {
 
+    private int minReadBufferSize = 64;
+    private int readBufferSize = 2048;
+    private int maxReadBufferSize = 65536;
     private int idleTimeForRead;
     private int idleTimeForWrite;
     private int idleTimeForBoth;
@@ -41,6 +44,9 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
             throw new NullPointerException("config");
         }
         
+        setReadBufferSize(config.getReadBufferSize());
+        setMinReadBufferSize(config.getMinReadBufferSize());
+        setMaxReadBufferSize(config.getMaxReadBufferSize());
         setIdleTime(IdleStatus.BOTH_IDLE, config.getIdleTime(IdleStatus.BOTH_IDLE));
         setIdleTime(IdleStatus.READER_IDLE, config.getIdleTime(IdleStatus.READER_IDLE));
         setIdleTime(IdleStatus.WRITER_IDLE, config.getIdleTime(IdleStatus.WRITER_IDLE));
@@ -54,6 +60,48 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
      * properties retrieved from the specified <tt>config</tt>.
      */
     protected abstract void doSetAll(IoSessionConfig config);
+
+    public int getReadBufferSize() {
+        return readBufferSize;
+    }
+    
+    public void setReadBufferSize(int readBufferSize) {
+        if (readBufferSize <= 0) {
+            throw new IllegalArgumentException("readBufferSize: " + readBufferSize + " (expected: 1+)");
+        }
+        this.readBufferSize = readBufferSize;
+    }
+
+    public int getMinReadBufferSize() {
+        return minReadBufferSize;
+    }
+    
+    public void setMinReadBufferSize(int minReadBufferSize) {
+        if (minReadBufferSize <= 0) {
+            throw new IllegalArgumentException("minReadBufferSize: " + minReadBufferSize + " (expected: 1+)");
+        }
+        if (minReadBufferSize > maxReadBufferSize ) {
+            throw new IllegalArgumentException("minReadBufferSize: " + minReadBufferSize + " (expected: smaller than " + maxReadBufferSize + ')');
+            
+        }
+        this.minReadBufferSize = minReadBufferSize;
+    }
+
+    public int getMaxReadBufferSize() {
+        return maxReadBufferSize;
+    }
+    
+    public void setMaxReadBufferSize(int maxReadBufferSize) {
+        if (maxReadBufferSize <= 0) {
+            throw new IllegalArgumentException("maxReadBufferSize: " + maxReadBufferSize + " (expected: 1+)");
+        }
+        
+        if (maxReadBufferSize < minReadBufferSize) {
+            throw new IllegalArgumentException("maxReadBufferSize: " + maxReadBufferSize + " (expected: greater than " + minReadBufferSize + ')');
+            
+        }
+        this.maxReadBufferSize = maxReadBufferSize;
+    }
 
     public int getIdleTime(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {

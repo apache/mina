@@ -26,6 +26,49 @@ package org.apache.mina.common;
  * @version $Rev$, $Date$
  */
 public interface IoSessionConfig {
+    
+    /**
+     * Returns the size of the read buffer that I/O processor allocates
+     * per each read.  It's unusual to adjust this property because
+     * it's often adjusted automatically by the I/O processor.
+     */
+    int getReadBufferSize();
+
+    /**
+     * Sets the size of the read buffer that I/O processor allocates
+     * per each read.  It's unusual to adjust this property because
+     * it's often adjusted automatically by the I/O processor.
+     */
+    void setReadBufferSize(int readBufferSize);
+    
+    /**
+     * Returns the minimum size of the read buffer that I/O processor
+     * allocates per each read.  I/O processor will not decrease the
+     * read buffer size to the smaller value than this property value.
+     */
+    int getMinReadBufferSize();
+
+    /**
+     * Sets the minimum size of the read buffer that I/O processor
+     * allocates per each read.  I/O processor will not decrease the
+     * read buffer size to the smaller value than this property value.
+     */
+    void setMinReadBufferSize(int minReadBufferSize);
+    
+    /**
+     * Returns the maximum size of the read buffer that I/O processor
+     * allocates per each read.  I/O processor will not increase the
+     * read buffer size to the greater value than this property value.
+     */
+    int getMaxReadBufferSize();
+
+    /**
+     * Sets the maximum size of the read buffer that I/O processor
+     * allocates per each read.  I/O processor will not increase the
+     * read buffer size to the greater value than this property value.
+     */
+    void setMaxReadBufferSize(int maxReadBufferSize);
+    
     /**
      * Returns idle time for the specified type of idleness in seconds.
      */
