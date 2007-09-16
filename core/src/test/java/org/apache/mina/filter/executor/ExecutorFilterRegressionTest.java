@@ -75,7 +75,7 @@ public class ExecutorFilterRegressionTest extends TestCase {
         }
         
         executor.shutdown();
-        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         
         for (int i = end; i >= 0; i--) {
             Assert.assertEquals(loop - 1, sessions[i].lastCount.intValue());
