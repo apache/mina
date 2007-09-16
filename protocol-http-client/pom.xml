@@ -45,7 +45,8 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
       <version>1.4.3</version>
     </dependency>
     <dependency>
