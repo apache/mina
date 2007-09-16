@@ -188,14 +188,14 @@ public class SocketAcceptor extends AbstractIoAcceptor {
         return (InetSocketAddress) super.getLocalAddress();
     }
 
-    // This method is overriden to work around a problem with
+    // This method is added to work around a problem with
     // bean property access mechanism.
 
     /**
      * @see org.apache.mina.common.AbstractIoAcceptor#setLocalAddress(java.net.SocketAddress)
+     * @param localAddress the local address
      */
-    @Override
-    public void setLocalAddress(SocketAddress localAddress) {
+    public void setLocalAddress(InetSocketAddress localAddress) {
         super.setLocalAddress(localAddress);
     }
 
