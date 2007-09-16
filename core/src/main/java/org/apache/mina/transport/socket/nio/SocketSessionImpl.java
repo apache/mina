@@ -23,8 +23,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
@@ -63,8 +61,6 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
 
     private final SocketChannel ch;
 
-    private final Queue<WriteRequest> writeRequestQueue;
-
     private final IoHandler handler;
 
     private SelectionKey key;
@@ -76,7 +72,6 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         this.ioProcessor = ioProcessor;
         this.filterChain = new SocketFilterChain(this);
         this.ch = ch;
-        this.writeRequestQueue = new ConcurrentLinkedQueue<WriteRequest>();
         this.handler = service.getHandler();
         this.config.setAll(service.getSessionConfig());
     }
@@ -120,27 +115,6 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
     @Override
     protected void close0() {
         filterChain.fireFilterClose(this);
-    }
-
-    Queue<WriteRequest> getWriteRequestQueue() {
-        return writeRequestQueue;
-    }
-
-    public int getScheduledWriteMessages() {
-        int size = 0;
-
-        for (WriteRequest request : writeRequestQueue) {
-            Object message = request.getMessage();
-            if (message instanceof ByteBuffer) {
-                if (((ByteBuffer) message).hasRemaining()) {
-                    size++;
-                }
-            } else {
-                size++;
-            }
-        }
-
-        return size;
     }
 
     @Override
@@ -188,7 +162,7 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
             }
         }
 
-        writeRequestQueue.add(writeRequest);
+        getWriteRequestQueue().add(writeRequest);
 
         if (getTrafficMask().isWritable()) {
             getIoProcessor().flush(this);

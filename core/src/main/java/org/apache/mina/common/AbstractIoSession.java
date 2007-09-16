@@ -28,7 +28,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -54,7 +56,10 @@ public abstract class AbstractIoSession implements IoSession {
     private final Object lock = new Object();
 
     private final Map<String, Object> attributes = Collections
-            .synchronizedMap(new HashMap<String, Object>(8));
+            .synchronizedMap(new HashMap<String, Object>(4));
+    
+    private final Queue<WriteRequest> writeRequestQueue =
+        new ConcurrentLinkedQueue<WriteRequest>();
 
     private final long creationTime;
 
@@ -99,8 +104,9 @@ public abstract class AbstractIoSession implements IoSession {
     private long lastIdleTimeForWrite;
 
     protected AbstractIoSession() {
-        creationTime = lastReadTime = lastWriteTime = lastIdleTimeForBoth = lastIdleTimeForRead = lastIdleTimeForWrite = System
-                .currentTimeMillis();
+        creationTime = lastReadTime = lastWriteTime =
+            lastIdleTimeForBoth = lastIdleTimeForRead =
+                lastIdleTimeForWrite = System.currentTimeMillis();
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
 
@@ -437,6 +443,10 @@ public abstract class AbstractIoSession implements IoSession {
 
     public void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
+    }
+    
+    public Queue<WriteRequest> getWriteRequestQueue() {
+        return writeRequestQueue;
     }
 
     public long getCreationTime() {

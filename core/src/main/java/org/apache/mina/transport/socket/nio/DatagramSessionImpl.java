@@ -24,8 +24,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
@@ -62,8 +60,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
             this);
 
     private final DatagramChannel ch;
-
-    private final Queue<WriteRequest> writeRequestQueue = new LinkedList<WriteRequest>();
 
     private final IoHandler handler;
 
@@ -150,10 +146,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
                     .remove(this);
         }
         filterChain.fireFilterClose(this);
-    }
-
-    Queue<WriteRequest> getWriteRequestQueue() {
-        return writeRequestQueue;
     }
 
     @Override

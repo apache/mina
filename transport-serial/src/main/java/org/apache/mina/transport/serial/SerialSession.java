@@ -19,17 +19,16 @@
  */
 package org.apache.mina.transport.serial;
 
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketAddress;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.TooManyListenersException;
 
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultTransportMetadata;
@@ -64,8 +63,6 @@ public class SerialSession extends AbstractIoSession implements
 
     private final SerialAddress address;
 
-    private final Queue<WriteRequest> writeRequestQueue;
-
     private InputStream inputStream;
 
     private OutputStream outputStream;
@@ -83,7 +80,6 @@ public class SerialSession extends AbstractIoSession implements
         this.service = service;
         this.ioHandler = service.getHandler();
         this.filterChain = new SerialFilterChain(this);
-        this.writeRequestQueue = new LinkedList<WriteRequest>();
         this.port = port;
         this.address = address;
 
@@ -117,40 +113,6 @@ public class SerialSession extends AbstractIoSession implements
 
     public SocketAddress getRemoteAddress() {
         return address;
-    }
-
-    Queue<WriteRequest> getWriteRequestQueue() {
-        return writeRequestQueue;
-    }
-
-    public int getScheduledWriteMessages() {
-        int size = 0;
-        synchronized (writeRequestQueue) {
-            for (WriteRequest request : writeRequestQueue) {
-                Object message = request.getMessage();
-                if (message instanceof ByteBuffer) {
-                    if (((ByteBuffer) message).hasRemaining()) {
-                        size++;
-                    }
-                } else {
-                    size++;
-                }
-            }
-        }
-
-        return size;
-    }
-
-    public long getScheduledWriteBytes() {
-        int size = 0;
-        synchronized (writeRequestQueue) {
-            for (Object o : writeRequestQueue) {
-                if (o instanceof ByteBuffer) {
-                    size += ((ByteBuffer) o).remaining();
-                }
-            }
-        }
-        return size;
     }
 
     public IoService getService() {
@@ -205,20 +167,13 @@ public class SerialSession extends AbstractIoSession implements
 
     private void flushWrites() {
         for (; ;) {
-            WriteRequest req;
-
-            synchronized (writeRequestQueue) {
-                req = writeRequestQueue.peek();
-            }
-
+            WriteRequest req = getWriteRequestQueue().peek();
             if (req == null)
                 break;
 
             ByteBuffer buf = (ByteBuffer) req.getMessage();
             if (buf.remaining() == 0) {
-                synchronized (writeRequestQueue) {
-                    writeRequestQueue.poll();
-                }
+                getWriteRequestQueue().poll();
                 this.increaseWrittenMessages();
 
                 buf.reset();
