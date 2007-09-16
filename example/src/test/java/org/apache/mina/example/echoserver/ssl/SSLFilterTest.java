@@ -28,11 +28,13 @@ public class SSLFilterTest extends TestCase {
 
     private IoAcceptor acceptor;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         acceptor = new SocketAcceptor();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         acceptor.setDisconnectOnUnbind(true);
         acceptor.unbind();
@@ -75,21 +77,21 @@ public class SSLFilterTest extends TestCase {
             //ss.getSession().invalidate();
             ss.startHandshake();
         }
-        
+
         bytesSent += writeMessage(socket, "test-2\n");
-        
+
         int[] response = new int[bytesSent];
         for (int i = 0; i < response.length; i++) {
             response[i] = socket.getInputStream().read();
         }
-        
+
         if (useSSL) {
             // Read SSL close notify.
             while (socket.getInputStream().read() >= 0) {
                 continue;
             }
         }
-        
+
         socket.close();
         while (acceptor.getManagedSessions().size() != 0) {
             Thread.sleep(100);
@@ -121,16 +123,19 @@ public class SSLFilterTest extends TestCase {
 
         List<String> sentMessages = new ArrayList<String>();
 
+        @Override
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
             cause.printStackTrace();
         }
 
+        @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {
             session.write(message);
         }
 
+        @Override
         public void messageSent(IoSession session, Object message)
                 throws Exception {
             sentMessages.add(message.toString());

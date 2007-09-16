@@ -52,13 +52,16 @@ public class SimpleTrustManagerFactory extends TrustManagerFactorySpi {
 
     public static final TrustManager[] X509_MANAGERS = new TrustManager[] { X509 };
 
+    @Override
     protected void engineInit(KeyStore keyStore) throws KeyStoreException {
     }
 
+    @Override
     protected void engineInit(ManagerFactoryParameters managerFactoryParameters)
             throws InvalidAlgorithmParameterException {
     }
 
+    @Override
     protected TrustManager[] engineGetTrustManagers() {
         return X509_MANAGERS;
     }

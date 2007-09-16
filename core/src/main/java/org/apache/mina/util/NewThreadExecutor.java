@@ -22,7 +22,7 @@ import java.util.concurrent.Executor;
 
 /**
  * An Executor that just launches in a new thread.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 446581 $, $Date: 2006-09-15 11:36:12Z $,
  */

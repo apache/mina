@@ -72,7 +72,7 @@ public class AsyncHttpClient {
                 port = 443;
             }
         }
-        if (scheme.toLowerCase().equals("http") && (port == -1)) {
+        if (scheme.toLowerCase().equals("http") && port == -1) {
             port = 80;
         }
 

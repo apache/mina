@@ -65,7 +65,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     private final int id = nextId++;
 
     private final Selector selector;
-    
+
     private final IoProcessor processor = new DatagramAcceptorProcessor();
 
     private DatagramChannel channel;
@@ -252,11 +252,11 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     protected IoServiceListenerSupport getListeners() {
         return super.getListeners();
     }
-    
+
     IoProcessor getProcessor() {
         return processor;
     }
-    
+
     private class DatagramAcceptorProcessor implements IoProcessor {
 
         public void add(IoSession session) {
@@ -387,7 +387,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
             if (session == null) {
                 break;
             }
-            
+
             session.setScheduledForFlush(false);
 
             try {
@@ -411,7 +411,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         if (!key.isValid()) {
             return false;
         }
-        key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
+        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
 
         DatagramChannel ch = session.getChannel();
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
@@ -453,7 +453,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
                     return false;
                 } else {
-                    key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
+                    key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
 
                     // pop and fire event
                     synchronized (writeRequestQueue) {
@@ -469,7 +469,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         } finally {
             session.increaseWrittenBytes(writtenBytes);
         }
-        
+
         return true;
     }
 

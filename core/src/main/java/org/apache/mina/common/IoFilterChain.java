@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -26,8 +26,8 @@ import org.apache.mina.common.IoFilter.NextFilter;
 /**
  * A container of {@link IoFilter}s that forwards {@link IoHandler} events
  * to the consisting filters and terminal {@link IoHandler} sequentially.
- * Every {@link IoSession} has its own {@link IoFilterChain} (1-to-1 relationship). 
- * 
+ * Every {@link IoSession} has its own {@link IoFilterChain} (1-to-1 relationship).
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -80,7 +80,7 @@ public interface IoFilterChain {
 
     /**
      * Returns <tt>true</tt> if this chain contains an {@link IoFilter} of the
-     * specified <tt>filterType</tt>.  
+     * specified <tt>filterType</tt>.
      */
     boolean contains(Class<? extends IoFilter> filterType);
 
@@ -121,7 +121,7 @@ public interface IoFilterChain {
     /**
      * Replace the filter with the specified name with the specified new
      * filter.
-     * 
+     *
      * @return the old filter
      * @throws IllegalArgumentException if there's no such filter
      */
@@ -130,7 +130,7 @@ public interface IoFilterChain {
     /**
      * Replace the filter with the specified name with the specified new
      * filter.
-     * 
+     *
      * @throws IllegalArgumentException if there's no such filter
      */
     void replace(IoFilter oldFilter, IoFilter newFilter);
@@ -139,7 +139,7 @@ public interface IoFilterChain {
      * Replace the filter of the specified type with the specified new
      * filter.  If there's more than one filter with the specified type,
      * the first match will be replaced.
-     * 
+     *
      * @throws IllegalArgumentException if there's no such filter
      */
     IoFilter replace(Class<? extends IoFilter> oldFilterType, IoFilter newFilter);
@@ -155,7 +155,7 @@ public interface IoFilterChain {
     /**
      * Replace the filter with the specified name with the specified new
      * filter.
-     * 
+     *
      * @throws IllegalArgumentException if there's no such filter
      */
     void remove(IoFilter filter);
@@ -164,7 +164,7 @@ public interface IoFilterChain {
      * Replace the filter of the specified type with the specified new
      * filter.  If there's more than one filter with the specified type,
      * the first match will be replaced.
-     * 
+     *
      * @throws IllegalArgumentException if there's no such filter
      */
     IoFilter remove(Class<? extends IoFilter> filterType);
@@ -257,7 +257,7 @@ public interface IoFilterChain {
 
         /**
          * Returns the {@link NextFilter} of the filter.
-         * 
+         *
          * @throws IllegalStateException if the {@link NextFilter} is not available
          */
         NextFilter getNextFilter();

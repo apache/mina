@@ -46,7 +46,7 @@ public class DummySession extends AbstractIoSession {
     };
 
     private volatile IoService service;
-    
+
     private volatile IoProcessor processor;
 
     private volatile IoSessionConfig config = new AbstractIoSessionConfig() {
@@ -98,7 +98,7 @@ public class DummySession extends AbstractIoSession {
         acceptor.setLocalAddress(ANONYMOUS_ADDRESS);
 
         this.service = acceptor;
-        
+
         this.processor = new IoProcessor() {
             public void add(IoSession session) {
             }
@@ -191,10 +191,12 @@ public class DummySession extends AbstractIoSession {
         this.remoteAddress = remoteAddress;
     }
 
+    @Override
     public long getScheduledWriteBytes() {
         return 0;
     }
 
+    @Override
     public int getScheduledWriteMessages() {
         return 0;
     }
@@ -213,16 +215,17 @@ public class DummySession extends AbstractIoSession {
 
         this.service = service;
     }
-    
+
+    @Override
     public IoProcessor getProcessor() {
         return processor;
     }
-    
+
     public void setProcessor(IoProcessor processor) {
         if (processor == null) {
             throw new NullPointerException("processor");
         }
-        
+
         this.processor = processor;
     }
 

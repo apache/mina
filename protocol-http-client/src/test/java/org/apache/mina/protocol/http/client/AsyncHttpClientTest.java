@@ -26,8 +26,6 @@ import java.util.Arrays;
 
 import org.apache.mina.filter.codec.http.HttpRequestMessage;
 import org.apache.mina.filter.codec.http.HttpResponseMessage;
-import org.apache.mina.protocol.http.client.AsyncHttpClient;
-import org.apache.mina.protocol.http.client.AsyncHttpClientCallback;
 
 public class AsyncHttpClientTest extends AbstractTest {
 
@@ -135,8 +133,9 @@ public class AsyncHttpClientTest extends AbstractTest {
         }
 
         if (!testForException) {
-            if (callback.isException())
+            if (callback.isException()) {
                 throw new Exception(callback.getThrowable());
+            }
         }
 
     }

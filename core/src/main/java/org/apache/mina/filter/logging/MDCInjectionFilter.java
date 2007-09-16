@@ -1,11 +1,13 @@
 package org.apache.mina.filter.logging;
 
-import org.apache.mina.common.*;
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.mina.common.IoEventType;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.util.WrappingFilter;
 import org.slf4j.MDC;
-
-import java.net.InetSocketAddress;
-import java.util.*;
 
 /**
  * This filter will inject some key IoSession properties into the Mapped Diagnostic Context (MDC)
@@ -48,6 +50,7 @@ public class MDCInjectionFilter extends WrappingFilter {
     private static final String CONTEXT_KEY = MDCInjectionFilter.class + ".CONTEXT_KEY";
 
     private ThreadLocal<Integer> callDepth = new ThreadLocal<Integer>() {
+        @Override
         protected Integer initialValue() {
             return 0;
         }
@@ -117,11 +120,16 @@ public class MDCInjectionFilter extends WrappingFilter {
      * @param value The value of the property
      */
     public static void setProperty (IoSession session, String key, String value) {
-        Context context = getContext(session);  
-        context.put(key, value);        
+        Context context = getContext(session);
+        context.put(key, value);
     }
 
     private static class Context extends HashMap<String,String> {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = -673025693009555560L;
     }
-    
+
 }

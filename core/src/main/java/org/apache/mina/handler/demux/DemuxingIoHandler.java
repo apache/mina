@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.handler.demux;
 
@@ -38,18 +38,18 @@ import org.apache.mina.util.IdentityHashSet;
  * {@link #removeMessageHandler(Class)}.
  * </p>
  * <p>
- * When <code>message</code> is received through a call to 
- * {@link #messageReceived(IoSession, Object)} the class of the 
- * <code>message</code> object will be used to find a {@link MessageHandler} for 
- * that particular message type. If no {@link MessageHandler} instance can be 
- * found for the immediate class (i.e. <code>message.getClass()</code>) the 
- * interfaces implemented by the immediate class will be searched in depth-first 
- * order. If no match can be found for any of the interfaces the search will be 
- * repeated recursively for the superclass of the immediate class 
+ * When <code>message</code> is received through a call to
+ * {@link #messageReceived(IoSession, Object)} the class of the
+ * <code>message</code> object will be used to find a {@link MessageHandler} for
+ * that particular message type. If no {@link MessageHandler} instance can be
+ * found for the immediate class (i.e. <code>message.getClass()</code>) the
+ * interfaces implemented by the immediate class will be searched in depth-first
+ * order. If no match can be found for any of the interfaces the search will be
+ * repeated recursively for the superclass of the immediate class
  * (i.e. <code>message.getClass().getSuperclass()</code>).
  * </p>
  * <p>
- * Consider the following type hierarchy (<code>Cx</code> are classes while 
+ * Consider the following type hierarchy (<code>Cx</code> are classes while
  * <code>Ix</code> are interfaces):
  * <pre>
  *     C3 - I7 - I9
@@ -61,18 +61,18 @@ import org.apache.mina.util.IdentityHashSet;
  *     C1 - I1 - I2 - I4
  *      |         |
  *      |        I3
- *    Object          
+ *    Object
  * </pre>
- * When <code>message</code> is of type <code>C3</code> this hierarchy will be 
+ * When <code>message</code> is of type <code>C3</code> this hierarchy will be
  * searched in the following order:
  * <code>C3, I7, I8, I9, I3, I4, C2, I5, I6, C1, I1, I2, I3, I4, Object</code>.
  * </p>
  * <p>
- * For efficiency searches will be cached. Calls to 
+ * For efficiency searches will be cached. Calls to
  * {@link #addMessageHandler(Class, MessageHandler)} and
  * {@link #removeMessageHandler(Class)} clear this cache.
  * </p>
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -92,7 +92,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     /**
      * Registers a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
-     * 
+     *
      * @return the old handler if there is already a registered handler for
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
@@ -106,7 +106,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     /**
      * Deregisters a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
-     * 
+     *
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
@@ -117,7 +117,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
 
     /**
      * Returns the {@link MessageHandler} which is registered to process
-     * the specified <code>type</code>. 
+     * the specified <code>type</code>.
      */
     @SuppressWarnings("unchecked")
     public <E> MessageHandler<? super E> getMessageHandler(Class<E> type) {
@@ -196,7 +196,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
 
         if (handler == null) {
             /*
-             * No match in type's interfaces could be found. Search the 
+             * No match in type's interfaces could be found. Search the
              * superclass.
              */
 
@@ -208,7 +208,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
 
         /*
          * Make sure the handler is added to the cache. By updating the cache
-         * here all the types (superclasses and interfaces) in the path which 
+         * here all the types (superclasses and interfaces) in the path which
          * led to a match will be cached along with the immediate message type.
          */
         if (handler != null) {

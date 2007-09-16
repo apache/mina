@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -31,10 +31,10 @@ import org.apache.mina.util.NamePreservingRunnable;
 /**
  * An abstract implementation of {@link IoProcessor} which helps
  * transport developers to write an {@link IoProcessor} easily.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
+ *
  * TODO Provide abstraction for bind, unbind and connect (+ cancellation)
  */
 public abstract class AbstractIoProcessor implements IoProcessor {
@@ -45,11 +45,11 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
     private final Queue<AbstractIoSession> newSessions =
         new ConcurrentLinkedQueue<AbstractIoSession>();
-    private final Queue<AbstractIoSession> removingSessions = 
+    private final Queue<AbstractIoSession> removingSessions =
         new ConcurrentLinkedQueue<AbstractIoSession>();
-    private final Queue<AbstractIoSession> flushingSessions = 
+    private final Queue<AbstractIoSession> flushingSessions =
         new ConcurrentLinkedQueue<AbstractIoSession>();
-    private final Queue<AbstractIoSession> trafficControllingSessions = 
+    private final Queue<AbstractIoSession> trafficControllingSessions =
         new ConcurrentLinkedQueue<AbstractIoSession>();
 
     private Worker worker;
@@ -59,11 +59,11 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         this.threadName = threadName;
         this.executor = executor;
     }
-    
+
     protected abstract int select(int timeout) throws Exception;
 
     protected abstract void wakeup();
-    
+
     protected abstract Iterator<AbstractIoSession> allSessions() throws Exception;
 
     protected abstract Iterator<AbstractIoSession> selectedSessions() throws Exception;
@@ -146,7 +146,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             try {
                 doAdd(session);
                 addedSessions ++;
-                
+
                 // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
                 // in AbstractIoFilterChain.fireSessionOpened().
                 ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
@@ -156,10 +156,10 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 session.getFilterChain().fireExceptionCaught(session, e);
             }
         }
-        
+
         return addedSessions;
     }
-    
+
     private int remove() {
         int removedSessions = 0;
         for (; ;) {
@@ -168,7 +168,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             if (session == null) {
                 break;
             }
-            
+
             SessionState state = state(session);
             switch (state) {
             case OPEN:
@@ -194,28 +194,28 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 throw new IllegalStateException(String.valueOf(state));
             }
         }
-        
+
         return removedSessions;
     }
-    
+
     private void process() throws Exception {
         for (Iterator<AbstractIoSession> i = selectedSessions(); i.hasNext();) {
             process(i.next());
             i.remove();
         }
     }
-    
+
     private void process(AbstractIoSession session) throws Exception {
         int readyOps = readyOps(session);
-        if (((readyOps & SelectionKey.OP_READ) != 0) && session.getTrafficMask().isReadable()) {
+        if ((readyOps & SelectionKey.OP_READ) != 0 && session.getTrafficMask().isReadable()) {
             read(session);
         }
 
-        if (((readyOps & SelectionKey.OP_WRITE) != 0) && session.getTrafficMask().isWritable()) {
+        if ((readyOps & SelectionKey.OP_WRITE) != 0 && session.getTrafficMask().isWritable()) {
             scheduleFlush(session);
         }
     }
-    
+
     private void read(AbstractIoSession session) {
         IoSessionConfig config = session.getConfig();
         ByteBuffer buf = ByteBuffer.allocate(config.getReadBufferSize());
@@ -244,7 +244,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             if (readBytes > 0) {
                 session.getFilterChain().fireMessageReceived(session, buf);
                 buf = null;
-                
+
                 if (session.getTransportMetadata().hasFragmentation()) {
                     if (readBytes * 2 < config.getReadBufferSize()) {
                         if (config.getReadBufferSize() > config.getMinReadBufferSize()) {
@@ -252,7 +252,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                         }
                     } else if (readBytes == config.getReadBufferSize()) {
                         int newReadBufferSize = config.getReadBufferSize() << 1;
-                        if (newReadBufferSize <= (config.getMaxReadBufferSize())) {
+                        if (newReadBufferSize <= config.getMaxReadBufferSize()) {
                             config.setReadBufferSize(newReadBufferSize);
                         } else {
                             config.setReadBufferSize(config.getMaxReadBufferSize());
@@ -270,11 +270,11 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             session.getFilterChain().fireExceptionCaught(session, e);
         }
     }
-    
+
     private void notifyIdleness() throws Exception {
         // process idle sessions
         long currentTime = System.currentTimeMillis();
-        if ((currentTime - lastIdleCheckTime) >= 1000) {
+        if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
             for (Iterator<AbstractIoSession> i = allSessions(); i.hasNext();) {
                 AbstractIoSession session = i.next();
@@ -308,7 +308,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     private void notifyIdleness0(AbstractIoSession session, long currentTime,
                                  long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
-                && (currentTime - lastIoTime) >= idleTime) {
+                && currentTime - lastIoTime >= idleTime) {
             session.increaseIdleCount(status);
             session.getFilterChain().fireSessionIdle(session, status);
         }
@@ -316,7 +316,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
     private void notifyWriteTimeout(AbstractIoSession session,
                                     long currentTime, long writeTimeout, long lastIoTime) throws Exception {
-        if (writeTimeout > 0 && (currentTime - lastIoTime) >= writeTimeout
+        if (writeTimeout > 0 && currentTime - lastIoTime >= writeTimeout
                 && (interestOps(session) & SelectionKey.OP_WRITE) != 0) {
             session.getFilterChain().fireExceptionCaught(session,
                     new WriteTimeoutException());
@@ -341,7 +341,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 clearWriteRequestQueue(session);
                 continue;
             }
-            
+
             SessionState state = state(session);
             switch (state) {
             case OPEN:
@@ -368,7 +368,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             }
         }
     }
-    
+
     private void clearWriteRequestQueue(AbstractIoSession session) {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
@@ -395,10 +395,10 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             }
         }
     }
-    
+
     private boolean flush(AbstractIoSession session) throws Exception {
         // Clear OP_WRITE
-        interestOps(session, interestOps(session) & (~SelectionKey.OP_WRITE));
+        interestOps(session, interestOps(session) & ~SelectionKey.OP_WRITE);
 
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
@@ -406,7 +406,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         // fairness.
         int maxWrittenBytes = session.getConfig().getMaxReadBufferSize();
         int writtenBytes = 0;
-        
+
         try {
             do {
                 // Check for pending writes.
@@ -433,7 +433,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                         region.setPosition(region.getPosition() + localWrittenBytes);
                         writtenBytes += localWrittenBytes;
                     }
-                    
+
                     if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
                         // Kernel buffer is full or wrote too much.
                         interestOps(session, interestOps(session) | SelectionKey.OP_WRITE);
@@ -470,7 +470,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
         return true;
     }
-    
+
     private void updateTrafficMask() {
         for (; ;) {
             AbstractIoSession session = trafficControllingSessions.poll();
@@ -478,7 +478,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             if (session == null) {
                 break;
             }
-            
+
             SessionState state = state(session);
             switch (state) {
             case OPEN:
@@ -510,18 +510,18 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             }
         }
     }
-    
+
     private class Worker implements Runnable {
         public void run() {
             int nSessions = 0;
-            
+
             Thread.currentThread().setName(AbstractIoProcessor.this.threadName);
             lastIdleCheckTime = System.currentTimeMillis();
 
             for (;;) {
                 try {
                     int nKeys = select(1000);
-                    
+
                     nSessions += add();
                     updateTrafficMask();
 
@@ -553,7 +553,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             }
         }
     }
-    
+
     protected static enum SessionState {
         OPEN,
         CLOSED,

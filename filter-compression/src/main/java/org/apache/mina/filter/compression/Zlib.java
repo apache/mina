@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.compression;
 
@@ -55,7 +55,7 @@ class Zlib {
 
     /**
      * @param compressionLevel the level of compression that should be used
-     * @param mode the mode in which the instance will operate. Can be either 
+     * @param mode the mode in which the instance will operate. Can be either
      * of <tt>MODE_DEFLATER</tt> or <tt>MODE_INFLATER</tt>
      */
     public Zlib(int compressionLevel, int mode) {
@@ -91,7 +91,7 @@ class Zlib {
      * @param inBuffer the {@link ByteBuffer} to be decompressed. The contents
      * of the buffer are transferred into a local byte array and the buffer is
      * flipped and returned intact.
-     * @return the decompressed data 
+     * @return the decompressed data
      * @throws IOException if the decompression of the data failed for some reason.
      */
     public ByteBuffer inflate(ByteBuffer inBuffer) throws IOException {

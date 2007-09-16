@@ -46,6 +46,7 @@ public abstract class AbstractTest extends TestCase {
 
     protected Embedded server;
 
+    @Override
     protected void setUp() throws Exception {
         System.out.println("BASEDIR = " + BASEDIR.getAbsolutePath());
         server = new Embedded();
@@ -76,9 +77,11 @@ public abstract class AbstractTest extends TestCase {
         server.start();
     }
 
+    @Override
     protected void tearDown() throws Exception {
-        if (server != null)
+        if (server != null) {
             server.stop();
+        }
     }
 
     protected final File getBaseDir() {

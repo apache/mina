@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.executor;
 
@@ -95,10 +95,12 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
 
     protected abstract void fireEvent(IoFilterEvent event);
 
+    @Override
     public final void sessionCreated(NextFilter nextFilter, IoSession session) {
         nextFilter.sessionCreated(session);
     }
 
+    @Override
     public final void sessionOpened(NextFilter nextFilter, IoSession session) {
         if (eventTypes.contains(IoEventType.SESSION_OPENED)) {
             fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED,
@@ -108,6 +110,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
         }
     }
 
+    @Override
     public final void sessionClosed(NextFilter nextFilter, IoSession session) {
         if (eventTypes.contains(IoEventType.SESSION_CLOSED)) {
             fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED,
@@ -117,6 +120,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
         }
     }
 
+    @Override
     public final void sessionIdle(NextFilter nextFilter, IoSession session,
             IdleStatus status) {
         if (eventTypes.contains(IoEventType.SESSION_IDLE)) {
@@ -127,6 +131,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
         }
     }
 
+    @Override
     public final void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) {
         if (eventTypes.contains(IoEventType.EXCEPTION_CAUGHT)) {
@@ -137,6 +142,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
         }
     }
 
+    @Override
     public final void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) {
         if (eventTypes.contains(IoEventType.MESSAGE_RECEIVED)) {
@@ -147,6 +153,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
         }
     }
 
+    @Override
     public final void messageSent(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) {
         if (eventTypes.contains(IoEventType.MESSAGE_SENT)) {
@@ -157,6 +164,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
         }
     }
 
+    @Override
     public final void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) {
         if (eventTypes.contains(IoEventType.WRITE)) {
@@ -167,6 +175,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
         }
     }
 
+    @Override
     public final void filterClose(NextFilter nextFilter, IoSession session)
             throws Exception {
         if (eventTypes.contains(IoEventType.CLOSE)) {

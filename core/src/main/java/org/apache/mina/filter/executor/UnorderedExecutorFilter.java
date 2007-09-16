@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.executor;
 
@@ -34,7 +34,7 @@ import org.apache.mina.common.IoFilterEvent;
  * Please note that this filter doesn't manage the life cycle of the underlying
  * {@link Executor}.  You have to destroy or stop it by yourself.
  * <p>
- * This filter does not maintain the order of events per session and thus 
+ * This filter does not maintain the order of events per session and thus
  * more than one event handler methods can be invoked at the same time with
  * mixed order.  For example, let's assume that messageReceived, messageSent,
  * and sessionClosed events are fired.
@@ -67,6 +67,7 @@ public class UnorderedExecutorFilter extends AbstractExecutorFilter {
         super(executor, eventTypes);
     }
 
+    @Override
     protected void fireEvent(IoFilterEvent event) {
         getExecutor().execute(new ProcessEventRunnable(event));
     }

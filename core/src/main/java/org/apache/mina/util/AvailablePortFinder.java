@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.util;
 
@@ -77,7 +77,7 @@ public class AvailablePortFinder {
      * @throws NoSuchElementException if there are no ports available
      */
     public static int getNextAvailable(int fromPort) {
-        if ((fromPort < MIN_PORT_NUMBER) || (fromPort > MAX_PORT_NUMBER)) {
+        if (fromPort < MIN_PORT_NUMBER || fromPort > MAX_PORT_NUMBER) {
             throw new IllegalArgumentException("Invalid start port: "
                     + fromPort);
         }
@@ -98,7 +98,7 @@ public class AvailablePortFinder {
      * @param port the port to check for availability
      */
     public static boolean available(int port) {
-        if ((port < MIN_PORT_NUMBER) || (port > MAX_PORT_NUMBER)) {
+        if (port < MIN_PORT_NUMBER || port > MAX_PORT_NUMBER) {
             throw new IllegalArgumentException("Invalid start port: " + port);
         }
 
@@ -137,8 +137,8 @@ public class AvailablePortFinder {
      * <code>fromPort</code> if greater than <code>toPort</code>.
      */
     public static Set<Integer> getAvailablePorts(int fromPort, int toPort) {
-        if ((fromPort < MIN_PORT_NUMBER) || (toPort > MAX_PORT_NUMBER)
-                || (fromPort > toPort)) {
+        if (fromPort < MIN_PORT_NUMBER || toPort > MAX_PORT_NUMBER
+                || fromPort > toPort) {
             throw new IllegalArgumentException("Invalid port range: "
                     + fromPort + " ~ " + toPort);
         }

@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.handler.demux;
 
@@ -124,7 +124,7 @@ public class DemuxingIoHandlerTest extends TestCase {
         ioHandler.messageReceived(session, msg[5]);
 
         /*
-         * Third round. C1 messages should be handled by handler1, C2 by 
+         * Third round. C1 messages should be handled by handler1, C2 by
          * handler2 and C3 by handler3.
          */
         ioHandler.addMessageHandler(C3.class, (MessageHandler) mockHandler3
@@ -205,7 +205,7 @@ public class DemuxingIoHandlerTest extends TestCase {
     /*
      * Define some interfaces and classes used when testing the findHandler
      * method. This is what the hierarchy looks like:
-     * 
+     *
      * C3 - I7 - I9
      *  |    |   /\
      *  |   I8  I3 I4

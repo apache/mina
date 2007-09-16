@@ -60,7 +60,7 @@ public class DatagramConnector extends AbstractIoConnector {
      */
     public DatagramConnector(Executor executor) {
         super(new DefaultDatagramSessionConfig());
-        
+
         processor = new NIOProcessor("DatagramConnector-" + id, executor);
     }
 
@@ -96,13 +96,13 @@ public class DatagramConnector extends AbstractIoConnector {
                 ch.socket().bind(localAddress);
             }
             ch.connect(remoteAddress);
-            
+
             session = new DatagramSessionImpl(this, ch, getHandler());
             getFilterChainBuilder().buildFilterChain(session.getFilterChain());
             ConnectFuture future = new DefaultConnectFuture();
             // DefaultIoFilterChain will notify the connect future.
             session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);
-            
+
             processor.add(session);
             initialized = true;
             return future;
@@ -119,7 +119,7 @@ public class DatagramConnector extends AbstractIoConnector {
             }
         }
     }
-    
+
     IoProcessor getProcessor() {
         return processor;
     }

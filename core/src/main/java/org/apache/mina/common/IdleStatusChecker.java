@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -25,8 +25,8 @@ import java.util.Set;
 import org.apache.mina.util.IdentityHashSet;
 
 /**
- * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them. 
- * 
+ * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them.
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 525369 $, $Date: 2007-04-04 05:05:11 +0200 (mer., 04 avr. 2007) $
  */
@@ -100,7 +100,7 @@ public class IdleStatusChecker {
     private void notifyIdleSession0(AbstractIoSession session, long currentTime,
             long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
-                && (currentTime - lastIoTime) >= idleTime) {
+                && currentTime - lastIoTime >= idleTime) {
             session.increaseIdleCount(status);
             session.getFilterChain().fireSessionIdle(session, status);
         }

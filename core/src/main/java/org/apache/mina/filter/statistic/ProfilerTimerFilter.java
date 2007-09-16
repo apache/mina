@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.statistic;
 
@@ -31,13 +31,13 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
 /**
- * This class will measure, the time it takes for a 
+ * This class will measure, the time it takes for a
  * method in the {@link IoFilterAdapter} class to execute.  The basic
  * premise of the logic in this class is to get the current time
- * at the beginning of the method, call method on nextFilter, and 
- * then get the current time again.  An example of how to use 
+ * at the beginning of the method, call method on nextFilter, and
+ * then get the current time again.  An example of how to use
  * the filter is:
- * 
+ *
  * <pre>
  *  ProfilerTimerFilter profiler = new ProfilerTimerFilter( ProfilerTimerFilter.MSG_RCV, ProfilerTimerUnit.MILLISECOND );
  *  chain.addFirst( "Profiler", profiler);
@@ -55,8 +55,8 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
 
     /**
      * Creates a new instance of ProfilerFilter.  This is the
-     * default constructor and will print out timings for 
-     * messageReceived and messageSent and the time increment 
+     * default constructor and will print out timings for
+     * messageReceived and messageSent and the time increment
      * will be in milliseconds.
      */
     public ProfilerTimerFilter() {
@@ -68,16 +68,16 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
     /**
      * Creates a new instance of ProfilerFilter.  An example
      * of this call would be:
-     * 
+     *
      * <code>
-     * new ProfilerTimerFilter( EnumSet.of( IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT ), 
+     * new ProfilerTimerFilter( EnumSet.of( IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT ),
      *  TimeUnit.MILLISECONDS );
      * </code>
-     * 
+     *
      * @param eventsToProfile
      *  A set of {@link IoEventType} representation of the methods to profile
      * @param unit
-     *  Used to determine the level of precision you need in your timing. 
+     *  Used to determine the level of precision you need in your timing.
      */
     public ProfilerTimerFilter(EnumSet<IoEventType> eventsToProfile,
             TimeUnit unit) {
@@ -133,7 +133,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
     }
 
     /**
-     * Return the bitmask that is being used to display 
+     * Return the bitmask that is being used to display
      * timing information for this filter.
      *
      * @return
@@ -161,9 +161,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         nextFilter.messageReceived(session, message);
         long end = timeUnit.timeNow();
 
-        if (getEventsToProfile().contains(IoEventType.MESSAGE_RECEIVED))
+        if (getEventsToProfile().contains(IoEventType.MESSAGE_RECEIVED)) {
             timerManager.get(IoEventType.MESSAGE_RECEIVED).addNewReading(
                     end - start);
+        }
     }
 
     @Override
@@ -173,9 +174,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         nextFilter.messageSent(session, writeRequest);
         long end = timeUnit.timeNow();
 
-        if (getEventsToProfile().contains(IoEventType.MESSAGE_SENT))
+        if (getEventsToProfile().contains(IoEventType.MESSAGE_SENT)) {
             timerManager.get(IoEventType.MESSAGE_SENT).addNewReading(
                     end - start);
+        }
     }
 
     @Override
@@ -185,9 +187,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         nextFilter.sessionClosed(session);
         long end = timeUnit.timeNow();
 
-        if (getEventsToProfile().contains(IoEventType.SESSION_CLOSED))
+        if (getEventsToProfile().contains(IoEventType.SESSION_CLOSED)) {
             timerManager.get(IoEventType.SESSION_CLOSED).addNewReading(
                     end - start);
+        }
     }
 
     @Override
@@ -197,9 +200,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         nextFilter.sessionCreated(session);
         long end = timeUnit.timeNow();
 
-        if (getEventsToProfile().contains(IoEventType.SESSION_CREATED))
+        if (getEventsToProfile().contains(IoEventType.SESSION_CREATED)) {
             timerManager.get(IoEventType.SESSION_CREATED).addNewReading(
                     end - start);
+        }
     }
 
     @Override
@@ -209,9 +213,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         nextFilter.sessionIdle(session, status);
         long end = timeUnit.timeNow();
 
-        if (getEventsToProfile().contains(IoEventType.SESSION_IDLE))
+        if (getEventsToProfile().contains(IoEventType.SESSION_IDLE)) {
             timerManager.get(IoEventType.SESSION_IDLE).addNewReading(
                     end - start);
+        }
     }
 
     @Override
@@ -221,9 +226,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         nextFilter.sessionOpened(session);
         long end = timeUnit.timeNow();
 
-        if (getEventsToProfile().contains(IoEventType.SESSION_OPENED))
+        if (getEventsToProfile().contains(IoEventType.SESSION_OPENED)) {
             timerManager.get(IoEventType.SESSION_OPENED).addNewReading(
                     end - start);
+        }
     }
 
     /**
@@ -265,7 +271,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      * The total time this method has been executing
      *
      * @param type
-     *  The {@link IoEventType} that the user wants to get the total time this method has 
+     *  The {@link IoEventType} that the user wants to get the total time this method has
      *  been executing
      * @return
      *  The total time for the method represented by the {@link IoEventType}
@@ -282,8 +288,8 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
     /**
      * The minimum time the method represented by {@link IoEventType} has executed
      *
-     * @param type  
-     *  The {@link IoEventType} that the user wants to get the minimum time this method has 
+     * @param type
+     *  The {@link IoEventType} that the user wants to get the minimum time this method has
      *  executed
      * @return
      *  The minimum time this method has executed represented by the {@link IoEventType}
@@ -301,7 +307,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      * The maximum time the method represented by {@link IoEventType} has executed
      *
      * @param type
-     *  The {@link IoEventType} that the user wants to get the maximum time this method has 
+     *  The {@link IoEventType} that the user wants to get the maximum time this method has
      *  executed
      * @return
      *  The maximum time this method has executed represented by the {@link IoEventType}
@@ -344,7 +350,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         }
 
         /**
-         * Add a new reading to this class.  Total is updated 
+         * Add a new reading to this class.  Total is updated
          * and calls is incremented
          *
          * @param newReading
@@ -420,28 +426,34 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
 
     enum ProfilerTimerUnit {
         SECONDS {
+            @Override
             public long timeNow() {
                 return System.currentTimeMillis() / 1000;
             }
 
+            @Override
             public String getDescription() {
                 return "seconds";
             }
         },
         MILLISECONDS {
+            @Override
             public long timeNow() {
                 return System.currentTimeMillis();
             }
 
+            @Override
             public String getDescription() {
                 return "milliseconds";
             }
         },
         NANOSECONDS {
+            @Override
             public long timeNow() {
                 return System.nanoTime();
             }
 
+            @Override
             public String getDescription() {
                 return "nanoseconds";
             }
@@ -449,10 +461,10 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
 
         /*
          * I was looking at possibly using the java.util.concurrent.TimeUnit
-         * and I found this construct for writing enums.  Here is what the 
+         * and I found this construct for writing enums.  Here is what the
          * JDK developers say for why these methods below cannot be marked as
          * abstract, but should act in an abstract way...
-         * 
+         *
          *     To maintain full signature compatibility with 1.5, and to improve the
          *     clarity of the generated javadoc (see 6287639: Abstract methods in
          *     enum classes should not be listed as abstract), method convert

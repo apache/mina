@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec.demux;
 
@@ -41,8 +41,8 @@ import org.apache.mina.util.IdentityHashSet;
  * {@link MessageEncoder}s and {@link MessageDecoder}s.
  * {@link ProtocolEncoder} and {@link ProtocolDecoder} this factory
  * returns demultiplex incoming messages and buffers to
- * appropriate {@link MessageEncoder}s and {@link MessageDecoder}s. 
- * 
+ * appropriate {@link MessageEncoder}s and {@link MessageDecoder}s.
+ *
  * <h2>Disposing resources acquired by {@link MessageEncoder} and {@link MessageDecoder}</h2>
  * <p>
  * Make your {@link MessageEncoder} and {@link MessageDecoder} to put all
@@ -53,10 +53,10 @@ import org.apache.mina.util.IdentityHashSet;
  * We didn't provide any <tt>dispose</tt> method for {@link MessageEncoder} and {@link MessageDecoder}
  * because they can give you a big performance penalty in case you have a lot of
  * message types to handle.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
+ *
  * @see MessageEncoder
  * @see MessageDecoder
  */
@@ -144,13 +144,13 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
      * Implement this method to release all resources acquired to perform
      * encoding and decoding messages for the specified <tt>session</tt>.
      * By default, this method does nothing.
-     * 
+     *
      * @param session the session that requires resource deallocation now
      */
     protected void disposeCodecResources(IoSession session) {
         // Do nothing by default; let users implement it as they want.
 
-        // This statement is just to avoid compiler warning.  Please ignore. 
+        // This statement is just to avoid compiler warning.  Please ignore.
         session.getService();
     }
 

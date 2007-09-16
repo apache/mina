@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.management;
 
@@ -31,17 +31,17 @@ import org.apache.mina.common.IoSession;
  * Collects statistics of an {@link IoService}. It's polling all the sessions of a given
  * IoService. It's attaching a {@link IoSessionStat} object to all the sessions polled
  * and filling the throughput values.
- * 
+ *
  * Usage :
  * <pre>
  * IoService service = ...
  * StatCollector collector = new StatCollector( service );
  * collector.start();
  * </pre>
- * 
- * By default the {@link StatCollector} is polling the sessions every 5 seconds. You can 
+ *
+ * By default the {@link StatCollector} is polling the sessions every 5 seconds. You can
  * give a different polling time using a second constructor.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -68,7 +68,7 @@ public class StatCollector {
 
     private Queue<IoSession> polledSessions;
 
-    // resume of session stats, for simplifying acces to the statistics 
+    // resume of session stats, for simplifying acces to the statistics
     private final AtomicLong totalProcessedSessions = new AtomicLong();
 
     private float msgWrittenThroughput = 0f;
@@ -96,7 +96,7 @@ public class StatCollector {
     };
 
     /**
-     * Create a stat collector for the given service with a default polling time of 5 seconds. 
+     * Create a stat collector for the given service with a default polling time of 5 seconds.
      * @param service the IoService to inspect
      */
     public StatCollector(IoService service) {
@@ -144,7 +144,7 @@ public class StatCollector {
 
     /**
      * Stop collecting stats. all the {@link IoSessionStat} object will be removed of the
-     * polled session attachements. 
+     * polled session attachements.
      */
     public void stop() {
         synchronized (this) {

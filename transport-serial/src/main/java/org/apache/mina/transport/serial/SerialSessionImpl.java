@@ -109,7 +109,8 @@ class SerialSessionImpl extends AbstractIoSession implements
     public SerialAddress getRemoteAddress() {
         return address;
     }
-    
+
+    @Override
     public SerialAddress getServiceAddress() {
         return (SerialAddress) super.getServiceAddress();
     }
@@ -140,6 +141,7 @@ class SerialSessionImpl extends AbstractIoSession implements
     private WriteWorker writeWorker;
 
     private class WriteWorker extends Thread {
+        @Override
         public void run() {
             while (isConnected() && !isClosing()) {
                 flushWrites();
@@ -159,8 +161,9 @@ class SerialSessionImpl extends AbstractIoSession implements
     private void flushWrites() {
         for (; ;) {
             WriteRequest req = getWriteRequestQueue().peek();
-            if (req == null)
+            if (req == null) {
                 break;
+            }
 
             ByteBuffer buf = (ByteBuffer) req.getMessage();
             if (buf.remaining() == 0) {
@@ -196,8 +199,9 @@ class SerialSessionImpl extends AbstractIoSession implements
                     } catch (InterruptedException e) {
                         log.error("InterruptedException", e);
                     }
-                    if (isClosing() || !isConnected())
+                    if (isClosing() || !isConnected()) {
                         break;
+                    }
                     int dataSize;
                     try {
                         dataSize = inputStream.available();

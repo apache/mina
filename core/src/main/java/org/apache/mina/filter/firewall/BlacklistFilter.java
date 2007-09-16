@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.firewall;
 
@@ -36,7 +36,7 @@ import org.apache.mina.common.WriteRequest;
 /**
  * A {@link IoFilter} which blocks connections from blacklisted remote
  * address.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -45,9 +45,9 @@ public class BlacklistFilter extends IoFilterAdapter {
 
     /**
      * Sets the addresses to be blacklisted.
-     * 
+     *
      * NOTE: this call will remove any previously blacklisted addresses.
-     * 
+     *
      * @param addresses an array of addresses to be blacklisted.
      */
     public void setBlacklist(InetAddress[] addresses) {
@@ -63,12 +63,12 @@ public class BlacklistFilter extends IoFilterAdapter {
 
     /**
      * Sets the addresses to be blacklisted.
-     * 
+     *
      * NOTE: this call will remove any previously blacklisted addresses.
-     * 
-     * @param addresses a collection of InetAddress objects representing the 
+     *
+     * @param addresses a collection of InetAddress objects representing the
      *        addresses to be blacklisted.
-     * @throws IllegalArgumentException if the specified collections contains 
+     * @throws IllegalArgumentException if the specified collections contains
      *         non-{@link InetAddress} objects.
      */
     public void setBlacklist(Collection<InetAddress> addresses) {

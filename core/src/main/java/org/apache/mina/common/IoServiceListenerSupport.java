@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -29,7 +29,7 @@ import org.apache.mina.util.ConcurrentHashSet;
 /**
  * A helper which provides addition and removal of {@link IoServiceListener}s and firing
  * events.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -211,7 +211,7 @@ public class IoServiceListenerSupport {
 
         Object lock = new Object();
         IoFutureListener listener = new LockNotifyingListener(lock);
-        
+
         for (IoSession s : managedSessions) {
             s.close().addListener(listener);
         }
@@ -226,14 +226,14 @@ public class IoServiceListenerSupport {
             // Ignored
         }
     }
-    
+
     private static class LockNotifyingListener implements IoFutureListener {
         private final Object lock;
-        
+
         public LockNotifyingListener(Object lock) {
             this.lock = lock;
         }
-        
+
         public void operationComplete(IoFuture future) {
             synchronized (lock) {
                 lock.notifyAll();

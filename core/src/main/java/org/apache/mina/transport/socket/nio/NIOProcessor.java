@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -37,7 +37,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 
 /**
- * 
+ *
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -47,14 +47,14 @@ class NIOProcessor extends AbstractIoProcessor {
 
     NIOProcessor(String threadName, Executor executor) {
         super(threadName, executor);
-    
+
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
             throw new RuntimeIOException("Failed to open a selector.", e);
         }
     }
-    
+
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
@@ -80,10 +80,11 @@ class NIOProcessor extends AbstractIoProcessor {
         return new IoSessionIterator(selector.keys());
     }
 
+    @Override
     protected Iterator<AbstractIoSession> selectedSessions() throws Exception {
         return new IoSessionIterator(selector.selectedKeys());
     }
-    
+
     @Override
     protected void doAdd(IoSession session) throws Exception {
         SelectableChannel ch = (SelectableChannel) getChannel(session);
@@ -92,7 +93,7 @@ class NIOProcessor extends AbstractIoProcessor {
                 session,
                 ch.register(selector, SelectionKey.OP_READ, session));
     }
-    
+
     @Override
     protected void doRemove(IoSession session) throws Exception {
         ByteChannel ch = getChannel(session);
@@ -107,7 +108,7 @@ class NIOProcessor extends AbstractIoProcessor {
         if (key == null) {
             return SessionState.PREPARING;
         }
-        
+
         return key.isValid()? SessionState.OPEN : SessionState.CLOSED;
     }
 
@@ -130,25 +131,25 @@ class NIOProcessor extends AbstractIoProcessor {
     protected int read(IoSession session, ByteBuffer buf) throws Exception {
         return getChannel(session).read(buf.buf());
     }
-    
+
     @Override
     protected int write(IoSession session, ByteBuffer buf) throws Exception {
         return getChannel(session).write(buf.buf());
     }
-    
+
     @Override
     protected long transferFile(IoSession session, FileRegion region) throws Exception {
         return region.getFileChannel().transferTo(region.getPosition(), region.getCount(), getChannel(session));
     }
-    
+
     private ByteChannel getChannel(IoSession session) {
         return ((NIOSession) session).getChannel();
     }
-    
+
     private SelectionKey getSelectionKey(IoSession session) {
         return ((NIOSession) session).getSelectionKey();
     }
-    
+
     private void setSelectionKey(IoSession session, SelectionKey key) {
         ((NIOSession) session).setSelectionKey(key);
     }
@@ -162,12 +163,12 @@ class NIOProcessor extends AbstractIoProcessor {
         public boolean hasNext() {
             return i.hasNext();
         }
-    
+
         public AbstractIoSession next() {
             SelectionKey key = i.next();
             return (AbstractIoSession) key.attachment();
         }
-    
+
         public void remove() {
             i.remove();
         }

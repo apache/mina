@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec;
 
@@ -31,8 +31,8 @@ import org.apache.mina.common.IoSession;
  * <p>
  * Please refer to
  * <a href="../../../../../xref-examples/org/apache/mina/examples/reverser/TextLineDecoder.html"><code>TextLineDecoder</code></a>
- * example. 
- * 
+ * example.
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -42,7 +42,7 @@ public interface ProtocolDecoder {
      * MINA invokes {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
      * method with read data, and then the decoder implementation puts decoded
      * messages into {@link ProtocolDecoderOutput}.
-     * 
+     *
      * @throws Exception if the read data violated protocol specification
      */
     void decode(IoSession session, ByteBuffer in, ProtocolDecoderOutput out)
@@ -54,7 +54,7 @@ public interface ProtocolDecoder {
      * such as HTTP response without <tt>content-length</tt> header. Implement this
      * method to process the remaining data that {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
      * method didn't process completely.
-     * 
+     *
      * @throws Exception if the read data violated protocol specification
      */
     void finishDecode(IoSession session, ProtocolDecoderOutput out)
@@ -62,7 +62,7 @@ public interface ProtocolDecoder {
 
     /**
      * Releases all resources related with this decoder.
-     * 
+     *
      * @throws Exception if failed to dispose all resources
      */
     void dispose(IoSession session) throws Exception;

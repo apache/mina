@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec.demux;
 
@@ -25,10 +25,10 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
  * Decodes specific messages.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
+ *
  * @see DemuxingProtocolCodecFactory
  * @see MessageDecoderFactory
  */
@@ -56,7 +56,7 @@ public interface MessageDecoder {
 
     /**
      * Checks the specified buffer is decodable by this decoder.
-     * 
+     *
      * @return {@link #OK} if this decoder can decode the specified buffer.
      *         {@link #NOT_OK} if this decoder cannot decode the specified buffer.
      *         {@link #NEED_DATA} if more data is required to determine if the
@@ -70,12 +70,12 @@ public interface MessageDecoder {
      * MINA invokes {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
      * method with read data, and then the decoder implementation puts decoded
      * messages into {@link ProtocolDecoderOutput}.
-     * 
+     *
      * @return {@link #OK} if you finished decoding messages successfully.
      *         {@link #NEED_DATA} if you need more data to finish decoding current message.
      *         {@link #NOT_OK} if you cannot decode current message due to protocol specification violation.
-     *         
-     * @throws Exception if the read data violated protocol specification 
+     *
+     * @throws Exception if the read data violated protocol specification
      */
     MessageDecoderResult decode(IoSession session, ByteBuffer in,
             ProtocolDecoderOutput out) throws Exception;
@@ -87,7 +87,7 @@ public interface MessageDecoder {
      * header. Implement this method to process the remaining data that
      * {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)} method didn't process
      * completely.
-     * 
+     *
      * @throws Exception if the read data violated protocol specification
      */
     void finishDecode(IoSession session, ProtocolDecoderOutput out)

@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.ssl;
 
@@ -49,12 +49,12 @@ import org.apache.mina.common.WriteRequestWrapper;
  * immediately, please specify {@code true} as {@code autoStart} parameter in
  * the constructor.
  * <p>
- * This filter uses an {@link SSLEngine} which was introduced in Java 5, so 
+ * This filter uses an {@link SSLEngine} which was introduced in Java 5, so
  * Java version 5 or above is mandatory to use this filter. And please note that
  * this filter only works for TCP/IP connections.
  * <p>
  * This filter logs debug information using {@link IoSessionLogger}.
- * 
+ *
  * <h2>Implementing StartTLS</h2>
  * <p>
  * You can use {@link #DISABLE_ENCRYPTION_ONCE} attribute to implement StartTLS:
@@ -71,13 +71,13 @@ import org.apache.mina.common.WriteRequestWrapper;
  *
  *        // Write StartTLSResponse which won't be encrypted.
  *        session.write(new MyStartTLSResponse(OK));
- *        
+ *
  *        // Now DISABLE_ENCRYPTION_ONCE attribute is cleared.
  *        assert session.getAttribute(SSLFilter.DISABLE_ENCRYPTION_ONCE) == null;
  *    }
  * }
  * </pre>
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -97,7 +97,7 @@ public class SSLFilter extends IoFilterAdapter {
      * attribute map as soon as {@link IoSession#write(Object)} is invoked,
      * and therefore should be put again if you want to make more messages
      * bypass this filter.  This is especially useful when you implement
-     * StartTLS.   
+     * StartTLS.
      */
     public static final String DISABLE_ENCRYPTION_ONCE = SSLFilter.class
             .getName()
@@ -115,16 +115,16 @@ public class SSLFilter extends IoFilterAdapter {
             + ".UseNotification";
 
     /**
-     * A session attribute key that should be set to an {@link InetSocketAddress}. 
-     * Setting this attribute causes  
-     * {@link SSLContext#createSSLEngine(String, int)} to be called passing the 
-     * hostname and port of the {@link InetSocketAddress} to get an 
+     * A session attribute key that should be set to an {@link InetSocketAddress}.
+     * Setting this attribute causes
+     * {@link SSLContext#createSSLEngine(String, int)} to be called passing the
+     * hostname and port of the {@link InetSocketAddress} to get an
      * {@link SSLEngine} instance. If not set {@link SSLContext#createSSLEngine()}
      * will be called.
      * .
-     * Using this feature {@link SSLSession} objects may be cached and reused 
-     * when in client mode. 
-     * 
+     * Using this feature {@link SSLSession} objects may be cached and reused
+     * when in client mode.
+     *
      * @see SSLContext#createSSLEngine(String, int)
      */
     public static final String PEER_ADDRESS = SSLFilter.class.getName()
@@ -151,10 +151,10 @@ public class SSLFilter extends IoFilterAdapter {
 
     private static final String SSL_HANDLER = SSLFilter.class.getName()
             + ".SSLHandler";
-    
+
     // SSL Context
     private final SSLContext sslContext;
-    
+
     private final boolean autoStart;
 
     private boolean client;
@@ -173,7 +173,7 @@ public class SSLFilter extends IoFilterAdapter {
     public SSLFilter(SSLContext sslContext) {
         this(sslContext, true);
     }
-    
+
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
      */
@@ -188,7 +188,7 @@ public class SSLFilter extends IoFilterAdapter {
 
     /**
      * Returns the underlying {@link SSLSession} for the specified session.
-     * 
+     *
      * @return <tt>null</tt> if no {@link SSLSession} is initialized yet.
      */
     public SSLSession getSSLSession(IoSession session) {
@@ -199,7 +199,7 @@ public class SSLFilter extends IoFilterAdapter {
      * (Re)starts SSL session for the specified <tt>session</tt> if not started yet.
      * Please note that SSL session is automatically started by default, and therefore
      * you don't need to call this method unless you've used TLS closure.
-     * 
+     *
      * @return <tt>true</tt> if the SSL session has been started, <tt>false</tt> if already started.
      * @throws SSLException if failed to start the SSL session
      */
@@ -243,7 +243,7 @@ public class SSLFilter extends IoFilterAdapter {
     /**
      * Stops the SSL session by sending TLS <tt>close_notify</tt> message to
      * initiate TLS closure.
-     * 
+     *
      * @param session the {@link IoSession} to initiate TLS closure
      * @throws SSLException if failed to initiate TLS closure
      * @throws IllegalArgumentException if this filter is not managing the specified session
@@ -311,7 +311,7 @@ public class SSLFilter extends IoFilterAdapter {
     /**
      * Returns the list of cipher suites to be enabled when {@link SSLEngine}
      * is initialized.
-     * 
+     *
      * @return <tt>null</tt> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledCipherSuites() {
@@ -321,7 +321,7 @@ public class SSLFilter extends IoFilterAdapter {
     /**
      * Sets the list of cipher suites to be enabled when {@link SSLEngine}
      * is initialized.
-     * 
+     *
      * @param cipherSuites <tt>null</tt> means 'use {@link SSLEngine}'s default.'
      */
     public void setEnabledCipherSuites(String[] cipherSuites) {
@@ -331,7 +331,7 @@ public class SSLFilter extends IoFilterAdapter {
     /**
      * Returns the list of protocols to be enabled when {@link SSLEngine}
      * is initialized.
-     * 
+     *
      * @return <tt>null</tt> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledProtocols() {
@@ -341,7 +341,7 @@ public class SSLFilter extends IoFilterAdapter {
     /**
      * Sets the list of protocols to be enabled when {@link SSLEngine}
      * is initialized.
-     * 
+     *
      * @param protocols <tt>null</tt> means 'use {@link SSLEngine}'s default.'
      */
     public void setEnabledProtocols(String[] protocols) {
@@ -451,7 +451,7 @@ public class SSLFilter extends IoFilterAdapter {
                         newSSLE.initCause(ssle);
                         ssle = newSSLE;
                     }
-                    
+
                     throw ssle;
                 }
             }
@@ -587,7 +587,7 @@ public class SSLFilter extends IoFilterAdapter {
         }
         handler.flushScheduledEvents();
     }
-    
+
     private WriteFuture initiateClosure(NextFilter nextFilter, IoSession session)
             throws SSLException {
         SSLHandler handler = getSSLSessionHandler(session);
@@ -666,7 +666,7 @@ public class SSLFilter extends IoFilterAdapter {
 
     /**
      * A message that is sent from {@link SSLFilter} when the connection became
-     * secure or is not secure anymore. 
+     * secure or is not secure anymore.
      *
      * @author The Apache MINA Project (dev@mina.apache.org)
      * @version $Rev$, $Date$

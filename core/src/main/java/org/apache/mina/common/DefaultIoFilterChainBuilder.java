@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -41,7 +41,7 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * doesn't manage the life cycle of the {@link IoFilter}s at all, and the
  * existing {@link IoSession}s won't get affected by the changes in this builder.
  * {@link IoFilterChainBuilder}s affect only newly created {@link IoSession}s.
- * 
+ *
  * <pre>
  * IoAcceptor acceptor = ...;
  * DefaultIoFilterChainBuilder builder = acceptor.getFilterChain();
@@ -61,7 +61,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     public DefaultIoFilterChainBuilder() {
         entries = new CopyOnWriteArrayList<Entry>();
     }
-    
+
     /**
      * Creates a new copy of the specified {@link DefaultFilterChainBuilder}.
      */
@@ -81,7 +81,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
                 return e;
             }
         }
-        
+
         return null;
     }
 
@@ -327,7 +327,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         if (baseName == null) {
             throw new NullPointerException("baseName");
         }
-        
+
         if (!contains(baseName)) {
             throw new IllegalArgumentException("Unknown filter name: "
                     + baseName);

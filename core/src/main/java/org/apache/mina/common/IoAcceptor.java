@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -28,7 +28,7 @@ import java.net.SocketAddress;
  * <p>
  * Please refer to
  * <a href="../../../../../xref-examples/org/apache/mina/examples/echoserver/Main.html">EchoServer</a>
- * example. 
+ * example.
  * <p>
  * You should bind to the desired socket address to accept incoming
  * connections, and then events for incoming connections will be sent to
@@ -36,7 +36,7 @@ import java.net.SocketAddress;
  * <p>
  * Threads accept incoming connections start automatically when
  * {@link #bind()} is invoked, and stop when {@link #unbind()} is invoked.
- *  
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -48,7 +48,7 @@ public interface IoAcceptor extends IoService {
 
     /**
      * Sets the local address to bind.
-     * 
+     *
      * @throws IllegalStateException if this service is already running.
      */
     void setLocalAddress(SocketAddress localAddress);
@@ -67,7 +67,7 @@ public interface IoAcceptor extends IoService {
 
     /**
      * Bind to the configured local address and start to accept incoming connections.
-     * 
+     *
      * @throws IOException if failed to bind
      */
     void bind() throws IOException;
@@ -92,7 +92,7 @@ public interface IoAcceptor extends IoService {
      * This operation is optional.  Please throw {@link UnsupportedOperationException}
      * if the transport type doesn't support this operation.  This operation is
      * usually implemented for connectionless transport types.
-     * 
+     *
      * @throws UnsupportedOperationException if this operation is not supported
      * @throws IllegalStateException if this service is not running.
      */

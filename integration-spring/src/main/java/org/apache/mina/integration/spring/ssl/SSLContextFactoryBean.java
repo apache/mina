@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.integration.spring.ssl;
 
@@ -24,17 +24,18 @@ import java.security.SecureRandom;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.ManagerFactoryParameters;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.util.Assert;
 
 /**
- * Spring {@link org.springframework.beans.factory.FactoryBean} implementation 
- * which makes it possible to configure {@link javax.net.ssl.SSLContext} 
+ * Spring {@link org.springframework.beans.factory.FactoryBean} implementation
+ * which makes it possible to configure {@link javax.net.ssl.SSLContext}
  * instances using Spring.
  * <p>
  * If no properties are set the returned {@link javax.net.ssl.SSLContext} will
@@ -178,6 +179,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
         return context;
     }
 
+    @Override
     public Class getObjectType() {
         return SSLContext.class;
     }
@@ -185,9 +187,9 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     /**
      * Sets the protocol to use when creating the {@link SSLContext}. The
      * default is <code>TLS</code>.
-     * 
+     *
      * @param protocol the name of the protocol.
-     * @throws IllegalArgumentException if the specified value is 
+     * @throws IllegalArgumentException if the specified value is
      *         <code>null</code>.
      */
     public void setProtocol(String protocol) {
@@ -201,7 +203,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      * no algorithm has been set using
      * {@link #setKeyManagerFactoryAlgorithm(String)} the default algorithm
      * return by {@link KeyManagerFactory#getDefaultAlgorithm()} will be used.
-     * 
+     *
      * @param useDefault
      *            <code>true</code> or <code>false</code>.
      */
@@ -212,10 +214,10 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     /**
      * If this is set to <code>true</code> while no {@link TrustManagerFactory}
      * has been set using {@link #setTrustManagerFactory(TrustManagerFactory)} and
-     * no algorithm has been set using 
+     * no algorithm has been set using
      * {@link #setTrustManagerFactoryAlgorithm(String)} the default algorithm
      * return by {@link TrustManagerFactory#getDefaultAlgorithm()} will be used.
-     * 
+     *
      * @param useDefault <code>true</code> or <code>false</code>.
      */
     public void setTrustManagerFactoryAlgorithmUseDefault(boolean useDefault) {
@@ -226,7 +228,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      * Sets the {@link KeyManagerFactory} to use. If this is set the properties
      * which are used by this factory bean to create a {@link KeyManagerFactory}
      * will all be ignored.
-     * 
+     *
      * @param factory the factory.
      */
     public void setKeyManagerFactory(KeyManagerFactory factory) {
@@ -234,7 +236,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the algorithm to use when creating the {@link KeyManagerFactory} 
+     * Sets the algorithm to use when creating the {@link KeyManagerFactory}
      * using {@link KeyManagerFactory#getInstance(java.lang.String)} or
      * {@link KeyManagerFactory#getInstance(java.lang.String, java.lang.String)}.
      * <p>
@@ -242,13 +244,13 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      * set directly using {@link #setKeyManagerFactory(KeyManagerFactory)}.
      * </p>
      * <p>
-     * If this property isn't set while no {@link KeyManagerFactory} has been 
-     * set using {@link #setKeyManagerFactory(KeyManagerFactory)} and 
-     * {@link #setKeyManagerFactoryAlgorithmUseDefault(boolean)} has been set to 
-     * <code>true</code> the value returned 
+     * If this property isn't set while no {@link KeyManagerFactory} has been
+     * set using {@link #setKeyManagerFactory(KeyManagerFactory)} and
+     * {@link #setKeyManagerFactoryAlgorithmUseDefault(boolean)} has been set to
+     * <code>true</code> the value returned
      * by {@link KeyManagerFactory#getDefaultAlgorithm()} will be used instead.
-     * </p> 
-     * 
+     * </p>
+     *
      * @param algorithm the algorithm to use.
      */
     public void setKeyManagerFactoryAlgorithm(String algorithm) {
@@ -256,8 +258,8 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the provider to use when creating the {@link KeyManagerFactory} 
-     * using 
+     * Sets the provider to use when creating the {@link KeyManagerFactory}
+     * using
      * {@link KeyManagerFactory#getInstance(java.lang.String, java.lang.String)}.
      * <p>
      * This property will be ignored if a {@link KeyManagerFactory} has been
@@ -265,11 +267,11 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      * </p>
      * <p>
      * If this property isn't set and no {@link KeyManagerFactory} has been set
-     * using {@link #setKeyManagerFactory(KeyManagerFactory)} 
+     * using {@link #setKeyManagerFactory(KeyManagerFactory)}
      * {@link KeyManagerFactory#getInstance(java.lang.String)} will be used
      * to create the {@link KeyManagerFactory}.
-     * </p> 
-     * 
+     * </p>
+     *
      * @param provider the name of the provider.
      */
     public void setKeyManagerFactoryProvider(String provider) {
@@ -277,10 +279,10 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the {@link KeyStore} which will be used in the call to 
+     * Sets the {@link KeyStore} which will be used in the call to
      * {@link KeyManagerFactory#init(java.security.KeyStore, char[])} when
-     * the {@link SSLContext} is created. 
-     * 
+     * the {@link SSLContext} is created.
+     *
      * @param keyStore the key store.
      */
     public void setKeyManagerFactoryKeyStore(KeyStore keyStore) {
@@ -288,10 +290,10 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the password which will be used in the call to 
+     * Sets the password which will be used in the call to
      * {@link KeyManagerFactory#init(java.security.KeyStore, char[])} when
-     * the {@link SSLContext} is created. 
-     * 
+     * the {@link SSLContext} is created.
+     *
      * @param password the password. Use <code>null</code> to disable password.
      */
     public void setKeyManagerFactoryKeyStorePassword(String password) {
@@ -306,7 +308,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      * Sets the {@link TrustManagerFactory} to use. If this is set the
      * properties which are used by this factory bean to create a
      * {@link TrustManagerFactory} will all be ignored.
-     * 
+     *
      * @param factory
      *            the factory.
      */
@@ -315,7 +317,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the algorithm to use when creating the {@link TrustManagerFactory} 
+     * Sets the algorithm to use when creating the {@link TrustManagerFactory}
      * using {@link TrustManagerFactory#getInstance(java.lang.String)} or
      * {@link TrustManagerFactory#getInstance(java.lang.String, java.lang.String)}.
      * <p>
@@ -323,13 +325,13 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      * set directly using {@link #setTrustManagerFactory(TrustManagerFactory)}.
      * </p>
      * <p>
-     * If this property isn't set while no {@link TrustManagerFactory} has been 
-     * set using {@link #setTrustManagerFactory(TrustManagerFactory)} and 
-     * {@link #setTrustManagerFactoryAlgorithmUseDefault(boolean)} has been set to 
-     * <code>true</code> the value returned 
+     * If this property isn't set while no {@link TrustManagerFactory} has been
+     * set using {@link #setTrustManagerFactory(TrustManagerFactory)} and
+     * {@link #setTrustManagerFactoryAlgorithmUseDefault(boolean)} has been set to
+     * <code>true</code> the value returned
      * by {@link TrustManagerFactory#getDefaultAlgorithm()} will be used instead.
-     * </p> 
-     * 
+     * </p>
+     *
      * @param algorithm the algorithm to use.
      */
     public void setTrustManagerFactoryAlgorithm(String algorithm) {
@@ -337,14 +339,14 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the {@link KeyStore} which will be used in the call to 
+     * Sets the {@link KeyStore} which will be used in the call to
      * {@link TrustManagerFactory#init(java.security.KeyStore)} when
-     * the {@link SSLContext} is created. 
+     * the {@link SSLContext} is created.
      * <p>
      * This property will be ignored if {@link ManagerFactoryParameters} has been
      * set directly using {@link #setTrustManagerFactoryParameters(ManagerFactoryParameters)}.
      * </p>
-     * 
+     *
      * @param keyStore the key store.
      */
     public void setTrustManagerFactoryKeyStore(KeyStore keyStore) {
@@ -355,7 +357,7 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      * Sets the {@link ManagerFactoryParameters} which will be used in the call to
      * {@link TrustManagerFactory#init(javax.net.ssl.ManagerFactoryParameters)} when
      * the {@link SSLContext} is created.
-     *  
+     *
      * @param parameters describing provider-specific trust material.
      */
     public void setTrustManagerFactoryParameters(
@@ -364,8 +366,8 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the provider to use when creating the {@link TrustManagerFactory} 
-     * using 
+     * Sets the provider to use when creating the {@link TrustManagerFactory}
+     * using
      * {@link TrustManagerFactory#getInstance(java.lang.String, java.lang.String)}.
      * <p>
      * This property will be ignored if a {@link TrustManagerFactory} has been
@@ -373,11 +375,11 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
      * </p>
      * <p>
      * If this property isn't set and no {@link TrustManagerFactory} has been set
-     * using {@link #setTrustManagerFactory(TrustManagerFactory)} 
+     * using {@link #setTrustManagerFactory(TrustManagerFactory)}
      * {@link TrustManagerFactory#getInstance(java.lang.String)} will be used
      * to create the {@link TrustManagerFactory}.
-     * </p> 
-     * 
+     * </p>
+     *
      * @param provider the name of the provider.
      */
     public void setTrustManagerFactoryProvider(String provider) {
@@ -385,10 +387,10 @@ public class SSLContextFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the {@link SecureRandom} to use when initializing the 
+     * Sets the {@link SecureRandom} to use when initializing the
      * {@link SSLContext}. The JVM's default will be used if this isn't set.
-     * 
-     * @param secureRandom the {@link SecureRandom} or <code>null</code> if the 
+     *
+     * @param secureRandom the {@link SecureRandom} or <code>null</code> if the
      *        JVM's default should be used.
      * @see SSLContext#init(javax.net.ssl.KeyManager[], javax.net.ssl.TrustManager[], java.security.SecureRandom)
      */

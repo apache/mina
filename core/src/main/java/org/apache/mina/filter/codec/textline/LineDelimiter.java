@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec.textline;
 
@@ -46,7 +46,7 @@ public class LineDelimiter {
      * A special line delimiter which is used for auto-detection of
      * EOL in {@link TextLineDecoder}.  If this delimiter is used,
      * {@link TextLineDecoder} will consider both  <tt>'\r'</tt> and
-     * <tt>'\n'</tt> as a delimiter. 
+     * <tt>'\n'</tt> as a delimiter.
      */
     public static final LineDelimiter AUTO = new LineDelimiter("");
 

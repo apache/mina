@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.firewall;
 
@@ -33,7 +33,7 @@ import org.apache.mina.common.IoSessionLogger;
 /**
  * A {@link IoFilter} which blocks connections from connecting
  * at a rate faster than the specified interval.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -53,11 +53,11 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
 
     /**
      * Constructor that takes in a specified wait time.
-     * 
+     *
      * @param allowedInterval
      * 	The number of milliseconds a client is allowed to wait
      * 	before making another successful connection
-     * 
+     *
      */
     public ConnectionThrottleFilter(long allowedInterval) {
         this.allowedInterval = allowedInterval;
@@ -65,9 +65,9 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     }
 
     /**
-     * Sets the interval between connections from a client. 
+     * Sets the interval between connections from a client.
      * This value is measured in milliseconds.
-     * 
+     *
      * @param allowedInterval
      * 	The number of milliseconds a client is allowed to wait
      * 	before making another successful connection
@@ -79,7 +79,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     /**
      * Method responsible for deciding if a connection is OK
      * to continue
-     * 
+     *
      * @param session
      * 	The new session that will be verified
      * @return
@@ -98,9 +98,9 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
                 Long lastConnTime = clients.get(addr.getAddress()
                         .getHostAddress());
 
-                // if the interval between now and the last connection is 
+                // if the interval between now and the last connection is
                 // less than the allowed interval, return false
-                if ((now - lastConnTime) < allowedInterval) {
+                if (now - lastConnTime < allowedInterval) {
                     IoSessionLogger.error(session,
                             "Session connection interval too short");
                     return false;

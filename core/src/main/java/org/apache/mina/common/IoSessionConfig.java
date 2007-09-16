@@ -6,27 +6,27 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
 /**
  * The configuration of {@link IoSession}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoSessionConfig {
-    
+
     /**
      * Returns the size of the read buffer that I/O processor allocates
      * per each read.  It's unusual to adjust this property because
@@ -40,7 +40,7 @@ public interface IoSessionConfig {
      * it's often adjusted automatically by the I/O processor.
      */
     void setReadBufferSize(int readBufferSize);
-    
+
     /**
      * Returns the minimum size of the read buffer that I/O processor
      * allocates per each read.  I/O processor will not decrease the
@@ -54,7 +54,7 @@ public interface IoSessionConfig {
      * read buffer size to the smaller value than this property value.
      */
     void setMinReadBufferSize(int minReadBufferSize);
-    
+
     /**
      * Returns the maximum size of the read buffer that I/O processor
      * allocates per each read.  I/O processor will not increase the
@@ -68,7 +68,7 @@ public interface IoSessionConfig {
      * read buffer size to the greater value than this property value.
      */
     void setMaxReadBufferSize(int maxReadBufferSize);
-    
+
     /**
      * Returns idle time for the specified type of idleness in seconds.
      */
@@ -98,7 +98,7 @@ public interface IoSessionConfig {
      * Sets write timeout in seconds.
      */
     void setWriteTimeout(int writeTimeout);
-    
+
     /**
      * Sets all configuration properties retrieved from the specified
      * <tt>config</tt>.

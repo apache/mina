@@ -49,7 +49,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     VmPipeFilterChain(AbstractIoSession session) {
         super(session);
     }
-    
+
     IoProcessor getProcessor() {
         return processor;
     }
@@ -170,7 +170,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     public void fireMessageReceived(IoSession session, Object message) {
         pushEvent(new IoEvent(IoEventType.MESSAGE_RECEIVED, session, message));
     }
-    
+
     private class VmPipeIoProcessor implements IoProcessor {
         public void flush(IoSession session, WriteRequest writeRequest) {
             VmPipeSessionImpl s = (VmPipeSessionImpl) session;
@@ -196,10 +196,10 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                                 rb.reset();
                                 messageCopy = wb;
                             }
-    
+
                             s.increaseWrittenBytes(byteCount);
                             s.increaseWrittenMessages();
-    
+
                             s.getRemoteSession().getFilterChain().fireMessageReceived(
                                     s.getRemoteSession(), messageCopy);
                             s.getFilterChain().fireMessageSent(s, req);
@@ -246,7 +246,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                     VmPipeFilterChain.this.fireMessageReceived(s, aData);
                 }
             }
-            
+
             if (s.getTrafficMask().isWritable()) {
                 flush(s, null); // The second parameter is unused.
             }

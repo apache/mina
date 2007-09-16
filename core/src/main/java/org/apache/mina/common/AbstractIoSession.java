@@ -52,12 +52,12 @@ public abstract class AbstractIoSession implements IoSession {
                 s.scheduledWriteMessages.set(0);
             }
         };
-    
+
     private final Object lock = new Object();
-    
+
     private final Map<String, Object> attributes = Collections
             .synchronizedMap(new HashMap<String, Object>(4));
-    
+
     private final Queue<WriteRequest> writeRequestQueue =
         new ConcurrentLinkedQueue<WriteRequest>();
 
@@ -74,7 +74,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     // Status variables
     private final AtomicBoolean scheduledForFlush = new AtomicBoolean();
-    
+
     private final AtomicLong scheduledWriteBytes = new AtomicLong();
 
     private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
@@ -109,9 +109,9 @@ public abstract class AbstractIoSession implements IoSession {
                 lastIdleTimeForWrite = System.currentTimeMillis();
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
-    
+
     protected abstract IoProcessor getProcessor();
-    
+
     public boolean isConnected() {
         return !closeFuture.isClosed();
     }
@@ -127,7 +127,7 @@ public abstract class AbstractIoSession implements IoSession {
     public boolean isScheduledForFlush() {
         return scheduledForFlush.get();
     }
-    
+
     public boolean setScheduledForFlush(boolean flag) {
         if (flag) {
             return scheduledForFlush.compareAndSet(false, true);
@@ -374,11 +374,11 @@ public abstract class AbstractIoSession implements IoSession {
     public long getWrittenMessages() {
         return writtenMessages;
     }
-    
+
     public long getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
-    
+
     public int getScheduledWriteMessages() {
         return scheduledWriteMessages.get();
     }
@@ -398,7 +398,7 @@ public abstract class AbstractIoSession implements IoSession {
             lastWriteTime = System.currentTimeMillis();
             idleCountForBoth = 0;
             idleCountForWrite = 0;
-            
+
             scheduledWriteBytes.addAndGet(-increment);
         }
     }
@@ -419,7 +419,7 @@ public abstract class AbstractIoSession implements IoSession {
     public void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
     }
-    
+
     public Queue<WriteRequest> getWriteRequestQueue() {
         return writeRequestQueue;
     }

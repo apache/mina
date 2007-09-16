@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -73,7 +73,7 @@ import java.util.Set;
  * <pre>
  * // Prefer heap buffers to direct buffers.
  * ByteBuffer.setPreferDirectBuffer(false);
- * 
+ *
  * // Try to allocate a heap buffer first, and then a direct buffer.
  * ByteBuffer buf = ByteBuffer.allocate(1024);
  * </pre>
@@ -137,7 +137,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     private static ByteBufferAllocator allocator = new SimpleByteBufferAllocator();
 
     private static boolean preferDirectBuffers = false;
-    
+
     /**
      * An immutable empty buffer.
      */
@@ -193,7 +193,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * {@link #allocate(int, boolean)} to allocate buffers of specific type.
      *
      * @param capacity the capacity of the buffer
-     * 
+     *
      * @see #setPreferDirectBuffers(boolean)
      */
     public static ByteBuffer allocate(int capacity) {
@@ -647,11 +647,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Relative <i>get</i> method for reading a medium int value.
-     * 
+     *
      * <p> Reads the next three bytes at this buffer's current position,
      * composing them into an int value according to the current byte order,
      * and then increments the position by three.</p>
-     * 
+     *
      * @return  The medium int value at the buffer's current position
      */
     public int getMediumInt() {
@@ -667,11 +667,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Relative <i>get</i> method for reading an unsigned medium int value.
-     * 
+     *
      * <p> Reads the next three bytes at this buffer's current position,
      * composing them into an int value according to the current byte order,
      * and then increments the position by three.</p>
-     * 
+     *
      * @return  The unsigned medium int value at the buffer's current position
      */
     public int getUnsignedMediumInt() {
@@ -687,13 +687,13 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Absolute <i>get</i> method for reading a medium int value.
-     * 
+     *
      * <p> Reads the next three bytes at this buffer's current position,
      * composing them into an int value according to the current byte order.</p>
-     * 
+     *
      * @param index  The index from which the medium int will be read
      * @return  The medium int value at the given index
-     * 
+     *
      * @throws  IndexOutOfBoundsException
      *          If <tt>index</tt> is negative
      *          or not smaller than the buffer's limit
@@ -711,13 +711,13 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Absolute <i>get</i> method for reading an unsigned medium int value.
-     * 
+     *
      * <p> Reads the next three bytes at this buffer's current position,
      * composing them into an int value according to the current byte order.</p>
-     * 
+     *
      * @param index  The index from which the unsigned medium int will be read
      * @return  The unsigned medium int value at the given index
-     * 
+     *
      * @throws  IndexOutOfBoundsException
      *          If <tt>index</tt> is negative
      *          or not smaller than the buffer's limit
@@ -734,7 +734,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     private int getMediumInt(byte b1, byte b2, byte b3) {
-        int ret = (b1 << 16 & 0xff0000) | (b2 << 8 & 0xff00) | (b3 & 0xff);
+        int ret = b1 << 16 & 0xff0000 | b2 << 8 & 0xff00 | b3 & 0xff;
         // Check to see if the medium int is negative (high bit in b1 set)
         if ((b1 & 0x80) == 0x80) {
             // Make the the whole int negative
@@ -1001,9 +1001,9 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Returns hexdump of this buffer.  The data and pointer are 
+     * Returns hexdump of this buffer.  The data and pointer are
      * not changed as a result of this method call.
-     * 
+     *
      * @return
      *  hexidecimal representation of this ByteBuffer
      */
@@ -1013,10 +1013,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Return hexdump of this buffer with limited length.
-     * 
-     * @param lengthLimit The maximum number of bytes to dump from 
+     *
+     * @param lengthLimit The maximum number of bytes to dump from
      *                    the current buffer position.
-     * @return 
+     * @return
      *  hexidecimal representation of this ByteBuffer
      */
     public String getHexDump(int lengthLimit) {
@@ -1078,7 +1078,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
             }
 
             if (end < 0) {
-                newPos = end = oldPos + ((oldLimit - oldPos) & 0xFFFFFFFE);
+                newPos = end = oldPos + (oldLimit - oldPos & 0xFFFFFFFE);
             } else {
                 if (end + 2 <= oldLimit) {
                     newPos = end + 2;
@@ -1152,7 +1152,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
         boolean utf16 = decoder.charset().name().startsWith("UTF-16");
 
-        if (utf16 && ((fieldSize & 1) != 0)) {
+        if (utf16 && (fieldSize & 1) != 0) {
             throw new IllegalArgumentException("fieldSize is not even.");
         }
 
@@ -1180,7 +1180,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
             }
         } else {
             for (i = oldPos; i < end; i += 2) {
-                if ((get(i) == 0) && (get(i + 1) == 0)) {
+                if (get(i) == 0 && get(i + 1) == 0) {
                     break;
                 }
             }
@@ -1319,7 +1319,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
         boolean utf16 = encoder.charset().name().startsWith("UTF-16");
 
-        if (utf16 && ((fieldSize & 1) != 0)) {
+        if (utf16 && (fieldSize & 1) != 0) {
             throw new IllegalArgumentException("fieldSize is not even.");
         }
 
@@ -1416,7 +1416,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
         boolean utf16 = decoder.charset().name().startsWith("UTF-16");
 
-        if (utf16 && ((fieldSize & 1) != 0)) {
+        if (utf16 && (fieldSize & 1) != 0) {
             throw new BufferDataException(
                     "fieldSize is not even for a UTF-16 string.");
         }
@@ -1603,7 +1603,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         }
 
         // Write the length field
-        fill(padValue, padding - ((position() - oldPos) & padMask));
+        fill(padValue, padding - (position() - oldPos & padMask));
         int length = position() - oldPos;
         switch (prefixLength) {
         case 1:
@@ -1755,7 +1755,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Returns the first occurence position of the specified byte from the current position to
      * the current limit.
-     * 
+     *
      * @return <tt>-1</tt> if the specified byte is not found
      */
     public int indexOf(byte b) {
@@ -1807,7 +1807,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         int r = size & 7;
 
         if (q > 0) {
-            int intValue = value | (value << 8) | (value << 16) | (value << 24);
+            int intValue = value | value << 8 | value << 16 | value << 24;
             long longValue = intValue;
             longValue <<= 32;
             longValue |= intValue;
@@ -1821,7 +1821,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         r = r & 3;
 
         if (q > 0) {
-            int intValue = value | (value << 8) | (value << 16) | (value << 24);
+            int intValue = value | value << 8 | value << 16 | value << 24;
             putInt(intValue);
         }
 
@@ -1829,7 +1829,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         r = r & 1;
 
         if (q > 0) {
-            short shortValue = (short) (value | (value << 8));
+            short shortValue = (short) (value | value << 8);
             putShort(shortValue);
         }
 
@@ -1912,10 +1912,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Reads a byte from the buffer and returns the correlating enum constant defined
      * by the specified enum type.
-     * 
+     *
      * @param <E> The enum type to return
      * @param enumClass  The enum's class object
-     * @return  
+     * @return
      */
     public <E extends Enum<E>> E getEnum(Class<E> enumClass) {
         return toEnum(enumClass, get());
@@ -1924,11 +1924,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Reads a byte from the buffer and returns the correlating enum constant defined
      * by the specified enum type.
-     * 
+     *
      * @param <E> The enum type to return
      * @param index  the index from which the byte will be read
      * @param enumClass  The enum's class object
-     * @return  
+     * @return
      */
     public <E extends Enum<E>> E getEnum(int index, Class<E> enumClass) {
         return toEnum(enumClass, get(index));
@@ -1937,10 +1937,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Reads a short from the buffer and returns the correlating enum constant defined
      * by the specified enum type.
-     * 
+     *
      * @param <E> The enum type to return
      * @param enumClass  The enum's class object
-     * @return  
+     * @return
      */
     public <E extends Enum<E>> E getEnumShort(Class<E> enumClass) {
         return toEnum(enumClass, getShort());
@@ -1949,11 +1949,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Reads a short from the buffer and returns the correlating enum constant defined
      * by the specified enum type.
-     * 
+     *
      * @param <E> The enum type to return
      * @param index  the index from which the bytes will be read
      * @param enumClass  The enum's class object
-     * @return  
+     * @return
      */
     public <E extends Enum<E>> E getEnumShort(int index, Class<E> enumClass) {
         return toEnum(enumClass, getShort(index));
@@ -1962,10 +1962,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Reads an int from the buffer and returns the correlating enum constant defined
      * by the specified enum type.
-     * 
+     *
      * @param <E> The enum type to return
      * @param enumClass  The enum's class object
-     * @return  
+     * @return
      */
     public <E extends Enum<E>> E getEnumInt(Class<E> enumClass) {
         return toEnum(enumClass, getInt());
@@ -1974,11 +1974,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Reads an int from the buffer and returns the correlating enum constant defined
      * by the specified enum type.
-     * 
+     *
      * @param <E> The enum type to return
      * @param index  the index from which the bytes will be read
      * @param enumClass  The enum's class object
-     * @return  
+     * @return
      */
     public <E extends Enum<E>> E getEnumInt(int index, Class<E> enumClass) {
         return toEnum(enumClass, getInt(index));
@@ -1986,7 +1986,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Writes an enum's ordinal value to the buffer as a byte.
-     * 
+     *
      * @param e  The enum to write to the buffer
      */
     public ByteBuffer putEnum(Enum<?> e) {
@@ -2013,7 +2013,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Writes an enum's ordinal value to the buffer as a short.
-     * 
+     *
      * @param e  The enum to write to the buffer
      */
     public ByteBuffer putEnumShort(Enum<?> e) {
@@ -2026,7 +2026,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Writes an enum's ordinal value to the buffer as a short.
-     * 
+     *
      * @param index The index at which the bytes will be written
      * @param e  The enum to write to the buffer
      */
@@ -2040,7 +2040,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Writes an enum's ordinal value to the buffer as an integer.
-     * 
+     *
      * @param e  The enum to write to the buffer
      */
     public ByteBuffer putEnumInt(Enum<?> e) {
@@ -2049,7 +2049,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Writes an enum's ordinal value to the buffer as an integer.
-     * 
+     *
      * @param index The index at which the bytes will be written
      * @param e  The enum to write to the buffer
      */
@@ -2084,11 +2084,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Reads a byte sized bit vector and converts it to an {@link EnumSet}.
-     * 
+     *
      * <p>Each bit is mapped to a value in the specified enum.  The least significant
      * bit maps to the first entry in the specified enum and each subsequent bit maps
      * to each subsequent bit as mapped to the subsequent enum value.</p>
-     * 
+     *
      * @param <E>  the enum type
      * @param enumClass  the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
@@ -2099,7 +2099,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Reads a byte sized bit vector and converts it to an {@link EnumSet}.
-     * 
+     *
      * @see #getEnumSet(Class)
      * @param <E>  the enum type
      * @param index  the index from which the byte will be read
@@ -2113,7 +2113,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Reads a short sized bit vector and converts it to an {@link EnumSet}.
-     * 
+     *
      * @see #getEnumSet(Class)
      * @param <E>  the enum type
      * @param enumClass  the enum class used to create the EnumSet
@@ -2125,7 +2125,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Reads a short sized bit vector and converts it to an {@link EnumSet}.
-     * 
+     *
      * @see #getEnumSet(Class)
      * @param <E>  the enum type
      * @param index  the index from which the bytes will be read
@@ -2139,7 +2139,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Reads an int sized bit vector and converts it to an {@link EnumSet}.
-     * 
+     *
      * @see #getEnumSet(Class)
      * @param <E>  the enum type
      * @param enumClass  the enum class used to create the EnumSet
@@ -2151,7 +2151,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Reads an int sized bit vector and converts it to an {@link EnumSet}.
-     * 
+     *
      * @see #getEnumSet(Class)
      * @param <E>  the enum type
      * @param index  the index from which the bytes will be read
@@ -2165,7 +2165,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Reads a long sized bit vector and converts it to an {@link EnumSet}.
-     * 
+     *
      * @see #getEnumSet(Class)
      * @param <E>  the enum type
      * @param enumClass  the enum class used to create the EnumSet
@@ -2177,7 +2177,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     /**
      * Reads a long sized bit vector and converts it to an {@link EnumSet}.
-     * 
+     *
      * @see #getEnumSet(Class)
      * @param <E>  the enum type
      * @param index  the index from which the bytes will be read
@@ -2190,7 +2190,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Utility method for converting a bit vector to an EnumSet. 
+     * Utility method for converting a bit vector to an EnumSet.
      */
     private <E extends Enum<E>> EnumSet<E> toEnumSet(Class<E> clazz, long vector) {
         EnumSet<E> set = EnumSet.noneOf(clazz);
@@ -2205,8 +2205,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Writes the specified {@link Set} to the buffer as a byte sized bit vector. 
-     * 
+     * Writes the specified {@link Set} to the buffer as a byte sized bit vector.
+     *
      * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
@@ -2220,8 +2220,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Writes the specified {@link Set} to the buffer as a byte sized bit vector. 
-     * 
+     * Writes the specified {@link Set} to the buffer as a byte sized bit vector.
+     *
      * @param <E> the enum type of the Set
      * @param index  the index at which the byte will be written
      * @param set  the enum set to write to the buffer
@@ -2236,8 +2236,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Writes the specified {@link Set} to the buffer as a short sized bit vector. 
-     * 
+     * Writes the specified {@link Set} to the buffer as a short sized bit vector.
+     *
      * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
@@ -2251,8 +2251,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Writes the specified {@link Set} to the buffer as a short sized bit vector. 
-     * 
+     * Writes the specified {@link Set} to the buffer as a short sized bit vector.
+     *
      * @param <E> the enum type of the Set
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
@@ -2267,8 +2267,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Writes the specified {@link Set} to the buffer as an int sized bit vector. 
-     * 
+     * Writes the specified {@link Set} to the buffer as an int sized bit vector.
+     *
      * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
@@ -2282,8 +2282,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Writes the specified {@link Set} to the buffer as an int sized bit vector. 
-     * 
+     * Writes the specified {@link Set} to the buffer as an int sized bit vector.
+     *
      * @param <E> the enum type of the Set
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
@@ -2298,8 +2298,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Writes the specified {@link Set} to the buffer as a long sized bit vector. 
-     * 
+     * Writes the specified {@link Set} to the buffer as a long sized bit vector.
+     *
      * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
@@ -2308,8 +2308,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Writes the specified {@link Set} to the buffer as a long sized bit vector. 
-     * 
+     * Writes the specified {@link Set} to the buffer as a long sized bit vector.
+     *
      * @param <E> the enum type of the Set
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
@@ -2319,7 +2319,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     }
 
     /**
-     * Utility method for converting an Set to a bit vector. 
+     * Utility method for converting an Set to a bit vector.
      */
     private <E extends Enum<E>> long toLong(Set<E> set) {
         long vector = 0;

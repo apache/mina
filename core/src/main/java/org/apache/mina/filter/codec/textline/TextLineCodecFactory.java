@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec.textline;
 
@@ -53,10 +53,10 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
 
 
     /**
-     * Creates a new instance with the specified {@link Charset}.  The 
-     * encoder uses a UNIX {@link LineDelimeter} and the decoder uses 
+     * Creates a new instance with the specified {@link Charset}.  The
+     * encoder uses a UNIX {@link LineDelimeter} and the decoder uses
      * the AUTO {@link LineDelimeter}.
-     * 
+     *
      * @param charset
      *  The charset to use in the encoding and decoding
      */
@@ -68,8 +68,8 @@ public class TextLineCodecFactory implements ProtocolCodecFactory
 
 
     /**
-     * Creates a new instance of TextLineCodecFactory.  This constructor 
-     * provides more flexibility for the developer.  
+     * Creates a new instance of TextLineCodecFactory.  This constructor
+     * provides more flexibility for the developer.
      *
      * @param charset
      *  The charset to use in the encoding and decoding

@@ -1,6 +1,10 @@
 package org.apache.mina.filter.util;
 
-import org.apache.mina.common.*;
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoEventType;
+import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteRequest;
 
 /**
  * Extend this class when you want to create a filter that
@@ -13,6 +17,7 @@ public abstract class WrappingFilter extends IoFilterAdapter {
 
     protected abstract void wrap(IoEventType eventType, IoSession session, Runnable action);
 
+    @Override
     final public void sessionCreated(final NextFilter nextFilter, final IoSession session) throws Exception {
         wrap(IoEventType.SESSION_CREATED, session, new Runnable() {
             public void run() {

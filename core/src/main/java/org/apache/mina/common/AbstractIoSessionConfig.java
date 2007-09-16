@@ -6,23 +6,23 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
 
 /**
  * A base implementation of {@link IoSessionConfig}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -38,12 +38,12 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
 
     protected AbstractIoSessionConfig() {
     }
-    
+
     public final void setAll(IoSessionConfig config) {
         if (config == null) {
             throw new NullPointerException("config");
         }
-        
+
         setReadBufferSize(config.getReadBufferSize());
         setMinReadBufferSize(config.getMinReadBufferSize());
         setMaxReadBufferSize(config.getMaxReadBufferSize());
@@ -51,10 +51,10 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
         setIdleTime(IdleStatus.READER_IDLE, config.getIdleTime(IdleStatus.READER_IDLE));
         setIdleTime(IdleStatus.WRITER_IDLE, config.getIdleTime(IdleStatus.WRITER_IDLE));
         setWriteTimeout(config.getWriteTimeout());
-        
+
         doSetAll(config);
     }
-    
+
     /**
      * Implement this method to set all transport-specific configuration
      * properties retrieved from the specified <tt>config</tt>.
@@ -64,7 +64,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     public int getReadBufferSize() {
         return readBufferSize;
     }
-    
+
     public void setReadBufferSize(int readBufferSize) {
         if (readBufferSize <= 0) {
             throw new IllegalArgumentException("readBufferSize: " + readBufferSize + " (expected: 1+)");
@@ -75,14 +75,14 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     public int getMinReadBufferSize() {
         return minReadBufferSize;
     }
-    
+
     public void setMinReadBufferSize(int minReadBufferSize) {
         if (minReadBufferSize <= 0) {
             throw new IllegalArgumentException("minReadBufferSize: " + minReadBufferSize + " (expected: 1+)");
         }
         if (minReadBufferSize > maxReadBufferSize ) {
             throw new IllegalArgumentException("minReadBufferSize: " + minReadBufferSize + " (expected: smaller than " + maxReadBufferSize + ')');
-            
+
         }
         this.minReadBufferSize = minReadBufferSize;
     }
@@ -90,15 +90,15 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     public int getMaxReadBufferSize() {
         return maxReadBufferSize;
     }
-    
+
     public void setMaxReadBufferSize(int maxReadBufferSize) {
         if (maxReadBufferSize <= 0) {
             throw new IllegalArgumentException("maxReadBufferSize: " + maxReadBufferSize + " (expected: 1+)");
         }
-        
+
         if (maxReadBufferSize < minReadBufferSize) {
             throw new IllegalArgumentException("maxReadBufferSize: " + maxReadBufferSize + " (expected: greater than " + minReadBufferSize + ')');
-            
+
         }
         this.maxReadBufferSize = maxReadBufferSize;
     }

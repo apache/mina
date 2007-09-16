@@ -226,7 +226,7 @@ class SSLHandler {
      * Check if there is any need to complete handshake.
      */
     public boolean needToCompleteHandshake() {
-        return (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone());
+        return handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone();
     }
 
     public void schedulePreHandshakeWriteRequest(NextFilter nextFilter,
@@ -290,7 +290,7 @@ class SSLHandler {
         if (buf.limit() > inNetBuffer.remaining()) {
             // We have to expand inNetBuffer
             inNetBuffer = SSLByteBufferUtil.expandBuffer(inNetBuffer,
-                    inNetBuffer.capacity() + (buf.limit() * 2));
+                    inNetBuffer.capacity() + buf.limit() * 2);
             // We also expand app. buffer (twice the size of in net. buffer)
             appBuffer = SSLByteBufferUtil.expandBuffer(appBuffer, inNetBuffer
                     .capacity() * 2);
@@ -352,8 +352,8 @@ class SSLHandler {
         // Loop until there is no more data in src
         while (src.hasRemaining()) {
 
-            if (src.remaining() > ((outNetBuffer.capacity() - outNetBuffer
-                    .position()) / 2)) {
+            if (src.remaining() > (outNetBuffer.capacity() - outNetBuffer
+                    .position()) / 2) {
                 // We have to expand outNetBuffer
                 // Note: there is no way to know the exact size required, but enrypted data
                 // shouln't need to be larger than twice the source data size?

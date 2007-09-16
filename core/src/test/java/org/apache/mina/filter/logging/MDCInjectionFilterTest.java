@@ -1,23 +1,39 @@
 package org.apache.mina.filter.logging;
 
-import junit.framework.TestCase;
-import org.apache.mina.filter.codec.*;
-import org.apache.mina.filter.executor.ExecutorFilter;
-import org.apache.mina.filter.statistic.ProfilerTimerFilter;
-import org.apache.mina.common.*;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketConnector;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
+import junit.framework.TestCase;
+
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.LoggingEvent;
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoHandlerAdapter;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFactory;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
+import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.ProtocolEncoder;
+import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
+import org.apache.mina.filter.codec.ProtocolEncoderOutput;
+import org.apache.mina.filter.executor.ExecutorFilter;
+import org.apache.mina.filter.statistic.ProfilerTimerFilter;
+import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
@@ -30,6 +46,7 @@ public class MDCInjectionFilterTest extends TestCase {
     private MyAppender appender = new MyAppender();
     private SocketAcceptor acceptor;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         // uncomment next line if you want to see normal logging
@@ -40,6 +57,7 @@ public class MDCInjectionFilterTest extends TestCase {
     }
 
 
+    @Override
     protected void tearDown() throws Exception {
         acceptor.unbind();
         super.tearDown();
@@ -184,7 +202,7 @@ public class MDCInjectionFilterTest extends TestCase {
                 }
                 if (user != null && user.equals(event.getMDC("user"))) {
                     return;
-                }                
+                }
                 return;
             }
         }
@@ -197,30 +215,36 @@ public class MDCInjectionFilterTest extends TestCase {
         CountDownLatch sessionClosedLatch = new CountDownLatch(2);
         CountDownLatch messageSentLatch = new CountDownLatch(2);
 
+        @Override
         public void sessionCreated(IoSession session) throws Exception {
             logger.info("sessionCreated");
             session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 1);
         }
 
+        @Override
         public void sessionOpened(IoSession session) throws Exception {
             logger.info("sessionOpened");
         }
 
+        @Override
         public void sessionClosed(IoSession session) throws Exception {
             logger.info("sessionClosed");
             sessionClosedLatch.countDown();
         }
 
+        @Override
         public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
             logger.info("sessionIdle");
             sessionIdleLatch.countDown();
-            session.close();            
+            session.close();
         }
 
+        @Override
         public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
             logger.info("exceptionCaught", cause);
         }
 
+        @Override
         public void messageReceived(IoSession session, Object message) throws Exception {
             logger.info("messageReceived");
             // adding a custom property to the context
@@ -231,6 +255,7 @@ public class MDCInjectionFilterTest extends TestCase {
             throw new RuntimeException("just a test, forcing exceptionCaught");
         }
 
+        @Override
         public void messageSent(IoSession session, Object message) throws Exception {
             logger.info("messageSent");
             messageSentLatch.countDown();
@@ -255,7 +280,7 @@ public class MDCInjectionFilterTest extends TestCase {
                     if (in.remaining() >= 4) {
                         int value = in.getInt();
                         logger.info("decode");
-                        out.write(value);                        
+                        out.write(value);
                     }
                 }
             };
@@ -266,20 +291,24 @@ public class MDCInjectionFilterTest extends TestCase {
 
         List<LoggingEvent> events = Collections.synchronizedList(new ArrayList<LoggingEvent>());
 
+        @Override
         protected void append(final LoggingEvent loggingEvent) {
             loggingEvent.getMDCCopy();
             events.add(loggingEvent);
         }
 
+        @Override
         public boolean requiresLayout() {
             return false;
         }
 
+        @Override
         public void close() {
         }
     }
 
     private static class DummyIoFilter extends IoFilterAdapter {
+        @Override
         public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
             logger.info("DummyIoFilter.sessionOpened");
             nextFilter.sessionOpened(session);

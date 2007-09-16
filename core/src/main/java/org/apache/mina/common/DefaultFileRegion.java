@@ -6,11 +6,11 @@ import java.nio.channels.FileChannel;
 public class DefaultFileRegion implements FileRegion {
 
     private final FileChannel channel;
-    
+
     private long originalPosition;
     private long position;
     private long count;
-    
+
     public DefaultFileRegion(FileChannel channel, long position, long count) {
         if (channel == null) {
             throw new IllegalArgumentException("channel can not be null");
@@ -26,7 +26,7 @@ public class DefaultFileRegion implements FileRegion {
         this.position = position;
         this.count = count;
     }
-    
+
     public long getWrittenBytes() {
         return position - originalPosition;
     }

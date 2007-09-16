@@ -199,7 +199,7 @@ public class Request {
 
     @Override
     public String toString() {
-        String timeout = (getTimeoutMillis() == Long.MAX_VALUE) ? "max"
+        String timeout = getTimeoutMillis() == Long.MAX_VALUE ? "max"
                 : String.valueOf(getTimeoutMillis());
 
         return "request: { id=" + getId() + ", timeout=" + timeout

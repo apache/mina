@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.util;
 
@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A thread-safe version of {@link Map} in which all operations that change the 
+ * A thread-safe version of {@link Map} in which all operations that change the
  * Map are implemented by making a new copy of the underlying Map.
- * 
+ *
  * While the creation of a new Map can be expensive, this class is designed for
- * cases in which the primary function is to read data from the Map, not to 
- * modify the Map.  Therefore the operations that do not cause a change to this 
+ * cases in which the primary function is to read data from the Map, not to
+ * modify the Map.  Therefore the operations that do not cause a change to this
  * class happen quickly and concurrently.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -56,7 +56,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     public CopyOnWriteMap(int initialCapacity) {
         internalMap = new HashMap<K, V>(initialCapacity);
     }
-    
+
     /**
      * Creates a new instance of CopyOnWriteMap in which the
      * initial data being held by this map is contained in
@@ -72,7 +72,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
 
     /**
      * Adds the provided key and value to this map.
-     * 
+     *
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public V put(K key, V value) {
@@ -87,7 +87,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     /**
      * Removed the value and key from this map based on the
      * provided key.
-     * 
+     *
      * @see java.util.Map#remove(java.lang.Object)
      */
     public V remove(Object key) {
@@ -102,7 +102,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     /**
      * Inserts all the keys and values contained in the
      * provided map to this map.
-     * 
+     *
      * @see java.util.Map#putAll(java.util.Map)
      */
     public void putAll(Map<? extends K, ? extends V> newData) {
@@ -115,7 +115,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
 
     /**
      * Removes all entries in this map.
-     * 
+     *
      * @see java.util.Map#clear()
      */
     public void clear() {
@@ -130,7 +130,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     // ==============================================
     /**
      * Returns the number of key/value pairs in this map.
-     * 
+     *
      * @see java.util.Map#size()
      */
     public int size() {
@@ -139,7 +139,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
 
     /**
      * Returns true if this map is empty, otherwise false.
-     * 
+     *
      * @see java.util.Map#isEmpty()
      */
     public boolean isEmpty() {
@@ -149,7 +149,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     /**
      * Returns true if this map contains the provided key, otherwise
      * this method return false.
-     * 
+     *
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public boolean containsKey(Object key) {
@@ -159,7 +159,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     /**
      * Returns true if this map contains the provided value, otherwise
      * this method returns false.
-     * 
+     *
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public boolean containsValue(Object value) {
@@ -169,7 +169,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     /**
      * Returns the value associated with the provided key from this
      * map.
-     * 
+     *
      * @see java.util.Map#get(java.lang.Object)
      */
     public V get(Object key) {
@@ -196,7 +196,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     public Set<Entry<K, V>> entrySet() {
         return internalMap.entrySet();
     }
-    
+
     @Override
     public Object clone() {
         try {

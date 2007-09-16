@@ -250,7 +250,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
 
         public Expirer() {
             expirerThread = new Thread(this, "ExpiringMapExpirer-"
-                    + (expirerCount++));
+                    + expirerCount++);
             expirerThread.setDaemon(true);
         }
 

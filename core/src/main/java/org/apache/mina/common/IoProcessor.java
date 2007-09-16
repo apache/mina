@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -24,7 +24,7 @@ package org.apache.mina.common;
  * actual I/O operations for {@link IoSession}s.  It abstracts existing
  * reactor frameworks such as Java NIO once again to simplify transport
  * implementations.
- *  
+ *
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -39,7 +39,7 @@ public interface IoProcessor {
     /**
      * Flushes the internal write request queue of the specified
      * {@code session}.
-     * 
+     *
      * @param writeRequest the write request added right now
      */
     void flush(IoSession session, WriteRequest writeRequest);
@@ -49,7 +49,7 @@ public interface IoProcessor {
      * in {@link IoSession#getTrafficMask()}.
      */
     void updateTrafficMask(IoSession session);
-    
+
     /**
      * Removes and closes the specified {@code session} from the I/O
      * processor so that the I/O processor closes the connection

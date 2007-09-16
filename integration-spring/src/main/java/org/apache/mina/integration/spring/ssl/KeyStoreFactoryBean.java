@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.integration.spring.ssl;
 
@@ -31,7 +31,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * Spring {@link org.springframework.beans.factory.FactoryBean} implementation 
+ * Spring {@link org.springframework.beans.factory.FactoryBean} implementation
  * which makes it possible to configure {@link java.security.KeyStore} instances
  * using Spring.
  *
@@ -52,7 +52,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean {
     /**
      * Creates a new {@link KeyStore}. This method will be called
      * by the base class when Spring creates a bean using this FactoryBean.
-     * 
+     *
      * @return the {@link KeyStore} instance.
      */
     @Override
@@ -88,6 +88,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean {
         return ks;
     }
 
+    @Override
     public Class getObjectType() {
         return KeyStore.class;
     }
@@ -95,7 +96,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean {
     /**
      * Sets the file which contains the key store. Either this
      * property or {@link #setProvider(String)} have to be set.
-     * 
+     *
      * @param file the file to load the key store from.
      */
     public void setFile(File file) {
@@ -105,8 +106,8 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean {
     /**
      * Sets the key store password. If this value is <code>null</code> no
      * password will be used to check the integrity of the key store.
-     * 
-     * @param password the password or <code>null</code> if no password is 
+     *
+     * @param password the password or <code>null</code> if no password is
      *        needed.
      */
     public void setPassword(String password) {
@@ -120,7 +121,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean {
     /**
      * Sets the name of the provider to use when creating the key store. The
      * default is to use the platform default provider.
-     * 
+     *
      * @param provider the name of the provider, e.g. SUN.
      */
     public void setProvider(String provider) {
@@ -130,7 +131,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean {
     /**
      * Sets a Spring {@link Resource} which contains the key store. Either this
      * property or {@link #setFile(File)} have to be set.
-     * 
+     *
      * @param resource the resource to load the key store from.
      */
     public void setResource(Resource resource) {
@@ -138,11 +139,11 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean {
     }
 
     /**
-     * Sets the type of key store to create. The default is to create a 
+     * Sets the type of key store to create. The default is to create a
      * JKS key store.
-     * 
+     *
      * @param type the type to use when creating the key store.
-     * @throws IllegalArgumentException if the specified value is 
+     * @throws IllegalArgumentException if the specified value is
      *         <code>null</code>.
      */
     public void setType(String type) {

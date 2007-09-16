@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.example.httpserver.codec;
 
@@ -38,7 +38,7 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
 /**
  * A {@link MessageDecoder} that decodes {@link HttpRequest}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -91,9 +91,9 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
         if (in.get(0) == (byte) 'G' && in.get(1) == (byte) 'E'
                 && in.get(2) == (byte) 'T') {
             // Http GET request therefore the last 4 bytes should be 0x0D 0x0A 0x0D 0x0A
-            return (in.get(last) == (byte) 0x0A
+            return in.get(last) == (byte) 0x0A
                     && in.get(last - 1) == (byte) 0x0D
-                    && in.get(last - 2) == (byte) 0x0A && in.get(last - 3) == (byte) 0x0D);
+                    && in.get(last - 2) == (byte) 0x0A && in.get(last - 3) == (byte) 0x0D;
         } else if (in.get(0) == (byte) 'P' && in.get(1) == (byte) 'O'
                 && in.get(2) == (byte) 'S' && in.get(3) == (byte) 'T') {
             // Http POST request
@@ -130,8 +130,8 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
                                 new byte[] { in.get(j) }));
                     }
                     // if content-length worth of data has been received then the message is complete
-                    return (Integer.parseInt(contentLength.toString().trim())
-                            + eoh == in.remaining());
+                    return Integer.parseInt(contentLength.toString().trim())
+                            + eoh == in.remaining();
                 }
             }
         }

@@ -83,6 +83,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
         return config;
     }
 
+    @Override
     protected IoProcessor getProcessor() {
         return processor;
     }
@@ -95,14 +96,17 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
         return METADATA;
     }
 
+    @Override
     SocketChannel getChannel() {
         return ch;
     }
 
+    @Override
     SelectionKey getSelectionKey() {
         return key;
     }
 
+    @Override
     void setSelectionKey(SelectionKey key) {
         this.key = key;
     }

@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -36,7 +36,7 @@ import org.apache.mina.filter.util.ReferenceCountingIoFilter;
  * <strong>Please NEVER implement your filters to wrap
  * {@link IoSession}s.</strong> Users can cache the reference to the
  * session, which might malfunction if any filters are added or removed later.
- * 
+ *
  * <h3>The Life Cycle</h3>
  * {@link IoFilter}s are activated only when they are inside {@link IoFilterChain}.
  * <p>
@@ -66,11 +66,11 @@ import org.apache.mina.filter.util.ReferenceCountingIoFilter;
  *       notify that the filter is removed from the chain.</li>
  *   <li>{@link #destroy()} is invoked by {@link ReferenceCountingIoFilter} if
  *       the removed filter was the last one.</li>
- * </ol>      
- * 
+ * </ol>
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
+ *
  * @see IoFilterAdapter
  */
 public interface IoFilter {
@@ -94,7 +94,7 @@ public interface IoFilter {
      * Invoked before this filter is added to the specified <tt>parent</tt>.
      * Please note that this method can be invoked more than once if
      * this filter is added to more than one parents.  This method is not
-     * invoked before {@link #init()} is invoked. 
+     * invoked before {@link #init()} is invoked.
      *
      * @param parent the parent who called this method
      * @param name the name assigned to this filter
@@ -108,7 +108,7 @@ public interface IoFilter {
      * Invoked after this filter is added to the specified <tt>parent</tt>.
      * Please note that this method can be invoked more than once if
      * this filter is added to more than one parents.  This method is not
-     * invoked before {@link #init()} is invoked. 
+     * invoked before {@link #init()} is invoked.
      *
      * @param parent the parent who called this method
      * @param name the name assigned to this filter
@@ -123,7 +123,7 @@ public interface IoFilter {
      * Please note that this method can be invoked more than once if
      * this filter is removed from more than one parents.
      * This method is always invoked before {@link #destroy()} is invoked.
-     *  
+     *
      * @param parent the parent who called this method
      * @param name the name assigned to this filter
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
@@ -137,7 +137,7 @@ public interface IoFilter {
      * Please note that this method can be invoked more than once if
      * this filter is removed from more than one parents.
      * This method is always invoked before {@link #destroy()} is invoked.
-     *  
+     *
      * @param parent the parent who called this method
      * @param name the name assigned to this filter
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse

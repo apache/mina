@@ -35,14 +35,14 @@ import org.apache.mina.protocol.http.client.AsyncHttpClientCallback;
  */
 public class Wget {
     /**
-     * object that is used to trigger events that have happened.  Rudimentary 
-     * locking mechanism for this class.  
+     * object that is used to trigger events that have happened.  Rudimentary
+     * locking mechanism for this class.
      */
     protected static final Object semaphore = new Object();
 
     /**
      * Creates a new instance of HttpClient.  Constructor that does all
-     * the work for this example.  
+     * the work for this example.
      *
      * @param url
      *  Example: http://www.google.com
@@ -53,10 +53,11 @@ public class Wget {
         WgetCallback callback = new WgetCallback();
 
         String path;
-        if (url.getPath() == null || url.getPath().length() == 0)
+        if (url.getPath() == null || url.getPath().length() == 0) {
             path = "/index.html";
-        else
+        } else {
             path = url.getPath();
+        }
 
         HttpRequestMessage request = new HttpRequestMessage(path);
         AsyncHttpClient ahc = new AsyncHttpClient(url, callback);
@@ -67,8 +68,9 @@ public class Wget {
             semaphore.wait(5000);
         }
 
-        if (callback.isException())
+        if (callback.isException()) {
             throw new Exception(callback.getThrowable());
+        }
 
         HttpResponseMessage msg = callback.getMessage();
         System.out.println(msg.getStringContent());
@@ -90,7 +92,7 @@ public class Wget {
 
         /**
          * What to do when a response has come from the server
-         * 
+         *
          * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onResponse(org.apache.mina.filter.codec.http.HttpResponseMessage)
          */
         public void onResponse(HttpResponseMessage message) {
@@ -102,7 +104,7 @@ public class Wget {
 
         /**
          * What to do when an exception has been thrown
-         * 
+         *
          * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onException(java.lang.Throwable)
          */
         public void onException(Throwable cause) {
@@ -116,7 +118,7 @@ public class Wget {
         /**
          * The connection has been closed, notify the semaphore object and set
          * closed to true.
-         * 
+         *
          * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onClosed()
          */
         public void onClosed() {
@@ -183,7 +185,7 @@ public class Wget {
      *
      * @param args
      *  String array of length 1.  First parameter is the url
-     * @throws Exception 
+     * @throws Exception
      *  Thrown if something goes wrong.
      */
     public static void main(String[] args) throws Exception {

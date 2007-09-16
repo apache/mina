@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.common;
 
@@ -24,7 +24,7 @@ import java.net.SocketAddress;
 /**
  * A connectionless transport can recycle existing sessions by assigning an
  * {@link IoSessionRecycler} to an {@link IoService}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * TODO More documentation
  */
@@ -49,7 +49,7 @@ public interface IoSessionRecycler {
 
     /**
      * Called when the underlying transport creates or writes a new {@link IoSession}.
-     * 
+     *
      * @param session
      *            the new {@link IoSession}.
      */
@@ -57,7 +57,7 @@ public interface IoSessionRecycler {
 
     /**
      * Attempts to retrieve a recycled {@link IoSession}.
-     * 
+     *
      * @param localAddress
      *            the local socket address of the {@link IoSession} the
      *            transport wants to recycle.
@@ -70,7 +70,7 @@ public interface IoSessionRecycler {
 
     /**
      * Called when an {@link IoSession} is explicitly closed.
-     * 
+     *
      * @param session
      *            the new {@link IoSession}.
      */
