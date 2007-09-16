@@ -52,7 +52,7 @@ public class Wget {
     public Wget(URL url) throws Exception {
         WgetCallback callback = new WgetCallback();
 
-        String path = null;
+        String path;
         if (url.getPath() == null || url.getPath().length() == 0)
             path = "/index.html";
         else
@@ -91,7 +91,7 @@ public class Wget {
         /**
          * What to do when a response has come from the server
          * 
-         * @see org.apache.mina.http.client.AsyncHttpClientCallback#onResponse(org.apache.mina.filter.codec.http.HttpResponseMessage)
+         * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onResponse(org.apache.mina.filter.codec.http.HttpResponseMessage)
          */
         public void onResponse(HttpResponseMessage message) {
             this.message = message;
@@ -103,7 +103,7 @@ public class Wget {
         /**
          * What to do when an exception has been thrown
          * 
-         * @see org.apache.mina.http.client.AsyncHttpClientCallback#onException(java.lang.Throwable)
+         * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onException(java.lang.Throwable)
          */
         public void onException(Throwable cause) {
             throwable = cause;
@@ -117,7 +117,7 @@ public class Wget {
          * The connection has been closed, notify the semaphore object and set
          * closed to true.
          * 
-         * @see org.apache.mina.http.client.AsyncHttpClientCallback#onClosed()
+         * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onClosed()
          */
         public void onClosed() {
             closed = true;
