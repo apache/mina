@@ -24,8 +24,8 @@ import java.net.URL;
 
 import org.apache.mina.filter.codec.http.HttpRequestMessage;
 import org.apache.mina.filter.codec.http.HttpResponseMessage;
-import org.apache.mina.http.client.AsyncHttpClient;
-import org.apache.mina.http.client.AsyncHttpClientCallback;
+import org.apache.mina.protocol.http.client.AsyncHttpClient;
+import org.apache.mina.protocol.http.client.AsyncHttpClientCallback;
 
 /**
  * Very minimal example of how to write an HTTP Client.
