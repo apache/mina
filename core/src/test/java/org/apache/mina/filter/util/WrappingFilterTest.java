@@ -102,9 +102,9 @@ public class WrappingFilterTest extends TestCase {
 
         private List<IoEventType> eventsAfter = new ArrayList<IoEventType>();
 
-        protected void wrapFilterAction(IoEventType eventType, IoSession session, WrappingFilter.FilterAction action) {
+        protected void wrap(IoEventType eventType, IoSession session, Runnable action) {
             eventsBefore.add(eventType);
-            action.execute();
+            action.run();
             eventsAfter.add(eventType);
         }
     }

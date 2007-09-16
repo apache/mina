@@ -22,13 +22,12 @@ package org.apache.mina.example.chat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Map;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
-import org.apache.mina.filter.logging.MdcLoggingFilter;
+import org.apache.mina.filter.logging.MDCInjectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,8 +94,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
                 sessions.add(session);
                 session.setAttribute("user", user);
-                Map<String,String> context = (Map<String,String>) session.getAttribute(MdcLoggingFilter.CONTEXT_KEY);
-                context.put("user", user);
+                MDCInjectionFilter.setProperty(session, "user", user);
 
                 // Allow all users
                 users.add(user);
