@@ -245,7 +245,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 session.getFilterChain().fireMessageReceived(session, buf);
                 buf = null;
                 
-                if (!session.getTransportMetadata().hasFragmentation()) {
+                if (session.getTransportMetadata().hasFragmentation()) {
                     if (readBytes * 2 < config.getReadBufferSize()) {
                         if (config.getReadBufferSize() > config.getMinReadBufferSize()) {
                             config.setReadBufferSize(config.getReadBufferSize() >>> 1);
