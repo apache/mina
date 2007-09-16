@@ -39,7 +39,6 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.common.WriteRequest;
 
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
