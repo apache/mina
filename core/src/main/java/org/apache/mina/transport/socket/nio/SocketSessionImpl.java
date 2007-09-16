@@ -24,7 +24,6 @@ import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
@@ -43,7 +42,7 @@ import org.apache.mina.common.TransportMetadata;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class SocketSessionImpl extends AbstractIoSession implements SocketSession {
+class SocketSessionImpl extends NIOSession implements SocketSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(

@@ -6,23 +6,24 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *
+ *  
  *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License.
- *
+ *  under the License. 
+ *  
  */
 package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -36,25 +37,24 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 
 /**
- * Performs all I/O operations for sockets which is connected or bound. This class is used by MINA internally.
- *
- * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
+ * 
+ * @author Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
-class SocketIoProcessor extends AbstractIoProcessor {
+class NIOProcessor extends AbstractIoProcessor {
 
-    private final Selector selector;
+    protected final Selector selector;
 
-    SocketIoProcessor(String threadName, Executor executor) {
+    NIOProcessor(String threadName, Executor executor) {
         super(threadName, executor);
-
+    
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
             throw new RuntimeIOException("Failed to open a selector.", e);
         }
     }
-
+    
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
@@ -65,6 +65,7 @@ class SocketIoProcessor extends AbstractIoProcessor {
         }
     }
 
+    @Override
     protected int select(int timeout) throws Exception {
         return selector.select(1000);
     }
@@ -81,6 +82,23 @@ class SocketIoProcessor extends AbstractIoProcessor {
 
     protected Iterator<AbstractIoSession> selectedSessions() throws Exception {
         return new IoSessionIterator(selector.selectedKeys());
+    }
+    
+    @Override
+    protected void doAdd(IoSession session) throws Exception {
+        SelectableChannel ch = (SelectableChannel) getChannel(session);
+        ch.configureBlocking(false);
+        setSelectionKey(
+                session,
+                ch.register(selector, SelectionKey.OP_READ, session));
+    }
+    
+    @Override
+    protected void doRemove(IoSession session) throws Exception {
+        ByteChannel ch = getChannel(session);
+        SelectionKey key = getSelectionKey(session);
+        key.cancel();
+        ch.close();
     }
 
     @Override
@@ -109,24 +127,6 @@ class SocketIoProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected void doAdd(IoSession session) throws Exception {
-        SocketSessionImpl s = (SocketSessionImpl) session;
-        SocketChannel ch = s.getChannel();
-        ch.configureBlocking(false);
-        s.setSelectionKey(
-                ch.register(selector, SelectionKey.OP_READ, session));
-    }
-    
-    @Override
-    protected void doRemove(IoSession session) throws Exception {
-        SocketSessionImpl s = (SocketSessionImpl) session;
-        SocketChannel ch = s.getChannel();
-        SelectionKey key = s.getSelectionKey();
-        key.cancel();
-        ch.close();
-    }
-
-    @Override
     protected int read(IoSession session, ByteBuffer buf) throws Exception {
         return getChannel(session).read(buf.buf());
     }
@@ -140,16 +140,21 @@ class SocketIoProcessor extends AbstractIoProcessor {
     protected long transferFile(IoSession session, FileRegion region) throws Exception {
         return region.getFileChannel().transferTo(region.getPosition(), region.getCount(), getChannel(session));
     }
-
-    private SocketChannel getChannel(IoSession session) {
-        return ((SocketSessionImpl) session).getChannel();
+    
+    private ByteChannel getChannel(IoSession session) {
+        return ((NIOSession) session).getChannel();
     }
     
     private SelectionKey getSelectionKey(IoSession session) {
-        return ((SocketSessionImpl) session).getSelectionKey();
+        return ((NIOSession) session).getSelectionKey();
     }
     
-    private static class IoSessionIterator implements Iterator<AbstractIoSession> {
+    private void setSelectionKey(IoSession session, SelectionKey key) {
+        ((NIOSession) session).setSelectionKey(key);
+    }
+
+
+    protected static class IoSessionIterator implements Iterator<AbstractIoSession> {
         private final Iterator<SelectionKey> i;
         private IoSessionIterator(Set<SelectionKey> keys) {
             i = keys.iterator();
@@ -157,12 +162,12 @@ class SocketIoProcessor extends AbstractIoProcessor {
         public boolean hasNext() {
             return i.hasNext();
         }
-
+    
         public AbstractIoSession next() {
             SelectionKey key = i.next();
             return (AbstractIoSession) key.attachment();
         }
-
+    
         public void remove() {
             i.remove();
         }

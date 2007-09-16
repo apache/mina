@@ -74,7 +74,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
 
     private final Queue<CancellationRequest> cancelQueue = new ConcurrentLinkedQueue<CancellationRequest>();
 
-    private final SocketIoProcessor[] ioProcessors;
+    private final NIOProcessor[] ioProcessors;
 
     private final int processorCount;
 
@@ -145,12 +145,12 @@ public class SocketAcceptor extends AbstractIoAcceptor {
         // Set other properties and initialize
         this.executor = executor;
         this.processorCount = processorCount;
-        ioProcessors = new SocketIoProcessor[processorCount];
+        ioProcessors = new NIOProcessor[processorCount];
 
         // create an array of SocketIoProcessors that will be used for
         // handling sessions.
         for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new SocketIoProcessor(
+            ioProcessors[i] = new NIOProcessor(
                     "SocketAcceptorIoProcessor-" + id + "." + i, executor);
         }
     }
@@ -433,7 +433,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
         }
     }
 
-    private SocketIoProcessor nextProcessor() {
+    private NIOProcessor nextProcessor() {
         if (this.processorDistributor == Integer.MAX_VALUE) {
             this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
         }

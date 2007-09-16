@@ -62,7 +62,7 @@ public class SocketConnector extends AbstractIoConnector {
 
     private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
 
-    private final SocketIoProcessor[] ioProcessors;
+    private final NIOProcessor[] ioProcessors;
 
     private final int processorCount;
 
@@ -104,10 +104,10 @@ public class SocketConnector extends AbstractIoConnector {
 
         this.executor = executor;
         this.processorCount = processorCount;
-        ioProcessors = new SocketIoProcessor[processorCount];
+        ioProcessors = new NIOProcessor[processorCount];
 
         for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new SocketIoProcessor(
+            ioProcessors[i] = new NIOProcessor(
                     "SocketConnectorIoProcessor-" + id + "." + i, executor);
         }
     }
@@ -295,7 +295,7 @@ public class SocketConnector extends AbstractIoConnector {
         session.getProcessor().add(session);
     }
 
-    private SocketIoProcessor nextProcessor() {
+    private NIOProcessor nextProcessor() {
         if (this.processorDistributor == Integer.MAX_VALUE) {
             this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
         }

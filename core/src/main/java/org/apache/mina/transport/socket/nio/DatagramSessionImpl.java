@@ -25,7 +25,6 @@ import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
-import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.DefaultIoFilterChain;
@@ -46,7 +45,7 @@ import org.apache.mina.common.WriteFuture;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
+class DatagramSessionImpl extends NIOSession implements DatagramSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
@@ -69,8 +68,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     private final InetSocketAddress remoteAddress;
 
     private SelectionKey key;
-
-    private int readBufferSize;
 
     /**
      * Creates a new acceptor instance.
@@ -180,10 +177,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
-    int getReadBufferSize() {
-        return readBufferSize;
-    }
-
     private class SessionConfigImpl extends AbstractDatagramSessionConfig {
 
         public int getReceiveBufferSize() {
@@ -200,7 +193,7 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
                     ch.socket().setReceiveBufferSize(receiveBufferSize);
                     // Re-retrieve the effective receive buffer size.
                     receiveBufferSize = ch.socket().getReceiveBufferSize();
-                    DatagramSessionImpl.this.readBufferSize = receiveBufferSize;
+                    DatagramSessionImpl.this.config.setReadBufferSize(receiveBufferSize);
                 } catch (SocketException e) {
                     throw new RuntimeIOException(e);
                 }

@@ -147,11 +147,11 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 doAdd(session);
                 addedSessions ++;
                 
-                // AbstractIoFilterChain.CONNECT_FUTURE is cleared inside here
+                // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
                 // in AbstractIoFilterChain.fireSessionOpened().
                 ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
             } catch (Exception e) {
-                // Clear the AbstractIoFilterChain.CONNECT_FUTURE attribute
+                // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
                 // and call ConnectFuture.setException().
                 session.getFilterChain().fireExceptionCaught(session, e);
             }
@@ -206,11 +206,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     }
     
     private void process(AbstractIoSession session) throws Exception {
-        if (((readyOps(session) & SelectionKey.OP_READ) != 0) && session.getTrafficMask().isReadable()) {
+        int readyOps = readyOps(session);
+        if (((readyOps & SelectionKey.OP_READ) != 0) && session.getTrafficMask().isReadable()) {
             read(session);
         }
 
-        if (((readyOps(session) & SelectionKey.OP_WRITE) != 0) && session.getTrafficMask().isWritable()) {
+        if (((readyOps & SelectionKey.OP_WRITE) != 0) && session.getTrafficMask().isWritable()) {
             scheduleFlush(session);
         }
     }
@@ -224,8 +225,15 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             int ret;
 
             try {
-                while ((ret = read(session, buf)) > 0) {
-                    readBytes += ret;
+                if (session.getTransportMetadata().hasFragmentation()) {
+                    while ((ret = read(session, buf)) > 0) {
+                        readBytes += ret;
+                    }
+                } else {
+                    ret = read(session, buf);
+                    if (ret > 0) {
+                        readBytes = ret;
+                    }
                 }
             } finally {
                 buf.flip();
@@ -237,16 +245,18 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 session.getFilterChain().fireMessageReceived(session, buf);
                 buf = null;
                 
-                if (readBytes * 2 < config.getReadBufferSize()) {
-                    if (config.getReadBufferSize() > config.getMinReadBufferSize()) {
-                        config.setReadBufferSize(config.getReadBufferSize() >>> 1);
-                    }
-                } else if (readBytes == config.getReadBufferSize()) {
-                    int newReadBufferSize = config.getReadBufferSize() << 1;
-                    if (newReadBufferSize <= (config.getMaxReadBufferSize())) {
-                        config.setReadBufferSize(newReadBufferSize);
-                    } else {
-                        config.setReadBufferSize(config.getMaxReadBufferSize());
+                if (!session.getTransportMetadata().hasFragmentation()) {
+                    if (readBytes * 2 < config.getReadBufferSize()) {
+                        if (config.getReadBufferSize() > config.getMinReadBufferSize()) {
+                            config.setReadBufferSize(config.getReadBufferSize() >>> 1);
+                        }
+                    } else if (readBytes == config.getReadBufferSize()) {
+                        int newReadBufferSize = config.getReadBufferSize() << 1;
+                        if (newReadBufferSize <= (config.getMaxReadBufferSize())) {
+                            config.setReadBufferSize(newReadBufferSize);
+                        } else {
+                            config.setReadBufferSize(config.getMaxReadBufferSize());
+                        }
                     }
                 }
             }
@@ -423,7 +433,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                         region.setPosition(region.getPosition() + localWrittenBytes);
                         writtenBytes += localWrittenBytes;
                     }
-
+                    
                     if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
                         // Kernel buffer is full or wrote too much.
                         interestOps(session, interestOps(session) | SelectionKey.OP_WRITE);
