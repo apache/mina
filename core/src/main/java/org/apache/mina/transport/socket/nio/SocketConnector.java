@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.AbstractIoFilterChain;
+import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
@@ -288,11 +288,11 @@ public class SocketConnector extends AbstractIoConnector {
 
         // Set the ConnectFuture of the specified session, which will be
         // removed and notified by AbstractIoFilterChain eventually.
-        session.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE,
+        session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE,
                 connectFuture);
 
         // Forward the remaining process to the SocketIoProcessor.
-        session.getIoProcessor().addNew(session);
+        session.getProcessor().add(session);
     }
 
     private SocketIoProcessor nextProcessor() {

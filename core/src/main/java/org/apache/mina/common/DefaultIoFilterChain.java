@@ -28,26 +28,21 @@ import java.util.Map;
 import org.apache.mina.common.IoFilter.NextFilter;
 
 /**
- * An abstract implementation of {@link IoFilterChain} that provides
- * common operations for developers to implement their own transport layer.
- * <p>
- * The only method a developer should implement is
- * {@link #doWrite(IoSession, IoFilter.WriteRequest)}.  This method is invoked
- * when filter chain is evaluated for
- * {@link IoFilter#filterWrite(NextFilter, IoSession, IoFilter.WriteRequest)} and
- * finally to be written out.
+ * A default implementation of {@link IoFilterChain} that provides
+ * all operations for developers who want to implement their own
+ * transport layer once used with {@link AbstractIoSession}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractIoFilterChain implements IoFilterChain {
+public class DefaultIoFilterChain implements IoFilterChain {
     /**
      * A session attribute that stores a {@link ConnectFuture} related with
-     * the {@link IoSession}.  {@link AbstractIoFilterChain} clears this
+     * the {@link IoSession}.  {@link DefaultIoFilterChain} clears this
      * attribute and notifies the future when {@link #fireSessionOpened(IoSession)}
      * or {@link #fireExceptionCaught(IoSession, Throwable)} is invoked
      */
-    public static final String CONNECT_FUTURE = AbstractIoFilterChain.class
+    public static final String CONNECT_FUTURE = DefaultIoFilterChain.class
             .getName()
             + ".connectFuture";
 
@@ -59,7 +54,7 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
 
     private final EntryImpl tail;
 
-    protected AbstractIoFilterChain(IoSession session) {
+    public DefaultIoFilterChain(AbstractIoSession session) {
         if (session == null) {
             throw new NullPointerException("session");
         }
@@ -519,11 +514,6 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
         }
     }
 
-    protected abstract void doWrite(IoSession session, WriteRequest writeRequest)
-            throws Exception;
-
-    protected abstract void doClose(IoSession session) throws Exception;
-
     private class HeadFilter extends IoFilterAdapter {
         @Override
         public void sessionCreated(NextFilter nextFilter, IoSession session) {
@@ -567,13 +557,37 @@ public abstract class AbstractIoFilterChain implements IoFilterChain {
         @Override
         public void filterWrite(NextFilter nextFilter, IoSession session,
                 WriteRequest writeRequest) throws Exception {
-            doWrite(session, writeRequest);
+            
+            AbstractIoSession s = (AbstractIoSession) session;
+            
+            // Maintain counters.
+            if (writeRequest.getMessage() instanceof ByteBuffer) {
+                ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
+                // I/O processor implementation will call buffer.reset()
+                // it after the write operation is finished, because
+                // the buffer will be specified with messageSent event.
+                buffer.mark();
+                int remaining = buffer.remaining();
+                if (remaining == 0) {
+                    // Zero-sized buffer means the internal message
+                    // delimiter.
+                    s.increaseScheduledWriteMessages();            
+                } else {
+                    s.increaseScheduledWriteBytes(buffer.remaining());
+                }
+            }
+
+            s.getWriteRequestQueue().add(writeRequest);
+            if (s.getTrafficMask().isWritable()) {
+                s.getProcessor().flush(s, writeRequest);
+            }
         }
 
         @Override
         public void filterClose(NextFilter nextFilter, IoSession session)
                 throws Exception {
-            doClose(session);
+            AbstractIoSession s = (AbstractIoSession) session;
+            s.getProcessor().remove(s);
         }
     }
 

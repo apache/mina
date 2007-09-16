@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.AbstractIoFilterChain;
+import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
@@ -92,7 +92,7 @@ public class VmPipeConnector extends AbstractIoConnector {
             this.getFilterChainBuilder().buildFilterChain(filterChain);
 
             // The following sentences don't throw any exceptions.
-            localSession.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE, future);
+            localSession.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);
             getListeners().fireSessionCreated(localSession);
             IdleStatusChecker.getInstance().addSession(localSession);
         } catch (Throwable t) {

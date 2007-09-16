@@ -26,15 +26,16 @@ import java.nio.channels.SocketChannel;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.WriteRequest;
 
 /**
  * An {@link IoSession} for socket transport (TCP/IP).
@@ -55,9 +56,9 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
 
     private final SocketSessionConfig config = new SessionConfigImpl();
 
-    private final SocketIoProcessor ioProcessor;
+    private final IoProcessor processor;
 
-    private final SocketFilterChain filterChain;
+    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
 
     private final SocketChannel ch;
 
@@ -67,10 +68,9 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
 
     private int readBufferSize = 1024;
 
-    SocketSessionImpl(IoService service, SocketIoProcessor ioProcessor, SocketChannel ch) {
+    SocketSessionImpl(IoService service, IoProcessor processor, SocketChannel ch) {
         this.service = service;
-        this.ioProcessor = ioProcessor;
-        this.filterChain = new SocketFilterChain(this);
+        this.processor = processor;
         this.ch = ch;
         this.handler = service.getHandler();
         this.config.setAll(service.getSessionConfig());
@@ -84,8 +84,8 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         return config;
     }
 
-    SocketIoProcessor getIoProcessor() {
-        return ioProcessor;
+    protected IoProcessor getProcessor() {
+        return processor;
     }
 
     public IoFilterChain getFilterChain() {
@@ -112,16 +112,6 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         return handler;
     }
 
-    @Override
-    protected void close0() {
-        filterChain.fireFilterClose(this);
-    }
-
-    @Override
-    protected void write0(WriteRequest writeRequest) {
-        filterChain.fireFilterWrite(this, writeRequest);
-    }
-
     public InetSocketAddress getRemoteAddress() {
         return (InetSocketAddress) ch.socket().getRemoteSocketAddress();
     }
@@ -135,38 +125,12 @@ class SocketSessionImpl extends AbstractIoSession implements SocketSession {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
-    @Override
-    protected void updateTrafficMask() {
-        this.ioProcessor.updateTrafficMask(this);
-    }
-
     int getReadBufferSize() {
         return readBufferSize;
     }
 
     void setReadBufferSize(int readBufferSize) {
         this.readBufferSize = readBufferSize;
-    }
-
-    void queueWriteRequest(WriteRequest writeRequest) {
-        if (writeRequest.getMessage() instanceof ByteBuffer) {
-            ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
-            // SocketIoProcessor.doFlush() will reset it after write is finished
-            // because the buffer will be passed with messageSent event.
-            buffer.mark();
-            int remaining = buffer.remaining();
-            if (remaining == 0) {
-                increaseScheduledWriteMessages();            
-            } else {
-                increaseScheduledWriteBytes(buffer.remaining());
-            }
-        }
-
-        getWriteRequestQueue().add(writeRequest);
-
-        if (getTrafficMask().isWritable()) {
-            getIoProcessor().flush(this);
-        }
     }
 
     private class SessionConfigImpl extends AbstractSocketSessionConfig implements SocketSessionConfig {

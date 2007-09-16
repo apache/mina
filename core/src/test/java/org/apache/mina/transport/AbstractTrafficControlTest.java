@@ -77,8 +77,8 @@ public abstract class AbstractTrafficControlTest extends TestCase {
         future.awaitUninterruptibly();
         IoSession session = future.getSession();
 
-        // We wait for the sessionCreated() event is fired becayse we cannot guarentee that
-        // it is invoked already.
+        // We wait for the sessionCreated() event is fired because we
+        // cannot guarantee that it is invoked already.
         while (session.getAttribute("lock") == null) {
             Thread.yield();
         }
@@ -113,6 +113,7 @@ public abstract class AbstractTrafficControlTest extends TestCase {
             assertEquals("12", getSent(session));
 
             session.resumeWrite();
+
             assertEquals('3', read(session));
             assertEquals('4', read(session));
 
@@ -159,6 +160,8 @@ public abstract class AbstractTrafficControlTest extends TestCase {
             lock.wait(200);
         }
         session.setAttribute("pos", new Integer(pos + 1));
+        String received = getReceived(session);
+        assertTrue(received.length() > pos);
         return getReceived(session).charAt(pos);
     }
 

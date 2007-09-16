@@ -89,8 +89,8 @@ public class SerialConnector extends AbstractIoConnector {
                                 portId, portAddress);
 
                         ConnectFuture future = new DefaultConnectFuture();
-                        SerialSession session = new SerialSession(this,
-                                portAddress, serialPort);
+                        SerialSessionImpl session = new SerialSessionImpl(
+                                this, portAddress, serialPort);
                         session.start();
                         future.setSession(session);
                         return future;
@@ -121,7 +121,7 @@ public class SerialConnector extends AbstractIoConnector {
     }
 
     public TransportMetadata getTransportMetadata() {
-        return SerialSession.METADATA;
+        return SerialSessionImpl.METADATA;
     }
 
     private SerialPort initializePort(String user, CommPortIdentifier portId,

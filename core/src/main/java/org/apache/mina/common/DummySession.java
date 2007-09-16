@@ -46,6 +46,8 @@ public class DummySession extends AbstractIoSession {
     };
 
     private volatile IoService service;
+    
+    private volatile IoProcessor processor;
 
     private volatile IoSessionConfig config = new AbstractIoSessionConfig() {
         @Override
@@ -53,17 +55,7 @@ public class DummySession extends AbstractIoSession {
         }
     };
 
-    private volatile IoFilterChain filterChain = new AbstractIoFilterChain(this) {
-        @Override
-        protected void doClose(IoSession session) throws Exception {
-        }
-
-        @Override
-        protected void doWrite(IoSession session, WriteRequest writeRequest)
-                throws Exception {
-            fireMessageSent(session, writeRequest);
-        }
-    };
+    private volatile IoFilterChain filterChain = new DefaultIoFilterChain(this);
 
     private volatile IoHandler handler = new IoHandlerAdapter();
     private volatile SocketAddress localAddress = ANONYMOUS_ADDRESS;
@@ -106,10 +98,21 @@ public class DummySession extends AbstractIoSession {
         acceptor.setLocalAddress(ANONYMOUS_ADDRESS);
 
         this.service = acceptor;
-    }
+        
+        this.processor = new IoProcessor() {
+            public void add(IoSession session) {
+            }
 
-    @Override
-    protected void updateTrafficMask() {
+            public void flush(IoSession session, WriteRequest writeRequest) {
+                getFilterChain().fireMessageSent(session, writeRequest);
+            }
+
+            public void remove(IoSession session) {
+            }
+
+            public void updateTrafficMask(IoSession session) {
+            }
+        };
     }
 
     public IoSessionConfig getConfig() {
@@ -209,6 +212,18 @@ public class DummySession extends AbstractIoSession {
         }
 
         this.service = service;
+    }
+    
+    public IoProcessor getProcessor() {
+        return processor;
+    }
+    
+    public void setProcessor(IoProcessor processor) {
+        if (processor == null) {
+            throw new NullPointerException("processor");
+        }
+        
+        this.processor = processor;
     }
 
     public TransportMetadata getTransportMetadata() {

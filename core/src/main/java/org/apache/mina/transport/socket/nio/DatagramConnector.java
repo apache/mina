@@ -31,12 +31,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.AbstractIoFilterChain;
+import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
@@ -58,6 +59,8 @@ public class DatagramConnector extends AbstractIoConnector {
     private final int id = nextId++;
 
     private final Selector selector;
+    
+    private final IoProcessor processor = new DatagramConnectorProcessor();
 
     private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
 
@@ -155,26 +158,44 @@ public class DatagramConnector extends AbstractIoConnector {
 
         return request;
     }
+    
+    IoProcessor getProcessor() {
+        return processor;
+    }
+    
+    private class DatagramConnectorProcessor implements IoProcessor {
+        public void add(IoSession session) {
+        }
+
+        public void flush(IoSession session, WriteRequest writeRequest) {
+            if (scheduleFlush((DatagramSessionImpl) session)) {
+                Selector selector = DatagramConnector.this.selector;
+                if (selector != null) {
+                    selector.wakeup();
+                }
+            }
+        }
+
+        public void remove(IoSession session) {
+            startupWorker();
+            cancelQueue.add((DatagramSessionImpl) session);
+            selector.wakeup();
+        }
+
+        public void updateTrafficMask(IoSession session) {
+            scheduleTrafficControl((DatagramSessionImpl) session);
+            Selector selector = DatagramConnector.this.selector;
+            if (selector != null) {
+                selector.wakeup();
+            }
+            selector.wakeup();
+        }
+    }
 
     private synchronized void startupWorker() {
         if (worker == null) {
             worker = new Worker();
             executor.execute(new NamePreservingRunnable(worker));
-        }
-    }
-
-    void closeSession(DatagramSessionImpl session) {
-        startupWorker();
-        cancelQueue.add(session);
-        selector.wakeup();
-    }
-
-    void flushSession(DatagramSessionImpl session) {
-        if (scheduleFlush(session)) {
-            Selector selector = this.selector;
-            if (selector != null) {
-                selector.wakeup();
-            }
         }
     }
 
@@ -185,15 +206,6 @@ public class DatagramConnector extends AbstractIoConnector {
         } else {
             return false;
         }
-    }
-
-    void updateTrafficMask(DatagramSessionImpl session) {
-        scheduleTrafficControl(session);
-        Selector selector = this.selector;
-        if (selector != null) {
-            selector.wakeup();
-        }
-        selector.wakeup();
     }
 
     private void scheduleTrafficControl(DatagramSessionImpl session) {
@@ -413,7 +425,7 @@ public class DatagramConnector extends AbstractIoConnector {
                     this, req.channel, getHandler());
 
             // AbstractIoFilterChain will notify the connect future.
-            session.setAttribute(AbstractIoFilterChain.CONNECT_FUTURE, req);
+            session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, req);
 
             boolean success = false;
             try {
@@ -461,7 +473,6 @@ public class DatagramConnector extends AbstractIoConnector {
                 }
 
                 getListeners().fireSessionDestroyed(session);
-                session.getCloseFuture().setClosed();
                 key.cancel();
                 selector.wakeup(); // wake up again to trigger thread death
             }

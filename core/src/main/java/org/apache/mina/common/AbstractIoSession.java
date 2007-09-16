@@ -54,7 +54,7 @@ public abstract class AbstractIoSession implements IoSession {
         };
     
     private final Object lock = new Object();
-
+    
     private final Map<String, Object> attributes = Collections
             .synchronizedMap(new HashMap<String, Object>(4));
     
@@ -109,7 +109,9 @@ public abstract class AbstractIoSession implements IoSession {
                 lastIdleTimeForWrite = System.currentTimeMillis();
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
-
+    
+    protected abstract IoProcessor getProcessor();
+    
     public boolean isConnected() {
         return !closeFuture.isClosed();
     }
@@ -144,17 +146,8 @@ public abstract class AbstractIoSession implements IoSession {
             }
         }
 
-        close0();
+        getFilterChain().fireFilterClose(this);
         return closeFuture;
-    }
-
-    /**
-     * Implement this method to perform real close operation.
-     * By default, this method is implemented to set the future to
-     * 'closed' immediately.
-     */
-    protected void close0() {
-        closeFuture.setClosed();
     }
 
     public WriteFuture write(Object message) {
@@ -194,7 +187,8 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         WriteFuture future = new DefaultWriteFuture(this);
-        write0(new DefaultWriteRequest(message, future, remoteAddress));
+        getFilterChain().fireFilterWrite(
+                this, new DefaultWriteRequest(message, future, remoteAddress));
 
         if (message instanceof File) {
             final FileChannel finalChannel = channel;
@@ -210,19 +204,6 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         return future;
-    }
-
-    /**
-     * Implement this method to perform real write operation with
-     * the specified <code>writeRequest</code>.
-     * <p/>
-     * By default, this method is implemented to set the future to
-     * 'not written' immediately.
-     *
-     * @param writeRequest Write request to make
-     */
-    protected void write0(WriteRequest writeRequest) {
-        writeRequest.getFuture().setWritten(false);
     }
 
     public Object getAttachment() {
@@ -359,7 +340,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         this.trafficMask = trafficMask;
-        updateTrafficMask();
+        getProcessor().updateTrafficMask(this);
     }
 
     public void suspendRead() {
@@ -377,12 +358,6 @@ public abstract class AbstractIoSession implements IoSession {
     public void resumeWrite() {
         setTrafficMask(getTrafficMask().or(TrafficMask.WRITE));
     }
-
-    /**
-     * Signals the {@link IoService} that the {@link TrafficMask} of this
-     * session has been changed.
-     */
-    protected abstract void updateTrafficMask();
 
     public long getReadBytes() {
         return readBytes;

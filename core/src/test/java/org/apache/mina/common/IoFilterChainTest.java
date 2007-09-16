@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import org.apache.mina.common.IoFilterChain.Entry;
 
 /**
- * Tests {@link AbstractIoFilterChain}.
+ * Tests {@link DefaultIoFilterChain}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$ 

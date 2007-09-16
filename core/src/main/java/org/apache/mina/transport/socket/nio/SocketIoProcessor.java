@@ -32,6 +32,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
@@ -46,7 +47,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-class SocketIoProcessor {
+class SocketIoProcessor implements IoProcessor {
     private final Object lock = new Object();
 
     private final String threadName;
@@ -87,14 +88,14 @@ class SocketIoProcessor {
         }
     }
 
-    void addNew(SocketSessionImpl session) {
-        newSessions.add(session);
+    public void add(IoSession session) {
+        newSessions.add((SocketSessionImpl) session);
 
         startupWorker();
     }
 
-    void remove(SocketSessionImpl session) {
-        scheduleRemove(session);
+    public void remove(IoSession session) {
+        scheduleRemove((SocketSessionImpl) session);
         startupWorker();
     }
 
@@ -108,15 +109,15 @@ class SocketIoProcessor {
         selector.wakeup();
     }
 
-    void flush(SocketSessionImpl session) {
+    public void flush(IoSession session, WriteRequest writeRequest) {
         boolean needsWakeup = flushingSessions.isEmpty();
-        if (scheduleFlush(session) && needsWakeup) {
+        if (scheduleFlush((SocketSessionImpl) session) && needsWakeup) {
             selector.wakeup();
         }
     }
 
-    void updateTrafficMask(SocketSessionImpl session) {
-        scheduleTrafficControl(session);
+    public void updateTrafficMask(IoSession session) {
+        scheduleTrafficControl((SocketSessionImpl) session);
         selector.wakeup();
     }
 

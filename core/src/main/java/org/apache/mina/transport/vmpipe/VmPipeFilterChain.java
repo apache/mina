@@ -19,12 +19,18 @@
  */
 package org.apache.mina.transport.vmpipe;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.mina.common.AbstractIoFilterChain;
+import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoEvent;
+import org.apache.mina.common.IoEventType;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
@@ -32,15 +38,20 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-class VmPipeFilterChain extends AbstractIoFilterChain {
+class VmPipeFilterChain extends DefaultIoFilterChain {
 
-    private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<Event>();
+    private final Queue<IoEvent> eventQueue = new ConcurrentLinkedQueue<IoEvent>();
+    private final IoProcessor processor = new VmPipeIoProcessor();
 
     private volatile boolean flushEnabled;
     private volatile boolean sessionOpened;
 
-    VmPipeFilterChain(IoSession session) {
+    VmPipeFilterChain(AbstractIoSession session) {
         super(session);
+    }
+    
+    IoProcessor getProcessor() {
+        return processor;
     }
 
     public void start() {
@@ -49,7 +60,7 @@ class VmPipeFilterChain extends AbstractIoFilterChain {
         flushPendingDataQueues((VmPipeSessionImpl) getSession());
     }
 
-    private void pushEvent(Event e) {
+    private void pushEvent(IoEvent e) {
         eventQueue.add(e);
         if (flushEnabled) {
             flushEvents();
@@ -57,23 +68,23 @@ class VmPipeFilterChain extends AbstractIoFilterChain {
     }
 
     private void flushEvents() {
-        Event e;
+        IoEvent e;
         while ((e = eventQueue.poll()) != null) {
             fireEvent(e);
         }
     }
 
-    private void fireEvent(Event e) {
+    private void fireEvent(IoEvent e) {
         IoSession session = getSession();
-        EventType type = e.getType();
-        Object data = e.getData();
+        IoEventType type = e.getType();
+        Object data = e.getParameter();
 
-        if (type == EventType.RECEIVED) {
+        if (type == IoEventType.MESSAGE_RECEIVED) {
             VmPipeSessionImpl s = (VmPipeSessionImpl) session;
             if (sessionOpened && s.getTrafficMask().isReadable() && s.getLock().tryLock()) {
                 try {
                     if (!s.getTrafficMask().isReadable()) {
-                        s.pendingDataQueue.add(data);
+                        s.receivedMessageQueue.add(data);
                     } else {
                         int byteCount = 1;
                         if (data instanceof ByteBuffer) {
@@ -88,186 +99,157 @@ class VmPipeFilterChain extends AbstractIoFilterChain {
                     s.getLock().unlock();
                 }
             } else {
-                s.pendingDataQueue.add(data);
+                s.receivedMessageQueue.add(data);
             }
-        } else if (type == EventType.WRITE) {
+        } else if (type == IoEventType.WRITE) {
             super.fireFilterWrite(session, (WriteRequest) data);
-        } else if (type == EventType.SENT) {
+        } else if (type == IoEventType.MESSAGE_SENT) {
             super.fireMessageSent(session, (WriteRequest) data);
-        } else if (type == EventType.EXCEPTION) {
+        } else if (type == IoEventType.EXCEPTION_CAUGHT) {
             super.fireExceptionCaught(session, (Throwable) data);
-        } else if (type == EventType.IDLE) {
+        } else if (type == IoEventType.SESSION_IDLE) {
             super.fireSessionIdle(session, (IdleStatus) data);
-        } else if (type == EventType.OPENED) {
+        } else if (type == IoEventType.SESSION_OPENED) {
             super.fireSessionOpened(session);
             sessionOpened = true;
-        } else if (type == EventType.CREATED) {
+        } else if (type == IoEventType.SESSION_CREATED) {
             super.fireSessionCreated(session);
-        } else if (type == EventType.CLOSED) {
+        } else if (type == IoEventType.SESSION_CLOSED) {
             super.fireSessionClosed(session);
-        } else if (type == EventType.CLOSE) {
+        } else if (type == IoEventType.CLOSE) {
             super.fireFilterClose(session);
         }
     }
 
     private static void flushPendingDataQueues(VmPipeSessionImpl s) {
-        s.updateTrafficMask();
-        s.getRemoteSession().updateTrafficMask();
+        s.getProcessor().updateTrafficMask(s);
+        s.getRemoteSession().getProcessor().updateTrafficMask(s);
     }
 
     @Override
     public void fireFilterClose(IoSession session) {
-        pushEvent(new Event(EventType.CLOSE, null));
+        pushEvent(new IoEvent(IoEventType.CLOSE, session, null));
     }
 
     @Override
     public void fireFilterWrite(IoSession session, WriteRequest writeRequest) {
-        pushEvent(new Event(EventType.WRITE, writeRequest));
+        pushEvent(new IoEvent(IoEventType.WRITE, session, writeRequest));
     }
 
     @Override
     public void fireExceptionCaught(IoSession session, Throwable cause) {
-        pushEvent(new Event(EventType.EXCEPTION, cause));
+        pushEvent(new IoEvent(IoEventType.EXCEPTION_CAUGHT, session, cause));
     }
 
     @Override
     public void fireMessageSent(IoSession session, WriteRequest request) {
-        pushEvent(new Event(EventType.SENT, request));
+        pushEvent(new IoEvent(IoEventType.MESSAGE_SENT, session, request));
     }
 
     @Override
     public void fireSessionClosed(IoSession session) {
-        pushEvent(new Event(EventType.CLOSED, null));
+        pushEvent(new IoEvent(IoEventType.SESSION_CLOSED, session, null));
     }
 
     @Override
     public void fireSessionCreated(IoSession session) {
-        pushEvent(new Event(EventType.CREATED, null));
+        pushEvent(new IoEvent(IoEventType.SESSION_CREATED, session, null));
     }
 
     @Override
     public void fireSessionIdle(IoSession session, IdleStatus status) {
-        pushEvent(new Event(EventType.IDLE, status));
+        pushEvent(new IoEvent(IoEventType.SESSION_IDLE, session, status));
     }
 
     @Override
     public void fireSessionOpened(IoSession session) {
-        pushEvent(new Event(EventType.OPENED, null));
+        pushEvent(new IoEvent(IoEventType.SESSION_OPENED, session, null));
     }
 
     @Override
     public void fireMessageReceived(IoSession session, Object message) {
-        pushEvent(new Event(EventType.RECEIVED, message));
+        pushEvent(new IoEvent(IoEventType.MESSAGE_RECEIVED, session, message));
     }
-
-    @Override
-    protected void doWrite(IoSession session, WriteRequest writeRequest) {
-        VmPipeSessionImpl s = (VmPipeSessionImpl) session;
-        if (s.isConnected()) {
-
-            if (s.getTrafficMask().isWritable() && s.getLock().tryLock()) {
-                try {
-                    Object message = writeRequest.getMessage();
-
-                    int byteCount = 1;
-                    Object messageCopy = message;
-                    if (message instanceof ByteBuffer) {
-                        ByteBuffer rb = (ByteBuffer) message;
-                        rb.mark();
-                        byteCount = rb.remaining();
-                        ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
-                        wb.put(rb);
-                        wb.flip();
-                        rb.reset();
-                        messageCopy = wb;
+    
+    private class VmPipeIoProcessor implements IoProcessor {
+        public void flush(IoSession session, WriteRequest writeRequest) {
+            VmPipeSessionImpl s = (VmPipeSessionImpl) session;
+            Queue<WriteRequest> queue = s.getWriteRequestQueue();
+            if (queue.isEmpty()) {
+                return;
+            }
+            if (s.isConnected()) {
+                if (s.getLock().tryLock()) {
+                    try {
+                        WriteRequest req;
+                        while ((req = queue.poll()) != null) {
+                            int byteCount = 0;
+                            Object message = req.getMessage();
+                            Object messageCopy = message;
+                            if (message instanceof ByteBuffer) {
+                                ByteBuffer rb = (ByteBuffer) message;
+                                rb.mark();
+                                byteCount = rb.remaining();
+                                ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+                                wb.put(rb);
+                                wb.flip();
+                                rb.reset();
+                                messageCopy = wb;
+                            }
+    
+                            s.increaseWrittenBytes(byteCount);
+                            s.increaseWrittenMessages();
+    
+                            s.getRemoteSession().getFilterChain().fireMessageReceived(
+                                    s.getRemoteSession(), messageCopy);
+                            s.getFilterChain().fireMessageSent(s, req);
+                        }
+                    } finally {
+                        s.getLock().unlock();
                     }
 
-                    // Avoid unwanted side effect that scheduledWrite* becomes negative
-                    // by increasing them.
-                    s.increaseScheduledWriteBytes(byteCount);
-                    s.increaseScheduledWriteMessages();
-                    
-                    s.increaseWrittenBytes(byteCount);
-                    s.increaseWrittenMessages();
-
-                    s.getRemoteSession().getFilterChain().fireMessageReceived(
-                            s.getRemoteSession(), messageCopy);
-                    s.getFilterChain().fireMessageSent(s, writeRequest);
-                } finally {
-                    s.getLock().unlock();
+                    flushPendingDataQueues(s);
                 }
-
-                flushPendingDataQueues(s);
             } else {
-                s.pendingDataQueue.add(writeRequest);
+                WriteRequest req;
+                while ((req = queue.poll()) != null) {
+                    req.getFuture().setWritten(false);
+                }
             }
-        } else {
-            writeRequest.getFuture().setWritten(false);
         }
-    }
 
-    @Override
-    protected void doClose(IoSession session) {
-        VmPipeSessionImpl s = (VmPipeSessionImpl) session;
-        try {
-            s.getLock().lock();
-            if (!session.getCloseFuture().isClosed()) {
-                s.getServiceListeners().fireSessionDestroyed(s);
-                s.getRemoteSession().close();
+        public void remove(IoSession session) {
+            VmPipeSessionImpl s = (VmPipeSessionImpl) session;
+            try {
+                s.getLock().lock();
+                if (!session.getCloseFuture().isClosed()) {
+                    s.getServiceListeners().fireSessionDestroyed(s);
+                    s.getRemoteSession().close();
+                }
+            } finally {
+                s.getLock().unlock();
             }
-        } finally {
-            s.getLock().unlock();
-        }
-    }
-
-    // FIXME Copied and pasted from {@link ExecutorFilter}.
-    private static class EventType {
-        public static final EventType CREATED = new EventType("CREATED");
-
-        public static final EventType OPENED = new EventType("OPENED");
-
-        public static final EventType CLOSED = new EventType("CLOSED");
-
-        public static final EventType RECEIVED = new EventType("RECEIVED");
-
-        public static final EventType SENT = new EventType("SENT");
-
-        public static final EventType IDLE = new EventType("IDLE");
-
-        public static final EventType EXCEPTION = new EventType("EXCEPTION");
-
-        public static final EventType WRITE = new EventType("WRITE");
-
-        public static final EventType CLOSE = new EventType("CLOSE");
-
-        private final String value;
-
-        private EventType(String value) {
-            this.value = value;
         }
 
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
-
-    private static class Event {
-        private final EventType type;
-
-        private final Object data;
-
-        private Event(EventType type, Object data) {
-            this.type = type;
-            this.data = data;
+        public void add(IoSession session) {
         }
 
-        public Object getData() {
-            return data;
-        }
-
-        public EventType getType() {
-            return type;
+        public void updateTrafficMask(IoSession session) {
+            VmPipeSessionImpl s = (VmPipeSessionImpl) session;
+            if (s.getTrafficMask().isReadable()) {
+                List<Object> data = new ArrayList<Object>();
+                s.receivedMessageQueue.drainTo(data);
+                for (Object aData : data) {
+                    // TODO Optimize inefficient data transfer.
+                    // Data will be returned to pendingDataQueue
+                    // if getTraffic().isReadable() is false.
+                    VmPipeFilterChain.this.fireMessageReceived(s, aData);
+                }
+            }
+            
+            if (s.getTrafficMask().isWritable()) {
+                flush(s, null); // The second parameter is unused.
+            }
         }
     }
 }

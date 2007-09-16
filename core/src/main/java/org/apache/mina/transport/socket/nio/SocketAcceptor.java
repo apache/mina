@@ -420,7 +420,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
                             session.getFilterChain());
 
                     // add the session to the SocketIoProcessor
-                    session.getIoProcessor().addNew(session);
+                    session.getProcessor().add(session);
                     success = true;
                 } catch (Throwable t) {
                     ExceptionMonitor.getInstance().exceptionCaught(t);

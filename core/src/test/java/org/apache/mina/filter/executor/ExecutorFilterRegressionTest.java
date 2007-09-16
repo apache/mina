@@ -59,8 +59,8 @@ public class ExecutorFilterRegressionTest extends TestCase {
         final int loop = 1000000;
         final int end = sessions.length - 1;
         final ExecutorFilter filter = this.filter;
-        ((ThreadPoolExecutor) filter.getExecutor()).setKeepAliveTime(3,
-                TimeUnit.SECONDS);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) filter.getExecutor();
+        executor.setKeepAliveTime(3, TimeUnit.SECONDS);
 
         for (int i = 0; i < loop; i++) {
             Integer objI = new Integer(i);
@@ -73,9 +73,10 @@ public class ExecutorFilterRegressionTest extends TestCase {
                 throw nextFilter.throwable;
             }
         }
-
-        Thread.sleep(1000);
-
+        
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        
         for (int i = end; i >= 0; i--) {
             Assert.assertEquals(loop - 1, sessions[i].lastCount.intValue());
         }

@@ -62,7 +62,7 @@ public abstract class AbstractBindTest extends TestCase {
 
         setReuseAddress(reuseAddress);
 
-        // Find an availble test port and bind to it.
+        // Find an available test port and bind to it.
         boolean socketBound = false;
 
         // Let's start from port #1 to detect possible resource leak

@@ -27,10 +27,13 @@ import java.nio.channels.SelectionKey;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.CloseFuture;
+import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
@@ -56,8 +59,7 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
 
     private final DatagramSessionConfig config = new SessionConfigImpl();
 
-    private final DatagramFilterChain filterChain = new DatagramFilterChain(
-            this);
+    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
 
     private final DatagramChannel ch;
 
@@ -110,6 +112,14 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     public IoService getService() {
         return service;
     }
+    
+    protected IoProcessor getProcessor() {
+        if (service instanceof DatagramAcceptor) {
+            return ((DatagramAcceptor) service).getProcessor();
+        } else {
+            return ((DatagramConnector) service).getProcessor();
+        }
+    }
 
     public DatagramSessionConfig getConfig() {
         return config;
@@ -140,12 +150,13 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     }
 
     @Override
-    protected void close0() {
+    public CloseFuture close() {
         if (service instanceof IoAcceptor) {
             ((DatagramAcceptor) service).getSessionRecycler()
                     .remove(this);
         }
-        filterChain.fireFilterClose(this);
+        CloseFuture answer = super.close();
+        return answer;
     }
 
     @Override
@@ -155,11 +166,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
         }
 
         return super.write(message, destination);
-    }
-
-    @Override
-    protected void write0(WriteRequest writeRequest) {
-        filterChain.fireFilterWrite(this, writeRequest);
     }
 
     public InetSocketAddress getRemoteAddress() {
@@ -173,13 +179,6 @@ class DatagramSessionImpl extends AbstractIoSession implements DatagramSession {
     @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();
-    }
-
-    @Override
-    protected void updateTrafficMask() {
-        if (service instanceof DatagramConnector) {
-            ((DatagramConnector) service).updateTrafficMask(this);
-        }
     }
 
     int getReadBufferSize() {

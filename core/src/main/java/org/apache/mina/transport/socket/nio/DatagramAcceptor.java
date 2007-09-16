@@ -36,6 +36,7 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.ExpiringIoSessionRecycler;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionRecycler;
@@ -64,6 +65,8 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     private final int id = nextId++;
 
     private final Selector selector;
+    
+    private final IoProcessor processor = new DatagramAcceptorProcessor();
 
     private DatagramChannel channel;
 
@@ -249,6 +252,32 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     protected IoServiceListenerSupport getListeners() {
         return super.getListeners();
     }
+    
+    IoProcessor getProcessor() {
+        return processor;
+    }
+    
+    private class DatagramAcceptorProcessor implements IoProcessor {
+
+        public void add(IoSession session) {
+        }
+
+        public void flush(IoSession session, WriteRequest writeRequest) {
+            if (scheduleFlush((DatagramSessionImpl) session)) {
+                Selector selector = DatagramAcceptor.this.selector;
+                if (selector != null) {
+                    selector.wakeup();
+                }
+            }
+        }
+
+        public void remove(IoSession session) {
+            getListeners().fireSessionDestroyed(session);
+        }
+
+        public void updateTrafficMask(IoSession session) {
+        }
+    }
 
     private void buildFilterChain(IoSession session) throws Exception {
         this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
@@ -258,15 +287,6 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         if (worker == null) {
             worker = new Worker();
             executor.execute(new NamePreservingRunnable(worker));
-        }
-    }
-
-    void flushSession(DatagramSessionImpl session) {
-        if (scheduleFlush(session)) {
-            Selector selector = this.selector;
-            if (selector != null) {
-                selector.wakeup();
-            }
         }
     }
 
@@ -418,8 +438,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
                     session.increaseWrittenMessages();
                     buf.reset();
-                    ((DatagramFilterChain) session.getFilterChain())
-                            .fireMessageSent(session, req);
+                    session.getFilterChain().fireMessageSent(session, req);
                     continue;
                 }
 

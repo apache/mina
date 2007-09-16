@@ -19,8 +19,6 @@
  */
 package org.apache.mina.transport.vmpipe;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
@@ -30,11 +28,11 @@ import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.WriteRequest;
 
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
@@ -71,7 +69,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
 
     private final Lock lock;
 
-    final BlockingQueue<Object> pendingDataQueue;
+    final BlockingQueue<Object> receivedMessageQueue;
 
     /*
      * Constructor for client-side session.
@@ -86,7 +84,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
         this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
         this.filterChain = new VmPipeFilterChain(this);
-        this.pendingDataQueue = new LinkedBlockingQueue<Object>();
+        this.receivedMessageQueue = new LinkedBlockingQueue<Object>();
 
         remoteSession = new VmPipeSessionImpl(this, remoteEntry);
     }
@@ -103,11 +101,15 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
         this.handler = entry.getHandler();
         this.filterChain = new VmPipeFilterChain(this);
         this.remoteSession = remoteSession;
-        this.pendingDataQueue = new LinkedBlockingQueue<Object>();
+        this.receivedMessageQueue = new LinkedBlockingQueue<Object>();
     }
 
     public IoService getService() {
         return service;
+    }
+    
+    protected IoProcessor getProcessor() {
+        return filterChain.getProcessor();
     }
 
     IoServiceListenerSupport getServiceListeners() {
@@ -134,16 +136,6 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
         return METADATA;
     }
 
-    @Override
-    protected void close0() {
-        filterChain.fireFilterClose(this);
-    }
-
-    @Override
-    protected void write0(WriteRequest writeRequest) {
-        this.filterChain.fireFilterWrite(this, writeRequest);
-    }
-
     public VmPipeAddress getRemoteAddress() {
         return remoteAddress;
     }
@@ -155,30 +147,6 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     @Override
     public VmPipeAddress getServiceAddress() {
         return serviceAddress;
-    }
-
-    @Override
-    protected void updateTrafficMask() {
-        if (getTrafficMask().isReadable() || getTrafficMask().isWritable()) {
-            List<Object> data = new ArrayList<Object>();
-
-            pendingDataQueue.drainTo(data);
-
-            for (Object aData : data) {
-                if (aData instanceof WriteRequest) {
-                    // TODO Optimize unefficient data transfer.
-                    // Data will be returned to pendingDataQueue
-                    // if getTraffic().isWritable() is false.
-                    WriteRequest wr = (WriteRequest) aData;
-                    filterChain.doWrite(this, wr);
-                } else {
-                    // TODO Optimize unefficient data transfer.
-                    // Data will be returned to pendingDataQueue
-                    // if getTraffic().isReadable() is false.
-                    filterChain.fireMessageReceived(this, aData);
-                }
-            }
-        }
     }
 
     Lock getLock() {
