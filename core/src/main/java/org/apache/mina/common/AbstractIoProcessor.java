@@ -58,7 +58,13 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         this.executor = executor;
     }
 
-    protected abstract int select(int timeout) throws Exception;
+    /**
+     * poll those sessions for the given timeout 
+     * @param timeout milliseconds before the call timeout if no event appear
+     * @return true if at least a session is ready for read or for write 
+     * @throws Exception if some low level IO error occurs
+     */
+    protected abstract boolean select(int timeout) throws Exception;
 
     protected abstract void wakeup();
 
@@ -571,12 +577,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
             for (;;) {
                 try {
-                    int nKeys = select(1000);
+                    boolean selected=select(1000);
 
                     nSessions += add();
                     updateTrafficMask();
 
-                    if (nKeys > 0) {
+                    if (selected) {
                         process();
                     }
 
