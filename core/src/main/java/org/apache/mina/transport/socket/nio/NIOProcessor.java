@@ -66,8 +66,8 @@ class NIOProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected int select(int timeout) throws Exception {
-        return selector.select(1000);
+    protected boolean select(int timeout) throws Exception {
+        return selector.select(1000)>0;
     }
 
     @Override
