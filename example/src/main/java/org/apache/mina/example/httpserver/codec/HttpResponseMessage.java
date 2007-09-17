@@ -60,7 +60,7 @@ public class HttpResponseMessage {
                 "EEE, dd MMM yyyy HH:mm:ss zzz").format(new Date()));
     }
 
-    public Map getHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 

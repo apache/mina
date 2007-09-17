@@ -153,7 +153,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
         return null;
     }
 
-    private Map parseRequest(Reader is) {
+    private Map<String, String[]> parseRequest(Reader is) {
         Map<String, String[]> map = new HashMap<String, String[]>();
         BufferedReader rdr = new BufferedReader(is);
 

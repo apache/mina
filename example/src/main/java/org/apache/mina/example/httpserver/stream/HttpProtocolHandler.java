@@ -27,7 +27,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -93,9 +92,7 @@ public class HttpProtocolHandler extends StreamIoHandler {
                 out
                         .println("<table border=\"1\"><tr><th>Key</th><th>Value</th></tr>");
 
-                Iterator it = headers.entrySet().iterator();
-                while (it.hasNext()) {
-                    Entry e = (Entry) it.next();
+                for (Entry<String, String> e: headers.entrySet()) {
                     out.println("<tr><td>" + e.getKey() + "</td><td>"
                             + e.getValue() + "</td></tr>");
                 }

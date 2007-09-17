@@ -19,7 +19,6 @@
  */
 package org.apache.mina.example.httpserver.codec;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -30,45 +29,43 @@ import java.util.Map.Entry;
  * @version $Rev$, $Date$
  */
 public class HttpRequestMessage {
-    /** Map<String, String[]> */
-    private Map headers = null;
+    
+    private Map<String, String[]> headers = null;
 
-    public void setHeaders(Map headers) {
+    public void setHeaders(Map<String, String[]> headers) {
         this.headers = headers;
     }
 
-    public Map getHeaders() {
+    public Map<String, String[]> getHeaders() {
         return headers;
     }
 
     public String getContext() {
-        String[] context = (String[]) headers.get("Context");
+        String[] context = headers.get("Context");
         return context == null ? "" : context[0];
     }
 
     public String getParameter(String name) {
-        String[] param = (String[]) headers.get("@".concat(name));
+        String[] param = headers.get("@".concat(name));
         return param == null ? "" : param[0];
     }
 
     public String[] getParameters(String name) {
-        String[] param = (String[]) headers.get("@".concat(name));
+        String[] param = headers.get("@".concat(name));
         return param == null ? new String[] {} : param;
     }
 
     public String[] getHeader(String name) {
-        return (String[]) headers.get(name);
+        return headers.get(name);
     }
 
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
 
-        Iterator it = headers.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry e = (Entry) it.next();
+        for (Entry<String, String[]> e: headers.entrySet()) {
             str.append(e.getKey() + " : "
-                    + arrayToString((String[]) e.getValue(), ',') + "\n");
+                    + arrayToString(e.getValue(), ',') + "\n");
         }
         return str.toString();
     }

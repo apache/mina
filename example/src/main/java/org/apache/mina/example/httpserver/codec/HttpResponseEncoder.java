@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -74,12 +73,10 @@ public class HttpResponseEncoder implements MessageEncoder {
                 break;
             }
             buf.put(CRLF);
-            for (Iterator it = msg.getHeaders().entrySet().iterator(); it
-                    .hasNext();) {
-                Entry entry = (Entry) it.next();
-                buf.putString((String) entry.getKey(), encoder);
+            for (Entry<String, String> entry: msg.getHeaders().entrySet()) {
+                buf.putString(entry.getKey(), encoder);
                 buf.putString(": ", encoder);
-                buf.putString((String) entry.getValue(), encoder);
+                buf.putString(entry.getValue(), encoder);
                 buf.put(CRLF);
             }
             // now the content length is the body length
