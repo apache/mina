@@ -90,7 +90,16 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
                 throw new IllegalStateException("handler is not set.");
             }
 
-            doBind();
+            try {
+                doBind();
+            } catch (IOException e) {
+                throw e;
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Throwable e) {
+                throw new RuntimeIOException(
+                        "Failed to bind to: " + getLocalAddress(), e);
+            }
             bound = true;
         }
     }
@@ -101,7 +110,14 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
                 return;
             }
 
-            doUnbind();
+            try {
+                doUnbind();
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Throwable e) {
+                throw new RuntimeIOException(
+                        "Failed to unbind from: " + getLocalAddress(), e);
+            }
             bound = false;
         }
     }
@@ -115,10 +131,10 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
     /**
      * Implement this method to perform the actual bind operation.
      */
-    protected abstract void doBind() throws IOException;
+    protected abstract void doBind() throws Exception;
 
     /**
      * Implement this method to perform the actual unbind operation.
      */
-    protected abstract void doUnbind();
+    protected abstract void doUnbind() throws Exception;
 }

@@ -68,11 +68,14 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
     private DatagramChannel channel;
 
-    private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
+    private final Queue<ServiceOperationFuture> registerQueue =
+        new ConcurrentLinkedQueue<ServiceOperationFuture>();
 
-    private final Queue<CancellationRequest> cancelQueue = new ConcurrentLinkedQueue<CancellationRequest>();
+    private final Queue<ServiceOperationFuture> cancelQueue =
+        new ConcurrentLinkedQueue<ServiceOperationFuture>();
     
-    private final ConcurrentMap<SocketAddress, Object> cache = new ConcurrentHashMap<SocketAddress, Object>();
+    private final ConcurrentMap<SocketAddress, Object> cache =
+        new ConcurrentHashMap<SocketAddress, Object>();
 
     private Worker worker;
 
@@ -151,49 +154,33 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     }
 
     @Override
-    protected void doBind() throws IOException {
-        RegistrationRequest request = new RegistrationRequest();
+    protected void doBind() throws Exception {
+        ServiceOperationFuture future = new ServiceOperationFuture();
 
-        registerQueue.add(request);
+        registerQueue.add(future);
         startupWorker();
         selector.wakeup();
 
-        synchronized (request) {
-            while (!request.done) {
-                try {
-                    request.wait();
-                } catch (InterruptedException e) {
-                }
-            }
+        future.awaitUninterruptibly();
+
+        if (future.getException() != null) {
+            throw future.getException();
         }
 
-        if (request.exception != null) {
-            throw (IOException) new IOException("Failed to bind")
-                    .initCause(request.exception);
-        } else {
-            setLocalAddress(channel.socket().getLocalSocketAddress());
-        }
+        setLocalAddress(channel.socket().getLocalSocketAddress());
     }
 
     @Override
-    protected void doUnbind() {
-        CancellationRequest request = new CancellationRequest();
+    protected void doUnbind() throws Exception {
+        ServiceOperationFuture future = new ServiceOperationFuture();
 
-        cancelQueue.add(request);
+        cancelQueue.add(future);
         startupWorker();
         selector.wakeup();
 
-        synchronized (request) {
-            while (!request.done) {
-                try {
-                    request.wait();
-                } catch (InterruptedException e) {
-                }
-            }
-        }
-
-        if (request.exception != null) {
-            throw new RuntimeException("Failed to unbind", request.exception);
+        future.awaitUninterruptibly();
+        if (future.getException() != null) {
+            throw future.getException();
         }
     }
 
@@ -352,8 +339,8 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         }
 
         for (; ;) {
-            RegistrationRequest req = registerQueue.poll();
-            if (req == null) {
+            ServiceOperationFuture future = registerQueue.poll();
+            if (future == null) {
                 break;
             }
 
@@ -372,19 +359,15 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
                 ch.configureBlocking(false);
                 ch.socket().bind(getLocalAddress());
-                ch.register(selector, SelectionKey.OP_READ, req);
+                ch.register(selector, SelectionKey.OP_READ, future);
                 this.channel = ch;
 
                 getListeners().fireServiceActivated();
-            } catch (Throwable t) {
-                req.exception = t;
+                future.setDone();
+            } catch (Exception e) {
+                future.setException(e);
             } finally {
-                synchronized (req) {
-                    req.done = true;
-                    req.notify();
-                }
-
-                if (ch != null && req.exception != null) {
+                if (ch != null && future.getException() != null) {
                     try {
                         ch.disconnect();
                         ch.close();
@@ -398,8 +381,8 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
     private void cancelKeys() {
         for (; ;) {
-            CancellationRequest request = cancelQueue.poll();
-            if (request == null) {
+            ServiceOperationFuture future = cancelQueue.poll();
+            if (future == null) {
                 break;
             }
 
@@ -416,27 +399,9 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
             } catch (Throwable t) {
                 ExceptionMonitor.getInstance().exceptionCaught(t);
             } finally {
-                synchronized (request) {
-                    request.done = true;
-                    request.notify();
-                }
-
-                if (request.exception == null) {
-                    getListeners().fireServiceDeactivated();
-                }
+                future.setDone();
+                getListeners().fireServiceDeactivated();
             }
         }
-    }
-
-    private static class RegistrationRequest {
-        private Throwable exception;
-
-        private boolean done;
-    }
-
-    private static class CancellationRequest {
-        private boolean done;
-
-        private RuntimeException exception;
     }
 }

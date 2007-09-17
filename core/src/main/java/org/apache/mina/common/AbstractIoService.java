@@ -116,4 +116,30 @@ public abstract class AbstractIoService implements IoService {
     public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }
+    
+    protected static class ServiceOperationFuture extends DefaultIoFuture {
+        public ServiceOperationFuture() {
+            super(null);
+        }
+        
+        public boolean isDone() {
+            return (getValue() == Boolean.TRUE);
+        }
+        
+        public void setDone() {
+            setValue(Boolean.TRUE);
+        }
+        
+        public Exception getException() {
+            if (getValue() instanceof Exception) {
+                return (Exception) getValue();
+            } else {
+                return null;
+            }
+        }
+        
+        public void setException(Exception cause) {
+            setValue(cause);
+        }
+    }
 }

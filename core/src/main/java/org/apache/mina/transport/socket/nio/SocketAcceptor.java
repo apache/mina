@@ -70,9 +70,11 @@ public class SocketAcceptor extends AbstractIoAcceptor {
 
     private ServerSocketChannel serverSocketChannel;
 
-    private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
+    private final Queue<ServiceOperationFuture> registerQueue =
+        new ConcurrentLinkedQueue<ServiceOperationFuture>();
 
-    private final Queue<CancellationRequest> cancelQueue = new ConcurrentLinkedQueue<CancellationRequest>();
+    private final Queue<ServiceOperationFuture> cancelQueue =
+        new ConcurrentLinkedQueue<ServiceOperationFuture>();
 
     private final NIOProcessor[] ioProcessors;
 
@@ -247,8 +249,8 @@ public class SocketAcceptor extends AbstractIoAcceptor {
     }
 
     @Override
-    protected void doBind() throws IOException {
-        RegistrationRequest request = new RegistrationRequest();
+    protected void doBind() throws Exception {
+        ServiceOperationFuture request = new ServiceOperationFuture();
 
         // adds the Registration request to the queue for the Workers
         // to handle
@@ -260,31 +262,17 @@ public class SocketAcceptor extends AbstractIoAcceptor {
 
         selector.wakeup();
 
-        synchronized (request) {
-            while (!request.done) {
-                try {
-                    request.wait();
-                } catch (InterruptedException e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
-            }
-        }
+        request.awaitUninterruptibly();
 
-        if (request.exception != null) {
-            if (request.exception instanceof RuntimeException) {
-                throw (RuntimeException) request.exception;
-            } else if (request.exception instanceof IOException) {
-                throw (IOException) request.exception;
-            } else {
-                throw new RuntimeIOException(request.exception);
-            }
-        } else {
-            // Update the local address.
-            // setLocalAddress() shouldn't be called from the worker thread
-            // because of deadlock.
-            setLocalAddress(serverSocketChannel.socket()
-                    .getLocalSocketAddress());
-        }
+        if (request.getException() != null) {
+            throw request.getException();
+        } 
+        
+        // Update the local address.
+        // setLocalAddress() shouldn't be called from the worker thread
+        // because of deadlock.
+        setLocalAddress(serverSocketChannel.socket()
+                .getLocalSocketAddress());
     }
 
     /**
@@ -307,27 +295,16 @@ public class SocketAcceptor extends AbstractIoAcceptor {
     }
 
     @Override
-    protected void doUnbind() {
-        CancellationRequest request = new CancellationRequest();
+    protected void doUnbind() throws Exception {
+        ServiceOperationFuture future = new ServiceOperationFuture();
 
-        cancelQueue.add(request);
+        cancelQueue.add(future);
         startupWorker();
         selector.wakeup();
 
-        synchronized (request) {
-            while (!request.done) {
-                try {
-                    request.wait();
-                } catch (InterruptedException e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
-            }
-        }
-
-        if (request.exception != null) {
-            request.exception.fillInStackTrace();
-
-            throw request.exception;
+        future.awaitUninterruptibly();
+        if (future.getException() != null) {
+            throw future.getException();
         }
     }
 
@@ -447,8 +424,8 @@ public class SocketAcceptor extends AbstractIoAcceptor {
      */
     private void registerNew() {
         for (; ;) {
-            RegistrationRequest req = registerQueue.poll();
-            if (req == null) {
+            ServiceOperationFuture future = registerQueue.poll();
+            if (future == null) {
                 break;
             }
 
@@ -465,22 +442,17 @@ public class SocketAcceptor extends AbstractIoAcceptor {
 
                 // and bind.
                 ssc.socket().bind(getLocalAddress(), getBacklog());
-                ssc.register(selector, SelectionKey.OP_ACCEPT, req);
+                ssc.register(selector, SelectionKey.OP_ACCEPT, future);
 
                 serverSocketChannel = ssc;
 
                 // and notify.
                 getListeners().fireServiceActivated();
-            } catch (Throwable e) {
-                req.exception = e;
+                future.setDone();
+            } catch (Exception e) {
+                future.setException(e);
             } finally {
-                synchronized (req) {
-                    req.done = true;
-
-                    req.notifyAll();
-                }
-
-                if (ssc != null && req.exception != null) {
+                if (ssc != null && future.getException() != null) {
                     try {
                         ssc.close();
                     } catch (IOException e) {
@@ -499,8 +471,8 @@ public class SocketAcceptor extends AbstractIoAcceptor {
      */
     private void cancelKeys() {
         for (; ;) {
-            CancellationRequest request = cancelQueue.poll();
-            if (request == null) {
+            ServiceOperationFuture future = cancelQueue.poll();
+            if (future == null) {
                 break;
             }
 
@@ -516,34 +488,10 @@ public class SocketAcceptor extends AbstractIoAcceptor {
             } catch (IOException e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
             } finally {
-                synchronized (request) {
-                    request.done = true;
-                    request.notifyAll();
-                }
-
-                if (request.exception == null) {
-                    getListeners().fireServiceDeactivated();
-                }
+                future.setDone();
+                getListeners().fireServiceDeactivated();
             }
         }
-    }
-
-    /**
-     * Class that triggers registration, or startup, of this class
-     */
-    private static class RegistrationRequest {
-        private Throwable exception;
-
-        private boolean done;
-    }
-
-    /**
-     * Class that triggers a signal to unbind.
-     */
-    private static class CancellationRequest {
-        private boolean done;
-
-        private RuntimeException exception;
     }
 
     /**
