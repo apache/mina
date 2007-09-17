@@ -154,11 +154,14 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         session.getService();
     }
 
+    @SuppressWarnings("unchecked")
     private class ProtocolEncoderImpl implements ProtocolEncoder {
-        private final Map<Class<?>, MessageEncoder> encoders = new IdentityHashMap<Class<?>, MessageEncoder>();
+        private final Map<Class<?>, MessageEncoder> encoders =
+            new IdentityHashMap<Class<?>, MessageEncoder>();
 
         private ProtocolEncoderImpl() throws Exception {
-            MessageEncoderFactory[] encoderFactories = DemuxingProtocolCodecFactory.this.encoderFactories;
+            MessageEncoderFactory[] encoderFactories =
+                DemuxingProtocolCodecFactory.this.encoderFactories;
             for (int i = encoderFactories.length - 1; i >= 0; i--) {
                 MessageEncoder encoder = encoderFactories[i].getEncoder();
                 Set<Class<?>> messageTypes = encoder.getMessageTypes();
@@ -360,11 +363,12 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
-    private static class DefaultConstructorMessageEncoderFactory<T> implements
-            MessageEncoderFactory<T> {
-        private final Class<MessageEncoder<T>> encoderClass;
+    @SuppressWarnings("unchecked")
+    private static class DefaultConstructorMessageEncoderFactory implements
+            MessageEncoderFactory {
+        private final Class encoderClass;
 
-        private DefaultConstructorMessageEncoderFactory(Class<MessageEncoder<T>> encoderClass) {
+        private DefaultConstructorMessageEncoderFactory(Class encoderClass) {
             if (encoderClass == null) {
                 throw new NullPointerException("encoderClass");
             }
@@ -376,8 +380,8 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             this.encoderClass = encoderClass;
         }
 
-        public MessageEncoder<T> getEncoder() throws Exception {
-            return encoderClass.newInstance();
+        public MessageEncoder getEncoder() throws Exception {
+            return (MessageEncoder) encoderClass.newInstance();
         }
     }
 
