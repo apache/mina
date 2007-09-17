@@ -416,11 +416,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
         try {
             for (; ;) {
-                WriteRequest req;
-                synchronized (writeRequestQueue) {
-                    req = writeRequestQueue.peek();
-                }
-
+                WriteRequest req = writeRequestQueue.peek();
                 if (req == null) {
                     break;
                 }
@@ -428,10 +424,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                 ByteBuffer buf = (ByteBuffer) req.getMessage();
                 if (buf.remaining() == 0) {
                     // pop and fire event
-                    synchronized (writeRequestQueue) {
-                        writeRequestQueue.poll();
-                    }
-
+                    writeRequestQueue.poll();
                     session.increaseWrittenMessages();
                     buf.reset();
                     session.getFilterChain().fireMessageSent(session, req);
@@ -452,10 +445,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                     key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
 
                     // pop and fire event
-                    synchronized (writeRequestQueue) {
-                        writeRequestQueue.poll();
-                    }
-
+                    writeRequestQueue.poll();
                     writtenBytes += localWrittenBytes;
                     session.increaseWrittenMessages();
                     buf.reset();
