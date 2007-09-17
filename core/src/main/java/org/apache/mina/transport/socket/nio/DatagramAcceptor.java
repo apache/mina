@@ -28,21 +28,22 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.ExpiringIoSessionRecycler;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoProcessor;
+import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
@@ -54,27 +55,24 @@ import org.apache.mina.util.NewThreadExecutor;
  */
 public class DatagramAcceptor extends AbstractIoAcceptor implements
         IoAcceptor {
-    private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringIoSessionRecycler();
 
     private static volatile int nextId = 0;
-
-    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
 
     private final Executor executor;
 
     private final int id = nextId++;
 
     private final Selector selector;
-
-    private final IoProcessor processor = new DatagramAcceptorProcessor();
+    
+    private final DatagramConnector connector;
 
     private DatagramChannel channel;
 
     private final Queue<RegistrationRequest> registerQueue = new ConcurrentLinkedQueue<RegistrationRequest>();
 
     private final Queue<CancellationRequest> cancelQueue = new ConcurrentLinkedQueue<CancellationRequest>();
-
-    private final Queue<DatagramSessionImpl> flushingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+    
+    private final ConcurrentMap<SocketAddress, Object> cache = new ConcurrentHashMap<SocketAddress, Object>();
 
     private Worker worker;
 
@@ -89,10 +87,14 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
      * Creates a new instance.
      */
     public DatagramAcceptor(Executor executor) {
-        super(new DefaultDatagramSessionConfig());
+        this(Runtime.getRuntime().availableProcessors() + 1, executor);
+    }
 
-        // The default reuseAddress should be 'true' for an accepted socket.
-        getSessionConfig().setReuseAddress(true);
+    /**
+     * Creates a new instance.
+     */
+    public DatagramAcceptor(int processorCount, Executor executor) {
+        super(new DefaultDatagramSessionConfig());
 
         try {
             this.selector = Selector.open();
@@ -101,6 +103,11 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         }
 
         this.executor = executor;
+        this.connector = new DatagramConnector(
+                this, "DatagramAcceptor-" + id, processorCount, executor);
+
+        // The default reuseAddress should be 'true' for an accepted socket.
+        getSessionConfig().setReuseAddress(true);
     }
 
     @Override
@@ -127,12 +134,28 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         return (InetSocketAddress) super.getLocalAddress();
     }
 
+    // This method is added to work around a problem with
+    // bean property access mechanism.
+
+    /**
+     * @see org.apache.mina.common.AbstractIoAcceptor#setLocalAddress(java.net.SocketAddress)
+     * @param localAddress the local address
+     */
+    public void setLocalAddress(InetSocketAddress localAddress) {
+        super.setLocalAddress(localAddress);
+    }
+    
+    @Override
+    protected IoServiceListenerSupport getListeners() {
+        return super.getListeners();
+    }
+
     @Override
     protected void doBind() throws IOException {
         RegistrationRequest request = new RegistrationRequest();
 
-        startupWorker();
         registerQueue.add(request);
+        startupWorker();
         selector.wakeup();
 
         synchronized (request) {
@@ -156,8 +179,8 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     protected void doUnbind() {
         CancellationRequest request = new CancellationRequest();
 
-        startupWorker();
         cancelQueue.add(request);
+        startupWorker();
         selector.wakeup();
 
         synchronized (request) {
@@ -184,98 +207,27 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                 throw new IllegalStateException(
                         "Can't create a session from a unbound service.");
             }
-
-            return newSessionWithoutLock(remoteAddress);
-        }
-    }
-
-    private IoSession newSessionWithoutLock(SocketAddress remoteAddress) {
-        Selector selector = this.selector;
-        DatagramChannel ch = this.channel;
-        SelectionKey key = ch.keyFor(selector);
-
-        IoSession session;
-        IoSessionRecycler sessionRecycler = getSessionRecycler();
-        synchronized (sessionRecycler) {
-            session = sessionRecycler.recycle(getLocalAddress(), remoteAddress);
-            if (session != null) {
-                return session;
-            }
-
-            // If a new session needs to be created.
-            DatagramSessionImpl datagramSession = new DatagramSessionImpl(
-                    this, ch, getHandler(),
-                    (InetSocketAddress) remoteAddress);
-            datagramSession.setSelectionKey(key);
-
-            getSessionRecycler().put(datagramSession);
-            session = datagramSession;
-        }
-
-        try {
-            this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
-            getListeners().fireSessionCreated(session);
-        } catch (Throwable t) {
-            ExceptionMonitor.getInstance().exceptionCaught(t);
-        }
-
-        return session;
-    }
-
-    /**
-     * Returns the {@link IoSessionRecycler} for this service.
-     */
-    public IoSessionRecycler getSessionRecycler() {
-        return sessionRecycler;
-    }
-
-    /**
-     * Sets the {@link IoSessionRecycler} for this service.
-     *
-     * @param sessionRecycler <tt>null</tt> to use the default recycler
-     */
-    public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
-        synchronized (bindLock) {
-            if (isBound()) {
-                throw new IllegalStateException(
-                        "sessionRecycler can't be set while the acceptor is bound.");
-            }
-
-            if (sessionRecycler == null) {
-                sessionRecycler = DEFAULT_RECYCLER;
-            }
-            this.sessionRecycler = sessionRecycler;
-        }
-    }
-
-    @Override
-    protected IoServiceListenerSupport getListeners() {
-        return super.getListeners();
-    }
-
-    IoProcessor getProcessor() {
-        return processor;
-    }
-
-    private class DatagramAcceptorProcessor implements IoProcessor {
-
-        public void add(IoSession session) {
-        }
-
-        public void flush(IoSession session, WriteRequest writeRequest) {
-            if (scheduleFlush((DatagramSessionImpl) session)) {
-                Selector selector = DatagramAcceptor.this.selector;
-                if (selector != null) {
-                    selector.wakeup();
+            
+            Object data;
+            synchronized (cache) { 
+                data = cache.get(remoteAddress);
+                if (data == null) {
+                    ConnectFuture future = connector.connect(remoteAddress, getLocalAddress());
+                    cache.put(remoteAddress, future);
+                    future.awaitUninterruptibly();
+                    return future.getSession();
                 }
             }
-        }
-
-        public void remove(IoSession session) {
-            getListeners().fireSessionDestroyed(session);
-        }
-
-        public void updateTrafficMask(IoSession session) {
+            
+            if (data instanceof ConnectFuture) {
+                ConnectFuture future = (ConnectFuture) data;
+                future.awaitUninterruptibly();
+                return future.getSession();
+            } else if (data instanceof IoSession) {
+                return ((IoSession) data);
+            } else {
+                throw new IllegalStateException();
+            }
         }
     }
 
@@ -283,15 +235,6 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         if (worker == null) {
             worker = new Worker();
             executor.execute(new NamePreservingRunnable(worker));
-        }
-    }
-
-    private boolean scheduleFlush(DatagramSessionImpl session) {
-        if (session.setScheduledForFlush(true)) {
-            flushingSessions.add(session);
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -309,7 +252,6 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                         processReadySessions(selector.selectedKeys());
                     }
 
-                    flushSessions();
                     cancelKeys();
 
                     if (selector.keys().isEmpty()) {
@@ -346,12 +288,6 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                 if (key.isReadable()) {
                     readSession(ch);
                 }
-
-                if (key.isWritable()) {
-                    for (IoSession session : getManagedSessions()) {
-                        scheduleFlush((DatagramSessionImpl) session);
-                    }
-                }
             } catch (Throwable t) {
                 ExceptionMonitor.getInstance().exceptionCaught(t);
             }
@@ -359,104 +295,55 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     }
 
     private void readSession(DatagramChannel channel) throws Exception {
-        ByteBuffer readBuf = ByteBuffer.allocate(getSessionConfig()
-                .getReceiveBufferSize());
+        final ByteBuffer readBuf = ByteBuffer.allocate(getSessionConfig()
+                .getReadBufferSize());
 
-        SocketAddress remoteAddress = channel.receive(readBuf.buf());
+        final SocketAddress remoteAddress = channel.receive(readBuf.buf());
         if (remoteAddress != null) {
-            DatagramSessionImpl session = (DatagramSessionImpl) newSessionWithoutLock(remoteAddress);
-
             readBuf.flip();
-
-            ByteBuffer newBuf = ByteBuffer.allocate(readBuf.limit());
-            newBuf.put(readBuf);
-            newBuf.flip();
-
-            session.increaseReadBytes(newBuf.remaining());
-            session.getFilterChain().fireMessageReceived(session, newBuf);
-        }
-    }
-
-    private void flushSessions() {
-        for (; ;) {
-            DatagramSessionImpl session = flushingSessions.poll();
-            if (session == null) {
-                break;
-            }
-
-            session.setScheduledForFlush(false);
-
-            try {
-                boolean flushedAll = flush(session);
-                if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.isScheduledForFlush()) {
-                    scheduleFlush(session);
-                }
-            } catch (IOException e) {
-                session.getFilterChain().fireExceptionCaught(session, e);
-            }
-        }
-    }
-
-    private boolean flush(DatagramSessionImpl session) throws IOException {
-        // Clear OP_WRITE
-        SelectionKey key = session.getSelectionKey();
-        if (key == null) {
-            scheduleFlush(session);
-            return false;
-        }
-        if (!key.isValid()) {
-            return false;
-        }
-        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
-
-        DatagramChannel ch = session.getChannel();
-        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
-
-        int writtenBytes = 0;
-        int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
-        try {
-            for (; ;) {
-                WriteRequest req = writeRequestQueue.peek();
-                if (req == null) {
-                    break;
-                }
-
-                ByteBuffer buf = (ByteBuffer) req.getMessage();
-                if (buf.remaining() == 0) {
-                    // pop and fire event
-                    writeRequestQueue.poll();
-                    session.increaseWrittenMessages();
-                    buf.reset();
-                    session.getFilterChain().fireMessageSent(session, req);
-                    continue;
-                }
-
-                SocketAddress destination = req.getDestination();
-                if (destination == null) {
-                    destination = session.getRemoteAddress();
-                }
-
-                int localWrittenBytes = ch.send(buf.buf(), destination);
-                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
-                    // Kernel buffer is full or wrote too much
-                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                    return false;
-                } else {
-                    key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
-
-                    // pop and fire event
-                    writeRequestQueue.poll();
-                    writtenBytes += localWrittenBytes;
-                    session.increaseWrittenMessages();
-                    buf.reset();
-                    session.getFilterChain().fireMessageSent(session, req);
+            Object data;
+            ConnectFuture future = null;
+            synchronized (cache) {
+                data = cache.get(remoteAddress);
+                if (data == null) {
+                    future = connector.connect(remoteAddress, getLocalAddress());
+                    cache.put(remoteAddress, future);
                 }
             }
-        } finally {
-            session.increaseWrittenBytes(writtenBytes);
+            
+            if (data == null) {
+                future.addListener(new IoFutureListener() {
+                    public void operationComplete(IoFuture future) {
+                        ConnectFuture f = (ConnectFuture) future;
+                        if (f.getException() == null) {
+                            IoSession s = f.getSession();
+                            cache.put(remoteAddress, s);
+                            s.getCloseFuture().addListener(new IoFutureListener() {
+                                public void operationComplete(IoFuture future) {
+                                    cache.remove(remoteAddress);
+                                }
+                            });
+                            s.getFilterChain().fireMessageReceived(readBuf);
+                        } else {
+                            ExceptionMonitor.getInstance().exceptionCaught(f.getException());
+                        }
+                    }
+                });
+            } else if (data instanceof ConnectFuture) {
+                future = (ConnectFuture) data;
+                future.addListener(new IoFutureListener() {
+                    public void operationComplete(IoFuture future) {
+                        ConnectFuture f = (ConnectFuture) future;
+                        if (f.getException() == null) {
+                            IoSession s = f.getSession();
+                            s.getFilterChain().fireMessageReceived(readBuf);
+                        }
+                    }
+                });
+            } else if (data instanceof IoSession) {
+                ((IoSession) data).getFilterChain().fireMessageReceived(readBuf);
+            }
         }
-
-        return true;
     }
 
     private void registerNew() {

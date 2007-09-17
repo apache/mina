@@ -271,7 +271,6 @@ public class SocketAcceptor extends AbstractIoAcceptor {
         }
 
         if (request.exception != null) {
-            // TODO better exception handling.
             if (request.exception instanceof RuntimeException) {
                 throw (RuntimeException) request.exception;
             } else if (request.exception instanceof IOException) {
@@ -472,8 +471,7 @@ public class SocketAcceptor extends AbstractIoAcceptor {
 
                 // and notify.
                 getListeners().fireServiceActivated();
-            } catch (Throwable e) // TODO better exception handling.
-            {
+            } catch (Throwable e) {
                 req.exception = e;
             } finally {
                 synchronized (req) {

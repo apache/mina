@@ -39,14 +39,14 @@ public class DefaultIoFilterChain implements IoFilterChain {
     /**
      * A session attribute that stores a {@link ConnectFuture} related with
      * the {@link IoSession}.  {@link DefaultIoFilterChain} clears this
-     * attribute and notifies the future when {@link #fireSessionOpened(IoSession)}
-     * or {@link #fireExceptionCaught(IoSession, Throwable)} is invoked
+     * attribute and notifies the future when {@link #fireSessionOpened()}
+     * or {@link #fireExceptionCaught(Throwable)} is invoked
      */
     public static final String CONNECT_FUTURE = DefaultIoFilterChain.class
             .getName()
             + ".connectFuture";
 
-    private final IoSession session;
+    private final AbstractIoSession session;
 
     private final Map<String, Entry> name2entry = new HashMap<String, Entry>();
 
@@ -271,7 +271,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
     }
 
-    public void fireSessionCreated(IoSession session) {
+    public void fireSessionCreated() {
         Entry head = this.head;
         callNextSessionCreated(head, session);
     }
@@ -280,11 +280,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         try {
             entry.getFilter().sessionCreated(entry.getNextFilter(), session);
         } catch (Throwable e) {
-            fireExceptionCaught(session, e);
+            fireExceptionCaught(e);
         }
     }
 
-    public void fireSessionOpened(IoSession session) {
+    public void fireSessionOpened() {
         Entry head = this.head;
         callNextSessionOpened(head, session);
     }
@@ -293,16 +293,16 @@ public class DefaultIoFilterChain implements IoFilterChain {
         try {
             entry.getFilter().sessionOpened(entry.getNextFilter(), session);
         } catch (Throwable e) {
-            fireExceptionCaught(session, e);
+            fireExceptionCaught(e);
         }
     }
 
-    public void fireSessionClosed(IoSession session) {
+    public void fireSessionClosed() {
         // Update future.
         try {
             session.getCloseFuture().setClosed();
         } catch (Throwable t) {
-            fireExceptionCaught(session, t);
+            fireExceptionCaught(t);
         }
 
         // And start the chain.
@@ -315,11 +315,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
             entry.getFilter().sessionClosed(entry.getNextFilter(), session);
 
         } catch (Throwable e) {
-            fireExceptionCaught(session, e);
+            fireExceptionCaught(e);
         }
     }
 
-    public void fireSessionIdle(IoSession session, IdleStatus status) {
+    public void fireSessionIdle(IdleStatus status) {
         Entry head = this.head;
         callNextSessionIdle(head, session, status);
     }
@@ -330,11 +330,15 @@ public class DefaultIoFilterChain implements IoFilterChain {
             entry.getFilter().sessionIdle(entry.getNextFilter(), session,
                     status);
         } catch (Throwable e) {
-            fireExceptionCaught(session, e);
+            fireExceptionCaught(e);
         }
     }
 
-    public void fireMessageReceived(IoSession session, Object message) {
+    public void fireMessageReceived(Object message) {
+        if (message instanceof ByteBuffer) {
+            session.increaseReadBytes(((ByteBuffer) message).remaining());
+        }
+
         Entry head = this.head;
         callNextMessageReceived(head, session, message);
     }
@@ -345,15 +349,27 @@ public class DefaultIoFilterChain implements IoFilterChain {
             entry.getFilter().messageReceived(entry.getNextFilter(), session,
                     message);
         } catch (Throwable e) {
-            fireExceptionCaught(session, e);
+            fireExceptionCaught(e);
         }
     }
 
-    public void fireMessageSent(IoSession session, WriteRequest request) {
+    public void fireMessageSent(WriteRequest request) {
+        Object message = request.getMessage();
+        if (message instanceof ByteBuffer) {
+            ByteBuffer b = (ByteBuffer) message;
+            if (b.hasRemaining()) {
+                session.increaseWrittenBytes(((ByteBuffer) message).remaining());
+            } else {
+                session.increaseWrittenMessages();
+            }
+        } else {
+            session.increaseWrittenMessages();
+        }
+
         try {
             request.getFuture().setWritten(true);
         } catch (Throwable t) {
-            fireExceptionCaught(session, t);
+            fireExceptionCaught(t);
         }
 
         Entry head = this.head;
@@ -366,11 +382,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
             entry.getFilter().messageSent(entry.getNextFilter(), session,
                     writeRequest);
         } catch (Throwable e) {
-            fireExceptionCaught(session, e);
+            fireExceptionCaught(e);
         }
     }
 
-    public void fireExceptionCaught(IoSession session, Throwable cause) {
+    public void fireExceptionCaught(Throwable cause) {
         // Notify the related ConnectFuture
         // if the session is created from SocketConnector.
         ConnectFuture future = (ConnectFuture) session
@@ -396,7 +412,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
     }
 
-    public void fireFilterWrite(IoSession session, WriteRequest writeRequest) {
+    public void fireFilterWrite(WriteRequest writeRequest) {
         Entry tail = this.tail;
         callPreviousFilterWrite(tail, session, writeRequest);
     }
@@ -408,11 +424,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
                     writeRequest);
         } catch (Throwable e) {
             writeRequest.getFuture().setWritten(false);
-            fireExceptionCaught(session, e);
+            fireExceptionCaught(e);
         }
     }
 
-    public void fireFilterClose(IoSession session) {
+    public void fireFilterClose() {
         Entry tail = this.tail;
         callPreviousFilterClose(tail, session);
     }
@@ -421,7 +437,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         try {
             entry.getFilter().filterClose(entry.getNextFilter(), session);
         } catch (Throwable e) {
-            fireExceptionCaught(session, e);
+            fireExceptionCaught(e);
         }
     }
 
@@ -579,7 +595,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
             s.getWriteRequestQueue().add(writeRequest);
             if (s.getTrafficMask().isWritable()) {
-                s.getProcessor().flush(s, writeRequest);
+                s.getProcessor().flush(s);
             }
         }
 

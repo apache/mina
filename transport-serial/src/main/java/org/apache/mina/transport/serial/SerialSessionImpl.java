@@ -168,11 +168,9 @@ class SerialSessionImpl extends AbstractIoSession implements
             ByteBuffer buf = (ByteBuffer) req.getMessage();
             if (buf.remaining() == 0) {
                 getWriteRequestQueue().poll();
-                this.increaseWrittenMessages();
-
                 buf.reset();
 
-                this.getFilterChain().fireMessageSent(this, req);
+                this.getFilterChain().fireMessageSent(req);
                 continue;
             }
 
@@ -180,9 +178,8 @@ class SerialSessionImpl extends AbstractIoSession implements
             try {
                 outputStream.write(buf.array());
                 buf.position(buf.position() + writtenBytes);
-                this.increaseWrittenBytes(writtenBytes);
             } catch (IOException e) {
-                this.getFilterChain().fireExceptionCaught(this, e);
+                this.getFilterChain().fireExceptionCaught(e);
             }
         }
     }
@@ -209,17 +206,16 @@ class SerialSessionImpl extends AbstractIoSession implements
                         int readBytes = inputStream.read(data);
 
                         if (readBytes > 0) {
-                            increaseReadBytes(readBytes);
                             ByteBuffer buf = ByteBuffer
                                     .wrap(data, 0, readBytes);
                             buf.put(data, 0, readBytes);
                             buf.flip();
                             getFilterChain().fireMessageReceived(
-                                    SerialSessionImpl.this, buf);
+                                    buf);
                         }
                     } catch (IOException e) {
                         getFilterChain().fireExceptionCaught(
-                                SerialSessionImpl.this, e);
+                                e);
                     }
                 }
             }
@@ -242,7 +238,7 @@ class SerialSessionImpl extends AbstractIoSession implements
     public void add(IoSession session) {
     }
 
-    public void flush(IoSession session, WriteRequest writeRequest) {
+    public void flush(IoSession session) {
         if (writeWorker == null) {
             writeWorker = new WriteWorker();
             writeWorker.start();
@@ -266,7 +262,7 @@ class SerialSessionImpl extends AbstractIoSession implements
         }
 
         port.close();
-        flush(session, null);
+        flush(session);
         synchronized (readReadyMonitor) {
             readReadyMonitor.notifyAll();
         }

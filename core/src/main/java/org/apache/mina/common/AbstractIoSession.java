@@ -146,7 +146,7 @@ public abstract class AbstractIoSession implements IoSession {
             }
         }
 
-        getFilterChain().fireFilterClose(this);
+        getFilterChain().fireFilterClose();
         return closeFuture;
     }
 
@@ -188,7 +188,7 @@ public abstract class AbstractIoSession implements IoSession {
 
         WriteFuture future = new DefaultWriteFuture(this);
         getFilterChain().fireFilterWrite(
-                this, new DefaultWriteRequest(message, future, remoteAddress));
+                new DefaultWriteRequest(message, future, remoteAddress));
 
         if (message instanceof File) {
             final FileChannel finalChannel = channel;

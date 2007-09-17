@@ -93,8 +93,8 @@ public class IoServiceListenerSupportTest extends TestCase {
 
         // Test creation
         listener.sessionCreated(session);
-        chain.fireSessionCreated(session);
-        chain.fireSessionOpened(session);
+        chain.fireSessionCreated();
+        chain.fireSessionOpened();
 
         listenerControl.replay();
         chainControl.replay();
@@ -111,7 +111,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         // Test destruction & other side effects
         listenerControl.reset();
         chainControl.reset();
-        chain.fireSessionClosed(session);
+        chain.fireSessionClosed();
         listener.sessionDestroyed(session);
 
         listenerControl.replay();
@@ -154,8 +154,8 @@ public class IoServiceListenerSupportTest extends TestCase {
         // Activate a service and create a session.
         listener.serviceActivated(acceptor);
         listener.sessionCreated(session);
-        chain.fireSessionCreated(session);
-        chain.fireSessionOpened(session);
+        chain.fireSessionCreated();
+        chain.fireSessionOpened();
 
         listenerControl.replay();
         chainControl.replay();
@@ -174,8 +174,8 @@ public class IoServiceListenerSupportTest extends TestCase {
         listener.serviceDeactivated(acceptor);
         acceptorControl.expectAndReturn(acceptor.isDisconnectOnUnbind(), true);
         listener.sessionDestroyed(session);
-        chain.fireFilterClose(session);
-        chain.fireSessionClosed(session);
+        chain.fireFilterClose();
+        chain.fireSessionClosed();
 
         listenerControl.replay();
         acceptorControl.replay();
@@ -229,8 +229,8 @@ public class IoServiceListenerSupportTest extends TestCase {
         // Creating a session should activate a service automatically.
         listener.serviceActivated(connector);
         listener.sessionCreated(session);
-        chain.fireSessionCreated(session);
-        chain.fireSessionOpened(session);
+        chain.fireSessionCreated();
+        chain.fireSessionOpened();
 
         listenerControl.replay();
         chainControl.replay();
@@ -245,7 +245,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         listenerControl.reset();
         chainControl.reset();
         listener.sessionDestroyed(session);
-        chain.fireSessionClosed(session);
+        chain.fireSessionClosed();
         listener.serviceDeactivated(connector);
 
         listenerControl.replay();

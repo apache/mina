@@ -20,14 +20,8 @@
 package org.apache.mina.transport.vmpipe;
 
 import java.net.SocketAddress;
-import java.util.Collection;
 
-import junit.framework.Assert;
-
-import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.transport.AbstractBindTest;
 
 /**
@@ -52,38 +46,8 @@ public class VmPipeBindTest extends AbstractBindTest {
         return ((VmPipeAddress) address).getPort();
     }
 
-    public void testUnbindDisconnectsClients() throws Exception {
-        // TODO: This test is almost identical to the test with the same name in SocketBindTest
-        bind(false);
-
-        SocketAddress addr = createSocketAddress(port);
-
-        IoConnector connector = new VmPipeConnector();
-        connector.setHandler(new IoHandlerAdapter());
-        IoSession[] sessions = new IoSession[5];
-        for (int i = 0; i < sessions.length; i++) {
-            ConnectFuture future = connector.connect(addr);
-            future.awaitUninterruptibly();
-            sessions[i] = future.getSession();
-            Assert.assertTrue(sessions[i].isConnected());
-        }
-
-        // Wait for the server side sessions to be created.
-        Thread.sleep(500);
-
-        Collection<IoSession> managedSessions = acceptor.getManagedSessions();
-        Assert.assertEquals(5, managedSessions.size());
-        for (IoSession element : sessions) {
-            Assert.assertFalse(managedSessions.contains(element));
-        }
-
-        acceptor.unbind();
-
-        // Wait for the client side sessions to close.
-        Thread.sleep(500);
-
-        for (IoSession element : sessions) {
-            Assert.assertFalse(element.isConnected());
-        }
+    @Override
+    protected IoConnector newConnector() {
+        return new VmPipeConnector();
     }
 }

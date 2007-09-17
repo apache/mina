@@ -21,14 +21,17 @@ package org.apache.mina.transport;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.Collection;
 import java.util.Date;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
@@ -56,6 +59,8 @@ public abstract class AbstractBindTest extends TestCase {
     protected abstract SocketAddress createSocketAddress(int port);
 
     protected abstract int getPort(SocketAddress address);
+    
+    protected abstract IoConnector newConnector();
 
     protected void bind(boolean reuseAddress) throws IOException {
         acceptor.setHandler(new EchoProtocolHandler());
@@ -146,6 +151,36 @@ public abstract class AbstractBindTest extends TestCase {
         for (int i = 0; i < 1024; i++) {
             acceptor.unbind();
             acceptor.bind();
+        }
+    }
+    
+    public void testUnbindDisconnectsClients() throws Exception {
+        bind(true);
+        IoConnector connector = newConnector();
+        IoSession[] sessions = new IoSession[5];
+        connector.setHandler(new IoHandlerAdapter());
+        for (int i = 0; i < sessions.length; i++) {
+            ConnectFuture future = connector.connect(createSocketAddress(port));
+            future.awaitUninterruptibly();
+            sessions[i] = future.getSession();
+            Assert.assertTrue(sessions[i].isConnected());
+            Assert.assertTrue(sessions[i].write(ByteBuffer.allocate(1)).awaitUninterruptibly().isWritten());
+        }
+
+        // Wait for the server side sessions to be created.
+        Thread.sleep(500);
+
+        Collection<IoSession> managedSessions = acceptor.getManagedSessions();
+        Assert.assertEquals(5, managedSessions.size());
+
+        acceptor.unbind();
+
+        // Wait for the client side sessions to close.
+        Thread.sleep(500);
+
+        Assert.assertEquals(0, managedSessions.size());
+        for (IoSession element : managedSessions) {
+            Assert.assertFalse(element.isConnected());
         }
     }
 

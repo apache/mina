@@ -26,10 +26,8 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.CloseFuture;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
-import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
@@ -66,37 +64,20 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
     private final InetSocketAddress localAddress;
 
     private final InetSocketAddress remoteAddress;
+    
+    private final IoProcessor processor;
 
     private SelectionKey key;
 
     /**
-     * Creates a new acceptor instance.
-     */
-    DatagramSessionImpl(
-            DatagramAcceptor service,
-            DatagramChannel ch, IoHandler defaultHandler,
-            InetSocketAddress remoteAddress) {
-        this.service = service;
-        this.ch = ch;
-        this.handler = defaultHandler;
-        this.remoteAddress = remoteAddress;
-
-        // We didn't set the localAddress by calling getLocalSocketAddress() to avoid
-        // the case that getLocalSocketAddress() returns IPv6 address while
-        // serviceAddress represents the same address in IPv4.
-        this.localAddress = service.getLocalAddress();
-
-        this.config.setAll(service.getSessionConfig());
-    }
-
-    /**
      * Creates a new connector instance.
      */
-    DatagramSessionImpl(DatagramConnector service,
-                        DatagramChannel ch, IoHandler defaultHandler) {
+    DatagramSessionImpl(IoService service,
+                        DatagramChannel ch, IoProcessor processor) {
         this.service = service;
         this.ch = ch;
-        this.handler = defaultHandler;
+        this.handler = service.getHandler();
+        this.processor = processor;
         this.remoteAddress = (InetSocketAddress) ch.socket()
                 .getRemoteSocketAddress();
         this.localAddress = (InetSocketAddress) ch.socket()
@@ -111,11 +92,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
 
     @Override
     protected IoProcessor getProcessor() {
-        if (service instanceof DatagramAcceptor) {
-            return ((DatagramAcceptor) service).getProcessor();
-        } else {
-            return ((DatagramConnector) service).getProcessor();
-        }
+        return processor;
     }
 
     public DatagramSessionConfig getConfig() {
@@ -147,16 +124,6 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
 
     public TransportMetadata getTransportMetadata() {
         return METADATA;
-    }
-
-    @Override
-    public CloseFuture close() {
-        if (service instanceof IoAcceptor) {
-            ((DatagramAcceptor) service).getSessionRecycler()
-                    .remove(this);
-        }
-        CloseFuture answer = super.close();
-        return answer;
     }
 
     @Override
@@ -197,7 +164,6 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
                     ch.socket().setReceiveBufferSize(receiveBufferSize);
                     // Re-retrieve the effective receive buffer size.
                     receiveBufferSize = ch.socket().getReceiveBufferSize();
-                    DatagramSessionImpl.this.config.setReadBufferSize(receiveBufferSize);
                 } catch (SocketException e) {
                     throw new RuntimeIOException(e);
                 }

@@ -103,8 +103,9 @@ public class DummySession extends AbstractIoSession {
             public void add(IoSession session) {
             }
 
-            public void flush(IoSession session, WriteRequest writeRequest) {
-                getFilterChain().fireMessageSent(session, writeRequest);
+            public void flush(IoSession session) {
+                getFilterChain().fireMessageSent(
+                        ((DummySession) session).getWriteRequestQueue().poll());
             }
 
             public void remove(IoSession session) {

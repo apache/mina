@@ -157,8 +157,8 @@ public class IoServiceListenerSupport {
         }
 
         // Fire session events.
-        session.getFilterChain().fireSessionCreated(session);
-        session.getFilterChain().fireSessionOpened(session);
+        session.getFilterChain().fireSessionCreated();
+        session.getFilterChain().fireSessionOpened();
 
         // Fire listener events.
         synchronized (listeners) {
@@ -183,7 +183,7 @@ public class IoServiceListenerSupport {
         }
 
         // Fire session events.
-        session.getFilterChain().fireSessionClosed(session);
+        session.getFilterChain().fireSessionClosed();
 
         // Fire listener events.
         try {

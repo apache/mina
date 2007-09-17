@@ -102,7 +102,7 @@ public class IdleStatusChecker {
         if (idleTime > 0 && lastIoTime != 0
                 && currentTime - lastIoTime >= idleTime) {
             session.increaseIdleCount(status);
-            session.getFilterChain().fireSessionIdle(session, status);
+            session.getFilterChain().fireSessionIdle(status);
         }
     }
 

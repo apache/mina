@@ -86,14 +86,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                     if (!s.getTrafficMask().isReadable()) {
                         s.receivedMessageQueue.add(data);
                     } else {
-                        int byteCount = 1;
-                        if (data instanceof ByteBuffer) {
-                            byteCount = ((ByteBuffer) data).remaining();
-                        }
-
-                        s.increaseReadBytes(byteCount);
-
-                        super.fireMessageReceived(s, data);
+                        super.fireMessageReceived(data);
                     }
                 } finally {
                     s.getLock().unlock();
@@ -102,22 +95,22 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 s.receivedMessageQueue.add(data);
             }
         } else if (type == IoEventType.WRITE) {
-            super.fireFilterWrite(session, (WriteRequest) data);
+            super.fireFilterWrite((WriteRequest) data);
         } else if (type == IoEventType.MESSAGE_SENT) {
-            super.fireMessageSent(session, (WriteRequest) data);
+            super.fireMessageSent((WriteRequest) data);
         } else if (type == IoEventType.EXCEPTION_CAUGHT) {
-            super.fireExceptionCaught(session, (Throwable) data);
+            super.fireExceptionCaught((Throwable) data);
         } else if (type == IoEventType.SESSION_IDLE) {
-            super.fireSessionIdle(session, (IdleStatus) data);
+            super.fireSessionIdle((IdleStatus) data);
         } else if (type == IoEventType.SESSION_OPENED) {
-            super.fireSessionOpened(session);
+            super.fireSessionOpened();
             sessionOpened = true;
         } else if (type == IoEventType.SESSION_CREATED) {
-            super.fireSessionCreated(session);
+            super.fireSessionCreated();
         } else if (type == IoEventType.SESSION_CLOSED) {
-            super.fireSessionClosed(session);
+            super.fireSessionClosed();
         } else if (type == IoEventType.CLOSE) {
-            super.fireFilterClose(session);
+            super.fireFilterClose();
         }
     }
 
@@ -127,52 +120,52 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     }
 
     @Override
-    public void fireFilterClose(IoSession session) {
-        pushEvent(new IoEvent(IoEventType.CLOSE, session, null));
+    public void fireFilterClose() {
+        pushEvent(new IoEvent(IoEventType.CLOSE, getSession(), null));
     }
 
     @Override
-    public void fireFilterWrite(IoSession session, WriteRequest writeRequest) {
-        pushEvent(new IoEvent(IoEventType.WRITE, session, writeRequest));
+    public void fireFilterWrite(WriteRequest writeRequest) {
+        pushEvent(new IoEvent(IoEventType.WRITE, getSession(), writeRequest));
     }
 
     @Override
-    public void fireExceptionCaught(IoSession session, Throwable cause) {
-        pushEvent(new IoEvent(IoEventType.EXCEPTION_CAUGHT, session, cause));
+    public void fireExceptionCaught(Throwable cause) {
+        pushEvent(new IoEvent(IoEventType.EXCEPTION_CAUGHT, getSession(), cause));
     }
 
     @Override
-    public void fireMessageSent(IoSession session, WriteRequest request) {
-        pushEvent(new IoEvent(IoEventType.MESSAGE_SENT, session, request));
+    public void fireMessageSent(WriteRequest request) {
+        pushEvent(new IoEvent(IoEventType.MESSAGE_SENT, getSession(), request));
     }
 
     @Override
-    public void fireSessionClosed(IoSession session) {
-        pushEvent(new IoEvent(IoEventType.SESSION_CLOSED, session, null));
+    public void fireSessionClosed() {
+        pushEvent(new IoEvent(IoEventType.SESSION_CLOSED, getSession(), null));
     }
 
     @Override
-    public void fireSessionCreated(IoSession session) {
-        pushEvent(new IoEvent(IoEventType.SESSION_CREATED, session, null));
+    public void fireSessionCreated() {
+        pushEvent(new IoEvent(IoEventType.SESSION_CREATED, getSession(), null));
     }
 
     @Override
-    public void fireSessionIdle(IoSession session, IdleStatus status) {
-        pushEvent(new IoEvent(IoEventType.SESSION_IDLE, session, status));
+    public void fireSessionIdle(IdleStatus status) {
+        pushEvent(new IoEvent(IoEventType.SESSION_IDLE, getSession(), status));
     }
 
     @Override
-    public void fireSessionOpened(IoSession session) {
-        pushEvent(new IoEvent(IoEventType.SESSION_OPENED, session, null));
+    public void fireSessionOpened() {
+        pushEvent(new IoEvent(IoEventType.SESSION_OPENED, getSession(), null));
     }
 
     @Override
-    public void fireMessageReceived(IoSession session, Object message) {
-        pushEvent(new IoEvent(IoEventType.MESSAGE_RECEIVED, session, message));
+    public void fireMessageReceived(Object message) {
+        pushEvent(new IoEvent(IoEventType.MESSAGE_RECEIVED, getSession(), message));
     }
 
     private class VmPipeIoProcessor implements IoProcessor {
-        public void flush(IoSession session, WriteRequest writeRequest) {
+        public void flush(IoSession session) {
             VmPipeSessionImpl s = (VmPipeSessionImpl) session;
             Queue<WriteRequest> queue = s.getWriteRequestQueue();
             if (queue.isEmpty()) {
@@ -183,13 +176,11 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                     try {
                         WriteRequest req;
                         while ((req = queue.poll()) != null) {
-                            int byteCount = 0;
                             Object message = req.getMessage();
                             Object messageCopy = message;
                             if (message instanceof ByteBuffer) {
                                 ByteBuffer rb = (ByteBuffer) message;
                                 rb.mark();
-                                byteCount = rb.remaining();
                                 ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
                                 wb.put(rb);
                                 wb.flip();
@@ -197,12 +188,9 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                                 messageCopy = wb;
                             }
 
-                            s.increaseWrittenBytes(byteCount);
-                            s.increaseWrittenMessages();
-
                             s.getRemoteSession().getFilterChain().fireMessageReceived(
-                                    s.getRemoteSession(), messageCopy);
-                            s.getFilterChain().fireMessageSent(s, req);
+                                    messageCopy);
+                            s.getFilterChain().fireMessageSent(req);
                         }
                     } finally {
                         s.getLock().unlock();
@@ -240,15 +228,12 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 List<Object> data = new ArrayList<Object>();
                 s.receivedMessageQueue.drainTo(data);
                 for (Object aData : data) {
-                    // TODO Optimize inefficient data transfer.
-                    // Data will be returned to pendingDataQueue
-                    // if getTraffic().isReadable() is false.
-                    VmPipeFilterChain.this.fireMessageReceived(s, aData);
+                    VmPipeFilterChain.this.fireMessageReceived(aData);
                 }
             }
 
             if (s.getTrafficMask().isWritable()) {
-                flush(s, null); // The second parameter is unused.
+                flush(s); // The second parameter is unused.
             }
         }
     }

@@ -34,8 +34,6 @@ import org.apache.mina.util.NamePreservingRunnable;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- *
- * TODO Provide abstraction for bind, unbind and connect (+ cancellation)
  */
 public abstract class AbstractIoProcessor implements IoProcessor {
 
@@ -96,7 +94,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         startupWorker();
     }
 
-    public void flush(IoSession session, WriteRequest writeRequest) {
+    public void flush(IoSession session) {
         boolean needsWakeup = flushingSessions.isEmpty();
         if (scheduleFlush((AbstractIoSession) session) && needsWakeup) {
             wakeup();
@@ -160,7 +158,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 if (notified) {
                     // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
                     // and call ConnectFuture.setException().
-                    session.getFilterChain().fireExceptionCaught(session, e);
+                    session.getFilterChain().fireExceptionCaught(e);
                     scheduleRemove(session);
                     wakeup();
                 } else {
@@ -193,7 +191,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     doRemove(session);
                     removedSessions ++;
                 } catch (Exception e) {
-                    session.getFilterChain().fireExceptionCaught(session, e);
+                    session.getFilterChain().fireExceptionCaught(e);
                 } finally {
                     clearWriteRequestQueue(session);
                     ((AbstractIoService) session.getService()).getListeners().fireSessionDestroyed(session);
@@ -256,10 +254,8 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 buf.flip();
             }
 
-            session.increaseReadBytes(readBytes);
-
             if (readBytes > 0) {
-                session.getFilterChain().fireMessageReceived(session, buf);
+                session.getFilterChain().fireMessageReceived(buf);
                 buf = null;
 
                 if (session.getTransportMetadata().hasFragmentation()) {
@@ -282,9 +278,9 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             }
         } catch (IOException e) {
             scheduleRemove(session);
-            session.getFilterChain().fireExceptionCaught(session, e);
+            session.getFilterChain().fireExceptionCaught(e);
         } catch (Throwable e) {
-            session.getFilterChain().fireExceptionCaught(session, e);
+            session.getFilterChain().fireExceptionCaught(e);
         }
     }
 
@@ -298,7 +294,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 try {
                     notifyIdleness(session, currentTime);
                 } catch (Exception e) {
-                    session.getFilterChain().fireExceptionCaught(session, e);
+                    session.getFilterChain().fireExceptionCaught(e);
                 }
             }
         }
@@ -327,7 +323,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         if (idleTime > 0 && lastIoTime != 0
                 && currentTime - lastIoTime >= idleTime) {
             session.increaseIdleCount(status);
-            session.getFilterChain().fireSessionIdle(session, status);
+            session.getFilterChain().fireSessionIdle(status);
         }
     }
 
@@ -335,8 +331,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                                     long currentTime, long writeTimeout, long lastIoTime) throws Exception {
         if (writeTimeout > 0 && currentTime - lastIoTime >= writeTimeout
                 && (interestOps(session) & SelectionKey.OP_WRITE) != 0) {
-            session.getFilterChain().fireExceptionCaught(session,
-                    new WriteTimeoutException());
+            session.getFilterChain().fireExceptionCaught(new WriteTimeoutException());
         }
     }
 
@@ -369,7 +364,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     }
                 } catch (Exception e) {
                     scheduleRemove(session);
-                    session.getFilterChain().fireExceptionCaught(session, e);
+                    session.getFilterChain().fireExceptionCaught(e);
                 }
                 break;
             case CLOSED:
@@ -400,7 +395,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 if (buf.hasRemaining()) {
                     req.getFuture().setWritten(false);
                 } else {
-                    session.getFilterChain().fireMessageSent(session, req);
+                    session.getFilterChain().fireMessageSent(req);
                 }
             } else {
                 req.getFuture().setWritten(false);
@@ -424,66 +419,58 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         int maxWrittenBytes = session.getConfig().getMaxReadBufferSize();
         int writtenBytes = 0;
 
-        try {
-            do {
-                // Check for pending writes.
-                WriteRequest req = writeRequestQueue.peek();
+        do {
+            // Check for pending writes.
+            WriteRequest req = writeRequestQueue.peek();
 
-                if (req == null) {
-                    break;
+            if (req == null) {
+                break;
+            }
+
+            Object message = req.getMessage();
+            if (message instanceof FileRegion) {
+                FileRegion region = (FileRegion) message;
+
+                if (region.getCount() <= 0) {
+                    // File has been sent, remove from queue
+                    writeRequestQueue.poll();
+                    session.getFilterChain().fireMessageSent(req);
+                    continue;
                 }
 
-                Object message = req.getMessage();
-                if (message instanceof FileRegion) {
-                    FileRegion region = (FileRegion) message;
-
-                    if (region.getCount() <= 0) {
-                        // File has been sent, remove from queue
-                        writeRequestQueue.poll();
-                        session.increaseWrittenMessages();
-                        session.getFilterChain().fireMessageSent(session, req);
-                        continue;
-                    }
-
-                    if ((readyOps(session) & SelectionKey.OP_WRITE) != 0) {
-                        long localWrittenBytes = transferFile(session, region);
-                        region.setPosition(region.getPosition() + localWrittenBytes);
-                        writtenBytes += localWrittenBytes;
-                    }
-
-                    if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
-                        // Kernel buffer is full or wrote too much.
-                        interestOps(session, interestOps(session) | SelectionKey.OP_WRITE);
-                        return false;
-                    }
-
-                } else {
-                    ByteBuffer buf = (ByteBuffer) message;
-                    if (buf.remaining() == 0) {
-                        // Buffer has been completely sent, remove request form queue
-                        writeRequestQueue.poll();
-
-                        session.increaseWrittenMessages();
-
-                        buf.reset();
-                        session.getFilterChain().fireMessageSent(session, req);
-                        continue;
-                    }
-
-                    if ((readyOps(session) & SelectionKey.OP_WRITE) != 0) {
-                        writtenBytes += write(session, buf);
-                    }
-
-                    if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
-                        // Kernel buffer is full or wrote too much.
-                        interestOps(session, interestOps(session) | SelectionKey.OP_WRITE);
-                        return false;
-                    }
+                if ((readyOps(session) & SelectionKey.OP_WRITE) != 0) {
+                    long localWrittenBytes = transferFile(session, region);
+                    region.setPosition(region.getPosition() + localWrittenBytes);
+                    writtenBytes += localWrittenBytes;
                 }
-            } while (writtenBytes < maxWrittenBytes);
-        } finally {
-            session.increaseWrittenBytes(writtenBytes);
-        }
+
+                if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
+                    // Kernel buffer is full or wrote too much.
+                    interestOps(session, interestOps(session) | SelectionKey.OP_WRITE);
+                    return false;
+                }
+
+            } else {
+                ByteBuffer buf = (ByteBuffer) message;
+                if (buf.remaining() == 0) {
+                    // Buffer has been completely sent, remove request form queue
+                    writeRequestQueue.poll();
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(req);
+                    continue;
+                }
+
+                if ((readyOps(session) & SelectionKey.OP_WRITE) != 0) {
+                    writtenBytes += write(session, buf);
+                }
+
+                if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
+                    // Kernel buffer is full or wrote too much.
+                    interestOps(session, interestOps(session) | SelectionKey.OP_WRITE);
+                    return false;
+                }
+            }
+        } while (writtenBytes < maxWrittenBytes);
 
         return true;
     }
@@ -511,7 +498,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 try {
                     interestOps(session, ops & mask);
                 } catch (Exception e) {
-                    session.getFilterChain().fireExceptionCaught(session, e);
+                    session.getFilterChain().fireExceptionCaught(e);
                 }
                 break;
             case CLOSED:

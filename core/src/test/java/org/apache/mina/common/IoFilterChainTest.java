@@ -196,13 +196,13 @@ public class IoFilterChainTest extends TestCase {
     }
 
     private void run(String expectedResult) {
-        chain.fireSessionCreated(session);
-        chain.fireSessionOpened(session);
-        chain.fireMessageReceived(session, new Object());
-        chain.fireFilterWrite(session, new DefaultWriteRequest(new Object()));
-        chain.fireSessionIdle(session, IdleStatus.READER_IDLE);
-        chain.fireExceptionCaught(session, new Exception());
-        chain.fireSessionClosed(session);
+        chain.fireSessionCreated();
+        chain.fireSessionOpened();
+        chain.fireMessageReceived(new Object());
+        chain.fireFilterWrite(new DefaultWriteRequest(new Object()));
+        chain.fireSessionIdle(IdleStatus.READER_IDLE);
+        chain.fireExceptionCaught(new Exception());
+        chain.fireSessionClosed();
 
         result = formatResult(result);
         expectedResult = formatResult(expectedResult);

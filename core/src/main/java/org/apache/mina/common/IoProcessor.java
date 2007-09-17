@@ -39,10 +39,8 @@ public interface IoProcessor {
     /**
      * Flushes the internal write request queue of the specified
      * {@code session}.
-     *
-     * @param writeRequest the write request added right now
      */
-    void flush(IoSession session, WriteRequest writeRequest);
+    void flush(IoSession session);
 
     /**
      * Controls the traffic of the specified {@code session} as specified
