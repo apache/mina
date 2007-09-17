@@ -97,7 +97,6 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
         }
 
         setLocalAddress(localAddress);
-        getListeners().fireServiceActivated();
     }
 
     @Override

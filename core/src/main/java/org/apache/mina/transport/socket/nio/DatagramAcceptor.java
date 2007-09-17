@@ -362,7 +362,6 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                 ch.register(selector, SelectionKey.OP_READ, future);
                 this.channel = ch;
 
-                getListeners().fireServiceActivated();
                 future.setDone();
             } catch (Exception e) {
                 future.setException(e);

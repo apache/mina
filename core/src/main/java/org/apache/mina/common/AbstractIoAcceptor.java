@@ -102,6 +102,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
             }
             bound = true;
         }
+        getListeners().fireServiceActivated();
     }
 
     public final void unbind() {
@@ -120,6 +121,8 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
             }
             bound = false;
         }
+        
+        getListeners().fireServiceDeactivated();
     }
 
     public boolean isBound() {

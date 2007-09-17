@@ -31,12 +31,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
+import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.util.NamePreservingRunnable;
@@ -349,10 +348,5 @@ public class SocketConnector extends AbstractIoConnector {
             this.deadline = System.currentTimeMillis()
                     + getConnectTimeoutMillis();
         }
-    }
-
-    @Override
-    protected IoServiceListenerSupport getListeners() {
-        return super.getListeners();
     }
 }

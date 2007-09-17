@@ -36,7 +36,6 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
@@ -447,7 +446,6 @@ public class SocketAcceptor extends AbstractIoAcceptor {
                 serverSocketChannel = ssc;
 
                 // and notify.
-                getListeners().fireServiceActivated();
                 future.setDone();
             } catch (Exception e) {
                 future.setException(e);
@@ -489,7 +487,6 @@ public class SocketAcceptor extends AbstractIoAcceptor {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
             } finally {
                 future.setDone();
-                getListeners().fireServiceDeactivated();
             }
         }
     }
@@ -499,10 +496,5 @@ public class SocketAcceptor extends AbstractIoAcceptor {
      */
     public IoSession newSession(SocketAddress remoteAddress) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected IoServiceListenerSupport getListeners() {
-        return super.getListeners();
     }
 }
