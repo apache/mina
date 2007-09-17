@@ -81,23 +81,13 @@ public class DatagramConnector extends AbstractIoConnector {
         IoSession session = null;
         try {
             ch = DatagramChannel.open();
-            DatagramSessionConfig cfg = getSessionConfig();
-
-            ch.socket().setReuseAddress(cfg.isReuseAddress());
-            ch.socket().setBroadcast(cfg.isBroadcast());
-            ch.socket().setReceiveBufferSize(cfg.getReceiveBufferSize());
-            ch.socket().setSendBufferSize(cfg.getSendBufferSize());
-
-            if (ch.socket().getTrafficClass() != cfg.getTrafficClass()) {
-                ch.socket().setTrafficClass(cfg.getTrafficClass());
-            }
+            session = new DatagramSessionImpl(this, ch, getHandler());
 
             if (localAddress != null) {
                 ch.socket().bind(localAddress);
             }
             ch.connect(remoteAddress);
 
-            session = new DatagramSessionImpl(this, ch, getHandler());
             ConnectFuture future = new DefaultConnectFuture();
             // DefaultIoFilterChain will notify the connect future.
             session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);
