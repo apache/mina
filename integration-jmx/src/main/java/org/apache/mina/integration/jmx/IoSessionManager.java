@@ -113,10 +113,10 @@ public class IoSessionManager implements IoSessionManagerMBean {
      * @see archean.util.mina.IoSessionManagerMBean#getInstalledFilters()
      */
     public String[] getInstalledFilters() {
-        List filters = session.getFilterChain().getAll();
+        List<IoFilterChain.Entry> filters = session.getFilterChain().getAll();
         String[] res = new String[filters.size()];
         for (int i = 0; i < res.length; i++) {
-            res[i] = ((IoFilterChain.Entry) filters.get(i)).getName();
+            res[i] = filters.get(i).getName();
         }
         return res;
     }
