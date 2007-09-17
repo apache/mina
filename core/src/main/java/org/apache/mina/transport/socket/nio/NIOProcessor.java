@@ -115,19 +115,36 @@ class NIOProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected int readyOps(IoSession session) throws Exception {
-        return getSelectionKey(session).readyOps();
+    protected boolean isReadable(IoSession session) throws Exception {
+        return  (getSelectionKey(session).readyOps() & SelectionKey.OP_READ)>0;
     }
 
     @Override
-    protected int interestOps(IoSession session) throws Exception {
-        return getSelectionKey(session).interestOps();
+    protected boolean isWritable(IoSession session) throws Exception {
+        return  (getSelectionKey(session).readyOps() & SelectionKey.OP_WRITE)>0;
     }
 
     @Override
-    protected void interestOps(IoSession session, int interestOps) throws Exception {
-        getSelectionKey(session).interestOps(interestOps);
+    protected boolean isOpRead(IoSession session) throws Exception {
+        return  (getSelectionKey(session).interestOps() & SelectionKey.OP_READ)>0;
     }
+
+    @Override
+    protected boolean isOpWrite(IoSession session) throws Exception {
+        return  (getSelectionKey(session).interestOps() & SelectionKey.OP_WRITE)>0;
+    }
+
+    @Override
+    protected void setOpRead(IoSession session, boolean value) throws Exception {
+        getSelectionKey(session).interestOps( getSelectionKey(session).interestOps() | SelectionKey.OP_READ);
+    }
+
+    @Override
+    protected void setOpWrite(IoSession session, boolean value)
+            throws Exception {
+        getSelectionKey(session).interestOps( getSelectionKey(session).interestOps() | SelectionKey.OP_WRITE);
+    }
+    
 
     @Override
     protected int read(IoSession session, ByteBuffer buf) throws Exception {
@@ -175,4 +192,5 @@ class NIOProcessor extends AbstractIoProcessor {
             i.remove();
         }
     }
+
 }

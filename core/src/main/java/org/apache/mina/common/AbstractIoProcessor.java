@@ -67,12 +67,54 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     protected abstract Iterator<AbstractIoSession> selectedSessions() throws Exception;
 
     protected abstract SessionState state(IoSession session);
-
-    protected abstract int readyOps(IoSession session) throws Exception;
-
-    protected abstract int interestOps(IoSession session) throws Exception;
-
-    protected abstract void interestOps(IoSession session, int interestOps) throws Exception;
+    
+    
+    /**
+     * Is the session ready for writing
+     * @param session the session queried
+     * @return true is ready, false if not ready
+     * @throws Exception if some low level IO error occurs
+     */
+    protected abstract boolean isWritable(IoSession session) throws Exception;
+    
+    /**
+     * Is the session ready for reading
+     * @param session the session queried
+     * @return true is ready, false if not ready
+     * @throws Exception if some low level IO error occurs
+     */
+    protected abstract boolean isReadable(IoSession session) throws Exception;
+    /**
+     * register a session for writing 
+     * @param session the session registered
+     * @param value true for registering, false for removing
+     * @throws Exception if some low level IO error occurs
+     */
+    protected abstract void setOpWrite(IoSession session,boolean value) throws Exception;
+    
+    /**
+     * register a session for reading 
+     * @param session the session registered
+     * @param value true for registering, false for removing
+     * @throws Exception if some low level IO error occurs
+     */
+    protected abstract void setOpRead(IoSession session,boolean value) throws Exception;
+    
+    /**
+     * is this session registered for reading
+     * @param session the session queried
+     * @return true is registered for reading 
+     * @throws Exception if some low level IO error occurs
+     */
+    protected abstract boolean isOpRead(IoSession session) throws Exception;
+    
+    /**
+     * is this session registered for writing
+     * @param session the session queried
+     * @return true is registered for writing 
+     * @throws Exception if some low level IO error occurs
+     */
+    protected abstract boolean isOpWrite(IoSession session) throws Exception;
 
     protected abstract void doAdd(IoSession session) throws Exception;
 
@@ -221,12 +263,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     }
 
     private void process(AbstractIoSession session) throws Exception {
-        int readyOps = readyOps(session);
-        if ((readyOps & SelectionKey.OP_READ) != 0 && session.getTrafficMask().isReadable()) {
+        
+        if (isReadable(session) && session.getTrafficMask().isReadable()) {
             read(session);
         }
 
-        if ((readyOps & SelectionKey.OP_WRITE) != 0 && session.getTrafficMask().isWritable()) {
+        if (isWritable(session) && session.getTrafficMask().isWritable()) {
             scheduleFlush(session);
         }
     }
@@ -330,7 +372,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     private void notifyWriteTimeout(AbstractIoSession session,
                                     long currentTime, long writeTimeout, long lastIoTime) throws Exception {
         if (writeTimeout > 0 && currentTime - lastIoTime >= writeTimeout
-                && (interestOps(session) & SelectionKey.OP_WRITE) != 0) {
+                && isOpWrite(session)) {
             session.getFilterChain().fireExceptionCaught(new WriteTimeoutException());
         }
     }
@@ -410,7 +452,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
     private boolean flush(AbstractIoSession session) throws Exception {
         // Clear OP_WRITE
-        interestOps(session, interestOps(session) & ~SelectionKey.OP_WRITE);
+        setOpWrite(session,false);
 
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
@@ -438,7 +480,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     continue;
                 }
 
-                if ((readyOps(session) & SelectionKey.OP_WRITE) != 0) {
+                if (isWritable(session)) {
                     long localWrittenBytes = transferFile(session, region);
                     region.setPosition(region.getPosition() + localWrittenBytes);
                     writtenBytes += localWrittenBytes;
@@ -446,7 +488,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
                 if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
-                    interestOps(session, interestOps(session) | SelectionKey.OP_WRITE);
+                    setOpWrite(session, true);
                     return false;
                 }
 
@@ -460,13 +502,13 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     continue;
                 }
 
-                if ((readyOps(session) & SelectionKey.OP_WRITE) != 0) {
+                if (isWritable(session)) {
                     writtenBytes += write(session, buf);
                 }
 
                 if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
-                    interestOps(session, interestOps(session) | SelectionKey.OP_WRITE);
+                    setOpWrite(session, true);
                     return false;
                 }
             }
@@ -496,7 +538,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 // Now mask the preferred ops with the mask of the current session
                 int mask = session.getTrafficMask().getInterestOps();
                 try {
-                    interestOps(session, ops & mask);
+                    setOpRead(session, isOpRead(session) || ( (mask &SelectionKey.OP_READ) >0) );
+                } catch (Exception e) {
+                    session.getFilterChain().fireExceptionCaught(e);
+                }
+                try {
+                    setOpWrite(session, isOpWrite(session) || ( (mask &SelectionKey.OP_WRITE) >0) );
                 } catch (Exception e) {
                     session.getFilterChain().fireExceptionCaught(e);
                 }
