@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.transport.socket;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -38,7 +38,7 @@ import org.apache.mina.common.ExceptionMonitor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
+public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     private static Map<InetSocketAddress, InetAddress> TEST_ADDRESSES = new LinkedHashMap<InetSocketAddress, InetAddress>();
 
@@ -236,7 +236,7 @@ class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     /**
      * Creates a new instance.
      */
-    DefaultSocketSessionConfig() {
+    public DefaultSocketSessionConfig() {
     }
 
     public boolean isReuseAddress() {

@@ -39,6 +39,8 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
+import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
@@ -49,7 +51,9 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
-public class SocketAcceptor extends AbstractIoAcceptor {
+public class SocketAcceptor extends AbstractIoAcceptor implements
+        org.apache.mina.transport.socket.SocketAcceptor {
+
     /**
      * @noinspection StaticNonFinalField
      */

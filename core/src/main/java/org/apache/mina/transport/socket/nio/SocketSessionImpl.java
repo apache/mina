@@ -35,6 +35,10 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
+import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
+import org.apache.mina.transport.socket.SocketSession;
+import org.apache.mina.transport.socket.SocketSessionConfig;
 
 /**
  * An {@link IoSession} for socket transport (TCP/IP).

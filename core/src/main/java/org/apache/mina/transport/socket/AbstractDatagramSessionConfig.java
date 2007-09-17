@@ -17,38 +17,34 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.transport.socket;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.transport.AbstractBindTest;
+import org.apache.mina.common.AbstractIoSessionConfig;
+import org.apache.mina.common.IoSessionConfig;
 
 /**
- * Tests {@link NIODatagramAcceptor} resource leakage.
- *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramBindTest extends AbstractBindTest {
+public abstract class AbstractDatagramSessionConfig extends
+        AbstractIoSessionConfig implements DatagramSessionConfig {
 
-    public DatagramBindTest() {
-        super(new DatagramAcceptor());
-    }
-
-    @Override
-    protected SocketAddress createSocketAddress(int port) {
-        return new InetSocketAddress("localhost", port);
+    protected AbstractDatagramSessionConfig() {
     }
 
     @Override
-    protected int getPort(SocketAddress address) {
-        return ((InetSocketAddress) address).getPort();
+    protected void doSetAll(IoSessionConfig config) {
+        if (config instanceof DatagramSessionConfig) {
+            DatagramSessionConfig cfg = (DatagramSessionConfig) config;
+            setBroadcast(cfg.isBroadcast());
+            setReceiveBufferSize(cfg.getReceiveBufferSize());
+            setReuseAddress(cfg.isReuseAddress());
+            setSendBufferSize(cfg.getSendBufferSize());
+
+            if (getTrafficClass() != cfg.getTrafficClass()) {
+                setTrafficClass(cfg.getTrafficClass());
+            }
+        }
     }
-    
-    @Override
-    protected IoConnector newConnector() {
-        return new DatagramConnector();
-    }
+
 }

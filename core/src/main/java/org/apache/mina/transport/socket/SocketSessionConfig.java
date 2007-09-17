@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.transport.socket;
 
 import java.net.Socket;
 

@@ -17,38 +17,42 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.transport.socket;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
+import java.net.ServerSocket;
 
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.transport.AbstractBindTest;
+import org.apache.mina.common.IoAcceptor;
 
 /**
- * Tests {@link NIODatagramAcceptor} resource leakage.
+ * {@link IoAcceptor} for socket transport (TCP/IP).  This class
+ * handles incoming TCP/IP based socket connections.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramBindTest extends AbstractBindTest {
-
-    public DatagramBindTest() {
-        super(new DatagramAcceptor());
-    }
-
-    @Override
-    protected SocketAddress createSocketAddress(int port) {
-        return new InetSocketAddress("localhost", port);
-    }
-
-    @Override
-    protected int getPort(SocketAddress address) {
-        return ((InetSocketAddress) address).getPort();
-    }
+public interface SocketAcceptor extends SocketService, IoAcceptor {
+    public InetSocketAddress getLocalAddress();
+    public void setLocalAddress(InetSocketAddress localAddress);
     
-    @Override
-    protected IoConnector newConnector() {
-        return new DatagramConnector();
-    }
+    /**
+     * @see ServerSocket#getReuseAddress()
+     */
+    public boolean isReuseAddress();
+
+    /**
+     * @see ServerSocket#setReuseAddress(boolean)
+     */
+    public void setReuseAddress(boolean reuseAddress);
+
+    /**
+     * Returns the size of the backlog.
+     */
+    public int getBacklog();
+
+    /**
+     * Sets the size of the backlog.  This can only be done when this
+     * class is not bound
+     */
+    public void setBacklog(int backlog);
 }

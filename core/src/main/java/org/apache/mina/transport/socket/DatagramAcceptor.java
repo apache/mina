@@ -17,38 +17,19 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.transport.socket;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.transport.AbstractBindTest;
+import org.apache.mina.common.IoAcceptor;
 
 /**
- * Tests {@link NIODatagramAcceptor} resource leakage.
+ * {@link IoAcceptor} for datagram transport (UDP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramBindTest extends AbstractBindTest {
-
-    public DatagramBindTest() {
-        super(new DatagramAcceptor());
-    }
-
-    @Override
-    protected SocketAddress createSocketAddress(int port) {
-        return new InetSocketAddress("localhost", port);
-    }
-
-    @Override
-    protected int getPort(SocketAddress address) {
-        return ((InetSocketAddress) address).getPort();
-    }
-    
-    @Override
-    protected IoConnector newConnector() {
-        return new DatagramConnector();
-    }
+public interface DatagramAcceptor extends DatagramService, IoAcceptor {
+    InetSocketAddress getLocalAddress();
+    void setLocalAddress(InetSocketAddress localAddress);
 }

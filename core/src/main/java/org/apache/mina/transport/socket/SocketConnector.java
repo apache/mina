@@ -17,34 +17,15 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.transport.socket;
 
-import org.apache.mina.common.AbstractIoSessionConfig;
-import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.IoConnector;
 
 /**
+ * {@link IoConnector} for socket transport (TCP/IP).
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-abstract class AbstractDatagramSessionConfig extends
-        AbstractIoSessionConfig implements DatagramSessionConfig {
-
-    protected AbstractDatagramSessionConfig() {
-    }
-
-    @Override
-    protected void doSetAll(IoSessionConfig config) {
-        if (config instanceof DatagramSessionConfig) {
-            DatagramSessionConfig cfg = (DatagramSessionConfig) config;
-            setBroadcast(cfg.isBroadcast());
-            setReceiveBufferSize(cfg.getReceiveBufferSize());
-            setReuseAddress(cfg.isReuseAddress());
-            setSendBufferSize(cfg.getSendBufferSize());
-
-            if (getTrafficClass() != cfg.getTrafficClass()) {
-                setTrafficClass(cfg.getTrafficClass());
-            }
-        }
-    }
-
+public interface SocketConnector extends SocketService, IoConnector {
 }

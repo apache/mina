@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.transport.socket;
 
 import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.IoSessionConfig;
@@ -26,7 +26,7 @@ import org.apache.mina.common.IoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfig
+public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfig
         implements SocketSessionConfig {
 
     protected AbstractSocketSessionConfig() {

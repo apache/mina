@@ -44,6 +44,8 @@ import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
 import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.transport.socket.DatagramSessionConfig;
+import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
@@ -54,7 +56,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @version $Rev$, $Date$
  */
 public class DatagramAcceptor extends AbstractIoAcceptor implements
-        IoAcceptor {
+        org.apache.mina.transport.socket.DatagramAcceptor {
 
     private static volatile int nextId = 0;
 

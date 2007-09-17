@@ -37,6 +37,8 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.transport.socket.DatagramSessionConfig;
+import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 import org.apache.mina.util.NewThreadExecutor;
 
 /**
@@ -45,7 +47,9 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends AbstractIoConnector {
+public class DatagramConnector extends AbstractIoConnector implements
+        org.apache.mina.transport.socket.DatagramConnector{
+
     private static volatile int nextId = 0;
 
     private final int id = nextId++;

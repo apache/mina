@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.transport.socket;
 
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -30,7 +30,7 @@ import org.apache.mina.common.ExceptionMonitor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 439913 $, $Date: 2006-09-04 05:12:43 +0200 (mån, 04 sep 2006) $
  */
-class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig {
+public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig {
 
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
 
@@ -126,7 +126,7 @@ class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig {
     /**
      * Creates a new instance.
      */
-    DefaultDatagramSessionConfig() {
+    public DefaultDatagramSessionConfig() {
     }
 
     /**
