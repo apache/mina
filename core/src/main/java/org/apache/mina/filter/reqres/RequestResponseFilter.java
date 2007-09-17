@@ -52,9 +52,9 @@ public class RequestResponseFilter extends IoFilterAdapter {
             .getName()
             + ".requestStore";
 
-    private static final String UNRESPONDED_REQUESTS = RequestResponseFilter.class
+    private static final String UNRESPONDED_REQUEST_STORE = RequestResponseFilter.class
             .getName()
-            + ".unrespondedRequests";
+            + ".unrespondedRequestStore";
 
     private final ResponseInspectorFactory responseInspectorFactory;
 
@@ -95,17 +95,19 @@ public class RequestResponseFilter extends IoFilterAdapter {
         IoSession session = parent.getSession();
         session.setAttribute(RESPONSE_INSPECTOR, responseInspectorFactory
                 .getResponseInspector());
-        session.setAttribute(REQUEST_STORE, new HashMap<Object, Request>());
-        session
-                .setAttribute(UNRESPONDED_REQUESTS,
-                        new LinkedHashSet<Request>());
+        session.setAttribute(REQUEST_STORE, createRequestStore(session));
+        session.setAttribute(UNRESPONDED_REQUEST_STORE, createUnrespondedRequestStore(session));
     }
 
     @Override
     public void onPostRemove(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
         IoSession session = parent.getSession();
-        session.removeAttribute(UNRESPONDED_REQUESTS);
+        
+        destroyUnrespondedRequestStore(getUnrespondedRequestStore(session));
+        destroyRequestStore(getRequestStore(session));
+        
+        session.removeAttribute(UNRESPONDED_REQUEST_STORE);
         session.removeAttribute(REQUEST_STORE);
         session.removeAttribute(RESPONSE_INSPECTOR);
     }
@@ -164,7 +166,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
                 ScheduledFuture<?> scheduledFuture = request.getTimeoutFuture();
                 if (scheduledFuture != null) {
                     scheduledFuture.cancel(false);
-                    Set<Request> unrespondedRequests = getUnrespondedRequests(session);
+                    Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
                     synchronized (unrespondedRequests) {
                         unrespondedRequests.remove(request);
                     }
@@ -241,7 +243,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
             request.setTimeoutFuture(timeoutFuture);
 
             // Add the timtoue task to the unfinished task set.
-            Set<Request> unrespondedRequests = getUnrespondedRequests(session);
+            Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
             synchronized (unrespondedRequests) {
                 unrespondedRequests.add(request);
             }
@@ -258,7 +260,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
             throws Exception {
         // Copy the unifished task set to avoid unnecessary lock acquisition.
         // Copying will be cheap because there won't be that many requests queued.
-        Set<Request> unrespondedRequests = getUnrespondedRequests(session);
+        Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
         List<Request> unrespondedRequestsCopy;
         synchronized (unrespondedRequests) {
             unrespondedRequestsCopy = new ArrayList<Request>(
@@ -289,8 +291,60 @@ public class RequestResponseFilter extends IoFilterAdapter {
     }
 
     @SuppressWarnings("unchecked")
-    private Set<Request> getUnrespondedRequests(IoSession session) {
-        return (Set<Request>) session.getAttribute(UNRESPONDED_REQUESTS);
+    private Set<Request> getUnrespondedRequestStore(IoSession session) {
+        return (Set<Request>) session.getAttribute(UNRESPONDED_REQUEST_STORE);
+    }
+    
+    /**
+     * Returns a {@link Map} which stores {@code messageId}-{@link Request}
+     * pairs whose {@link Response}s are not received yet.  Please override
+     * this method if you need to use other {@link Map} implementation
+     * than the default one ({@link HashMap}).
+     */
+    protected Map<Object, Request> createRequestStore(
+            @SuppressWarnings("unused") IoSession session) {
+        return new HashMap<Object, Request>();
+    }
+
+    /**
+     * Returns a {@link Set} which stores {@link Request} whose
+     * {@link Response}s are not received yet. Please override
+     * this method if you need to use other {@link Set} implementation
+     * than the default one ({@link LinkedHashSet}).  Please note that
+     * the {@link Iterator} of the returned {@link Set} have to iterate
+     * its elements in the insertion order to ensure that
+     * {@link RequestTimeoutException}s are thrown in the order which
+     * {@link Request}s were written.  If you don't need to guarantee
+     * the order of thrown exceptions, any {@link Set} implementation
+     * can be used.
+     */
+    protected Set<Request> createUnrespondedRequestStore(
+            @SuppressWarnings("unused") IoSession session) {
+        return new LinkedHashSet<Request>();
+    }
+    
+    /**
+     * Releases any resources related with the {@link Map} created by
+     * {@link #createRequestStore(IoSession)}.  This method is useful
+     * if you override {@link #createRequestStore(IoSession)}.
+     * 
+     * @param requestStore what you returned in {@link #createRequestStore(IoSession)}
+     */
+    protected void destroyRequestStore(
+            @SuppressWarnings("unused")
+            Map<Object, Request> requestStore) {
+    }
+
+    /**
+     * Releases any resources related with the {@link Set} created by
+     * {@link #createUnrespondedRequestStore(IoSession)}.  This method is
+     * useful if you override {@link #createUnrespondedRequestStore(IoSession)}.
+     * 
+     * @param requestStore what you returned in {@link #createUnrespondedRequestStore(IoSession)}
+     */
+    protected void destroyUnrespondedRequestStore(
+            @SuppressWarnings("unused")
+            Set<Request> unrespondedRequestStore) {
     }
 
     private class TimeoutTask implements Runnable {
@@ -308,7 +362,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
         }
 
         public void run() {
-            Set<Request> unrespondedRequests = getUnrespondedRequests(session);
+            Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
             if (unrespondedRequests != null) {
                 synchronized (unrespondedRequests) {
                     unrespondedRequests.remove(request);

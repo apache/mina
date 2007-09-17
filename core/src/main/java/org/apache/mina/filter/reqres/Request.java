@@ -40,7 +40,7 @@ public class Request {
 
     private volatile Runnable timeoutTask;
 
-    private volatile ScheduledFuture timeoutFuture;
+    private volatile ScheduledFuture<?> timeoutFuture;
 
     private final BlockingQueue<Object> responses = new LinkedBlockingQueue<Object>();
 
@@ -214,11 +214,11 @@ public class Request {
         this.timeoutTask = timeoutTask;
     }
 
-    ScheduledFuture getTimeoutFuture() {
+    ScheduledFuture<?> getTimeoutFuture() {
         return timeoutFuture;
     }
 
-    void setTimeoutFuture(ScheduledFuture timeoutFuture) {
+    void setTimeoutFuture(ScheduledFuture<?> timeoutFuture) {
         this.timeoutFuture = timeoutFuture;
     }
 }
