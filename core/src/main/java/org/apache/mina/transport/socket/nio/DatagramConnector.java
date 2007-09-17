@@ -98,7 +98,6 @@ public class DatagramConnector extends AbstractIoConnector {
             ch.connect(remoteAddress);
 
             session = new DatagramSessionImpl(this, ch, getHandler());
-            getFilterChainBuilder().buildFilterChain(session.getFilterChain());
             ConnectFuture future = new DefaultConnectFuture();
             // DefaultIoFilterChain will notify the connect future.
             session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);

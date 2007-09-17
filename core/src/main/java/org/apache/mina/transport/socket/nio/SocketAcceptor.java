@@ -415,10 +415,6 @@ public class SocketAcceptor extends AbstractIoAcceptor {
                     SocketSessionImpl session = new SocketSessionImpl(
                             SocketAcceptor.this, nextProcessor(), ch);
 
-                    // build the list of filters for this session.
-                    getFilterChainBuilder().buildFilterChain(
-                            session.getFilterChain());
-
                     // add the session to the SocketIoProcessor
                     session.getProcessor().add(session);
                     success = true;

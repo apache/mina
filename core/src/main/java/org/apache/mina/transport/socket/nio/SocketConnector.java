@@ -274,17 +274,9 @@ public class SocketConnector extends AbstractIoConnector {
         }
     }
 
-    private void newSession(SocketChannel ch, ConnectFuture connectFuture)
-            throws IOException {
+    private void newSession(SocketChannel ch, ConnectFuture connectFuture) {
         SocketSessionImpl session = new SocketSessionImpl(this,
                 nextProcessor(), ch);
-
-        try {
-            getFilterChainBuilder().buildFilterChain(session.getFilterChain());
-        } catch (Throwable e) {
-            throw (IOException) new IOException("Failed to create a session.")
-                    .initCause(e);
-        }
 
         // Set the ConnectFuture of the specified session, which will be
         // removed and notified by AbstractIoFilterChain eventually.

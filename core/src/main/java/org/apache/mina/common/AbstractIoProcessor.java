@@ -143,17 +143,34 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 break;
             }
 
+            boolean notified = false;
             try {
                 doAdd(session);
                 addedSessions ++;
 
+                // Build the filter chain of this session.
+                session.getService().getFilterChainBuilder().buildFilterChain(
+                        session.getFilterChain());
+
                 // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
                 // in AbstractIoFilterChain.fireSessionOpened().
                 ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
+                notified = true;
             } catch (Exception e) {
-                // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
-                // and call ConnectFuture.setException().
-                session.getFilterChain().fireExceptionCaught(session, e);
+                if (notified) {
+                    // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
+                    // and call ConnectFuture.setException().
+                    session.getFilterChain().fireExceptionCaught(session, e);
+                    scheduleRemove(session);
+                    wakeup();
+                } else {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                    try {
+                        doRemove(session);
+                    } catch (Exception e1) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e1);
+                    }
+                }
             }
         }
 

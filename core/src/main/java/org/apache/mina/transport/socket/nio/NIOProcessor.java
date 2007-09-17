@@ -98,7 +98,9 @@ class NIOProcessor extends AbstractIoProcessor {
     protected void doRemove(IoSession session) throws Exception {
         ByteChannel ch = getChannel(session);
         SelectionKey key = getSelectionKey(session);
-        key.cancel();
+        if (key != null) {
+            key.cancel();
+        }
         ch.close();
     }
 

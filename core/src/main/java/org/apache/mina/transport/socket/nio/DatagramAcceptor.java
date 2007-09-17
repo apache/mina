@@ -213,7 +213,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         }
 
         try {
-            buildFilterChain(session);
+            this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
             getListeners().fireSessionCreated(session);
         } catch (Throwable t) {
             ExceptionMonitor.getInstance().exceptionCaught(t);
@@ -277,10 +277,6 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
         public void updateTrafficMask(IoSession session) {
         }
-    }
-
-    private void buildFilterChain(IoSession session) throws Exception {
-        this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
     }
 
     private synchronized void startupWorker() {
