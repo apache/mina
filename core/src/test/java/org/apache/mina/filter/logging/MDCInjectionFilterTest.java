@@ -64,6 +64,7 @@ public class MDCInjectionFilterTest extends TestCase {
     }
 
     public void testSimpleChain() throws IOException, InterruptedException {
+      System.out.println("proc: " + Runtime.getRuntime().availableProcessors());
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         chain.addFirst("mdc-injector", new MDCInjectionFilter());
         chain.addLast("dummy", new DummyIoFilter());
@@ -145,8 +146,11 @@ public class MDCInjectionFilterTest extends TestCase {
         simpleIoHandler.sessionIdleLatch.await();
         simpleIoHandler.sessionClosedLatch.await();
 
+        // make a copy to prevent ConcurrentModificationException
+        List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
+
         // verify that all logging events have correct MDC
-        for (LoggingEvent event : new ArrayList<LoggingEvent>(appender.events)) {
+        for (LoggingEvent event : events) {
             if (!ExecutorFilter.class.getName().equals(event.getLoggerName())) {
                 Object remoteAddress = event.getMDC("remoteAddress");
                 assertNotNull(
@@ -164,17 +168,17 @@ public class MDCInjectionFilterTest extends TestCase {
         // asert we have received all expected logging events for each client
         for (int i = 0; i < remoteAddressClients.length; i++) {
             SocketAddress remoteAddressClient = remoteAddressClients[i];
-            assertEventExists(appender.events, "sessionCreated", remoteAddressClient, null);
-            assertEventExists(appender.events, "sessionOpened", remoteAddressClient, null);
-            assertEventExists(appender.events, "decode", remoteAddressClient, null);
-            assertEventExists(appender.events, "messageReceived", remoteAddressClient, null);
-            assertEventExists(appender.events, "encode", remoteAddressClient, null);
-            assertEventExists(appender.events, "exceptionCaught", remoteAddressClient, "user-" + i);
-            assertEventExists(appender.events, "messageSent", remoteAddressClient, "user-" + i);
-            assertEventExists(appender.events, "sessionIdle", remoteAddressClient, "user-" + i);
-            assertEventExists(appender.events, "sessionClosed", remoteAddressClient, "user-" + i);
-            assertEventExists(appender.events, "sessionClosed", remoteAddressClient, "user-" + i);
-            assertEventExists(appender.events, "DummyIoFilter.sessionOpened", remoteAddressClient, "user-" + i);
+            assertEventExists(events, "sessionCreated", remoteAddressClient, null);
+            assertEventExists(events, "sessionOpened", remoteAddressClient, null);
+            assertEventExists(events, "decode", remoteAddressClient, null);
+            assertEventExists(events, "messageReceived", remoteAddressClient, null);
+            assertEventExists(events, "encode", remoteAddressClient, null);
+            assertEventExists(events, "exceptionCaught", remoteAddressClient, "user-" + i);
+            assertEventExists(events, "messageSent", remoteAddressClient, "user-" + i);
+            assertEventExists(events, "sessionIdle", remoteAddressClient, "user-" + i);
+            assertEventExists(events, "sessionClosed", remoteAddressClient, "user-" + i);
+            assertEventExists(events, "sessionClosed", remoteAddressClient, "user-" + i);
+            assertEventExists(events, "DummyIoFilter.sessionOpened", remoteAddressClient, "user-" + i);
         }
     }
 
