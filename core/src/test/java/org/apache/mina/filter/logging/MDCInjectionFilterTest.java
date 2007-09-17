@@ -36,6 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Tests MDCInjectionFilter in variuos scenario's
+ *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
 public class MDCInjectionFilterTest extends TestCase {
 
