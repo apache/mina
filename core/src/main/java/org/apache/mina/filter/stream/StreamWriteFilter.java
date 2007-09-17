@@ -29,7 +29,6 @@ import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.IoFilter.NextFilter;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -122,6 +121,10 @@ public class StreamWriteFilter extends IoFilterAdapter {
         return (Queue<WriteRequest>) session.getAttribute(WRITE_REQUEST_QUEUE);
     }
 
+    @SuppressWarnings("unchecked")
+    private Queue<WriteRequest> removeWriteRequestQueue(IoSession session) {
+        return (Queue<WriteRequest>) session.removeAttribute(WRITE_REQUEST_QUEUE);
+    }
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session,
                             WriteRequest writeRequest) throws Exception {
@@ -140,8 +143,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
                         .removeAttribute(CURRENT_WRITE_REQUEST);
 
                 // Write queued WriteRequests.
-                Queue<? extends WriteRequest> queue = (Queue<? extends WriteRequest>) session
-                        .removeAttribute(WRITE_REQUEST_QUEUE);
+                Queue<WriteRequest> queue = removeWriteRequestQueue(session);
                 if (queue != null) {
                     WriteRequest wr = queue.poll();
                     while (wr != null) {
