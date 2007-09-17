@@ -65,7 +65,7 @@ public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean 
     }
 
     @Override
-    public Class getObjectType() {
+    public Class<?> getObjectType() {
         return DefaultIoFilterChainBuilder.class;
     }
 
@@ -97,7 +97,7 @@ public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean 
      *         <code>null</code> or contains objects of the wrong type.
      * @see #setFilterNamePrefix(String)
      */
-    public void setFilters(List filters) {
+    public void setFilters(List<?> filters) {
         Assert.notNull(filters, "Property 'filters' may not be null");
         IoFilterMapping[] filterMappings = new IoFilterMapping[filters.size()];
 

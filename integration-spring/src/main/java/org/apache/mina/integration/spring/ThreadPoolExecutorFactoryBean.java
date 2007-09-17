@@ -132,7 +132,7 @@ public class ThreadPoolExecutorFactoryBean extends AbstractFactoryBean {
     }
 
     @Override
-    public Class getObjectType() {
+    public Class<?> getObjectType() {
         return ThreadPoolExecutor.class;
     }
 

@@ -89,7 +89,7 @@ public class KeyStoreFactoryBean extends AbstractFactoryBean {
     }
 
     @Override
-    public Class getObjectType() {
+    public Class<?> getObjectType() {
         return KeyStore.class;
     }
 
