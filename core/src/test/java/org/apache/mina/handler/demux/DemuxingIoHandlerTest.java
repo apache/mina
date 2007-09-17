@@ -30,6 +30,7 @@ import org.easymock.MockControl;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
+@SuppressWarnings("unchecked")
 public class DemuxingIoHandlerTest extends TestCase {
     MockControl mockHandler1;
 
@@ -80,7 +81,6 @@ public class DemuxingIoHandlerTest extends TestCase {
                 .getMock();
     }
 
-    @SuppressWarnings("unchecked")
     public void testFindHandlerByClass() throws Exception {
         /*
          * Record expectations.
@@ -141,7 +141,6 @@ public class DemuxingIoHandlerTest extends TestCase {
         mockHandler3.verify();
     }
 
-    @SuppressWarnings("unchecked")
     public void testFindHandlerByInterface() throws Exception {
         /*
          * Record expectations.
