@@ -33,7 +33,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
@@ -46,7 +46,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class SocketSessionImpl extends NIOSession implements SocketSession {
+class SocketSessionImpl extends NioSession implements SocketSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
@@ -145,7 +145,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 return ch.socket().getKeepAlive();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -153,7 +153,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 ch.socket().setKeepAlive(on);
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -161,7 +161,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 return ch.socket().getOOBInline();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -169,7 +169,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 ch.socket().setOOBInline(on);
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -177,7 +177,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 return ch.socket().getReuseAddress();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -185,7 +185,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 ch.socket().setReuseAddress(on);
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -193,7 +193,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 return ch.socket().getSoLinger();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -205,7 +205,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
                     ch.socket().setSoLinger(true, linger);
                 }
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -213,7 +213,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 return ch.socket().getTcpNoDelay();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -221,7 +221,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 ch.socket().setTcpNoDelay(on);
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -232,7 +232,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
                 } catch (SocketException e) {
                     // Throw an exception only when setTrafficClass is also available.
                     if (DefaultSocketSessionConfig.isSetTrafficClassAvailable()) {
-                        throw new RuntimeIOException(e);
+                        throw new RuntimeIoException(e);
                     }
                 }
             }
@@ -245,7 +245,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
                 try {
                     ch.socket().setTrafficClass(tc);
                 } catch (SocketException e) {
-                    throw new RuntimeIOException(e);
+                    throw new RuntimeIoException(e);
                 }
             }
         }
@@ -254,7 +254,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 return ch.socket().getSendBufferSize();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -263,7 +263,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
                 try {
                     ch.socket().setSendBufferSize(size);
                 } catch (SocketException e) {
-                    throw new RuntimeIOException(e);
+                    throw new RuntimeIoException(e);
                 }
             }
         }
@@ -272,7 +272,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
             try {
                 return ch.socket().getReceiveBufferSize();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -281,7 +281,7 @@ class SocketSessionImpl extends NIOSession implements SocketSession {
                 try {
                     ch.socket().setReceiveBufferSize(size);
                 } catch (SocketException e) {
-                    throw new RuntimeIOException(e);
+                    throw new RuntimeIoException(e);
                 }
             }
         }

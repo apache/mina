@@ -29,8 +29,8 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
-import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.DatagramAcceptor;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
@@ -80,7 +80,7 @@ public abstract class AbstractTest extends TestCase {
     protected void setUp() throws Exception {
         // Disable SSL by default
         useSSL = false;
-        final SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
+        final SslFilter sslFilter = new SslFilter(BogusSslContextFactory
                 .getInstance(true));
 
         boundAddress = null;
@@ -130,15 +130,15 @@ public abstract class AbstractTest extends TestCase {
                                 && buf.remaining() == 1
                                 && buf.get() == (byte) '.') {
                             IoSessionLogger.info(session, "TLS Reentrance");
-                            ((SSLFilter) session.getFilterChain().get("SSL"))
-                                    .startSSL(session);
+                            ((SslFilter) session.getFilterChain().get("SSL"))
+                                    .startSsl(session);
 
                             // Send a response
                             buf = ByteBuffer.allocate(1);
                             buf.put((byte) '.');
                             buf.flip();
                             session
-                                    .setAttribute(SSLFilter.DISABLE_ENCRYPTION_ONCE);
+                                    .setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE);
                             session.write(buf);
                         } else {
                             super.messageReceived(session, message);

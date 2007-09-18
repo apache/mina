@@ -29,7 +29,7 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -109,7 +109,7 @@ public abstract class AbstractConnectorTest extends TestCase {
         try {
             future.getSession().close();
             fail();
-        } catch (RuntimeIOException e) {
+        } catch (RuntimeIoException e) {
             // OK.
         }
         Assert.assertEquals("1", buf.toString());

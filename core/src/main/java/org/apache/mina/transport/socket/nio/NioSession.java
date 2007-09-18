@@ -29,7 +29,7 @@ import org.apache.mina.common.AbstractIoSession;
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-abstract class NIOSession extends AbstractIoSession {
+abstract class NioSession extends AbstractIoSession {
     abstract ByteChannel getChannel();
     abstract SelectionKey getSelectionKey();
     abstract void setSelectionKey(SelectionKey key);

@@ -55,7 +55,7 @@ public class DatagramConnector extends AbstractIoConnector implements
     private final int id = nextId++;
     private final IoService parent;
     private final int processorCount;
-    private final NIOProcessor[] ioProcessors;
+    private final NioProcessor[] ioProcessors;
 
     private int processorDistributor = 0;
 
@@ -99,17 +99,17 @@ public class DatagramConnector extends AbstractIoConnector implements
         }
 
         this.processorCount = processorCount;
-        ioProcessors = new NIOProcessor[processorCount];
+        ioProcessors = new NioProcessor[processorCount];
 
         // create an array of SocketIoProcessors that will be used for
         // handling sessions.
         for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new NIOProcessor(
+            ioProcessors[i] = new NioProcessor(
                     threadNamePrefix + '.' + i, executor);
         }
     }
 
-    private NIOProcessor nextProcessor() {
+    private NioProcessor nextProcessor() {
         if (this.processorDistributor == Integer.MAX_VALUE) {
             this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
         }
@@ -201,7 +201,7 @@ public class DatagramConnector extends AbstractIoConnector implements
             }
             ch.connect(remoteAddress);
 
-            NIOProcessor processor = nextProcessor();
+            NioProcessor processor = nextProcessor();
             session = new DatagramSessionImpl(parent, ch, processor);
             ConnectFuture future = new DefaultConnectFuture();
             // DefaultIoFilterChain will notify the connect future.

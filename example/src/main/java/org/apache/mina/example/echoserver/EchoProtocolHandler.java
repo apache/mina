@@ -24,7 +24,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.SocketSession;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
         session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 
         // We're going to use SSL negotiation notification.
-        session.setAttribute(SSLFilter.USE_NOTIFICATION);
+        session.setAttribute(SslFilter.USE_NOTIFICATION);
     }
 
     @Override

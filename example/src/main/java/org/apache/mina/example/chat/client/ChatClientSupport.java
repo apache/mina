@@ -26,8 +26,8 @@ import javax.net.ssl.SSLContext;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 
 /**
@@ -61,9 +61,9 @@ public class ChatClientSupport {
         try {
 
             if (useSsl) {
-                SSLContext sslContext = BogusSSLContextFactory
+                SSLContext sslContext = BogusSslContextFactory
                         .getInstance(false);
-                SSLFilter sslFilter = new SSLFilter(sslContext);
+                SslFilter sslFilter = new SslFilter(sslContext);
                 sslFilter.setUseClientMode(true);
                 connector.getFilterChain().addLast("sslFilter", sslFilter);
             }

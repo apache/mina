@@ -26,7 +26,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TrafficMask;
 
 /**
@@ -60,7 +60,7 @@ public class ClientToProxyIoHandler extends AbstractProxyIoHandler {
                     future.getSession().setAttachment(session);
                     session.setAttachment(future.getSession());
                     future.getSession().setTrafficMask(TrafficMask.ALL);
-                } catch (RuntimeIOException e) {
+                } catch (RuntimeIoException e) {
                     // Connect failed
                     session.close();
                 } finally {

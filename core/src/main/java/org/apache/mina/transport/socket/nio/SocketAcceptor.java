@@ -37,7 +37,7 @@ import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
@@ -79,7 +79,7 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
     private final Queue<ServiceOperationFuture> cancelQueue =
         new ConcurrentLinkedQueue<ServiceOperationFuture>();
 
-    private final NIOProcessor[] ioProcessors;
+    private final NioProcessor[] ioProcessors;
 
     private final int processorCount;
 
@@ -129,7 +129,7 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
             s = new ServerSocket();
             reuseAddress = s.getReuseAddress();
         } catch (IOException e) {
-            throw new RuntimeIOException(
+            throw new RuntimeIoException(
                     "Failed to get the default configuration.", e);
         } finally {
             if (s != null) {
@@ -144,18 +144,18 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
-            throw new RuntimeIOException("Failed to open a selector.", e);
+            throw new RuntimeIoException("Failed to open a selector.", e);
         }
 
         // Set other properties and initialize
         this.executor = executor;
         this.processorCount = processorCount;
-        ioProcessors = new NIOProcessor[processorCount];
+        ioProcessors = new NioProcessor[processorCount];
 
         // create an array of SocketIoProcessors that will be used for
         // handling sessions.
         for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new NIOProcessor(
+            ioProcessors[i] = new NioProcessor(
                     "SocketAcceptorIoProcessor-" + id + "." + i, executor);
         }
     }
@@ -408,7 +408,7 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
         }
     }
 
-    private NIOProcessor nextProcessor() {
+    private NioProcessor nextProcessor() {
         if (this.processorDistributor == Integer.MAX_VALUE) {
             this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
         }

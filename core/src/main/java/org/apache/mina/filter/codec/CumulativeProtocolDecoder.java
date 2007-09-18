@@ -33,7 +33,7 @@ import org.apache.mina.common.IoSession;
  * Here is an example decoder that decodes CRLF terminated lines into
  * <code>Command</code> objects:
  * <pre>
- * public class CRLFTerminatedCommandLineDecoder
+ * public class CrLfTerminatedCommandLineDecoder
  *         extends CumulativeProtocolDecoder {
  *
  *     private Command parseCommand(ByteBuffer in) {

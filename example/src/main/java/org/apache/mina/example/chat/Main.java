@@ -20,12 +20,12 @@
 package org.apache.mina.example.chat;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
-import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
+import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
-import org.apache.mina.filter.logging.MDCInjectionFilter;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.filter.logging.MdcInjectionFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 import java.net.InetSocketAddress;
@@ -47,7 +47,7 @@ public class Main {
         SocketAcceptor acceptor = new SocketAcceptor();
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
 
-        MDCInjectionFilter mdcInjectionFilter = new MDCInjectionFilter();
+        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
         chain.addLast("mdc", mdcInjectionFilter);
 
         // Add SSL filter if SSL is enabled.
@@ -70,7 +70,7 @@ public class Main {
 
     private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
             throws Exception {
-        SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
+        SslFilter sslFilter = new SslFilter(BogusSslContextFactory
                 .getInstance(true));
         chain.addLast("sslFilter", sslFilter);
         System.out.println("SSL ON");

@@ -36,14 +36,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tests MDCInjectionFilter in variuos scenario's
+ * Tests {@link MdcInjectionFilter} in variuos scenarios.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class MDCInjectionFilterTest extends TestCase {
+public class MdcInjectionFilterTest extends TestCase {
 
-    private static Logger logger = LoggerFactory.getLogger("MDCInjectionFilterTest");
+    private static Logger logger = LoggerFactory.getLogger(MdcInjectionFilterTest.class);
     private static final int PORT = 7475;
     private static final int TIMEOUT = 5000;
 
@@ -70,7 +70,7 @@ public class MDCInjectionFilterTest extends TestCase {
     public void testSimpleChain() throws IOException, InterruptedException {
       System.out.println("proc: " + Runtime.getRuntime().availableProcessors());
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        chain.addFirst("mdc-injector", new MDCInjectionFilter());
+        chain.addFirst("mdc-injector", new MdcInjectionFilter());
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         test(chain);
@@ -78,7 +78,7 @@ public class MDCInjectionFilterTest extends TestCase {
 
     public void testExecutorFilterAtTheEnd() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        MDCInjectionFilter mdcInjectionFilter = new MDCInjectionFilter();
+        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
         chain.addFirst("mdc-injector1", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
@@ -89,7 +89,7 @@ public class MDCInjectionFilterTest extends TestCase {
 
     public void testExecutorFilterAtBeginning() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        MDCInjectionFilter mdcInjectionFilter = new MDCInjectionFilter();
+        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
         chain.addLast("executor" , new ExecutorFilter());
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
@@ -99,7 +99,7 @@ public class MDCInjectionFilterTest extends TestCase {
 
     public void testExecutorFilterBeforeProtocol() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        MDCInjectionFilter mdcInjectionFilter = new MDCInjectionFilter();
+        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
         chain.addLast("executor" , new ExecutorFilter());
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
@@ -109,7 +109,7 @@ public class MDCInjectionFilterTest extends TestCase {
 
     public void testMultipleFilters() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        MDCInjectionFilter mdcInjectionFilter = new MDCInjectionFilter();
+        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
         chain.addLast("executor" , new ExecutorFilter());
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("profiler", new ProfilerTimerFilter());
@@ -122,7 +122,7 @@ public class MDCInjectionFilterTest extends TestCase {
 
     public void testTwoExecutorFilters() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        MDCInjectionFilter mdcInjectionFilter = new MDCInjectionFilter();
+        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
         chain.addLast("executor1" , new ExecutorFilter());
         chain.addLast("mdc-injector1", mdcInjectionFilter);
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
@@ -257,7 +257,7 @@ public class MDCInjectionFilterTest extends TestCase {
             logger.info("messageReceived");
             // adding a custom property to the context
             String user = "user-" + message;
-            MDCInjectionFilter.setProperty(session, "user", user);
+            MdcInjectionFilter.setProperty(session, "user", user);
             logger.info("logged-in: " + user);
             session.write(message);
             throw new RuntimeException("just a test, forcing exceptionCaught");

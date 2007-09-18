@@ -31,8 +31,8 @@ import javax.net.SocketFactory;
 
 import org.apache.commons.net.EchoTCPClient;
 import org.apache.commons.net.EchoUDPClient;
-import org.apache.mina.example.echoserver.ssl.SSLServerSocketFactory;
-import org.apache.mina.example.echoserver.ssl.SSLSocketFactory;
+import org.apache.mina.example.echoserver.ssl.SslServerSocketFactory;
+import org.apache.mina.example.echoserver.ssl.SslSocketFactory;
 
 /**
  * Tests echo server example.
@@ -54,13 +54,13 @@ public class AcceptorTest extends AbstractTest {
         useSSL = true;
 
         // Create a commons-net socket factory
-        SSLSocketFactory.setSslEnabled(true);
-        SSLServerSocketFactory.setSslEnabled(true);
+        SslSocketFactory.setSslEnabled(true);
+        SslServerSocketFactory.setSslEnabled(true);
         org.apache.commons.net.SocketFactory factory = new org.apache.commons.net.SocketFactory() {
 
-            private SocketFactory f = SSLSocketFactory.getSocketFactory();
+            private SocketFactory f = SslSocketFactory.getSocketFactory();
 
-            private ServerSocketFactory ssf = SSLServerSocketFactory
+            private ServerSocketFactory ssf = SslServerSocketFactory
                     .getServerSocketFactory();
 
             public Socket createSocket(String arg0, int arg1)

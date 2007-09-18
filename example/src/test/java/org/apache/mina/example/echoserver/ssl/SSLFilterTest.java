@@ -19,7 +19,7 @@ import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 public class SSLFilterTest extends TestCase {
@@ -50,9 +50,9 @@ public class SSLFilterTest extends TestCase {
     }
 
     private void testMessageSentIsCalled(boolean useSSL) throws Exception {
-        SSLFilter sslFilter = null;
+        SslFilter sslFilter = null;
         if (useSSL) {
-            sslFilter = new SSLFilter(BogusSSLContextFactory.getInstance(true));
+            sslFilter = new SslFilter(BogusSslContextFactory.getInstance(true));
             acceptor.getFilterChain().addLast("sslFilter", sslFilter);
         }
         acceptor.getFilterChain().addLast(

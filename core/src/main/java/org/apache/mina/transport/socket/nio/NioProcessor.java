@@ -34,24 +34,24 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 
 /**
  *
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class NIOProcessor extends AbstractIoProcessor {
+class NioProcessor extends AbstractIoProcessor {
 
     protected final Selector selector;
 
-    NIOProcessor(String threadName, Executor executor) {
+    NioProcessor(String threadName, Executor executor) {
         super(threadName, executor);
 
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
-            throw new RuntimeIOException("Failed to open a selector.", e);
+            throw new RuntimeIoException("Failed to open a selector.", e);
         }
     }
 
@@ -163,15 +163,15 @@ class NIOProcessor extends AbstractIoProcessor {
     }
 
     private ByteChannel getChannel(IoSession session) {
-        return ((NIOSession) session).getChannel();
+        return ((NioSession) session).getChannel();
     }
 
     private SelectionKey getSelectionKey(IoSession session) {
-        return ((NIOSession) session).getSelectionKey();
+        return ((NioSession) session).getSelectionKey();
     }
 
     private void setSelectionKey(IoSession session, SelectionKey key) {
-        ((NIOSession) session).setSelectionKey(key);
+        ((NioSession) session).setSelectionKey(key);
     }
 
 

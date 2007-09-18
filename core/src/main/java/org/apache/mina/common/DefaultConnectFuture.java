@@ -45,12 +45,12 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
     }
 
     @Override
-    public IoSession getSession() throws RuntimeIOException {
+    public IoSession getSession() throws RuntimeIoException {
         Object v = getValue();
-        if (v instanceof RuntimeIOException) {
-            throw (RuntimeIOException) v;
+        if (v instanceof RuntimeIoException) {
+            throw (RuntimeIoException) v;
         } else if (v instanceof Throwable) {
-            throw (RuntimeIOException) new RuntimeIOException(
+            throw (RuntimeIoException) new RuntimeIoException(
                     "Failed to get the session.").initCause((Throwable) v);
         } else {
             return (IoSession) v;

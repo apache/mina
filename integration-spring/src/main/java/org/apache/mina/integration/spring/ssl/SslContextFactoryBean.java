@@ -57,7 +57,7 @@ import org.springframework.util.Assert;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class SSLContextFactoryBean extends AbstractFactoryBean {
+public class SslContextFactoryBean extends AbstractFactoryBean {
     private String protocol = "TLS";
 
     private final String provider = null;

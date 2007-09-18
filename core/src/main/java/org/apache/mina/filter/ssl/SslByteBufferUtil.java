@@ -31,7 +31,7 @@ import javax.net.ssl.SSLEngine;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class SSLByteBufferUtil {
+class SslByteBufferUtil {
     private static final int PACKET_BUFFER_INDEX = 0;
 
     private static final int APPLICATION_BUFFER_INDEX = 1;

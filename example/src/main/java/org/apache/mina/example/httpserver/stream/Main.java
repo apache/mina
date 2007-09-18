@@ -23,8 +23,8 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
 /**
@@ -59,7 +59,7 @@ public class Main {
     private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
             throws Exception {
         System.out.println("SSL is enabled.");
-        SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
+        SslFilter sslFilter = new SslFilter(BogusSslContextFactory
                 .getInstance(true));
         chain.addLast("sslFilter", sslFilter);
     }

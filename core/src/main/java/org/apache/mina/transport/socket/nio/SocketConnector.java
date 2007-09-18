@@ -36,7 +36,7 @@ import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
@@ -65,7 +65,7 @@ public class SocketConnector extends AbstractIoConnector implements
 
     private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
 
-    private final NIOProcessor[] ioProcessors;
+    private final NioProcessor[] ioProcessors;
 
     private final int processorCount;
 
@@ -102,15 +102,15 @@ public class SocketConnector extends AbstractIoConnector implements
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
-            throw new RuntimeIOException("Failed to open a selector.", e);
+            throw new RuntimeIoException("Failed to open a selector.", e);
         }
 
         this.executor = executor;
         this.processorCount = processorCount;
-        ioProcessors = new NIOProcessor[processorCount];
+        ioProcessors = new NioProcessor[processorCount];
 
         for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new NIOProcessor(
+            ioProcessors[i] = new NioProcessor(
                     "SocketConnectorIoProcessor-" + id + "." + i, executor);
         }
     }
@@ -290,7 +290,7 @@ public class SocketConnector extends AbstractIoConnector implements
         session.getProcessor().add(session);
     }
 
-    private NIOProcessor nextProcessor() {
+    private NioProcessor nextProcessor() {
         if (this.processorDistributor == Integer.MAX_VALUE) {
             this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
         }

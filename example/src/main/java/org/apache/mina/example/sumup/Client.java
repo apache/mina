@@ -23,7 +23,7 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
@@ -89,7 +89,7 @@ public class Client {
                 future.awaitUninterruptibly();
                 session = future.getSession();
                 break;
-            } catch (RuntimeIOException e) {
+            } catch (RuntimeIoException e) {
                 System.err.println("Failed to connect.");
                 e.printStackTrace();
                 Thread.sleep(5000);

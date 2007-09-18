@@ -33,7 +33,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
@@ -47,7 +47,7 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DatagramSessionImpl extends NIOSession implements DatagramSession {
+class DatagramSessionImpl extends NioSession implements DatagramSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
@@ -158,7 +158,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
             try {
                 return ch.socket().getReceiveBufferSize();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -169,7 +169,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
                     // Re-retrieve the effective receive buffer size.
                     receiveBufferSize = ch.socket().getReceiveBufferSize();
                 } catch (SocketException e) {
-                    throw new RuntimeIOException(e);
+                    throw new RuntimeIoException(e);
                 }
             }
         }
@@ -178,7 +178,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
             try {
                 return ch.socket().getBroadcast();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -186,7 +186,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
             try {
                 ch.socket().setBroadcast(broadcast);
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -194,7 +194,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
             try {
                 return ch.socket().getSendBufferSize();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -203,7 +203,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
                 try {
                     ch.socket().setSendBufferSize(sendBufferSize);
                 } catch (SocketException e) {
-                    throw new RuntimeIOException(e);
+                    throw new RuntimeIoException(e);
                 }
             }
         }
@@ -212,7 +212,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
             try {
                 return ch.socket().getReuseAddress();
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -220,7 +220,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
             try {
                 ch.socket().setReuseAddress(reuseAddress);
             } catch (SocketException e) {
-                throw new RuntimeIOException(e);
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -229,7 +229,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
                 try {
                     return ch.socket().getTrafficClass();
                 } catch (SocketException e) {
-                    throw new RuntimeIOException(e);
+                    throw new RuntimeIoException(e);
                 }
             } else {
                 return 0;
@@ -241,7 +241,7 @@ class DatagramSessionImpl extends NIOSession implements DatagramSession {
                 try {
                     ch.socket().setTrafficClass(trafficClass);
                 } catch (SocketException e) {
-                    throw new RuntimeIOException(e);
+                    throw new RuntimeIoException(e);
                 }
             }
         }

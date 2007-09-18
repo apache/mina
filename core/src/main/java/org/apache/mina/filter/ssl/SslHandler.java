@@ -52,8 +52,8 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-class SSLHandler {
-    private final SSLFilter parent;
+class SslHandler {
+    private final SslFilter parent;
 
     private final SSLContext ctx;
 
@@ -85,7 +85,7 @@ class SSLHandler {
     /**
      * Empty buffer used during initial handshake and close operations
      */
-    private final ByteBuffer hsBB = ByteBuffer.allocate(0);
+    private final ByteBuffer emptyBuffer = ByteBuffer.allocate(0);
 
     /**
      * Handshake status
@@ -107,7 +107,7 @@ class SSLHandler {
      * @param sslc
      * @throws SSLException
      */
-    public SSLHandler(SSLFilter parent, SSLContext sslc, IoSession session)
+    public SslHandler(SslFilter parent, SSLContext sslc, IoSession session)
             throws SSLException {
         this.parent = parent;
         this.session = session;
@@ -121,7 +121,7 @@ class SSLHandler {
         }
 
         InetSocketAddress peer = (InetSocketAddress) session
-                .getAttribute(SSLFilter.PEER_ADDRESS);
+                .getAttribute(SslFilter.PEER_ADDRESS);
         if (peer == null) {
             sslEngine = ctx.createSSLEngine();
         } else {
@@ -150,12 +150,12 @@ class SSLHandler {
         handshakeComplete = false;
         initialHandshakeComplete = false;
 
-        SSLByteBufferUtil.initiate(sslEngine);
+        SslByteBufferUtil.initiate(sslEngine);
 
-        appBuffer = SSLByteBufferUtil.getApplicationBuffer();
+        appBuffer = SslByteBufferUtil.getApplicationBuffer();
 
-        inNetBuffer = SSLByteBufferUtil.getPacketBuffer();
-        outNetBuffer = SSLByteBufferUtil.getPacketBuffer();
+        inNetBuffer = SslByteBufferUtil.getPacketBuffer();
+        outNetBuffer = SslByteBufferUtil.getPacketBuffer();
         outNetBuffer.position(0);
         outNetBuffer.limit(0);
 
@@ -181,7 +181,7 @@ class SSLHandler {
         try {
             do {
                 outNetBuffer.clear();
-            } while (sslEngine.wrap(hsBB, outNetBuffer).bytesProduced() > 0);
+            } while (sslEngine.wrap(emptyBuffer, outNetBuffer).bytesProduced() > 0);
         } catch (SSLException e) {
             IoSessionLogger.debug(session,
                     "Unexpected exception from SSLEngine.wrap().", e);
@@ -192,7 +192,7 @@ class SSLHandler {
         preHandshakeEventQueue.clear();
     }
 
-    public SSLFilter getParent() {
+    public SslFilter getParent() {
         return parent;
     }
 
@@ -289,10 +289,10 @@ class SSLHandler {
     public void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
         if (buf.limit() > inNetBuffer.remaining()) {
             // We have to expand inNetBuffer
-            inNetBuffer = SSLByteBufferUtil.expandBuffer(inNetBuffer,
+            inNetBuffer = SslByteBufferUtil.expandBuffer(inNetBuffer,
                     inNetBuffer.capacity() + buf.limit() * 2);
             // We also expand app. buffer (twice the size of in net. buffer)
-            appBuffer = SSLByteBufferUtil.expandBuffer(appBuffer, inNetBuffer
+            appBuffer = SslByteBufferUtil.expandBuffer(appBuffer, inNetBuffer
                     .capacity() * 2);
             if (IoSessionLogger.isDebugEnabled(session)) {
                 IoSessionLogger.debug(session, " expanded inNetBuffer:"
@@ -357,7 +357,7 @@ class SSLHandler {
                 // We have to expand outNetBuffer
                 // Note: there is no way to know the exact size required, but enrypted data
                 // shouln't need to be larger than twice the source data size?
-                outNetBuffer = SSLByteBufferUtil.expandBuffer(outNetBuffer, src
+                outNetBuffer = SslByteBufferUtil.expandBuffer(outNetBuffer, src
                         .capacity() * 2);
                 if (IoSessionLogger.isDebugEnabled(session)) {
                     IoSessionLogger.debug(session, " expanded outNetBuffer:"
@@ -401,7 +401,7 @@ class SSLHandler {
         // By RFC 2616, we can "fire and forget" our close_notify
         // message, so that's what we'll do here.
         outNetBuffer.clear();
-        SSLEngineResult result = sslEngine.wrap(hsBB, outNetBuffer);
+        SSLEngineResult result = sslEngine.wrap(emptyBuffer, outNetBuffer);
         if (result.getStatus() != SSLEngineResult.Status.CLOSED) {
             throw new SSLException("Improper close state: " + result);
         }
@@ -459,7 +459,7 @@ class SSLHandler {
 
         for (; ;) {
             if (handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED) {
-                session.setAttribute(SSLFilter.SSL_SESSION, sslEngine
+                session.setAttribute(SslFilter.SSL_SESSION, sslEngine
                         .getSession());
                 if (IoSessionLogger.isDebugEnabled(session)) {
                     SSLSession sslSession = sslEngine.getSession();
@@ -470,12 +470,12 @@ class SSLHandler {
                 }
                 handshakeComplete = true;
                 if (!initialHandshakeComplete
-                        && session.containsAttribute(SSLFilter.USE_NOTIFICATION)) {
+                        && session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
                     // SESSION_SECURED is fired only when it's the first handshake.
                     // (i.e. renegotiation shouldn't trigger SESSION_SECURED.)
                     initialHandshakeComplete = true;
                     scheduleMessageReceived(nextFilter,
-                            SSLFilter.SESSION_SECURED);
+                            SslFilter.SESSION_SECURED);
                 }
                 break;
             } else if (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_TASK) {
@@ -511,7 +511,7 @@ class SSLHandler {
                     break;
                 }
                 outNetBuffer.clear();
-                SSLEngineResult result = sslEngine.wrap(hsBB, outNetBuffer);
+                SSLEngineResult result = sslEngine.wrap(emptyBuffer, outNetBuffer);
                 if (IoSessionLogger.isDebugEnabled(session)) {
                     IoSessionLogger.debug(session, " Wrap res:" + result);
                 }
@@ -561,10 +561,10 @@ class SSLHandler {
                 try {
                     handshake(nextFilter);
                 } catch (SSLException ssle) {
-                    SSLException newSSLE = new SSLHandshakeException(
+                    SSLException newSsle = new SSLHandshakeException(
                             "SSL handshake failed.");
-                    newSSLE.initCause(ssle);
-                    throw newSSLE;
+                    newSsle.initCause(ssle);
+                    throw newSsle;
                 }
                 if (getOutNetBuffer().hasRemaining()) {
                     if (IoSessionLogger.isDebugEnabled(session)) {

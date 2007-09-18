@@ -44,10 +44,10 @@ import org.slf4j.MDC;
  * @version $Rev: 566952 $, $Date: 2007-08-17 09:25:04 +0200 (vr, 17 aug 2007) $
  */
 
-public class MDCInjectionFilter extends WrappingFilter {
+public class MdcInjectionFilter extends WrappingFilter {
 
     /** key used for storing the context map in the IoSession */
-    private static final String CONTEXT_KEY = MDCInjectionFilter.class + ".CONTEXT_KEY";
+    private static final String CONTEXT_KEY = MdcInjectionFilter.class + ".CONTEXT_KEY";
 
     private ThreadLocal<Integer> callDepth = new ThreadLocal<Integer>() {
         @Override

@@ -19,10 +19,10 @@
  */
 package org.apache.mina.filter.reqres;
 
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 
 /**
- * An {@link RuntimeIOException} which is thrown when a {@link Request} is timed out.
+ * An {@link RuntimeIoException} which is thrown when a {@link Request} is timed out.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,

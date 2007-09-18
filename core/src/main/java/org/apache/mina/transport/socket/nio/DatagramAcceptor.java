@@ -42,7 +42,7 @@ import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
@@ -104,7 +104,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
-            throw new RuntimeIOException("Failed to open a selector.", e);
+            throw new RuntimeIoException("Failed to open a selector.", e);
         }
 
         this.executor = executor;

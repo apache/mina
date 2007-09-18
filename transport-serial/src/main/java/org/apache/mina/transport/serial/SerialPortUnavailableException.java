@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.serial;
 
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 
 /**
  * Exception thrown when the serial port can't be open because
@@ -27,7 +27,7 @@ import org.apache.mina.common.RuntimeIOException;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: $, $Date: $
  */
-public class SerialPortUnavailableException extends RuntimeIOException {
+public class SerialPortUnavailableException extends RuntimeIoException {
 
     private static final long serialVersionUID = 1L;
 

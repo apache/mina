@@ -27,7 +27,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
-import org.apache.mina.filter.logging.MDCInjectionFilter;
+import org.apache.mina.filter.logging.MdcInjectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +94,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
                 sessions.add(session);
                 session.setAttribute("user", user);
-                MDCInjectionFilter.setProperty(session, "user", user);
+                MdcInjectionFilter.setProperty(session, "user", user);
 
                 // Allow all users
                 users.add(user);

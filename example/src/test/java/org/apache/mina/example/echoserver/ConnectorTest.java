@@ -29,10 +29,10 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
-import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.WriteFuture;
-import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.DatagramConnector;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
@@ -50,7 +50,7 @@ public class ConnectorTest extends AbstractTest {
 
     private final int DATA_SIZE = 16;
 
-    private SSLFilter connectorSSLFilter;
+    private SslFilter connectorSSLFilter;
 
     public ConnectorTest() {
     }
@@ -59,7 +59,7 @@ public class ConnectorTest extends AbstractTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        connectorSSLFilter = new SSLFilter(BogusSSLContextFactory
+        connectorSSLFilter = new SslFilter(BogusSslContextFactory
                 .getInstance(false));
         connectorSSLFilter.setUseClientMode(true); // set client mode
     }
@@ -116,7 +116,7 @@ public class ConnectorTest extends AbstractTest {
                     future.awaitUninterruptibly();
                     session = future.getSession();
                     break;
-                } catch (RuntimeIOException e) {
+                } catch (RuntimeIoException e) {
                     // Try again until we succeed to bind.
                 }
             }
@@ -131,7 +131,7 @@ public class ConnectorTest extends AbstractTest {
 
         // Send closeNotify to test TLS closure if it is TLS connection.
         if (useSSL) {
-            connectorSSLFilter.stopSSL(session).awaitUninterruptibly();
+            connectorSSLFilter.stopSsl(session).awaitUninterruptibly();
 
             System.out
                     .println("-------------------------------------------------------------------------------");
@@ -157,7 +157,7 @@ public class ConnectorTest extends AbstractTest {
             Assert.assertEquals((byte) '.', handler.readBuf.get());
 
             // Now start TLS connection
-            Assert.assertTrue(connectorSSLFilter.startSSL(session));
+            Assert.assertTrue(connectorSSLFilter.startSsl(session));
             testConnector0(session);
         }
 
