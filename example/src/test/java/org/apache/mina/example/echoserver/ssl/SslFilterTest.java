@@ -22,7 +22,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 
-public class SSLFilterTest extends TestCase {
+public class SslFilterTest extends TestCase {
 
     private static final int PORT = 17887;
 
