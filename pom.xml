@@ -89,6 +89,7 @@
   <modules>
     <module>core</module>
     <module>transport-serial</module>
+    <module>transport-apr</module>
     <module>filter-compression</module>
     <module>filter-codec-netty</module>
     <module>filter-codec-http</module>
