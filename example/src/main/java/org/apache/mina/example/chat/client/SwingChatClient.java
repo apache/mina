@@ -141,6 +141,8 @@ public class SwingChatClient extends JFrame implements Callback {
 
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                client.quit();
+                connector.close(); 
                 dispose();
             }
         });

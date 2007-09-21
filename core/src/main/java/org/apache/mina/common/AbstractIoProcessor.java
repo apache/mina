@@ -40,6 +40,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     private final Object lock = new Object();
     private final String threadName;
     private final Executor executor;
+    private boolean closeFlag;
 
     private final Queue<AbstractIoSession> newSessions =
         new ConcurrentLinkedQueue<AbstractIoSession>();
@@ -132,6 +133,10 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
     protected abstract long transferFile(IoSession session, FileRegion region) throws Exception;
 
+    public void close(){
+        closeFlag = true;
+    }
+    
     public void add(IoSession session) {
         newSessions.add((AbstractIoSession) session);
         startupWorker();
@@ -579,6 +584,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 try {
                     boolean selected=select(1000);
 
+                    if (closeFlag){
+                        synchronized (lock) {
+                            worker = null;
+                            break;
+                        }
+                    }
                     nSessions += add();
                     updateTrafficMask();
 
