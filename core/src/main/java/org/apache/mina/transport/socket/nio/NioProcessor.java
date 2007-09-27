@@ -137,14 +137,22 @@ class NioProcessor extends AbstractIoProcessor {
     @Override
     protected void setOpRead(IoSession session, boolean value) throws Exception {
         SelectionKey key = getSelectionKey(session);
-        key.interestOps(key.interestOps() | SelectionKey.OP_READ);
+        if (value) {
+            key.interestOps(key.interestOps() | SelectionKey.OP_READ);
+        } else {
+            key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
+        }
     }
 
     @Override
     protected void setOpWrite(IoSession session, boolean value)
             throws Exception {
         SelectionKey key = getSelectionKey(session);
-        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+        if (value) {
+            key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+        } else {
+            key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+        }
     }
 
     @Override
