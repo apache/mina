@@ -35,6 +35,7 @@ import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.ExpiringSessionRecycler;
+import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoServiceListenerSupport;
@@ -60,25 +61,19 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
 
     private static volatile int nextId = 0;
 
-    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
-
     private final Executor executor;
-
     private final int id = nextId++;
-
     private final Selector selector;
-
     private final IoProcessor processor = new DatagramAcceptorProcessor();
-
-    private DatagramChannel channel;
-
     private final Queue<ServiceOperationFuture> registerQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
-
     private final Queue<ServiceOperationFuture> cancelQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
-
     private final Queue<NioDatagramSession> flushingSessions = new ConcurrentLinkedQueue<NioDatagramSession>();
 
+    private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
+
+    private DatagramChannel channel;
     private Worker worker;
+    private long lastIdleCheckTime;
 
     /**
      * Creates a new instance.
@@ -277,10 +272,11 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
     private class Worker implements Runnable {
         public void run() {
             Thread.currentThread().setName("DatagramAcceptor-" + id);
+            lastIdleCheckTime = System.currentTimeMillis();
 
             for (; ;) {
                 try {
-                    int nKeys = selector.select();
+                    int nKeys = selector.select(1000);
 
                     registerNew();
 
@@ -290,6 +286,8 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
 
                     flushSessions();
                     cancelKeys();
+
+                    notifyIdleSessions();
 
                     if (selector.keys().isEmpty()) {
                         synchronized (NioDatagramAcceptor.this) {
@@ -507,6 +505,17 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
                 getListeners().fireServiceDeactivated();
                 request.setDone();
             }
+        }
+    }
+
+    private void notifyIdleSessions() {
+        // process idle sessions
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastIdleCheckTime >= 1000) {
+            lastIdleCheckTime = currentTime;
+            IdleStatusChecker.notifyIdleSessions(
+                    getListeners().getManagedSessions().iterator(),
+                    currentTime);
         }
     }
 }

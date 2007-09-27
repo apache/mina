@@ -81,8 +81,27 @@ public class IdleStatusChecker {
             }
         }
     }
+    
+    /**
+     * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable
+     * sessions in the specified collection.
+     *   
+     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
+     */
+    public static void notifyIdleSessions(Iterator<? extends IoSession> sessions, long currentTime) {
+        while (sessions.hasNext()) {
+            IoSession s = sessions.next();
+            notifyIdleSession(s, currentTime);
+        }
+    }
 
-    private void notifyIdleSession(AbstractIoSession session, long currentTime) {
+    /**
+     * Fires a {@link IoEventType#SESSION_IDLE} event if applicable for the
+     * specified {@code session}.
+     * 
+     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
+     */
+    public static void notifyIdleSession(IoSession session, long currentTime) {
         notifyIdleSession0(session, currentTime, session
                 .getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
                 IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
@@ -95,15 +114,27 @@ public class IdleStatusChecker {
                 .getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
                 IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(),
                         session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
+        notifyWriteTimeout(session, currentTime, session
+                .getConfig().getWriteTimeoutInMillis(), session.getLastWriteTime());
     }
 
-    private void notifyIdleSession0(AbstractIoSession session, long currentTime,
+    private static void notifyIdleSession0(IoSession session, long currentTime,
             long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
                 && currentTime - lastIoTime >= idleTime) {
-            session.increaseIdleCount(status);
+            if (session instanceof AbstractIoSession) {
+                ((AbstractIoSession) session).increaseIdleCount(status);
+            }
             session.getFilterChain().fireSessionIdle(status);
         }
     }
 
+    private static void notifyWriteTimeout(IoSession session,
+            long currentTime, long writeTimeout, long lastIoTime) {
+        if (session instanceof AbstractIoSession &&
+                writeTimeout > 0 && currentTime - lastIoTime >= writeTimeout &&
+                !((AbstractIoSession) session).getWriteRequestQueue().isEmpty()) {
+            session.getFilterChain().fireExceptionCaught(new WriteTimeoutException());
+        }
+    }
 }

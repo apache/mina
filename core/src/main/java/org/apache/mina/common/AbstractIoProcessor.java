@@ -332,54 +332,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         }
     }
 
-    private void notifyIdleness() throws Exception {
+    private void notifyIdleSessions() throws Exception {
         // process idle sessions
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
-            for (Iterator<AbstractIoSession> i = allSessions(); i.hasNext();) {
-                AbstractIoSession session = i.next();
-                try {
-                    notifyIdleness(session, currentTime);
-                } catch (Exception e) {
-                    session.getFilterChain().fireExceptionCaught(e);
-                }
-            }
-        }
-    }
-
-    private void notifyIdleness(AbstractIoSession session, long currentTime) throws Exception {
-        notifyIdleness0(session, currentTime, session
-                .getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
-                IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
-                .getLastIdleTime(IdleStatus.BOTH_IDLE)));
-        notifyIdleness0(session, currentTime, session
-                .getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
-                IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(),
-                session.getLastIdleTime(IdleStatus.READER_IDLE)));
-        notifyIdleness0(session, currentTime, session
-                .getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
-                IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(),
-                session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
-
-        notifyWriteTimeout(session, currentTime, session
-                .getConfig().getWriteTimeoutInMillis(), session.getLastWriteTime());
-    }
-
-    private void notifyIdleness0(AbstractIoSession session, long currentTime,
-                                 long idleTime, IdleStatus status, long lastIoTime) {
-        if (idleTime > 0 && lastIoTime != 0
-                && currentTime - lastIoTime >= idleTime) {
-            session.increaseIdleCount(status);
-            session.getFilterChain().fireSessionIdle(status);
-        }
-    }
-
-    private void notifyWriteTimeout(AbstractIoSession session,
-                                    long currentTime, long writeTimeout, long lastIoTime) throws Exception {
-        if (writeTimeout > 0 && currentTime - lastIoTime >= writeTimeout
-                && isOpWrite(session)) {
-            session.getFilterChain().fireExceptionCaught(new WriteTimeoutException());
+            IdleStatusChecker.notifyIdleSessions(allSessions(), currentTime);
         }
     }
 
@@ -585,7 +543,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
                     flush();
                     nSessions -= remove();
-                    notifyIdleness();
+                    notifyIdleSessions();
 
                     if (nSessions == 0) {
                         synchronized (lock) {
