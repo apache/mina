@@ -66,11 +66,10 @@ public class DatagramConfigTest extends TestCase {
         acceptor.setLocalAddress(new InetSocketAddress(port));
         acceptor.setHandler(mockHandler);
         acceptor.bind();
-
+        
         try {
             connector.setHandler(new IoHandlerAdapter());
-            ConnectFuture future = connector.connect(new InetSocketAddress(
-                    "localhost", port));
+            ConnectFuture future = connector.connect(new InetSocketAddress(port));
             future.awaitUninterruptibly();
 
             WriteFuture writeFuture = future.getSession().write(
