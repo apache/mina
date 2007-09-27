@@ -79,8 +79,6 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
 
     private int workerTimeout = 60; // 1 min.
 
-    private boolean closeFlag;
-
     /**
      * Create a connector with a single processing thread using a NewThreadExecutor
      */
@@ -158,11 +156,8 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     }
 
     public void close(){
-        closeFlag = true;
+        setWorkerTimeout(0);
         selector.wakeup();
-        for (NioProcessor ioProcessor : ioProcessors) {
-          ioProcessor.close();
-        }
     }
 
     @Override
@@ -317,13 +312,6 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
             for (; ;) {
                 try {
                     int nKeys = selector.select(1000);
-
-                    if (closeFlag){
-                        synchronized (lock) {
-                            worker = null;
-                            break;
-                        }
-                    }
 
                     registerNew();
 
