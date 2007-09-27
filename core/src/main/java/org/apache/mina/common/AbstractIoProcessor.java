@@ -549,12 +549,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 // Now mask the preferred ops with the mask of the current session
                 int mask = session.getTrafficMask().getInterestOps();
                 try {
-                    setOpRead(session, isOpRead(session) && ( (mask &SelectionKey.OP_READ) >0) );
+                    setOpRead(session, isOpRead(session) && ((mask & SelectionKey.OP_READ) != 0));
                 } catch (Exception e) {
                     session.getFilterChain().fireExceptionCaught(e);
                 }
                 try {
-                    setOpWrite(session, isOpWrite(session) && ( (mask &SelectionKey.OP_WRITE) >0) );
+                    setOpWrite(session, isOpWrite(session) && ((mask & SelectionKey.OP_WRITE) != 0));
                 } catch (Exception e) {
                     session.getFilterChain().fireExceptionCaught(e);
                 }
@@ -582,7 +582,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
             for (;;) {
                 try {
-                    boolean selected=select(1000);
+                    boolean selected = select(1000);
 
                     if (closeFlag){
                         synchronized (lock) {
