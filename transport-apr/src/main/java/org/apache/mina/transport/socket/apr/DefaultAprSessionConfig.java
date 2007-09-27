@@ -21,13 +21,13 @@ package org.apache.mina.transport.socket.apr;
 
 
 /**
- * Default configuration for {@link APRSession}
+ * Default configuration for {@link AprSession}
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DefaultAPRSessionConfig extends AbstractAPRSessionConfig implements
-        APRSessionConfig {
+class DefaultAprSessionConfig extends AbstractAprSessionConfig implements
+        AprSessionConfig {
 
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
 
@@ -72,7 +72,7 @@ class DefaultAPRSessionConfig extends AbstractAPRSessionConfig implements
     /**
      * Creates a new instance.
      */
-    DefaultAPRSessionConfig() {
+    DefaultAprSessionConfig() {
     }
 
     public boolean isReuseAddress() {

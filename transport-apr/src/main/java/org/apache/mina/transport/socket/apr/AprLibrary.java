@@ -29,12 +29,12 @@ import org.apache.tomcat.jni.Pool;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class APRLibrary {
+class AprLibrary {
 
     // is APR library was initialized (load of native libraries)
-    private static APRLibrary library = null;
+    private static AprLibrary library = null;
 
-    static synchronized APRLibrary getLibrary() {
+    static synchronized AprLibrary getLibrary() {
         if (!isInitialized())
             initialize();
         return library;
@@ -42,7 +42,7 @@ class APRLibrary {
 
     static synchronized void initialize() {
         if (library == null)
-            library = new APRLibrary();
+            library = new AprLibrary();
     }
 
     static synchronized boolean isInitialized() {
@@ -52,7 +52,7 @@ class APRLibrary {
     // APR memory pool (package wide mother pool)	
     private long pool = -1;
 
-    private APRLibrary() {
+    private AprLibrary() {
         try {
             Library.initialize(null);
         } catch (Exception e) {

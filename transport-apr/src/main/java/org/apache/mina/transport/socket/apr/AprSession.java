@@ -19,24 +19,22 @@
  */
 package org.apache.mina.transport.socket.apr;
 
-import org.apache.tomcat.jni.Socket;
+import java.net.InetSocketAddress;
+
+import org.apache.mina.common.IoSession;
 
 /**
- * Protocol usable with the {@link APRConnector}.
+ * {@link IoSession} for the {@link AprConnector}
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public enum APRProtocol {
-    TCP(Socket.APR_PROTO_TCP,Socket.SOCK_STREAM), 
-    UDP(Socket.APR_PROTO_UDP,Socket.SOCK_DGRAM),
-    SCTP(Socket.APR_PROTO_SCTP,Socket.SOCK_STREAM);
+public interface AprSession extends IoSession {
+    AprSessionConfig getConfig();
 
-    int socketType;
-    int codeProto;
+    InetSocketAddress getRemoteAddress();
 
-    private APRProtocol(int codeProto,int socketType) {
-        this.codeProto = codeProto;
-        this.socketType = socketType;
-    }
+    InetSocketAddress getLocalAddress();
+
+    InetSocketAddress getServiceAddress();
 }

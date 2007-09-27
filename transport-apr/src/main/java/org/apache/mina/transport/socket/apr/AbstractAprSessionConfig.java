@@ -23,22 +23,22 @@ import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.IoSessionConfig;
 
 /**
- * An abstract APRSessionConfig {@link APRSessionConfig}.
+ * An abstract APRSessionConfig {@link AprSessionConfig}.
  *  
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev:  $, $Date:  $
  */
-abstract class AbstractAPRSessionConfig extends AbstractIoSessionConfig
-        implements APRSessionConfig {
+abstract class AbstractAprSessionConfig extends AbstractIoSessionConfig
+        implements AprSessionConfig {
 
-    public AbstractAPRSessionConfig() {
+    public AbstractAprSessionConfig() {
         super();
     }
 
     @Override
     protected final void doSetAll(IoSessionConfig config) {
-        if (config instanceof APRSessionConfig) {
-            APRSessionConfig cfg = (APRSessionConfig) config;
+        if (config instanceof AprSessionConfig) {
+            AprSessionConfig cfg = (AprSessionConfig) config;
             setKeepAlive(cfg.isKeepAlive());
             setOobInline(cfg.isOobInline());
             setReceiveBufferSize(cfg.getReceiveBufferSize());

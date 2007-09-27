@@ -33,19 +33,19 @@ import org.apache.mina.common.TransportMetadata;
 import org.apache.tomcat.jni.Socket;
 
 /**
- * Implementation for {@link APRSession}
+ * Implementation for {@link AprSession}
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class APRSessionImpl extends AbstractIoSession implements APRSession {
+class AprSessionImpl extends AbstractIoSession implements AprSession {
     private long socket;
 
     private final IoService service;
 
-    private final APRSessionConfig config = new APRSessionConfigImpl();
+    private final AprSessionConfig config = new APRSessionConfigImpl();
 
-    private final APRIoProcessor ioProcessor;
+    private final AprIoProcessor ioProcessor;
 
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
 
@@ -59,7 +59,7 @@ class APRSessionImpl extends AbstractIoSession implements APRSession {
 
     static final TransportMetadata METADATA = new DefaultTransportMetadata(
             "Apache Portable Runtime socket", false, true,
-            InetSocketAddress.class, APRSessionConfig.class, ByteBuffer.class);
+            InetSocketAddress.class, AprSessionConfig.class, ByteBuffer.class);
 
     private boolean isOpRead=false;
     
@@ -67,7 +67,7 @@ class APRSessionImpl extends AbstractIoSession implements APRSession {
     /**
      * Creates a new instance.
      */
-    APRSessionImpl(IoService service, APRIoProcessor ioProcessor, long socket,
+    AprSessionImpl(IoService service, AprIoProcessor ioProcessor, long socket,
             InetSocketAddress remoteAddress, InetSocketAddress localAddress) {
         this.service = service;
         this.ioProcessor = ioProcessor;
@@ -81,7 +81,7 @@ class APRSessionImpl extends AbstractIoSession implements APRSession {
         return socket;
     }
 
-    public APRSessionConfig getConfig() {
+    public AprSessionConfig getConfig() {
         return config;
     }
 
@@ -111,7 +111,7 @@ class APRSessionImpl extends AbstractIoSession implements APRSession {
         return service;
     }
 
-    APRIoProcessor getIoProcessor() {
+    AprIoProcessor getIoProcessor() {
         return ioProcessor;
     }
 
@@ -124,8 +124,8 @@ class APRSessionImpl extends AbstractIoSession implements APRSession {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
-    private class APRSessionConfigImpl extends AbstractAPRSessionConfig
-            implements APRSessionConfig {
+    private class APRSessionConfigImpl extends AbstractAprSessionConfig
+            implements AprSessionConfig {
 
         public boolean isKeepAlive() {
             try {

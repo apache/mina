@@ -24,12 +24,12 @@ import java.net.Socket;
 import org.apache.mina.common.IoSessionConfig;
 
 /**
- * {@link IoSessionConfig} for configuring {@link APRSession} options.
+ * {@link IoSessionConfig} for configuring {@link AprSession} options.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface APRSessionConfig extends IoSessionConfig {
+public interface AprSessionConfig extends IoSessionConfig {
 
     /**
      * @see Socket#getReuseAddress()

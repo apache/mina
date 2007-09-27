@@ -40,13 +40,13 @@ import org.apache.tomcat.jni.Status;
  * An {@link IoConnector} implementation using the Apache Portable Runtime 
  * (APR : http://apr.apache.org) for providing socket.
  * It's supporting different transport protocol, so you need to give the 
- * wanted {@link APRProtocol} as parameter to the constructor.
- * @see APRSession
- * @see APRProtocol
+ * wanted {@link AprProtocol} as parameter to the constructor.
+ * @see AprSession
+ * @see AprProtocol
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class APRConnector extends AbstractIoConnector {
+public class AprConnector extends AbstractIoConnector {
 
     /**
      * @noinspection StaticNonFinalField
@@ -60,11 +60,11 @@ public class APRConnector extends AbstractIoConnector {
 
     private final Executor executor;
 
-    private final APRIoProcessor[] ioProcessors;
+    private final AprIoProcessor[] ioProcessors;
 
     private int processorDistributor = 0;
 
-    private APRProtocol protocol;
+    private AprProtocol protocol;
 
     /**
      * Create a connector with a single processing thread using a
@@ -72,7 +72,7 @@ public class APRConnector extends AbstractIoConnector {
      * @param protocol 
      *            The needed socket protocol (TCP,UDP,...)
      */
-    public APRConnector(APRProtocol protocol) {
+    public AprConnector(AprProtocol protocol) {
         this(protocol, 1, new NewThreadExecutor());
     }
 
@@ -86,15 +86,15 @@ public class APRConnector extends AbstractIoConnector {
      * @param executor
      *            Executor to use for launching threads
      */
-    public APRConnector(APRProtocol protocol, int processorCount,
+    public AprConnector(AprProtocol protocol, int processorCount,
             Executor executor) {
-        super(new DefaultAPRSessionConfig());
+        super(new DefaultAprSessionConfig());
 
         this.protocol = protocol;
 
         // load  the APR library
 
-        APRLibrary.initialize();
+        AprLibrary.initialize();
 
         if (processorCount < 1) {
             throw new IllegalArgumentException(
@@ -103,10 +103,10 @@ public class APRConnector extends AbstractIoConnector {
 
         this.executor = executor;
         this.processorCount = processorCount;
-        ioProcessors = new APRIoProcessor[processorCount];
+        ioProcessors = new AprIoProcessor[processorCount];
 
         for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new APRIoProcessor("APRConnectorIoProcessor-"
+            ioProcessors[i] = new AprIoProcessor("APRConnectorIoProcessor-"
                     + id + "." + i, executor);
         }
     }
@@ -120,11 +120,11 @@ public class APRConnector extends AbstractIoConnector {
             //pool = Pool.create(pool);
             long inetAddr = 0;
             inetAddr = Address.info(sockAddr.getHostName(), Socket.APR_INET,
-                    sockAddr.getPort(), 0, APRLibrary.getLibrary().getPool());
+                    sockAddr.getPort(), 0, AprLibrary.getLibrary().getPool());
 
             // TODO : type of socket need to be configurable
             long clientSock = Socket.create(Socket.APR_INET,
-                    protocol.socketType, protocol.codeProto, APRLibrary
+                    protocol.socketType, protocol.codeProto, AprLibrary
                             .getLibrary().getPool());
 
             
@@ -143,9 +143,9 @@ public class APRConnector extends AbstractIoConnector {
             }
 
             ConnectFuture future = new DefaultConnectFuture();
-            APRIoProcessor proc=nextProcessor();
+            AprIoProcessor proc=nextProcessor();
             System.err.println("proc : "+proc);
-            APRSessionImpl session = new APRSessionImpl(this,proc ,
+            AprSessionImpl session = new AprSessionImpl(this,proc ,
                     clientSock, sockAddr, (InetSocketAddress) localAddress);
 
             try {
@@ -176,7 +176,7 @@ public class APRConnector extends AbstractIoConnector {
         return super.getListeners();
     }
 
-    private APRIoProcessor nextProcessor() {
+    private AprIoProcessor nextProcessor() {
         if (this.processorDistributor == Integer.MAX_VALUE) {
             this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
         }
@@ -184,6 +184,6 @@ public class APRConnector extends AbstractIoConnector {
     }
 
     public TransportMetadata getTransportMetadata() {
-        return APRSessionImpl.METADATA;
+        return AprSessionImpl.METADATA;
     }
 }
