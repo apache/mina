@@ -137,7 +137,9 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     /**
      * How many seconds to keep the connection thread alive between connection requests
      *
-     * @return Number of seconds to keep connection thread alive
+     * @return the number of seconds to keep connection thread alive.
+     *         0 means that the connection thread will terminate immediately
+     *         when there's no connection to make.
      */
     public int getWorkerTimeout() {
         return workerTimeout;
@@ -146,7 +148,10 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     /**
      * Set how many seconds the connection worker thread should remain alive once idle before terminating itself.
      *
-     * @param workerTimeout Number of seconds to keep thread alive. Must be >=0
+     * @param workerTimeout the number of seconds to keep thread alive.
+     *                      Must be >=0.  If 0 is specified, the connection
+     *                      worker thread will terminate immediately when
+     *                      there's no connection to make.
      */
     public void setWorkerTimeout(int workerTimeout) {
         if (workerTimeout < 0) {
