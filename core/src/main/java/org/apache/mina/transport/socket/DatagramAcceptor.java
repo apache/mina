@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoSessionRecycler;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
@@ -32,4 +33,16 @@ import org.apache.mina.common.IoAcceptor;
 public interface DatagramAcceptor extends DatagramService, IoAcceptor {
     InetSocketAddress getLocalAddress();
     void setLocalAddress(InetSocketAddress localAddress);
+
+    /**
+     * Returns the {@link IoSessionRecycler} for this service.
+     */
+    IoSessionRecycler getSessionRecycler();
+
+    /**
+     * Sets the {@link IoSessionRecycler} for this service.
+     *
+     * @param sessionRecycler <tt>null</tt> to use the default recycler
+     */
+    void setSessionRecycler(IoSessionRecycler sessionRecycler);
 }

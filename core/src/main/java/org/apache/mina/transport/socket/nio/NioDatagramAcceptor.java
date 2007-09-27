@@ -209,18 +209,10 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         return session;
     }
 
-    /**
-     * Returns the {@link IoSessionRecycler} for this service.
-     */
     public IoSessionRecycler getSessionRecycler() {
         return sessionRecycler;
     }
 
-    /**
-     * Sets the {@link IoSessionRecycler} for this service.
-     *
-     * @param sessionRecycler <tt>null</tt> to use the default recycler
-     */
     public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
         synchronized (bindLock) {
             if (isBound()) {
