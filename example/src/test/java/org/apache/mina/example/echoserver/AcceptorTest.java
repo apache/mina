@@ -19,18 +19,12 @@
  */
 package org.apache.mina.example.echoserver;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 
-import javax.net.ServerSocketFactory;
-import javax.net.SocketFactory;
-
-import org.apache.commons.net.EchoTCPClient;
-import org.apache.commons.net.EchoUDPClient;
 import org.apache.mina.example.echoserver.ssl.SslServerSocketFactory;
 import org.apache.mina.example.echoserver.ssl.SslSocketFactory;
 
@@ -45,76 +39,28 @@ public class AcceptorTest extends AbstractTest {
     }
 
     public void testTCP() throws Exception {
-        EchoTCPClient client = new EchoTCPClient();
-        testTCP0(client);
+        testTCP0(new Socket("localhost", port));
     }
 
     public void testTCPWithSSL() throws Exception {
         // Add an SSL filter
         useSSL = true;
 
-        // Create a commons-net socket factory
+        // Create a echo client with SSL factory and test it.
         SslSocketFactory.setSslEnabled(true);
         SslServerSocketFactory.setSslEnabled(true);
-        org.apache.commons.net.SocketFactory factory = new org.apache.commons.net.SocketFactory() {
-
-            private SocketFactory f = SslSocketFactory.getSocketFactory();
-
-            private ServerSocketFactory ssf = SslServerSocketFactory
-                    .getServerSocketFactory();
-
-            public Socket createSocket(String arg0, int arg1)
-                    throws UnknownHostException, IOException {
-                return f.createSocket(arg0, arg1);
-            }
-
-            public Socket createSocket(InetAddress arg0, int arg1)
-                    throws IOException {
-                return f.createSocket(arg0, arg1);
-            }
-
-            public Socket createSocket(String arg0, int arg1, InetAddress arg2,
-                    int arg3) throws UnknownHostException, IOException {
-                return f.createSocket(arg0, arg1, arg2, arg3);
-            }
-
-            public Socket createSocket(InetAddress arg0, int arg1,
-                    InetAddress arg2, int arg3) throws IOException {
-                return f.createSocket(arg0, arg1, arg2, arg3);
-            }
-
-            public ServerSocket createServerSocket(int arg0) throws IOException {
-                return ssf.createServerSocket(arg0);
-            }
-
-            public ServerSocket createServerSocket(int arg0, int arg1)
-                    throws IOException {
-                return ssf.createServerSocket(arg0, arg1);
-            }
-
-            public ServerSocket createServerSocket(int arg0, int arg1,
-                    InetAddress arg2) throws IOException {
-                return ssf.createServerSocket(arg0, arg1, arg2);
-            }
-
-        };
-
-        // Create a echo client with SSL factory and test it.
-        EchoTCPClient client = new EchoTCPClient();
-        client.setSocketFactory(factory);
-        testTCP0(client);
+        testTCP0(SslSocketFactory.getSocketFactory().createSocket(
+                "localhost", port));
     }
 
-    private void testTCP0(EchoTCPClient client) throws Exception {
-        client.connect("localhost", port);
+    private void testTCP0(Socket client) throws Exception {
+        client.setSoTimeout(3000);
         byte[] writeBuf = new byte[16];
 
         for (int i = 0; i < 10; i++) {
             fillWriteBuffer(writeBuf, i);
             client.getOutputStream().write(writeBuf);
         }
-
-        client.setSoTimeout(30000);
 
         byte[] readBuf = new byte[writeBuf.length];
 
@@ -144,31 +90,31 @@ public class AcceptorTest extends AbstractTest {
         } catch (SocketTimeoutException e) {
         }
 
-        client.disconnect();
+        client.getInputStream().close();
+        client.close();
     }
 
     public void testUDP() throws Exception {
-        EchoUDPClient client = new EchoUDPClient();
-        client.open();
-        client.setSoTimeout(3000);
+        DatagramSocket client = new DatagramSocket();
+        client.connect(new InetSocketAddress(port));
+        client.setSoTimeout(500);
 
         byte[] writeBuf = new byte[16];
         byte[] readBuf = new byte[writeBuf.length];
-
-        client.setSoTimeout(500);
+        DatagramPacket wp = new DatagramPacket(writeBuf, writeBuf.length);
+        DatagramPacket rp = new DatagramPacket(readBuf, readBuf.length);
 
         for (int i = 0; i < 10; i++) {
             fillWriteBuffer(writeBuf, i);
-            client.send(writeBuf, writeBuf.length, InetAddress.getByName(null),
-                    port);
+            client.send(wp);
 
-            assertEquals(readBuf.length, client
-                    .receive(readBuf, readBuf.length));
+            client.receive(rp);
+            assertEquals(writeBuf.length, rp.getLength());
             assertEquals(writeBuf, readBuf);
         }
 
         try {
-            client.receive(readBuf);
+            client.receive(rp);
             fail("Unexpected incoming data.");
         } catch (SocketTimeoutException e) {
         }

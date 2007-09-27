@@ -138,15 +138,6 @@ class NioDatagramSession extends NioSession implements DatagramSession {
         return METADATA;
     }
 
-    @Override
-    public WriteFuture write(Object message, SocketAddress destination) {
-        if (!this.config.isBroadcast()) {
-            throw new IllegalStateException("Non-broadcast session");
-        }
-
-        return super.write(message, destination);
-    }
-
     public InetSocketAddress getRemoteAddress() {
         return remoteAddress;
     }
