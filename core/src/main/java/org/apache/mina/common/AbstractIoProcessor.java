@@ -541,20 +541,17 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             case OPEN:
                 // The normal is OP_READ and, if there are write requests in the
                 // session's write queue, set OP_WRITE to trigger flushing.
-                int ops = SelectionKey.OP_READ;
-                if (!session.getWriteRequestQueue().isEmpty()) {
-                    ops |= SelectionKey.OP_WRITE;
-                }
-
-                // Now mask the preferred ops with the mask of the current session
                 int mask = session.getTrafficMask().getInterestOps();
                 try {
-                    setOpRead(session, isOpRead(session) && ((mask & SelectionKey.OP_READ) != 0));
+                    setOpRead(session, (mask & SelectionKey.OP_READ) != 0);
                 } catch (Exception e) {
                     session.getFilterChain().fireExceptionCaught(e);
                 }
                 try {
-                    setOpWrite(session, isOpWrite(session) && ((mask & SelectionKey.OP_WRITE) != 0));
+                    setOpWrite(
+                            session,
+                            !session.getWriteRequestQueue().isEmpty() &&
+                                    ((mask & SelectionKey.OP_WRITE) != 0));
                 } catch (Exception e) {
                     session.getFilterChain().fireExceptionCaught(e);
                 }

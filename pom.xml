@@ -121,8 +121,9 @@
             <exclude>**/Abstract*</exclude>
 
             <!-- Timing issues with these tests due to VM bug for releasing file descriptors -->
+<!--
             <exclude>**/DatagramBindTest.java</exclude>
-            <exclude>**/VmPipeTrafficControlTest.java</exclude>
+-->
 
             <exclude>**/*RegressionTest*</exclude>
           </excludes>

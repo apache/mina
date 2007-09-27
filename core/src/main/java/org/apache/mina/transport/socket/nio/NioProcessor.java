@@ -140,7 +140,7 @@ class NioProcessor extends AbstractIoProcessor {
         if (value) {
             key.interestOps(key.interestOps() | SelectionKey.OP_READ);
         } else {
-            key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
+            key.interestOps(key.interestOps() & (~SelectionKey.OP_READ));
         }
     }
 
@@ -151,7 +151,7 @@ class NioProcessor extends AbstractIoProcessor {
         if (value) {
             key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
         } else {
-            key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+            key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
         }
     }
 
