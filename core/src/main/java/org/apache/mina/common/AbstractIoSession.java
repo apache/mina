@@ -158,6 +158,11 @@ public abstract class AbstractIoSession implements IoSession {
         if (message == null) {
             throw new NullPointerException("message");
         }
+        
+        if (!getTransportMetadata().isConnectionless() &&
+                remoteAddress != null) {
+            throw new UnsupportedOperationException();
+        }
 
         if (isClosing() || !isConnected()) {
             return DefaultWriteFuture.newNotWrittenFuture(this);

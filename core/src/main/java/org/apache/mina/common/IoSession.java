@@ -89,6 +89,28 @@ public interface IoSession {
     WriteFuture write(Object message);
 
     /**
+     * (Optional) Writes the specified <tt>message</tt> to the specified <tt>destination</tt>.
+     * This operation is asynchronous; {@link IoHandler#messageSent(IoSession, Object)}
+     * will be invoked when the message is actually sent to remote peer. You can
+     * also wait for the returned {@link WriteFuture} if you want to wait for
+     * the message actually written.
+     * <p>
+     * When you implement a client that receives a broadcast message from a server
+     * such as DHCP server, the client might need to send a response message for the
+     * broadcast message the server sent.  Because the remote address of the session
+     * is not the address of the server in case of broadcasting, there should be a
+     * way to specify the destination when you write the response message.
+     * This interface provides {@link #write(Object, SocketAddress)} method so you
+     * can specify the destination.
+     *
+     * @param destination <tt>null</tt> if you want the message sent to the
+     *                    default remote address
+     *                    
+     * @throws UnsupportedOperationException if this operation is not supported
+     */
+    WriteFuture write(Object message, SocketAddress destination);
+
+    /**
      * Closes this session immediately.  This operation is asynchronous.
      * Wait for the returned {@link CloseFuture} if you want to wait for
      * the session actually closed.

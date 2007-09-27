@@ -2,9 +2,9 @@ package org.apache.mina.transport.socket;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.BroadcastIoSession;
+import org.apache.mina.common.IoSession;
 
-public interface DatagramSession extends BroadcastIoSession {
+public interface DatagramSession extends IoSession {
     DatagramSessionConfig getConfig();
 
     InetSocketAddress getRemoteAddress();
