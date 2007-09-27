@@ -43,6 +43,7 @@ import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.transport.socket.DatagramAcceptor;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
@@ -54,8 +55,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramAcceptor extends AbstractIoAcceptor implements
-        org.apache.mina.transport.socket.DatagramAcceptor {
+public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramAcceptor {
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
 
     private static volatile int nextId = 0;
@@ -76,21 +76,21 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
     private final Queue<ServiceOperationFuture> cancelQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
 
-    private final Queue<DatagramSessionImpl> flushingSessions = new ConcurrentLinkedQueue<DatagramSessionImpl>();
+    private final Queue<NioDatagramSession> flushingSessions = new ConcurrentLinkedQueue<NioDatagramSession>();
 
     private Worker worker;
 
     /**
      * Creates a new instance.
      */
-    public DatagramAcceptor() {
+    public NioDatagramAcceptor() {
         this(new NewThreadExecutor());
     }
 
     /**
      * Creates a new instance.
      */
-    public DatagramAcceptor(Executor executor) {
+    public NioDatagramAcceptor(Executor executor) {
         super(new DefaultDatagramSessionConfig());
 
         try {
@@ -113,7 +113,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
     }
 
     public TransportMetadata getTransportMetadata() {
-        return DatagramSessionImpl.METADATA;
+        return NioDatagramSession.METADATA;
     }
 
     @Override
@@ -191,7 +191,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
             }
 
             // If a new session needs to be created.
-            DatagramSessionImpl datagramSession = new DatagramSessionImpl(
+            NioDatagramSession datagramSession = new NioDatagramSession(
                     this, ch, processor, remoteAddress);
             datagramSession.setSelectionKey(key);
 
@@ -250,8 +250,8 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         }
 
         public void flush(IoSession session) {
-            if (scheduleFlush((DatagramSessionImpl) session)) {
-                Selector selector = DatagramAcceptor.this.selector;
+            if (scheduleFlush((NioDatagramSession) session)) {
+                Selector selector = NioDatagramAcceptor.this.selector;
                 if (selector != null) {
                     selector.wakeup();
                 }
@@ -273,7 +273,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         }
     }
 
-    private boolean scheduleFlush(DatagramSessionImpl session) {
+    private boolean scheduleFlush(NioDatagramSession session) {
         if (session.setScheduledForFlush(true)) {
             flushingSessions.add(session);
             return true;
@@ -300,7 +300,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
                     cancelKeys();
 
                     if (selector.keys().isEmpty()) {
-                        synchronized (DatagramAcceptor.this) {
+                        synchronized (NioDatagramAcceptor.this) {
                             if (selector.keys().isEmpty()
                                     && registerQueue.isEmpty()
                                     && cancelQueue.isEmpty()) {
@@ -336,7 +336,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
                 if (key.isWritable()) {
                     for (IoSession session : getManagedSessions()) {
-                        scheduleFlush((DatagramSessionImpl) session);
+                        scheduleFlush((NioDatagramSession) session);
                     }
                 }
             } catch (Throwable t) {
@@ -351,7 +351,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
         SocketAddress remoteAddress = channel.receive(readBuf.buf());
         if (remoteAddress != null) {
-            DatagramSessionImpl session = (DatagramSessionImpl) newSessionWithoutLock(remoteAddress);
+            NioDatagramSession session = (NioDatagramSession) newSessionWithoutLock(remoteAddress);
 
             readBuf.flip();
 
@@ -366,7 +366,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
 
     private void flushSessions() {
         for (; ;) {
-            DatagramSessionImpl session = flushingSessions.poll();
+            NioDatagramSession session = flushingSessions.poll();
             if (session == null) {
                 break;
             }
@@ -384,7 +384,7 @@ public class DatagramAcceptor extends AbstractIoAcceptor implements
         }
     }
 
-    private boolean flush(DatagramSessionImpl session) throws IOException {
+    private boolean flush(NioDatagramSession session) throws IOException {
         // Clear OP_WRITE
         SelectionKey key = session.getSelectionKey();
         if (key == null) {

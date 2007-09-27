@@ -30,7 +30,7 @@ import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.example.udp.MemoryMonitor;
-import org.apache.mina.transport.socket.nio.DatagramConnector;
+import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class MemMonClient extends IoHandlerAdapter {
 
         log.debug("UDPClient::UDPClient");
         log.debug("Created a datagram connector");
-        connector = new DatagramConnector();
+        connector = new NioDatagramConnector();
 
         log.debug("Setting the handler");
         connector.setHandler(this);

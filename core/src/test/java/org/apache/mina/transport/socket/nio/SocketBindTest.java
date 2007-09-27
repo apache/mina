@@ -26,7 +26,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.transport.AbstractBindTest;
 
 /**
- * Tests {@link SocketAcceptor} resource leakage.
+ * Tests {@link NioSocketAcceptor} resource leakage.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -34,7 +34,7 @@ import org.apache.mina.transport.AbstractBindTest;
 public class SocketBindTest extends AbstractBindTest {
 
     public SocketBindTest() {
-        super(new SocketAcceptor());
+        super(new NioSocketAcceptor());
     }
 
     @Override
@@ -49,6 +49,6 @@ public class SocketBindTest extends AbstractBindTest {
     
     @Override
     protected IoConnector newConnector() {
-        return new SocketConnector();
+        return new NioSocketConnector();
     }
 }

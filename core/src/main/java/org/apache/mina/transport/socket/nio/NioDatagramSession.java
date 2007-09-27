@@ -47,7 +47,7 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class DatagramSessionImpl extends NioSession implements DatagramSession {
+class NioDatagramSession extends NioSession implements DatagramSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
@@ -76,7 +76,7 @@ class DatagramSessionImpl extends NioSession implements DatagramSession {
     /**
      * Creates a new acceptor-side session instance.
      */
-    DatagramSessionImpl(IoService service,
+    NioDatagramSession(IoService service,
                         DatagramChannel ch, IoProcessor processor,
                         SocketAddress remoteAddress) {
         this.service = service;
@@ -93,7 +93,7 @@ class DatagramSessionImpl extends NioSession implements DatagramSession {
     /**
      * Creates a new connector-side session instance.
      */
-    DatagramSessionImpl(IoService service,
+    NioDatagramSession(IoService service,
                         DatagramChannel ch, IoProcessor processor) {
         this(service, ch, processor, ch.socket().getRemoteSocketAddress());
     }

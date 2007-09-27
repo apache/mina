@@ -34,7 +34,7 @@ import javax.swing.JTabbedPane;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
-import org.apache.mina.transport.socket.nio.DatagramAcceptor;
+import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 
 /**
  * The class that will accept and process clients in order to properly
@@ -59,7 +59,7 @@ public class MemoryMonitor {
 
     public MemoryMonitor() throws IOException {
 
-        DatagramAcceptor acceptor = new DatagramAcceptor();
+        NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
         acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new MemoryMonitorHandler(this));
 

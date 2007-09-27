@@ -32,6 +32,7 @@ import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.transport.socket.DatagramConnector;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 import org.apache.mina.util.NewThreadExecutor;
@@ -42,8 +43,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DatagramConnector extends AbstractIoConnector implements
-        org.apache.mina.transport.socket.DatagramConnector{
+public class NioDatagramConnector extends AbstractIoConnector implements DatagramConnector{
 
     private static volatile int nextId = 0;
 
@@ -57,21 +57,21 @@ public class DatagramConnector extends AbstractIoConnector implements
     /**
      * Creates a new instance.
      */
-    public DatagramConnector() {
+    public NioDatagramConnector() {
         this(new NewThreadExecutor());
     }
 
     /**
      * Creates a new instance.
      */
-    public DatagramConnector(Executor executor) {
+    public NioDatagramConnector(Executor executor) {
         this(Runtime.getRuntime().availableProcessors() + 1, executor);
     }
 
     /**
      * Creates a new instance.
      */
-    public DatagramConnector(int processorCount, Executor executor) {
+    public NioDatagramConnector(int processorCount, Executor executor) {
         super(new DefaultDatagramSessionConfig());
         
         if (processorCount < 1) {
@@ -99,7 +99,7 @@ public class DatagramConnector extends AbstractIoConnector implements
     }
 
     public TransportMetadata getTransportMetadata() {
-        return DatagramSessionImpl.METADATA;
+        return NioDatagramSession.METADATA;
     }
 
     @Override
@@ -125,7 +125,7 @@ public class DatagramConnector extends AbstractIoConnector implements
             ch.connect(remoteAddress);
 
             NioProcessor processor = nextProcessor();
-            session = new DatagramSessionImpl(this, ch, processor);
+            session = new NioDatagramSession(this, ch, processor);
             ConnectFuture future = new DefaultConnectFuture();
             // DefaultIoFilterChain will notify the connect future.
             session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);

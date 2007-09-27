@@ -28,7 +28,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
  * A simple chat client for a given user.
@@ -51,7 +51,7 @@ public class ChatClientSupport {
         this.handler = handler;
     }
 
-    public boolean connect(SocketConnector connector, SocketAddress address,
+    public boolean connect(NioSocketConnector connector, SocketAddress address,
             boolean useSsl) {
         if (session != null && session.isConnected()) {
             throw new IllegalStateException(

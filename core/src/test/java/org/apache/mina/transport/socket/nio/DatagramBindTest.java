@@ -34,7 +34,7 @@ import org.apache.mina.transport.AbstractBindTest;
 public class DatagramBindTest extends AbstractBindTest {
 
     public DatagramBindTest() {
-        super(new DatagramAcceptor());
+        super(new NioDatagramAcceptor());
     }
 
     @Override
@@ -49,6 +49,6 @@ public class DatagramBindTest extends AbstractBindTest {
     
     @Override
     protected IoConnector newConnector() {
-        return new DatagramConnector();
+        return new NioDatagramConnector();
     }
 }

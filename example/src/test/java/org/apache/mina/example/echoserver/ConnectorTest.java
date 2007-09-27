@@ -33,8 +33,8 @@ import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.transport.socket.nio.DatagramConnector;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioDatagramConnector;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -65,14 +65,14 @@ public class ConnectorTest extends AbstractTest {
     }
 
     public void testTCP() throws Exception {
-        IoConnector connector = new SocketConnector();
+        IoConnector connector = new NioSocketConnector();
         testConnector(connector);
     }
 
     public void testTCPWithSSL() throws Exception {
         useSSL = true;
         // Create a connector
-        IoConnector connector = new SocketConnector();
+        IoConnector connector = new NioSocketConnector();
 
         // Add an SSL filter to connector
         connector.getFilterChain().addLast("SSL", connectorSSLFilter);
@@ -80,7 +80,7 @@ public class ConnectorTest extends AbstractTest {
     }
 
     public void testUDP() throws Exception {
-        IoConnector connector = new DatagramConnector();
+        IoConnector connector = new NioDatagramConnector();
         testConnector(connector);
     }
 

@@ -32,7 +32,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.http.HttpProtocolCodecFactory;
 import org.apache.mina.filter.codec.http.HttpRequestMessage;
 import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 public class AsyncHttpClient {
 
@@ -58,7 +58,7 @@ public class AsyncHttpClient {
     }
 
     public void connect() throws Exception {
-        SocketConnector connector = new SocketConnector();
+        NioSocketConnector connector = new NioSocketConnector();
 
         connector.setConnectTimeout(connectionTimeout);
 

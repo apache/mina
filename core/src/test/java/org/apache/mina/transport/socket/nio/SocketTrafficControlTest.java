@@ -37,13 +37,13 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
 public class SocketTrafficControlTest extends AbstractTrafficControlTest {
 
     public SocketTrafficControlTest() {
-        super(new SocketAcceptor());
+        super(new NioSocketAcceptor());
     }
 
     @Override
     protected ConnectFuture connect(int port, IoHandler handler)
             throws Exception {
-        IoConnector connector = new SocketConnector();
+        IoConnector connector = new NioSocketConnector();
         connector.setHandler(handler);
         return connector.connect(new InetSocketAddress("localhost", port));
     }

@@ -22,7 +22,7 @@ package org.apache.mina.example.netcat;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
  * (<b>Entry point</b>) NetCat client.  NetCat client connects to the specified
@@ -40,7 +40,7 @@ public class Main {
         }
 
         // Create TCP/IP connector.
-        SocketConnector connector = new SocketConnector();
+        NioSocketConnector connector = new NioSocketConnector();
 
         // Set connect timeout.
         connector.setConnectTimeout(30);

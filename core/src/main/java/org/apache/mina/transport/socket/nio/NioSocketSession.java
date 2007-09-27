@@ -46,7 +46,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class SocketSessionImpl extends NioSession implements SocketSession {
+class NioSocketSession extends NioSession implements SocketSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
@@ -71,7 +71,7 @@ class SocketSessionImpl extends NioSession implements SocketSession {
 
     private int readBufferSize = 1024;
 
-    SocketSessionImpl(IoService service, IoProcessor processor, SocketChannel ch) {
+    NioSocketSession(IoService service, IoProcessor processor, SocketChannel ch) {
         this.service = service;
         this.processor = processor;
         this.ch = ch;

@@ -25,7 +25,7 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
  * (<b>Entry point</b>) HTTP server
@@ -40,7 +40,7 @@ public class Main {
     private static final boolean USE_SSL = false;
 
     public static void main(String[] args) throws Exception {
-        IoAcceptor acceptor = new SocketAcceptor();
+        IoAcceptor acceptor = new NioSocketAcceptor();
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
 
         // Add SSL filter if SSL is enabled.

@@ -26,7 +26,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
 import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import java.net.InetSocketAddress;
 
@@ -44,7 +44,7 @@ public class Main {
     private static final boolean USE_SSL = false;
 
     public static void main(String[] args) throws Exception {
-        SocketAcceptor acceptor = new SocketAcceptor();
+        NioSocketAcceptor acceptor = new NioSocketAcceptor();
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
 
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();

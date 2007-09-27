@@ -39,9 +39,9 @@ import org.apache.mina.util.AvailablePortFinder;
  * @version $Rev$, $Date$
  */
 public class DatagramRecyclerTest extends TestCase {
-    private final DatagramAcceptor acceptor = new DatagramAcceptor();
+    private final NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
 
-    private final DatagramConnector connector = new DatagramConnector();
+    private final NioDatagramConnector connector = new NioDatagramConnector();
 
     public DatagramRecyclerTest() {
     }

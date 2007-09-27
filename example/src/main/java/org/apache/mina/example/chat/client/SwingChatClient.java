@@ -41,7 +41,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.mina.example.chat.client.SwingChatClientHandler.Callback;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
  * Simple chat client based on Swing & MINA that implements the chat protocol.
@@ -72,12 +72,12 @@ public class SwingChatClient extends JFrame implements Callback {
 
     private SwingChatClientHandler handler;
 
-    private SocketConnector connector;
+    private NioSocketConnector connector;
 
     public SwingChatClient() {
         super("Chat Client based on Apache MINA");
 
-        connector = new SocketConnector();
+        connector = new NioSocketConnector();
 
         loginButton = new JButton(new LoginAction());
         loginButton.setText("Connect");

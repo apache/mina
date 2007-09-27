@@ -24,7 +24,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.transport.AbstractConnectorTest;
 
 /**
- * Tests {@link SocketConnector}.
+ * Tests {@link NioSocketConnector}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -33,11 +33,11 @@ public class SocketConnectorTest extends AbstractConnectorTest {
 
     @Override
     protected IoAcceptor createAcceptor() {
-        return new SocketAcceptor();
+        return new NioSocketAcceptor();
     }
 
     @Override
     protected IoConnector createConnector() {
-        return new SocketConnector();
+        return new NioSocketConnector();
     }
 }

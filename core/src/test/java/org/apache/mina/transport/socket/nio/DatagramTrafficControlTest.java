@@ -37,13 +37,13 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
 public class DatagramTrafficControlTest extends AbstractTrafficControlTest {
 
     public DatagramTrafficControlTest() {
-        super(new DatagramAcceptor());
+        super(new NioDatagramAcceptor());
     }
 
     @Override
     protected ConnectFuture connect(int port, IoHandler handler)
             throws Exception {
-        IoConnector connector = new DatagramConnector();
+        IoConnector connector = new NioDatagramConnector();
         connector.setHandler(handler);
         return connector.connect(new InetSocketAddress("localhost", port));
     }

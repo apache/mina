@@ -30,8 +30,8 @@ import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.statistic.ProfilerTimerFilter;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class MdcInjectionFilterTest extends TestCase {
     private static final int TIMEOUT = 5000;
 
     private MyAppender appender = new MyAppender();
-    private SocketAcceptor acceptor;
+    private NioSocketAcceptor acceptor;
 
     @Override
     protected void setUp() throws Exception {
@@ -57,7 +57,7 @@ public class MdcInjectionFilterTest extends TestCase {
         org.apache.log4j.Logger.getRootLogger().removeAllAppenders();
         org.apache.log4j.Logger.getRootLogger().setLevel(Level.DEBUG);
         org.apache.log4j.Logger.getRootLogger().addAppender(appender);
-        acceptor = new SocketAcceptor();
+        acceptor = new NioSocketAcceptor();
     }
 
 
@@ -140,7 +140,7 @@ public class MdcInjectionFilterTest extends TestCase {
         acceptor.bind();
         acceptor.setFilterChainBuilder(chain);
         // create some clients
-        SocketConnector connector = new SocketConnector();
+        NioSocketConnector connector = new NioSocketConnector();
         connector.setHandler(new IoHandlerAdapter());
         SocketAddress remoteAddressClients[] = new SocketAddress[2];
         remoteAddressClients[0] = connectAndWrite(connector,0);
@@ -186,7 +186,7 @@ public class MdcInjectionFilterTest extends TestCase {
         }
     }
 
-    private SocketAddress connectAndWrite(SocketConnector connector, int clientNr) {
+    private SocketAddress connectAndWrite(NioSocketConnector connector, int clientNr) {
         ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost",PORT));
         connectFuture.awaitUninterruptibly(TIMEOUT);
         ByteBuffer message = ByteBuffer.allocate(4).putInt(clientNr).flip();

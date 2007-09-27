@@ -43,8 +43,8 @@ import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
@@ -338,12 +338,12 @@ public class StreamWriteFilterTest extends TestCase {
     }
 
     public void testWriteUsingSocketTransport() throws Exception {
-        SocketAcceptor acceptor = new SocketAcceptor();
+        NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
         SocketAddress address = new InetSocketAddress("localhost",
                 AvailablePortFinder.getNextAvailable());
 
-        SocketConnector connector = new SocketConnector();
+        NioSocketConnector connector = new NioSocketConnector();
 
         FixedRandomInputStream stream = new FixedRandomInputStream(
                 4 * 1024 * 1024);

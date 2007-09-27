@@ -40,6 +40,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
+import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
@@ -51,8 +52,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
-public class SocketAcceptor extends AbstractIoAcceptor implements
-        org.apache.mina.transport.socket.SocketAcceptor {
+public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAcceptor {
 
     /**
      * @noinspection StaticNonFinalField
@@ -92,7 +92,7 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
     /**
      * Create an acceptor with a single processing thread using a NewThreadExecutor
      */
-    public SocketAcceptor() {
+    public NioSocketAcceptor() {
         this(new NewThreadExecutor());
     }
 
@@ -102,7 +102,7 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
      *
      * @param executor Executor to use for launching threads
      */
-    public SocketAcceptor(Executor executor) {
+    public NioSocketAcceptor(Executor executor) {
         this(Runtime.getRuntime().availableProcessors() + 1, executor);
     }
 
@@ -112,7 +112,7 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
      * @param processorCount Number of processing threads
      * @param executor       Executor to use for launching threads
      */
-    public SocketAcceptor(int processorCount, Executor executor) {
+    public NioSocketAcceptor(int processorCount, Executor executor) {
         super(new DefaultSocketSessionConfig());
 
         // The default reuseAddress of an accepted socket should be 'true'.
@@ -171,7 +171,7 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
     }
 
     public TransportMetadata getTransportMetadata() {
-        return SocketSessionImpl.METADATA;
+        return NioSocketSession.METADATA;
     }
 
     @Override
@@ -284,7 +284,7 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
      */
     private class Worker implements Runnable {
         public void run() {
-            Thread.currentThread().setName(SocketAcceptor.this.threadName);
+            Thread.currentThread().setName(NioSocketAcceptor.this.threadName);
 
             for (; ;) {
                 try {
@@ -358,8 +358,8 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
                 try {
                     // Create a new session object.  This class extends
                     // BaseIoSession and is custom for socket-based sessions.
-                    SocketSessionImpl session = new SocketSessionImpl(
-                            SocketAcceptor.this, nextProcessor(), ch);
+                    NioSocketSession session = new NioSocketSession(
+                            NioSocketAcceptor.this, nextProcessor(), ch);
 
                     // add the session to the SocketIoProcessor
                     session.getProcessor().add(session);

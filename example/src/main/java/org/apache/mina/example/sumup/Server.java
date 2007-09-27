@@ -25,7 +25,7 @@ import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
  * (<strong>Entry Point</strong>) Starts SumUp server.
@@ -40,7 +40,7 @@ public class Server {
     private static final boolean USE_CUSTOM_CODEC = true;
 
     public static void main(String[] args) throws Throwable {
-        SocketAcceptor acceptor = new SocketAcceptor();
+        NioSocketAcceptor acceptor = new NioSocketAcceptor();
 
         // Prepare the service configuration.
         if (USE_CUSTOM_CODEC) {

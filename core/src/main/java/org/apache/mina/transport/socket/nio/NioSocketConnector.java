@@ -39,6 +39,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
+import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
@@ -49,8 +50,7 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
-public class SocketConnector extends AbstractIoConnector implements
-        org.apache.mina.transport.socket.SocketConnector {
+public class NioSocketConnector extends AbstractIoConnector implements SocketConnector {
 
     /**
      * @noinspection StaticNonFinalField
@@ -84,7 +84,7 @@ public class SocketConnector extends AbstractIoConnector implements
     /**
      * Create a connector with a single processing thread using a NewThreadExecutor
      */
-    public SocketConnector() {
+    public NioSocketConnector() {
         this(1, new NewThreadExecutor());
     }
 
@@ -94,7 +94,7 @@ public class SocketConnector extends AbstractIoConnector implements
      * @param processorCount Number of processing threads
      * @param executor       Executor to use for launching threads
      */
-    public SocketConnector(int processorCount, Executor executor) {
+    public NioSocketConnector(int processorCount, Executor executor) {
         super(new DefaultSocketSessionConfig());
         if (processorCount < 1) {
             throw new IllegalArgumentException(
@@ -128,7 +128,7 @@ public class SocketConnector extends AbstractIoConnector implements
     }
 
     public TransportMetadata getTransportMetadata() {
-        return SocketSessionImpl.METADATA;
+        return NioSocketSession.METADATA;
     }
 
     @Override
@@ -288,7 +288,7 @@ public class SocketConnector extends AbstractIoConnector implements
     }
 
     private void newSession(SocketChannel ch, ConnectFuture connectFuture) {
-        SocketSessionImpl session = new SocketSessionImpl(this,
+        NioSocketSession session = new NioSocketSession(this,
                 nextProcessor(), ch);
 
         // Set the ConnectFuture of the specified session, which will be
@@ -312,7 +312,7 @@ public class SocketConnector extends AbstractIoConnector implements
         private long lastActive = System.currentTimeMillis();
 
         public void run() {
-            Thread.currentThread().setName(SocketConnector.this.threadName);
+            Thread.currentThread().setName(NioSocketConnector.this.threadName);
 
             for (; ;) {
                 try {

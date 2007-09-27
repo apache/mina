@@ -28,7 +28,7 @@ import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
  * (<strong>Entry Point</strong>) Starts SumUp client.
@@ -58,7 +58,7 @@ public class Client {
             values[i] = Integer.parseInt(args[i]);
         }
 
-        SocketConnector connector = new SocketConnector();
+        NioSocketConnector connector = new NioSocketConnector();
 
         // Change the worker timeout to 1 second to make the I/O thread quit soon
         // when there's no connection to manage.

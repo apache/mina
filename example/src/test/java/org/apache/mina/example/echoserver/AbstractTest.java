@@ -32,8 +32,8 @@ import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
-import org.apache.mina.transport.socket.nio.DatagramAcceptor;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
  * Tests echo server example.
@@ -84,12 +84,12 @@ public abstract class AbstractTest extends TestCase {
                 .getInstance(true));
 
         boundAddress = null;
-        datagramAcceptor = new DatagramAcceptor();
-        socketAcceptor = new SocketAcceptor();
+        datagramAcceptor = new NioDatagramAcceptor();
+        socketAcceptor = new NioSocketAcceptor();
 
         ((DatagramSessionConfig) datagramAcceptor.getSessionConfig())
                 .setReuseAddress(true);
-        ((SocketAcceptor) socketAcceptor).setReuseAddress(true);
+        ((NioSocketAcceptor) socketAcceptor).setReuseAddress(true);
 
         // Find an availble test port and bind to it.
         boolean socketBound = false;

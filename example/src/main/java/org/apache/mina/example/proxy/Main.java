@@ -22,8 +22,8 @@ package org.apache.mina.example.proxy;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
  * (<b>Entry point</b>) Demonstrates how to write a very simple tunneling proxy
@@ -50,10 +50,10 @@ public class Main {
         }
 
         // Create TCP/IP acceptor.
-        SocketAcceptor acceptor = new SocketAcceptor();
+        NioSocketAcceptor acceptor = new NioSocketAcceptor();
 
         // Create TCP/IP connector.
-        IoConnector connector = new SocketConnector();
+        IoConnector connector = new NioSocketConnector();
 
         // Set connect timeout.
         connector.setConnectTimeout(30);

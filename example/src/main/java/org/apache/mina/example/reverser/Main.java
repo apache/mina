@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
  * (<b>Entry point</b>) Reverser server which reverses all text lines from
@@ -38,7 +38,7 @@ public class Main {
     private static final int PORT = 8080;
 
     public static void main(String[] args) throws Exception {
-        SocketAcceptor acceptor = new SocketAcceptor();
+        NioSocketAcceptor acceptor = new NioSocketAcceptor();
 
         // Prepare the configuration
         acceptor.getFilterChain().addLast("logger", new LoggingFilter());

@@ -20,7 +20,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 public class SslFilterTest extends TestCase {
 
@@ -31,7 +31,7 @@ public class SslFilterTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        acceptor = new SocketAcceptor();
+        acceptor = new NioSocketAcceptor();
     }
 
     @Override

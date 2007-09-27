@@ -33,12 +33,12 @@ public class DatagramConnectorTest extends AbstractConnectorTest {
 
     @Override
     protected IoAcceptor createAcceptor() {
-        return new DatagramAcceptor();
+        return new NioDatagramAcceptor();
     }
 
     @Override
     protected IoConnector createConnector() {
-        return new DatagramConnector();
+        return new NioDatagramConnector();
     }
 
     @Override

@@ -23,7 +23,7 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
-import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
  * (<b>Entry point</b>) HTTP server
@@ -49,7 +49,7 @@ public class Server {
 
         try {
             // Create an acceptor
-            SocketAcceptor acceptor = new SocketAcceptor();
+            NioSocketAcceptor acceptor = new NioSocketAcceptor();
 
             // Create a service configuration
             acceptor.getFilterChain().addLast(

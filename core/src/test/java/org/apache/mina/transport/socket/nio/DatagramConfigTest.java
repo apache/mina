@@ -43,9 +43,9 @@ import org.apache.mina.util.AvailablePortFinder;
  * @version $Rev$, $Date$
  */
 public class DatagramConfigTest extends TestCase {
-    private final IoAcceptor acceptor = new DatagramAcceptor();
+    private final IoAcceptor acceptor = new NioDatagramAcceptor();
 
-    private final IoConnector connector = new DatagramConnector();
+    private final IoConnector connector = new NioDatagramConnector();
 
     private String result;
 
