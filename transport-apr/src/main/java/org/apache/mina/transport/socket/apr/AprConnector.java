@@ -55,7 +55,8 @@ public class AprConnector extends AbstractIoConnector {
 
     private final int id = nextId++;
 
-    // private final String threadName = "APRConnector-" + id;
+    private final String threadName = "APRConnector-" + id;
+
     private final int processorCount;
 
     private final Executor executor;
@@ -106,15 +107,15 @@ public class AprConnector extends AbstractIoConnector {
         ioProcessors = new AprIoProcessor[processorCount];
 
         for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new AprIoProcessor("APRConnectorIoProcessor-"
-                    + id + "." + i, executor);
+            ioProcessors[i] = new AprIoProcessor(
+                    threadName + "." + i, executor);
         }
     }
 
     @Override
     protected ConnectFuture doConnect(SocketAddress remoteAddress,
             SocketAddress localAddress) {
-        boolean success = false;
+        // FIXME: this operation should be non-blocking and asynchronous like NioSocketConnector.
         try {
             InetSocketAddress sockAddr = (InetSocketAddress) remoteAddress;
             //pool = Pool.create(pool);
@@ -163,8 +164,6 @@ public class AprConnector extends AbstractIoConnector {
             // Forward the remaining process to the APRIoProcessor.
             // it's will validate the COnnectFuture when the session is in the poll set
             session.getIoProcessor().add(session);
-
-            success = true;
             return future;
         } catch (Exception e) {
             return DefaultConnectFuture.newFailedFuture(e);

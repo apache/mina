@@ -123,8 +123,6 @@ class AprIoProcessor extends AbstractIoProcessor {
 
     @Override
     protected Iterator<AbstractIoSession> allSessions() throws Exception {
-        
-        // TODO Auto-generated method stub
         return new IoSessionIterator(managedSessions.values());
     }
     
