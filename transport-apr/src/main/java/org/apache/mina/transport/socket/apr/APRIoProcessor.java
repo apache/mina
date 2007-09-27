@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.apr;
+package org.apache.mina.transport.socket.apr;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.apr;
+package org.apache.mina.transport.socket.apr;
 
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;

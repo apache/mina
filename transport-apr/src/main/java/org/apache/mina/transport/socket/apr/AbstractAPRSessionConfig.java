@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.transport.apr;
+package org.apache.mina.transport.socket.apr;
 
 import org.apache.mina.common.AbstractIoSessionConfig;
 import org.apache.mina.common.IoSessionConfig;
@@ -37,8 +37,8 @@ abstract class AbstractAPRSessionConfig extends AbstractIoSessionConfig
 
     @Override
     protected final void doSetAll(IoSessionConfig config) {
-        if (config instanceof DefaultAPRSessionConfig) {
-            DefaultAPRSessionConfig cfg = (DefaultAPRSessionConfig) config;
+        if (config instanceof APRSessionConfig) {
+            APRSessionConfig cfg = (APRSessionConfig) config;
             setKeepAlive(cfg.isKeepAlive());
             setOobInline(cfg.isOobInline());
             setReceiveBufferSize(cfg.getReceiveBufferSize());
