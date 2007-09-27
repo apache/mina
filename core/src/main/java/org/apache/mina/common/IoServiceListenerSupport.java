@@ -19,10 +19,11 @@
  */
 package org.apache.mina.common;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.mina.util.ConcurrentHashSet;
 
@@ -42,7 +43,7 @@ public class IoServiceListenerSupport {
     /**
      * A list of {@link IoServiceListener}s.
      */
-    private final List<IoServiceListener> listeners = new ArrayList<IoServiceListener>();
+    private final List<IoServiceListener> listeners = new CopyOnWriteArrayList<IoServiceListener>();
 
     /**
      * Tracks managed sessions.
@@ -54,7 +55,7 @@ public class IoServiceListenerSupport {
      */
     private final Set<IoSession> readOnlyManagedSessions = Collections.unmodifiableSet(managedSessions);
 
-    private boolean activated;
+    private final AtomicBoolean activated = new AtomicBoolean();
 
     /**
      * Creates a new instance.
@@ -70,18 +71,14 @@ public class IoServiceListenerSupport {
      * Adds a new listener.
      */
     public void add(IoServiceListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     /**
      * Removes an existing listener.
      */
     public void remove(IoServiceListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
     public Set<IoSession> getManagedSessions() {
@@ -93,18 +90,12 @@ public class IoServiceListenerSupport {
      * for all registered listeners.
      */
     public void fireServiceActivated() {
-        synchronized (listeners) {
-            if (activated) {
-                return;
-            }
+        if (!activated.compareAndSet(false, true)) {
+            return;
+        }
 
-            try {
-                for (IoServiceListener l : listeners) {
-                    l.serviceActivated(service);
-                }
-            } finally {
-                activated = true;
-            }
+        for (IoServiceListener l : listeners) {
+            l.serviceActivated(service);
         }
     }
 
@@ -113,27 +104,16 @@ public class IoServiceListenerSupport {
      * for all registered listeners.
      */
     public void fireServiceDeactivated() {
-        boolean disconnect = false;
+        if (!activated.compareAndSet(true, false)) {
+            return;
+        }
+        
         try {
-            synchronized (listeners) {
-                if (!activated) {
-                    return;
-                }
-
-                disconnect = true;
-
-                try {
-                    for (IoServiceListener l : listeners) {
-                        l.serviceDeactivated(service);
-                    }
-                } finally {
-                    activated = false;
-                }
+            for (IoServiceListener l : listeners) {
+                l.serviceDeactivated(service);
             }
         } finally {
-            if (disconnect) {
-                disconnectSessions();
-            }
+            disconnectSessions();
         }
     }
 
@@ -142,17 +122,19 @@ public class IoServiceListenerSupport {
      */
     public void fireSessionCreated(IoSession session) {
         boolean firstSession = false;
-        synchronized (managedSessions) {
-            firstSession = managedSessions.isEmpty();
+        if (session.getService() instanceof IoConnector) {
+            synchronized (managedSessions) {
+                firstSession = managedSessions.isEmpty();
+            }
         }
-
+        
         // If already registered, ignore.
         if (!managedSessions.add(session)) {
             return;
         }
 
         // If the first connector session, fire a virtual service activation event.
-        if (session.getService() instanceof IoConnector && firstSession) {
+        if (firstSession) {
             fireServiceActivated();
         }
 
@@ -161,10 +143,8 @@ public class IoServiceListenerSupport {
         session.getFilterChain().fireSessionOpened();
 
         // Fire listener events.
-        synchronized (listeners) {
-            for (IoServiceListener l : listeners) {
-                l.sessionCreated(session);
-            }
+        for (IoServiceListener l : listeners) {
+            l.sessionCreated(session);
         }
     }
 
@@ -177,25 +157,24 @@ public class IoServiceListenerSupport {
             return;
         }
 
-        boolean lastSession = false;
-        synchronized (managedSessions) {
-            lastSession = managedSessions.isEmpty();
-        }
-
         // Fire session events.
         session.getFilterChain().fireSessionClosed();
 
         // Fire listener events.
         try {
-            synchronized (listeners) {
-                for (IoServiceListener l : listeners) {
-                    l.sessionDestroyed(session);
-                }
+            for (IoServiceListener l : listeners) {
+                l.sessionDestroyed(session);
             }
         } finally {
             // Fire a virtual service deactivation event for the last session of the connector.
-            if (session.getService() instanceof IoConnector && lastSession) {
-                fireServiceDeactivated();
+            if (session.getService() instanceof IoConnector) {
+                boolean lastSession = false;
+                synchronized (managedSessions) {
+                    lastSession = managedSessions.isEmpty();
+                }
+                if (lastSession) {
+                    fireServiceDeactivated();
+                }
             }
         }
     }
