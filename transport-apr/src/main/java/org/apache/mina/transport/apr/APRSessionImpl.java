@@ -20,8 +20,6 @@
 package org.apache.mina.transport.apr;
 
 import java.net.InetSocketAddress;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
@@ -32,7 +30,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.WriteRequest;
 import org.apache.tomcat.jni.Socket;
 
 /**

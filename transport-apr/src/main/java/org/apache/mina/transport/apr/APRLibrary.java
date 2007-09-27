@@ -19,8 +19,6 @@
  */
 package org.apache.mina.transport.apr;
 
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoService;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 

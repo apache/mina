@@ -20,7 +20,6 @@
 package org.apache.mina.transport.apr;
 
 import org.apache.mina.common.AbstractIoSessionConfig;
-import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoSessionConfig;
 
 /**

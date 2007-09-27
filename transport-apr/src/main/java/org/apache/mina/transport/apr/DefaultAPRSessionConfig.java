@@ -19,7 +19,6 @@
  */
 package org.apache.mina.transport.apr;
 
-import org.apache.mina.common.IoSession;
 
 /**
  * Default configuration for {@link APRSession}

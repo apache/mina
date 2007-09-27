@@ -21,7 +21,6 @@ package org.apache.mina.transport.apr;
 
 import java.net.Socket;
 
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 
 /**
