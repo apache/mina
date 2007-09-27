@@ -7,8 +7,8 @@
     <version>2.0.0-M1-SNAPSHOT</version>
   </parent>
   <artifactId>mina-integration-jmx</artifactId>
-  <name>Apache MINA JMX integration</name>
-  <packaging>jar</packaging>  
+  <name>Apache MINA JMX Integration</name>
+  <packaging>bundle</packaging>  
   <dependencies>
     <dependency>
       <groupId>org.apache.mina</groupId>
@@ -16,16 +16,6 @@
       <version>${pom.version}</version>
       <scope>compile</scope>
     </dependency>
-
-<!-- This dependency makes the build process very cumbersome
-    <dependency>
-      <groupId>javax.management</groupId>
-      <artifactId>jmxri</artifactId>
-      <version>1.2.1</version>
-      <scope>compile</scope>
-    </dependency>
--->
   </dependencies>
-  
 </project>
 

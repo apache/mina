@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mina-transport-serial</artifactId>
   <name>Apache MINA Serial Communication support</name>
-  <packaging>jar</packaging>  
+  <packaging>bundle</packaging>  
   <dependencies>
     <dependency>
       <groupId>org.apache.mina</groupId>

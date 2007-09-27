@@ -8,6 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mina-protocol-http-server</artifactId>
   <name>Apache MINA HTTP Server</name>
+  <packaging>jar</packaging>  
   <dependencies>
   </dependencies>
 </project>

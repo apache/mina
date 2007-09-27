@@ -24,8 +24,8 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mina-protocol-http-client</artifactId>
-  <packaging>jar</packaging>
   <name>Apache MINA HTTP Client</name>
+  <packaging>bundle</packaging>  
   <dependencies>
     <dependency>
       <groupId>org.apache.mina</groupId>

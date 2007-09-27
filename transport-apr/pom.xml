@@ -7,8 +7,8 @@
     <version>2.0.0-M1-SNAPSHOT</version>
   </parent>
   <artifactId>mina-transport-apr</artifactId>
-  <name>Apache MINA Apache Portable Runtime (APR) communication support</name>
-  <packaging>jar</packaging>  
+  <name>Apache MINA APR Communication Support</name>
+  <packaging>bundle</packaging>
   <dependencies>
     <dependency>
       <groupId>org.apache.mina</groupId>

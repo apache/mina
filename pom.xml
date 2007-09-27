@@ -133,7 +133,7 @@
         <artifactId>maven-source-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-sources</id>
+            <id>attach-source</id>
             <goals>
               <goal>jar</goal>
             </goals>
@@ -159,6 +159,18 @@
           </tagBase>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>1.0.0</version>
+        <inherited>true</inherited>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Export-Package>org.apache.mina.*</Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <reporting>
@@ -175,7 +187,7 @@
           <windowtitle>Apache MINA ${project.version} API Documentation</windowtitle>
           <doctitle>Apache MINA ${project.version} API Documentation</doctitle>
           <encoding>UTF-8</encoding>
-          <excludePackageNames>*.support:*.example.*</excludePackageNames>
+          <excludePackageNames>*.example.*</excludePackageNames>
           <links>
             <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
             <link>http://www.slf4j.org/api/</link>

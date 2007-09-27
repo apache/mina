@@ -10,24 +10,7 @@
   <name>Apache MINA Core</name>
   <packaging>bundle</packaging>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>0.9.0-incubator-SNAPSHOT</version>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Export-Package>org.apache.mina.*</Export-Package>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
   <dependencies>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -48,8 +31,6 @@
       <version>1.2_Java1.3</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
-
 </project>
 
