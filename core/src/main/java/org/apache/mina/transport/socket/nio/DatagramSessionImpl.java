@@ -74,20 +74,28 @@ class DatagramSessionImpl extends NioSession implements DatagramSession {
     private SelectionKey key;
 
     /**
-     * Creates a new connector instance.
+     * Creates a new acceptor-side session instance.
      */
     DatagramSessionImpl(IoService service,
-                        DatagramChannel ch, IoProcessor processor) {
+                        DatagramChannel ch, IoProcessor processor,
+                        SocketAddress remoteAddress) {
         this.service = service;
         this.ch = ch;
         this.handler = service.getHandler();
         this.processor = processor;
-        this.remoteAddress = (InetSocketAddress) ch.socket()
-                .getRemoteSocketAddress();
+        this.remoteAddress = (InetSocketAddress) remoteAddress;
         this.localAddress = (InetSocketAddress) ch.socket()
                 .getLocalSocketAddress();
 
         this.config.setAll(service.getSessionConfig());
+    }
+
+    /**
+     * Creates a new connector-side session instance.
+     */
+    DatagramSessionImpl(IoService service,
+                        DatagramChannel ch, IoProcessor processor) {
+        this(service, ch, processor, ch.socket().getRemoteSocketAddress());
     }
 
     public IoService getService() {

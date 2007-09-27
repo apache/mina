@@ -170,50 +170,28 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
         }
     }
 
-    /**
-     * @see org.apache.mina.common.IoService#getTransportMetadata()
-     */
     public TransportMetadata getTransportMetadata() {
         return SocketSessionImpl.METADATA;
     }
 
-    /**
-     * @see org.apache.mina.common.AbstractIoService#getSessionConfig()
-     */
     @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
 
-    /**
-     * @see org.apache.mina.common.AbstractIoAcceptor#getLocalAddress()
-     */
     @Override
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
 
-    // This method is added to work around a problem with
-    // bean property access mechanism.
-
-    /**
-     * @see org.apache.mina.common.AbstractIoAcceptor#setLocalAddress(java.net.SocketAddress)
-     * @param localAddress the local address
-     */
     public void setLocalAddress(InetSocketAddress localAddress) {
-        super.setLocalAddress(localAddress);
+        setLocalAddress((SocketAddress) localAddress);
     }
 
-    /**
-     * @see ServerSocket#getReuseAddress()
-     */
     public boolean isReuseAddress() {
         return reuseAddress;
     }
 
-    /**
-     * @see ServerSocket#setReuseAddress(boolean)
-     */
     public void setReuseAddress(boolean reuseAddress) {
         synchronized (bindLock) {
             if (isBound()) {
@@ -225,21 +203,10 @@ public class SocketAcceptor extends AbstractIoAcceptor implements
         }
     }
 
-    /**
-     * Returns the size of the backlog.
-     *
-     * @return
-     */
     public int getBacklog() {
         return backlog;
     }
 
-    /**
-     * Sets the size of the backlog.  This can only be done when this
-     * class is not bound
-     *
-     * @param backlog
-     */
     public void setBacklog(int backlog) {
         synchronized (bindLock) {
             if (isBound()) {

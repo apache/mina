@@ -28,13 +28,8 @@ import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.DefaultIoFilterChain;
-import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFilterChainBuilder;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -53,7 +48,7 @@ public class DatagramConnector extends AbstractIoConnector implements
     private static volatile int nextId = 0;
 
     private final int id = nextId++;
-    private final IoService parent;
+    private final String threadName = "DatagramConnector-" + id;
     private final int processorCount;
     private final NioProcessor[] ioProcessors;
 
@@ -77,21 +72,7 @@ public class DatagramConnector extends AbstractIoConnector implements
      * Creates a new instance.
      */
     public DatagramConnector(int processorCount, Executor executor) {
-        this(null, null, processorCount, executor);
-    }
-    
-    DatagramConnector(
-            IoService parent, String threadNamePrefix, int processorCount, Executor executor) {
         super(new DefaultDatagramSessionConfig());
-        
-        // DotagramAcceptor can use DatagramConnector as a child.
-        if (parent == null) {
-            parent = this;
-        }
-        if (threadNamePrefix == null) {
-            threadNamePrefix = "DatagramConnector-" + id;
-        }
-        this.parent = parent;
         
         if (processorCount < 1) {
             throw new IllegalArgumentException(
@@ -105,7 +86,7 @@ public class DatagramConnector extends AbstractIoConnector implements
         // handling sessions.
         for (int i = 0; i < processorCount; i++) {
             ioProcessors[i] = new NioProcessor(
-                    threadNamePrefix + '.' + i, executor);
+                    threadName + '.' + i, executor);
         }
     }
 
@@ -122,66 +103,8 @@ public class DatagramConnector extends AbstractIoConnector implements
     }
 
     @Override
-    protected IoServiceListenerSupport getListeners() {
-        if (parent == this) {
-            return super.getListeners();
-        } else {
-            return ((DatagramAcceptor) parent).getListeners();
-        }
-    }
-
-    @Override
     public DatagramSessionConfig getSessionConfig() {
-        if (parent == this) {
-            return (DatagramSessionConfig) super.getSessionConfig();
-        } else {
-            return (DatagramSessionConfig) parent.getSessionConfig();
-        }
-    }
-
-    @Override
-    public DefaultIoFilterChainBuilder getFilterChain() {
-        if (parent == this) {
-            return super.getFilterChain();
-        } else {
-            return parent.getFilterChain();
-        }
-    }
-
-    @Override
-    public IoFilterChainBuilder getFilterChainBuilder() {
-        if (parent == this) {
-            return super.getFilterChainBuilder();
-        } else {
-            return parent.getFilterChainBuilder();
-        }
-    }
-
-    @Override
-    public void setFilterChainBuilder(IoFilterChainBuilder builder) {
-        if (parent == this) {
-            super.setFilterChainBuilder(builder);
-        } else {
-            parent.setFilterChainBuilder(builder);
-        }
-    }
-
-    @Override
-    public IoHandler getHandler() {
-        if (parent == this) {
-            return super.getHandler();
-        } else {
-            return parent.getHandler();
-        }
-    }
-
-    @Override
-    public void setHandler(IoHandler handler) {
-        if (parent == this) {
-            super.setHandler(handler);
-        } else {
-            parent.setHandler(handler);
-        }
+        return (DatagramSessionConfig) super.getSessionConfig();
     }
 
     @Override
@@ -202,7 +125,7 @@ public class DatagramConnector extends AbstractIoConnector implements
             ch.connect(remoteAddress);
 
             NioProcessor processor = nextProcessor();
-            session = new DatagramSessionImpl(parent, ch, processor);
+            session = new DatagramSessionImpl(this, ch, processor);
             ConnectFuture future = new DefaultConnectFuture();
             // DefaultIoFilterChain will notify the connect future.
             session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);

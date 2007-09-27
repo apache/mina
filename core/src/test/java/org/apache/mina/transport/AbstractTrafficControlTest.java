@@ -92,6 +92,8 @@ public abstract class AbstractTrafficControlTest extends TestCase {
             assertEquals("1", getSent(session));
 
             session.suspendRead();
+            
+            Thread.sleep(100);
 
             write(session, "2");
             assertFalse(canRead(session));
@@ -100,6 +102,8 @@ public abstract class AbstractTrafficControlTest extends TestCase {
 
             session.suspendWrite();
 
+            Thread.sleep(100);
+
             write(session, "3");
             assertFalse(canRead(session));
             assertEquals("1", getReceived(session));
@@ -107,12 +111,16 @@ public abstract class AbstractTrafficControlTest extends TestCase {
 
             session.resumeRead();
 
+            Thread.sleep(100);
+
             write(session, "4");
             assertEquals('2', read(session));
             assertEquals("12", getReceived(session));
             assertEquals("12", getSent(session));
 
             session.resumeWrite();
+
+            Thread.sleep(100);
 
             assertEquals('3', read(session));
             assertEquals('4', read(session));
@@ -124,6 +132,8 @@ public abstract class AbstractTrafficControlTest extends TestCase {
 
             session.suspendWrite();
 
+            Thread.sleep(100);
+
             write(session, "6");
             assertFalse(canRead(session));
             assertEquals("12345", getReceived(session));
@@ -132,12 +142,17 @@ public abstract class AbstractTrafficControlTest extends TestCase {
             session.suspendRead();
             session.resumeWrite();
 
+            Thread.sleep(100);
+
             write(session, "7");
             assertFalse(canRead(session));
             assertEquals("12345", getReceived(session));
             assertEquals("1234567", getSent(session));
 
             session.resumeRead();
+
+            Thread.sleep(100);
+
             assertEquals('6', read(session));
             assertEquals('7', read(session));
 
