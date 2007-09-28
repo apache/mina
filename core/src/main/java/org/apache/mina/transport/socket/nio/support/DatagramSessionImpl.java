@@ -158,15 +158,6 @@ class DatagramSessionImpl extends BaseIoSession implements BroadcastIoSession {
     }
 
     @Override
-    public WriteFuture write(Object message, SocketAddress destination) {
-        if (!this.config.isBroadcast()) {
-            throw new IllegalStateException("Non-broadcast session");
-        }
-
-        return super.write(message, destination);
-    }
-
-    @Override
     protected void write0(WriteRequest writeRequest) {
         filterChain.fireFilterWrite(this, writeRequest);
     }
