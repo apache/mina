@@ -49,13 +49,13 @@ public class IoSessionLogger {
         return session.getHandler().getClass();
     }
 
-    public static void trace(IoSession session, String message) {
+    public static void trace(IoSession session, Object message) {
         trace(getLogger(session), session, message);
     }
 
-    public static void trace(Logger log, IoSession session, String message) {
+    public static void trace(Logger log, IoSession session, Object message) {
         if (log.isTraceEnabled()) {
-            log.trace(String.valueOf(getPrefix(session)) + message);
+            log.trace("{}{}", getPrefix(session), message);
         }
     }
 
@@ -66,17 +66,17 @@ public class IoSessionLogger {
     public static void trace(Logger log, IoSession session, String message,
             Throwable cause) {
         if (log.isTraceEnabled()) {
-            log.trace(String.valueOf(getPrefix(session)) + message, cause);
+            log.trace(getPrefix(session) + message, cause);
         }
     }
 
-    public static void debug(IoSession session, String message) {
+    public static void debug(IoSession session, Object message) {
         debug(getLogger(session), session, message);
     }
 
-    public static void debug(Logger log, IoSession session, String message) {
+    public static void debug(Logger log, IoSession session, Object message) {
         if (log.isDebugEnabled()) {
-            log.debug(String.valueOf(getPrefix(session)) + message);
+            log.debug("{}{}", getPrefix(session), message);
         }
     }
 
@@ -87,17 +87,17 @@ public class IoSessionLogger {
     public static void debug(Logger log, IoSession session, String message,
             Throwable cause) {
         if (log.isDebugEnabled()) {
-            log.debug(String.valueOf(getPrefix(session)) + message, cause);
+            log.debug(getPrefix(session) + message, cause);
         }
     }
 
-    public static void info(IoSession session, String message) {
+    public static void info(IoSession session, Object message) {
         info(getLogger(session), session, message);
     }
 
-    public static void info(Logger log, IoSession session, String message) {
+    public static void info(Logger log, IoSession session, Object message) {
         if (log.isInfoEnabled()) {
-            log.info(String.valueOf(getPrefix(session)) + message);
+            log.info("{}{}", getPrefix(session), message);
         }
     }
 
@@ -108,17 +108,17 @@ public class IoSessionLogger {
     public static void info(Logger log, IoSession session, String message,
             Throwable cause) {
         if (log.isInfoEnabled()) {
-            log.info(String.valueOf(getPrefix(session)) + message, cause);
+            log.info(getPrefix(session) + message, cause);
         }
     }
 
-    public static void warn(IoSession session, String message) {
+    public static void warn(IoSession session, Object message) {
         warn(getLogger(session), session, message);
     }
 
-    public static void warn(Logger log, IoSession session, String message) {
+    public static void warn(Logger log, IoSession session, Object message) {
         if (log.isWarnEnabled()) {
-            log.warn(String.valueOf(getPrefix(session)) + message);
+            log.warn("{}{}", getPrefix(session), message);
         }
     }
 
@@ -133,17 +133,17 @@ public class IoSessionLogger {
     public static void warn(Logger log, IoSession session, String message,
             Throwable cause) {
         if (log.isWarnEnabled()) {
-            log.warn(String.valueOf(getPrefix(session)) + message, cause);
+            log.warn(getPrefix(session) + message, cause);
         }
     }
 
-    public static void error(IoSession session, String message) {
+    public static void error(IoSession session, Object message) {
         error(getLogger(session), session, message);
     }
 
-    public static void error(Logger log, IoSession session, String message) {
+    public static void error(Logger log, IoSession session, Object message) {
         if (log.isErrorEnabled()) {
-            log.error(String.valueOf(getPrefix(session)) + message);
+            log.error("{}{}", getPrefix(session), message);
         }
     }
 
@@ -158,7 +158,7 @@ public class IoSessionLogger {
     public static void error(Logger log, IoSession session, String message,
             Throwable cause) {
         if (log.isErrorEnabled()) {
-            log.error(String.valueOf(getPrefix(session)) + message, cause);
+            log.error(getPrefix(session) + message, cause);
         }
     }
 
