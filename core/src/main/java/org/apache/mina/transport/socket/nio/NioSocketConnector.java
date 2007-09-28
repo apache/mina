@@ -33,7 +33,6 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
-import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.RuntimeIoException;
@@ -58,25 +57,17 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     private static volatile int nextId = 0;
 
     private final Object lock = new Object();
-
     private final int id = nextId++;
-
     private final String threadName = "SocketConnector-" + id;
-
     private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
-
+    private final Queue<ConnectionRequest> cancelQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
     private final NioProcessor[] ioProcessors;
-
     private final int processorCount;
-
     private final Executor executor;
-
     private final Selector selector;
 
     private Worker worker;
-
     private int processorDistributor = 0;
-
     private int workerTimeout = 60; // 1 min.
 
     /**
@@ -200,9 +191,8 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
         }
 
         ConnectionRequest request = new ConnectionRequest(ch);
-        startupWorker();
-
         connectQueue.add(request);
+        startupWorker();
         selector.wakeup();
 
         return request;
@@ -229,6 +219,29 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
                 ch.register(selector, SelectionKey.OP_CONNECT, req);
             } catch (IOException e) {
                 req.setException(e);
+            }
+        }
+    }
+
+    private void cancelKeys() {
+        for (; ;) {
+            ConnectionRequest req = cancelQueue.poll();
+            if (req == null) {
+                break;
+            }
+
+            SocketChannel ch = req.channel;
+            SelectionKey key = ch.keyFor(selector);
+            if (key == null) {
+                continue;
+            }
+            
+            key.cancel();
+            
+            try {
+                ch.close();
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
             }
         }
     }
@@ -288,14 +301,11 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     }
 
     private void newSession(SocketChannel ch, ConnectFuture connectFuture) {
-        NioSocketSession session = new NioSocketSession(this,
-                nextProcessor(), ch);
-
-        // Set the ConnectFuture of the specified session, which will be
-        // removed and notified by AbstractIoFilterChain eventually.
-        session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE,
-                connectFuture);
-
+        NioSocketSession session = new NioSocketSession(
+                this, nextProcessor(), ch);
+        
+        finishSessionInitialization(session, connectFuture);
+        
         // Forward the remaining process to the SocketIoProcessor.
         session.getProcessor().add(session);
     }
@@ -325,6 +335,8 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
                     }
 
                     processTimedOutSessions(selector.keys());
+                    
+                    cancelKeys();
 
                     if (selector.keys().isEmpty()) {
                         if (System.currentTimeMillis() - lastActive > workerTimeout * 1000L) {
@@ -354,13 +366,20 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
 
     private class ConnectionRequest extends DefaultConnectFuture {
         private final SocketChannel channel;
-
         private final long deadline;
 
         private ConnectionRequest(SocketChannel channel) {
             this.channel = channel;
             this.deadline = System.currentTimeMillis()
                     + getConnectTimeoutMillis();
+        }
+
+        @Override
+        public void cancel() {
+            super.cancel();
+            cancelQueue.add(this);
+            startupWorker();
+            selector.wakeup();
         }
     }
 }

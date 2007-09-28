@@ -28,6 +28,9 @@ package org.apache.mina.common;
  */
 public class DefaultConnectFuture extends DefaultIoFuture implements
         ConnectFuture {
+    
+    private static final Object CANCELED = new Object();
+    
     /**
      * Returns a new {@link ConnectFuture} which is already marked as 'failed to connect'.
      */
@@ -52,8 +55,10 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
         } else if (v instanceof Throwable) {
             throw (RuntimeIoException) new RuntimeIoException(
                     "Failed to get the session.").initCause((Throwable) v);
-        } else {
+        } else if (v instanceof IoSession) {
             return (IoSession) v;
+        } else {
+            return null;
         }
     }
 
@@ -69,6 +74,10 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
     public boolean isConnected() {
         return getValue() instanceof IoSession;
     }
+    
+    public boolean isCanceled() {
+        return getValue() == CANCELED;
+    }
 
     public void setSession(IoSession session) {
         setValue(session);
@@ -76,6 +85,10 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
 
     public void setException(Throwable exception) {
         setValue(exception);
+    }
+    
+    public void cancel() {
+        setValue(CANCELED);
     }
 
     @Override

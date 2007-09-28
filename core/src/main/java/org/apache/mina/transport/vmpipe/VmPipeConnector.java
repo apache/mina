@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
@@ -82,6 +81,8 @@ public class VmPipeConnector extends AbstractIoConnector {
 
         VmPipeSessionImpl localSession = new VmPipeSessionImpl(this,
                 getListeners(), actualLocalAddress, getHandler(), entry);
+        
+        finishSessionInitialization(localSession, future);
 
         // and reclaim the local address when the connection is closed.
         localSession.getCloseFuture().addListener(LOCAL_ADDRESS_RECLAIMER);
@@ -92,7 +93,6 @@ public class VmPipeConnector extends AbstractIoConnector {
             this.getFilterChainBuilder().buildFilterChain(filterChain);
 
             // The following sentences don't throw any exceptions.
-            localSession.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);
             getListeners().fireSessionCreated(localSession);
             IdleStatusChecker.getInstance().addSession(localSession);
         } catch (Throwable t) {

@@ -27,7 +27,6 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
-import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoSession;
@@ -112,7 +111,6 @@ public class NioDatagramConnector extends AbstractIoConnector implements Datagra
                                       SocketAddress localAddress) {
         DatagramChannel ch = null;
         boolean initialized = false;
-        IoSession session = null;
         try {
             ch = DatagramChannel.open();
             ch.socket().setReuseAddress(getSessionConfig().isReuseAddress());
@@ -125,11 +123,9 @@ public class NioDatagramConnector extends AbstractIoConnector implements Datagra
             ch.connect(remoteAddress);
 
             NioProcessor processor = nextProcessor();
-            session = new NioDatagramSession(this, ch, processor);
+            final IoSession session = new NioDatagramSession(this, ch, processor);
             ConnectFuture future = new DefaultConnectFuture();
-            // DefaultIoFilterChain will notify the connect future.
-            session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);
-
+            finishSessionInitialization(session, future);
             processor.add(session);
             initialized = true;
             return future;

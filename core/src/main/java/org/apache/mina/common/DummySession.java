@@ -66,7 +66,7 @@ public class DummySession extends AbstractIoSession {
      * Creates a new instance.
      */
     public DummySession() {
-        // Initialize dumy service.
+        // Initialize dummy service.
         IoAcceptor acceptor = new AbstractIoAcceptor(
                 new AbstractIoSessionConfig() {
                     @Override

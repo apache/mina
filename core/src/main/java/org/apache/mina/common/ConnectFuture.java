@@ -55,6 +55,12 @@ public interface ConnectFuture extends IoFuture {
      * Returns <tt>true</tt> if the connect operation is finished successfully.
      */
     boolean isConnected();
+    
+    /**
+     * Returns {@code true} if the connect operation has been canceled by
+     * {@link #cancel()} method.
+     */
+    boolean isCanceled();
 
     /**
      * Sets the newly connected session and notifies all threads waiting for
@@ -69,6 +75,12 @@ public interface ConnectFuture extends IoFuture {
      * internally.  Please do not call this method directly.
      */
     void setException(Throwable exception);
+    
+    /**
+     * Cancels the connection attempt and notifies all threads waiting for
+     * this future.
+     */
+    void cancel();
 
     ConnectFuture await() throws InterruptedException;
 

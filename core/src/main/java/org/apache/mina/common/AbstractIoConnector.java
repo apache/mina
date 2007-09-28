@@ -91,4 +91,27 @@ public abstract class AbstractIoConnector extends AbstractIoService implements
      */
     protected abstract ConnectFuture doConnect(SocketAddress remoteAddress,
             SocketAddress localAddress);
+    
+    /**
+     * Adds required internal attributes and {@link IoFutureListener}s
+     * related with event notifications to the specified {@code session}
+     * and {@code future}.
+     */
+    protected static void finishSessionInitialization(
+            final IoSession session, ConnectFuture future) {
+        // DefaultIoFilterChain will notify the connect future.
+        session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);
+
+        // In case that ConnectFuture.cancel() is invoked before
+        // setSession() is invoked, add a listener that closes the
+        // connection immediately on cancellation.
+        future.addListener(new IoFutureListener() {
+            public void operationComplete(IoFuture future) {
+                ConnectFuture f = (ConnectFuture) future;
+                if (f.isCanceled()) {
+                    session.close();
+                }
+            }
+        });
+    }
 }
