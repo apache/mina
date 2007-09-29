@@ -55,8 +55,8 @@ public abstract class AbstractIoSession implements IoSession {
 
     private final Object lock = new Object();
 
-    private final Map<String, Object> attributes = Collections
-            .synchronizedMap(new HashMap<String, Object>(4));
+    private final Map<Object, Object> attributes = Collections
+            .synchronizedMap(new HashMap<Object, Object>(4));
 
     private final Queue<WriteRequest> writeRequestQueue =
         new ConcurrentLinkedQueue<WriteRequest>();
@@ -219,7 +219,7 @@ public abstract class AbstractIoSession implements IoSession {
         return setAttribute("", attachment);
     }
 
-    public Object getAttribute(String key) {
+    public Object getAttribute(Object key) {
         if (key == null) {
             throw new NullPointerException("key");
         }
@@ -227,7 +227,7 @@ public abstract class AbstractIoSession implements IoSession {
         return attributes.get(key);
     }
 
-    public Object getAttribute(String key, Object defaultValue) {
+    public Object getAttribute(Object key, Object defaultValue) {
         if (key == null) {
             throw new NullPointerException("key");
         }
@@ -243,7 +243,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    public Object setAttribute(String key, Object value) {
+    public Object setAttribute(Object key, Object value) {
         if (key == null) {
             throw new NullPointerException("key");
         }
@@ -255,11 +255,11 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    public Object setAttribute(String key) {
+    public Object setAttribute(Object key) {
         return setAttribute(key, Boolean.TRUE);
     }
 
-    public Object setAttributeIfAbsent(String key, Object value) {
+    public Object setAttributeIfAbsent(Object key, Object value) {
         if (key == null) {
             throw new NullPointerException("key");
         }
@@ -278,7 +278,7 @@ public abstract class AbstractIoSession implements IoSession {
         return oldValue;
     }
 
-    public Object removeAttribute(String key) {
+    public Object removeAttribute(Object key) {
         if (key == null) {
             throw new NullPointerException("key");
         }
@@ -286,7 +286,7 @@ public abstract class AbstractIoSession implements IoSession {
         return attributes.remove(key);
     }
 
-    public boolean removeAttribute(String key, Object value) {
+    public boolean removeAttribute(Object key, Object value) {
         if (key == null) {
             throw new NullPointerException("key");
         }
@@ -305,7 +305,7 @@ public abstract class AbstractIoSession implements IoSession {
         return false;
     }
 
-    public boolean replaceAttribute(String key, Object oldValue, Object newValue) {
+    public boolean replaceAttribute(Object key, Object oldValue, Object newValue) {
         synchronized (attributes) {
             Object actualOldValue = attributes.get(key);
             if (actualOldValue == null) {
@@ -321,13 +321,13 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    public boolean containsAttribute(String key) {
+    public boolean containsAttribute(Object key) {
         return attributes.containsKey(key);
     }
 
-    public Set<String> getAttributeKeys() {
+    public Set<Object> getAttributeKeys() {
         synchronized (attributes) {
-            return new HashSet<String>(attributes.keySet());
+            return new HashSet<Object>(attributes.keySet());
         }
     }
 

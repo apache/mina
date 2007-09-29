@@ -137,7 +137,7 @@ public interface IoSession {
      * @param key the key of the attribute
      * @return <tt>null</tt> if there is no attribute with the specified key
      */
-    Object getAttribute(String key);
+    Object getAttribute(Object key);
 
     /**
      * Returns the value of user defined attribute associated with the
@@ -154,7 +154,7 @@ public interface IoSession {
      * }
      * </pre>
      */
-    Object getAttribute(String key, Object defaultValue);
+    Object getAttribute(Object key, Object defaultValue);
 
     /**
      * Sets a user-defined attribute.
@@ -163,7 +163,7 @@ public interface IoSession {
      * @param value the value of the attribute
      * @return The old value of the attribute.  <tt>null</tt> if it is new.
      */
-    Object setAttribute(String key, Object value);
+    Object setAttribute(Object key, Object value);
 
     /**
      * Sets a user defined attribute without a value.  This is useful when
@@ -173,7 +173,7 @@ public interface IoSession {
      * @param key the key of the attribute
      * @return The old value of the attribute.  <tt>null</tt> if it is new.
      */
-    Object setAttribute(String key);
+    Object setAttribute(Object key);
 
     /**
      * Sets a user defined attribute if the attribute with the specified key
@@ -187,14 +187,14 @@ public interface IoSession {
      * }
      * </pre>
      */
-    Object setAttributeIfAbsent(String key, Object value);
+    Object setAttributeIfAbsent(Object key, Object value);
 
     /**
      * Removes a user-defined attribute with the specified key.
      *
      * @return The old value of the attribute.  <tt>null</tt> if not found.
      */
-    Object removeAttribute(String key);
+    Object removeAttribute(Object key);
 
     /**
      * Removes a user defined attribute with the specified key if the current
@@ -210,7 +210,7 @@ public interface IoSession {
      * }
      * </pre>
      */
-    boolean removeAttribute(String key, Object value);
+    boolean removeAttribute(Object key, Object value);
 
     /**
      * Replaces a user defined attribute with the specified key if the
@@ -226,18 +226,18 @@ public interface IoSession {
      * }
      * </pre>
      */
-    boolean replaceAttribute(String key, Object oldValue, Object newValue);
+    boolean replaceAttribute(Object key, Object oldValue, Object newValue);
 
     /**
      * Returns <tt>true</tt> if this session contains the attribute with
      * the specified <tt>key</tt>.
      */
-    boolean containsAttribute(String key);
+    boolean containsAttribute(Object key);
 
     /**
      * Returns the set of keys of all user-defined attributes.
      */
-    Set<String> getAttributeKeys();
+    Set<Object> getAttributeKeys();
 
     /**
      * Returns <code>true</code> if this session is connected with remote peer.
