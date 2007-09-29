@@ -81,6 +81,9 @@ public class IoEvent {
         case SESSION_OPENED:
             getSession().getFilterChain().fireSessionOpened();
             break;
+        case SESSION_CREATED:
+            getSession().getFilterChain().fireSessionCreated();
+            break;
         case SESSION_CLOSED:
             getSession().getFilterChain().fireSessionClosed();
             break;

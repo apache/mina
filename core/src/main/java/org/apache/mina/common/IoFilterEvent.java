@@ -71,6 +71,9 @@ public class IoFilterEvent extends IoEvent {
         case SESSION_OPENED:
             getNextFilter().sessionOpened(getSession());
             break;
+        case SESSION_CREATED:
+            getNextFilter().sessionCreated(getSession());
+            break;
         case SESSION_CLOSED:
             getNextFilter().sessionClosed(getSession());
             break;
