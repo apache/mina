@@ -46,4 +46,9 @@ public class IoFilterEvent extends IoEvent {
     public NextFilter getNextFilter() {
         return nextFilter;
     }
+    
+    @Override
+    public void fire() {
+        getNextFilter().filter(this);
+    }
 }

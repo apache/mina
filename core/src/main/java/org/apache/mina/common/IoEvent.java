@@ -57,6 +57,10 @@ public class IoEvent {
     public Object getParameter() {
         return parameter;
     }
+    
+    public void fire() {
+        getSession().getFilterChain().fire(getType(), getParameter());
+    }
 
     @Override
     public String toString() {

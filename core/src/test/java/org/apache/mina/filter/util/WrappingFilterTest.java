@@ -8,9 +8,9 @@ import junit.framework.TestCase;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoEvent;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilter;
+import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 import org.easymock.MockControl;
@@ -104,9 +104,9 @@ public class WrappingFilterTest extends TestCase {
         private List<IoEventType> eventsAfter = new ArrayList<IoEventType>();
 
         @Override
-        protected void filter(NextFilter nextFilter, IoEvent event) {
+        protected void filter(IoFilterEvent event) {
             eventsBefore.add(event.getType());
-            nextFilter.filter(event);
+            event.fire();
             eventsAfter.add(event.getType());
         }
     }

@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.mina.common.IoEvent;
+import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.util.WrappingFilter;
 import org.slf4j.MDC;
@@ -57,7 +57,7 @@ public class MdcInjectionFilter extends WrappingFilter {
     };
 
     @Override
-    protected void filter(NextFilter nextFilter, IoEvent event) throws Exception {
+    protected void filter(IoFilterEvent event) throws Exception {
         // since this method can potentially call into itself
         // we need to check the call depth before clearing the MDC
         callDepth.set (callDepth.get() + 1);
@@ -68,7 +68,7 @@ public class MdcInjectionFilter extends WrappingFilter {
         }
         try {
             /* propagate event down the filter chain */
-            nextFilter.filter(event);
+            event.fire();
         } finally {
             callDepth.set ( callDepth.get() - 1);
             if (callDepth.get() == 0) {
