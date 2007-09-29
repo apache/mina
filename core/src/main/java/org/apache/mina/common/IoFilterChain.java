@@ -176,15 +176,6 @@ public interface IoFilterChain {
     void clear() throws Exception;
 
     /**
-     * Fires an {@link IoEvent} of the specified {@link IoEventType}.  Most users don't
-     * need to call this method at all.  Please use this methos only when you implement a
-     * new transport or fire a virtual event.
-     * 
-     * @param parameter the data object associated with the event
-     */
-    public void fire(IoEventType eventType, Object parameter);
-    
-    /**
      * Fires a {@link IoHandler#sessionCreated(IoSession)} event.  Most users don't need to
      * call this method at all.  Please use this method only when you implement a new transport
      * or fire a virtual event.

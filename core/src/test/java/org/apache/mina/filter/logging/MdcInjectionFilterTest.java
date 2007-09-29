@@ -68,7 +68,7 @@ public class MdcInjectionFilterTest extends TestCase {
     }
 
     public void testSimpleChain() throws IOException, InterruptedException {
-      System.out.println("proc: " + Runtime.getRuntime().availableProcessors());
+        System.out.println("proc: " + Runtime.getRuntime().availableProcessors());
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         chain.addFirst("mdc-injector", new MdcInjectionFilter());
         chain.addLast("dummy", new DummyIoFilter());

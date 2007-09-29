@@ -251,10 +251,5 @@ public interface IoFilter {
          * Forwards <tt>filterClose</tt> event to next filter.
          */
         void filterClose(IoSession session);
-        
-        /**
-         * Forwards the specified {@link IoEvent} to next filter.
-         */
-        void filter(IoEvent event);
     }
 }

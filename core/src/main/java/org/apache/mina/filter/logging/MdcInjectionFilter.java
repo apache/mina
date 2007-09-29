@@ -70,7 +70,7 @@ public class MdcInjectionFilter extends WrappingFilter {
             /* propagate event down the filter chain */
             event.fire();
         } finally {
-            callDepth.set ( callDepth.get() - 1);
+            callDepth.set (callDepth.get() - 1);
             if (callDepth.get() == 0) {
                 /* remove context from the MDC */
                 for (Object key : context.keySet()) {

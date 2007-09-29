@@ -49,6 +49,33 @@ public class IoFilterEvent extends IoEvent {
     
     @Override
     public void fire() {
-        getNextFilter().filter(this);
+        switch (getType()) {
+        case MESSAGE_RECEIVED:
+            getNextFilter().messageReceived(getSession(), getParameter());
+            break;
+        case MESSAGE_SENT:
+            getNextFilter().messageSent(getSession(), (WriteRequest) getParameter());
+            break;
+        case WRITE:
+            getNextFilter().filterWrite(getSession(), (WriteRequest) getParameter());
+            break;
+        case CLOSE:
+            getNextFilter().filterClose(getSession());
+            break;
+        case EXCEPTION_CAUGHT:
+            getNextFilter().exceptionCaught(getSession(), (Throwable) getParameter());
+            break;
+        case SESSION_IDLE:
+            getNextFilter().sessionIdle(getSession(), (IdleStatus) getParameter());
+            break;
+        case SESSION_OPENED:
+            getNextFilter().sessionOpened(getSession());
+            break;
+        case SESSION_CLOSED:
+            getNextFilter().sessionClosed(getSession());
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown event type: " + getType());
+        }
     }
 }

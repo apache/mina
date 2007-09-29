@@ -59,7 +59,34 @@ public class IoEvent {
     }
     
     public void fire() {
-        getSession().getFilterChain().fire(getType(), getParameter());
+        switch (getType()) {
+        case MESSAGE_RECEIVED:
+            getSession().getFilterChain().fireMessageReceived(getParameter());
+            break;
+        case MESSAGE_SENT:
+            getSession().getFilterChain().fireMessageSent((WriteRequest) getParameter());
+            break;
+        case WRITE:
+            getSession().getFilterChain().fireFilterWrite((WriteRequest) getParameter());
+            break;
+        case CLOSE:
+            getSession().getFilterChain().fireFilterClose();
+            break;
+        case EXCEPTION_CAUGHT:
+            getSession().getFilterChain().fireExceptionCaught((Throwable) getParameter());
+            break;
+        case SESSION_IDLE:
+            getSession().getFilterChain().fireSessionIdle((IdleStatus) getParameter());
+            break;
+        case SESSION_OPENED:
+            getSession().getFilterChain().fireSessionOpened();
+            break;
+        case SESSION_CLOSED:
+            getSession().getFilterChain().fireSessionClosed();
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown event type: " + getType());
+        }
     }
 
     @Override
