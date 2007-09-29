@@ -270,6 +270,37 @@ public class DefaultIoFilterChain implements IoFilterChain {
                     "Other filter is using the same name '" + name + "'");
         }
     }
+    
+    public void fire(IoEventType eventType, Object parameter) {
+        switch (eventType) {
+        case MESSAGE_RECEIVED:
+            fireMessageReceived(parameter);
+            break;
+        case MESSAGE_SENT:
+            fireMessageSent((WriteRequest) parameter);
+            break;
+        case WRITE:
+            fireFilterWrite((WriteRequest) parameter);
+            break;
+        case CLOSE:
+            fireFilterClose();
+            break;
+        case EXCEPTION_CAUGHT:
+            fireExceptionCaught((Throwable) parameter);
+            break;
+        case SESSION_IDLE:
+            fireSessionIdle((IdleStatus) parameter);
+            break;
+        case SESSION_OPENED:
+            fireSessionOpened();
+            break;
+        case SESSION_CLOSED:
+            fireSessionClosed();
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown event type: " + eventType);
+        }
+    }
 
     public void fireSessionCreated() {
         Entry head = this.head;
@@ -749,6 +780,38 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 public void filterClose(IoSession session) {
                     Entry nextEntry = EntryImpl.this.prevEntry;
                     callPreviousFilterClose(nextEntry, session);
+                }
+                
+                public void filter(IoEvent event) {
+                    Object data = event.getParameter();
+                    switch (event.getType()) {
+                    case MESSAGE_RECEIVED:
+                        messageReceived(session, data);
+                        break;
+                    case MESSAGE_SENT:
+                        messageSent(session, (WriteRequest) data);
+                        break;
+                    case WRITE:
+                        filterWrite(session, (WriteRequest) data);
+                        break;
+                    case CLOSE:
+                        filterClose(session);
+                        break;
+                    case EXCEPTION_CAUGHT:
+                        exceptionCaught(session, (Throwable) data);
+                        break;
+                    case SESSION_IDLE:
+                        sessionIdle(session, (IdleStatus) data);
+                        break;
+                    case SESSION_OPENED:
+                        sessionOpened(session);
+                        break;
+                    case SESSION_CLOSED:
+                        sessionClosed(session);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown event type: " + event.getType());
+                    }
                 }
             };
         }

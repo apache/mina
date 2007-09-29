@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
@@ -130,6 +131,9 @@ public class ExecutorFilterRegressionTest extends TestCase {
         }
 
         public void sessionCreated(IoSession session) {
+        }
+
+        public void filter(IoEvent event) {
         }
     }
 

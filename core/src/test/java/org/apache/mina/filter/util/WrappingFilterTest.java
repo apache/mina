@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoEvent;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoSession;
@@ -103,10 +104,10 @@ public class WrappingFilterTest extends TestCase {
         private List<IoEventType> eventsAfter = new ArrayList<IoEventType>();
 
         @Override
-        protected void wrap(IoEventType eventType, IoSession session, Runnable action) {
-            eventsBefore.add(eventType);
-            action.run();
-            eventsAfter.add(eventType);
+        protected void filter(NextFilter nextFilter, IoEvent event) {
+            eventsBefore.add(event.getType());
+            nextFilter.filter(event);
+            eventsAfter.add(event.getType());
         }
     }
 }
