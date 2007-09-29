@@ -22,12 +22,11 @@ package org.apache.mina.filter.compression;
 import java.io.IOException;
 
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.filter.util.WriteRequestFilter;
 
 /**
  * An {@link IoFilter} which compresses all data using
@@ -56,7 +55,7 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class CompressionFilter extends IoFilterAdapter {
+public class CompressionFilter extends WriteRequestFilter {
     /**
      * Max compression level.  Will give the highest compression ratio, but
      * will also take more cpu time and is the slowest.
@@ -166,18 +165,17 @@ public class CompressionFilter extends IoFilterAdapter {
      * @see org.apache.mina.common.IoFilter#filterWrite(org.apache.mina.common.IoFilter.NextFilter, org.apache.mina.common.IoSession, org.apache.mina.common.IoFilter.WriteRequest)
      */
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
+    protected Object doFilterWrite(
+            NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws IOException {
         if (!compressOutbound) {
-            nextFilter.filterWrite(session, writeRequest);
-            return;
+            return null;
         }
 
         if (session.containsAttribute(DISABLE_COMPRESSION_ONCE)) {
             // Remove the marker attribute because it is temporary.
             session.removeAttribute(DISABLE_COMPRESSION_ONCE);
-            nextFilter.filterWrite(session, writeRequest);
-            return;
+            return null;
         }
 
         Zlib deflater = (Zlib) session.getAttribute(DEFLATER);
@@ -188,11 +186,9 @@ public class CompressionFilter extends IoFilterAdapter {
         ByteBuffer inBuffer = (ByteBuffer) writeRequest.getMessage();
         if (!inBuffer.hasRemaining()) {
             // Ignore empty buffers
-            nextFilter.filterWrite(session, writeRequest);
+            return null;
         } else {
-            ByteBuffer outBuf = deflater.deflate(inBuffer);
-            nextFilter.filterWrite(session, new DefaultWriteRequest(outBuf,
-                    writeRequest.getFuture(), writeRequest.getDestination()));
+            return deflater.deflate(inBuffer);
         }
     }
 

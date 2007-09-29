@@ -22,6 +22,7 @@ package org.apache.mina.filter.reqres;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,19 +31,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.WriteRequestWrapper;
+import org.apache.mina.filter.util.WriteRequestFilter;
 
 /**
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class RequestResponseFilter extends IoFilterAdapter {
+public class RequestResponseFilter extends WriteRequestFilter {
 
     private static final String RESPONSE_INSPECTOR = RequestResponseFilter.class
             .getName()
@@ -179,20 +179,18 @@ public class RequestResponseFilter extends IoFilterAdapter {
             nextFilter.messageReceived(session, response);
         }
     }
-
+    
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    protected Object doFilterWrite(
+            final NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
         if (!(message instanceof Request)) {
-            nextFilter.filterWrite(session, writeRequest);
-            return;
+            return null;
         }
-
-        Request request = (Request) message;
+        
+        final Request request = (Request) message;
         if (request.getTimeoutFuture() != null) {
-            nextFilter.exceptionCaught(session, new IllegalArgumentException(
-                    "Request can not be reused."));
+            throw new IllegalArgumentException("Request can not be reused.");
         }
 
         Map<Object, Request> requestStore = getRequestStore(session);
@@ -205,60 +203,44 @@ public class RequestResponseFilter extends IoFilterAdapter {
             }
         }
         if (oldValue != null) {
-            nextFilter.exceptionCaught(session, new IllegalStateException(
-                    "Duplicate request ID: " + request.getId()));
+            throw new IllegalStateException(
+                    "Duplicate request ID: " + request.getId());
         }
-
-        nextFilter.filterWrite(session, new RequestWriteRequest(writeRequest));
-    }
-
-    @Override
-    public void messageSent(final NextFilter nextFilter,
-            final IoSession session, WriteRequest writeRequest)
-            throws Exception {
-        if (writeRequest instanceof RequestWriteRequest) {
-            // Schedule a task to be executed on timeout.
-            RequestWriteRequest wrappedRequest = (RequestWriteRequest) writeRequest;
-            WriteRequest actualRequest = wrappedRequest.getWriteRequest();
-            final Request request = (Request) actualRequest.getMessage();
-
-            // Find the timeout date avoiding overflow.
-            Date timeoutDate = new Date(System.currentTimeMillis());
-            if (Long.MAX_VALUE - request.getTimeoutMillis() < timeoutDate
-                    .getTime()) {
-                timeoutDate.setTime(Long.MAX_VALUE);
-            } else {
-                timeoutDate.setTime(timeoutDate.getTime()
-                        + request.getTimeoutMillis());
-            }
-
-            TimeoutTask timeoutTask = new TimeoutTask(nextFilter, request,
-                    session);
-
-            // Schedule the timeout task.
-            ScheduledFuture<?> timeoutFuture = timeoutScheduler.schedule(
-                    timeoutTask, request.getTimeoutMillis(),
-                    TimeUnit.MILLISECONDS);
-            request.setTimeoutTask(timeoutTask);
-            request.setTimeoutFuture(timeoutFuture);
-
-            // Add the timtoue task to the unfinished task set.
-            Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
-            synchronized (unrespondedRequests) {
-                unrespondedRequests.add(request);
-            }
-
-            // and forward the original write request.
-            nextFilter.messageSent(session, wrappedRequest.getWriteRequest());
+        
+        // Schedule a task to be executed on timeout.
+        // Find the timeout date avoiding overflow.
+        Date timeoutDate = new Date(System.currentTimeMillis());
+        if (Long.MAX_VALUE - request.getTimeoutMillis() < timeoutDate
+                .getTime()) {
+            timeoutDate.setTime(Long.MAX_VALUE);
         } else {
-            nextFilter.messageSent(session, writeRequest);
+            timeoutDate.setTime(timeoutDate.getTime()
+                    + request.getTimeoutMillis());
         }
+
+        TimeoutTask timeoutTask = new TimeoutTask(
+                nextFilter, request, session);
+
+        // Schedule the timeout task.
+        ScheduledFuture<?> timeoutFuture = timeoutScheduler.schedule(
+                timeoutTask, request.getTimeoutMillis(),
+                TimeUnit.MILLISECONDS);
+        request.setTimeoutTask(timeoutTask);
+        request.setTimeoutFuture(timeoutFuture);
+
+        // Add the timeout task to the unfinished task set.
+        Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
+        synchronized (unrespondedRequests) {
+            unrespondedRequests.add(request);
+        }
+        
+        return request.getMessage();
     }
 
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session)
             throws Exception {
-        // Copy the unifished task set to avoid unnecessary lock acquisition.
+        // Copy the unfinished task set to avoid unnecessary lock acquisition.
         // Copying will be cheap because there won't be that many requests queued.
         Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
         List<Request> unrespondedRequestsCopy;
@@ -268,7 +250,7 @@ public class RequestResponseFilter extends IoFilterAdapter {
             unrespondedRequests.clear();
         }
 
-        // Generate timeout artifically.
+        // Generate timeout artificially.
         for (Request r : unrespondedRequestsCopy) {
             if (r.getTimeoutFuture().cancel(false)) {
                 r.getTimeoutTask().run();
@@ -387,17 +369,6 @@ public class RequestResponseFilter extends IoFilterAdapter {
                 request.signal(e);
                 filter.exceptionCaught(session, e);
             }
-        }
-    }
-
-    private static class RequestWriteRequest extends WriteRequestWrapper {
-        public RequestWriteRequest(WriteRequest writeRequest) {
-            super(writeRequest);
-        }
-
-        @Override
-        public Object getMessage() {
-            return ((Request) super.getMessage()).getMessage();
         }
     }
 }
