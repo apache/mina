@@ -185,39 +185,4 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
             nextFilter.filterClose(session);
         }
     }
-
-    protected final void processEvent(IoFilterEvent event) {
-        NextFilter nextFilter = event.getNextFilter();
-        IoSession session = event.getSession();
-        Object data = event.getParameter();
-
-        switch (event.getType()) {
-        case MESSAGE_RECEIVED:
-            nextFilter.messageReceived(session, data);
-            break;
-        case MESSAGE_SENT:
-            nextFilter.messageSent(session, (WriteRequest) data);
-            break;
-        case WRITE:
-            nextFilter.filterWrite(session, (WriteRequest) data);
-            break;
-        case CLOSE:
-            nextFilter.filterClose(session);
-            break;
-        case EXCEPTION_CAUGHT:
-            nextFilter.exceptionCaught(session, (Throwable) data);
-            break;
-        case SESSION_IDLE:
-            nextFilter.sessionIdle(session, (IdleStatus) data);
-            break;
-        case SESSION_OPENED:
-            nextFilter.sessionOpened(session);
-            break;
-        case SESSION_CLOSED:
-            nextFilter.sessionClosed(session);
-            break;
-        default:
-            throw new InternalError("Unknown event type: " + event.getType());
-        }
-    }
 }

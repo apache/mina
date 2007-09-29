@@ -153,7 +153,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
                     }
                 }
 
-                processEvent(event);
+                event.fire();
             }
 
             if (logger.isDebugEnabled()) {

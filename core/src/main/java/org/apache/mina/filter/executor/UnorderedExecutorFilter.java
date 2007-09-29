@@ -80,7 +80,7 @@ public class UnorderedExecutorFilter extends AbstractExecutorFilter {
         }
 
         public void run() {
-            processEvent(event);
+            event.fire();
         }
     }
 }
