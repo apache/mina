@@ -50,7 +50,6 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
             ((IoSession) session.getAttachment()).closeOnFlush();
             session.setAttachment(null);
         }
-        System.out.println("CLOSED: " + session);
     }
 
     @Override
