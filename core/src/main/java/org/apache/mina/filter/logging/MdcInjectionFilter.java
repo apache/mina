@@ -17,7 +17,7 @@ import org.slf4j.MDC;
  *
  * The following properties will be set for all transports:
  * <ul>
- *  <li>"IoHandlerClass"</li>
+ *  <li>"handlerClass"</li>
  *  <li>"remoteAddress"</li>
  *  <li>"localAddress"</li>
  * </ul>
@@ -34,10 +34,10 @@ import org.slf4j.MDC;
  * User code can also add properties to the context, via
  *
  * If you only want the MDC to be set for the IoHandler code, it's enough to add
- * one MDCInjectionFilter at the end of the filter chain.
+ * one MdcInjectionFilter at the end of the filter chain.
  *
  * If you want the MDC to be set for ALL code, you should
- *   add an MDCInjectionFilter to the start of the chain
+ *   add an MdcInjectionFilter to the start of the chain
  *   and add one after EVERY ExecutorFilter in the chain
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -99,7 +99,7 @@ public class MdcInjectionFilter extends WrappingFilter {
      * @param context key properties will be added to this map
      */
     protected static void fillContext(final IoSession session, final Context context) {
-        context.put("IoHandlerClass", session.getHandler().getClass().getName());
+        context.put("handlerClass", session.getHandler().getClass().getName());
         context.put("remoteAddress", session.getRemoteAddress().toString());
         context.put("localAddress", session.getLocalAddress().toString());
         if (session.getTransportMetadata().getAddressType() == InetSocketAddress.class) {

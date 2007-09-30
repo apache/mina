@@ -164,9 +164,9 @@ public class MdcInjectionFilterTest extends TestCase {
                     "MDC[remotePort] not set for [" + event.getMessage() + "]",
                     event.getMDC("remotePort"));
                 assertEquals(
-                    "every event should have MDC[IoHandlerClass]",
+                    "every event should have MDC[handlerClass]",
                     SimpleIoHandler.class.getName(),
-                    event.getMDC("IoHandlerClass") );
+                    event.getMDC("handlerClass") );
             }
         }
         // asert we have received all expected logging events for each client
