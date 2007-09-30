@@ -80,11 +80,6 @@ public interface IoAcceptor extends IoService {
     void unbind();
 
     /**
-     * Returns <tt>true</tt> if and if only this service is bound to the local address.
-     */
-    boolean isBound();
-
-    /**
      * (Optional) Returns an {@link IoSession} that is bound to the current
      * local address and the specified <tt>remoteAddress</tt> which reuses
      * the local address that is already bound by this service.

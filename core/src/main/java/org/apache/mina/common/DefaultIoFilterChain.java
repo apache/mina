@@ -656,6 +656,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         @Override
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) throws Exception {
+            ((AbstractIoSession) session).increaseReadMessages();
             session.getHandler().messageReceived(session, message);
         }
 

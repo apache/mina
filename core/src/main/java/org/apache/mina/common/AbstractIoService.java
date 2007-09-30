@@ -20,6 +20,7 @@
 package org.apache.mina.common;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -43,6 +44,14 @@ public abstract class AbstractIoService implements IoService {
      * Maintains the {@link IoServiceListener}s of this service.
      */
     private final IoServiceListenerSupport listeners;
+    
+    private volatile long activationTime;
+    private final AtomicLong readBytes = new AtomicLong();
+    private final AtomicLong writtenBytes = new AtomicLong();
+    private final AtomicLong readMessages = new AtomicLong();
+    private final AtomicLong writtenMessages = new AtomicLong();
+    private final AtomicLong scheduledWriteBytes = new AtomicLong();
+    private final AtomicLong scheduledWriteMessages = new AtomicLong();
 
     /**
      * The default {@link IoSessionConfig} which will be used to configure new sessions.
@@ -93,6 +102,10 @@ public abstract class AbstractIoService implements IoService {
         getListeners().remove(listener);
     }
 
+    public boolean isActive() {
+        return getListeners().isActive();
+    }
+
     public Set<IoSession> getManagedSessions() {
         return getListeners().getManagedSessions();
     }
@@ -117,6 +130,64 @@ public abstract class AbstractIoService implements IoService {
         return sessionConfig;
     }
     
+    public long getReadBytes() {
+        return readBytes.get();
+    }
+    
+    protected void increaseReadBytes(long increment) {
+        readBytes.addAndGet(increment);
+    }
+
+    public long getReadMessages() {
+        return readMessages.get();
+    }
+    
+    protected void increaseReadMessages() {
+        readMessages.incrementAndGet();
+    }
+
+    public long getScheduledWriteBytes() {
+        return scheduledWriteBytes.get();
+    }
+    
+    protected void increaseScheduledWriteBytes(long increment) {
+        scheduledWriteBytes.addAndGet(increment);
+    }
+
+    public long getScheduledWriteMessages() {
+        return scheduledWriteMessages.get();
+    }
+    
+    protected void increaseScheduledWriteMessages() {
+        scheduledWriteMessages.incrementAndGet();
+    }
+
+    public long getActivationTime() {
+        return activationTime;
+    }
+    
+    protected void setActivationTime(long activationTime) {
+        this.activationTime = activationTime;
+    }
+
+    public long getWrittenBytes() {
+        return writtenBytes.get();
+    }
+    
+    protected void increaseWrittenBytes(long increment) {
+        writtenBytes.addAndGet(increment);
+        scheduledWriteBytes.addAndGet(-increment);
+    }
+
+    public long getWrittenMessages() {
+        return writtenMessages.get();
+    }
+    
+    protected void increaseWrittenMessages() {
+        writtenMessages.incrementAndGet();
+        scheduledWriteMessages.decrementAndGet();
+    }
+
     protected static class ServiceOperationFuture extends DefaultIoFuture {
         public ServiceOperationFuture() {
             super(null);

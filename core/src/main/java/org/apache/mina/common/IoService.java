@@ -101,4 +101,21 @@ public interface IoService {
      *                               not a {@link DefaultIoFilterChainBuilder}
      */
     DefaultIoFilterChainBuilder getFilterChain();
+    
+    boolean isActive();
+    
+    long getActivationTime();
+    
+    long getReadBytes();
+    
+    long getWrittenBytes();
+    
+    long getReadMessages();
+    
+    long getWrittenMessages();
+    
+    long getScheduledWriteBytes();
+    
+    long getScheduledWriteMessages();
+    
 }

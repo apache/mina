@@ -124,11 +124,11 @@ public abstract class AbstractIoSession implements IoSession {
         return closeFuture;
     }
 
-    public boolean isScheduledForFlush() {
+    protected boolean isScheduledForFlush() {
         return scheduledForFlush.get();
     }
 
-    public boolean setScheduledForFlush(boolean flag) {
+    protected boolean setScheduledForFlush(boolean flag) {
         if (flag) {
             return scheduledForFlush.compareAndSet(false, true);
         } else {
@@ -388,16 +388,20 @@ public abstract class AbstractIoSession implements IoSession {
         return scheduledWriteMessages.get();
     }
 
-    public void increaseReadBytes(int increment) {
+    protected void increaseReadBytes(long increment) {
         if (increment > 0) {
             readBytes += increment;
             lastReadTime = System.currentTimeMillis();
             idleCountForBoth = 0;
             idleCountForRead = 0;
+            
+            if (getService() instanceof AbstractIoService) {
+                ((AbstractIoService) getService()).increaseReadBytes(increment);
+            }
         }
     }
 
-    public void increaseWrittenBytes(long increment) {
+    protected void increaseWrittenBytes(long increment) {
         if (increment > 0) {
             writtenBytes += increment;
             lastWriteTime = System.currentTimeMillis();
@@ -405,27 +409,43 @@ public abstract class AbstractIoSession implements IoSession {
             idleCountForWrite = 0;
 
             scheduledWriteBytes.addAndGet(-increment);
+            
+            if (getService() instanceof AbstractIoService) {
+                ((AbstractIoService) getService()).increaseWrittenBytes(increment);
+            }
         }
     }
 
-    public void increaseReadMessages() {
+    protected void increaseReadMessages() {
         readMessages++;
+        if (getService() instanceof AbstractIoService) {
+            ((AbstractIoService) getService()).increaseReadMessages();
+        }
     }
 
-    public void increaseWrittenMessages() {
+    protected void increaseWrittenMessages() {
         writtenMessages++;
         scheduledWriteMessages.decrementAndGet();
+        if (getService() instanceof AbstractIoService) {
+            ((AbstractIoService) getService()).increaseWrittenMessages();
+        }
     }
 
-    public void increaseScheduledWriteBytes(int increment) {
+    protected void increaseScheduledWriteBytes(long increment) {
         scheduledWriteBytes.addAndGet(increment);
+        if (getService() instanceof AbstractIoService) {
+            ((AbstractIoService) getService()).increaseScheduledWriteBytes(increment);
+        }
     }
 
-    public void increaseScheduledWriteMessages() {
+    protected void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
+        if (getService() instanceof AbstractIoService) {
+            ((AbstractIoService) getService()).increaseScheduledWriteMessages();
+        }
     }
 
-    public Queue<WriteRequest> getWriteRequestQueue() {
+    protected Queue<WriteRequest> getWriteRequestQueue() {
         return writeRequestQueue;
     }
 
@@ -493,7 +513,7 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public void increaseIdleCount(IdleStatus status) {
+    protected void increaseIdleCount(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             idleCountForBoth++;
             lastIdleTimeForBoth = System.currentTimeMillis();

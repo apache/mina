@@ -194,7 +194,7 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
 
     public void setReuseAddress(boolean reuseAddress) {
         synchronized (bindLock) {
-            if (isBound()) {
+            if (isActive()) {
                 throw new IllegalStateException(
                         "backlog can't be set while the acceptor is bound.");
             }
@@ -209,7 +209,7 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
 
     public void setBacklog(int backlog) {
         synchronized (bindLock) {
-            if (isBound()) {
+            if (isActive()) {
                 throw new IllegalStateException(
                         "backlog can't be set while the acceptor is bound.");
             }

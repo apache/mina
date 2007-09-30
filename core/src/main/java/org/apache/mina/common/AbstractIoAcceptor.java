@@ -125,7 +125,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
         getListeners().fireServiceDeactivated();
     }
 
-    public boolean isBound() {
+    public boolean isActive() {
         synchronized (bindLock) {
             return bound;
         }

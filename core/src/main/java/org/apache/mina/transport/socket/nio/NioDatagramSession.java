@@ -24,6 +24,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
+import java.util.Queue;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
@@ -35,6 +36,7 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.WriteRequest;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.transport.socket.DatagramSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -148,6 +150,21 @@ class NioDatagramSession extends NioSession implements DatagramSession {
     @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();
+    }
+
+    @Override
+    protected Queue<WriteRequest> getWriteRequestQueue() {
+        return super.getWriteRequestQueue();
+    }
+
+    @Override
+    protected boolean isScheduledForFlush() {
+        return super.isScheduledForFlush();
+    }
+
+    @Override
+    protected boolean setScheduledForFlush(boolean flag) {
+        return super.setScheduledForFlush(flag);
     }
 
     private class SessionConfigImpl extends AbstractDatagramSessionConfig {

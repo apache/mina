@@ -84,6 +84,10 @@ public class IoServiceListenerSupport {
     public Set<IoSession> getManagedSessions() {
         return readOnlyManagedSessions;
     }
+    
+    public boolean isActive() {
+        return activated.get();
+    }
 
     /**
      * Calls {@link IoServiceListener#serviceActivated(IoService)}
@@ -92,6 +96,10 @@ public class IoServiceListenerSupport {
     public void fireServiceActivated() {
         if (!activated.compareAndSet(false, true)) {
             return;
+        }
+        
+        if (service instanceof AbstractIoService) {
+            ((AbstractIoService) service).setActivationTime(System.currentTimeMillis());
         }
 
         for (IoServiceListener l : listeners) {
@@ -114,6 +122,9 @@ public class IoServiceListenerSupport {
             }
         } finally {
             disconnectSessions();
+            if (service instanceof AbstractIoService) {
+                ((AbstractIoService) service).setActivationTime(0);
+            }
         }
     }
 

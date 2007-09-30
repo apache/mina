@@ -163,7 +163,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         }
 
         synchronized (bindLock) {
-            if (!isBound()) {
+            if (!isActive()) {
                 throw new IllegalStateException(
                         "Can't create a session from a unbound service.");
             }
@@ -210,7 +210,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
 
     public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
         synchronized (bindLock) {
-            if (isBound()) {
+            if (isActive()) {
                 throw new IllegalStateException(
                         "sessionRecycler can't be set while the acceptor is bound.");
             }
@@ -349,7 +349,6 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
             newBuf.put(readBuf);
             newBuf.flip();
 
-            session.increaseReadBytes(newBuf.remaining());
             session.getFilterChain().fireMessageReceived(newBuf);
         }
     }
@@ -391,46 +390,40 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
 
         int writtenBytes = 0;
         int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
-        try {
-            for (; ;) {
-                WriteRequest req = writeRequestQueue.peek();
-                if (req == null) {
-                    break;
-                }
-
-                ByteBuffer buf = (ByteBuffer) req.getMessage();
-                if (buf.remaining() == 0) {
-                    // pop and fire event
-                    writeRequestQueue.poll();
-                    session.increaseWrittenMessages();
-                    buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
-                    continue;
-                }
-
-                SocketAddress destination = req.getDestination();
-                if (destination == null) {
-                    destination = session.getRemoteAddress();
-                }
-
-                int localWrittenBytes = ch.send(buf.buf(), destination);
-                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
-                    // Kernel buffer is full or wrote too much
-                    key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                    return false;
-                } else {
-                    key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
-
-                    // pop and fire event
-                    writeRequestQueue.poll();
-                    writtenBytes += localWrittenBytes;
-                    session.increaseWrittenMessages();
-                    buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
-                }
+        for (; ;) {
+            WriteRequest req = writeRequestQueue.peek();
+            if (req == null) {
+                break;
             }
-        } finally {
-            session.increaseWrittenBytes(writtenBytes);
+
+            ByteBuffer buf = (ByteBuffer) req.getMessage();
+            if (buf.remaining() == 0) {
+                // pop and fire event
+                writeRequestQueue.poll();
+                buf.reset();
+                session.getFilterChain().fireMessageSent(req);
+                continue;
+            }
+
+            SocketAddress destination = req.getDestination();
+            if (destination == null) {
+                destination = session.getRemoteAddress();
+            }
+
+            int localWrittenBytes = ch.send(buf.buf(), destination);
+            if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
+                // Kernel buffer is full or wrote too much
+                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                return false;
+            } else {
+                key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+
+                // pop and fire event
+                writeRequestQueue.poll();
+                writtenBytes += localWrittenBytes;
+                buf.reset();
+                session.getFilterChain().fireMessageSent(req);
+            }
         }
 
         return true;

@@ -22,7 +22,6 @@ package org.apache.mina.filter.codec;
 import java.net.SocketAddress;
 import java.util.Queue;
 
-import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
@@ -342,14 +341,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 IoSession session, NextFilter nextFilter) {
             this.session = session;
             this.nextFilter = nextFilter;
-        }
-
-        @Override
-        public void write(Object message) {
-            super.write(message);
-            if (session instanceof AbstractIoSession) {
-                ((AbstractIoSession) session).increaseReadMessages();
-            }
         }
 
         public void flush() {
