@@ -116,12 +116,28 @@ public class MdcInjectionFilter extends WrappingFilter {
      * Add a property to the context for the given session
      * This property will be added to the MDC for all subsequent events
      * @param session The session for which you want to set a property
-     * @param key  The name of the property
+     * @param key  The name of the property (should not be null)
      * @param value The value of the property
      */
     public static void setProperty (IoSession session, String key, String value) {
-        Context context = getContext(session);
-        context.put(key, value);
+      if (key == null) {
+        throw new NullPointerException("key should not be null");
+      }
+      if (value == null) {
+        removeProperty(session, key);
+      }
+      Context context = getContext(session);
+      context.put(key, value);
+      MDC.put(key, value);
+    }
+
+    public static void removeProperty(IoSession session, String key) {
+      if (key == null) {
+        throw new NullPointerException("key should not be null");
+      }
+      Context context = getContext(session);
+      context.remove(key);
+      MDC.remove(key);
     }
 
     private static class Context extends HashMap<String,String> {

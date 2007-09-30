@@ -53,7 +53,7 @@ public class MdcInjectionFilterTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        // uncomment next line if you want to see normal logging
+        // comment out next line if you want to see normal logging
         org.apache.log4j.Logger.getRootLogger().removeAllAppenders();
         org.apache.log4j.Logger.getRootLogger().setLevel(Level.DEBUG);
         org.apache.log4j.Logger.getRootLogger().addAppender(appender);
@@ -68,7 +68,6 @@ public class MdcInjectionFilterTest extends TestCase {
     }
 
     public void testSimpleChain() throws IOException, InterruptedException {
-        System.out.println("proc: " + Runtime.getRuntime().availableProcessors());
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         chain.addFirst("mdc-injector", new MdcInjectionFilter());
         chain.addLast("dummy", new DummyIoFilter());
@@ -175,10 +174,12 @@ public class MdcInjectionFilterTest extends TestCase {
             assertEventExists(events, "sessionCreated", remoteAddressClient, null);
             assertEventExists(events, "sessionOpened", remoteAddressClient, null);
             assertEventExists(events, "decode", remoteAddressClient, null);
-            assertEventExists(events, "messageReceived", remoteAddressClient, null);
+            assertEventExists(events, "messageReceived-1", remoteAddressClient, null);
+            assertEventExists(events, "messageReceived-2", remoteAddressClient, "user-" + i);
             assertEventExists(events, "encode", remoteAddressClient, null);
             assertEventExists(events, "exceptionCaught", remoteAddressClient, "user-" + i);
-            assertEventExists(events, "messageSent", remoteAddressClient, "user-" + i);
+            assertEventExists(events, "messageSent-1", remoteAddressClient, "user-" + i);
+            assertEventExists(events, "messageSent-2", remoteAddressClient, null);
             assertEventExists(events, "sessionIdle", remoteAddressClient, "user-" + i);
             assertEventExists(events, "sessionClosed", remoteAddressClient, "user-" + i);
             assertEventExists(events, "sessionClosed", remoteAddressClient, "user-" + i);
@@ -254,18 +255,20 @@ public class MdcInjectionFilterTest extends TestCase {
 
         @Override
         public void messageReceived(IoSession session, Object message) throws Exception {
-            logger.info("messageReceived");
+            logger.info("messageReceived-1");
             // adding a custom property to the context
             String user = "user-" + message;
             MdcInjectionFilter.setProperty(session, "user", user);
-            logger.info("logged-in: " + user);
+            logger.info("messageReceived-2");
             session.write(message);
             throw new RuntimeException("just a test, forcing exceptionCaught");
         }
 
         @Override
         public void messageSent(IoSession session, Object message) throws Exception {
-            logger.info("messageSent");
+            logger.info("messageSent-1");
+            MdcInjectionFilter.removeProperty(session, "user");
+            logger.info("messageSent-2");
             messageSentLatch.countDown();
         }
     }
