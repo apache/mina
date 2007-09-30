@@ -73,16 +73,17 @@ public class MdcInjectionFilter extends WrappingFilter {
             callDepth.set (callDepth.get() - 1);
             if (callDepth.get() == 0) {
                 /* remove context from the MDC */
-                for (Object key : context.keySet()) {
-                    MDC.remove(key.toString());
+                for (String key : context.keySet()) {
+                    MDC.remove(key);
                 }
                 MDC.remove("name");
+                callDepth.remove();
             }
         }
     }
 
 
-    public static Context getContext(final IoSession session) {
+    private static Context getContext(final IoSession session) {
         Context context = (Context) session.getAttribute(CONTEXT_KEY);
         if (context == null) {
             context = new Context();
@@ -125,10 +126,6 @@ public class MdcInjectionFilter extends WrappingFilter {
     }
 
     private static class Context extends HashMap<String,String> {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = -673025693009555560L;
     }
 
