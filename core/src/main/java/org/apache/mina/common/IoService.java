@@ -102,20 +102,69 @@ public interface IoService {
      */
     DefaultIoFilterChainBuilder getFilterChain();
     
+    /**
+     * Returns a value of whether or not this service is active
+     * 
+     * @return
+     * 	whether of not the service is active.
+     */
     boolean isActive();
     
+    /**
+     * Returns the time when this service was activated.  Should return
+     * zero if the service has not been activated.  
+     * 
+     * @return
+     * 	The time by using <code>System.currentTimeMillis()</code>
+     */
     long getActivationTime();
     
+    /**
+     * Returns the number of bytes read by this service
+     * 
+     * @return
+     * 	The number of bytes this service has read
+     */
     long getReadBytes();
     
+    /**
+     * Returns the number of bytes written out by this service
+     * 
+     * @return
+     * 	The number of bytes this service has written
+     */
     long getWrittenBytes();
     
+    /**
+     * Returns the number of messages this services has read
+     * 
+     * @return
+     * 	The number of messages this services has read
+     */
     long getReadMessages();
     
+    /**
+     * Returns the number of messages this service has written
+     * 
+     * @return
+     * 	The number of messages this service has written
+     */
     long getWrittenMessages();
     
+    /**
+     * Returns the number of bytes scheduled to be written
+     * 
+     * @return
+     * 	The number of bytes scheduled to be written
+     */
     long getScheduledWriteBytes();
     
+    /**
+     * Returns the number of messages scheduled to be written
+     * 
+     * @return
+     * 	The number of messages scheduled to be written
+     */
     long getScheduledWriteMessages();
     
 }
