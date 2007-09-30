@@ -13,73 +13,19 @@
     <dependency>
       <groupId>org.apache.mina</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${pom.version}</version>
-      <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>org.apache.mina</groupId>
       <artifactId>mina-integration-spring</artifactId>
-      <version>${pom.version}</version>
-      <scope>compile</scope>
     </dependency>
-
-   <dependency>
-     <groupId>org.apache.mina</groupId>
-     <artifactId>mina-protocol-http-client</artifactId>
-     <version>${pom.version}</version>
-   </dependency>
-    
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.4.3</version>
-      <scope>runtime</scope>
+      <groupId>org.apache.mina</groupId>
+      <artifactId>mina-protocol-http-client</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.14</version>
-      <scope>compile</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>2.0.6</version>
-      <scope>compile</scope>
+      <artifactId>spring</artifactId>
     </dependency>
-    
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-support</artifactId>
-      <version>2.0.6</version>
-      <scope>compile</scope>
-    </dependency>
-    
-	<dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jmx</artifactId>
-      <version>2.0.6</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-aop</artifactId>
-      <version>2.0.6</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>commons-net</groupId>
-      <artifactId>commons-net</artifactId>
-      <version>1.4.1</version>
-      <scope>test</scope>
-    </dependency>
-    
   </dependencies>
-
 </project>
 

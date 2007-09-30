@@ -12,27 +12,13 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.gleamynode</groupId>
-      <artifactId>netty2</artifactId>
-      <version>1.9.2</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.mina</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${pom.version}</version>
-      <scope>compile</scope>
     </dependency>
-
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.4.3</version>
-      <scope>test</scope>
+      <groupId>net.gleamynode</groupId>
+      <artifactId>netty2</artifactId>
     </dependency>
-
   </dependencies>
-
 </project>
 

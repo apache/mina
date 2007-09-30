@@ -10,55 +10,14 @@
   <name>Apache MINA Spring Integration</name>
   <packaging>bundle</packaging>  
   <dependencies>
-
     <dependency>
       <groupId>org.apache.mina</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${pom.version}</version>
-      <scope>compile</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.4.3</version>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-beans</artifactId>
-      <version>2.0.6</version>
+      <artifactId>spring</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>2.0.6</version>
-    </dependency>
-
-    <dependency>
-      <groupId>easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <version>1.2_Java1.3</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>easymock</groupId>
-      <artifactId>easymockclassextension</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-net</groupId>
-      <artifactId>commons-net</artifactId>
-      <version>1.4.1</version>
-      <scope>test</scope>
-    </dependency>
-    
   </dependencies>
-  
 </project>
 

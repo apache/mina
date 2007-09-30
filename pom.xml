@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
-    <version>3</version>
+    <version>4</version>
   </parent>
   <organization>
     <name>Apache MINA Project</name>
@@ -13,7 +13,7 @@
   <groupId>org.apache.mina</groupId>
   <version>2.0.0-M1-SNAPSHOT</version>
   <artifactId>build</artifactId>
-  <name>Apache MINA Root Build POM</name>
+  <name>Apache MINA Parent POM</name>
   <packaging>pom</packaging>
 
   <url>http://mina.apache.org/</url>
@@ -50,6 +50,8 @@
     MINA (Multipurpose Infrastructure for Network Applications) is a
     network application framework which helps users develop high
     performance and highly scalable network applications easily.
+    It provides an abstract &middot; event-driven &middot; asynchronous
+    API over various transports such as TCP/IP and UDP/IP via Java NIO.
   </description>
 
   <licenses>
@@ -60,31 +62,189 @@
     </license>
   </licenses>
 
+  <dependencyManagement>
+    <dependencies>
+      <!-- Submodules -->
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-core</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-transport-serial</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-transport-apr</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-filter-compression</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-filter-codec-netty</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-filter-codec-http</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-protocol-http-client</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-protocol-http-server</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-integration-jmx</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-integration-spring</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+
+      <!-- Transport -->
+      <dependency>
+        <groupId>tomcat</groupId>
+        <artifactId>tomcat-apr</artifactId>
+        <version>5.5.15</version>
+      </dependency>
+      <dependency>
+        <groupId>org.rxtx</groupId>
+        <artifactId>rxtx</artifactId>
+        <version>2.1.7</version>
+      </dependency>
+
+      <!-- Filter -->
+      <dependency>
+        <groupId>com.jcraft</groupId>
+        <artifactId>jzlib</artifactId>
+        <version>1.0.7</version>
+      </dependency>
+
+      <!-- Protocol -->
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.3</version>
+      </dependency>
+
+      <!-- Integration -->
+      <dependency>
+        <groupId>net.gleamynode</groupId>
+        <artifactId>netty2</artifactId>
+        <version>1.9.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring</artifactId>
+        <version>2.0.6</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- Logging -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.4.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl104-over-slf4j</artifactId>
+        <version>1.4.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.4.3</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.14</version>
+      </dependency>
+
+      <!-- Testing -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>2.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymockclassextension</artifactId>
+        <version>2.2.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
-   <dependency>
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl104-over-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.3.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Plugin Repository</name>
-      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-
-  <repositories>
-  </repositories>
 
   <modules>
     <module>core</module>
@@ -95,8 +255,8 @@
     <module>filter-codec-http</module>
     <module>protocol-http-client</module>
     <module>protocol-http-server</module>
-    <module>integration-spring</module>
     <module>integration-jmx</module>
+    <module>integration-spring</module>
     <module>example</module>
   </modules>
   
@@ -119,12 +279,6 @@
         <configuration>
           <excludes>
             <exclude>**/Abstract*</exclude>
-
-            <!-- Timing issues with these tests due to VM bug for releasing file descriptors -->
-<!--
-            <exclude>**/DatagramBindTest.java</exclude>
--->
-
             <exclude>**/*RegressionTest*</exclude>
           </excludes>
         </configuration>

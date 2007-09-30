@@ -11,36 +11,15 @@
   <packaging>bundle</packaging>  
 
   <dependencies>
-
     <dependency>
       <groupId>org.apache.mina</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${pom.version}</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.4.3</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <version>1.2_Java1.3</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.jcraft</groupId>
       <artifactId>jzlib</artifactId>
-      <version>1.0.7</version>
-      <scope>compile</scope>
     </dependency>
-
   </dependencies>
-
 </project>
 
