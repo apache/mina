@@ -192,6 +192,7 @@ public abstract class AbstractIoSession implements IoSession {
     
     public CloseFuture closeOnFlush() {
         getWriteRequestQueue().offer(CLOSE_REQUEST);
+        getProcessor().flush(this);
         return closeFuture;
     }
 
