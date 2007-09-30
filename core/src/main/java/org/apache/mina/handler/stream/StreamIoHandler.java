@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
@@ -43,11 +44,8 @@ import org.apache.mina.common.IoSessionLogger;
  * @version $Rev$, $Date$
  */
 public abstract class StreamIoHandler extends IoHandlerAdapter {
-    private static final String KEY_IN = StreamIoHandler.class.getName()
-            + ".in";
-
-    private static final String KEY_OUT = StreamIoHandler.class.getName()
-            + ".out";
+    private static final AttributeKey KEY_IN = new AttributeKey(StreamIoHandler.class, "in");
+    private static final AttributeKey KEY_OUT = new AttributeKey(StreamIoHandler.class, "out");
 
     private int readTimeout;
 

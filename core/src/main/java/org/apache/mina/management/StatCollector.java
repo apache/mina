@@ -23,6 +23,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
@@ -49,7 +50,7 @@ public class StatCollector {
     /**
      * The session attribute key for {@link IoSessionStat}.
      */
-    public static final String KEY = StatCollector.class.getName() + ".stat";
+    public static final AttributeKey KEY = new AttributeKey(StatCollector.class, "stat");
 
     /**
      * @noinspection StaticNonFinalField

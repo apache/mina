@@ -19,6 +19,7 @@
  */
 package org.apache.mina.handler.multiton;
 
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
@@ -37,9 +38,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * The key used to store the {@link SingleSessionIoHandler} as a session
      * attribute.
      */
-    public static final String HANDLER = SingleSessionIoHandlerDelegate.class
-            .getName()
-            + ".handler";
+    public static final AttributeKey HANDLER = new AttributeKey(SingleSessionIoHandlerDelegate.class, "handler");
 
     /**
      * The {@link SingleSessionIoHandlerFactory} used to create new

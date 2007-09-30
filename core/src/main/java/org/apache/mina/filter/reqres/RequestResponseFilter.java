@@ -31,6 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
@@ -44,20 +45,11 @@ import org.apache.mina.filter.util.WriteRequestFilter;
  */
 public class RequestResponseFilter extends WriteRequestFilter {
 
-    private static final String RESPONSE_INSPECTOR = RequestResponseFilter.class
-            .getName()
-            + ".responseInspector";
-
-    private static final String REQUEST_STORE = RequestResponseFilter.class
-            .getName()
-            + ".requestStore";
-
-    private static final String UNRESPONDED_REQUEST_STORE = RequestResponseFilter.class
-            .getName()
-            + ".unrespondedRequestStore";
+    private final AttributeKey RESPONSE_INSPECTOR = new AttributeKey(getClass(), "responseInspector");
+    private final AttributeKey REQUEST_STORE = new AttributeKey(getClass(), "requestStore");
+    private final AttributeKey UNRESPONDED_REQUEST_STORE = new AttributeKey(getClass(), "unrespondedRequestStore");
 
     private final ResponseInspectorFactory responseInspectorFactory;
-
     private final ScheduledExecutorService timeoutScheduler;
 
     public RequestResponseFilter(final ResponseInspector responseInspector,

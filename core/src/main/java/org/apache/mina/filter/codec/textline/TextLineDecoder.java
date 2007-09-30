@@ -25,6 +25,7 @@ import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.common.BufferDataException;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -36,8 +37,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @version $Rev$, $Date$,
  */
 public class TextLineDecoder implements ProtocolDecoder {
-    private static final String CONTEXT = TextLineDecoder.class.getName()
-            + ".context";
+    private final AttributeKey CONTEXT = new AttributeKey(getClass(), "context");
 
     private final Charset charset;
 

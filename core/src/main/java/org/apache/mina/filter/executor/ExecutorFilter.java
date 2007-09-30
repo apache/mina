@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterEvent;
@@ -54,6 +55,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */
 public class ExecutorFilter extends AbstractExecutorFilter {
+    private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // added a default constructor for IoC containers that need one
@@ -84,7 +86,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
     @Override
     protected void fireEvent(IoFilterEvent event) {
         IoSession session = event.getSession();
-        SessionBuffer buf = SessionBuffer.getSessionBuffer(session);
+        SessionBuffer buf = getSessionBuffer(session);
 
         boolean execute;
         synchronized (buf.eventQueue) {
@@ -106,22 +108,19 @@ public class ExecutorFilter extends AbstractExecutorFilter {
             getExecutor().execute(new ProcessEventsRunnable(buf));
         }
     }
+    
+    private SessionBuffer getSessionBuffer(IoSession session) {
+        synchronized (session) {
+            SessionBuffer buf = (SessionBuffer) session.getAttribute(BUFFER);
+            if (buf == null) {
+                buf = new SessionBuffer(session);
+                session.setAttribute(BUFFER, buf);
+            }
+            return buf;
+        }
+    }
 
     private static class SessionBuffer {
-        private static final String KEY = SessionBuffer.class.getName()
-                + ".KEY";
-
-        private static SessionBuffer getSessionBuffer(IoSession session) {
-            synchronized (session) {
-                SessionBuffer buf = (SessionBuffer) session.getAttribute(KEY);
-                if (buf == null) {
-                    buf = new SessionBuffer(session);
-                    session.setAttribute(KEY, buf);
-                }
-                return buf;
-            }
-        }
-
         private final IoSession session;
 
         private final Queue<IoFilterEvent> eventQueue = new LinkedList<IoFilterEvent>();

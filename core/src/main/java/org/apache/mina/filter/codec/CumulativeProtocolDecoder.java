@@ -20,6 +20,7 @@
 package org.apache.mina.filter.codec;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 
 /**
@@ -95,9 +96,7 @@ import org.apache.mina.common.IoSession;
  */
 public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
 
-    private static final String BUFFER = CumulativeProtocolDecoder.class
-            .getName()
-            + ".Buffer";
+    private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
 
     /**
      * Creates a new instance.

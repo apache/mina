@@ -25,6 +25,7 @@ import java.util.Queue;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
@@ -43,19 +44,13 @@ import org.apache.mina.common.WriteRequestWrapper;
  * @version $Rev$, $Date$
  */
 public class ProtocolCodecFilter extends IoFilterAdapter {
-    public static final String ENCODER = ProtocolCodecFilter.class.getName()
-            + ".encoder";
-
-    public static final String DECODER = ProtocolCodecFilter.class.getName()
-            + ".decoder";
-
-    private static final String DECODER_OUT = ProtocolCodecFilter.class.getName()
-            + ".decoderOut";
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
-
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(new byte[0]);
 
+    private final AttributeKey ENCODER = new AttributeKey(getClass(), "encoder");
+    private final AttributeKey DECODER = new AttributeKey(getClass(), "decoder");
+    private final AttributeKey DECODER_OUT = new AttributeKey(getClass(), "decoderOut");
     private final ProtocolCodecFactory factory;
 
     public ProtocolCodecFilter(ProtocolCodecFactory factory) {
@@ -125,14 +120,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             }
         };
     }
-
-    @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
-        if (parent.contains(ProtocolCodecFilter.class)) {
-            throw new IllegalStateException(
-                    "A filter chain cannot contain more than one ProtocolCodecFilter.");
-        }
+    
+    public ProtocolEncoder getEncoder(IoSession session) {
+        return (ProtocolEncoder) session.getAttribute(ENCODER);
+    }
+    
+    public ProtocolDecoder getDecoder(IoSession session) {
+        return (ProtocolDecoder) session.getAttribute(DECODER);
     }
 
     @Override
@@ -152,7 +146,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         ByteBuffer in = (ByteBuffer) message;
-        ProtocolDecoder decoder = getDecoder(session);
+        ProtocolDecoder decoder = getDecoder0(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
         try {
@@ -198,7 +192,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             return;
         }
 
-        ProtocolEncoder encoder = getEncoder(session);
+        ProtocolEncoder encoder = getEncoder0(session);
         ProtocolEncoderOutputImpl encoderOut = getEncoderOut(session,
                 nextFilter, writeRequest);
 
@@ -222,7 +216,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public void sessionClosed(NextFilter nextFilter, IoSession session)
             throws Exception {
         // Call finishDecode() first when a connection is closed.
-        ProtocolDecoder decoder = getDecoder(session);
+        ProtocolDecoder decoder = getDecoder0(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         try {
             decoder.finishDecode(session, decoderOut);
@@ -245,7 +239,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         nextFilter.sessionClosed(session);
     }
 
-    private ProtocolEncoder getEncoder(IoSession session) throws Exception {
+    private ProtocolEncoder getEncoder0(IoSession session) throws Exception {
         ProtocolEncoder encoder = (ProtocolEncoder) session
                 .getAttribute(ENCODER);
         if (encoder == null) {
@@ -260,7 +254,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         return new ProtocolEncoderOutputImpl(session, nextFilter, writeRequest);
     }
 
-    private ProtocolDecoder getDecoder(IoSession session) throws Exception {
+    private ProtocolDecoder getDecoder0(IoSession session) throws Exception {
         ProtocolDecoder decoder = (ProtocolDecoder) session
                 .getAttribute(DECODER);
         if (decoder == null) {

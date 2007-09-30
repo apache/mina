@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
@@ -36,8 +37,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @version $Rev$, $Date$,
  */
 public class TextLineEncoder extends ProtocolEncoderAdapter {
-    private static final String ENCODER = TextLineEncoder.class.getName()
-            + ".encoder";
+    private final AttributeKey ENCODER = new AttributeKey(getClass(), "encoder");
 
     private final Charset charset;
 

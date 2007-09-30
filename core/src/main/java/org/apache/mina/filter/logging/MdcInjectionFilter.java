@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.util.WrappingFilter;
@@ -47,7 +48,7 @@ import org.slf4j.MDC;
 public class MdcInjectionFilter extends WrappingFilter {
 
     /** key used for storing the context map in the IoSession */
-    private static final String CONTEXT_KEY = MdcInjectionFilter.class + ".CONTEXT_KEY";
+    private static final AttributeKey CONTEXT_KEY = new AttributeKey(MdcInjectionFilter.class, "context");
 
     private ThreadLocal<Integer> callDepth = new ThreadLocal<Integer>() {
         @Override

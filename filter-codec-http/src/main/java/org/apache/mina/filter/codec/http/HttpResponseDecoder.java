@@ -20,6 +20,7 @@
 package org.apache.mina.filter.codec.http;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -32,84 +33,88 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  */
 public class HttpResponseDecoder extends CumulativeProtocolDecoder {
 
-    public final static String CURRENT_RESPONSE = "CURRENT_RESPONSE";
+    private final AttributeKey CURRENT_RESPONSE =
+        new AttributeKey(getClass(), "currentResponse");
 
     private HttpDecoder httpDecoder = new HttpDecoder();
-
+    
     protected boolean doDecode(IoSession ioSession, ByteBuffer in,
             ProtocolDecoderOutput out) throws Exception {
 
-        HttpResponseMessage response = (HttpResponseMessage) ioSession
-                .getAttribute(CURRENT_RESPONSE);
+        HttpResponseMessage response = (HttpResponseMessage) ioSession.getAttribute(CURRENT_RESPONSE);
         if (response == null) {
             response = new HttpResponseMessage();
             ioSession.setAttribute(CURRENT_RESPONSE, response);
         }
 
-        //Test if we need the response...
-        if (response.getState() == HttpResponseMessage.STATE_START) {
-
-            if (!processStatus(response, in)) {
-                return false;
-            }
-
-            //Handle HTTP/1.1 100 Continue
-            if (response.getStatusCode() == 100) {
-                response.setState(HttpResponseMessage.STATE_STATUS_CONTINUE);
-            } else {
-                response.setState(HttpResponseMessage.STATE_STATUS_READ);
-            }
-        }
-
-        //If we are in a 100 Continue, read until we get the real header
-        if (response.getState() == HttpResponseMessage.STATE_STATUS_CONTINUE) {
-            //Continue reading until we get a blank line
-            while (true) {
-                String line = httpDecoder.decodeLine(in);
-
-                //Check if the entire response has been read
-                if (line == null)
+        try {
+            // Test if we need the response...
+            if (response.getState() == HttpResponseMessage.STATE_START) {
+    
+                if (!processStatus(response, in)) {
                     return false;
-
-                //Check if the entire response headers have been read
-                if (line.length() == 0) {
+                }
+    
+                //Handle HTTP/1.1 100 Continue
+                if (response.getStatusCode() == 100) {
+                    response.setState(HttpResponseMessage.STATE_STATUS_CONTINUE);
+                } else {
                     response.setState(HttpResponseMessage.STATE_STATUS_READ);
-
-                    //The next line should be a header
-                    if (!processStatus(response, in)) {
-                        return false;
-                    }
-                    break;
                 }
             }
+    
+            //If we are in a 100 Continue, read until we get the real header
+            if (response.getState() == HttpResponseMessage.STATE_STATUS_CONTINUE) {
+                //Continue reading until we get a blank line
+                while (true) {
+                    String line = httpDecoder.decodeLine(in);
+    
+                    //Check if the entire response has been read
+                    if (line == null)
+                        return false;
+    
+                    //Check if the entire response headers have been read
+                    if (line.length() == 0) {
+                        response.setState(HttpResponseMessage.STATE_STATUS_READ);
+    
+                        //The next line should be a header
+                        if (!processStatus(response, in)) {
+                            return false;
+                        }
+                        break;
+                    }
+                }
+            }
+    
+            //Are we reading headers?
+            if (response.getState() == HttpResponseMessage.STATE_STATUS_READ) {
+                if (processHeaders(response, in) == false)
+                    return false;
+            }
+    
+            //Are we reading content?
+            if (response.getState() == HttpResponseMessage.STATE_HEADERS_READ) {
+                if (processContent(response, in) == false)
+                    return false;
+            }
+    
+            //If we are chunked and we have read all the content, then read the footers if there are any
+            if (response.isChunked()
+                    && response.getState() == HttpResponseMessage.STATE_CONTENT_READ) {
+                if (processFooters(response, in) == false)
+                    return false;
+            }
+    
+            response.setState(HttpResponseMessage.STATE_FINISHED);
+    
+            out.write(response);
+    
+            ioSession.removeAttribute(CURRENT_RESPONSE);
+            return true;
+        } catch (Exception e) {
+            ioSession.removeAttribute(CURRENT_RESPONSE);
+            throw e;
         }
-
-        //Are we reading headers?
-        if (response.getState() == HttpResponseMessage.STATE_STATUS_READ) {
-            if (processHeaders(response, in) == false)
-                return false;
-        }
-
-        //Are we reading content?
-        if (response.getState() == HttpResponseMessage.STATE_HEADERS_READ) {
-            if (processContent(response, in) == false)
-                return false;
-        }
-
-        //If we are chunked and we have read all the content, then read the footers if there are any
-        if (response.isChunked()
-                && response.getState() == HttpResponseMessage.STATE_CONTENT_READ) {
-            if (processFooters(response, in) == false)
-                return false;
-        }
-
-        response.setState(HttpResponseMessage.STATE_FINISHED);
-
-        out.write(response);
-
-        ioSession.removeAttribute(CURRENT_RESPONSE);
-
-        return true;
     }
 
     private boolean processHeaders(HttpResponseMessage response, ByteBuffer in)
@@ -198,6 +203,12 @@ public class HttpResponseDecoder extends CumulativeProtocolDecoder {
         response.setState(HttpResponseMessage.STATE_CONTENT_READ);
 
         return true;
+    }
+
+    @Override
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
+            throws Exception {
+        session.removeAttribute(CURRENT_RESPONSE);
     }
 
     private boolean processStatus(HttpResponseMessage response, ByteBuffer in)

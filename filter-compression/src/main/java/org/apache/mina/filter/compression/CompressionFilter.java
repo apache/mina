@@ -22,6 +22,7 @@ package org.apache.mina.filter.compression;
 import java.io.IOException;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
@@ -81,21 +82,17 @@ public class CompressionFilter extends WriteRequestFilter {
     /**
      * A session attribute that stores the {@link Zlib} object used for compression.
      */
-    private static final String DEFLATER = CompressionFilter.class.getName()
-            + ".Deflater";
+    private final AttributeKey DEFLATER = new AttributeKey(getClass(), "deflater");
 
     /**
      * A session attribute that stores the {@link Zlib} object used for decompression.
      */
-    private static final String INFLATER = CompressionFilter.class.getName()
-            + ".Inflater";
+    private final AttributeKey INFLATER = new AttributeKey(getClass(), "inflater");
 
     /**
      * A flag that allows you to disable compression once.
      */
-    public static final String DISABLE_COMPRESSION_ONCE = CompressionFilter.class
-            .getName()
-            + ".DisableCompressionOnce";
+    public static final AttributeKey DISABLE_COMPRESSION_ONCE = new AttributeKey(CompressionFilter.class, "disableOnce"); 
 
     private boolean compressInbound = true;
 
@@ -197,8 +194,7 @@ public class CompressionFilter extends WriteRequestFilter {
             NextFilter nextFilter) throws Exception {
         if (parent.contains(CompressionFilter.class)) {
             throw new IllegalStateException(
-                    "A filter chain cannot contain more than"
-                            + " one Stream Compression filter.");
+                    "Only one " + CompressionFilter.class + " is permitted.");
         }
 
         Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_DEFLATER);

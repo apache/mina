@@ -38,12 +38,12 @@ public class IoSessionLogger {
     /**
      * Session attribute key: prefix string
      */
-    public static final String PREFIX = IoSessionLogger.class.getName() + ".prefix";
+    public static final AttributeKey PREFIX = new AttributeKey(IoSessionLogger.class, "prefix");
 
     /**
      * Session attribute key: {@link Logger}
      */
-    public static final String LOGGER = IoSessionLogger.class.getName() + ".logger";
+    public static final AttributeKey LOGGER = new AttributeKey(IoSessionLogger.class, "logger");
 
     private static Class<? extends IoHandler> getClass(IoSession session) {
         return session.getHandler().getClass();

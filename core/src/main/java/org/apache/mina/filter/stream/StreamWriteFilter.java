@@ -26,7 +26,9 @@ import java.util.Queue;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
@@ -64,19 +66,21 @@ public class StreamWriteFilter extends IoFilterAdapter {
     /**
      * The attribute name used when binding the {@link InputStream} to the session.
      */
-    public static final String CURRENT_STREAM = StreamWriteFilter.class
-            .getName()
-            + ".stream";
+    public static final AttributeKey CURRENT_STREAM = new AttributeKey(StreamWriteFilter.class, "stream");
 
-    protected static final String WRITE_REQUEST_QUEUE = StreamWriteFilter.class
-            .getName()
-            + ".queue";
-
-    protected static final String CURRENT_WRITE_REQUEST = StreamWriteFilter.class
-            .getName()
-            + ".writeRequest";
+    static final AttributeKey WRITE_REQUEST_QUEUE = new AttributeKey(StreamWriteFilter.class, "queue");
+    static final AttributeKey CURRENT_WRITE_REQUEST = new AttributeKey(StreamWriteFilter.class, "writeRequest");
 
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
+
+    @Override
+    public void onPreAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        if (parent.contains(StreamWriteFilter.class)) {
+            throw new IllegalStateException(
+                    "Only one " + StreamWriteFilter.class.getName() + " is permitted.");
+        }
+    }
 
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session,

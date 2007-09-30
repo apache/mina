@@ -42,9 +42,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
      * attribute and notifies the future when {@link #fireSessionOpened()}
      * or {@link #fireExceptionCaught(Throwable)} is invoked
      */
-    public static final String CONNECT_FUTURE = DefaultIoFilterChain.class
-            .getName()
-            + ".connectFuture";
+    public static final AttributeKey CONNECT_FUTURE = new AttributeKey(DefaultIoFilterChain.class, "connectFuture");
 
     private final AbstractIoSession session;
 
