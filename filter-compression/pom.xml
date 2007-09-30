@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mina-filter-compression</artifactId>
   <name>Apache MINA Compression Filter</name>
-  <packaging>bundle</packaging>  
+  <packaging>jar</packaging>  
 
   <dependencies>
     <dependency>

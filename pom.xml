@@ -314,6 +314,7 @@
           </tagBase>
         </configuration>
       </plugin>
+      <!--
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -325,6 +326,48 @@
             <Export-Package>org.apache.mina.*</Export-Package>
           </instructions>
         </configuration>
+      </plugin>
+      -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-license</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+                <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+                <if>
+                  <equals arg1="${project.packaging}" arg2="jar"/>
+                  <then>
+                    <jar destfile="${project.build.directory}/${project.build.finalName}.jar" update="yes">
+                      <zipfileset dir="${basedir}/.." prefix="META-INF/">
+                        <include name="LICENSE.*"/>
+                        <include name="NOTICE.*"/>
+                      </zipfileset>
+                    </jar>
+                    <jar destfile="${project.build.directory}/${project.build.finalName}-sources.jar" update="yes">
+                      <zipfileset dir="${basedir}/.." prefix="META-INF/">
+                        <include name="LICENSE.*"/>
+                        <include name="NOTICE.*"/>
+                      </zipfileset>
+                    </jar>
+                  </then>
+                </if>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b2</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>

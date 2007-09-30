@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mina-filter-codec-http</artifactId>
   <name>Apache MINA HTTP Codec</name>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <dependencies>
     <dependency>
       <groupId>org.apache.mina</groupId>

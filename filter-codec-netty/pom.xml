@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mina-filter-codec-netty</artifactId>
   <name>Apache MINA Netty Codec</name>
-  <packaging>bundle</packaging>  
+  <packaging>jar</packaging>  
 
   <dependencies>
     <dependency>

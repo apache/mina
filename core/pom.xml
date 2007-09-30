@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mina-core</artifactId>
   <name>Apache MINA Core</name>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <dependencies>
   </dependencies>
