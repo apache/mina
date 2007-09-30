@@ -51,7 +51,14 @@ public abstract class AbstractIoSession implements IoSession {
                 s.scheduledWriteBytes.set(0);
                 s.scheduledWriteMessages.set(0);
             }
-        };
+    };
+
+    /**
+     * An internal write request object that triggers session close.
+     * @see #writeRequestQueue
+     */
+    private static final WriteRequest CLOSE_REQUEST =
+        new DefaultWriteRequest(new Object());
 
     private final Object lock = new Object();
 
@@ -59,7 +66,32 @@ public abstract class AbstractIoSession implements IoSession {
             .synchronizedMap(new HashMap<Object, Object>(4));
 
     private final Queue<WriteRequest> writeRequestQueue =
-        new ConcurrentLinkedQueue<WriteRequest>();
+        new ConcurrentLinkedQueue<WriteRequest>() {
+            private static final long serialVersionUID = -3899506857975733565L;
+
+            // Discard close request offered by closeOnFlush() silently.
+            @Override
+            public WriteRequest peek() {
+                WriteRequest answer = super.peek();
+                if (answer == CLOSE_REQUEST) {
+                    AbstractIoSession.this.close();
+                    clear();
+                    answer = null;
+                }
+                return answer;
+            }
+
+            @Override
+            public WriteRequest poll() {
+                WriteRequest answer = super.poll();
+                if (answer == CLOSE_REQUEST) {
+                    AbstractIoSession.this.close();
+                    clear();
+                    answer = null;
+                }
+                return answer;
+            }
+    };
 
     private final long creationTime;
 
@@ -136,6 +168,14 @@ public abstract class AbstractIoSession implements IoSession {
             return true;
         }
     }
+    
+    public CloseFuture close(boolean rightNow) {
+        if (rightNow) {
+            return close();
+        } else {
+            return closeOnFlush();
+        }
+    }
 
     public CloseFuture close() {
         synchronized (lock) {
@@ -147,6 +187,11 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         getFilterChain().fireFilterClose();
+        return closeFuture;
+    }
+    
+    public CloseFuture closeOnFlush() {
+        getWriteRequestQueue().offer(CLOSE_REQUEST);
         return closeFuture;
     }
 
