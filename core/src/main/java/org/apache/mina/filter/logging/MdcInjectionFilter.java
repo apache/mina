@@ -76,7 +76,6 @@ public class MdcInjectionFilter extends WrappingFilter {
                 for (String key : context.keySet()) {
                     MDC.remove(key);
                 }
-                MDC.remove("name");
                 callDepth.remove();
             }
         }
