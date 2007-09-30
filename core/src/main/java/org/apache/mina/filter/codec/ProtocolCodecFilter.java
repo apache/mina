@@ -128,6 +128,15 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public ProtocolDecoder getDecoder(IoSession session) {
         return (ProtocolDecoder) session.getAttribute(DECODER);
     }
+    
+    @Override
+    public void onPreAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        if (parent.contains(this)) {
+            throw new IllegalArgumentException(
+                    "You can't add the same filter instance more than once.");
+        }
+    }
 
     @Override
     public void onPostRemove(IoFilterChain parent, String name,

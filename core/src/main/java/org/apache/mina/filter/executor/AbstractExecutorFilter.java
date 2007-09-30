@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
@@ -94,6 +95,15 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
     }
 
     protected abstract void fireEvent(IoFilterEvent event);
+
+    @Override
+    public void onPreAdd(IoFilterChain parent, String name,
+            NextFilter nextFilter) throws Exception {
+        if (parent.contains(this)) {
+            throw new IllegalArgumentException(
+                    "You can't add the same filter instance more than once.");
+        }
+    }
 
     @Override
     public final void sessionCreated(NextFilter nextFilter, IoSession session) {

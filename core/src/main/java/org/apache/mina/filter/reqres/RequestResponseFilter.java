@@ -84,6 +84,11 @@ public class RequestResponseFilter extends WriteRequestFilter {
     @Override
     public void onPreAdd(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
+        if (parent.contains(this)) {
+            throw new IllegalArgumentException(
+                    "You can't add the same filter instance more than once.");
+        }
+
         IoSession session = parent.getSession();
         session.setAttribute(RESPONSE_INSPECTOR, responseInspectorFactory
                 .getResponseInspector());
