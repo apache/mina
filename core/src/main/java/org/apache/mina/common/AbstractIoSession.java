@@ -215,8 +215,8 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         FileChannel channel = null;
-        if (message instanceof ByteBuffer
-                && !((ByteBuffer) message).hasRemaining()) {
+        if (message instanceof IoBuffer
+                && !((IoBuffer) message).hasRemaining()) {
             throw new IllegalArgumentException(
                     "message is empty. Forgot to call flip()?");
         } else if (message instanceof FileChannel) {

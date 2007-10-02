@@ -29,7 +29,7 @@ import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.ExceptionMonitor;
@@ -74,7 +74,7 @@ class SerialSessionImpl extends AbstractIoSession implements
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
                     "serial", false, true, SerialAddress.class,
-                    SerialSessionConfig.class, ByteBuffer.class);
+                    SerialSessionConfig.class, IoBuffer.class);
 
     SerialSessionImpl(IoService service, SerialAddress address, SerialPort port) {
         this.service = service;
@@ -165,7 +165,7 @@ class SerialSessionImpl extends AbstractIoSession implements
                 break;
             }
 
-            ByteBuffer buf = (ByteBuffer) req.getMessage();
+            IoBuffer buf = (IoBuffer) req.getMessage();
             if (buf.remaining() == 0) {
                 getWriteRequestQueue().poll();
                 buf.reset();
@@ -206,7 +206,7 @@ class SerialSessionImpl extends AbstractIoSession implements
                         int readBytes = inputStream.read(data);
 
                         if (readBytes > 0) {
-                            ByteBuffer buf = ByteBuffer
+                            IoBuffer buf = IoBuffer
                                     .wrap(data, 0, readBytes);
                             buf.put(data, 0, readBytes);
                             buf.flip();

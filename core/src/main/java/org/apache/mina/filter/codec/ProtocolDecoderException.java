@@ -19,11 +19,11 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 
 /**
  * An exception that is thrown when {@link ProtocolDecoder}
- * cannot understand or failed to validate the specified {@link ByteBuffer}
+ * cannot understand or failed to validate the specified {@link IoBuffer}
  * content.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)

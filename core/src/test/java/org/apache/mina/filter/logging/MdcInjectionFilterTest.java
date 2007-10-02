@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IdleStatus;
@@ -190,7 +190,7 @@ public class MdcInjectionFilterTest extends TestCase {
     private SocketAddress connectAndWrite(NioSocketConnector connector, int clientNr) {
         ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost",PORT));
         connectFuture.awaitUninterruptibly(TIMEOUT);
-        ByteBuffer message = ByteBuffer.allocate(4).putInt(clientNr).flip();
+        IoBuffer message = IoBuffer.allocate(4).putInt(clientNr).flip();
         IoSession session = connectFuture.getSession();
         session.write(message).awaitUninterruptibly(TIMEOUT);
         return session.getLocalAddress();
@@ -279,7 +279,7 @@ public class MdcInjectionFilterTest extends TestCase {
             return new ProtocolEncoderAdapter() {
                 public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
                     logger.info("encode");
-                    ByteBuffer buffer = ByteBuffer.allocate(4).putInt(123).flip();
+                    IoBuffer buffer = IoBuffer.allocate(4).putInt(123).flip();
                     out.write(buffer);
                 }
             };
@@ -287,7 +287,7 @@ public class MdcInjectionFilterTest extends TestCase {
 
         public ProtocolDecoder getDecoder() throws Exception {
             return new ProtocolDecoderAdapter() {
-                public void decode(IoSession session, ByteBuffer in, ProtocolDecoderOutput out) throws Exception {
+                public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
                     if (in.remaining() >= 4) {
                         int value = in.getInt();
                         logger.info("decode");

@@ -21,7 +21,7 @@ package org.apache.mina.filter.compression;
 
 import java.io.IOException;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
@@ -153,8 +153,8 @@ public class CompressionFilter extends WriteRequestFilter {
             throw new IllegalStateException();
         }
 
-        ByteBuffer inBuffer = (ByteBuffer) message;
-        ByteBuffer outBuffer = inflater.inflate(inBuffer);
+        IoBuffer inBuffer = (IoBuffer) message;
+        IoBuffer outBuffer = inflater.inflate(inBuffer);
         nextFilter.messageReceived(session, outBuffer);
     }
 
@@ -180,7 +180,7 @@ public class CompressionFilter extends WriteRequestFilter {
             throw new IllegalStateException();
         }
 
-        ByteBuffer inBuffer = (ByteBuffer) writeRequest.getMessage();
+        IoBuffer inBuffer = (IoBuffer) writeRequest.getMessage();
         if (!inBuffer.hasRemaining()) {
             // Ignore empty buffers
             return null;

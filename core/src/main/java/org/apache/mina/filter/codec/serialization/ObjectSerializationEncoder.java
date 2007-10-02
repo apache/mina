@@ -22,7 +22,7 @@ package org.apache.mina.filter.codec.serialization;
 import java.io.NotSerializableException;
 import java.io.Serializable;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
@@ -30,7 +30,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
  * A {@link ProtocolEncoder} which serializes {@link Serializable} Java objects
- * using {@link ByteBuffer#putObject(Object)}.
+ * using {@link IoBuffer#putObject(Object)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -75,7 +75,7 @@ public class ObjectSerializationEncoder extends ProtocolEncoderAdapter {
             throw new NotSerializableException();
         }
 
-        ByteBuffer buf = ByteBuffer.allocate(64);
+        IoBuffer buf = IoBuffer.allocate(64);
         buf.setAutoExpand(true);
         buf.putObject(message);
 

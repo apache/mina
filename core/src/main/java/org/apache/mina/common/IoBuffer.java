@@ -63,19 +63,19 @@ import java.util.Set;
  * <p>
  * You can allocate a new heap buffer.
  * <pre>
- * ByteBuffer buf = ByteBuffer.allocate(1024, false);
+ * IoBuffer buf = IoBuffer.allocate(1024, false);
  * </pre>
  * you can also allocate a new direct buffer:
  * <pre>
- * ByteBuffer buf = ByteBuffer.allocate(1024, true);
+ * IoBuffer buf = IoBuffer.allocate(1024, true);
  * </pre>
  * or you can set your preference.
  * <pre>
  * // Prefer heap buffers to direct buffers.
- * ByteBuffer.setPreferDirectBuffer(false);
+ * IoBuffer.setPreferDirectBuffer(false);
  *
  * // Try to allocate a heap buffer first, and then a direct buffer.
- * ByteBuffer buf = ByteBuffer.allocate(1024);
+ * IoBuffer buf = IoBuffer.allocate(1024);
  * </pre>
  * </p>
  *
@@ -87,19 +87,19 @@ import java.util.Set;
  * <h2>AutoExpand</h2>
  * <p>
  * Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
- * easy, and it is because its size is fixed.  MINA <tt>ByteBuffer</tt>
+ * easy, and it is because its size is fixed.  MINA {@link IoBuffer}
  * introduces <tt>autoExpand</tt> property.  If <tt>autoExpand</tt> property
  * is true, you never get {@link BufferOverflowException} or
  * {@link IndexOutOfBoundsException} (except when index is negative).
  * It automatically expands its capacity and limit value.  For example:
  * <pre>
  * String greeting = messageBundle.getMessage( "hello" );
- * ByteBuffer buf = ByteBuffer.allocate( 16 );
+ * IoBuffer buf = IoBuffer.allocate( 16 );
  * // Turn on autoExpand (it is off by default)
  * buf.setAutoExpand( true );
  * buf.putString( greeting, utf8encoder );
  * </pre>
- * NIO <tt>ByteBuffer</tt> is reallocated by MINA <tt>ByteBuffer</tt> behind
+ * NIO <tt>ByteBuffer</tt> is reallocated by MINA {@link IoBuffer} behind
  * the scene if the encoded data is larger than 16 bytes.  Its capacity will
  * increase by two times, and its limit will increase to the last position
  * the string is written.
@@ -118,47 +118,47 @@ import java.util.Set;
  *
  * <h2>Changing Buffer Allocation Policy</h2>
  * <p>
- * MINA provides a {@link ByteBufferAllocator} interface to let you override
+ * MINA provides a {@link IoBufferAllocator} interface to let you override
  * the default buffer management behavior.  There's only one allocator
  * provided out-of-the-box:
  * <ul>
- * <li>{@link SimpleByteBufferAllocator}</li>
+ * <li>{@link SimpleBufferAllocator}</li>
  * </ul>
  * You can implement your own allocator and use it by calling
- * {@link #setAllocator(ByteBufferAllocator)}.
+ * {@link #setAllocator(IoBufferAllocator)}.
  * </p>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * @noinspection StaticNonFinalField
- * @see ByteBufferAllocator
+ * @see IoBufferAllocator
  */
-public abstract class ByteBuffer implements Comparable<ByteBuffer> {
-    private static ByteBufferAllocator allocator = new SimpleByteBufferAllocator();
+public abstract class IoBuffer implements Comparable<IoBuffer> {
+    private static IoBufferAllocator allocator = new SimpleBufferAllocator();
 
     private static boolean preferDirectBuffers = false;
 
     /**
      * An immutable empty buffer.
      */
-    public static final ByteBuffer EMPTY_BUFFER = wrap(new byte[0]);
+    public static final IoBuffer EMPTY_BUFFER = wrap(new byte[0]);
 
     /**
      * Returns the allocator used by existing and new buffers
      */
-    public static ByteBufferAllocator getAllocator() {
+    public static IoBufferAllocator getAllocator() {
         return allocator;
     }
 
     /**
      * Sets the allocator used by existing and new buffers
      */
-    public static void setAllocator(ByteBufferAllocator newAllocator) {
+    public static void setAllocator(IoBufferAllocator newAllocator) {
         if (newAllocator == null) {
             throw new NullPointerException("allocator");
         }
 
-        ByteBufferAllocator oldAllocator = allocator;
+        IoBufferAllocator oldAllocator = allocator;
 
         allocator = newAllocator;
 
@@ -182,7 +182,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * <tt>false</tt>.
      */
     public static void setPreferDirectBuffers(boolean preferDirectBuffers) {
-        ByteBuffer.preferDirectBuffers = preferDirectBuffers;
+        IoBuffer.preferDirectBuffers = preferDirectBuffers;
     }
 
     /**
@@ -196,7 +196,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @see #setPreferDirectBuffers(boolean)
      */
-    public static ByteBuffer allocate(int capacity) {
+    public static IoBuffer allocate(int capacity) {
         try {
             // first try to allocate a buffer of the preferred type.
             return allocate(capacity, preferDirectBuffers);
@@ -214,28 +214,28 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param direct   <tt>true</tt> to get a direct buffer,
      *                 <tt>false</tt> to get a heap buffer.
      */
-    public static ByteBuffer allocate(int capacity, boolean direct) {
+    public static IoBuffer allocate(int capacity, boolean direct) {
         return allocator.allocate(capacity, direct);
     }
 
     /**
      * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
      */
-    public static ByteBuffer wrap(java.nio.ByteBuffer nioBuffer) {
+    public static IoBuffer wrap(java.nio.ByteBuffer nioBuffer) {
         return allocator.wrap(nioBuffer);
     }
 
     /**
      * Wraps the specified byte array into MINA heap buffer.
      */
-    public static ByteBuffer wrap(byte[] byteArray) {
+    public static IoBuffer wrap(byte[] byteArray) {
         return wrap(java.nio.ByteBuffer.wrap(byteArray));
     }
 
     /**
      * Wraps the specified byte array into MINA heap buffer.
      */
-    public static ByteBuffer wrap(byte[] byteArray, int offset, int length) {
+    public static IoBuffer wrap(byte[] byteArray, int offset, int length) {
         return wrap(java.nio.ByteBuffer.wrap(byteArray, offset, length));
     }
 
@@ -243,7 +243,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * Creates a new instance of ByteBuffer.  This is an empty constructor.
      *
      */
-    protected ByteBuffer() {
+    protected IoBuffer() {
     }
 
     /**
@@ -269,7 +269,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Changes the capacity of this buffer.
      */
-    public abstract ByteBuffer capacity(int newCapacity);
+    public abstract IoBuffer capacity(int newCapacity);
 
     /**
      * Returns <tt>true</tt> if and only if <tt>autoExpand</tt> is turned on.
@@ -279,7 +279,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Turns on or off <tt>autoExpand</tt>.
      */
-    public abstract ByteBuffer setAutoExpand(boolean autoExpand);
+    public abstract IoBuffer setAutoExpand(boolean autoExpand);
 
     /**
      * Changes the capacity and limit of this buffer so this buffer get
@@ -287,7 +287,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * This method works even if you didn't set <tt>autoExpand</tt> to
      * <tt>true</tt>.
      */
-    public ByteBuffer expand(int expectedRemaining) {
+    public IoBuffer expand(int expectedRemaining) {
         return expand(position(), expectedRemaining);
     }
 
@@ -298,7 +298,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * This method works even if you didn't set <tt>autoExpand</tt> to
      * <tt>true</tt>.
      */
-    public abstract ByteBuffer expand(int pos, int expectedRemaining);
+    public abstract IoBuffer expand(int pos, int expectedRemaining);
 
     /**
      * @see java.nio.Buffer#position()
@@ -308,7 +308,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.Buffer#position(int)
      */
-    public abstract ByteBuffer position(int newPosition);
+    public abstract IoBuffer position(int newPosition);
 
     /**
      * @see java.nio.Buffer#limit()
@@ -318,12 +318,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.Buffer#limit(int)
      */
-    public abstract ByteBuffer limit(int newLimit);
+    public abstract IoBuffer limit(int newLimit);
 
     /**
      * @see java.nio.Buffer#mark()
      */
-    public abstract ByteBuffer mark();
+    public abstract IoBuffer mark();
 
     /**
      * Returns the position of the current mark.  This method returns <tt>-1</tt> if no
@@ -334,19 +334,19 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.Buffer#reset()
      */
-    public abstract ByteBuffer reset();
+    public abstract IoBuffer reset();
 
     /**
      * @see java.nio.Buffer#clear()
      */
-    public abstract ByteBuffer clear();
+    public abstract IoBuffer clear();
 
     /**
      * Clears this buffer and fills its content with <tt>NUL</tt>.
      * The position is set to zero, the limit is set to the capacity,
      * and the mark is discarded.
      */
-    public ByteBuffer sweep() {
+    public IoBuffer sweep() {
         clear();
         return fillAndReset(remaining());
     }
@@ -356,7 +356,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * The position is set to zero, the limit is set to the capacity,
      * and the mark is discarded.
      */
-    public ByteBuffer sweep(byte value) {
+    public IoBuffer sweep(byte value) {
         clear();
         return fillAndReset(value, remaining());
     }
@@ -364,12 +364,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.Buffer#flip()
      */
-    public abstract ByteBuffer flip();
+    public abstract IoBuffer flip();
 
     /**
      * @see java.nio.Buffer#rewind()
      */
-    public abstract ByteBuffer rewind();
+    public abstract IoBuffer rewind();
 
     /**
      * @see java.nio.Buffer#remaining()
@@ -388,17 +388,17 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#duplicate()
      */
-    public abstract ByteBuffer duplicate();
+    public abstract IoBuffer duplicate();
 
     /**
      * @see java.nio.ByteBuffer#slice()
      */
-    public abstract ByteBuffer slice();
+    public abstract IoBuffer slice();
 
     /**
      * @see java.nio.ByteBuffer#asReadOnlyBuffer()
      */
-    public abstract ByteBuffer asReadOnlyBuffer();
+    public abstract IoBuffer asReadOnlyBuffer();
 
     /**
      * @see java.nio.ByteBuffer#hasArray()
@@ -430,7 +430,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#put(byte)
      */
-    public abstract ByteBuffer put(byte b);
+    public abstract IoBuffer put(byte b);
 
     /**
      * @see java.nio.ByteBuffer#get(int)
@@ -447,48 +447,48 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#put(int, byte)
      */
-    public abstract ByteBuffer put(int index, byte b);
+    public abstract IoBuffer put(int index, byte b);
 
     /**
      * @see java.nio.ByteBuffer#get(byte[], int, int)
      */
-    public abstract ByteBuffer get(byte[] dst, int offset, int length);
+    public abstract IoBuffer get(byte[] dst, int offset, int length);
 
     /**
      * @see java.nio.ByteBuffer#get(byte[])
      */
-    public ByteBuffer get(byte[] dst) {
+    public IoBuffer get(byte[] dst) {
         return get(dst, 0, dst.length);
     }
 
     /**
      * Writes the content of the specified <tt>src</tt> into this buffer.
      */
-    public abstract ByteBuffer put(java.nio.ByteBuffer src);
+    public abstract IoBuffer put(java.nio.ByteBuffer src);
 
     /**
      * Writes the content of the specified <tt>src</tt> into this buffer.
      */
-    public ByteBuffer put(ByteBuffer src) {
+    public IoBuffer put(IoBuffer src) {
         return put(src.buf());
     }
 
     /**
      * @see java.nio.ByteBuffer#put(byte[], int, int)
      */
-    public abstract ByteBuffer put(byte[] src, int offset, int length);
+    public abstract IoBuffer put(byte[] src, int offset, int length);
 
     /**
      * @see java.nio.ByteBuffer#put(byte[])
      */
-    public ByteBuffer put(byte[] src) {
+    public IoBuffer put(byte[] src) {
         return put(src, 0, src.length);
     }
 
     /**
      * @see java.nio.ByteBuffer#compact()
      */
-    public abstract ByteBuffer compact();
+    public abstract IoBuffer compact();
 
     @Override
     public String toString() {
@@ -522,11 +522,11 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ByteBuffer)) {
+        if (!(o instanceof IoBuffer)) {
             return false;
         }
 
-        ByteBuffer that = (ByteBuffer) o;
+        IoBuffer that = (IoBuffer) o;
         if (this.remaining() != that.remaining()) {
             return false;
         }
@@ -542,7 +542,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         return true;
     }
 
-    public int compareTo(ByteBuffer that) {
+    public int compareTo(IoBuffer that) {
         int n = this.position() + Math.min(this.remaining(), that.remaining());
         for (int i = this.position(), j = that.position(); i < n; i++, j++) {
             byte v1 = this.get(i);
@@ -567,7 +567,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#order(ByteOrder)
      */
-    public abstract ByteBuffer order(ByteOrder bo);
+    public abstract IoBuffer order(ByteOrder bo);
 
     /**
      * @see java.nio.ByteBuffer#getChar()
@@ -577,7 +577,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putChar(char)
      */
-    public abstract ByteBuffer putChar(char value);
+    public abstract IoBuffer putChar(char value);
 
     /**
      * @see java.nio.ByteBuffer#getChar(int)
@@ -587,7 +587,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putChar(int, char)
      */
-    public abstract ByteBuffer putChar(int index, char value);
+    public abstract IoBuffer putChar(int index, char value);
 
     /**
      * @see java.nio.ByteBuffer#asCharBuffer()
@@ -609,7 +609,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putShort(short)
      */
-    public abstract ByteBuffer putShort(short value);
+    public abstract IoBuffer putShort(short value);
 
     /**
      * @see java.nio.ByteBuffer#getShort()
@@ -626,7 +626,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putShort(int, short)
      */
-    public abstract ByteBuffer putShort(int index, short value);
+    public abstract IoBuffer putShort(int index, short value);
 
     /**
      * @see java.nio.ByteBuffer#asShortBuffer()
@@ -763,7 +763,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @throws  ReadOnlyBufferException
      *          If this buffer is read-only
      */
-    public ByteBuffer putMediumInt(int value) {
+    public IoBuffer putMediumInt(int value) {
         byte b1 = (byte) (value >> 16);
         byte b2 = (byte) (value >> 8);
         byte b3 = (byte) value;
@@ -800,7 +800,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @throws  ReadOnlyBufferException
      *          If this buffer is read-only
      */
-    public ByteBuffer putMediumInt(int index, int value) {
+    public IoBuffer putMediumInt(int index, int value) {
         byte b1 = (byte) (value >> 16);
         byte b2 = (byte) (value >> 8);
         byte b3 = (byte) value;
@@ -817,7 +817,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putInt(int)
      */
-    public abstract ByteBuffer putInt(int value);
+    public abstract IoBuffer putInt(int value);
 
     /**
      * @see java.nio.ByteBuffer#getInt(int)
@@ -834,7 +834,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putInt(int, int)
      */
-    public abstract ByteBuffer putInt(int index, int value);
+    public abstract IoBuffer putInt(int index, int value);
 
     /**
      * @see java.nio.ByteBuffer#asIntBuffer()
@@ -849,7 +849,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putLong(int, long)
      */
-    public abstract ByteBuffer putLong(long value);
+    public abstract IoBuffer putLong(long value);
 
     /**
      * @see java.nio.ByteBuffer#getLong(int)
@@ -859,7 +859,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putLong(int, long)
      */
-    public abstract ByteBuffer putLong(int index, long value);
+    public abstract IoBuffer putLong(int index, long value);
 
     /**
      * @see java.nio.ByteBuffer#asLongBuffer()
@@ -874,7 +874,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putFloat(float)
      */
-    public abstract ByteBuffer putFloat(float value);
+    public abstract IoBuffer putFloat(float value);
 
     /**
      * @see java.nio.ByteBuffer#getFloat(int)
@@ -884,7 +884,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putFloat(int, float)
      */
-    public abstract ByteBuffer putFloat(int index, float value);
+    public abstract IoBuffer putFloat(int index, float value);
 
     /**
      * @see java.nio.ByteBuffer#asFloatBuffer()
@@ -899,7 +899,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putDouble(double)
      */
-    public abstract ByteBuffer putDouble(double value);
+    public abstract IoBuffer putDouble(double value);
 
     /**
      * @see java.nio.ByteBuffer#getDouble(int)
@@ -909,7 +909,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * @see java.nio.ByteBuffer#putDouble(int, double)
      */
-    public abstract ByteBuffer putDouble(int index, double value);
+    public abstract IoBuffer putDouble(int index, double value);
 
     /**
      * @see java.nio.ByteBuffer#asDoubleBuffer()
@@ -925,12 +925,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         return new InputStream() {
             @Override
             public int available() {
-                return ByteBuffer.this.remaining();
+                return IoBuffer.this.remaining();
             }
 
             @Override
             public synchronized void mark(int readlimit) {
-                ByteBuffer.this.mark();
+                IoBuffer.this.mark();
             }
 
             @Override
@@ -940,8 +940,8 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
             @Override
             public int read() {
-                if (ByteBuffer.this.hasRemaining()) {
-                    return ByteBuffer.this.get() & 0xff;
+                if (IoBuffer.this.hasRemaining()) {
+                    return IoBuffer.this.get() & 0xff;
                 } else {
                     return -1;
                 }
@@ -949,10 +949,10 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
             @Override
             public int read(byte[] b, int off, int len) {
-                int remaining = ByteBuffer.this.remaining();
+                int remaining = IoBuffer.this.remaining();
                 if (remaining > 0) {
                     int readBytes = Math.min(remaining, len);
-                    ByteBuffer.this.get(b, off, readBytes);
+                    IoBuffer.this.get(b, off, readBytes);
                     return readBytes;
                 } else {
                     return -1;
@@ -961,18 +961,18 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
             @Override
             public synchronized void reset() {
-                ByteBuffer.this.reset();
+                IoBuffer.this.reset();
             }
 
             @Override
             public long skip(long n) {
                 int bytes;
                 if (n > Integer.MAX_VALUE) {
-                    bytes = ByteBuffer.this.remaining();
+                    bytes = IoBuffer.this.remaining();
                 } else {
-                    bytes = Math.min(ByteBuffer.this.remaining(), (int) n);
+                    bytes = Math.min(IoBuffer.this.remaining(), (int) n);
                 }
-                ByteBuffer.this.skip(bytes);
+                IoBuffer.this.skip(bytes);
                 return bytes;
             }
         };
@@ -990,12 +990,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         return new OutputStream() {
             @Override
             public void write(byte[] b, int off, int len) {
-                ByteBuffer.this.put(b, off, len);
+                IoBuffer.this.put(b, off, len);
             }
 
             @Override
             public void write(int b) {
-                ByteBuffer.this.put((byte) b);
+                IoBuffer.this.put((byte) b);
             }
         };
     }
@@ -1020,7 +1020,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *  hexidecimal representation of this ByteBuffer
      */
     public String getHexDump(int lengthLimit) {
-        return ByteBufferHexDumper.getHexdump(this, lengthLimit);
+        return IoBufferHexDumper.getHexdump(this, lengthLimit);
     }
 
     ////////////////////////////////
@@ -1242,7 +1242,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putString(CharSequence val, CharsetEncoder encoder)
+    public IoBuffer putString(CharSequence val, CharsetEncoder encoder)
             throws CharacterCodingException {
         if (val.length() == 0) {
             return this;
@@ -1307,7 +1307,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @param fieldSize the maximum number of bytes to write
      */
-    public ByteBuffer putString(CharSequence val, int fieldSize,
+    public IoBuffer putString(CharSequence val, int fieldSize,
             CharsetEncoder encoder) throws CharacterCodingException {
         checkFieldSize(fieldSize);
 
@@ -1470,7 +1470,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
+    public IoBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
             throws CharacterCodingException {
         return putPrefixedString(in, 2, 0, encoder);
     }
@@ -1485,7 +1485,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
             CharsetEncoder encoder) throws CharacterCodingException {
         return putPrefixedString(in, prefixLength, 0, encoder);
     }
@@ -1501,7 +1501,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
             int padding, CharsetEncoder encoder)
             throws CharacterCodingException {
         return putPrefixedString(in, prefixLength, padding, (byte) 0, encoder);
@@ -1518,7 +1518,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @throws BufferOverflowException if the specified string doesn't fit
      */
-    public ByteBuffer putPrefixedString(CharSequence val, int prefixLength,
+    public IoBuffer putPrefixedString(CharSequence val, int prefixLength,
             int padding, byte padValue, CharsetEncoder encoder)
             throws CharacterCodingException {
         int maxLength;
@@ -1666,7 +1666,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     /**
      * Writes the specified Java object to the buffer.
      */
-    public ByteBuffer putObject(Object o) {
+    public IoBuffer putObject(Object o) {
         int oldPos = position();
         skip(4); // Make a room for the length field.
         try {
@@ -1792,7 +1792,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * Forwards the position of this buffer as the specified <code>size</code>
      * bytes.
      */
-    public ByteBuffer skip(int size) {
+    public IoBuffer skip(int size) {
         autoExpand(size);
         return position(position() + size);
     }
@@ -1801,7 +1801,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * Fills this buffer with the specified value.
      * This method moves buffer position forward.
      */
-    public ByteBuffer fill(byte value, int size) {
+    public IoBuffer fill(byte value, int size) {
         autoExpand(size);
         int q = size >>> 3;
         int r = size & 7;
@@ -1844,7 +1844,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * Fills this buffer with the specified value.
      * This method does not change buffer position.
      */
-    public ByteBuffer fillAndReset(byte value, int size) {
+    public IoBuffer fillAndReset(byte value, int size) {
         autoExpand(size);
         int pos = position();
         try {
@@ -1859,7 +1859,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * Fills this buffer with <code>NUL (0x00)</code>.
      * This method moves buffer position forward.
      */
-    public ByteBuffer fill(int size) {
+    public IoBuffer fill(int size) {
         autoExpand(size);
         int q = size >>> 3;
         int r = size & 7;
@@ -1893,7 +1893,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * Fills this buffer with <code>NUL (0x00)</code>.
      * This method does not change buffer position.
      */
-    public ByteBuffer fillAndReset(int size) {
+    public IoBuffer fillAndReset(int size) {
         autoExpand(size);
         int pos = position();
         try {
@@ -1989,7 +1989,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnum(Enum<?> e) {
+    public IoBuffer putEnum(Enum<?> e) {
         if (e.ordinal() > Byte.MAX_VALUE) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e,
                     "byte"));
@@ -2003,7 +2003,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param index The index at which the byte will be written
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnum(int index, Enum<?> e) {
+    public IoBuffer putEnum(int index, Enum<?> e) {
         if (e.ordinal() > Byte.MAX_VALUE) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e,
                     "byte"));
@@ -2016,7 +2016,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnumShort(Enum<?> e) {
+    public IoBuffer putEnumShort(Enum<?> e) {
         if (e.ordinal() > Short.MAX_VALUE) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e,
                     "short"));
@@ -2030,7 +2030,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param index The index at which the bytes will be written
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnumShort(int index, Enum<?> e) {
+    public IoBuffer putEnumShort(int index, Enum<?> e) {
         if (e.ordinal() > Short.MAX_VALUE) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e,
                     "short"));
@@ -2043,7 +2043,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      *
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnumInt(Enum<?> e) {
+    public IoBuffer putEnumInt(Enum<?> e) {
         return putInt(e.ordinal());
     }
 
@@ -2053,7 +2053,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param index The index at which the bytes will be written
      * @param e  The enum to write to the buffer
      */
-    public ByteBuffer putEnumInt(int index, Enum<?> e) {
+    public IoBuffer putEnumInt(int index, Enum<?> e) {
         return putInt(index, e.ordinal());
     }
 
@@ -2210,7 +2210,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSet(Set<E> set) {
+    public <E extends Enum<E>> IoBuffer putEnumSet(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~BYTE_MASK) != 0) {
             throw new IllegalArgumentException(
@@ -2226,7 +2226,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param index  the index at which the byte will be written
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSet(int index, Set<E> set) {
+    public <E extends Enum<E>> IoBuffer putEnumSet(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~BYTE_MASK) != 0) {
             throw new IllegalArgumentException(
@@ -2241,7 +2241,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetShort(Set<E> set) {
+    public <E extends Enum<E>> IoBuffer putEnumSetShort(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~SHORT_MASK) != 0) {
             throw new IllegalArgumentException(
@@ -2257,7 +2257,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetShort(int index, Set<E> set) {
+    public <E extends Enum<E>> IoBuffer putEnumSetShort(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~SHORT_MASK) != 0) {
             throw new IllegalArgumentException(
@@ -2272,7 +2272,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetInt(Set<E> set) {
+    public <E extends Enum<E>> IoBuffer putEnumSetInt(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~INT_MASK) != 0) {
             throw new IllegalArgumentException(
@@ -2288,7 +2288,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetInt(int index, Set<E> set) {
+    public <E extends Enum<E>> IoBuffer putEnumSetInt(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~INT_MASK) != 0) {
             throw new IllegalArgumentException(
@@ -2303,7 +2303,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param <E> the enum type of the Set
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetLong(Set<E> set) {
+    public <E extends Enum<E>> IoBuffer putEnumSetLong(Set<E> set) {
         return putLong(toLong(set));
     }
 
@@ -2314,7 +2314,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * @param index  the index at which the bytes will be written
      * @param set  the enum set to write to the buffer
      */
-    public <E extends Enum<E>> ByteBuffer putEnumSetLong(int index, Set<E> set) {
+    public <E extends Enum<E>> IoBuffer putEnumSetLong(int index, Set<E> set) {
         return putLong(index, toLong(set));
     }
 
@@ -2338,7 +2338,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * This method forwards the call to {@link #expand(int)} only when
      * <tt>autoExpand</tt> property is <tt>true</tt>.
      */
-    protected ByteBuffer autoExpand(int expectedRemaining) {
+    protected IoBuffer autoExpand(int expectedRemaining) {
         if (isAutoExpand()) {
             expand(expectedRemaining);
         }
@@ -2349,7 +2349,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      * This method forwards the call to {@link #expand(int)} only when
      * <tt>autoExpand</tt> property is <tt>true</tt>.
      */
-    protected ByteBuffer autoExpand(int pos, int expectedRemaining) {
+    protected IoBuffer autoExpand(int pos, int expectedRemaining) {
         if (isAutoExpand()) {
             expand(pos, expectedRemaining);
         }

@@ -20,7 +20,7 @@
 package org.apache.mina.common;
 
 /**
- * A {@link RuntimeException} which is thrown when the data the {@link ByteBuffer}
+ * A {@link RuntimeException} which is thrown when the data the {@link IoBuffer}
  * contains is corrupt.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)

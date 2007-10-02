@@ -23,7 +23,7 @@ import java.net.InetSocketAddress;
 
 import junit.framework.Assert;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
@@ -144,7 +144,7 @@ public class ConnectorTest extends AbstractTest {
             // Test if we can enter TLS mode again.
             //// Send StartTLS request.
             handler.readBuf.clear();
-            ByteBuffer buf = ByteBuffer.allocate(1);
+            IoBuffer buf = IoBuffer.allocate(1);
             buf.put((byte) '.');
             buf.flip();
             session.write(buf).awaitUninterruptibly();
@@ -167,11 +167,11 @@ public class ConnectorTest extends AbstractTest {
     private void testConnector0(IoSession session) throws InterruptedException {
         EchoConnectorHandler handler = (EchoConnectorHandler) session
                 .getHandler();
-        ByteBuffer readBuf = handler.readBuf;
+        IoBuffer readBuf = handler.readBuf;
         readBuf.clear();
         WriteFuture writeFuture = null;
         for (int i = 0; i < COUNT; i++) {
-            ByteBuffer buf = ByteBuffer.allocate(DATA_SIZE);
+            IoBuffer buf = IoBuffer.allocate(DATA_SIZE);
             buf.limit(DATA_SIZE);
             fillWriteBuffer(buf, i);
             buf.flip();
@@ -195,7 +195,7 @@ public class ConnectorTest extends AbstractTest {
         readBuf.flip();
         IoSessionLogger.info(session, "readBuf: " + readBuf);
         Assert.assertEquals(DATA_SIZE * COUNT, readBuf.remaining());
-        ByteBuffer expectedBuf = ByteBuffer.allocate(DATA_SIZE * COUNT);
+        IoBuffer expectedBuf = IoBuffer.allocate(DATA_SIZE * COUNT);
         for (int i = 0; i < COUNT; i++) {
             expectedBuf.limit((i + 1) * DATA_SIZE);
             fillWriteBuffer(expectedBuf, i);
@@ -217,7 +217,7 @@ public class ConnectorTest extends AbstractTest {
         Assert.assertEquals(bytes, handler.readBuf.position());
     }
 
-    private void fillWriteBuffer(ByteBuffer writeBuf, int i) {
+    private void fillWriteBuffer(IoBuffer writeBuf, int i) {
         while (writeBuf.remaining() > 0) {
             writeBuf.put((byte) i++);
         }
@@ -228,7 +228,7 @@ public class ConnectorTest extends AbstractTest {
     }
 
     private static class EchoConnectorHandler extends IoHandlerAdapter {
-        private final ByteBuffer readBuf = ByteBuffer.allocate(1024);
+        private final IoBuffer readBuf = IoBuffer.allocate(1024);
 
         private EchoConnectorHandler() {
             readBuf.setAutoExpand(true);
@@ -236,7 +236,7 @@ public class ConnectorTest extends AbstractTest {
 
         @Override
         public void messageReceived(IoSession session, Object message) {
-            readBuf.put((ByteBuffer) message);
+            readBuf.put((IoBuffer) message);
         }
 
         @Override

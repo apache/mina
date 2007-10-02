@@ -24,7 +24,7 @@ import java.net.InetSocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IdleStatus;
@@ -65,7 +65,7 @@ public class DatagramRecyclerTest extends TestCase {
             future.awaitUninterruptibly();
 
             // Write whatever to trigger the acceptor.
-            future.getSession().write(ByteBuffer.allocate(1))
+            future.getSession().write(IoBuffer.allocate(1))
                     .awaitUninterruptibly();
 
             // Close the client-side connection.

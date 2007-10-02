@@ -27,7 +27,7 @@ import java.io.ObjectInput;
 import java.io.StreamCorruptedException;
 
 import org.apache.mina.common.BufferDataException;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 
 /**
  * An {@link ObjectInput} and {@link InputStream} that can read the objects encoded
@@ -108,7 +108,7 @@ public class ObjectSerializationInputStream extends InputStream implements
                     + objectSize + " (expected: <= " + maxObjectSize + ')');
         }
 
-        ByteBuffer buf = ByteBuffer.allocate(objectSize + 4, false);
+        IoBuffer buf = IoBuffer.allocate(objectSize + 4, false);
         buf.putInt(objectSize);
         in.readFully(buf.array(), 4, objectSize);
         buf.position(0);

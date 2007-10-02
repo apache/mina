@@ -22,7 +22,7 @@ package org.apache.mina.handler.stream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 
@@ -36,7 +36,7 @@ import org.apache.mina.common.IoSession;
 class IoSessionInputStream extends InputStream {
     private final Object mutex = new Object();
 
-    private final ByteBuffer buf;
+    private final IoBuffer buf;
 
     private volatile boolean closed;
 
@@ -45,7 +45,7 @@ class IoSessionInputStream extends InputStream {
     private IOException exception;
 
     public IoSessionInputStream() {
-        buf = ByteBuffer.allocate(16);
+        buf = IoBuffer.allocate(16);
         buf.setAutoExpand(true);
         buf.limit(0);
     }
@@ -147,7 +147,7 @@ class IoSessionInputStream extends InputStream {
         released = true;
     }
 
-    public void write(ByteBuffer src) {
+    public void write(IoBuffer src) {
         synchronized (mutex) {
             if (closed) {
                 return;

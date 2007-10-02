@@ -126,9 +126,9 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
     protected abstract void doRemove(IoSession session) throws Exception;
 
-    protected abstract int read(IoSession session, ByteBuffer buf) throws Exception;
+    protected abstract int read(IoSession session, IoBuffer buf) throws Exception;
 
-    protected abstract int write(IoSession session, ByteBuffer buf) throws Exception;
+    protected abstract int write(IoSession session, IoBuffer buf) throws Exception;
 
     protected abstract long transferFile(IoSession session, FileRegion region) throws Exception;
 
@@ -281,7 +281,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
     private void read(AbstractIoSession session) {
         IoSessionConfig config = session.getConfig();
-        ByteBuffer buf = ByteBuffer.allocate(config.getReadBufferSize());
+        IoBuffer buf = IoBuffer.allocate(config.getReadBufferSize());
 
         try {
             int readBytes = 0;
@@ -393,8 +393,8 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
         if ((req = writeRequestQueue.poll()) != null) {
             Object m = req.getMessage();
-            if (m instanceof ByteBuffer) {
-                ByteBuffer buf = (ByteBuffer) req.getMessage();
+            if (m instanceof IoBuffer) {
+                IoBuffer buf = (IoBuffer) req.getMessage();
 
                 // The first unwritten empty buffer must be
                 // forwarded to the filter chain.
@@ -457,7 +457,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 }
 
             } else {
-                ByteBuffer buf = (ByteBuffer) message;
+                IoBuffer buf = (IoBuffer) message;
                 if (buf.remaining() == 0) {
                     // Buffer has been completely sent, remove request form queue
                     writeRequestQueue.poll();

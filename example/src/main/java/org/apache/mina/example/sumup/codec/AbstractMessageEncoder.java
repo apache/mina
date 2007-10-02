@@ -19,7 +19,7 @@
  */
 package org.apache.mina.example.sumup.codec;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.example.sumup.message.AbstractMessage;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
@@ -42,7 +42,7 @@ public abstract class AbstractMessageEncoder implements MessageEncoder {
     public void encode(IoSession session, Object message,
             ProtocolEncoderOutput out) throws Exception {
         AbstractMessage m = (AbstractMessage) message;
-        ByteBuffer buf = ByteBuffer.allocate(16);
+        IoBuffer buf = IoBuffer.allocate(16);
         buf.setAutoExpand(true); // Enable auto-expand for easier encoding
 
         // Encode a header
@@ -56,5 +56,5 @@ public abstract class AbstractMessageEncoder implements MessageEncoder {
     }
 
     protected abstract void encodeBody(IoSession session,
-            AbstractMessage message, ByteBuffer out);
+            AbstractMessage message, IoBuffer out);
 }

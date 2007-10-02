@@ -21,7 +21,7 @@ package org.apache.mina.filter.codec.netty;
 
 import net.gleamynode.netty2.Message;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderException;
@@ -49,7 +49,7 @@ public class NettyEncoder implements ProtocolEncoder {
         }
 
         for (;;) {
-            ByteBuffer buf = ByteBuffer.allocate(8192);
+            IoBuffer buf = IoBuffer.allocate(8192);
             Message m = (Message) message;
             try {
                 if (m.write(buf.buf())) {

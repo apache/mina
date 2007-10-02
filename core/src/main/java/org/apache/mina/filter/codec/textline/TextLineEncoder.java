@@ -22,7 +22,7 @@ package org.apache.mina.filter.codec.textline;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
@@ -107,7 +107,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
         }
 
         String value = message.toString();
-        ByteBuffer buf = ByteBuffer.allocate(value.length())
+        IoBuffer buf = IoBuffer.allocate(value.length())
                 .setAutoExpand(true);
         buf.putString(value, encoder);
         if (buf.position() > maxLineLength) {

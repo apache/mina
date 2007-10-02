@@ -19,7 +19,7 @@
  */
 package org.apache.mina.example.echoserver;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
@@ -68,13 +68,13 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
-        if (!(message instanceof ByteBuffer)) {
+        if (!(message instanceof IoBuffer)) {
             return;
         }
 
-        ByteBuffer rb = (ByteBuffer) message;
+        IoBuffer rb = (IoBuffer) message;
         // Write the received data back to remote peer
-        ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+        IoBuffer wb = IoBuffer.allocate(rb.remaining());
         wb.put(rb);
         wb.flip();
         session.write(wb);

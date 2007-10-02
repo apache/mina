@@ -19,7 +19,7 @@
  */
 package org.apache.mina.example.netcat;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
@@ -57,7 +57,7 @@ public class NetCatProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void messageReceived(IoSession session, Object message) {
-        ByteBuffer buf = (ByteBuffer) message;
+        IoBuffer buf = (IoBuffer) message;
         // Print out read buffer content.
         while (buf.hasRemaining()) {
             System.out.print((char) buf.get());

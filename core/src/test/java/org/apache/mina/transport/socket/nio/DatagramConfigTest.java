@@ -24,7 +24,7 @@ import java.net.InetSocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
@@ -73,7 +73,7 @@ public class DatagramConfigTest extends TestCase {
             future.awaitUninterruptibly();
 
             WriteFuture writeFuture = future.getSession().write(
-                    ByteBuffer.allocate(16).putInt(0).flip());
+                    IoBuffer.allocate(16).putInt(0).flip());
             writeFuture.awaitUninterruptibly();
             Assert.assertTrue(writeFuture.isWritten());
 

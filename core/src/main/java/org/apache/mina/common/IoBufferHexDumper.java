@@ -26,7 +26,7 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class ByteBufferHexDumper {
+class IoBufferHexDumper {
     private static final byte[] highDigits;
 
     private static final byte[] lowDigits;
@@ -49,7 +49,7 @@ class ByteBufferHexDumper {
         lowDigits = low;
     }
 
-    public static String getHexdump(ByteBuffer in, int lengthLimit) {
+    public static String getHexdump(IoBuffer in, int lengthLimit) {
         if (lengthLimit == 0) {
             throw new IllegalArgumentException("lengthLimit: " + lengthLimit
                     + " (expected: 1+)");

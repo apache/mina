@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
@@ -249,7 +249,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
 
         @Override
-        protected boolean doDecode(IoSession session, ByteBuffer in,
+        protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
             if (currentDecoder == null) {
                 MessageDecoder[] decoders = this.decoders;

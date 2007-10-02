@@ -30,7 +30,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoProcessor;
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoSession;
@@ -156,12 +156,12 @@ class NioProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected int read(IoSession session, ByteBuffer buf) throws Exception {
+    protected int read(IoSession session, IoBuffer buf) throws Exception {
         return getChannel(session).read(buf.buf());
     }
 
     @Override
-    protected int write(IoSession session, ByteBuffer buf) throws Exception {
+    protected int write(IoSession session, IoBuffer buf) throws Exception {
         return getChannel(session).write(buf.buf());
     }
 

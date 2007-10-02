@@ -19,12 +19,12 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 
 /**
  * Decodes binary or protocol-specific data into higher-level message objects.
- * MINA invokes {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
+ * MINA invokes {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
  * method with read data, and then the decoder implementation puts decoded
  * messages into {@link ProtocolDecoderOutput} by calling
  * {@link ProtocolDecoderOutput#write(Object)}.
@@ -39,20 +39,20 @@ import org.apache.mina.common.IoSession;
 public interface ProtocolDecoder {
     /**
      * Decodes binary or protocol-specific content into higher-level message objects.
-     * MINA invokes {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
+     * MINA invokes {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
      * method with read data, and then the decoder implementation puts decoded
      * messages into {@link ProtocolDecoderOutput}.
      *
      * @throws Exception if the read data violated protocol specification
      */
-    void decode(IoSession session, ByteBuffer in, ProtocolDecoderOutput out)
+    void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws Exception;
 
     /**
      * Invoked when the specified <tt>session</tt> is closed.  This method is useful
      * when you deal with the protocol which doesn't specify the length of a message
      * such as HTTP response without <tt>content-length</tt> header. Implement this
-     * method to process the remaining data that {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
+     * method to process the remaining data that {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
      * method didn't process completely.
      *
      * @throws Exception if the read data violated protocol specification

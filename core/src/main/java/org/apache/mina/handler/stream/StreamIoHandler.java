@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
@@ -132,7 +132,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
     public void messageReceived(IoSession session, Object buf) {
         final IoSessionInputStream in = (IoSessionInputStream) session
                 .getAttribute(KEY_IN);
-        in.write((ByteBuffer) buf);
+        in.write((IoBuffer) buf);
     }
 
     /**

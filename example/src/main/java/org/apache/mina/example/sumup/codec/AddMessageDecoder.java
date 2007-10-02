@@ -19,7 +19,7 @@
  */
 package org.apache.mina.example.sumup.codec;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.example.sumup.message.AbstractMessage;
 import org.apache.mina.example.sumup.message.AddMessage;
@@ -39,7 +39,7 @@ public class AddMessageDecoder extends AbstractMessageDecoder {
     }
 
     @Override
-    protected AbstractMessage decodeBody(IoSession session, ByteBuffer in) {
+    protected AbstractMessage decodeBody(IoSession session, IoBuffer in) {
         if (in.remaining() < Constants.ADD_BODY_LEN) {
             return null;
         }

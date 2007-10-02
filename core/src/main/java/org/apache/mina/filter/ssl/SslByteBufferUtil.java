@@ -109,7 +109,7 @@ class SslByteBufferUtil {
     }
 
     private static ByteBuffer createBuffer(int capacity) {
-        if (org.apache.mina.common.ByteBuffer.isPreferDirectBuffers()) {
+        if (org.apache.mina.common.IoBuffer.isPreferDirectBuffers()) {
             try {
                 return ByteBuffer.allocateDirect(capacity);
             } catch (OutOfMemoryError e) {

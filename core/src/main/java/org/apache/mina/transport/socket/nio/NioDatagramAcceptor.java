@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoAcceptor;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IdleStatusChecker;
@@ -336,7 +336,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
     }
 
     private void readSession(DatagramChannel channel) throws Exception {
-        ByteBuffer readBuf = ByteBuffer.allocate(getSessionConfig()
+        IoBuffer readBuf = IoBuffer.allocate(getSessionConfig()
                 .getReceiveBufferSize());
 
         SocketAddress remoteAddress = channel.receive(readBuf.buf());
@@ -345,7 +345,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
 
             readBuf.flip();
 
-            ByteBuffer newBuf = ByteBuffer.allocate(readBuf.limit());
+            IoBuffer newBuf = IoBuffer.allocate(readBuf.limit());
             newBuf.put(readBuf);
             newBuf.flip();
 
@@ -396,7 +396,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
                 break;
             }
 
-            ByteBuffer buf = (ByteBuffer) req.getMessage();
+            IoBuffer buf = (IoBuffer) req.getMessage();
             if (buf.remaining() == 0) {
                 // pop and fire event
                 writeRequestQueue.poll();

@@ -29,17 +29,17 @@ import java.nio.ShortBuffer;
 
 
 /**
- * A base implementation of {@link ByteBuffer}.  This implementation
- * assumes that {@link ByteBuffer#buf()} always returns a correct NIO
+ * A base implementation of {@link IoBuffer}.  This implementation
+ * assumes that {@link IoBuffer#buf()} always returns a correct NIO
  * {@link java.nio.ByteBuffer} instance.  Most implementations could
  * extend this class and implement their own buffer management mechanism.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * @noinspection StaticNonFinalField
- * @see ByteBufferAllocator
+ * @see IoBufferAllocator
  */
-public abstract class AbstractByteBuffer extends ByteBuffer {
+public abstract class AbstractIoBuffer extends IoBuffer {
     private boolean autoExpand;
 
     private boolean autoExpandAllowed = true;
@@ -50,11 +50,11 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
      */
     private int mark = -1;
 
-    protected AbstractByteBuffer() {
+    protected AbstractIoBuffer() {
         this(true);
     }
 
-    protected AbstractByteBuffer(boolean autoExpandAllowed) {
+    protected AbstractIoBuffer(boolean autoExpandAllowed) {
         this.autoExpandAllowed = autoExpandAllowed;
     }
 
@@ -74,7 +74,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer capacity(int newCapacity) {
+    public IoBuffer capacity(int newCapacity) {
         if (newCapacity > capacity()) {
             // Allocate a new buffer and transfer all settings to it.
             int pos = position();
@@ -106,7 +106,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer setAutoExpand(boolean autoExpand) {
+    public IoBuffer setAutoExpand(boolean autoExpand) {
         if (!autoExpandAllowed) {
             throw new IllegalStateException(
                     "Derived buffers can't be auto-expandable.");
@@ -116,7 +116,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer expand(int pos, int expectedRemaining) {
+    public IoBuffer expand(int pos, int expectedRemaining) {
         int end = pos + expectedRemaining;
         if (end > capacity()) {
             // The buffer needs expansion.
@@ -136,7 +136,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer position(int newPosition) {
+    public IoBuffer position(int newPosition) {
         autoExpand(newPosition, 0);
         buf().position(newPosition);
         if (mark > newPosition) {
@@ -151,7 +151,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer limit(int newLimit) {
+    public IoBuffer limit(int newLimit) {
         autoExpand(newLimit, 0);
         buf().limit(newLimit);
         if (mark > newLimit) {
@@ -161,7 +161,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer mark() {
+    public IoBuffer mark() {
         buf().mark();
         mark = position();
         return this;
@@ -173,27 +173,27 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer reset() {
+    public IoBuffer reset() {
         buf().reset();
         return this;
     }
 
     @Override
-    public ByteBuffer clear() {
+    public IoBuffer clear() {
         buf().clear();
         mark = -1;
         return this;
     }
 
     @Override
-    public ByteBuffer flip() {
+    public IoBuffer flip() {
         buf().flip();
         mark = -1;
         return this;
     }
 
     @Override
-    public ByteBuffer rewind() {
+    public IoBuffer rewind() {
         buf().rewind();
         mark = -1;
         return this;
@@ -205,7 +205,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer put(byte b) {
+    public IoBuffer put(byte b) {
         autoExpand(1);
         buf().put(b);
         return this;
@@ -217,34 +217,34 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer put(int index, byte b) {
+    public IoBuffer put(int index, byte b) {
         autoExpand(index, 1);
         buf().put(index, b);
         return this;
     }
 
     @Override
-    public ByteBuffer get(byte[] dst, int offset, int length) {
+    public IoBuffer get(byte[] dst, int offset, int length) {
         buf().get(dst, offset, length);
         return this;
     }
 
     @Override
-    public ByteBuffer put(java.nio.ByteBuffer src) {
+    public IoBuffer put(java.nio.ByteBuffer src) {
         autoExpand(src.remaining());
         buf().put(src);
         return this;
     }
 
     @Override
-    public ByteBuffer put(byte[] src, int offset, int length) {
+    public IoBuffer put(byte[] src, int offset, int length) {
         autoExpand(length);
         buf().put(src, offset, length);
         return this;
     }
 
     @Override
-    public ByteBuffer compact() {
+    public IoBuffer compact() {
         buf().compact();
         mark = -1;
         return this;
@@ -256,7 +256,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer order(ByteOrder bo) {
+    public IoBuffer order(ByteOrder bo) {
         buf().order(bo);
         return this;
     }
@@ -267,7 +267,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putChar(char value) {
+    public IoBuffer putChar(char value) {
         autoExpand(2);
         buf().putChar(value);
         return this;
@@ -279,7 +279,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putChar(int index, char value) {
+    public IoBuffer putChar(int index, char value) {
         autoExpand(index, 2);
         buf().putChar(index, value);
         return this;
@@ -296,7 +296,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putShort(short value) {
+    public IoBuffer putShort(short value) {
         autoExpand(2);
         buf().putShort(value);
         return this;
@@ -308,7 +308,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putShort(int index, short value) {
+    public IoBuffer putShort(int index, short value) {
         autoExpand(index, 2);
         buf().putShort(index, value);
         return this;
@@ -325,7 +325,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putInt(int value) {
+    public IoBuffer putInt(int value) {
         autoExpand(4);
         buf().putInt(value);
         return this;
@@ -337,7 +337,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putInt(int index, int value) {
+    public IoBuffer putInt(int index, int value) {
         autoExpand(index, 4);
         buf().putInt(index, value);
         return this;
@@ -354,7 +354,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putLong(long value) {
+    public IoBuffer putLong(long value) {
         autoExpand(8);
         buf().putLong(value);
         return this;
@@ -366,7 +366,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putLong(int index, long value) {
+    public IoBuffer putLong(int index, long value) {
         autoExpand(index, 8);
         buf().putLong(index, value);
         return this;
@@ -383,7 +383,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putFloat(float value) {
+    public IoBuffer putFloat(float value) {
         autoExpand(4);
         buf().putFloat(value);
         return this;
@@ -395,7 +395,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putFloat(int index, float value) {
+    public IoBuffer putFloat(int index, float value) {
         autoExpand(index, 4);
         buf().putFloat(index, value);
         return this;
@@ -412,7 +412,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putDouble(double value) {
+    public IoBuffer putDouble(double value) {
         autoExpand(8);
         buf().putDouble(value);
         return this;
@@ -424,7 +424,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putDouble(int index, double value) {
+    public IoBuffer putDouble(int index, double value) {
         autoExpand(index, 8);
         buf().putDouble(index, value);
         return this;
@@ -436,7 +436,7 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
     }
 
     @Override
-    public final ByteBuffer asReadOnlyBuffer() {
+    public final IoBuffer asReadOnlyBuffer() {
         autoExpandAllowed = false;
         return asReadOnlyBuffer0();
     }
@@ -445,10 +445,10 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
      * Implement this method to return the unexpandable read only version of
      * this buffer.
      */
-    protected abstract ByteBuffer asReadOnlyBuffer0();
+    protected abstract IoBuffer asReadOnlyBuffer0();
 
     @Override
-    public final ByteBuffer duplicate() {
+    public final IoBuffer duplicate() {
         autoExpandAllowed = false;
         return duplicate0();
     }
@@ -457,10 +457,10 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
      * Implement this method to return the unexpandable duplicate of this
      * buffer.
      */
-    protected abstract ByteBuffer duplicate0();
+    protected abstract IoBuffer duplicate0();
 
     @Override
-    public final ByteBuffer slice() {
+    public final IoBuffer slice() {
         autoExpandAllowed = false;
         return slice0();
     }
@@ -469,5 +469,5 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
      * Implement this method to return the unexpandable slice of this
      * buffer.
      */
-    protected abstract ByteBuffer slice0();
+    protected abstract IoBuffer slice0();
 }

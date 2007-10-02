@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.http.HttpResponseDecoder;
 import org.apache.mina.filter.codec.http.HttpResponseMessage;
@@ -43,7 +43,7 @@ public class ChunkedTest extends TestCase {
             + "Content-Type: text/plain\r\n" + "\r\n" + fakeHttp;
 
     public void testChunking() throws Exception {
-        ByteBuffer buffer = ByteBuffer.allocate(fakeHttp.length());
+        IoBuffer buffer = IoBuffer.allocate(fakeHttp.length());
         buffer.put(fakeHttp.getBytes());
         buffer.flip();
 
@@ -58,7 +58,7 @@ public class ChunkedTest extends TestCase {
     }
 
     public void testChunkingContinue() throws Exception {
-        ByteBuffer buffer = ByteBuffer.allocate(fakeHttpContinue.length());
+        IoBuffer buffer = IoBuffer.allocate(fakeHttpContinue.length());
         buffer.put(fakeHttp.getBytes());
         buffer.flip();
 

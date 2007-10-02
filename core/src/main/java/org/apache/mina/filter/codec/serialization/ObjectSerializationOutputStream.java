@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.OutputStream;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 
 /**
  * An {@link ObjectOutput} and {@link OutputStream} that can write the objects as
@@ -103,7 +103,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements
     }
 
     public void writeObject(Object obj) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(64, false);
+        IoBuffer buf = IoBuffer.allocate(64, false);
         buf.setAutoExpand(true);
         buf.putObject(obj);
 

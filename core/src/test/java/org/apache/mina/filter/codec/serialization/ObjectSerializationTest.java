@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -48,7 +48,7 @@ public class ObjectSerializationTest extends TestCase {
         encoder.encode(session, expected, out);
 
         Assert.assertEquals(1, session.getEncoderOutputQueue().size());
-        ByteBuffer buf = session.getEncoderOutputQueue().poll();
+        IoBuffer buf = session.getEncoderOutputQueue().poll();
 
         testDecoderAndInputStream(expected, buf);
     }
@@ -63,10 +63,10 @@ public class ObjectSerializationTest extends TestCase {
         osos.writeObject(expected);
         osos.flush();
 
-        testDecoderAndInputStream(expected, ByteBuffer.wrap(baos.toByteArray()));
+        testDecoderAndInputStream(expected, IoBuffer.wrap(baos.toByteArray()));
     }
 
-    private void testDecoderAndInputStream(String expected, ByteBuffer in)
+    private void testDecoderAndInputStream(String expected, IoBuffer in)
             throws Exception {
         // Test InputStream
         ObjectSerializationInputStream osis = new ObjectSerializationInputStream(

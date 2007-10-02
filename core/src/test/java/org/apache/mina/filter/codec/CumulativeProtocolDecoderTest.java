@@ -25,7 +25,7 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 
 /**
@@ -37,7 +37,7 @@ import org.apache.mina.common.IoSession;
 public class CumulativeProtocolDecoderTest extends TestCase {
     private final ProtocolCodecSession session = new ProtocolCodecSession();
 
-    private ByteBuffer buf;
+    private IoBuffer buf;
     private IntegerDecoder decoder;
 
     public static void main(String[] args) {
@@ -46,7 +46,7 @@ public class CumulativeProtocolDecoderTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        buf = ByteBuffer.allocate(16);
+        buf = IoBuffer.allocate(16);
         decoder = new IntegerDecoder();
     }
 
@@ -104,7 +104,7 @@ public class CumulativeProtocolDecoderTest extends TestCase {
     private static class IntegerDecoder extends CumulativeProtocolDecoder {
 
         @Override
-        protected boolean doDecode(IoSession session, ByteBuffer in,
+        protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
             Assert.assertTrue(in.hasRemaining());
             if (in.remaining() < 4) {
@@ -123,7 +123,7 @@ public class CumulativeProtocolDecoderTest extends TestCase {
     private static class WrongDecoder extends CumulativeProtocolDecoder {
 
         @Override
-        protected boolean doDecode(IoSession session, ByteBuffer in,
+        protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
             return true;
         }

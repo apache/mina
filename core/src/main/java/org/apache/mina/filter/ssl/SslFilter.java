@@ -27,7 +27,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterAdapter;
@@ -407,7 +407,7 @@ public class SslFilter extends IoFilterAdapter {
             if (!isSslStarted(session) && handler.isInboundDone()) {
                 handler.scheduleMessageReceived(nextFilter, message);
             } else {
-                ByteBuffer buf = (ByteBuffer) message;
+                IoBuffer buf = (IoBuffer) message;
                 if (IoSessionLogger.isDebugEnabled(session)) {
                     IoSessionLogger.debug(session, " Data Read: " + handler + " ("
                             + buf + ')');
@@ -482,7 +482,7 @@ public class SslFilter extends IoFilterAdapter {
                         writeRequest);
             } else {
                 // Otherwise, encrypt the buffer.
-                ByteBuffer buf = (ByteBuffer) writeRequest.getMessage();
+                IoBuffer buf = (IoBuffer) writeRequest.getMessage();
 
                 if (IoSessionLogger.isDebugEnabled(session)) {
                     IoSessionLogger.debug(session, " Filtered Write: " + handler);
@@ -505,7 +505,7 @@ public class SslFilter extends IoFilterAdapter {
                     int pos = buf.position();
                     handler.encrypt(buf.buf());
                     buf.position(pos);
-                    ByteBuffer encryptedBuffer = SslHandler.copy(handler
+                    IoBuffer encryptedBuffer = SslHandler.copy(handler
                             .getOutNetBuffer());
 
                     if (IoSessionLogger.isDebugEnabled(session)) {
@@ -632,7 +632,7 @@ public class SslFilter extends IoFilterAdapter {
         }
 
         // forward read app data
-        ByteBuffer readBuffer = SslHandler.copy(handler.getAppBuffer());
+        IoBuffer readBuffer = SslHandler.copy(handler.getAppBuffer());
         handler.getAppBuffer().clear();
         if (IoSessionLogger.isDebugEnabled(session)) {
             IoSessionLogger.debug(session, " app data read: " + readBuffer + " ("
@@ -678,10 +678,10 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     private static class EncryptedWriteRequest extends WriteRequestWrapper {
-        private final ByteBuffer encryptedMessage;
+        private final IoBuffer encryptedMessage;
 
         private EncryptedWriteRequest(WriteRequest writeRequest,
-                ByteBuffer encryptedMessage) {
+                IoBuffer encryptedMessage) {
             super(writeRequest);
             this.encryptedMessage = encryptedMessage;
         }

@@ -25,7 +25,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEvent;
@@ -178,10 +178,10 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                         while ((req = queue.poll()) != null) {
                             Object message = req.getMessage();
                             Object messageCopy = message;
-                            if (message instanceof ByteBuffer) {
-                                ByteBuffer rb = (ByteBuffer) message;
+                            if (message instanceof IoBuffer) {
+                                IoBuffer rb = (IoBuffer) message;
                                 rb.mark();
-                                ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+                                IoBuffer wb = IoBuffer.allocate(rb.remaining());
                                 wb.put(rb);
                                 wb.flip();
                                 rb.reset();

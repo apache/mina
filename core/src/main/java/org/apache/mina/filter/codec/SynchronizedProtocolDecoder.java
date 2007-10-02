@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 
 /**
@@ -54,7 +54,7 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
         return decoder;
     }
 
-    public void decode(IoSession session, ByteBuffer in,
+    public void decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         synchronized (decoder) {
             decoder.decode(session, in, out);

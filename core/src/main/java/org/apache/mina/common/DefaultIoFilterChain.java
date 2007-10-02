@@ -333,8 +333,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public void fireMessageReceived(Object message) {
-        if (message instanceof ByteBuffer) {
-            session.increaseReadBytes(((ByteBuffer) message).remaining());
+        if (message instanceof IoBuffer) {
+            session.increaseReadBytes(((IoBuffer) message).remaining());
         }
 
         Entry head = this.head;
@@ -353,10 +353,10 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
     public void fireMessageSent(WriteRequest request) {
         Object message = request.getMessage();
-        if (message instanceof ByteBuffer) {
-            ByteBuffer b = (ByteBuffer) message;
+        if (message instanceof IoBuffer) {
+            IoBuffer b = (IoBuffer) message;
             if (b.hasRemaining()) {
-                session.increaseWrittenBytes(((ByteBuffer) message).remaining());
+                session.increaseWrittenBytes(((IoBuffer) message).remaining());
             } else {
                 session.increaseWrittenMessages();
             }
@@ -575,8 +575,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
             AbstractIoSession s = (AbstractIoSession) session;
 
             // Maintain counters.
-            if (writeRequest.getMessage() instanceof ByteBuffer) {
-                ByteBuffer buffer = (ByteBuffer) writeRequest.getMessage();
+            if (writeRequest.getMessage() instanceof IoBuffer) {
+                IoBuffer buffer = (IoBuffer) writeRequest.getMessage();
                 // I/O processor implementation will call buffer.reset()
                 // it after the write operation is finished, because
                 // the buffer will be specified with messageSent event.

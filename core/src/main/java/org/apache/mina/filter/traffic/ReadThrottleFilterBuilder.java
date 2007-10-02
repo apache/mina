@@ -22,7 +22,7 @@ package org.apache.mina.filter.traffic;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
@@ -169,8 +169,8 @@ public class ReadThrottleFilterBuilder {
         @Override
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) throws Exception {
-            if (message instanceof ByteBuffer) {
-                add(session, ((ByteBuffer) message).remaining());
+            if (message instanceof IoBuffer) {
+                add(session, ((IoBuffer) message).remaining());
             }
 
             nextFilter.messageReceived(session, message);
@@ -181,8 +181,8 @@ public class ReadThrottleFilterBuilder {
         @Override
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) throws Exception {
-            if (message instanceof ByteBuffer) {
-                release(session, ((ByteBuffer) message).remaining());
+            if (message instanceof IoBuffer) {
+                release(session, ((IoBuffer) message).remaining());
             }
 
             nextFilter.messageReceived(session, message);

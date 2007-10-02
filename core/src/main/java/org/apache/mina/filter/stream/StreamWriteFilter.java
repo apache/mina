@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterAdapter;
@@ -36,7 +36,7 @@ import org.apache.mina.common.WriteRequest;
  * Filter implementation which makes it possible to write {@link InputStream}
  * objects directly using {@link IoSession#write(Object)}. When an
  * {@link InputStream} is written to a session this filter will read the bytes
- * from the stream into {@link ByteBuffer} objects and write those buffers
+ * from the stream into {@link IoBuffer} objects and write those buffers
  * to the next filter. When end of stream has been reached this filter will
  * call {@link NextFilter#messageSent(IoSession,WriteRequest)} using the original
  * {@link InputStream} written to the session and notifies
@@ -102,7 +102,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
 
             InputStream inputStream = (InputStream) message;
 
-            ByteBuffer byteBuffer = getNextByteBuffer(inputStream);
+            IoBuffer byteBuffer = getNextByteBuffer(inputStream);
             if (byteBuffer == null) {
                 // End of stream reached.
                 writeRequest.getFuture().setWritten(true);
@@ -138,7 +138,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
         if (inputStream == null) {
             nextFilter.messageSent(session, writeRequest);
         } else {
-            ByteBuffer byteBuffer = getNextByteBuffer(inputStream);
+            IoBuffer byteBuffer = getNextByteBuffer(inputStream);
 
             if (byteBuffer == null) {
                 // End of stream reached.
@@ -165,7 +165,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
         }
     }
 
-    private ByteBuffer getNextByteBuffer(InputStream is) throws IOException {
+    private IoBuffer getNextByteBuffer(InputStream is) throws IOException {
         byte[] bytes = new byte[writeBufferSize];
 
         int off = 0;
@@ -179,7 +179,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
             return null;
         }
 
-        ByteBuffer buffer = ByteBuffer.wrap(bytes, 0, off);
+        IoBuffer buffer = IoBuffer.wrap(bytes, 0, off);
 
         return buffer;
     }

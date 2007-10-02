@@ -21,7 +21,7 @@ package org.apache.mina.filter.compression;
 
 import java.io.IOException;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 
 import com.jcraft.jzlib.JZlib;
 import com.jcraft.jzlib.ZStream;
@@ -88,13 +88,13 @@ class Zlib {
     }
 
     /**
-     * @param inBuffer the {@link ByteBuffer} to be decompressed. The contents
+     * @param inBuffer the {@link IoBuffer} to be decompressed. The contents
      * of the buffer are transferred into a local byte array and the buffer is
      * flipped and returned intact.
      * @return the decompressed data
      * @throws IOException if the decompression of the data failed for some reason.
      */
-    public ByteBuffer inflate(ByteBuffer inBuffer) throws IOException {
+    public IoBuffer inflate(IoBuffer inBuffer) throws IOException {
         if (mode == MODE_DEFLATER) {
             throw new IllegalStateException("not initialized as INFLATER");
         }
@@ -103,7 +103,7 @@ class Zlib {
         inBuffer.get(inBytes).flip();
 
         byte[] outBytes = new byte[inBytes.length * 2];
-        ByteBuffer outBuffer = ByteBuffer.allocate(outBytes.length);
+        IoBuffer outBuffer = IoBuffer.allocate(outBytes.length);
         outBuffer.setAutoExpand(true);
 
         zStream.next_in = inBytes;
@@ -147,7 +147,7 @@ class Zlib {
      * @return the buffer with the compressed data
      * @throws IOException if the compression of teh buffer failed for some reason
      */
-    public ByteBuffer deflate(ByteBuffer inBuffer) throws IOException {
+    public IoBuffer deflate(IoBuffer inBuffer) throws IOException {
         if (mode == MODE_INFLATER) {
             throw new IllegalStateException("not initialized as DEFLATER");
         }
@@ -176,7 +176,7 @@ class Zlib {
                     + retval);
         }
 
-        ByteBuffer outBuf = ByteBuffer
+        IoBuffer outBuf = IoBuffer
                 .wrap(outBytes, 0, zStream.next_out_index);
 
         return outBuf;

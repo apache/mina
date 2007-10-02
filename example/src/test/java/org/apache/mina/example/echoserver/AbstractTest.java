@@ -25,7 +25,7 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
@@ -59,7 +59,7 @@ public abstract class AbstractTest extends TestCase {
         assertEquals(toString(expected), toString(actual));
     }
 
-    protected static void assertEquals(ByteBuffer expected, ByteBuffer actual) {
+    protected static void assertEquals(IoBuffer expected, IoBuffer actual) {
         assertEquals(toString(expected), toString(actual));
     }
 
@@ -72,7 +72,7 @@ public abstract class AbstractTest extends TestCase {
         return str.toString();
     }
 
-    protected static String toString(ByteBuffer buf) {
+    protected static String toString(IoBuffer buf) {
         return buf.getHexDump();
     }
 
@@ -121,11 +121,11 @@ public abstract class AbstractTest extends TestCase {
                     @Override
                     public void messageReceived(IoSession session,
                             Object message) throws Exception {
-                        if (!(message instanceof ByteBuffer)) {
+                        if (!(message instanceof IoBuffer)) {
                             return;
                         }
 
-                        ByteBuffer buf = (ByteBuffer) message;
+                        IoBuffer buf = (IoBuffer) message;
                         if (session.getFilterChain().contains("SSL")
                                 && buf.remaining() == 1
                                 && buf.get() == (byte) '.') {
@@ -134,7 +134,7 @@ public abstract class AbstractTest extends TestCase {
                                     .startSsl(session);
 
                             // Send a response
-                            buf = ByteBuffer.allocate(1);
+                            buf = IoBuffer.allocate(1);
                             buf.put((byte) '.');
                             buf.flip();
                             session

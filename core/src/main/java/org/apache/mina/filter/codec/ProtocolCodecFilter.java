@@ -22,7 +22,7 @@ package org.apache.mina.filter.codec;
 import java.net.SocketAddress;
 import java.util.Queue;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.AttributeKey;
@@ -46,7 +46,7 @@ import org.apache.mina.common.WriteRequestWrapper;
 public class ProtocolCodecFilter extends IoFilterAdapter {
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
-    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.wrap(new byte[0]);
+    private static final IoBuffer EMPTY_BUFFER = IoBuffer.wrap(new byte[0]);
 
     private final AttributeKey ENCODER = new AttributeKey(getClass(), "encoder");
     private final AttributeKey DECODER = new AttributeKey(getClass(), "decoder");
@@ -149,12 +149,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws Exception {
-        if (!(message instanceof ByteBuffer)) {
+        if (!(message instanceof IoBuffer)) {
             nextFilter.messageReceived(session, message);
             return;
         }
 
-        ByteBuffer in = (ByteBuffer) message;
+        IoBuffer in = (IoBuffer) message;
         ProtocolDecoder decoder = getDecoder0(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
@@ -196,7 +196,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
-        if (message instanceof ByteBuffer) {
+        if (message instanceof IoBuffer) {
             nextFilter.filterWrite(session, writeRequest);
             return;
         }
@@ -318,7 +318,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
 
     private static class EncodedWriteRequest extends DefaultWriteRequest {
-        private EncodedWriteRequest(ByteBuffer encodedMessage,
+        private EncodedWriteRequest(IoBuffer encodedMessage,
                 WriteFuture future, SocketAddress destination) {
             super(encodedMessage, future, destination);
         }
@@ -370,10 +370,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         public WriteFuture flush() {
-            Queue<ByteBuffer> bufferQueue = getBufferQueue();
+            Queue<IoBuffer> bufferQueue = getBufferQueue();
             WriteFuture future = null;
             for (;;) {
-                ByteBuffer buf = bufferQueue.poll();
+                IoBuffer buf = bufferQueue.poll();
                 if (buf == null) {
                     break;
                 }

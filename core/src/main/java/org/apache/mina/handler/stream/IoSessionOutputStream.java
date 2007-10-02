@@ -22,7 +22,7 @@ package org.apache.mina.handler.stream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
 
@@ -58,7 +58,7 @@ class IoSessionOutputStream extends OutputStream {
         }
     }
 
-    private synchronized void write(ByteBuffer buf) throws IOException {
+    private synchronized void write(IoBuffer buf) throws IOException {
         checkClosed();
         WriteFuture future = session.write(buf);
         lastWriteFuture = future;
@@ -66,12 +66,12 @@ class IoSessionOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        write(ByteBuffer.wrap(b.clone(), off, len));
+        write(IoBuffer.wrap(b.clone(), off, len));
     }
 
     @Override
     public void write(int b) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(1);
+        IoBuffer buf = IoBuffer.allocate(1);
         buf.put((byte) b);
         buf.flip();
         write(buf);

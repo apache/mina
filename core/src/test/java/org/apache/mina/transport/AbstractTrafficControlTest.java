@@ -23,7 +23,7 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoHandler;
@@ -165,7 +165,7 @@ public abstract class AbstractTrafficControlTest extends TestCase {
     }
 
     private void write(IoSession session, String s) throws Exception {
-        session.write(ByteBuffer.wrap(s.getBytes("ASCII")));
+        session.write(IoBuffer.wrap(s.getBytes("ASCII")));
     }
 
     private int read(IoSession session) throws Exception {
@@ -209,7 +209,7 @@ public abstract class AbstractTrafficControlTest extends TestCase {
         @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {
-            ByteBuffer buffer = (ByteBuffer) message;
+            IoBuffer buffer = (IoBuffer) message;
             byte[] data = new byte[buffer.remaining()];
             buffer.get(data);
             Object lock = session.getAttribute("lock");
@@ -224,7 +224,7 @@ public abstract class AbstractTrafficControlTest extends TestCase {
         @Override
         public void messageSent(IoSession session, Object message)
                 throws Exception {
-            ByteBuffer buffer = (ByteBuffer) message;
+            IoBuffer buffer = (IoBuffer) message;
             buffer.rewind();
             byte[] data = new byte[buffer.remaining()];
             buffer.get(data);
@@ -239,8 +239,8 @@ public abstract class AbstractTrafficControlTest extends TestCase {
         public void messageReceived(IoSession session, Object message)
                 throws Exception {
             // Just echo the received bytes.
-            ByteBuffer rb = (ByteBuffer) message;
-            ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+            IoBuffer rb = (IoBuffer) message;
+            IoBuffer wb = IoBuffer.allocate(rb.remaining());
             wb.put(rb);
             wb.flip();
             session.write(wb);

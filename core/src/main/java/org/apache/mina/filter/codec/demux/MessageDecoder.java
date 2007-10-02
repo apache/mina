@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.codec.demux;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
@@ -34,22 +34,22 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  */
 public interface MessageDecoder {
     /**
-     * Represents a result from {@link #decodable(IoSession, ByteBuffer)} and
-     * {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}.  Please
+     * Represents a result from {@link #decodable(IoSession, IoBuffer)} and
+     * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
     static MessageDecoderResult OK = MessageDecoderResult.OK;
 
     /**
-     * Represents a result from {@link #decodable(IoSession, ByteBuffer)} and
-     * {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}.  Please
+     * Represents a result from {@link #decodable(IoSession, IoBuffer)} and
+     * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
     static MessageDecoderResult NEED_DATA = MessageDecoderResult.NEED_DATA;
 
     /**
-     * Represents a result from {@link #decodable(IoSession, ByteBuffer)} and
-     * {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}.  Please
+     * Represents a result from {@link #decodable(IoSession, IoBuffer)} and
+     * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
     static MessageDecoderResult NOT_OK = MessageDecoderResult.NOT_OK;
@@ -63,11 +63,11 @@ public interface MessageDecoder {
      *         specified buffer is decodable ({@link #OK}) or not decodable
      *         {@link #NOT_OK}.
      */
-    MessageDecoderResult decodable(IoSession session, ByteBuffer in);
+    MessageDecoderResult decodable(IoSession session, IoBuffer in);
 
     /**
      * Decodes binary or protocol-specific content into higher-level message objects.
-     * MINA invokes {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
+     * MINA invokes {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
      * method with read data, and then the decoder implementation puts decoded
      * messages into {@link ProtocolDecoderOutput}.
      *
@@ -77,7 +77,7 @@ public interface MessageDecoder {
      *
      * @throws Exception if the read data violated protocol specification
      */
-    MessageDecoderResult decode(IoSession session, ByteBuffer in,
+    MessageDecoderResult decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception;
 
     /**
@@ -85,7 +85,7 @@ public interface MessageDecoder {
      * parsing the data.  This method is useful when you deal with the protocol which doesn't
      * specify the length of a message such as HTTP response without <tt>content-length</tt>
      * header. Implement this method to process the remaining data that
-     * {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)} method didn't process
+     * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)} method didn't process
      * completely.
      *
      * @throws Exception if the read data violated protocol specification

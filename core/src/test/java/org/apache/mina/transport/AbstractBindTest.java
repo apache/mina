@@ -27,7 +27,7 @@ import java.util.Date;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoAcceptor;
@@ -164,7 +164,7 @@ public abstract class AbstractBindTest extends TestCase {
             future.awaitUninterruptibly();
             sessions[i] = future.getSession();
             Assert.assertTrue(sessions[i].isConnected());
-            Assert.assertTrue(sessions[i].write(ByteBuffer.allocate(1)).awaitUninterruptibly().isWritten());
+            Assert.assertTrue(sessions[i].write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
         }
 
         // Wait for the server side sessions to be created.
@@ -231,13 +231,13 @@ public abstract class AbstractBindTest extends TestCase {
         @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {
-            if (!(message instanceof ByteBuffer)) {
+            if (!(message instanceof IoBuffer)) {
                 return;
             }
 
-            ByteBuffer rb = (ByteBuffer) message;
+            IoBuffer rb = (IoBuffer) message;
             // Write the received data back to remote peer
-            ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+            IoBuffer wb = IoBuffer.allocate(rb.remaining());
             wb.put(rb);
             wb.flip();
             session.write(wb);

@@ -21,7 +21,7 @@ package org.apache.mina.example.udp;
 
 import java.net.SocketAddress;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -52,8 +52,8 @@ public class MemoryMonitorHandler extends IoHandlerAdapter {
     public void messageReceived(IoSession session, Object message)
             throws Exception {
 
-        if (message instanceof ByteBuffer) {
-            ByteBuffer buffer = (ByteBuffer) message;
+        if (message instanceof IoBuffer) {
+            IoBuffer buffer = (IoBuffer) message;
             SocketAddress remoteAddress = session.getRemoteAddress();
             server.recvUpdate(remoteAddress, buffer.getLong());
         }

@@ -27,7 +27,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoProcessor;
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoSession;
 import org.apache.tomcat.jni.Error;
@@ -217,7 +217,7 @@ class AprIoProcessor extends AbstractIoProcessor {
     }
     
     @Override
-    protected int read(IoSession sess, ByteBuffer buffer) throws Exception {
+    protected int read(IoSession sess, IoBuffer buffer) throws Exception {
         logger.debug("read");
         AprSessionImpl session=(AprSessionImpl)sess;
         
@@ -326,7 +326,7 @@ class AprIoProcessor extends AbstractIoProcessor {
     }
     
     @Override
-    protected int write(IoSession session, ByteBuffer buf) throws Exception {
+    protected int write(IoSession session, IoBuffer buf) throws Exception {
         logger.debug("write");
         // be sure APR_SO_NONBLOCK was set, or it will block
         int toWrite = buf.remaining();

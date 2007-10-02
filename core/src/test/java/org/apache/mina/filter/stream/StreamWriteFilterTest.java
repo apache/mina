@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IdleStatus;
@@ -162,7 +162,7 @@ public class StreamWriteFilterTest extends TestCase {
         /*
          * Record expectations
          */
-        nextFilter.filterWrite(session, new DefaultWriteRequest(ByteBuffer
+        nextFilter.filterWrite(session, new DefaultWriteRequest(IoBuffer
                 .wrap(data)));
         mockNextFilter.setMatcher(new WriteRequestMatcher());
         nextFilter.messageSent(session, writeRequest);
@@ -201,11 +201,11 @@ public class StreamWriteFilterTest extends TestCase {
         WriteRequest writeRequest = new DefaultWriteRequest(stream,
                 new DummyWriteFuture());
 
-        WriteRequest chunk1Request = new DefaultWriteRequest(ByteBuffer
+        WriteRequest chunk1Request = new DefaultWriteRequest(IoBuffer
                 .wrap(chunk1));
-        WriteRequest chunk2Request = new DefaultWriteRequest(ByteBuffer
+        WriteRequest chunk2Request = new DefaultWriteRequest(IoBuffer
                 .wrap(chunk2));
-        WriteRequest chunk3Request = new DefaultWriteRequest(ByteBuffer
+        WriteRequest chunk3Request = new DefaultWriteRequest(IoBuffer
                 .wrap(chunk3));
 
         /*
@@ -501,7 +501,7 @@ public class StreamWriteFilterTest extends TestCase {
         @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {
-            ByteBuffer buf = (ByteBuffer) message;
+            IoBuffer buf = (IoBuffer) message;
             while (buf.hasRemaining()) {
                 digest.update(buf.get());
                 bytesRead++;

@@ -25,7 +25,7 @@ import java.nio.charset.CharsetEncoder;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
@@ -47,7 +47,7 @@ public class TextLineDecoderTest extends TestCase {
         CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
         ProtocolCodecSession session = new ProtocolCodecSession();
         ProtocolDecoderOutput out = session.getDecoderOutput();
-        ByteBuffer in = ByteBuffer.allocate(16);
+        IoBuffer in = IoBuffer.allocate(16);
 
         // Test one decode and one output
         in.putString("ABC\r\n", encoder);
@@ -148,7 +148,7 @@ public class TextLineDecoderTest extends TestCase {
         CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
         ProtocolCodecSession session = new ProtocolCodecSession();
         ProtocolDecoderOutput out = session.getDecoderOutput();
-        ByteBuffer in = ByteBuffer.allocate(16);
+        IoBuffer in = IoBuffer.allocate(16);
 
         // Test one decode and one output
         in.putString("ABC\r\n", encoder);

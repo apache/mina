@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -49,13 +49,13 @@ public class ZlibTest extends TestCase {
         for (int i = 0; i < 10; i++) {
             strInput += "The quick brown fox jumps over the lazy dog.  ";
         }
-        ByteBuffer byteInput = ByteBuffer.wrap(strInput.getBytes("UTF8"));
+        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
 
         // increase the count to have the compression and decompression
         // done using the same instance of Zlib
         for (int i = 0; i < 5; i++) {
-            ByteBuffer byteCompressed = deflater.deflate(byteInput);
-            ByteBuffer byteUncompressed = inflater.inflate(byteCompressed);
+            IoBuffer byteCompressed = deflater.deflate(byteInput);
+            IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
             String strOutput = byteUncompressed.getString(Charset.forName(
                     "UTF8").newDecoder());
             assertTrue(strOutput.equals(strInput));
@@ -64,13 +64,13 @@ public class ZlibTest extends TestCase {
 
     public void testCorruptedData() throws Exception {
         String strInput = "Hello World";
-        ByteBuffer byteInput = ByteBuffer.wrap(strInput.getBytes("UTF8"));
+        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
 
-        ByteBuffer byteCompressed = deflater.deflate(byteInput);
+        IoBuffer byteCompressed = deflater.deflate(byteInput);
         // change the contents to something else. Since this doesn't check
         // for integrity, it wont throw an exception
         byteCompressed.put(5, (byte) 0xa);
-        ByteBuffer byteUncompressed = inflater.inflate(byteCompressed);
+        IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
         String strOutput = byteUncompressed.getString(Charset.forName("UTF8")
                 .newDecoder());
         assertFalse(strOutput.equals(strInput));
@@ -78,9 +78,9 @@ public class ZlibTest extends TestCase {
 
     public void testCorruptedHeader() throws Exception {
         String strInput = "Hello World";
-        ByteBuffer byteInput = ByteBuffer.wrap(strInput.getBytes("UTF8"));
+        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
 
-        ByteBuffer byteCompressed = deflater.deflate(byteInput);
+        IoBuffer byteCompressed = deflater.deflate(byteInput);
         // write a bad value into the zlib header. Make sure that
         // the decompression fails
         byteCompressed.put(0, (byte) 0xca);
@@ -98,8 +98,8 @@ public class ZlibTest extends TestCase {
         for (int i = 0; i < 10; i++) {
             strInput += "The quick brown fox jumps over the lazy dog.  ";
         }
-        ByteBuffer byteInput = ByteBuffer.wrap(strInput.getBytes("UTF8"));
-        ByteBuffer byteCompressed = null;
+        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
+        IoBuffer byteCompressed = null;
 
         for (int i = 0; i < 5; i++) {
             byteCompressed = deflater.deflate(byteInput);
@@ -107,7 +107,7 @@ public class ZlibTest extends TestCase {
                 // decompress the first compressed output since it contains
                 // the zlib header, which will not be generated for further
                 // compressions done with the same instance
-                ByteBuffer byteUncompressed = inflater.inflate(byteCompressed);
+                IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
                 String strOutput = byteUncompressed.getString(Charset.forName(
                         "UTF8").newDecoder());
                 assertTrue(strOutput.equals(strInput));
@@ -115,7 +115,7 @@ public class ZlibTest extends TestCase {
         }
         // check if the last compressed data block can be decompressed
         // successfully.
-        ByteBuffer byteUncompressed = inflater.inflate(byteCompressed);
+        IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
         String strOutput = byteUncompressed.getString(Charset.forName("UTF8")
                 .newDecoder());
         assertTrue(strOutput.equals(strInput));

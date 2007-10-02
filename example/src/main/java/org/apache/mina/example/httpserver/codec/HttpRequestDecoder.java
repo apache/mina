@@ -29,7 +29,7 @@ import java.nio.charset.CharsetDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.demux.MessageDecoder;
@@ -54,7 +54,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
     public HttpRequestDecoder() {
     }
 
-    public MessageDecoderResult decodable(IoSession session, ByteBuffer in) {
+    public MessageDecoderResult decodable(IoSession session, IoBuffer in) {
         // Return NEED_DATA if the whole header is not read yet.
         try {
             return messageComplete(in) ? MessageDecoderResult.OK
@@ -66,7 +66,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
         return MessageDecoderResult.NOT_OK;
     }
 
-    public MessageDecoderResult decode(IoSession session, ByteBuffer in,
+    public MessageDecoderResult decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         // Try to decode body
         HttpRequestMessage m = decodeBody(in);
@@ -81,7 +81,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
         return MessageDecoderResult.OK;
     }
 
-    private boolean messageComplete(ByteBuffer in) throws Exception {
+    private boolean messageComplete(IoBuffer in) throws Exception {
         int last = in.remaining() - 1;
         if (in.remaining() < 4) {
             return false;
@@ -140,7 +140,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
         return false;
     }
 
-    private HttpRequestMessage decodeBody(ByteBuffer in) {
+    private HttpRequestMessage decodeBody(IoBuffer in) {
         request = new HttpRequestMessage();
         try {
             request.setHeaders(parseRequest(new StringReader(in

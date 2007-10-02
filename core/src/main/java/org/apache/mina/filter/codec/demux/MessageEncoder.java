@@ -21,7 +21,7 @@ package org.apache.mina.filter.codec.demux;
 
 import java.util.Set;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
@@ -44,7 +44,7 @@ public interface MessageEncoder<T> {
      * Encodes higher-level message objects into binary or protocol-specific data.
      * MINA invokes {@link #encode(IoSession, Object, ProtocolEncoderOutput)}
      * method with message which is popped from the session write queue, and then
-     * the encoder implementation puts encoded {@link ByteBuffer}s into
+     * the encoder implementation puts encoded {@link IoBuffer}s into
      * {@link ProtocolEncoderOutput}.
      *
      * @throws Exception if the message violated protocol specification

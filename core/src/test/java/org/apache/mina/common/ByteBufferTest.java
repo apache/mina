@@ -35,7 +35,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 /**
- * Tests {@link ByteBuffer}.
+ * Tests {@link IoBuffer}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -57,7 +57,7 @@ public class ByteBufferTest extends TestCase {
     public void testAllocate() throws Exception {
         for (int i = 10; i < 1048576 * 2; i = i * 11 / 10) // increase by 10%
         {
-            ByteBuffer buf = ByteBuffer.allocate(i);
+            IoBuffer buf = IoBuffer.allocate(i);
             Assert.assertEquals(0, buf.position());
             Assert.assertEquals(buf.capacity(), buf.remaining());
             Assert.assertTrue(buf.capacity() >= i);
@@ -66,7 +66,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testAutoExpand() throws Exception {
-        ByteBuffer buf = ByteBuffer.allocate(1);
+        IoBuffer buf = IoBuffer.allocate(1);
 
         buf.put((byte) 0);
         try {
@@ -98,7 +98,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testAutoExpandMark() throws Exception {
-        ByteBuffer buf = ByteBuffer.allocate(4).setAutoExpand(true);
+        IoBuffer buf = IoBuffer.allocate(4).setAutoExpand(true);
 
         buf.put((byte) 0);
         buf.put((byte) 0);
@@ -117,7 +117,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testGetString() throws Exception {
-        ByteBuffer buf = ByteBuffer.allocate(16);
+        IoBuffer buf = IoBuffer.allocate(16);
         CharsetDecoder decoder;
 
         Charset charset = Charset.forName("UTF-8");
@@ -231,7 +231,7 @@ public class ByteBufferTest extends TestCase {
 
     public void testGetStringWithFailure() throws Exception {
         String test = "\u30b3\u30e1\u30f3\u30c8\u7de8\u96c6";
-        ByteBuffer buffer = ByteBuffer.wrap(test.getBytes("Shift_JIS"));
+        IoBuffer buffer = IoBuffer.wrap(test.getBytes("Shift_JIS"));
 
         // Make sure the limit doesn't change when an exception arose.
         int oldLimit = buffer.limit();
@@ -255,7 +255,7 @@ public class ByteBufferTest extends TestCase {
 
     public void testPutString() throws Exception {
         CharsetEncoder encoder;
-        ByteBuffer buf = ByteBuffer.allocate(16);
+        IoBuffer buf = IoBuffer.allocate(16);
         encoder = Charset.forName("ISO-8859-1").newEncoder();
 
         buf.putString("ABC", encoder);
@@ -321,7 +321,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testGetPrefixedString() throws Exception {
-        ByteBuffer buf = ByteBuffer.allocate(16);
+        IoBuffer buf = IoBuffer.allocate(16);
         CharsetEncoder encoder;
         CharsetDecoder decoder;
         encoder = Charset.forName("ISO-8859-1").newEncoder();
@@ -335,7 +335,7 @@ public class ByteBufferTest extends TestCase {
 
     public void testPutPrefixedString() throws Exception {
         CharsetEncoder encoder;
-        ByteBuffer buf = ByteBuffer.allocate(16);
+        IoBuffer buf = IoBuffer.allocate(16);
         buf.fillAndReset(buf.remaining());
         encoder = Charset.forName("ISO-8859-1").newEncoder();
 
@@ -382,7 +382,7 @@ public class ByteBufferTest extends TestCase {
 
     public void testPutPrefixedStringWithPrefixLength() throws Exception {
         CharsetEncoder encoder = Charset.forName("ISO-8859-1").newEncoder();
-        ByteBuffer buf = ByteBuffer.allocate(16).sweep().setAutoExpand(true);
+        IoBuffer buf = IoBuffer.allocate(16).sweep().setAutoExpand(true);
 
         buf.putPrefixedString("A", 1, encoder);
         Assert.assertEquals(2, buf.position());
@@ -408,7 +408,7 @@ public class ByteBufferTest extends TestCase {
 
     public void testPutPrefixedStringWithPadding() throws Exception {
         CharsetEncoder encoder = Charset.forName("ISO-8859-1").newEncoder();
-        ByteBuffer buf = ByteBuffer.allocate(16).sweep().setAutoExpand(true);
+        IoBuffer buf = IoBuffer.allocate(16).sweep().setAutoExpand(true);
 
         buf.putPrefixedString("A", 1, 2, (byte) 32, encoder);
         Assert.assertEquals(3, buf.position());
@@ -429,7 +429,7 @@ public class ByteBufferTest extends TestCase {
     public void testWideUtf8Characters() throws Exception {
         Runnable r = new Runnable() {
             public void run() {
-                ByteBuffer buffer = ByteBuffer.allocate(1);
+                IoBuffer buffer = IoBuffer.allocate(1);
                 buffer.setAutoExpand(true);
 
                 Charset charset = Charset.forName("UTF-8");
@@ -465,7 +465,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testObjectSerialization() throws Exception {
-        ByteBuffer buf = ByteBuffer.allocate(16);
+        IoBuffer buf = IoBuffer.allocate(16);
         buf.setAutoExpand(true);
         List<Object> o = new ArrayList<Object>();
         o.add(new Date());
@@ -483,7 +483,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testSweepWithZeros() throws Exception {
-        ByteBuffer buf = ByteBuffer.allocate(4);
+        IoBuffer buf = IoBuffer.allocate(4);
         buf.putInt(0xdeadbeef);
         buf.clear();
         Assert.assertEquals(0xdeadbeef, buf.getInt());
@@ -497,7 +497,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testSweepNonZeros() throws Exception {
-        ByteBuffer buf = ByteBuffer.allocate(4);
+        IoBuffer buf = IoBuffer.allocate(4);
         buf.putInt(0xdeadbeef);
         buf.clear();
         Assert.assertEquals(0xdeadbeef, buf.getInt());
@@ -515,7 +515,7 @@ public class ByteBufferTest extends TestCase {
         nioBuf.position(3);
         nioBuf.limit(7);
 
-        ByteBuffer buf = ByteBuffer.wrap(nioBuf);
+        IoBuffer buf = IoBuffer.wrap(nioBuf);
         Assert.assertEquals(3, buf.position());
         Assert.assertEquals(7, buf.limit());
         Assert.assertEquals(10, buf.capacity());
@@ -524,7 +524,7 @@ public class ByteBufferTest extends TestCase {
     public void testWrapSubArray() throws Exception {
         byte[] array = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-        ByteBuffer buf = ByteBuffer.wrap(array, 3, 4);
+        IoBuffer buf = IoBuffer.wrap(array, 3, 4);
         Assert.assertEquals(3, buf.position());
         Assert.assertEquals(7, buf.limit());
         Assert.assertEquals(10, buf.capacity());
@@ -536,11 +536,11 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testDuplicate() throws Exception {
-        ByteBuffer original;
-        ByteBuffer duplicate;
+        IoBuffer original;
+        IoBuffer duplicate;
 
         // Test if the buffer is duplicated correctly.
-        original = ByteBuffer.allocate(16).sweep();
+        original = IoBuffer.allocate(16).sweep();
         original.position(4);
         original.limit(10);
         duplicate = original.duplicate();
@@ -553,13 +553,13 @@ public class ByteBufferTest extends TestCase {
         Assert.assertEquals(127, duplicate.get(4));
 
         // Test a duplicate of a duplicate.
-        original = ByteBuffer.allocate(16);
+        original = IoBuffer.allocate(16);
         duplicate = original.duplicate().duplicate();
         Assert.assertNotSame(original.buf(), duplicate.buf());
         Assert.assertSame(original.buf().array(), duplicate.buf().array());
 
         // Try to expand.
-        original = ByteBuffer.allocate(16);
+        original = IoBuffer.allocate(16);
         original.setAutoExpand(true);
         duplicate = original.duplicate();
         Assert.assertFalse(original.isAutoExpand());
@@ -580,11 +580,11 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testSlice() throws Exception {
-        ByteBuffer original;
-        ByteBuffer slice;
+        IoBuffer original;
+        IoBuffer slice;
 
         // Test if the buffer is sliced correctly.
-        original = ByteBuffer.allocate(16).sweep();
+        original = IoBuffer.allocate(16).sweep();
         original.position(4);
         original.limit(10);
         slice = original.slice();
@@ -597,11 +597,11 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testReadOnlyBuffer() throws Exception {
-        ByteBuffer original;
-        ByteBuffer duplicate;
+        IoBuffer original;
+        IoBuffer duplicate;
 
         // Test if the buffer is duplicated correctly.
-        original = ByteBuffer.allocate(16).sweep();
+        original = IoBuffer.allocate(16).sweep();
         original.position(4);
         original.limit(10);
         duplicate = original.asReadOnlyBuffer();
@@ -614,7 +614,7 @@ public class ByteBufferTest extends TestCase {
 
         // Try to expand.
         try {
-            original = ByteBuffer.allocate(16);
+            original = IoBuffer.allocate(16);
             duplicate = original.asReadOnlyBuffer();
             duplicate.putString("A very very very very looooooong string",
                     Charset.forName("ISO-8859-1").newEncoder());
@@ -625,7 +625,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testGetUnsigned() throws Exception {
-        ByteBuffer buf = ByteBuffer.allocate(16);
+        IoBuffer buf = IoBuffer.allocate(16);
         buf.put((byte) 0xA4);
         buf.put((byte) 0xD0);
         buf.put((byte) 0xB3);
@@ -645,7 +645,7 @@ public class ByteBufferTest extends TestCase {
     public void testIndexOf() throws Exception {
         boolean direct = false;
         for (int i = 0; i < 2; i++, direct = !direct) {
-            ByteBuffer buf = ByteBuffer.allocate(16, direct);
+            IoBuffer buf = IoBuffer.allocate(16, direct);
             buf.put((byte) 0x1);
             buf.put((byte) 0x2);
             buf.put((byte) 0x3);
@@ -674,7 +674,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testPutEnumSet() {
-        ByteBuffer buf = ByteBuffer.allocate(8);
+        IoBuffer buf = IoBuffer.allocate(8);
 
         // Test empty set
         buf.putEnumSet(EnumSet.noneOf(TestEnum.class));
@@ -761,7 +761,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testGetEnumSet() {
-        ByteBuffer buf = ByteBuffer.allocate(8);
+        IoBuffer buf = IoBuffer.allocate(8);
 
         // Test empty set
         buf.put((byte) 0);
@@ -865,7 +865,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testBitVectorOverFlow() {
-        ByteBuffer buf = ByteBuffer.allocate(8);
+        IoBuffer buf = IoBuffer.allocate(8);
         try {
             buf.putEnumSet(EnumSet.of(TestEnum.E9));
             fail("Should have thrown IllegalArgumentException");
@@ -896,7 +896,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testGetPutEnum() {
-        ByteBuffer buf = ByteBuffer.allocate(4);
+        IoBuffer buf = IoBuffer.allocate(4);
 
         buf.putEnum(TestEnum.E64);
         buf.flip();
@@ -914,7 +914,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testGetMediumInt() {
-        ByteBuffer buf = ByteBuffer.allocate(3);
+        IoBuffer buf = IoBuffer.allocate(3);
 
         buf.put((byte) 0x01);
         buf.put((byte) 0x02);
@@ -958,7 +958,7 @@ public class ByteBufferTest extends TestCase {
     }
 
     public void testPutMediumInt() {
-        ByteBuffer buf = ByteBuffer.allocate(3);
+        IoBuffer buf = IoBuffer.allocate(3);
 
         checkMediumInt(buf, 0);
         checkMediumInt(buf, 1);
@@ -966,7 +966,7 @@ public class ByteBufferTest extends TestCase {
         checkMediumInt(buf, 0x7fffff);
     }
 
-    private void checkMediumInt(ByteBuffer buf, int x) {
+    private void checkMediumInt(IoBuffer buf, int x) {
         buf.putMediumInt(x);
         assertEquals(3, buf.position());
         buf.flip();

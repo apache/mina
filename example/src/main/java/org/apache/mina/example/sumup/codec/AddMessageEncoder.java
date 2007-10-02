@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.example.sumup.message.AbstractMessage;
 import org.apache.mina.example.sumup.message.AddMessage;
@@ -50,7 +50,7 @@ public class AddMessageEncoder extends AbstractMessageEncoder {
 
     @Override
     protected void encodeBody(IoSession session, AbstractMessage message,
-            ByteBuffer out) {
+            IoBuffer out) {
         AddMessage m = (AddMessage) message;
         out.putInt(m.getValue());
     }

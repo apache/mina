@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.common.BufferDataException;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
@@ -43,7 +43,7 @@ public class TextLineDecoder implements ProtocolDecoder {
 
     private final LineDelimiter delimiter;
 
-    private ByteBuffer delimBuf;
+    private IoBuffer delimBuf;
 
     private int maxLineLength = 1024;
 
@@ -104,7 +104,7 @@ public class TextLineDecoder implements ProtocolDecoder {
         this.maxLineLength = maxLineLength;
     }
 
-    public void decode(IoSession session, ByteBuffer in,
+    public void decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         Context ctx = getContext(session);
 
@@ -138,7 +138,7 @@ public class TextLineDecoder implements ProtocolDecoder {
         }
     }
 
-    private int decodeAuto(ByteBuffer in, ByteBuffer buf, int matchCount,
+    private int decodeAuto(IoBuffer in, IoBuffer buf, int matchCount,
             CharsetDecoder decoder, ProtocolDecoderOutput out)
             throws CharacterCodingException {
         // Try to find a match
@@ -192,12 +192,12 @@ public class TextLineDecoder implements ProtocolDecoder {
         return matchCount;
     }
 
-    private int decodeNormal(ByteBuffer in, ByteBuffer buf, int matchCount,
+    private int decodeNormal(IoBuffer in, IoBuffer buf, int matchCount,
             CharsetDecoder decoder, ProtocolDecoderOutput out)
             throws CharacterCodingException {
         // Convert delimiter to ByteBuffer if not done yet.
         if (delimBuf == null) {
-            ByteBuffer tmp = ByteBuffer.allocate(2).setAutoExpand(true);
+            IoBuffer tmp = IoBuffer.allocate(2).setAutoExpand(true);
             tmp.putString(delimiter.getValue(), charset.newEncoder());
             tmp.flip();
             delimBuf = tmp;
@@ -246,20 +246,20 @@ public class TextLineDecoder implements ProtocolDecoder {
     private class Context {
         private final CharsetDecoder decoder;
 
-        private final ByteBuffer buf;
+        private final IoBuffer buf;
 
         private int matchCount = 0;
 
         private Context() {
             decoder = charset.newDecoder();
-            buf = ByteBuffer.allocate(80).setAutoExpand(true);
+            buf = IoBuffer.allocate(80).setAutoExpand(true);
         }
 
         public CharsetDecoder getDecoder() {
             return decoder;
         }
 
-        public ByteBuffer getBuffer() {
+        public IoBuffer getBuffer() {
             return buf;
         }
 

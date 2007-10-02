@@ -21,7 +21,7 @@ package org.apache.mina.example.udp.client;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoConnector;
@@ -89,7 +89,7 @@ public class MemMonClient extends IoHandlerAdapter {
     private void sendData() throws InterruptedException {
         for (int i = 0; i < 30; i++) {
             long free = Runtime.getRuntime().freeMemory();
-            ByteBuffer buffer = ByteBuffer.allocate(8);
+            IoBuffer buffer = IoBuffer.allocate(8);
             buffer.putLong(free);
             buffer.flip();
             session.write(buffer);

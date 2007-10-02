@@ -19,7 +19,7 @@
  */
 package org.apache.mina.example.sumup.codec;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.example.sumup.message.AbstractMessage;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -44,7 +44,7 @@ public abstract class AbstractMessageDecoder implements MessageDecoder {
         this.type = type;
     }
 
-    public MessageDecoderResult decodable(IoSession session, ByteBuffer in) {
+    public MessageDecoderResult decodable(IoSession session, IoBuffer in) {
         // Return NEED_DATA if the whole header is not read yet.
         if (in.remaining() < Constants.HEADER_LEN) {
             return MessageDecoderResult.NEED_DATA;
@@ -59,7 +59,7 @@ public abstract class AbstractMessageDecoder implements MessageDecoder {
         return MessageDecoderResult.NOT_OK;
     }
 
-    public MessageDecoderResult decode(IoSession session, ByteBuffer in,
+    public MessageDecoderResult decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         // Try to skip header if not read.
         if (!readHeader) {
@@ -86,5 +86,5 @@ public abstract class AbstractMessageDecoder implements MessageDecoder {
      * @return <tt>null</tt> if the whole body is not read yet
      */
     protected abstract AbstractMessage decodeBody(IoSession session,
-            ByteBuffer in);
+            IoBuffer in);
 }

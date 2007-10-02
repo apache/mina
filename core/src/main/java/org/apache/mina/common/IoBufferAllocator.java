@@ -20,13 +20,13 @@
 package org.apache.mina.common;
 
 /**
- * Allocates {@link ByteBuffer}s and manages them.  Please implement this
+ * Allocates {@link IoBuffer}s and manages them.  Please implement this
  * interface if you need more advanced memory management scheme.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface ByteBufferAllocator {
+public interface IoBufferAllocator {
     /**
      * Returns the buffer which is capable of the specified size.
      *
@@ -34,12 +34,12 @@ public interface ByteBufferAllocator {
      * @param direct <tt>true</tt> to get a direct buffer,
      *               <tt>false</tt> to get a heap buffer.
      */
-    ByteBuffer allocate(int capacity, boolean direct);
+    IoBuffer allocate(int capacity, boolean direct);
 
     /**
      * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
      */
-    ByteBuffer wrap(java.nio.ByteBuffer nioBuffer);
+    IoBuffer wrap(java.nio.ByteBuffer nioBuffer);
 
     /**
      * Dispose of this allocator.

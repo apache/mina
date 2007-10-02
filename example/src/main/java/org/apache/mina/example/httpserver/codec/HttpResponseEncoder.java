@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
@@ -55,7 +55,7 @@ public class HttpResponseEncoder implements MessageEncoder {
     public void encode(IoSession session, Object message,
             ProtocolEncoderOutput out) throws Exception {
         HttpResponseMessage msg = (HttpResponseMessage) message;
-        ByteBuffer buf = ByteBuffer.allocate(256);
+        IoBuffer buf = IoBuffer.allocate(256);
         // Enable auto-expand for easier encoding
         buf.setAutoExpand(true);
 

@@ -22,7 +22,7 @@ package org.apache.mina.filter.codec.serialization;
 import java.io.Serializable;
 
 import org.apache.mina.common.BufferDataException;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoder;
@@ -30,7 +30,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
  * A {@link ProtocolDecoder} which deserializes {@link Serializable} Java
- * objects using {@link ByteBuffer#getObject(ClassLoader)}.
+ * objects using {@link IoBuffer#getObject(ClassLoader)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -84,7 +84,7 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
     }
 
     @Override
-    protected boolean doDecode(IoSession session, ByteBuffer in,
+    protected boolean doDecode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         if (!in.prefixedDataAvailable(4, maxObjectSize)) {
             return false;

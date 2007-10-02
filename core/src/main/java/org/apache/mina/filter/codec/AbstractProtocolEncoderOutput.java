@@ -22,7 +22,7 @@ package org.apache.mina.filter.codec;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 
 /**
  * A {@link ProtocolEncoderOutput} based on queue.
@@ -32,16 +32,16 @@ import org.apache.mina.common.ByteBuffer;
  */
 public abstract class AbstractProtocolEncoderOutput implements
         ProtocolEncoderOutput {
-    private final Queue<ByteBuffer> bufferQueue = new LinkedList<ByteBuffer>();
+    private final Queue<IoBuffer> bufferQueue = new LinkedList<IoBuffer>();
 
     public AbstractProtocolEncoderOutput() {
     }
 
-    public Queue<ByteBuffer> getBufferQueue() {
+    public Queue<IoBuffer> getBufferQueue() {
         return bufferQueue;
     }
 
-    public void write(ByteBuffer buf) {
+    public void write(IoBuffer buf) {
         if (buf.hasRemaining()) {
             bufferQueue.add(buf);
         } else {
@@ -60,16 +60,16 @@ public abstract class AbstractProtocolEncoderOutput implements
 
         // Get the size of merged BB
         int sum = 0;
-        for (ByteBuffer b : bufferQueue) {
+        for (IoBuffer b : bufferQueue) {
             sum += b.remaining();
         }
 
         // Allocate a new BB that will contain all fragments
-        ByteBuffer newBuf = ByteBuffer.allocate(sum);
+        IoBuffer newBuf = IoBuffer.allocate(sum);
 
         // and merge all.
         for (; ;) {
-            ByteBuffer buf = bufferQueue.poll();
+            IoBuffer buf = bufferQueue.poll();
             if (buf == null) {
                 break;
             }

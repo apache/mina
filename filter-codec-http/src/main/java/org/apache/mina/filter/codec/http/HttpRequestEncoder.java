@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
@@ -53,7 +53,7 @@ public class HttpRequestEncoder extends ProtocolEncoderAdapter {
             ProtocolEncoderOutput out) throws Exception {
         HttpRequestMessage msg = (HttpRequestMessage) message;
 
-        ByteBuffer buf = ByteBuffer.allocate(256);
+        IoBuffer buf = IoBuffer.allocate(256);
 
         // Enable auto-expand for easier encoding
         buf.setAutoExpand(true);

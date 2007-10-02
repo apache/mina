@@ -546,7 +546,7 @@ class SslHandler {
                 IoSessionLogger.debug(session, " write outNetBuffer: "
                         + getOutNetBuffer());
             }
-            org.apache.mina.common.ByteBuffer writeBuffer = copy(getOutNetBuffer());
+            org.apache.mina.common.IoBuffer writeBuffer = copy(getOutNetBuffer());
             if (IoSessionLogger.isDebugEnabled(session)) {
                 IoSessionLogger.debug(session, " session write: " + writeBuffer);
             }
@@ -571,7 +571,7 @@ class SslHandler {
                         IoSessionLogger.debug(session, " write outNetBuffer2: "
                                 + getOutNetBuffer());
                     }
-                    org.apache.mina.common.ByteBuffer writeBuffer2 = copy(getOutNetBuffer());
+                    org.apache.mina.common.IoBuffer writeBuffer2 = copy(getOutNetBuffer());
                     writeFuture = new DefaultWriteFuture(session);
                     parent.filterWrite(nextFilter, session,
                             new DefaultWriteRequest(writeBuffer2, writeFuture));
@@ -702,8 +702,8 @@ class SslHandler {
      * @param src the buffer to copy
      * @return the new buffer, ready to read from
      */
-    public static org.apache.mina.common.ByteBuffer copy(java.nio.ByteBuffer src) {
-        org.apache.mina.common.ByteBuffer copy = org.apache.mina.common.ByteBuffer
+    public static org.apache.mina.common.IoBuffer copy(java.nio.ByteBuffer src) {
+        org.apache.mina.common.IoBuffer copy = org.apache.mina.common.IoBuffer
                 .allocate(src.remaining());
         copy.put(src);
         copy.flip();

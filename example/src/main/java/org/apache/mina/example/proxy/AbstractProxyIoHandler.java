@@ -21,7 +21,7 @@ package org.apache.mina.example.proxy;
 
 import java.nio.charset.Charset;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
@@ -55,8 +55,8 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
-        ByteBuffer rb = (ByteBuffer) message;
-        ByteBuffer wb = ByteBuffer.allocate(rb.remaining());
+        IoBuffer rb = (IoBuffer) message;
+        IoBuffer wb = IoBuffer.allocate(rb.remaining());
         rb.mark();
         wb.put(rb);
         wb.flip();

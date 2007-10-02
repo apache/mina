@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 
@@ -27,7 +27,7 @@ import org.apache.mina.common.IoSession;
  * A {@link ProtocolDecoder} that cumulates the content of received
  * buffers to a <em>cumulative buffer</em> to help users implement decoders.
  * <p>
- * If the received {@link ByteBuffer} is only a part of a message.
+ * If the received {@link IoBuffer} is only a part of a message.
  * decoders should cumulate received buffers to make a message complete or
  * to postpone decoding until more buffers arrive.
  * <p>
@@ -106,17 +106,17 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
 
     /**
      * Cumulates content of <tt>in</tt> into internal buffer and forwards
-     * decoding request to {@link #doDecode(IoSession, ByteBuffer, ProtocolDecoderOutput)}.
+     * decoding request to {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
      * <tt>doDecode()</tt> is invoked repeatedly until it returns <tt>false</tt>
      * and the cumulative buffer is compacted after decoding ends.
      *
      * @throws IllegalStateException if your <tt>doDecode()</tt> returned
      *                               <tt>true</tt> not consuming the cumulative buffer.
      */
-    public void decode(IoSession session, ByteBuffer in,
+    public void decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         boolean usingSessionBuffer = true;
-        ByteBuffer buf = (ByteBuffer) session.getAttribute(BUFFER);
+        IoBuffer buf = (IoBuffer) session.getAttribute(BUFFER);
         // If we have a session buffer, append data to that; otherwise
         // use the buffer read from the network directly.
         if (buf != null) {
@@ -171,7 +171,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      *         then this method will be invoked again when more data is cumulated.
      * @throws Exception if cannot decode <tt>in</tt>.
      */
-    protected abstract boolean doDecode(IoSession session, ByteBuffer in,
+    protected abstract boolean doDecode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception;
 
     /**
@@ -188,8 +188,8 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         session.removeAttribute(BUFFER);
     }
 
-    private void storeRemainingInSession(ByteBuffer buf, IoSession session) {
-        final ByteBuffer remainingBuf = ByteBuffer.allocate(buf.capacity());
+    private void storeRemainingInSession(IoBuffer buf, IoSession session) {
+        final IoBuffer remainingBuf = IoBuffer.allocate(buf.capacity());
         remainingBuf.setAutoExpand(true);
         remainingBuf.order(buf.order());
         remainingBuf.put(buf);

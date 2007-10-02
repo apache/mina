@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Date;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 
 /**
  * TODO HttpDecoder.
@@ -65,7 +65,7 @@ public class HttpDecoder {
 
     private CharsetDecoder decoder = Charset.defaultCharset().newDecoder();
 
-    public String decodeLine(ByteBuffer in) throws Exception {
+    public String decodeLine(IoBuffer in) throws Exception {
         int beginPos = in.position();
         int limit = in.limit();
         boolean lastIsCR = false;
@@ -90,7 +90,7 @@ public class HttpDecoder {
 
         String result = null;
         if (terminatorPos > 1) {
-            ByteBuffer line = in.slice();
+            IoBuffer line = in.slice();
             line.limit(terminatorPos - beginPos - 1);
             result = line.getString(decoder);
         }
@@ -153,14 +153,14 @@ public class HttpDecoder {
         return Integer.parseInt(strippedLine, 16);
     }
 
-    public void decodeContent(ByteBuffer in, HttpResponseMessage msg)
+    public void decodeContent(IoBuffer in, HttpResponseMessage msg)
             throws Exception {
         byte content[] = new byte[msg.getContentLength()];
         in.get(content);
         msg.addContent(content);
     }
 
-    public void decodeChunkedContent(ByteBuffer in, HttpResponseMessage msg)
+    public void decodeChunkedContent(IoBuffer in, HttpResponseMessage msg)
             throws Exception {
         int toRead = msg.getExpectedToRead();
         if ((in.get(in.position() + toRead) != CR)

@@ -26,7 +26,7 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.util.Queue;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.IoFilterChain;
@@ -54,7 +54,7 @@ class NioDatagramSession extends NioSession implements DatagramSession {
             new DefaultTransportMetadata(
                     "datagram", true, false,
                     InetSocketAddress.class,
-                    DatagramSessionConfig.class, ByteBuffer.class);
+                    DatagramSessionConfig.class, IoBuffer.class);
 
     private final IoService service;
 

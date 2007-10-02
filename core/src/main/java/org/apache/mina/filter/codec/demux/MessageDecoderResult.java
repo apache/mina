@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.codec.demux;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
@@ -33,23 +33,23 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  */
 public class MessageDecoderResult {
     /**
-     * Represents a result from {@link MessageDecoder#decodable(IoSession, ByteBuffer)}
-     * and {@link MessageDecoder#decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}.
+     * Represents a result from {@link MessageDecoder#decodable(IoSession, IoBuffer)}
+     * and {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
      * Please refer to each method's documentation for detailed explanation.
      */
     public static MessageDecoderResult OK = new MessageDecoderResult("OK");
 
     /**
-     * Represents a result from {@link MessageDecoder#decodable(IoSession, ByteBuffer)}
-     * and {@link MessageDecoder#decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}.
+     * Represents a result from {@link MessageDecoder#decodable(IoSession, IoBuffer)}
+     * and {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
      * Please refer to each method's documentation for detailed explanation.
      */
     public static MessageDecoderResult NEED_DATA = new MessageDecoderResult(
             "NEED_DATA");
 
     /**
-     * Represents a result from {@link MessageDecoder#decodable(IoSession, ByteBuffer)}
-     * and {@link MessageDecoder#decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}.
+     * Represents a result from {@link MessageDecoder#decodable(IoSession, IoBuffer)}
+     * and {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
      * Please refer to each method's documentation for detailed explanation.
      */
     public static MessageDecoderResult NOT_OK = new MessageDecoderResult(

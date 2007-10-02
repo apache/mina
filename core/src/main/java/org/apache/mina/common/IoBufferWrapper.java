@@ -34,7 +34,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
 /**
- * A {@link ByteBuffer} that wraps a buffer and proxies any operations to it.
+ * A {@link IoBuffer} that wraps a buffer and proxies any operations to it.
  * <p>
  * You can think this class like a {@link FilterOutputStream}.  All operations
  * are proxied by default so that you can extend this class and override existing
@@ -43,18 +43,18 @@ import java.nio.charset.CharsetEncoder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ByteBufferWrapper extends ByteBuffer {
+public class IoBufferWrapper extends IoBuffer {
 
     /**
      * The buffer proxied by this proxy.
      */
-    protected ByteBuffer buf;
+    protected IoBuffer buf;
 
     /**
      * Create a new instance.
      * @param buf the buffer to be proxied
      */
-    protected ByteBufferWrapper(ByteBuffer buf) {
+    protected IoBufferWrapper(IoBuffer buf) {
         if (buf == null) {
             throw new NullPointerException("buf");
         }
@@ -82,7 +82,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer position(int newPosition) {
+    public IoBuffer position(int newPosition) {
         buf.position(newPosition);
         return this;
     }
@@ -93,49 +93,49 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer limit(int newLimit) {
+    public IoBuffer limit(int newLimit) {
         buf.limit(newLimit);
         return this;
     }
 
     @Override
-    public ByteBuffer mark() {
+    public IoBuffer mark() {
         buf.mark();
         return this;
     }
 
     @Override
-    public ByteBuffer reset() {
+    public IoBuffer reset() {
         buf.reset();
         return this;
     }
 
     @Override
-    public ByteBuffer clear() {
+    public IoBuffer clear() {
         buf.clear();
         return this;
     }
 
     @Override
-    public ByteBuffer sweep() {
+    public IoBuffer sweep() {
         buf.sweep();
         return this;
     }
 
     @Override
-    public ByteBuffer sweep(byte value) {
+    public IoBuffer sweep(byte value) {
         buf.sweep(value);
         return this;
     }
 
     @Override
-    public ByteBuffer flip() {
+    public IoBuffer flip() {
         buf.flip();
         return this;
     }
 
     @Override
-    public ByteBuffer rewind() {
+    public IoBuffer rewind() {
         buf.rewind();
         return this;
     }
@@ -161,7 +161,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer put(byte b) {
+    public IoBuffer put(byte b) {
         buf.put(b);
         return this;
     }
@@ -177,49 +177,49 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer put(int index, byte b) {
+    public IoBuffer put(int index, byte b) {
         buf.put(index, b);
         return this;
     }
 
     @Override
-    public ByteBuffer get(byte[] dst, int offset, int length) {
+    public IoBuffer get(byte[] dst, int offset, int length) {
         buf.get(dst, offset, length);
         return this;
     }
 
     @Override
-    public ByteBuffer get(byte[] dst) {
+    public IoBuffer get(byte[] dst) {
         buf.get(dst);
         return this;
     }
 
     @Override
-    public ByteBuffer put(ByteBuffer src) {
+    public IoBuffer put(IoBuffer src) {
         buf.put(src);
         return this;
     }
 
     @Override
-    public ByteBuffer put(java.nio.ByteBuffer src) {
+    public IoBuffer put(java.nio.ByteBuffer src) {
         buf.put(src);
         return this;
     }
 
     @Override
-    public ByteBuffer put(byte[] src, int offset, int length) {
+    public IoBuffer put(byte[] src, int offset, int length) {
         buf.put(src, offset, length);
         return this;
     }
 
     @Override
-    public ByteBuffer put(byte[] src) {
+    public IoBuffer put(byte[] src) {
         buf.put(src);
         return this;
     }
 
     @Override
-    public ByteBuffer compact() {
+    public IoBuffer compact() {
         buf.compact();
         return this;
     }
@@ -240,7 +240,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public int compareTo(ByteBuffer that) {
+    public int compareTo(IoBuffer that) {
         return buf.compareTo(that);
     }
 
@@ -250,7 +250,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer order(ByteOrder bo) {
+    public IoBuffer order(ByteOrder bo) {
         buf.order(bo);
         return this;
     }
@@ -261,7 +261,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putChar(char value) {
+    public IoBuffer putChar(char value) {
         buf.putChar(value);
         return this;
     }
@@ -272,7 +272,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putChar(int index, char value) {
+    public IoBuffer putChar(int index, char value) {
         buf.putChar(index, value);
         return this;
     }
@@ -293,7 +293,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putShort(short value) {
+    public IoBuffer putShort(short value) {
         buf.putShort(value);
         return this;
     }
@@ -309,7 +309,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putShort(int index, short value) {
+    public IoBuffer putShort(int index, short value) {
         buf.putShort(index, value);
         return this;
     }
@@ -330,7 +330,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putInt(int value) {
+    public IoBuffer putInt(int value) {
         buf.putInt(value);
         return this;
     }
@@ -346,7 +346,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putInt(int index, int value) {
+    public IoBuffer putInt(int index, int value) {
         buf.putInt(index, value);
         return this;
     }
@@ -362,7 +362,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putLong(long value) {
+    public IoBuffer putLong(long value) {
         buf.putLong(value);
         return this;
     }
@@ -373,7 +373,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putLong(int index, long value) {
+    public IoBuffer putLong(int index, long value) {
         buf.putLong(index, value);
         return this;
     }
@@ -389,7 +389,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putFloat(float value) {
+    public IoBuffer putFloat(float value) {
         buf.putFloat(value);
         return this;
     }
@@ -400,7 +400,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putFloat(int index, float value) {
+    public IoBuffer putFloat(int index, float value) {
         buf.putFloat(index, value);
         return this;
     }
@@ -416,7 +416,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putDouble(double value) {
+    public IoBuffer putDouble(double value) {
         buf.putDouble(value);
         return this;
     }
@@ -427,7 +427,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putDouble(int index, double value) {
+    public IoBuffer putDouble(int index, double value) {
         buf.putDouble(index, value);
         return this;
     }
@@ -467,35 +467,35 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putString(CharSequence in, int fieldSize,
+    public IoBuffer putString(CharSequence in, int fieldSize,
             CharsetEncoder encoder) throws CharacterCodingException {
         buf.putString(in, fieldSize, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer putString(CharSequence in, CharsetEncoder encoder)
+    public IoBuffer putString(CharSequence in, CharsetEncoder encoder)
             throws CharacterCodingException {
         buf.putString(in, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
+    public IoBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
             throws CharacterCodingException {
         buf.putPrefixedString(in, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
             CharsetEncoder encoder) throws CharacterCodingException {
         buf.putPrefixedString(in, prefixLength, encoder);
         return this;
     }
 
     @Override
-    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
             int padding, CharsetEncoder encoder)
             throws CharacterCodingException {
         buf.putPrefixedString(in, prefixLength, padding, encoder);
@@ -503,7 +503,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putPrefixedString(CharSequence in, int prefixLength,
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
             int padding, byte padValue, CharsetEncoder encoder)
             throws CharacterCodingException {
         buf.putPrefixedString(in, prefixLength, padding, padValue, encoder);
@@ -511,31 +511,31 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer skip(int size) {
+    public IoBuffer skip(int size) {
         buf.skip(size);
         return this;
     }
 
     @Override
-    public ByteBuffer fill(byte value, int size) {
+    public IoBuffer fill(byte value, int size) {
         buf.fill(value, size);
         return this;
     }
 
     @Override
-    public ByteBuffer fillAndReset(byte value, int size) {
+    public IoBuffer fillAndReset(byte value, int size) {
         buf.fillAndReset(value, size);
         return this;
     }
 
     @Override
-    public ByteBuffer fill(int size) {
+    public IoBuffer fill(int size) {
         buf.fill(size);
         return this;
     }
 
     @Override
-    public ByteBuffer fillAndReset(int size) {
+    public IoBuffer fillAndReset(int size) {
         buf.fillAndReset(size);
         return this;
     }
@@ -546,19 +546,19 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer setAutoExpand(boolean autoExpand) {
+    public IoBuffer setAutoExpand(boolean autoExpand) {
         buf.setAutoExpand(autoExpand);
         return this;
     }
 
     @Override
-    public ByteBuffer expand(int pos, int expectedRemaining) {
+    public IoBuffer expand(int pos, int expectedRemaining) {
         buf.expand(pos, expectedRemaining);
         return this;
     }
 
     @Override
-    public ByteBuffer expand(int expectedRemaining) {
+    public IoBuffer expand(int expectedRemaining) {
         buf.expand(expectedRemaining);
         return this;
     }
@@ -575,7 +575,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer putObject(Object o) {
+    public IoBuffer putObject(Object o) {
         buf.putObject(o);
         return this;
     }
@@ -591,17 +591,17 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer duplicate() {
+    public IoBuffer duplicate() {
         return buf.duplicate();
     }
 
     @Override
-    public ByteBuffer slice() {
+    public IoBuffer slice() {
         return buf.slice();
     }
 
     @Override
-    public ByteBuffer asReadOnlyBuffer() {
+    public IoBuffer asReadOnlyBuffer() {
         return buf.asReadOnlyBuffer();
     }
 
@@ -616,7 +616,7 @@ public class ByteBufferWrapper extends ByteBuffer {
     }
 
     @Override
-    public ByteBuffer capacity(int newCapacity) {
+    public IoBuffer capacity(int newCapacity) {
         buf.capacity(newCapacity);
         return this;
     }

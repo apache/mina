@@ -22,7 +22,7 @@ package org.apache.mina.transport.socket.apr;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.IoFilterChain;
@@ -59,7 +59,7 @@ class AprSessionImpl extends AbstractIoSession implements AprSession {
 
     static final TransportMetadata METADATA = new DefaultTransportMetadata(
             "Apache Portable Runtime socket", false, true,
-            InetSocketAddress.class, AprSessionConfig.class, ByteBuffer.class);
+            InetSocketAddress.class, AprSessionConfig.class, IoBuffer.class);
 
     private boolean isOpRead=false;
     

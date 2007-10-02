@@ -21,7 +21,7 @@ package org.apache.mina.filter.compression;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
@@ -112,8 +112,8 @@ public class CompressionFilterTest extends TestCase {
 
     public void testCompression() throws Exception {
         // prepare the input data
-        ByteBuffer buf = ByteBuffer.wrap(strCompress.getBytes("UTF8"));
-        ByteBuffer actualOutput = actualDeflater.deflate(buf);
+        IoBuffer buf = IoBuffer.wrap(strCompress.getBytes("UTF8"));
+        IoBuffer actualOutput = actualDeflater.deflate(buf);
         WriteRequest writeRequest = new DefaultWriteRequest(buf);
 
         // record all the mock calls
@@ -157,9 +157,9 @@ public class CompressionFilterTest extends TestCase {
 
     public void testDecompression() throws Exception {
         // prepare the input data
-        ByteBuffer buf = ByteBuffer.wrap(strCompress.getBytes("UTF8"));
-        ByteBuffer byteInput = actualDeflater.deflate(buf);
-        ByteBuffer actualOutput = actualInflater.inflate(byteInput);
+        IoBuffer buf = IoBuffer.wrap(strCompress.getBytes("UTF8"));
+        IoBuffer byteInput = actualDeflater.deflate(buf);
+        IoBuffer actualOutput = actualInflater.inflate(byteInput);
 
         // record all the mock calls
         ioFilterChain.contains(CompressionFilter.class);
@@ -209,8 +209,8 @@ public class CompressionFilterTest extends TestCase {
             if (arg0 instanceof WriteRequest) {
                 WriteRequest expected = (WriteRequest) arg0;
                 WriteRequest actual = (WriteRequest) arg1;
-                ByteBuffer bExpected = (ByteBuffer) expected.getMessage();
-                ByteBuffer bActual = (ByteBuffer) actual.getMessage();
+                IoBuffer bExpected = (IoBuffer) expected.getMessage();
+                IoBuffer bActual = (IoBuffer) actual.getMessage();
                 return bExpected.equals(bActual);
             }
             return true;

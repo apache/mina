@@ -23,7 +23,7 @@ import net.gleamynode.netty2.Message;
 import net.gleamynode.netty2.MessageParseException;
 import net.gleamynode.netty2.MessageRecognizer;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
@@ -55,7 +55,7 @@ public class NettyDecoder extends ProtocolDecoderAdapter {
         this.recognizer = recognizer;
     }
 
-    private void put(ByteBuffer in) {
+    private void put(IoBuffer in) {
         // copy to read buffer
         if (in.remaining() > readBuf.remaining()) {
             expand((readBuf.position() + in.remaining()) * 3 / 2);
@@ -70,7 +70,7 @@ public class NettyDecoder extends ProtocolDecoderAdapter {
         readBuf = newBuf;
     }
 
-    public void decode(IoSession session, ByteBuffer in,
+    public void decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         put(in);
 

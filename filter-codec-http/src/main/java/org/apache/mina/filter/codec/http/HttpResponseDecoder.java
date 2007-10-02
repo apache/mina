@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.codec.http;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
@@ -38,7 +38,7 @@ public class HttpResponseDecoder extends CumulativeProtocolDecoder {
 
     private HttpDecoder httpDecoder = new HttpDecoder();
     
-    protected boolean doDecode(IoSession ioSession, ByteBuffer in,
+    protected boolean doDecode(IoSession ioSession, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
 
         HttpResponseMessage response = (HttpResponseMessage) ioSession.getAttribute(CURRENT_RESPONSE);
@@ -117,7 +117,7 @@ public class HttpResponseDecoder extends CumulativeProtocolDecoder {
         }
     }
 
-    private boolean processHeaders(HttpResponseMessage response, ByteBuffer in)
+    private boolean processHeaders(HttpResponseMessage response, IoBuffer in)
             throws Exception {
         if (!findHeaders(response, in))
             return false;
@@ -126,7 +126,7 @@ public class HttpResponseDecoder extends CumulativeProtocolDecoder {
         return true;
     }
 
-    private boolean processFooters(HttpResponseMessage response, ByteBuffer in)
+    private boolean processFooters(HttpResponseMessage response, IoBuffer in)
             throws Exception {
         if (!findHeaders(response, in))
             return false;
@@ -135,7 +135,7 @@ public class HttpResponseDecoder extends CumulativeProtocolDecoder {
         return true;
     }
 
-    private boolean findHeaders(HttpResponseMessage response, ByteBuffer in)
+    private boolean findHeaders(HttpResponseMessage response, IoBuffer in)
             throws Exception {
         //Read the headers and process them
         while (true) {
@@ -155,7 +155,7 @@ public class HttpResponseDecoder extends CumulativeProtocolDecoder {
         return true;
     }
 
-    private boolean processContent(HttpResponseMessage response, ByteBuffer in)
+    private boolean processContent(HttpResponseMessage response, IoBuffer in)
             throws Exception {
         if (response.isChunked()) {
             while (true) {
@@ -211,7 +211,7 @@ public class HttpResponseDecoder extends CumulativeProtocolDecoder {
         session.removeAttribute(CURRENT_RESPONSE);
     }
 
-    private boolean processStatus(HttpResponseMessage response, ByteBuffer in)
+    private boolean processStatus(HttpResponseMessage response, IoBuffer in)
             throws Exception {
         //Read the status header
         String header = httpDecoder.decodeLine(in);

@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
@@ -47,7 +47,7 @@ public class TextLineEncoderTest extends TestCase {
 
         encoder.encode(session, "ABC", out);
         Assert.assertEquals(1, session.getEncoderOutputQueue().size());
-        ByteBuffer buf = session.getEncoderOutputQueue().poll();
+        IoBuffer buf = session.getEncoderOutputQueue().poll();
         Assert.assertEquals(5, buf.remaining());
         Assert.assertEquals('A', buf.get());
         Assert.assertEquals('B', buf.get());

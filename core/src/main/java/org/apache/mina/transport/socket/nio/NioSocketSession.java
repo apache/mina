@@ -24,7 +24,7 @@ import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.FileRegion;
@@ -53,7 +53,7 @@ class NioSocketSession extends NioSession implements SocketSession {
                     "socket", false, true,
                     InetSocketAddress.class,
                     SocketSessionConfig.class,
-                    ByteBuffer.class, FileRegion.class);
+                    IoBuffer.class, FileRegion.class);
 
     private final IoService service;
 
