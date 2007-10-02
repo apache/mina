@@ -21,7 +21,7 @@ package org.apache.mina.common;
 
 
 /**
- * Provides utility methods for ByteBuffers.
+ * Provides utility methods for an {@link IoBuffer}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

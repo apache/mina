@@ -102,8 +102,8 @@ public class StreamWriteFilter extends IoFilterAdapter {
 
             InputStream inputStream = (InputStream) message;
 
-            IoBuffer byteBuffer = getNextByteBuffer(inputStream);
-            if (byteBuffer == null) {
+            IoBuffer buffer = getNextBuffer(inputStream);
+            if (buffer == null) {
                 // End of stream reached.
                 writeRequest.getFuture().setWritten(true);
                 nextFilter.messageSent(session, writeRequest);
@@ -112,7 +112,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
                 session.setAttribute(CURRENT_WRITE_REQUEST, writeRequest);
 
                 nextFilter.filterWrite(session, new DefaultWriteRequest(
-                        byteBuffer));
+                        buffer));
             }
 
         } else {
@@ -138,9 +138,9 @@ public class StreamWriteFilter extends IoFilterAdapter {
         if (inputStream == null) {
             nextFilter.messageSent(session, writeRequest);
         } else {
-            IoBuffer byteBuffer = getNextByteBuffer(inputStream);
+            IoBuffer buffer = getNextBuffer(inputStream);
 
-            if (byteBuffer == null) {
+            if (buffer == null) {
                 // End of stream reached.
                 session.removeAttribute(CURRENT_STREAM);
                 WriteRequest currentWriteRequest = (WriteRequest) session
@@ -160,12 +160,12 @@ public class StreamWriteFilter extends IoFilterAdapter {
                 nextFilter.messageSent(session, currentWriteRequest);
             } else {
                 nextFilter.filterWrite(session, new DefaultWriteRequest(
-                        byteBuffer));
+                        buffer));
             }
         }
     }
 
-    private IoBuffer getNextByteBuffer(InputStream is) throws IOException {
+    private IoBuffer getNextBuffer(InputStream is) throws IOException {
         byte[] bytes = new byte[writeBufferSize];
 
         int off = 0;

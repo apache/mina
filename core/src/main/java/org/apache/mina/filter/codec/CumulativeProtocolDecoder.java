@@ -37,14 +37,14 @@ import org.apache.mina.common.IoSession;
  * public class CrLfTerminatedCommandLineDecoder
  *         extends CumulativeProtocolDecoder {
  *
- *     private Command parseCommand(ByteBuffer in) {
+ *     private Command parseCommand(IoBuffer in) {
  *         // Convert the bytes in the specified buffer to a
  *         // Command object.
  *         ...
  *     }
  *
- *     protected boolean doDecode(IoSession session, ByteBuffer in,
- *                                ProtocolDecoderOutput out)
+ *     protected boolean doDecode(
+ *             IoSession session, IoBuffer in, ProtocolDecoderOutput out)
  *             throws Exception {
  *
  *         // Remember the initial position.

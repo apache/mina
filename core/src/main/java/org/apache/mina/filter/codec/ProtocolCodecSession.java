@@ -40,14 +40,14 @@ import org.apache.mina.common.WriteFuture;
  *
  * encoder.encode(session, in, session.getProtocolEncoderOutput());
  *
- * ByteBuffer buffer = session.getProtocolDecoderOutputQueue().poll();
+ * IoBuffer buffer = session.getProtocolDecoderOutputQueue().poll();
  * </pre>
  *
  * <h2>Decoding</h2>
  * <pre>
  * ProtocolCodecSession session = new ProtocolCodecSession();
  * ProtocolDecoder decoder = ...;
- * ByteBuffer in = ...;
+ * IoBuffer in = ...;
  *
  * decoder.decode(session, in, session.getProtocolDecoderOutput());
  *

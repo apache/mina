@@ -31,7 +31,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * A MINA {@link ProtocolDecoder} that decodes byte buffers into
+ * A MINA {@link ProtocolDecoder} that decodes buffers into
  * Netty2 {@link Message}s using specified {@link MessageRecognizer}s.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)

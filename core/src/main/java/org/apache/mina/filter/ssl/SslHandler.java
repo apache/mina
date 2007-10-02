@@ -45,7 +45,7 @@ import org.apache.mina.common.WriteRequest;
  * A helper class using the SSLEngine API to decrypt/encrypt data.
  * <p/>
  * Each connection has a SSLEngine that is used through the lifetime of the connection.
- * We allocate byte buffers for use as the outbound and inbound network buffers.
+ * We allocate buffers for use as the outbound and inbound network buffers.
  * These buffers handle all of the intermediary data for the SSL connection. To make things easy,
  * we'll require outNetBuffer be completely flushed before trying to wrap any more data.
  *
@@ -150,12 +150,12 @@ class SslHandler {
         handshakeComplete = false;
         initialHandshakeComplete = false;
 
-        SslByteBufferUtil.initiate(sslEngine);
+        SslBufferUtil.initiate(sslEngine);
 
-        appBuffer = SslByteBufferUtil.getApplicationBuffer();
+        appBuffer = SslBufferUtil.getApplicationBuffer();
 
-        inNetBuffer = SslByteBufferUtil.getPacketBuffer();
-        outNetBuffer = SslByteBufferUtil.getPacketBuffer();
+        inNetBuffer = SslBufferUtil.getPacketBuffer();
+        outNetBuffer = SslBufferUtil.getPacketBuffer();
         outNetBuffer.position(0);
         outNetBuffer.limit(0);
 
@@ -163,7 +163,7 @@ class SslHandler {
     }
 
     /**
-     * Release allocated ByteBuffers.
+     * Release allocated buffers.
      */
     public void destroy() {
         if (sslEngine == null) {
@@ -289,10 +289,10 @@ class SslHandler {
     public void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
         if (buf.limit() > inNetBuffer.remaining()) {
             // We have to expand inNetBuffer
-            inNetBuffer = SslByteBufferUtil.expandBuffer(inNetBuffer,
+            inNetBuffer = SslBufferUtil.expandBuffer(inNetBuffer,
                     inNetBuffer.capacity() + buf.limit() * 2);
             // We also expand app. buffer (twice the size of in net. buffer)
-            appBuffer = SslByteBufferUtil.expandBuffer(appBuffer, inNetBuffer
+            appBuffer = SslBufferUtil.expandBuffer(appBuffer, inNetBuffer
                     .capacity() * 2);
             if (IoSessionLogger.isDebugEnabled(session)) {
                 IoSessionLogger.debug(session, " expanded inNetBuffer:"
@@ -357,7 +357,7 @@ class SslHandler {
                 // We have to expand outNetBuffer
                 // Note: there is no way to know the exact size required, but enrypted data
                 // shouln't need to be larger than twice the source data size?
-                outNetBuffer = SslByteBufferUtil.expandBuffer(outNetBuffer, src
+                outNetBuffer = SslBufferUtil.expandBuffer(outNetBuffer, src
                         .capacity() * 2);
                 if (IoSessionLogger.isDebugEnabled(session)) {
                     IoSessionLogger.debug(session, " expanded outNetBuffer:"
@@ -696,7 +696,7 @@ class SslHandler {
     }
 
     /**
-     * Creates a new Mina byte buffer that is a deep copy of the remaining bytes
+     * Creates a new MINA buffer that is a deep copy of the remaining bytes
      * in the given buffer (between index buf.position() and buf.limit())
      *
      * @param src the buffer to copy

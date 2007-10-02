@@ -24,14 +24,12 @@ import java.nio.ByteBuffer;
 import javax.net.ssl.SSLEngine;
 
 /**
- * Simple ByteBuffer pool used by SSLHandler.
- * ByteBuffers are by default allocated as direct byte buffers. To use non-direct
- * ByteBuffers, set system property mina.sslfilter.directbuffer to false.
+ * Simple buffer pool used by SSLHandler.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class SslByteBufferUtil {
+class SslBufferUtil {
     private static final int PACKET_BUFFER_INDEX = 0;
 
     private static final int APPLICATION_BUFFER_INDEX = 1;

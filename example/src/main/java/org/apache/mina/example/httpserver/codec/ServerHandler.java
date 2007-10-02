@@ -49,7 +49,7 @@ public class ServerHandler extends IoHandlerAdapter {
 
         // msg.setResponseCode(HttpResponseMessage.HTTP_STATUS_SUCCESS);
         // byte[] b = new byte[ta.buffer.limit()];
-        // ((ByteBuffer)ta.buffer.rewind()).get(b);
+        // ta.buffer.rewind().get(b);
         // msg.appendBody(b);
         // System.out.println("####################");
         // System.out.println("  GET_TILE RESPONSE SENT - ATTACHMENT GOOD DIAMOND.SI="+d.si+

@@ -42,20 +42,20 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
         } else {
             nioBuffer = java.nio.ByteBuffer.allocate(capacity);
         }
-        return new SimpleIoBuffer(nioBuffer, true);
+        return new SimpleBuffer(nioBuffer, true);
     }
 
     public IoBuffer wrap(java.nio.ByteBuffer nioBuffer) {
-        return new SimpleIoBuffer(nioBuffer, true);
+        return new SimpleBuffer(nioBuffer, true);
     }
 
     public void dispose() {
     }
 
-    private static class SimpleIoBuffer extends AbstractIoBuffer {
+    private static class SimpleBuffer extends AbstractIoBuffer {
         private java.nio.ByteBuffer buf;
 
-        protected SimpleIoBuffer(java.nio.ByteBuffer buf,
+        protected SimpleBuffer(java.nio.ByteBuffer buf,
                 boolean autoExpandAllowed) {
             super(autoExpandAllowed);
             this.buf = buf;
@@ -90,17 +90,17 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
 
         @Override
         protected IoBuffer duplicate0() {
-            return new SimpleIoBuffer(this.buf.duplicate(), false);
+            return new SimpleBuffer(this.buf.duplicate(), false);
         }
 
         @Override
         protected IoBuffer slice0() {
-            return new SimpleIoBuffer(this.buf.slice(), false);
+            return new SimpleBuffer(this.buf.slice(), false);
         }
 
         @Override
         protected IoBuffer asReadOnlyBuffer0() {
-            return new SimpleIoBuffer(this.buf.asReadOnlyBuffer(), false);
+            return new SimpleBuffer(this.buf.asReadOnlyBuffer(), false);
         }
 
         @Override

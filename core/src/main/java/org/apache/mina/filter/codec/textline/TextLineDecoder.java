@@ -195,7 +195,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     private int decodeNormal(IoBuffer in, IoBuffer buf, int matchCount,
             CharsetDecoder decoder, ProtocolDecoderOutput out)
             throws CharacterCodingException {
-        // Convert delimiter to ByteBuffer if not done yet.
+        // Convert delimiter to the buffer if not done yet.
         if (delimBuf == null) {
             IoBuffer tmp = IoBuffer.allocate(2).setAutoExpand(true);
             tmp.putString(delimiter.getValue(), charset.newEncoder());

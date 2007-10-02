@@ -29,7 +29,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
  * A MINA <tt>ProtocolEncoder</tt> that encodes Netty2 {@link Message}s
- * into byte buffers.
+ * into buffers.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,

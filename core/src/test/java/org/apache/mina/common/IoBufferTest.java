@@ -40,10 +40,10 @@ import junit.framework.TestCase;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ByteBufferTest extends TestCase {
+public class IoBufferTest extends TestCase {
 
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(ByteBufferTest.class);
+        junit.textui.TestRunner.run(IoBufferTest.class);
     }
 
     @Override
