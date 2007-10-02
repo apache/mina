@@ -19,6 +19,8 @@
  */
 package org.apache.mina.common;
 
+import java.nio.ByteBuffer;
+
 /**
  * Allocates {@link IoBuffer}s and manages them.  Please implement this
  * interface if you need more advanced memory management scheme.
@@ -37,9 +39,9 @@ public interface IoBufferAllocator {
     IoBuffer allocate(int capacity, boolean direct);
 
     /**
-     * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
+     * Wraps the specified NIO {@link ByteBuffer} into MINA buffer.
      */
-    IoBuffer wrap(java.nio.ByteBuffer nioBuffer);
+    IoBuffer wrap(ByteBuffer nioBuffer);
 
     /**
      * Dispose of this allocator.

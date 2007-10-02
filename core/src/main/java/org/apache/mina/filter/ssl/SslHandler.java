@@ -19,27 +19,29 @@
  */
 package org.apache.mina.filter.ssl;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLSession;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLSession;
+
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoEventType;
-import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.IoFilter.NextFilter;
 
 /**
  * A helper class using the SSLEngine API to decrypt/encrypt data.
@@ -702,9 +704,8 @@ class SslHandler {
      * @param src the buffer to copy
      * @return the new buffer, ready to read from
      */
-    public static org.apache.mina.common.IoBuffer copy(java.nio.ByteBuffer src) {
-        org.apache.mina.common.IoBuffer copy = org.apache.mina.common.IoBuffer
-                .allocate(src.remaining());
+    public static IoBuffer copy(ByteBuffer src) {
+        IoBuffer copy = IoBuffer.allocate(src.remaining());
         copy.put(src);
         copy.flip();
         return copy;

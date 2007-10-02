@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
@@ -31,7 +32,7 @@ import java.nio.ShortBuffer;
 /**
  * A base implementation of {@link IoBuffer}.  This implementation
  * assumes that {@link IoBuffer#buf()} always returns a correct NIO
- * {@link java.nio.ByteBuffer} instance.  Most implementations could
+ * {@link ByteBuffer} instance.  Most implementations could
  * extend this class and implement their own buffer management mechanism.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -230,7 +231,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     }
 
     @Override
-    public IoBuffer put(java.nio.ByteBuffer src) {
+    public IoBuffer put(ByteBuffer src) {
         autoExpand(src.remaining());
         buf().put(src);
         return this;

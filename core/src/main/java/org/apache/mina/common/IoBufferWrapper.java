@@ -22,6 +22,7 @@ package org.apache.mina.common;
 import java.io.FilterOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
@@ -67,7 +68,7 @@ public class IoBufferWrapper extends IoBuffer {
     }
 
     @Override
-    public java.nio.ByteBuffer buf() {
+    public ByteBuffer buf() {
         return buf.buf();
     }
 
@@ -201,7 +202,7 @@ public class IoBufferWrapper extends IoBuffer {
     }
 
     @Override
-    public IoBuffer put(java.nio.ByteBuffer src) {
+    public IoBuffer put(ByteBuffer src) {
         buf.put(src);
         return this;
     }

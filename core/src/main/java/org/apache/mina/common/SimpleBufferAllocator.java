@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 
@@ -36,16 +37,16 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
     }
 
     public IoBuffer allocate(int capacity, boolean direct) {
-        java.nio.ByteBuffer nioBuffer;
+        ByteBuffer nioBuffer;
         if (direct) {
-            nioBuffer = java.nio.ByteBuffer.allocateDirect(capacity);
+            nioBuffer = ByteBuffer.allocateDirect(capacity);
         } else {
-            nioBuffer = java.nio.ByteBuffer.allocate(capacity);
+            nioBuffer = ByteBuffer.allocate(capacity);
         }
         return new SimpleBuffer(nioBuffer, true);
     }
 
-    public IoBuffer wrap(java.nio.ByteBuffer nioBuffer) {
+    public IoBuffer wrap(ByteBuffer nioBuffer) {
         return new SimpleBuffer(nioBuffer, true);
     }
 
@@ -53,9 +54,9 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
     }
 
     private static class SimpleBuffer extends AbstractIoBuffer {
-        private java.nio.ByteBuffer buf;
+        private ByteBuffer buf;
 
-        protected SimpleBuffer(java.nio.ByteBuffer buf,
+        protected SimpleBuffer(ByteBuffer buf,
                 boolean autoExpandAllowed) {
             super(autoExpandAllowed);
             this.buf = buf;
@@ -63,7 +64,7 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
         }
 
         @Override
-        public java.nio.ByteBuffer buf() {
+        public ByteBuffer buf() {
             return buf;
         }
 
@@ -74,12 +75,12 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
                 newCapacity <<= 1;
             }
 
-            java.nio.ByteBuffer oldBuf = this.buf;
-            java.nio.ByteBuffer newBuf;
+            ByteBuffer oldBuf = this.buf;
+            ByteBuffer newBuf;
             if (isDirect()) {
-                newBuf = java.nio.ByteBuffer.allocateDirect(newCapacity);
+                newBuf = ByteBuffer.allocateDirect(newCapacity);
             } else {
-                newBuf = java.nio.ByteBuffer.allocate(newCapacity);
+                newBuf = ByteBuffer.allocate(newCapacity);
             }
 
             newBuf.clear();

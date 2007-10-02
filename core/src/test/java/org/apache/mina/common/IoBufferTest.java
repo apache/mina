@@ -20,6 +20,7 @@
 package org.apache.mina.common;
 
 import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ReadOnlyBufferException;
 import java.nio.charset.CharacterCodingException;
@@ -511,7 +512,7 @@ public class IoBufferTest extends TestCase {
     }
 
     public void testWrapNioBuffer() throws Exception {
-        java.nio.ByteBuffer nioBuf = java.nio.ByteBuffer.allocate(10);
+        ByteBuffer nioBuf = ByteBuffer.allocate(10);
         nioBuf.position(3);
         nioBuf.limit(7);
 

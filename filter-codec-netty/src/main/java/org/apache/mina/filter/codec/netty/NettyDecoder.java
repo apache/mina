@@ -19,6 +19,8 @@
  */
 package org.apache.mina.filter.codec.netty;
 
+import java.nio.ByteBuffer;
+
 import net.gleamynode.netty2.Message;
 import net.gleamynode.netty2.MessageParseException;
 import net.gleamynode.netty2.MessageRecognizer;
@@ -40,7 +42,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 public class NettyDecoder extends ProtocolDecoderAdapter {
     private final MessageRecognizer recognizer;
 
-    private java.nio.ByteBuffer readBuf = java.nio.ByteBuffer.allocate(1024);
+    private ByteBuffer readBuf = ByteBuffer.allocate(1024);
 
     private Message readingMessage;
 
@@ -64,7 +66,7 @@ public class NettyDecoder extends ProtocolDecoderAdapter {
     }
 
     private void expand(int newCapacity) {
-        java.nio.ByteBuffer newBuf = java.nio.ByteBuffer.allocate(newCapacity);
+        ByteBuffer newBuf = ByteBuffer.allocate(newCapacity);
         readBuf.flip();
         newBuf.put(readBuf);
         readBuf = newBuf;

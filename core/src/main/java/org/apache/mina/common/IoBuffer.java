@@ -27,6 +27,7 @@ import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
@@ -46,10 +47,9 @@ import java.util.Set;
 /**
  * A byte buffer used by MINA applications.
  * <p>
- * This is a replacement for {@link java.nio.ByteBuffer}. Please refer to
- * {@link java.nio.ByteBuffer} and {@link java.nio.Buffer} documentation for
- * usage.  MINA does not use NIO {@link java.nio.ByteBuffer} directly for two
- * reasons:
+ * This is a replacement for {@link ByteBuffer}. Please refer to
+ * {@link ByteBuffer} documentation for preliminary usage.  MINA does
+ * not use NIO {@link ByteBuffer} directly for two reasons:
  * <ul>
  * <li>It doesn't provide useful getters and putters such as
  * <code>fill</code>, <code>get/putString</code>, and
@@ -219,9 +219,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * Wraps the specified NIO {@link java.nio.ByteBuffer} into MINA buffer.
+     * Wraps the specified NIO {@link ByteBuffer} into MINA buffer.
      */
-    public static IoBuffer wrap(java.nio.ByteBuffer nioBuffer) {
+    public static IoBuffer wrap(ByteBuffer nioBuffer) {
         return allocator.wrap(nioBuffer);
     }
 
@@ -229,14 +229,14 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Wraps the specified byte array into MINA heap buffer.
      */
     public static IoBuffer wrap(byte[] byteArray) {
-        return wrap(java.nio.ByteBuffer.wrap(byteArray));
+        return wrap(ByteBuffer.wrap(byteArray));
     }
 
     /**
      * Wraps the specified byte array into MINA heap buffer.
      */
     public static IoBuffer wrap(byte[] byteArray, int offset, int length) {
-        return wrap(java.nio.ByteBuffer.wrap(byteArray, offset, length));
+        return wrap(ByteBuffer.wrap(byteArray, offset, length));
     }
 
     /**
@@ -249,20 +249,20 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Returns the underlying NIO buffer instance.
      */
-    public abstract java.nio.ByteBuffer buf();
+    public abstract ByteBuffer buf();
 
     /**
-     * @see java.nio.ByteBuffer#isDirect()
+     * @see ByteBuffer#isDirect()
      */
     public abstract boolean isDirect();
 
     /**
-     * @see java.nio.ByteBuffer#isReadOnly()
+     * @see ByteBuffer#isReadOnly()
      */
     public abstract boolean isReadOnly();
 
     /**
-     * @see java.nio.ByteBuffer#capacity()
+     * @see ByteBuffer#capacity()
      */
     public abstract int capacity();
 
@@ -386,37 +386,37 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#duplicate()
+     * @see ByteBuffer#duplicate()
      */
     public abstract IoBuffer duplicate();
 
     /**
-     * @see java.nio.ByteBuffer#slice()
+     * @see ByteBuffer#slice()
      */
     public abstract IoBuffer slice();
 
     /**
-     * @see java.nio.ByteBuffer#asReadOnlyBuffer()
+     * @see ByteBuffer#asReadOnlyBuffer()
      */
     public abstract IoBuffer asReadOnlyBuffer();
 
     /**
-     * @see java.nio.ByteBuffer#hasArray()
+     * @see ByteBuffer#hasArray()
      */
     public abstract boolean hasArray();
 
     /**
-     * @see java.nio.ByteBuffer#array()
+     * @see ByteBuffer#array()
      */
     public abstract byte[] array();
 
     /**
-     * @see java.nio.ByteBuffer#arrayOffset()
+     * @see ByteBuffer#arrayOffset()
      */
     public abstract int arrayOffset();
 
     /**
-     * @see java.nio.ByteBuffer#get()
+     * @see ByteBuffer#get()
      */
     public abstract byte get();
 
@@ -428,12 +428,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#put(byte)
+     * @see ByteBuffer#put(byte)
      */
     public abstract IoBuffer put(byte b);
 
     /**
-     * @see java.nio.ByteBuffer#get(int)
+     * @see ByteBuffer#get(int)
      */
     public abstract byte get(int index);
 
@@ -445,17 +445,17 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#put(int, byte)
+     * @see ByteBuffer#put(int, byte)
      */
     public abstract IoBuffer put(int index, byte b);
 
     /**
-     * @see java.nio.ByteBuffer#get(byte[], int, int)
+     * @see ByteBuffer#get(byte[], int, int)
      */
     public abstract IoBuffer get(byte[] dst, int offset, int length);
 
     /**
-     * @see java.nio.ByteBuffer#get(byte[])
+     * @see ByteBuffer#get(byte[])
      */
     public IoBuffer get(byte[] dst) {
         return get(dst, 0, dst.length);
@@ -464,7 +464,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Writes the content of the specified <tt>src</tt> into this buffer.
      */
-    public abstract IoBuffer put(java.nio.ByteBuffer src);
+    public abstract IoBuffer put(ByteBuffer src);
 
     /**
      * Writes the content of the specified <tt>src</tt> into this buffer.
@@ -474,19 +474,19 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#put(byte[], int, int)
+     * @see ByteBuffer#put(byte[], int, int)
      */
     public abstract IoBuffer put(byte[] src, int offset, int length);
 
     /**
-     * @see java.nio.ByteBuffer#put(byte[])
+     * @see ByteBuffer#put(byte[])
      */
     public IoBuffer put(byte[] src) {
         return put(src, 0, src.length);
     }
 
     /**
-     * @see java.nio.ByteBuffer#compact()
+     * @see ByteBuffer#compact()
      */
     public abstract IoBuffer compact();
 
@@ -560,42 +560,42 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#order()
+     * @see ByteBuffer#order()
      */
     public abstract ByteOrder order();
 
     /**
-     * @see java.nio.ByteBuffer#order(ByteOrder)
+     * @see ByteBuffer#order(ByteOrder)
      */
     public abstract IoBuffer order(ByteOrder bo);
 
     /**
-     * @see java.nio.ByteBuffer#getChar()
+     * @see ByteBuffer#getChar()
      */
     public abstract char getChar();
 
     /**
-     * @see java.nio.ByteBuffer#putChar(char)
+     * @see ByteBuffer#putChar(char)
      */
     public abstract IoBuffer putChar(char value);
 
     /**
-     * @see java.nio.ByteBuffer#getChar(int)
+     * @see ByteBuffer#getChar(int)
      */
     public abstract char getChar(int index);
 
     /**
-     * @see java.nio.ByteBuffer#putChar(int, char)
+     * @see ByteBuffer#putChar(int, char)
      */
     public abstract IoBuffer putChar(int index, char value);
 
     /**
-     * @see java.nio.ByteBuffer#asCharBuffer()
+     * @see ByteBuffer#asCharBuffer()
      */
     public abstract CharBuffer asCharBuffer();
 
     /**
-     * @see java.nio.ByteBuffer#getShort()
+     * @see ByteBuffer#getShort()
      */
     public abstract short getShort();
 
@@ -607,12 +607,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#putShort(short)
+     * @see ByteBuffer#putShort(short)
      */
     public abstract IoBuffer putShort(short value);
 
     /**
-     * @see java.nio.ByteBuffer#getShort()
+     * @see ByteBuffer#getShort()
      */
     public abstract short getShort(int index);
 
@@ -624,17 +624,17 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#putShort(int, short)
+     * @see ByteBuffer#putShort(int, short)
      */
     public abstract IoBuffer putShort(int index, short value);
 
     /**
-     * @see java.nio.ByteBuffer#asShortBuffer()
+     * @see ByteBuffer#asShortBuffer()
      */
     public abstract ShortBuffer asShortBuffer();
 
     /**
-     * @see java.nio.ByteBuffer#getInt()
+     * @see ByteBuffer#getInt()
      */
     public abstract int getInt();
 
@@ -815,12 +815,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#putInt(int)
+     * @see ByteBuffer#putInt(int)
      */
     public abstract IoBuffer putInt(int value);
 
     /**
-     * @see java.nio.ByteBuffer#getInt(int)
+     * @see ByteBuffer#getInt(int)
      */
     public abstract int getInt(int index);
 
@@ -832,87 +832,87 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @see java.nio.ByteBuffer#putInt(int, int)
+     * @see ByteBuffer#putInt(int, int)
      */
     public abstract IoBuffer putInt(int index, int value);
 
     /**
-     * @see java.nio.ByteBuffer#asIntBuffer()
+     * @see ByteBuffer#asIntBuffer()
      */
     public abstract IntBuffer asIntBuffer();
 
     /**
-     * @see java.nio.ByteBuffer#getLong()
+     * @see ByteBuffer#getLong()
      */
     public abstract long getLong();
 
     /**
-     * @see java.nio.ByteBuffer#putLong(int, long)
+     * @see ByteBuffer#putLong(int, long)
      */
     public abstract IoBuffer putLong(long value);
 
     /**
-     * @see java.nio.ByteBuffer#getLong(int)
+     * @see ByteBuffer#getLong(int)
      */
     public abstract long getLong(int index);
 
     /**
-     * @see java.nio.ByteBuffer#putLong(int, long)
+     * @see ByteBuffer#putLong(int, long)
      */
     public abstract IoBuffer putLong(int index, long value);
 
     /**
-     * @see java.nio.ByteBuffer#asLongBuffer()
+     * @see ByteBuffer#asLongBuffer()
      */
     public abstract LongBuffer asLongBuffer();
 
     /**
-     * @see java.nio.ByteBuffer#getFloat()
+     * @see ByteBuffer#getFloat()
      */
     public abstract float getFloat();
 
     /**
-     * @see java.nio.ByteBuffer#putFloat(float)
+     * @see ByteBuffer#putFloat(float)
      */
     public abstract IoBuffer putFloat(float value);
 
     /**
-     * @see java.nio.ByteBuffer#getFloat(int)
+     * @see ByteBuffer#getFloat(int)
      */
     public abstract float getFloat(int index);
 
     /**
-     * @see java.nio.ByteBuffer#putFloat(int, float)
+     * @see ByteBuffer#putFloat(int, float)
      */
     public abstract IoBuffer putFloat(int index, float value);
 
     /**
-     * @see java.nio.ByteBuffer#asFloatBuffer()
+     * @see ByteBuffer#asFloatBuffer()
      */
     public abstract FloatBuffer asFloatBuffer();
 
     /**
-     * @see java.nio.ByteBuffer#getDouble()
+     * @see ByteBuffer#getDouble()
      */
     public abstract double getDouble();
 
     /**
-     * @see java.nio.ByteBuffer#putDouble(double)
+     * @see ByteBuffer#putDouble(double)
      */
     public abstract IoBuffer putDouble(double value);
 
     /**
-     * @see java.nio.ByteBuffer#getDouble(int)
+     * @see ByteBuffer#getDouble(int)
      */
     public abstract double getDouble(int index);
 
     /**
-     * @see java.nio.ByteBuffer#putDouble(int, double)
+     * @see ByteBuffer#putDouble(int, double)
      */
     public abstract IoBuffer putDouble(int index, double value);
 
     /**
-     * @see java.nio.ByteBuffer#asDoubleBuffer()
+     * @see ByteBuffer#asDoubleBuffer()
      */
     public abstract DoubleBuffer asDoubleBuffer();
 
