@@ -30,6 +30,7 @@ import org.apache.mina.common.support.AbstractIoFilterChain;
 /**
  * An {@link IoFilterChain} for datagram transport (UDP/IP).
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  */
 class DatagramFilterChain extends AbstractIoFilterChain {

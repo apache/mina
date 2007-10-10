@@ -30,7 +30,8 @@ import org.slf4j.Logger;
  * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
- * 
+ *
+ * @org.apache.xbean.XBean
  * @see SessionLog
  */
 public class LoggingFilter extends IoFilterAdapter {

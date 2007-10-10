@@ -36,6 +36,7 @@ import org.apache.mina.util.SessionLog;
  * A {@link IoFilter} which blocks connections from blacklisted remote
  * address.
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

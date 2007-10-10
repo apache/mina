@@ -34,6 +34,7 @@ import org.apache.mina.filter.executor.ExecutorFilter;
  * so you can safely downcast the returned {@link Executor} of {@link #getExecutor()} to
  * {@link ThreadPoolExecutor} by default.
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

@@ -52,6 +52,7 @@ import org.apache.mina.filter.support.Zlib;
  * It goes without saying that the other end of this stream should also have a
  * compatible compressor/decompressor using the same algorithm.
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

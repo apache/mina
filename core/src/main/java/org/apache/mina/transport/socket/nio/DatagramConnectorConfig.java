@@ -29,6 +29,7 @@ import org.apache.mina.transport.socket.nio.support.DatagramSessionConfigImpl;
 /**
  * An {@link IoConnectorConfig} for {@link DatagramConnector}.
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

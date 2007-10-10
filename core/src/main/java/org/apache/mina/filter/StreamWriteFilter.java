@@ -51,6 +51,7 @@ import org.apache.mina.common.WriteFuture;
  * callback.
  * </p>
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

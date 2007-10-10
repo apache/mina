@@ -52,6 +52,7 @@ import org.apache.mina.util.NamePreservingRunnable;
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

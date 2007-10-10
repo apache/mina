@@ -29,6 +29,7 @@ import org.apache.mina.util.NewThreadExecutor;
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

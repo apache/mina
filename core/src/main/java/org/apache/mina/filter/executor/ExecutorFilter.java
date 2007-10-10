@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * Please note that this filter doesn't manage the life cycle of the underlying
  * {@link Executor}.  You have to destroy or stop it by yourself.
  *
+ * @org.apache.xbean.XBean
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 350169 $, $Date: 2005-12-01 00:17:41 -0500 (Thu, 01 Dec 2005) $
  */

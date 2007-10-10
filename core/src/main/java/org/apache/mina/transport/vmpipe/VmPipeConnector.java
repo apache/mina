@@ -43,6 +43,7 @@ import org.apache.mina.util.AnonymousSocketAddress;
  * Connects to {@link IoHandler}s which is bound on the specified
  * {@link VmPipeAddress}.
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

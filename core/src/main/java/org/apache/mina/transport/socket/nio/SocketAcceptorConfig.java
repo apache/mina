@@ -30,6 +30,7 @@ import org.apache.mina.common.support.BaseIoAcceptorConfig;
 /**
  * An {@link IoAcceptorConfig} for {@link SocketAcceptor}.
  *
+ * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
