@@ -442,9 +442,12 @@ class SocketIoProcessor {
                         writeRequestQueue.pop();
                     }
     
-                    session.increaseWrittenMessages();
-    
                     buf.reset();
+                    
+                    if (!buf.hasRemaining()) {
+                        session.increaseWrittenMessages();
+                    }
+                    
                     session.getFilterChain().fireMessageSent(session, req);
                     continue;
                 }

@@ -468,9 +468,13 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
                     synchronized (writeRequestQueue) {
                         writeRequestQueue.pop();
                     }
-    
-                    session.increaseWrittenMessages();
+
                     buf.reset();
+    
+                    if (!buf.hasRemaining()) {
+                        session.increaseWrittenMessages();
+                    }
+                    
                     ((DatagramFilterChain) session.getFilterChain())
                             .fireMessageSent(session, req);
                     continue;
@@ -494,8 +498,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
                         writeRequestQueue.pop();
                     }
     
-                    session.increaseWrittenMessages();
                     buf.reset();
+                    
+                    if (!buf.hasRemaining()) {
+                        session.increaseWrittenMessages();
+                    }
+
                     session.getFilterChain().fireMessageSent(session, req);
                 }
             }
