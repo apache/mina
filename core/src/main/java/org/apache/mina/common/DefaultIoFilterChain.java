@@ -589,6 +589,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 } else {
                     s.increaseScheduledWriteBytes(buffer.remaining());
                 }
+            } else {
+                s.increaseScheduledWriteMessages();
             }
 
             s.getWriteRequestQueue().add(writeRequest);
