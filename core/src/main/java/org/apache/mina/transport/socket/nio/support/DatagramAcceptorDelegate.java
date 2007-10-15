@@ -458,8 +458,11 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
                     // pop and fire event
                     writeRequestQueue.poll();
     
-                    session.increaseWrittenMessages();
                     buf.reset();
+                    
+                    if (!buf.hasRemaining()) {
+                        session.increaseWrittenMessages();
+                    }
                     session.getFilterChain().fireMessageSent(session, req);
                     continue;
                 }
@@ -480,8 +483,12 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
                     // pop and fire event
                     writeRequestQueue.poll();
     
-                    session.increaseWrittenMessages();
                     buf.reset();
+                    
+                    if (!buf.hasRemaining()) {
+                        session.increaseWrittenMessages();
+                    }
+
                     session.getFilterChain().fireMessageSent(session, req);
                 }
             }
