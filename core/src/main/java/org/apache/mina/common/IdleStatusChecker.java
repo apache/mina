@@ -19,10 +19,9 @@
  */
 package org.apache.mina.common;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import org.apache.mina.util.IdentityHashSet;
 
 /**
  * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them.
@@ -37,7 +36,7 @@ public class IdleStatusChecker {
         return INSTANCE;
     }
 
-    private final Set<AbstractIoSession> sessions = new IdentityHashSet<AbstractIoSession>();
+    private final Set<AbstractIoSession> sessions = new HashSet<AbstractIoSession>();
 
     private final Worker worker = new Worker();
 
