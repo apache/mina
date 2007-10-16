@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.vmpipe.support;
 
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -38,7 +38,7 @@ public class VmPipeIdleStatusChecker {
         return INSTANCE;
     }
 
-    private final Map sessions = new IdentityHashMap(); // will use as a set
+    private final Map sessions = new HashMap(); // will use as a set
 
     private final Worker worker = new Worker();
 
