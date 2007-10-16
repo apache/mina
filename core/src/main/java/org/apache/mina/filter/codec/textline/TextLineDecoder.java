@@ -177,8 +177,11 @@ public class TextLineDecoder implements ProtocolDecoder {
                     ByteBuffer buf = ctx.getBuffer();
                     buf.flip();
                     buf.limit(buf.limit() - matchCount);
-                    out.write(buf.getString(ctx.getDecoder()));
-                    buf.clear();
+                    try {
+                        out.write(buf.getString(ctx.getDecoder()));
+                    } finally {
+                        buf.clear();
+                    }
                 } else {
                     int overflowPosition = ctx.getOverflowPosition();
                     ctx.reset();
@@ -233,8 +236,11 @@ public class TextLineDecoder implements ProtocolDecoder {
                         ByteBuffer buf = ctx.getBuffer();
                         buf.flip();
                         buf.limit(buf.limit() - matchCount);
-                        out.write(buf.getString(ctx.getDecoder()));
-                        buf.clear();
+                        try {
+                            out.write(buf.getString(ctx.getDecoder()));
+                        } finally {
+                            buf.clear();
+                        }
                     } else {
                         int overflowPosition = ctx.getOverflowPosition();
                         ctx.reset();
