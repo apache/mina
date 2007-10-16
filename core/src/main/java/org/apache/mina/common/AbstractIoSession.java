@@ -134,6 +134,8 @@ public abstract class AbstractIoSession implements IoSession {
     private long lastIdleTimeForRead;
 
     private long lastIdleTimeForWrite;
+    
+    private boolean deferDecreaseReadBuffer = true;
 
     protected AbstractIoSession() {
         creationTime = lastReadTime = lastWriteTime =
@@ -493,6 +495,30 @@ public abstract class AbstractIoSession implements IoSession {
 
     protected Queue<WriteRequest> getWriteRequestQueue() {
         return writeRequestQueue;
+    }
+    
+    protected void increaseReadBufferSize() {
+        int newReadBufferSize = getConfig().getReadBufferSize() << 1;
+        if (newReadBufferSize <= getConfig().getMaxReadBufferSize()) {
+            getConfig().setReadBufferSize(newReadBufferSize);
+        } else {
+            getConfig().setReadBufferSize(getConfig().getMaxReadBufferSize());
+        }
+        
+        deferDecreaseReadBuffer = true;
+    }
+    
+    protected void decreaseReadBufferSize() {
+        if (deferDecreaseReadBuffer) {
+            deferDecreaseReadBuffer = false;
+            return;
+        }
+        
+        if (getConfig().getReadBufferSize() > getConfig().getMinReadBufferSize()) {
+            getConfig().setReadBufferSize(getConfig().getReadBufferSize() >>> 1);
+        }
+
+        deferDecreaseReadBuffer = true;
     }
 
     public long getCreationTime() {

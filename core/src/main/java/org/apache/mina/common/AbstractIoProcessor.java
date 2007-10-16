@@ -307,17 +307,10 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 buf = null;
 
                 if (session.getTransportMetadata().hasFragmentation()) {
-                    if (readBytes * 2 < config.getReadBufferSize()) {
-                        if (config.getReadBufferSize() > config.getMinReadBufferSize()) {
-                            config.setReadBufferSize(config.getReadBufferSize() >>> 1);
-                        }
+                    if ((readBytes << 1) < config.getReadBufferSize()) {
+                        session.decreaseReadBufferSize();
                     } else if (readBytes == config.getReadBufferSize()) {
-                        int newReadBufferSize = config.getReadBufferSize() << 1;
-                        if (newReadBufferSize <= config.getMaxReadBufferSize()) {
-                            config.setReadBufferSize(newReadBufferSize);
-                        } else {
-                            config.setReadBufferSize(config.getMaxReadBufferSize());
-                        }
+                        session.increaseReadBufferSize();
                     }
                 }
             }
