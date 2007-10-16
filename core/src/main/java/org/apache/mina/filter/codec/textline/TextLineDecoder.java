@@ -170,6 +170,9 @@ public class TextLineDecoder implements ProtocolDecoder {
 
                 ctx.append(in);
 
+                in.limit(oldLimit);
+                in.position(pos);
+
                 if (ctx.getOverflowPosition() == 0) {
                     ByteBuffer buf = ctx.getBuffer();
                     buf.flip();
@@ -183,8 +186,6 @@ public class TextLineDecoder implements ProtocolDecoder {
                             "Line is too long: " + overflowPosition);
                 }
 
-                in.limit(oldLimit);
-                in.position(pos);
                 oldPos = pos;
                 matchCount = 0;
             }
@@ -225,6 +226,9 @@ public class TextLineDecoder implements ProtocolDecoder {
 
                     ctx.append(in);
                     
+                    in.limit(oldLimit);
+                    in.position(pos);
+
                     if (ctx.getOverflowPosition() == 0) {
                         ByteBuffer buf = ctx.getBuffer();
                         buf.flip();
@@ -238,8 +242,6 @@ public class TextLineDecoder implements ProtocolDecoder {
                                 "Line is too long: " + overflowPosition);
                     }
 
-                    in.limit(oldLimit);
-                    in.position(pos);
                     oldPos = pos;
                     matchCount = 0;
                 }
@@ -288,6 +290,7 @@ public class TextLineDecoder implements ProtocolDecoder {
         
         public void reset() {
             overflowPosition = 0;
+            matchCount = 0;
             decoder.reset();
         }
         
