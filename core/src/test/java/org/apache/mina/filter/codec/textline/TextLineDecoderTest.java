@@ -269,14 +269,18 @@ public class TextLineDecoderTest extends TestCase {
         decoder.decode(session, in.reset().mark(), out);
         Assert.assertEquals(0, session.getDecoderOutputQueue().size());
         
-        in.clear().putString("\r\n", encoder).flip();
+        in.clear().putString("A\r\nB\r\n", encoder).flip();
         try {
             decoder.decode(session, in, out);
             Assert.fail();
         } catch (BufferDataException e) {
             // Success!
         }
-        
+
+        decoder.decode(session, in, out);
+        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
+        Assert.assertEquals("B", session.getDecoderOutputQueue().poll());
+
         // Make sure OOM is not thrown.
         long oldFreeMemory = Runtime.getRuntime().freeMemory();
         in = IoBuffer.allocate(1048576 * 16).mark();
@@ -288,7 +292,7 @@ public class TextLineDecoderTest extends TestCase {
             Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576); 
         }
 
-        in.clear().putString("\r\n", encoder).flip();
+        in.clear().putString("C\r\nD\r\n", encoder).flip();
         try {
             decoder.decode(session, in, out);
             Assert.fail();
@@ -296,6 +300,10 @@ public class TextLineDecoderTest extends TestCase {
             // Success!
         }
         
+        decoder.decode(session, in, out);
+        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
+        Assert.assertEquals("D", session.getDecoderOutputQueue().poll());
+
         // Memory consumption should be minimal.
         Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576); 
     }
