@@ -168,11 +168,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                 in.limit(pos);
                 in.position(oldPos);
 
-                buf.put(in);
-                if (buf.position() > maxLineLength) {
-                    throw new BufferDataException("Line is too long: "
-                            + buf.position());
-                }
+                appendToOutput (in, buf);
                 buf.flip();
                 buf.limit(buf.limit() - matchCount);
                 out.write(buf.getString(decoder));
@@ -187,7 +183,7 @@ public class TextLineDecoder implements ProtocolDecoder {
 
         // Put remainder to buf.
         in.position(oldPos);
-        buf.put(in);
+        appendToOutput (in, buf);
 
         return matchCount;
     }
@@ -216,11 +212,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                     in.limit(pos);
                     in.position(oldPos);
 
-                    buf.put(in);
-                    if (buf.position() > maxLineLength) {
-                        throw new BufferDataException("Line is too long: "
-                                + buf.position());
-                    }
+                    appendToOutput (in, buf);
                     buf.flip();
                     buf.limit(buf.limit() - matchCount);
                     out.write(buf.getString(decoder));
@@ -238,9 +230,17 @@ public class TextLineDecoder implements ProtocolDecoder {
 
         // Put remainder to buf.
         in.position(oldPos);
-        buf.put(in);
+        appendToOutput (in, buf);
 
         return matchCount;
+    }
+
+    private void appendToOutput (ByteBuffer in, ByteBuffer buf) {
+      buf.put(in);
+      if (buf.position() > maxLineLength) {
+          throw new BufferDataException("Line is too long: "
+                  + buf.position());
+      }
     }
 
     private class Context {
