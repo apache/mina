@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *
+ *  
  *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License.
- *
+ *  under the License. 
+ *  
  */
 package org.apache.mina.filter.codec.textline;
 
@@ -23,17 +23,17 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.BufferDataException;
 import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
  * A {@link ProtocolDecoder} which decodes a text line into a string.
- *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * 
+ * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
 public class TextLineDecoder implements ProtocolDecoder {
@@ -109,11 +109,9 @@ public class TextLineDecoder implements ProtocolDecoder {
         Context ctx = getContext(session);
 
         if (LineDelimiter.AUTO.equals(delimiter)) {
-            ctx.setMatchCount(decodeAuto(in, ctx.getBuffer(), ctx
-                    .getMatchCount(), ctx.getDecoder(), out));
+            decodeAuto(ctx, in, out);
         } else {
-            ctx.setMatchCount(decodeNormal(in, ctx.getBuffer(), ctx
-                    .getMatchCount(), ctx.getDecoder(), out));
+            decodeNormal(ctx, in, out);
         }
     }
 
@@ -138,9 +136,11 @@ public class TextLineDecoder implements ProtocolDecoder {
         }
     }
 
-    private int decodeAuto(IoBuffer in, IoBuffer buf, int matchCount,
-            CharsetDecoder decoder, ProtocolDecoderOutput out)
+    private void decodeAuto(Context ctx, IoBuffer in, ProtocolDecoderOutput out)
             throws CharacterCodingException {
+
+        int matchCount = ctx.getMatchCount();
+        
         // Try to find a match
         int oldPos = in.position();
         int oldLimit = in.limit();
@@ -168,11 +168,20 @@ public class TextLineDecoder implements ProtocolDecoder {
                 in.limit(pos);
                 in.position(oldPos);
 
-                appendToOutput (in, buf);
-                buf.flip();
-                buf.limit(buf.limit() - matchCount);
-                out.write(buf.getString(decoder));
-                buf.clear();
+                ctx.append(in);
+
+                if (ctx.getOverflowPosition() == 0) {
+                    IoBuffer buf = ctx.getBuffer();
+                    buf.flip();
+                    buf.limit(buf.limit() - matchCount);
+                    out.write(buf.getString(ctx.getDecoder()));
+                    buf.clear();
+                } else {
+                    int overflowPosition = ctx.getOverflowPosition();
+                    ctx.reset();
+                    throw new BufferDataException(
+                            "Line is too long: " + overflowPosition);
+                }
 
                 in.limit(oldLimit);
                 in.position(pos);
@@ -183,15 +192,17 @@ public class TextLineDecoder implements ProtocolDecoder {
 
         // Put remainder to buf.
         in.position(oldPos);
-        appendToOutput (in, buf);
+        ctx.append(in);
 
-        return matchCount;
+        ctx.setMatchCount(matchCount);
     }
 
-    private int decodeNormal(IoBuffer in, IoBuffer buf, int matchCount,
-            CharsetDecoder decoder, ProtocolDecoderOutput out)
+    private void decodeNormal(Context ctx, IoBuffer in, ProtocolDecoderOutput out)
             throws CharacterCodingException {
-        // Convert delimiter to the buffer if not done yet.
+
+        int matchCount = ctx.getMatchCount();
+        
+        // Convert delimiter to ByteBuffer if not done yet.
         if (delimBuf == null) {
             IoBuffer tmp = IoBuffer.allocate(2).setAutoExpand(true);
             tmp.putString(delimiter.getValue(), charset.newEncoder());
@@ -212,11 +223,20 @@ public class TextLineDecoder implements ProtocolDecoder {
                     in.limit(pos);
                     in.position(oldPos);
 
-                    appendToOutput (in, buf);
-                    buf.flip();
-                    buf.limit(buf.limit() - matchCount);
-                    out.write(buf.getString(decoder));
-                    buf.clear();
+                    ctx.append(in);
+                    
+                    if (ctx.getOverflowPosition() == 0) {
+                        IoBuffer buf = ctx.getBuffer();
+                        buf.flip();
+                        buf.limit(buf.limit() - matchCount);
+                        out.write(buf.getString(ctx.getDecoder()));
+                        buf.clear();
+                    } else {
+                        int overflowPosition = ctx.getOverflowPosition();
+                        ctx.reset();
+                        throw new BufferDataException(
+                                "Line is too long: " + overflowPosition);
+                    }
 
                     in.limit(oldLimit);
                     in.position(pos);
@@ -230,25 +250,16 @@ public class TextLineDecoder implements ProtocolDecoder {
 
         // Put remainder to buf.
         in.position(oldPos);
-        appendToOutput (in, buf);
+        ctx.append(in);
 
-        return matchCount;
-    }
-
-    private void appendToOutput (ByteBuffer in, ByteBuffer buf) {
-      buf.put(in);
-      if (buf.position() > maxLineLength) {
-          throw new BufferDataException("Line is too long: "
-                  + buf.position());
-      }
+        ctx.setMatchCount(matchCount);
     }
 
     private class Context {
         private final CharsetDecoder decoder;
-
         private final IoBuffer buf;
-
         private int matchCount = 0;
+        private int overflowPosition = 0;
 
         private Context() {
             decoder = charset.newDecoder();
@@ -262,13 +273,43 @@ public class TextLineDecoder implements ProtocolDecoder {
         public IoBuffer getBuffer() {
             return buf;
         }
-
+        
+        public int getOverflowPosition() {
+            return overflowPosition;
+        }
+        
         public int getMatchCount() {
             return matchCount;
         }
 
         public void setMatchCount(int matchCount) {
             this.matchCount = matchCount;
+        }
+        
+        public void reset() {
+            overflowPosition = 0;
+            decoder.reset();
+        }
+        
+        public void append(IoBuffer in) {
+            if (overflowPosition != 0) {
+                discard(in);
+            } else if (buf.position() > maxLineLength - in.remaining()) {
+                    overflowPosition = buf.position();
+                    buf.clear();
+                    discard(in);
+            } else {
+                getBuffer().put(in);
+            }
+        }
+
+        private void discard(IoBuffer in) {
+            if (Integer.MAX_VALUE - in.remaining() < overflowPosition) {
+                overflowPosition = Integer.MAX_VALUE;
+            } else {
+                overflowPosition += in.remaining();
+            }
+            in.position(in.limit());
         }
     }
 }

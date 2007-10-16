@@ -25,6 +25,7 @@ import java.nio.charset.CharsetEncoder;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.mina.common.BufferDataException;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -244,5 +245,58 @@ public class TextLineDecoderTest extends TestCase {
         Assert.assertEquals(2, session.getDecoderOutputQueue().size());
         Assert.assertEquals("PQR\rX", session.getDecoderOutputQueue().poll());
         Assert.assertEquals("STU", session.getDecoderOutputQueue().poll());
+    }
+    
+    public void testOverflow() throws Exception {
+        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"),
+                LineDelimiter.AUTO);
+        decoder.setMaxLineLength(3);
+
+        CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+        ProtocolCodecSession session = new ProtocolCodecSession();
+        ProtocolDecoderOutput out = session.getDecoderOutput();
+        IoBuffer in = IoBuffer.allocate(16);
+
+        // Make sure the overflow exception is not thrown until
+        // the delimiter is encountered.
+        in.putString("A", encoder).flip().mark();
+        decoder.decode(session, in.reset().mark(), out);
+        Assert.assertEquals(0, session.getDecoderOutputQueue().size());
+        decoder.decode(session, in.reset().mark(), out);
+        Assert.assertEquals(0, session.getDecoderOutputQueue().size());
+        decoder.decode(session, in.reset().mark(), out);
+        Assert.assertEquals(0, session.getDecoderOutputQueue().size());
+        decoder.decode(session, in.reset().mark(), out);
+        Assert.assertEquals(0, session.getDecoderOutputQueue().size());
+        
+        in.clear().putString("\r\n", encoder).flip();
+        try {
+            decoder.decode(session, in, out);
+            Assert.fail();
+        } catch (BufferDataException e) {
+            // Success!
+        }
+        
+        // Make sure OOM is not thrown.
+        long oldFreeMemory = Runtime.getRuntime().freeMemory();
+        in = IoBuffer.allocate(1048576 * 16).mark();
+        for (int i = 0; i < 10; i ++) {
+            decoder.decode(session, in.reset().mark(), out);
+            Assert.assertEquals(0, session.getDecoderOutputQueue().size());
+
+            // Memory consumption should be minimal.
+            Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576); 
+        }
+
+        in.clear().putString("\r\n", encoder).flip();
+        try {
+            decoder.decode(session, in, out);
+            Assert.fail();
+        } catch (BufferDataException e) {
+            // Success!
+        }
+        
+        // Memory consumption should be minimal.
+        Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576); 
     }
 }
