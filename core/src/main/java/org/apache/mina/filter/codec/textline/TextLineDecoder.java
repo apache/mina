@@ -110,11 +110,9 @@ public class TextLineDecoder implements ProtocolDecoder {
         Context ctx = getContext(session);
 
         if (LineDelimiter.AUTO.equals(delimiter)) {
-            ctx.setMatchCount(decodeAuto(in, ctx.getBuffer(), ctx
-                    .getMatchCount(), ctx.getDecoder(), out));
+            decodeAuto(ctx, in, out);
         } else {
-            ctx.setMatchCount(decodeNormal(in, ctx.getBuffer(), ctx
-                    .getMatchCount(), ctx.getDecoder(), out));
+            decodeNormal(ctx, in, out);
         }
     }
 
@@ -140,9 +138,11 @@ public class TextLineDecoder implements ProtocolDecoder {
         }
     }
 
-    private int decodeAuto(ByteBuffer in, ByteBuffer buf, int matchCount,
-            CharsetDecoder decoder, ProtocolDecoderOutput out)
+    private void decodeAuto(Context ctx, ByteBuffer in, ProtocolDecoderOutput out)
             throws CharacterCodingException {
+
+        int matchCount = ctx.getMatchCount();
+        
         // Try to find a match
         int oldPos = in.position();
         int oldLimit = in.limit();
@@ -170,11 +170,20 @@ public class TextLineDecoder implements ProtocolDecoder {
                 in.limit(pos);
                 in.position(oldPos);
 
-                appendToOutput (in, buf);
-                buf.flip();
-                buf.limit(buf.limit() - matchCount);
-                out.write(buf.getString(decoder));
-                buf.clear();
+                ctx.append(in);
+
+                if (ctx.getOverflowPosition() == 0) {
+                    ByteBuffer buf = ctx.getBuffer();
+                    buf.flip();
+                    buf.limit(buf.limit() - matchCount);
+                    out.write(buf.getString(ctx.getDecoder()));
+                    buf.clear();
+                } else {
+                    int overflowPosition = ctx.getOverflowPosition();
+                    ctx.reset();
+                    throw new BufferDataException(
+                            "Line is too long: " + overflowPosition);
+                }
 
                 in.limit(oldLimit);
                 in.position(pos);
@@ -185,14 +194,16 @@ public class TextLineDecoder implements ProtocolDecoder {
 
         // Put remainder to buf.
         in.position(oldPos);
-        appendToOutput (in, buf);
+        ctx.append(in);
 
-        return matchCount;
+        ctx.setMatchCount(matchCount);
     }
 
-    private int decodeNormal(ByteBuffer in, ByteBuffer buf, int matchCount,
-            CharsetDecoder decoder, ProtocolDecoderOutput out)
+    private void decodeNormal(Context ctx, ByteBuffer in, ProtocolDecoderOutput out)
             throws CharacterCodingException {
+
+        int matchCount = ctx.getMatchCount();
+        
         // Convert delimiter to ByteBuffer if not done yet.
         if (delimBuf == null) {
             ByteBuffer tmp = ByteBuffer.allocate(2).setAutoExpand(true);
@@ -214,11 +225,20 @@ public class TextLineDecoder implements ProtocolDecoder {
                     in.limit(pos);
                     in.position(oldPos);
 
-                    appendToOutput (in, buf);
-                    buf.flip();
-                    buf.limit(buf.limit() - matchCount);
-                    out.write(buf.getString(decoder));
-                    buf.clear();
+                    ctx.append(in);
+                    
+                    if (ctx.getOverflowPosition() == 0) {
+                        ByteBuffer buf = ctx.getBuffer();
+                        buf.flip();
+                        buf.limit(buf.limit() - matchCount);
+                        out.write(buf.getString(ctx.getDecoder()));
+                        buf.clear();
+                    } else {
+                        int overflowPosition = ctx.getOverflowPosition();
+                        ctx.reset();
+                        throw new BufferDataException(
+                                "Line is too long: " + overflowPosition);
+                    }
 
                     in.limit(oldLimit);
                     in.position(pos);
@@ -232,25 +252,16 @@ public class TextLineDecoder implements ProtocolDecoder {
 
         // Put remainder to buf.
         in.position(oldPos);
-        appendToOutput (in, buf);
+        ctx.append(in);
 
-        return matchCount;
-    }
-
-    private void appendToOutput (ByteBuffer in, ByteBuffer buf) {
-      buf.put(in);
-      if (buf.position() > maxLineLength) {
-          throw new BufferDataException("Line is too long: "
-                  + buf.position());
-      }
+        ctx.setMatchCount(matchCount);
     }
 
     private class Context {
         private final CharsetDecoder decoder;
-
         private final ByteBuffer buf;
-
         private int matchCount = 0;
+        private int overflowPosition = 0;
 
         private Context() {
             decoder = charset.newDecoder();
@@ -264,13 +275,43 @@ public class TextLineDecoder implements ProtocolDecoder {
         public ByteBuffer getBuffer() {
             return buf;
         }
-
+        
+        public int getOverflowPosition() {
+            return overflowPosition;
+        }
+        
         public int getMatchCount() {
             return matchCount;
         }
 
         public void setMatchCount(int matchCount) {
             this.matchCount = matchCount;
+        }
+        
+        public void reset() {
+            overflowPosition = 0;
+            decoder.reset();
+        }
+        
+        public void append(ByteBuffer in) {
+            if (overflowPosition != 0) {
+                discard(in);
+            } else if (buf.position() > maxLineLength - in.remaining()) {
+                    overflowPosition = buf.position();
+                    buf.clear();
+                    discard(in);
+            } else {
+                getBuffer().put(in);
+            }
+        }
+
+        private void discard(ByteBuffer in) {
+            if (Integer.MAX_VALUE - in.remaining() < overflowPosition) {
+                overflowPosition = Integer.MAX_VALUE;
+            } else {
+                overflowPosition += in.remaining();
+            }
+            in.position(in.limit());
         }
     }
 }
