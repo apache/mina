@@ -219,17 +219,9 @@ class SocketIoProcessor {
                 buf = null;
 
                 if (readBytes * 2 < session.getReadBufferSize()) {
-                    if (session.getReadBufferSize() > 64) {
-                        session.setReadBufferSize(session.getReadBufferSize() >>> 1);
-                    }
+                    session.decreaseReadBufferSize();
                 } else if (readBytes == session.getReadBufferSize()) {
-                    int newReadBufferSize = session.getReadBufferSize() << 1;
-                    if (newReadBufferSize <= (((SocketSessionConfig) session.getConfig()).getReceiveBufferSize() << 1)) {
-                        // read buffer size shouldn't get bigger than
-                        // twice of the receive buffer size because of
-                        // read-write fairness.
-                        session.setReadBufferSize(newReadBufferSize);
-                    }
+                    session.increaseReadBufferSize();
                 }
             }
             if (ret < 0) {
