@@ -149,23 +149,38 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
         try {
-            synchronized (decoderOut) {
-                decoder.decode(session, in, decoderOut);
+            while (in.hasRemaining()) {
+                int oldPos = in.position();
+                try {
+                    synchronized (decoderOut) {
+                        decoder.decode(session, in, decoderOut);
+                    }
+                    // Finish decoding if no exception was thrown.
+                    decoderOut.flush();
+                    break;
+                } catch (Throwable t) {
+                    ProtocolDecoderException pde;
+                    if (t instanceof ProtocolDecoderException) {
+                        pde = (ProtocolDecoderException) t;
+                    } else {
+                        pde = new ProtocolDecoderException(t);
+                    }
+                    pde.setHexdump(in.getHexDump());
+                    
+                    // Fire the exceptionCaught event.
+                    decoderOut.flush();
+                    nextFilter.exceptionCaught(session, pde);
+                    
+                    // Stop retrying if the buffer position didn't change
+                    // because retrying can cause an infinite loop.
+                    if (in.position() == oldPos) {
+                        break;
+                    }
+                }
             }
-        } catch (Throwable t) {
-            ProtocolDecoderException pde;
-            if (t instanceof ProtocolDecoderException) {
-                pde = (ProtocolDecoderException) t;
-            } else {
-                pde = new ProtocolDecoderException(t);
-            }
-            pde.setHexdump(in.getHexDump());
-            throw pde;
         } finally {
             // Release the read buffer.
             in.release();
-
-            decoderOut.flush();
         }
     }
 
