@@ -72,6 +72,7 @@ class SocketSessionImpl extends BaseIoSession {
     private SelectionKey key;
 
     private int readBufferSize = 1024;
+    private boolean deferDecreaseReadBufferSize = true;
 
     /**
      * Creates a new instance.
@@ -186,8 +187,30 @@ class SocketSessionImpl extends BaseIoSession {
         return readBufferSize;
     }
     
-    void setReadBufferSize(int readBufferSize) {
+    void increaseReadBufferSize() {
+        int newReadBufferSize = getReadBufferSize() << 1;
+        if (newReadBufferSize <= ((SocketSessionConfig) getConfig()).getReceiveBufferSize() << 1) {
+            // read buffer size shouldn't get bigger than
+            // twice of the receive buffer size because of
+            // read-write fairness.
+            setReadBufferSize(newReadBufferSize);
+        }
+    }
+    
+    void decreaseReadBufferSize() {
+        if (deferDecreaseReadBufferSize) {
+            deferDecreaseReadBufferSize = false;
+            return;
+        }
+        
+        if (getReadBufferSize() > 64) {
+            setReadBufferSize(getReadBufferSize() >>> 1);
+        }
+    }
+    
+    private void setReadBufferSize(int readBufferSize) {
         this.readBufferSize = readBufferSize;
+        this.deferDecreaseReadBufferSize = true;
     }
 
     private class SessionConfigImpl extends BaseIoSessionConfig implements
