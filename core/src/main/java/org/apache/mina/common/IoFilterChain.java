@@ -45,10 +45,32 @@ public interface IoFilterChain {
     Entry getEntry(String name);
 
     /**
+     * Returns the {@link Entry} with the specified <tt>filter</tt> in this chain.
+     * @return <tt>null</tt> if there's no such filter in this chain
+     */
+    Entry getEntry(IoFilter filter);
+
+    /**
+     * Returns the {@link Entry} with the specified <tt>filterType</tt>
+     * in this chain.  If there's more than one filter with the specified
+     * type, the first match will be chosen.
+     * @return <tt>null</tt> if there's no such name in this chain
+     */
+    Entry getEntry(Class<? extends IoFilter> filterType);
+
+    /**
      * Returns the {@link IoFilter} with the specified <tt>name</tt> in this chain.
      * @return <tt>null</tt> if there's no such name in this chain
      */
     IoFilter get(String name);
+
+    /**
+     * Returns the {@link IoFilter} with the specified <tt>filterType</tt>
+     * in this chain. If there's more than one filter with the specified
+     * type, the first match will be chosen.
+     * @return <tt>null</tt> if there's no such name in this chain
+     */
+    IoFilter get(Class<? extends IoFilter> filterType);
 
     /**
      * Returns the {@link NextFilter} of the {@link IoFilter} with the
@@ -56,6 +78,21 @@ public interface IoFilterChain {
      * @return <tt>null</tt> if there's no such name in this chain
      */
     NextFilter getNextFilter(String name);
+
+    /**
+     * Returns the {@link NextFilter} of the specified {@link IoFilter}
+     * in this chain.
+     * @return <tt>null</tt> if there's no such name in this chain
+     */
+    NextFilter getNextFilter(IoFilter filter);
+
+    /**
+     * Returns the {@link NextFilter} of the specified <tt>filterType</tt>
+     * in this chain.  If there's more than one filter with the specified
+     * type, the first match will be chosen.
+     * @return <tt>null</tt> if there's no such name in this chain
+     */
+    NextFilter getNextFilter(Class<? extends IoFilter> filterType);
 
     /**
      * Returns the list of all {@link Entry}s this chain contains.

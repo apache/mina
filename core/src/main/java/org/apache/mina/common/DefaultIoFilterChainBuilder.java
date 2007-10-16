@@ -86,6 +86,32 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     }
 
     /**
+     * @see IoFilterChain#getEntry(IoFilter)
+     */
+    public Entry getEntry(IoFilter filter) {
+        for (Entry e: entries) {
+            if (e.getFilter() == filter) {
+                return e;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @see IoFilterChain#getEntry(Class)
+     */
+    public Entry getEntry(Class<? extends IoFilter> filterType) {
+        for (Entry e: entries) {
+            if (filterType.isAssignableFrom(e.getFilter().getClass())) {
+                return e;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @see IoFilterChain#get(String)
      */
     public IoFilter get(String name) {
@@ -93,7 +119,19 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         if (e == null) {
             return null;
         }
+    
+        return e.getFilter();
+    }
 
+    /**
+     * @see IoFilterChain#get(Class)
+     */
+    public IoFilter get(Class<? extends IoFilter> filterType) {
+        Entry e = getEntry(filterType);
+        if (e == null) {
+            return null;
+        }
+    
         return e.getFilter();
     }
 
@@ -124,26 +162,14 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * @see IoFilterChain#contains(IoFilter)
      */
     public boolean contains(IoFilter filter) {
-        for (Entry e : entries) {
-            if (e.getFilter() == filter) {
-                return true;
-            }
-        }
-
-        return false;
+        return getEntry(filter) != null;
     }
 
     /**
      * @see IoFilterChain#contains(Class)
      */
     public boolean contains(Class<? extends IoFilter> filterType) {
-        for (Entry e : entries) {
-            if (filterType.isAssignableFrom(e.getFilter().getClass())) {
-                return true;
-            }
-        }
-
-        return false;
+        return getEntry(filterType) != null;
     }
 
     /**

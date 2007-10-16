@@ -74,6 +74,28 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
         return e;
     }
+    
+    public Entry getEntry(IoFilter filter) {
+        EntryImpl e = head.nextEntry;
+        while (e != tail) {
+            if (e.getFilter() == filter) {
+                return e;
+            }
+            e = e.nextEntry;
+        }
+        return null;
+    }
+
+    public Entry getEntry(Class<? extends IoFilter> filterType) {
+        EntryImpl e = head.nextEntry;
+        while (e != tail) {
+            if (filterType.isAssignableFrom(e.getFilter().getClass())) {
+                return e;
+            }
+            e = e.nextEntry;
+        }
+        return null;
+    }
 
     public IoFilter get(String name) {
         Entry e = getEntry(name);
@@ -84,8 +106,35 @@ public class DefaultIoFilterChain implements IoFilterChain {
         return e.getFilter();
     }
 
+    public IoFilter get(Class<? extends IoFilter> filterType) {
+        Entry e = getEntry(filterType);
+        if (e == null) {
+            return null;
+        }
+
+        return e.getFilter();
+    }
+
     public NextFilter getNextFilter(String name) {
         Entry e = getEntry(name);
+        if (e == null) {
+            return null;
+        }
+
+        return e.getNextFilter();
+    }
+
+    public NextFilter getNextFilter(IoFilter filter) {
+        Entry e = getEntry(filter);
+        if (e == null) {
+            return null;
+        }
+
+        return e.getNextFilter();
+    }
+
+    public NextFilter getNextFilter(Class<? extends IoFilter> filterType) {
+        Entry e = getEntry(filterType);
         if (e == null) {
             return null;
         }
@@ -465,25 +514,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public boolean contains(IoFilter filter) {
-        EntryImpl e = head.nextEntry;
-        while (e != tail) {
-            if (e.getFilter() == filter) {
-                return true;
-            }
-            e = e.nextEntry;
-        }
-        return false;
+        return getEntry(filter) != null;
     }
 
     public boolean contains(Class<? extends IoFilter> filterType) {
-        EntryImpl e = head.nextEntry;
-        while (e != tail) {
-            if (filterType.isAssignableFrom(e.getFilter().getClass())) {
-                return true;
-            }
-            e = e.nextEntry;
-        }
-        return false;
+        return getEntry(filterType) != null;
     }
 
     @Override
