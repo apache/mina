@@ -31,7 +31,6 @@ import org.apache.mina.common.support.AbstractIoFilterChain;
 /**
  * @todo Document me!
  *
- * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
