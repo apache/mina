@@ -19,11 +19,11 @@
  */
 package org.apache.mina.transport.vmpipe.support;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.util.IdentityHashSet;
 
 /**
  * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them. 
@@ -38,7 +38,7 @@ public class VmPipeIdleStatusChecker {
         return INSTANCE;
     }
 
-    private final Set<VmPipeSessionImpl> sessions = new IdentityHashSet<VmPipeSessionImpl>();
+    private final Set<VmPipeSessionImpl> sessions = new HashSet<VmPipeSessionImpl>();
 
     private final Worker worker = new Worker();
 
