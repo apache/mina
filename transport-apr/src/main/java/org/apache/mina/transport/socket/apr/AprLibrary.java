@@ -63,7 +63,7 @@ class AprLibrary {
     }
 
     protected void finalize() throws Throwable {
-        //		 TODO : necessary I think, need to check APR doc
+        super.finalize();
         Pool.clear(pool);
     }
 

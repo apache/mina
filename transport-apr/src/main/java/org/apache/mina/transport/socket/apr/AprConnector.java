@@ -123,7 +123,6 @@ public class AprConnector extends AbstractIoConnector {
             inetAddr = Address.info(sockAddr.getHostName(), Socket.APR_INET,
                     sockAddr.getPort(), 0, AprLibrary.getLibrary().getPool());
 
-            // TODO : type of socket need to be configurable
             long clientSock = Socket.create(Socket.APR_INET,
                     protocol.socketType, protocol.codeProto, AprLibrary
                             .getLibrary().getPool());
