@@ -219,6 +219,11 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
                 ch.register(selector, SelectionKey.OP_CONNECT, req);
             } catch (IOException e) {
                 req.setException(e);
+                try {
+                    ch.close();
+                } catch (IOException e2) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e2);
+                }
             }
         }
     }
