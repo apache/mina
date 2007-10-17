@@ -118,6 +118,10 @@ public abstract class AbstractIoService implements IoService {
         if (handler == null) {
             throw new NullPointerException("handler");
         }
+        
+        if (isActive()) {
+            throw new IllegalStateException("handler cannot be set while the service is active.");
+        }
 
         this.handler = handler;
     }
