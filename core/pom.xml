@@ -8,8 +8,11 @@
   </parent>
   <artifactId>mina-core</artifactId>
   <name>Apache MINA Core</name>
-  <packaging>jar</packaging>
-
+  <packaging>bundle</packaging>
+  <properties>
+    <symbolicName>${groupId}.core</symbolicName>
+    <exportedPackage>${groupId}</exportedPackage>
+  </properties>
   <dependencies>
   </dependencies>
 </project>

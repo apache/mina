@@ -46,13 +46,7 @@
     </notifiers>
   </ciManagement>
 
-  <description>
-    MINA (Multipurpose Infrastructure for Network Applications) is a
-    network application framework which helps users develop high
-    performance and highly scalable network applications easily.
-    It provides an abstract &middot; event-driven &middot; asynchronous
-    API over various transports such as TCP/IP and UDP/IP via Java NIO.
-  </description>
+  <description>Apache MINA is a network application framework which helps users develop high performance and highly scalable network applications easily.  It provides an abstract &middot; event-driven &middot; asynchronous API over various transports such as TCP/IP and UDP/IP via Java NIO.</description>
 
   <licenses>
     <license>
@@ -61,6 +55,10 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+  <properties>
+    <symbolicName>${exportedPackage}</symbolicName>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -254,7 +252,9 @@
     <module>filter-codec-netty</module>
     <module>filter-codec-http</module>
     <module>protocol-http-client</module>
+    <!--
     <module>protocol-http-server</module>
+    -->
     <module>integration-jmx</module>
     <module>integration-spring</module>
     <module>example</module>
@@ -314,7 +314,6 @@
           </tagBase>
         </configuration>
       </plugin>
-      <!--
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -323,11 +322,11 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Export-Package>org.apache.mina.*</Export-Package>
+            <Bundle-SymbolicName>${symbolicName}</Bundle-SymbolicName>
+            <Export-Package>${exportedPackage}.*</Export-Package>
           </instructions>
         </configuration>
       </plugin>
-      -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -338,20 +337,26 @@
               <tasks>
                 <taskdef resource="net/sf/antcontrib/antlib.xml"/>
                 <if>
-                  <equals arg1="${project.packaging}" arg2="jar"/>
+                  <or>
+                    <equals arg1="${project.packaging}" arg2="jar"/>
+                    <equals arg1="${project.packaging}" arg2="bundle"/>
+                  </or>
                   <then>
-                    <jar destfile="${project.build.directory}/${project.build.finalName}.jar" update="yes">
+                    <move file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.build.directory}/${project.build.finalName}.orig.jar"/>
+                    <zip destfile="${project.build.directory}/${project.build.finalName}.jar">
+                      <zipfileset dir="${basedir}/.." prefix="META-INF/">
+                        <include name="LICENSE.*"/>
+                        <include name="NOTICE.*"/>
+                      </zipfileset>
+                      <zipfileset src="${project.build.directory}/${project.build.finalName}.orig.jar" filemode="644" dirmode="755"/>
+                    </zip>
+                    <jar destfile="${project.build.directory}/${project.build.finalName}-sources.jar" update="true">
                       <zipfileset dir="${basedir}/.." prefix="META-INF/">
                         <include name="LICENSE.*"/>
                         <include name="NOTICE.*"/>
                       </zipfileset>
                     </jar>
-                    <jar destfile="${project.build.directory}/${project.build.finalName}-sources.jar" update="yes">
-                      <zipfileset dir="${basedir}/.." prefix="META-INF/">
-                        <include name="LICENSE.*"/>
-                        <include name="NOTICE.*"/>
-                      </zipfileset>
-                    </jar>
+                    <delete file="${project.build.directory}/${project.build.finalName}.orig.jar"/>
                   </then>
                 </if>
               </tasks>

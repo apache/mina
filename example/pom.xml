@@ -11,15 +11,15 @@
   <packaging>jar</packaging>  
   <dependencies>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-integration-spring</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-protocol-http-client</artifactId>
     </dependency>
     <dependency>

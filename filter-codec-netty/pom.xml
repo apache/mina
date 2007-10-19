@@ -8,11 +8,13 @@
   </parent>
   <artifactId>mina-filter-codec-netty</artifactId>
   <name>Apache MINA Netty Codec</name>
-  <packaging>jar</packaging>  
-
+  <packaging>bundle</packaging>  
+  <properties>
+    <exportedPackage>${groupId}.filter.codec.netty</exportedPackage>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>

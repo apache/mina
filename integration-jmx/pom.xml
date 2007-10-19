@@ -8,10 +8,13 @@
   </parent>
   <artifactId>mina-integration-jmx</artifactId>
   <name>Apache MINA JMX Integration</name>
-  <packaging>jar</packaging>  
+  <packaging>bundle</packaging>  
+  <properties>
+    <exportedPackage>${groupId}.integration.jmx</exportedPackage>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
   </dependencies>

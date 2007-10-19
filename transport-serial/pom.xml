@@ -8,10 +8,13 @@
   </parent>
   <artifactId>mina-transport-serial</artifactId>
   <name>Apache MINA Serial Communication support</name>
-  <packaging>jar</packaging>  
+  <packaging>bundle</packaging>  
+  <properties>
+    <exportedPackage>${groupId}.transport.serial</exportedPackage>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>

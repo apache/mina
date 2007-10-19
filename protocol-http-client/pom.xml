@@ -25,14 +25,17 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mina-protocol-http-client</artifactId>
   <name>Apache MINA HTTP Client</name>
-  <packaging>jar</packaging>  
+  <packaging>bundle</packaging>  
+  <properties>
+    <exportedPackage>${groupId}.protocol.http.client</exportedPackage>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-filter-codec-http</artifactId>
     </dependency>
     <dependency>

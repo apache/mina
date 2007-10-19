@@ -8,10 +8,13 @@
   </parent>
   <artifactId>mina-transport-apr</artifactId>
   <name>Apache MINA APR Communication Support</name>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>  
+  <properties>
+    <exportedPackage>${groupId}.transport.socket.apr</exportedPackage>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>

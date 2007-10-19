@@ -8,11 +8,13 @@
   </parent>
   <artifactId>mina-filter-compression</artifactId>
   <name>Apache MINA Compression Filter</name>
-  <packaging>jar</packaging>  
-
+  <packaging>bundle</packaging>  
+  <properties>
+    <exportedPackage>${groupId}.filter.compression</exportedPackage>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.apache.mina</groupId>
+      <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
 
