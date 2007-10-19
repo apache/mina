@@ -167,13 +167,21 @@ public class DefaultIoFuture implements IoFuture {
                 "Please use " + IoFutureListener.class.getSimpleName() +
                 " or configure a proper thread model alternatively.");
 
+        // Simple and quick check.
+        for (StackTraceElement s: e.getStackTrace()) {
+            if (AbstractIoProcessor.class.getName().equals(s.getClassName())) {
+                throw e;
+            }
+        }
+
+        // And then more precisely. 
         for (StackTraceElement s: e.getStackTrace()) {
             try {
                 Class<?> cls = DefaultIoFuture.class.getClassLoader().loadClass(s.getClassName());
                 if (IoProcessor.class.isAssignableFrom(cls)) {
                     throw e;
                 }
-            } catch (ClassNotFoundException cnfe) {
+            } catch (Exception cnfe) {
                 // Ignore
             }
         }
