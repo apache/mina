@@ -31,18 +31,15 @@ import java.util.concurrent.TimeUnit;
  * @version $Rev$, $Date$
  */
 public class DefaultIoFuture implements IoFuture {
+    
+    private static final int DEAD_LOCK_CHECK_INTERVAL = 5000;
+    
     private final IoSession session;
-
     private final Object lock;
-
     private IoFutureListener firstListener;
-
     private List<IoFutureListener> otherListeners;
-
     private Object result;
-
     private boolean ready;
-
     private int waiters;
 
     /**
@@ -72,7 +69,8 @@ public class DefaultIoFuture implements IoFuture {
             while (!ready) {
                 waiters++;
                 try {
-                    lock.wait();
+                    lock.wait(DEAD_LOCK_CHECK_INTERVAL);
+                    checkDeadLock();
                 } finally {
                     waiters--;
                 }
@@ -87,17 +85,7 @@ public class DefaultIoFuture implements IoFuture {
     }
 
     public boolean await(long timeoutMillis) throws InterruptedException {
-        synchronized (lock) {
-            if (!ready) {
-                waiters++;
-                try {
-                    lock.wait(timeoutMillis);
-                } finally {
-                    waiters--;
-                }
-            }
-            return ready;
-        }
+        return await0(timeoutMillis, true);
     }
 
     public IoFuture awaitUninterruptibly() {
@@ -105,10 +93,13 @@ public class DefaultIoFuture implements IoFuture {
             while (!ready) {
                 waiters++;
                 try {
-                    lock.wait();
+                    lock.wait(DEAD_LOCK_CHECK_INTERVAL);
                 } catch (InterruptedException e) {
                 } finally {
                     waiters--;
+                    if (!ready) {
+                        checkDeadLock();
+                    }
                 }
             }
         }
@@ -121,6 +112,14 @@ public class DefaultIoFuture implements IoFuture {
     }
 
     public boolean awaitUninterruptibly(long timeoutMillis) {
+        try {
+            return await0(timeoutMillis, false);
+        } catch (InterruptedException e) {
+            throw new InternalError();
+        }
+    }
+
+    private boolean await0(long timeoutMillis, boolean interruptable) throws InterruptedException {
         long startTime = timeoutMillis <= 0 ? 0 : System.currentTimeMillis();
         long waitTime = timeoutMillis;
 
@@ -135,8 +134,11 @@ public class DefaultIoFuture implements IoFuture {
             try {
                 for (;;) {
                     try {
-                        lock.wait(waitTime);
+                        lock.wait(Math.min(waitTime, DEAD_LOCK_CHECK_INTERVAL));
                     } catch (InterruptedException e) {
+                        if (interruptable) {
+                            throw e;
+                        }
                     }
 
                     if (ready) {
@@ -151,6 +153,28 @@ public class DefaultIoFuture implements IoFuture {
                 }
             } finally {
                 waiters--;
+                if (!ready) {
+                    checkDeadLock();
+                }
+            }
+        }
+    }
+    
+    private void checkDeadLock() {
+        IllegalStateException e = new IllegalStateException(
+                "DEAD LOCK: " + IoFuture.class.getSimpleName() +
+                ".await() was invoked from an I/O processor thread.  " +
+                "Please use " + IoFutureListener.class.getSimpleName() +
+                " or configure a proper thread model alternatively.");
+
+        for (StackTraceElement s: e.getStackTrace()) {
+            try {
+                Class<?> cls = DefaultIoFuture.class.getClassLoader().loadClass(s.getClassName());
+                if (IoProcessor.class.isAssignableFrom(cls)) {
+                    throw e;
+                }
+            } catch (ClassNotFoundException cnfe) {
+                // Ignore
             }
         }
     }
