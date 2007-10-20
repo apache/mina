@@ -113,6 +113,11 @@
         <artifactId>mina-integration-spring</artifactId>
         <version>${pom.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-statemachine</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
 
       <!-- Transport -->
       <dependency>
@@ -162,6 +167,13 @@
         </exclusions>
       </dependency>
 
+      <!-- State Machine -->
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.1</version>
+      </dependency>
+
       <!-- Logging -->
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -199,6 +211,11 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymockclassextension</artifactId>
         <version>2.2.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.agical.rmock</groupId>
+        <artifactId>rmock</artifactId>
+        <version>2.0.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -242,6 +259,11 @@
       <artifactId>easymockclassextension</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.agical.rmock</groupId>
+      <artifactId>rmock</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <modules>
@@ -257,6 +279,7 @@
     -->
     <module>integration-jmx</module>
     <module>integration-spring</module>
+    <module>statemachine</module>
     <module>example</module>
   </modules>
   
