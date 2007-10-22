@@ -92,12 +92,13 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
             long now = System.currentTimeMillis();
 
             if (clients.containsKey(addr.getAddress().getHostAddress())) {
-
-                clients.put(addr.getAddress().getHostAddress(), now);
+                
                 IoSessionLogger.info(session, "This is not a new client");
                 Long lastConnTime = clients.get(addr.getAddress()
                         .getHostAddress());
 
+                clients.put(addr.getAddress().getHostAddress(), now);
+                
                 // if the interval between now and the last connection is
                 // less than the allowed interval, return false
                 if (now - lastConnTime < allowedInterval) {
