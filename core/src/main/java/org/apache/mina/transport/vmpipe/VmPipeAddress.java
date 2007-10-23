@@ -24,7 +24,6 @@ import java.net.SocketAddress;
 /**
  * A {@link SocketAddress} which represents in-VM pipe port number.
  *
- * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

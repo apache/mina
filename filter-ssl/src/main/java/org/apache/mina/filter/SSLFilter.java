@@ -74,7 +74,6 @@ import org.apache.mina.util.SessionLog;
  * }
  * </pre>
  *
- * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

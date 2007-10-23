@@ -47,7 +47,6 @@ import org.apache.mina.util.NewThreadExecutor;
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
  *
- * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */

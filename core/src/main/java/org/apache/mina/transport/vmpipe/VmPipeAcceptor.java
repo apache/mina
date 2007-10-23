@@ -37,7 +37,6 @@ import org.apache.mina.transport.vmpipe.support.VmPipe;
  * Binds the specified {@link IoHandler} to the specified
  * {@link VmPipeAddress}.
  *
- * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */

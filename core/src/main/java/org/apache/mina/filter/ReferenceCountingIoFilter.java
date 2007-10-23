@@ -28,7 +28,6 @@ import org.apache.mina.common.IoSession;
  * An {@link IoFilter}s wrapper that keeps track of the number of usages of this filter and will call init/destroy
  * when the filter is not in use.
  *
- * @org.apache.xbean.XBean
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
