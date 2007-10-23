@@ -22,6 +22,9 @@ package org.apache.mina.filter.logging;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.EnumSet;
 
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterEvent;
@@ -35,7 +38,7 @@ import org.slf4j.MDC;
  * These properties will be set in the MDC for all logging events that are generated
  * down the call stack, even in code that is not aware of MINA.
  *
- * The following properties will be set for all transports:
+ * By default, the following properties will be set for all transports:
  * <ul>
  *  <li>"handlerClass"</li>
  *  <li>"remoteAddress"</li>
@@ -66,8 +69,15 @@ import org.slf4j.MDC;
 
 public class MdcInjectionFilter extends WrappingFilter {
 
+    public enum MdcKey {
+        handlerClass, remoteAddress, localAddress,
+        remoteIp, remotePort, localIp, localPort }
+
     /** key used for storing the context map in the IoSession */
     private static final AttributeKey CONTEXT_KEY = new AttributeKey(MdcInjectionFilter.class, "context");
+
+    /** key used for storing the mDCInjectionFilter  itself in the IoSession */
+    private static final AttributeKey MDC_FILTER_KEY = new AttributeKey(MdcInjectionFilter.class, "mdcFilter");
 
     private ThreadLocal<Integer> callDepth = new ThreadLocal<Integer>() {
         @Override
@@ -76,12 +86,50 @@ public class MdcInjectionFilter extends WrappingFilter {
         }
     };
 
+    private EnumSet<MdcKey> mdcKeys;
+
+    /**
+     * Use this constructor when you want to specify which keys to add to the MDC.
+     * You could still add custom keys via <code>setproperty</code>
+     * @param keys set of keys that should be added to the MDC
+     *
+     * @see #setProperty(org.apache.mina.common.IoSession, String, String)
+     */
+    public MdcInjectionFilter(EnumSet<MdcKey> keys) {
+        this.mdcKeys = keys;
+    }
+
+    /**
+     * Use this constructor when you want to specify which keys to add to the MDC
+     * You could still add custom keys via <code>setProperty</code>
+     * @param keys list of keys that should be added to the MDC
+     *
+     * @see #setProperty(org.apache.mina.common.IoSession, String, String)
+     */
+    public MdcInjectionFilter(MdcKey... keys) {
+        Set<MdcKey> keySet = new HashSet<MdcKey>();
+        for (MdcKey key : keys) {
+            keySet.add(key);
+        }
+        this.mdcKeys = EnumSet.copyOf(keySet);        
+    }
+
+
+    public MdcInjectionFilter() {
+      this.mdcKeys = EnumSet.allOf(MdcKey.class);
+    }
+
     @Override
     protected void filter(IoFilterEvent event) throws Exception {
         // since this method can potentially call into itself
         // we need to check the call depth before clearing the MDC
         callDepth.set (callDepth.get() + 1);
-        Context context = getContext(event.getSession());
+        Context context = getAndFillContext(event.getSession());
+
+        if (event.getSession().getAttribute(MDC_FILTER_KEY) == null) {
+          event.getSession().setAttribute(MDC_FILTER_KEY, this);  
+        }
+
         /* copy context to the MDC */
         for (Map.Entry<String,String> e : context.entrySet()) {
             MDC.put(e.getKey(), e.getValue());
@@ -101,12 +149,18 @@ public class MdcInjectionFilter extends WrappingFilter {
         }
     }
 
+    private Context getAndFillContext(final IoSession session) {
+        Context context = getContext(session);
+        if (context.isEmpty()) {
+            fillContext(session, context);
+        }
+        return context;
+    }
 
     private static Context getContext(final IoSession session) {
         Context context = (Context) session.getAttribute(CONTEXT_KEY);
         if (context == null) {
             context = new Context();
-            fillContext(session, context);
             session.setAttribute(CONTEXT_KEY, context);
         }
         return context;
@@ -118,17 +172,31 @@ public class MdcInjectionFilter extends WrappingFilter {
      * @param session the session to map
      * @param context key properties will be added to this map
      */
-    protected static void fillContext(final IoSession session, final Context context) {
-        context.put("handlerClass", session.getHandler().getClass().getName());
-        context.put("remoteAddress", session.getRemoteAddress().toString());
-        context.put("localAddress", session.getLocalAddress().toString());
+    protected void fillContext(final IoSession session, final Context context) {
+        if (mdcKeys.contains(MdcKey.handlerClass)) {
+            context.put(MdcKey.handlerClass.name(), session.getHandler().getClass().getName());
+        }
+        if (mdcKeys.contains(MdcKey.remoteAddress)) {
+            context.put(MdcKey.remoteAddress.name(), session.getRemoteAddress().toString());
+        }
+        if (mdcKeys.contains(MdcKey.localAddress)) {
+            context.put(MdcKey.localAddress.name(), session.getLocalAddress().toString());
+        }
         if (session.getTransportMetadata().getAddressType() == InetSocketAddress.class) {
             InetSocketAddress remoteAddress = (InetSocketAddress) session.getRemoteAddress();
             InetSocketAddress localAddress  = (InetSocketAddress) session.getLocalAddress();
-            context.put("remoteIp", remoteAddress.getAddress().getHostAddress());
-            context.put("remotePort", String.valueOf(remoteAddress.getPort()));
-            context.put("localIp", localAddress.getAddress().getHostAddress());
-            context.put("localPort", String.valueOf(localAddress.getPort()));
+            if (mdcKeys.contains(MdcKey.remoteIp)) {
+                context.put(MdcKey.remoteIp.name(), remoteAddress.getAddress().getHostAddress());
+            }
+            if (mdcKeys.contains(MdcKey.remotePort)) {
+                context.put(MdcKey.remotePort.name(), String.valueOf(remoteAddress.getPort()));
+            }
+            if (mdcKeys.contains(MdcKey.localIp)) {
+                context.put(MdcKey.localIp.name(), localAddress.getAddress().getHostAddress());
+            }
+            if (mdcKeys.contains(MdcKey.localPort)) {
+                context.put(MdcKey.localPort.name(), String.valueOf(localAddress.getPort()));
+            }
         }
     }
 
@@ -162,6 +230,11 @@ public class MdcInjectionFilter extends WrappingFilter {
 
     private static class Context extends HashMap<String,String> {
         private static final long serialVersionUID = -673025693009555560L;
+    }
+
+    public static void main(String[] args) {
+        String s = MdcKey.handlerClass.name();
+        System.out.println("s = " + s);
     }
 
 }

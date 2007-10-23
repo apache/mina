@@ -40,7 +40,9 @@
     <property name="filters">
       <list>
         <bean class="org.apache.mina.filter.executor.ExecutorFilter"/>
-        <bean class="org.apache.mina.filter.logging.MdcInjectionFilter"/>
+        <bean class="org.apache.mina.filter.logging.MdcInjectionFilter">
+            <constructor-arg value="remoteAddress"/>
+        </bean>
         <bean class="org.apache.mina.filter.codec.ProtocolCodecFilter">
           <constructor-arg>
             <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />

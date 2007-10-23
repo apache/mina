@@ -32,13 +32,7 @@ import junit.framework.TestCase;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.DefaultIoFilterChainBuilder;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.*;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.ProtocolDecoder;
@@ -148,6 +142,44 @@ public class MdcInjectionFilterTest extends TestCase {
         chain.addLast("executor2" , new ExecutorFilter());
         chain.addLast("mdc-injector2", mdcInjectionFilter);
         test(chain);
+    }
+
+    public void testOnlyRemoteAddress() throws IOException, InterruptedException {
+        DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
+        chain.addFirst("mdc-injector", new MdcInjectionFilter(
+            MdcInjectionFilter.MdcKey.remoteAddress));
+        chain.addLast("dummy", new DummyIoFilter());
+        chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
+        SimpleIoHandler simpleIoHandler = new SimpleIoHandler();
+        acceptor.setHandler(simpleIoHandler);
+        acceptor.setLocalAddress(new InetSocketAddress(PORT));
+        acceptor.bind();
+        acceptor.setFilterChainBuilder(chain);
+        // create some clients
+        NioSocketConnector connector = new NioSocketConnector();
+        connector.setHandler(new IoHandlerAdapter());
+        SocketAddress remoteAddressClients[] = new SocketAddress[2];
+        remoteAddressClients[0] = connectAndWrite(connector,0);
+        remoteAddressClients[1] = connectAndWrite(connector,1);
+        // wait until Iohandler has received all events
+        simpleIoHandler.messageSentLatch.await();
+        simpleIoHandler.sessionIdleLatch.await();
+        simpleIoHandler.sessionClosedLatch.await();
+        // make a copy to prevent ConcurrentModificationException
+        List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
+        // verify that all logging events have correct MDC
+        for (LoggingEvent event : events) {
+            for (MdcInjectionFilter.MdcKey mdcKey : MdcInjectionFilter.MdcKey.values()) {
+              String key = mdcKey.name();
+              Object value = event.getMDC(key);
+              if (mdcKey == MdcInjectionFilter.MdcKey.remoteAddress) {
+                  assertNotNull(
+                      "MDC[remoteAddress] not set for [" + event.getMessage() + "]", value);
+              } else {
+                  assertNull("MDC[" + key + "] set for [" + event.getMessage() + "]", value);
+              }
+            }
+        }
     }
 
     private void test(DefaultIoFilterChainBuilder chain) throws IOException, InterruptedException {
