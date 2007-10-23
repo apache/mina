@@ -1,7 +1,8 @@
 package org.apache.mina.filter.keepalive;
 
-import org.apache.log4j.Logger;
 import org.apache.mina.common.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A protocol level filter which filters keepalive messages and sends
@@ -12,7 +13,7 @@ import org.apache.mina.common.IoSession;
  * @version $Rev$, $Date$
  */
 public class PassiveKeepAliveFilter extends AbstractKeepAliveFilter {
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * @see AbstractKeepAliveFilter#AbstractKeepAliveFilter()

@@ -3,8 +3,9 @@ package org.apache.mina.filter.keepalive;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
 import org.apache.mina.common.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A protocol level filter which will send keepalive messages
@@ -21,7 +22,7 @@ import org.apache.mina.common.IoSession;
  * @see org.apache.mina.handler.chain.ChainedIoHandler
  */
 public class ActiveKeepAliveFilter extends AbstractKeepAliveFilter {
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final IoSession session;
 
