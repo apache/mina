@@ -19,7 +19,7 @@
  */
 package org.apache.mina.common;
 
-import org.apache.mina.filter.util.ReferenceCountingIoFilter;
+import org.apache.mina.filter.util.ReferenceCountingFilter;
 
 /**
  * A filter which intercepts {@link IoHandler} events like Servlet
@@ -42,7 +42,7 @@ import org.apache.mina.filter.util.ReferenceCountingIoFilter;
  * <p>
  * When you add an {@link IoFilter} to an {@link IoFilterChain}:
  * <ol>
- *   <li>{@link #init()} is invoked by {@link ReferenceCountingIoFilter} if
+ *   <li>{@link #init()} is invoked by {@link ReferenceCountingFilter} if
  *       the filter is added at the first time.</li>
  *   <li>{@link #onPreAdd(IoFilterChain, String, NextFilter)} is invoked to notify
  *       that the filter will be added to the chain.</li>
@@ -52,7 +52,7 @@ import org.apache.mina.filter.util.ReferenceCountingIoFilter;
  *       that the filter is added to the chain.</li>
  *   <li>The filter is removed from the chain if {@link #onPostAdd(IoFilterChain, String, org.apache.mina.common.IoFilter.NextFilter)}
  *       threw an exception.  {@link #destroy()} is also invoked by
- *       {@link ReferenceCountingIoFilter} if the filter is the last filter which
+ *       {@link ReferenceCountingFilter} if the filter is the last filter which
  *       was added to {@link IoFilterChain}s.</li>
  * </ol>
  * <p>
@@ -64,7 +64,7 @@ import org.apache.mina.filter.util.ReferenceCountingIoFilter;
  *       don't pass through the filter from now.</li>
  *   <li>{@link #onPostRemove(IoFilterChain, String, NextFilter)} is invoked to
  *       notify that the filter is removed from the chain.</li>
- *   <li>{@link #destroy()} is invoked by {@link ReferenceCountingIoFilter} if
+ *   <li>{@link #destroy()} is invoked by {@link ReferenceCountingFilter} if
  *       the removed filter was the last one.</li>
  * </ol>
  *
@@ -75,18 +75,18 @@ import org.apache.mina.filter.util.ReferenceCountingIoFilter;
  */
 public interface IoFilter {
     /**
-     * Invoked by {@link ReferenceCountingIoFilter} when this filter
+     * Invoked by {@link ReferenceCountingFilter} when this filter
      * is added to a {@link IoFilterChain} at the first time, so you can
      * initialize shared resources.  Please note that this method is never
-     * called if you don't wrap a filter with {@link ReferenceCountingIoFilter}.
+     * called if you don't wrap a filter with {@link ReferenceCountingFilter}.
      */
     void init() throws Exception;
 
     /**
-     * Invoked by {@link ReferenceCountingIoFilter} when this filter
+     * Invoked by {@link ReferenceCountingFilter} when this filter
      * is not used by any {@link IoFilterChain} anymore, so you can destroy
      * shared resources.  Please note that this method is never called if
-     * you don't wrap a filter with {@link ReferenceCountingIoFilter}.
+     * you don't wrap a filter with {@link ReferenceCountingFilter}.
      */
     void destroy() throws Exception;
 

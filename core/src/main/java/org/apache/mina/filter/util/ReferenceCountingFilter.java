@@ -32,12 +32,12 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ReferenceCountingIoFilter implements IoFilter {
+public class ReferenceCountingFilter implements IoFilter {
     private final IoFilter filter;
 
     private int count = 0;
 
-    public ReferenceCountingIoFilter(IoFilter filter) {
+    public ReferenceCountingFilter(IoFilter filter) {
         this.filter = filter;
     }
 
