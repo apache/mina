@@ -179,7 +179,7 @@ public class SocketAcceptor extends BaseIoAcceptor {
                 selector = Selector.open();
                 worker = new Worker();
 
-                executor.execute(new NamePreservingRunnable(worker));
+                executor.execute(new NamePreservingRunnable(worker, threadName));
             }
         }
     }
@@ -237,8 +237,6 @@ public class SocketAcceptor extends BaseIoAcceptor {
 
     private class Worker implements Runnable {
         public void run() {
-            Thread.currentThread().setName(SocketAcceptor.this.threadName);
-
             Selector selector = getSelector();
             for (;;) {
                 try {

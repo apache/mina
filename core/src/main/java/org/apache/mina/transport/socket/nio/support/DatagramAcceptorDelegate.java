@@ -282,7 +282,8 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
         if (worker == null) {
             selector = Selector.open();
             worker = new Worker();
-            executor.execute(new NamePreservingRunnable(worker));
+            executor.execute(
+                    new NamePreservingRunnable(worker, "DatagramAcceptor-" + id));
         }
     }
 
@@ -311,8 +312,6 @@ public class DatagramAcceptorDelegate extends BaseIoAcceptor implements
 
     private class Worker implements Runnable {
         public void run() {
-            Thread.currentThread().setName("DatagramAcceptor-" + id);
-
             Selector selector = DatagramAcceptorDelegate.this.getSelector();
             for (;;) {
                 try {

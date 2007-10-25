@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.mina.filter.executor.ExecutorFilter;
+import org.apache.mina.util.NamePreservingRunnable;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
@@ -89,9 +90,11 @@ public class ExecutorThreadModel implements ThreadModel {
             private final AtomicInteger threadId = new AtomicInteger(0);
 
             public Thread newThread(Runnable runnable) {
-                Thread t = originalThreadFactory.newThread(runnable);
-                t.setName(ExecutorThreadModel.this.threadNamePrefix + '-'
-                        + threadId.incrementAndGet());
+                Thread t = originalThreadFactory.newThread(
+                        new NamePreservingRunnable(
+                                runnable, 
+                                ExecutorThreadModel.this.threadNamePrefix + '-' +
+                                threadId.incrementAndGet()));
                 t.setDaemon(true);
                 return t;
             }
