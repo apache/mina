@@ -232,7 +232,7 @@ public class SocketConnector extends BaseIoConnector {
             if (worker == null) {
                 selector = Selector.open();
                 worker = new Worker();
-                executor.execute(new NamePreservingRunnable(worker));
+                executor.execute(new NamePreservingRunnable(worker, threadName));
             }
         }
     }
@@ -351,8 +351,6 @@ public class SocketConnector extends BaseIoConnector {
         private long lastActive = System.currentTimeMillis();
 
         public void run() {
-            Thread.currentThread().setName(SocketConnector.this.threadName);
-
             Selector selector = SocketConnector.this.selector;
             for (;;) {
                 try {

@@ -82,7 +82,7 @@ class SocketIoProcessor {
             if (worker == null) {
                 selector = Selector.open();
                 worker = new Worker();
-                executor.execute(new NamePreservingRunnable(worker));
+                executor.execute(new NamePreservingRunnable(worker, threadName));
             }
             selector.wakeup();
         }
@@ -453,8 +453,6 @@ class SocketIoProcessor {
 
     private class Worker implements Runnable {
         public void run() {
-            Thread.currentThread().setName(SocketIoProcessor.this.threadName);
-
             Selector selector = SocketIoProcessor.this.selector;
             for (;;) {
                 try {

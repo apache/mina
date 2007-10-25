@@ -27,6 +27,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.filter.executor.ExecutorFilter;
+import org.apache.mina.util.NamePreservingRunnable;
 
 /**
  * A {@link ThreadModel} which represents a thread model with an {@link Executor}
@@ -87,9 +88,11 @@ public class ExecutorThreadModel implements ThreadModel {
             private final AtomicInteger threadId = new AtomicInteger(0);
 
             public Thread newThread(Runnable runnable) {
-                Thread t = originalThreadFactory.newThread(runnable);
-                t.setName(ExecutorThreadModel.this.threadNamePrefix + '-'
-                        + threadId.incrementAndGet());
+                Thread t = originalThreadFactory.newThread(
+                        new NamePreservingRunnable(
+                                runnable, 
+                                ExecutorThreadModel.this.threadNamePrefix + '-' +
+                                threadId.incrementAndGet()));
                 t.setDaemon(true);
                 return t;
             }

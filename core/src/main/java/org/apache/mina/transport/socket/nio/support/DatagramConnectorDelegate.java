@@ -200,7 +200,8 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
             if (worker == null) {
                 selector = Selector.open();
                 worker = new Worker();
-                executor.execute(new NamePreservingRunnable(worker));
+                executor.execute(
+                        new NamePreservingRunnable(worker, "DatagramConnector-" + id));
             }
         }
     }
@@ -292,8 +293,6 @@ public class DatagramConnectorDelegate extends BaseIoConnector implements
 
     private class Worker implements Runnable {
         public void run() {
-            Thread.currentThread().setName("DatagramConnector-" + id);
-
             Selector selector = DatagramConnectorDelegate.this.selector;
             for (;;) {
                 try {
