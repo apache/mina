@@ -70,14 +70,12 @@ import org.slf4j.MDC;
 public class MdcInjectionFilter extends WrappingFilter {
 
     public enum MdcKey {
-        handlerClass, remoteAddress, localAddress,
-        remoteIp, remotePort, localIp, localPort }
+        handlerClass, remoteAddress, localAddress, remoteIp, remotePort, localIp, localPort
+    }
 
     /** key used for storing the context map in the IoSession */
-    private static final AttributeKey CONTEXT_KEY = new AttributeKey(MdcInjectionFilter.class, "context");
-
-    /** key used for storing the mDCInjectionFilter  itself in the IoSession */
-    private static final AttributeKey MDC_FILTER_KEY = new AttributeKey(MdcInjectionFilter.class, "mdcFilter");
+    private static final AttributeKey CONTEXT_KEY = new AttributeKey(
+            MdcInjectionFilter.class, "context");
 
     private ThreadLocal<Integer> callDepth = new ThreadLocal<Integer>() {
         @Override
@@ -90,7 +88,7 @@ public class MdcInjectionFilter extends WrappingFilter {
 
     /**
      * Use this constructor when you want to specify which keys to add to the MDC.
-     * You could still add custom keys via <code>setproperty</code>
+     * You could still add custom keys via {@link #setProperty(IoSession, String, String)}
      * @param keys set of keys that should be added to the MDC
      *
      * @see #setProperty(org.apache.mina.common.IoSession, String, String)
@@ -101,7 +99,7 @@ public class MdcInjectionFilter extends WrappingFilter {
 
     /**
      * Use this constructor when you want to specify which keys to add to the MDC
-     * You could still add custom keys via <code>setProperty</code>
+     * You could still add custom keys via {@link #setProperty(IoSession, String, String)}
      * @param keys list of keys that should be added to the MDC
      *
      * @see #setProperty(org.apache.mina.common.IoSession, String, String)
@@ -111,56 +109,57 @@ public class MdcInjectionFilter extends WrappingFilter {
         for (MdcKey key : keys) {
             keySet.add(key);
         }
-        this.mdcKeys = EnumSet.copyOf(keySet);        
+        this.mdcKeys = EnumSet.copyOf(keySet);
     }
 
-
     public MdcInjectionFilter() {
-      this.mdcKeys = EnumSet.allOf(MdcKey.class);
+        this.mdcKeys = EnumSet.allOf(MdcKey.class);
     }
 
     @Override
     protected void filter(IoFilterEvent event) throws Exception {
         // since this method can potentially call into itself
         // we need to check the call depth before clearing the MDC
-        callDepth.set (callDepth.get() + 1);
-        Context context = getAndFillContext(event.getSession());
+        int currentCallDepth = callDepth.get();
+        callDepth.set(currentCallDepth + 1);
+        Map<String, String> context = getAndFillContext(event.getSession());
 
-        if (event.getSession().getAttribute(MDC_FILTER_KEY) == null) {
-          event.getSession().setAttribute(MDC_FILTER_KEY, this);  
+        if (currentCallDepth == 0) {
+            /* copy context to the MDC when necessary. */
+            for (Map.Entry<String, String> e : context.entrySet()) {
+                MDC.put(e.getKey(), e.getValue());
+            }
         }
-
-        /* copy context to the MDC */
-        for (Map.Entry<String,String> e : context.entrySet()) {
-            MDC.put(e.getKey(), e.getValue());
-        }
+        
         try {
             /* propagate event down the filter chain */
             event.fire();
         } finally {
-            callDepth.set (callDepth.get() - 1);
-            if (callDepth.get() == 0) {
+            if (currentCallDepth == 0) {
                 /* remove context from the MDC */
                 for (String key : context.keySet()) {
                     MDC.remove(key);
                 }
                 callDepth.remove();
+            } else {
+                callDepth.set(currentCallDepth);
             }
         }
     }
 
-    private Context getAndFillContext(final IoSession session) {
-        Context context = getContext(session);
+    private Map<String, String> getAndFillContext(final IoSession session) {
+        Map<String, String> context = getContext(session);
         if (context.isEmpty()) {
             fillContext(session, context);
         }
         return context;
     }
 
-    private static Context getContext(final IoSession session) {
-        Context context = (Context) session.getAttribute(CONTEXT_KEY);
+    @SuppressWarnings("unchecked")
+    private static Map<String, String> getContext(final IoSession session) {
+        Map<String, String> context = (Map<String, String>) session.getAttribute(CONTEXT_KEY);
         if (context == null) {
-            context = new Context();
+            context = new HashMap<String, String>();
             session.setAttribute(CONTEXT_KEY, context);
         }
         return context;
@@ -172,33 +171,57 @@ public class MdcInjectionFilter extends WrappingFilter {
      * @param session the session to map
      * @param context key properties will be added to this map
      */
-    protected void fillContext(final IoSession session, final Context context) {
+    protected void fillContext(final IoSession session, final Map<String, String> context) {
         if (mdcKeys.contains(MdcKey.handlerClass)) {
-            context.put(MdcKey.handlerClass.name(), session.getHandler().getClass().getName());
+            context.put(MdcKey.handlerClass.name(), session.getHandler()
+                    .getClass().getName());
         }
         if (mdcKeys.contains(MdcKey.remoteAddress)) {
-            context.put(MdcKey.remoteAddress.name(), session.getRemoteAddress().toString());
+            context.put(MdcKey.remoteAddress.name(), session.getRemoteAddress()
+                    .toString());
         }
         if (mdcKeys.contains(MdcKey.localAddress)) {
-            context.put(MdcKey.localAddress.name(), session.getLocalAddress().toString());
+            context.put(MdcKey.localAddress.name(), session.getLocalAddress()
+                    .toString());
         }
         if (session.getTransportMetadata().getAddressType() == InetSocketAddress.class) {
-            InetSocketAddress remoteAddress = (InetSocketAddress) session.getRemoteAddress();
-            InetSocketAddress localAddress  = (InetSocketAddress) session.getLocalAddress();
+            InetSocketAddress remoteAddress = (InetSocketAddress) session
+                    .getRemoteAddress();
+            InetSocketAddress localAddress = (InetSocketAddress) session
+                    .getLocalAddress();
             if (mdcKeys.contains(MdcKey.remoteIp)) {
-                context.put(MdcKey.remoteIp.name(), remoteAddress.getAddress().getHostAddress());
+                context.put(MdcKey.remoteIp.name(), remoteAddress.getAddress()
+                        .getHostAddress());
             }
             if (mdcKeys.contains(MdcKey.remotePort)) {
-                context.put(MdcKey.remotePort.name(), String.valueOf(remoteAddress.getPort()));
+                context.put(MdcKey.remotePort.name(), String
+                        .valueOf(remoteAddress.getPort()));
             }
             if (mdcKeys.contains(MdcKey.localIp)) {
-                context.put(MdcKey.localIp.name(), localAddress.getAddress().getHostAddress());
+                context.put(MdcKey.localIp.name(), localAddress.getAddress()
+                        .getHostAddress());
             }
             if (mdcKeys.contains(MdcKey.localPort)) {
-                context.put(MdcKey.localPort.name(), String.valueOf(localAddress.getPort()));
+                context.put(MdcKey.localPort.name(), String
+                        .valueOf(localAddress.getPort()));
             }
         }
     }
+
+    public static String getProperty(IoSession session, String key) {
+        if (key == null) {
+            throw new NullPointerException("key should not be null");
+        }
+
+        Map<String, String> context = getContext(session);
+        String answer = context.get(key);
+        if (answer != null) {
+            return answer;
+        }
+        
+        return MDC.get(key);
+    }
+
 
     /**
      * Add a property to the context for the given session
@@ -207,34 +230,24 @@ public class MdcInjectionFilter extends WrappingFilter {
      * @param key  The name of the property (should not be null)
      * @param value The value of the property
      */
-    public static void setProperty (IoSession session, String key, String value) {
-      if (key == null) {
-        throw new NullPointerException("key should not be null");
-      }
-      if (value == null) {
-        removeProperty(session, key);
-      }
-      Context context = getContext(session);
-      context.put(key, value);
-      MDC.put(key, value);
+    public static void setProperty(IoSession session, String key, String value) {
+        if (key == null) {
+            throw new NullPointerException("key should not be null");
+        }
+        if (value == null) {
+            removeProperty(session, key);
+        }
+        Map<String, String> context = getContext(session);
+        context.put(key, value);
+        MDC.put(key, value);
     }
 
     public static void removeProperty(IoSession session, String key) {
-      if (key == null) {
-        throw new NullPointerException("key should not be null");
-      }
-      Context context = getContext(session);
-      context.remove(key);
-      MDC.remove(key);
+        if (key == null) {
+            throw new NullPointerException("key should not be null");
+        }
+        Map<String, String> context = getContext(session);
+        context.remove(key);
+        MDC.remove(key);
     }
-
-    private static class Context extends HashMap<String,String> {
-        private static final long serialVersionUID = -673025693009555560L;
-    }
-
-    public static void main(String[] args) {
-        String s = MdcKey.handlerClass.name();
-        System.out.println("s = " + s);
-    }
-
 }
