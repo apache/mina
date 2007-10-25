@@ -20,6 +20,7 @@
 package org.apache.mina.filter.util;
 
 import org.apache.mina.common.IoEventType;
+import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
@@ -28,7 +29,7 @@ import org.apache.mina.common.WriteRequestWrapper;
 /**
  * An abstract {@link IoFilter} that simplifies the implementation of
  * an {@link IoFilter} that filters an {@link IoEventType#WRITE} event.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
@@ -64,25 +65,25 @@ public abstract class WriteRequestFilter extends IoFilterAdapter {
                 return;
             }
         }
-        
+
         nextFilter.messageSent(session, writeRequest);
     }
-    
+
     protected abstract Object doFilterWrite(
             NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception;
 
     private class FilteredWriteRequest extends WriteRequestWrapper {
         private final Object filteredMessage;
-        
+
         public FilteredWriteRequest(Object filteredMessage, WriteRequest writeRequest) {
             super(writeRequest);
-            
+
             if (filteredMessage == null) {
                 throw new NullPointerException("filteredMessage");
             }
             this.filteredMessage = filteredMessage;
         }
-        
+
         public WriteRequestFilter getParent() {
             return WriteRequestFilter.this;
         }

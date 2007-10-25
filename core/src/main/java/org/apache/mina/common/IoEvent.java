@@ -57,7 +57,7 @@ public class IoEvent {
     public Object getParameter() {
         return parameter;
     }
-    
+
     public void fire() {
         switch (getType()) {
         case MESSAGE_RECEIVED:

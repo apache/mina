@@ -24,10 +24,10 @@ import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.FileRegion;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;

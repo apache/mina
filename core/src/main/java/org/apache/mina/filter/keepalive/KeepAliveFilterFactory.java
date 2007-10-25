@@ -8,10 +8,10 @@ import org.apache.mina.common.IoSession;
  * A factory that creates protocol level filters, that implement
  * a simple keepalive routine for the connection. The factory has
  * "settings" so it is not safe to be used by concurrent threads.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
+ *
  * @see org.apache.mina.handler.chain.ChainedIoHandler
  */
 public class KeepAliveFilterFactory {
@@ -47,19 +47,22 @@ public class KeepAliveFilterFactory {
     }
 
     public void setScheduler(ScheduledExecutorService scheduler) {
-        if (scheduler != null)
+        if (scheduler != null) {
             this.scheduler = scheduler;
+        }
     }
 
     public void setPingMessage(Object pingMessage) {
-        if (this.pingMessage != pingMessage)
+        if (this.pingMessage != pingMessage) {
             cache = null;
+        }
         this.pingMessage = pingMessage;
     }
 
     public void setPongMessage(Object pongMessage) {
-        if (this.pongMessage != pongMessage)
+        if (this.pongMessage != pongMessage) {
             cache = null;
+        }
         this.pongMessage = pongMessage;
     }
 
@@ -75,7 +78,7 @@ public class KeepAliveFilterFactory {
      * Creates a new ActiveKeepAliveFilter for the IoSession
      * <code>session</code>.
      * @param session Iosession of the connection.
-     * @return new ActiveKeepAliveFilter for <code>session</code>. 
+     * @return new ActiveKeepAliveFilter for <code>session</code>.
      */
     public ActiveKeepAliveFilter createActiveKeepAliveFilter(IoSession session) {
         return new ActiveKeepAliveFilter(session, scheduler, pingingInterval,
@@ -86,8 +89,9 @@ public class KeepAliveFilterFactory {
      * @return a PassiveKeepAliveFilter.
      */
     public PassiveKeepAliveFilter createPassiveKeepAliveFilter() {
-        if (cache == null)
+        if (cache == null) {
             cache = new PassiveKeepAliveFilter(pingMessage, pongMessage);
+        }
         return cache;
     }
 }

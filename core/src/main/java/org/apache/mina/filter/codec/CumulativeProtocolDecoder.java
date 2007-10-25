@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.AttributeKey;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 
 /**

@@ -28,9 +28,9 @@ package org.apache.mina.common;
  */
 public class DefaultConnectFuture extends DefaultIoFuture implements
         ConnectFuture {
-    
+
     private static final Object CANCELED = new Object();
-    
+
     /**
      * Returns a new {@link ConnectFuture} which is already marked as 'failed to connect'.
      */
@@ -74,7 +74,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
     public boolean isConnected() {
         return getValue() instanceof IoSession;
     }
-    
+
     public boolean isCanceled() {
         return getValue() == CANCELED;
     }
@@ -86,7 +86,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
     public void setException(Throwable exception) {
         setValue(exception);
     }
-    
+
     public void cancel() {
         setValue(CANCELED);
     }

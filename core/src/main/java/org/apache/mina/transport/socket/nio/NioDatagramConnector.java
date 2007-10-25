@@ -72,7 +72,7 @@ public class NioDatagramConnector extends AbstractIoConnector implements Datagra
      */
     public NioDatagramConnector(int processorCount, Executor executor) {
         super(new DefaultDatagramSessionConfig());
-        
+
         if (processorCount < 1) {
             throw new IllegalArgumentException(
                     "Must have at least one processor");
@@ -116,7 +116,7 @@ public class NioDatagramConnector extends AbstractIoConnector implements Datagra
             ch.socket().setReuseAddress(getSessionConfig().isReuseAddress());
             ch.socket().setReuseAddress(true);
             ch.socket().setBroadcast(getSessionConfig().isBroadcast());
-            
+
             if (localAddress != null) {
                 ch.socket().bind(localAddress);
             }

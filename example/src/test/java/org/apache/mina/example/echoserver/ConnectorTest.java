@@ -193,7 +193,7 @@ public class ConnectorTest extends AbstractTest {
         //// in SocketIoProcessor if there was a read timeout because
         //// we share readBuf.
         readBuf.flip();
-        IoSessionLogger.info(session, "readBuf: " + readBuf);
+        IoSessionLogger.getLogger(session).info("readBuf: " + readBuf);
         Assert.assertEquals(DATA_SIZE * COUNT, readBuf.remaining());
         IoBuffer expectedBuf = IoBuffer.allocate(DATA_SIZE * COUNT);
         for (int i = 0; i < COUNT; i++) {

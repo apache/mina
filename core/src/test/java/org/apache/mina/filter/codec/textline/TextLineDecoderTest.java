@@ -246,7 +246,7 @@ public class TextLineDecoderTest extends TestCase {
         Assert.assertEquals("PQR\rX", session.getDecoderOutputQueue().poll());
         Assert.assertEquals("STU", session.getDecoderOutputQueue().poll());
     }
-    
+
     public void testOverflow() throws Exception {
         TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"),
                 LineDelimiter.AUTO);
@@ -268,7 +268,7 @@ public class TextLineDecoderTest extends TestCase {
         Assert.assertEquals(0, session.getDecoderOutputQueue().size());
         decoder.decode(session, in.reset().mark(), out);
         Assert.assertEquals(0, session.getDecoderOutputQueue().size());
-        
+
         in.clear().putString("A\r\nB\r\n", encoder).flip();
         try {
             decoder.decode(session, in, out);
@@ -289,7 +289,7 @@ public class TextLineDecoderTest extends TestCase {
             Assert.assertEquals(0, session.getDecoderOutputQueue().size());
 
             // Memory consumption should be minimal.
-            Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576); 
+            Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576);
         }
 
         in.clear().putString("C\r\nD\r\n", encoder).flip();
@@ -299,12 +299,12 @@ public class TextLineDecoderTest extends TestCase {
         } catch (BufferDataException e) {
             // Success!
         }
-        
+
         decoder.decode(session, in, out);
         Assert.assertEquals(1, session.getDecoderOutputQueue().size());
         Assert.assertEquals("D", session.getDecoderOutputQueue().poll());
 
         // Memory consumption should be minimal.
-        Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576); 
+        Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576);
     }
 }

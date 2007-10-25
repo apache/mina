@@ -240,9 +240,9 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
             if (key == null) {
                 continue;
             }
-            
+
             key.cancel();
-            
+
             try {
                 ch.close();
             } catch (IOException e) {
@@ -308,9 +308,9 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     private void newSession(SocketChannel ch, ConnectFuture connectFuture) {
         NioSocketSession session = new NioSocketSession(
                 this, nextProcessor(), ch);
-        
+
         finishSessionInitialization(session, connectFuture);
-        
+
         // Forward the remaining process to the SocketIoProcessor.
         session.getProcessor().add(session);
     }
@@ -338,7 +338,7 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
                     }
 
                     processTimedOutSessions(selector.keys());
-                    
+
                     cancelKeys();
 
                     if (selector.keys().isEmpty()) {

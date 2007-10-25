@@ -36,7 +36,7 @@ import org.easymock.MockControl;
 public class IoServiceListenerSupportTest extends TestCase {
     private static final SocketAddress ADDRESS = new InetSocketAddress(8080);
 
-    private final IoService mockService = (IoService) MockControl
+    private final IoService mockService = MockControl
             .createControl(IoService.class).getMock();
 
     public void testServiceLifecycle() throws Exception {

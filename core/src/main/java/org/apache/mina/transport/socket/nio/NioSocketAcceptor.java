@@ -236,8 +236,8 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
 
         if (request.getException() != null) {
             throw request.getException();
-        } 
-        
+        }
+
         // Update the local address.
         // setLocalAddress() shouldn't be called from the worker thread
         // because of deadlock.

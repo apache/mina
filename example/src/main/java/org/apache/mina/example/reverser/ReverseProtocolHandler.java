@@ -32,7 +32,6 @@ import org.apache.mina.common.IoSession;
 public class ReverseProtocolHandler extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        cause.printStackTrace();
         // Close connection when unexpected exception is caught.
         session.close();
     }

@@ -34,7 +34,7 @@ import org.apache.mina.common.IoAcceptor;
 public interface SocketAcceptor extends SocketService, IoAcceptor {
     public InetSocketAddress getLocalAddress();
     public void setLocalAddress(InetSocketAddress localAddress);
-    
+
     /**
      * @see ServerSocket#getReuseAddress()
      */

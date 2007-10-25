@@ -25,9 +25,9 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoEvent;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoProcessor;

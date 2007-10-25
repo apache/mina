@@ -91,7 +91,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements
      */
     protected abstract ConnectFuture doConnect(SocketAddress remoteAddress,
             SocketAddress localAddress);
-    
+
     /**
      * Adds required internal attributes and {@link IoFutureListener}s
      * related with event notifications to the specified {@code session}

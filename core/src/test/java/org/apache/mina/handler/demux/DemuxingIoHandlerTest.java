@@ -77,7 +77,7 @@ public class DemuxingIoHandlerTest extends TestCase {
         handler2 = (MessageHandler) mockHandler2.getMock();
         handler3 = (MessageHandler) mockHandler3.getMock();
 
-        session = (IoSession) MockControl.createControl(IoSession.class)
+        session = MockControl.createControl(IoSession.class)
                 .getMock();
     }
 

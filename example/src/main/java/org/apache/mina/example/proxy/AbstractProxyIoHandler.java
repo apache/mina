@@ -62,6 +62,6 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         wb.flip();
         ((IoSession) session.getAttachment()).write(wb);
         rb.reset();
-        IoSessionLogger.info(session, rb.getString(CHARSET.newDecoder()));
+        IoSessionLogger.getLogger(session).info(rb.getString(CHARSET.newDecoder()));
     }
 }

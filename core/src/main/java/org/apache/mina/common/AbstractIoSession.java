@@ -134,7 +134,7 @@ public abstract class AbstractIoSession implements IoSession {
     private long lastIdleTimeForRead;
 
     private long lastIdleTimeForWrite;
-    
+
     private boolean deferDecreaseReadBuffer = true;
 
     protected AbstractIoSession() {
@@ -170,7 +170,7 @@ public abstract class AbstractIoSession implements IoSession {
             return true;
         }
     }
-    
+
     public CloseFuture close(boolean rightNow) {
         if (rightNow) {
             return close();
@@ -191,7 +191,7 @@ public abstract class AbstractIoSession implements IoSession {
         getFilterChain().fireFilterClose();
         return closeFuture;
     }
-    
+
     public CloseFuture closeOnFlush() {
         getWriteRequestQueue().offer(CLOSE_REQUEST);
         getProcessor().flush(this);
@@ -206,7 +206,7 @@ public abstract class AbstractIoSession implements IoSession {
         if (message == null) {
             throw new NullPointerException("message");
         }
-        
+
         if (!getTransportMetadata().isConnectionless() &&
                 remoteAddress != null) {
             throw new UnsupportedOperationException();
@@ -442,7 +442,7 @@ public abstract class AbstractIoSession implements IoSession {
             lastReadTime = System.currentTimeMillis();
             idleCountForBoth = 0;
             idleCountForRead = 0;
-            
+
             if (getService() instanceof AbstractIoService) {
                 ((AbstractIoService) getService()).increaseReadBytes(increment);
             }
@@ -457,7 +457,7 @@ public abstract class AbstractIoSession implements IoSession {
             idleCountForWrite = 0;
 
             scheduledWriteBytes.addAndGet(-increment);
-            
+
             if (getService() instanceof AbstractIoService) {
                 ((AbstractIoService) getService()).increaseWrittenBytes(increment);
             }
@@ -496,7 +496,7 @@ public abstract class AbstractIoSession implements IoSession {
     protected Queue<WriteRequest> getWriteRequestQueue() {
         return writeRequestQueue;
     }
-    
+
     protected void increaseReadBufferSize() {
         int newReadBufferSize = getConfig().getReadBufferSize() << 1;
         if (newReadBufferSize <= getConfig().getMaxReadBufferSize()) {
@@ -504,16 +504,16 @@ public abstract class AbstractIoSession implements IoSession {
         } else {
             getConfig().setReadBufferSize(getConfig().getMaxReadBufferSize());
         }
-        
+
         deferDecreaseReadBuffer = true;
     }
-    
+
     protected void decreaseReadBufferSize() {
         if (deferDecreaseReadBuffer) {
             deferDecreaseReadBuffer = false;
             return;
         }
-        
+
         if (getConfig().getReadBufferSize() > getConfig().getMinReadBufferSize()) {
             getConfig().setReadBufferSize(getConfig().getReadBufferSize() >>> 1);
         }

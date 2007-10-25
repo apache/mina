@@ -31,9 +31,9 @@ import java.util.concurrent.TimeUnit;
  * @version $Rev$, $Date$
  */
 public class DefaultIoFuture implements IoFuture {
-    
+
     private static final int DEAD_LOCK_CHECK_INTERVAL = 5000;
-    
+
     private final IoSession session;
     private final Object lock;
     private IoFutureListener firstListener;
@@ -159,7 +159,7 @@ public class DefaultIoFuture implements IoFuture {
             }
         }
     }
-    
+
     private void checkDeadLock() {
         IllegalStateException e = new IllegalStateException(
                 "DEAD LOCK: " + IoFuture.class.getSimpleName() +
@@ -168,7 +168,7 @@ public class DefaultIoFuture implements IoFuture {
                 " or configure a proper thread model alternatively.");
 
         StackTraceElement[] stackTrace = e.getStackTrace();
-        
+
         // Simple and quick check.
         for (StackTraceElement s: stackTrace) {
             if (AbstractIoProcessor.class.getName().equals(s.getClassName())) {
@@ -176,7 +176,7 @@ public class DefaultIoFuture implements IoFuture {
             }
         }
 
-        // And then more precisely. 
+        // And then more precisely.
         for (StackTraceElement s: stackTrace) {
             try {
                 Class<?> cls = DefaultIoFuture.class.getClassLoader().loadClass(s.getClassName());

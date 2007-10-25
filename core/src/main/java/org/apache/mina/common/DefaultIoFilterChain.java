@@ -74,7 +74,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
         return e;
     }
-    
+
     public Entry getEntry(IoFilter filter) {
         EntryImpl e = head.nextEntry;
         while (e != tail) {
@@ -317,7 +317,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                     "Other filter is using the same name '" + name + "'");
         }
     }
-    
+
     public void fireSessionCreated() {
         Entry head = this.head;
         callNextSessionCreated(head, session);
@@ -454,7 +454,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             entry.getFilter().exceptionCaught(entry.getNextFilter(), session,
                     cause);
         } catch (Throwable e) {
-            IoSessionLogger.warn(session,
+            IoSessionLogger.getLogger(session, getClass()).warn(
                     "Unexpected exception from exceptionCaught handler.", e);
         }
     }

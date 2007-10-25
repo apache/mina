@@ -59,9 +59,9 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     }
 
     /**
-     * poll those sessions for the given timeout 
+     * poll those sessions for the given timeout
      * @param timeout milliseconds before the call timeout if no event appear
-     * @return true if at least a session is ready for read or for write 
+     * @return true if at least a session is ready for read or for write
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean select(int timeout) throws Exception;
@@ -73,8 +73,8 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     protected abstract Iterator<AbstractIoSession> selectedSessions() throws Exception;
 
     protected abstract SessionState state(IoSession session);
-    
-    
+
+
     /**
      * Is the session ready for writing
      * @param session the session queried
@@ -82,7 +82,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean isWritable(IoSession session) throws Exception;
-    
+
     /**
      * Is the session ready for reading
      * @param session the session queried
@@ -91,33 +91,33 @@ public abstract class AbstractIoProcessor implements IoProcessor {
      */
     protected abstract boolean isReadable(IoSession session) throws Exception;
     /**
-     * register a session for writing 
+     * register a session for writing
      * @param session the session registered
      * @param value true for registering, false for removing
      * @throws Exception if some low level IO error occurs
      */
     protected abstract void setOpWrite(IoSession session,boolean value) throws Exception;
-    
+
     /**
-     * register a session for reading 
+     * register a session for reading
      * @param session the session registered
      * @param value true for registering, false for removing
      * @throws Exception if some low level IO error occurs
      */
     protected abstract void setOpRead(IoSession session,boolean value) throws Exception;
-    
+
     /**
      * is this session registered for reading
      * @param session the session queried
-     * @return true is registered for reading 
+     * @return true is registered for reading
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean isOpRead(IoSession session) throws Exception;
-    
+
     /**
      * is this session registered for writing
      * @param session the session queried
-     * @return true is registered for writing 
+     * @return true is registered for writing
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean isOpWrite(IoSession session) throws Exception;
@@ -269,7 +269,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     }
 
     private void process(AbstractIoSession session) throws Exception {
-        
+
         if (isReadable(session) && session.getTrafficMask().isReadable()) {
             read(session);
         }
@@ -307,7 +307,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 buf = null;
 
                 if (session.getTransportMetadata().hasFragmentation()) {
-                    if ((readBytes << 1) < config.getReadBufferSize()) {
+                    if (readBytes << 1 < config.getReadBufferSize()) {
                         session.decreaseReadBufferSize();
                     } else if (readBytes == config.getReadBufferSize()) {
                         session.increaseReadBufferSize();
@@ -497,7 +497,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     setOpWrite(
                             session,
                             !session.getWriteRequestQueue().isEmpty() &&
-                                    ((mask & SelectionKey.OP_WRITE) != 0));
+                                    (mask & SelectionKey.OP_WRITE) != 0);
                 } catch (Exception e) {
                     session.getFilterChain().fireExceptionCaught(e);
                 }

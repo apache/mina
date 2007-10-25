@@ -24,9 +24,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -153,7 +153,8 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
         if (e != null && in != null) {
             in.throwException(e);
         } else {
-            IoSessionLogger.warn(session, "Unexpected exception.", cause);
+            IoSessionLogger.getLogger(session, getClass()).warn(
+                    "Unexpected exception.", cause);
             session.close();
         }
     }

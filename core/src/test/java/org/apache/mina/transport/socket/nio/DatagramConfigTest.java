@@ -24,9 +24,9 @@ import java.net.InetSocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
@@ -66,7 +66,7 @@ public class DatagramConfigTest extends TestCase {
         acceptor.setLocalAddress(new InetSocketAddress(port));
         acceptor.setHandler(mockHandler);
         acceptor.bind();
-        
+
         try {
             connector.setHandler(new IoHandlerAdapter());
             ConnectFuture future = connector.connect(new InetSocketAddress(port));

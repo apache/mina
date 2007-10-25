@@ -46,7 +46,7 @@ public class DatagramBindTest extends AbstractBindTest {
     protected int getPort(SocketAddress address) {
         return ((InetSocketAddress) address).getPort();
     }
-    
+
     @Override
     protected IoConnector newConnector() {
         return new NioDatagramConnector();

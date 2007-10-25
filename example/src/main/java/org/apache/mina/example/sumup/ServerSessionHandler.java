@@ -75,7 +75,7 @@ public class ServerSessionHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
-        IoSessionLogger.info(session, "Disconnecting the idle.");
+        IoSessionLogger.getLogger(session).info("Disconnecting the idle.");
         // disconnect an idle client
         session.close();
     }

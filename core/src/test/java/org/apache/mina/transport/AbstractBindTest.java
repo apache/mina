@@ -27,10 +27,10 @@ import java.util.Date;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -59,7 +59,7 @@ public abstract class AbstractBindTest extends TestCase {
     protected abstract SocketAddress createSocketAddress(int port);
 
     protected abstract int getPort(SocketAddress address);
-    
+
     protected abstract IoConnector newConnector();
 
     protected void bind(boolean reuseAddress) throws IOException {
@@ -153,7 +153,7 @@ public abstract class AbstractBindTest extends TestCase {
             acceptor.bind();
         }
     }
-    
+
     public void testUnbindDisconnectsClients() throws Exception {
         bind(true);
         IoConnector connector = newConnector();

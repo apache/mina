@@ -23,9 +23,9 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -92,7 +92,7 @@ public abstract class AbstractTrafficControlTest extends TestCase {
             assertEquals("1", getSent(session));
 
             session.suspendRead();
-            
+
             Thread.sleep(100);
 
             write(session, "2");

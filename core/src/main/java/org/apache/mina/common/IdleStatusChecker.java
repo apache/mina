@@ -80,11 +80,11 @@ public class IdleStatusChecker {
             }
         }
     }
-    
+
     /**
      * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable
      * sessions in the specified collection.
-     *   
+     *
      * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleSessions(Iterator<? extends IoSession> sessions, long currentTime) {
@@ -97,7 +97,7 @@ public class IdleStatusChecker {
     /**
      * Fires a {@link IoEventType#SESSION_IDLE} event if applicable for the
      * specified {@code session}.
-     * 
+     *
      * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleSession(IoSession session, long currentTime) {

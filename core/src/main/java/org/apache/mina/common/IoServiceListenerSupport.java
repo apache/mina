@@ -84,7 +84,7 @@ public class IoServiceListenerSupport {
     public Set<IoSession> getManagedSessions() {
         return readOnlyManagedSessions;
     }
-    
+
     public boolean isActive() {
         return activated.get();
     }
@@ -97,7 +97,7 @@ public class IoServiceListenerSupport {
         if (!activated.compareAndSet(false, true)) {
             return;
         }
-        
+
         if (service instanceof AbstractIoService) {
             ((AbstractIoService) service).setActivationTime(System.currentTimeMillis());
         }
@@ -115,7 +115,7 @@ public class IoServiceListenerSupport {
         if (!activated.compareAndSet(true, false)) {
             return;
         }
-        
+
         try {
             for (IoServiceListener l : listeners) {
                 l.serviceDeactivated(service);
@@ -138,7 +138,7 @@ public class IoServiceListenerSupport {
                 firstSession = managedSessions.isEmpty();
             }
         }
-        
+
         // If already registered, ignore.
         if (!managedSessions.add(session)) {
             return;

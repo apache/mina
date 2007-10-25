@@ -29,7 +29,6 @@ import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.easymock.AbstractMatcher;
@@ -85,9 +84,6 @@ public class RequestResponseFilterTest extends TestCase {
         // Destroy the filter.
         filter.onPreRemove(chain, "reqres", nextFilter);
         filter.onPostRemove(chain, "reqres", nextFilter);
-        session.removeAttribute(IoSessionLogger.LOGGER);
-        session.removeAttribute(IoSessionLogger.PREFIX);
-        Assert.assertTrue(session.getAttributeKeys().isEmpty());
         filter.destroy();
         filter = null;
         scheduler.shutdown();

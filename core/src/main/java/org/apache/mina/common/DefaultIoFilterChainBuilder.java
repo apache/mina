@@ -119,7 +119,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         if (e == null) {
             return null;
         }
-    
+
         return e.getFilter();
     }
 
@@ -131,7 +131,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         if (e == null) {
             return null;
         }
-    
+
         return e.getFilter();
     }
 

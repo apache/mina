@@ -22,10 +22,10 @@ package org.apache.mina.filter.codec;
 import java.net.SocketAddress;
 import java.util.Queue;
 
-import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
-import org.apache.mina.common.AttributeKey;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
@@ -120,15 +120,15 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             }
         };
     }
-    
+
     public ProtocolEncoder getEncoder(IoSession session) {
         return (ProtocolEncoder) session.getAttribute(ENCODER);
     }
-    
+
     public ProtocolDecoder getDecoder(IoSession session) {
         return (ProtocolDecoder) session.getAttribute(DECODER);
     }
-    
+
     @Override
     public void onPreAdd(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
@@ -175,11 +175,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     pde = new ProtocolDecoderException(t);
                 }
                 pde.setHexdump(in.getHexDump());
-                
+
                 // Fire the exceptionCaught event.
                 decoderOut.flush();
                 nextFilter.exceptionCaught(session, pde);
-                
+
                 // Stop retrying if the buffer position didn't change
                 // because retrying will cause an infinite loop.
                 if (in.position() == oldPos) {
@@ -306,8 +306,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         try {
             encoder.dispose(session);
         } catch (Throwable t) {
-            IoSessionLogger.warn(session, "Failed to dispose: "
-                    + encoder.getClass().getName() + " (" + encoder + ')');
+            IoSessionLogger.getLogger(session, getClass()).warn(
+                    "Failed to dispose: " + encoder.getClass().getName() + " (" + encoder + ')');
         }
     }
 
@@ -321,8 +321,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         try {
             decoder.dispose(session);
         } catch (Throwable t) {
-            IoSessionLogger.warn(session, "Falied to dispose: "
-                    + decoder.getClass().getName() + " (" + decoder + ')');
+            IoSessionLogger.getLogger(session, getClass()).warn(
+                    "Falied to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }
 

@@ -28,6 +28,8 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.CopyOnWriteMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Logs all MINA protocol events using the {@link IoSessionLogger}.  Each event can be
@@ -48,11 +50,11 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     public static final LogLevel NONE = new LogLevel() {
         @Override
-        void log(IoSession session, String message) {
+        void log(IoSession session, Logger logger, String message) {
         }
 
         @Override
-        void log(IoSession session, String message, Throwable cause) {
+        void log(IoSession session, Logger logger, String message, Throwable cause) {
         }
 
         @Override
@@ -66,13 +68,13 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     public static final LogLevel TRACE = new LogLevel() {
         @Override
-        void log(IoSession session, String message) {
-            IoSessionLogger.trace(session, message);
+        void log(IoSession session, Logger logger, String message) {
+            IoSessionLogger.getLogger(session, logger).trace(message);
         }
 
         @Override
-        void log(IoSession session, String message, Throwable cause) {
-            IoSessionLogger.trace(session, message, cause);
+        void log(IoSession session, Logger logger, String message, Throwable cause) {
+            IoSessionLogger.getLogger(session, logger).trace(message, cause);
         }
 
         @Override
@@ -86,13 +88,13 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     public static final LogLevel DEBUG = new LogLevel() {
         @Override
-        void log(IoSession session, String message) {
-            IoSessionLogger.debug(session, message);
+        void log(IoSession session, Logger logger, String message) {
+            IoSessionLogger.getLogger(session, logger).debug(message);
         }
 
         @Override
-        void log(IoSession session, String message, Throwable cause) {
-            IoSessionLogger.debug(session, message, cause);
+        void log(IoSession session, Logger logger, String message, Throwable cause) {
+            IoSessionLogger.getLogger(session, logger).debug(message, cause);
         }
 
         @Override
@@ -106,13 +108,13 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     public static final LogLevel INFO = new LogLevel() {
         @Override
-        void log(IoSession session, String message) {
-            IoSessionLogger.info(session, message);
+        void log(IoSession session, Logger logger, String message) {
+            IoSessionLogger.getLogger(session, logger).info(message);
         }
 
         @Override
-        void log(IoSession session, String message, Throwable cause) {
-            IoSessionLogger.info(session, message, cause);
+        void log(IoSession session, Logger logger, String message, Throwable cause) {
+            IoSessionLogger.getLogger(session, logger).info(message, cause);
         }
 
         @Override
@@ -126,13 +128,13 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     public static final LogLevel WARN = new LogLevel() {
         @Override
-        void log(IoSession session, String message) {
-            IoSessionLogger.warn(session, message);
+        void log(IoSession session, Logger logger, String message) {
+            IoSessionLogger.getLogger(session, logger).warn(message);
         }
 
         @Override
-        void log(IoSession session, String message, Throwable cause) {
-            IoSessionLogger.warn(session, message, cause);
+        void log(IoSession session, Logger logger, String message, Throwable cause) {
+            IoSessionLogger.getLogger(session, logger).warn(message, cause);
         }
 
         @Override
@@ -146,13 +148,13 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     public static final LogLevel ERROR = new LogLevel() {
         @Override
-        void log(IoSession session, String message) {
-            IoSessionLogger.error(session, message);
+        void log(IoSession session, Logger logger, String message) {
+            IoSessionLogger.getLogger(session, logger).error(message);
         }
 
         @Override
-        void log(IoSession session, String message, Throwable cause) {
-            IoSessionLogger.error(session, message, cause);
+        void log(IoSession session, Logger logger, String message, Throwable cause) {
+            IoSessionLogger.getLogger(session, logger).error(message, cause);
         }
 
         @Override
@@ -162,11 +164,29 @@ public class LoggingFilter extends IoFilterAdapter {
     };
 
     private final Map<IoEventType, LogLevel> logSettings = new CopyOnWriteMap<IoEventType, LogLevel>();
+    private final String name;
+    private final Logger logger;
 
     /**
      * Default Constructor.
      */
     public LoggingFilter() {
+        this((String) null);
+    }
+
+    public LoggingFilter(Class<?> clazz) {
+        this(clazz.getName());
+    }
+
+    public LoggingFilter(String name) {
+        this.name = name;
+
+        if (name != null) {
+            this.logger = LoggerFactory.getLogger(name);
+        } else {
+            this.logger = null;
+        }
+
         // Exceptions will be logged to WARN as default.
         setLogLevel(IoEventType.EXCEPTION_CAUGHT, WARN);
         setLogLevel(IoEventType.MESSAGE_RECEIVED, INFO);
@@ -177,55 +197,59 @@ public class LoggingFilter extends IoFilterAdapter {
         setLogLevel(IoEventType.SESSION_OPENED, INFO);
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) throws Exception {
-        getLogLevel(IoEventType.EXCEPTION_CAUGHT).log(session, "EXCEPTION: ",
-                cause);
+        getLogLevel(IoEventType.EXCEPTION_CAUGHT).log(
+                session, logger, "EXCEPTION: ", cause);
         nextFilter.exceptionCaught(session, cause);
     }
 
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws Exception {
-        getLogLevel(IoEventType.MESSAGE_RECEIVED).log(session,
-                "RECEIVED: " + message);
+        getLogLevel(IoEventType.MESSAGE_RECEIVED).log(
+                session, logger, "RECEIVED: " + message);
         nextFilter.messageReceived(session, message);
     }
 
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception {
-        getLogLevel(IoEventType.MESSAGE_SENT).log(session,
-                "SENT: " + writeRequest.getMessage());
+        getLogLevel(IoEventType.MESSAGE_SENT).log(
+                session, logger, "SENT: " + writeRequest.getMessage());
         nextFilter.messageSent(session, writeRequest);
     }
 
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session)
             throws Exception {
-        getLogLevel(IoEventType.SESSION_CLOSED).log(session, "CLOSED");
+        getLogLevel(IoEventType.SESSION_CLOSED).log(session, logger, "CLOSED");
         nextFilter.sessionClosed(session);
     }
 
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session)
             throws Exception {
-        getLogLevel(IoEventType.SESSION_CREATED).log(session, "CREATED");
+        getLogLevel(IoEventType.SESSION_CREATED).log(session, logger, "CREATED");
         nextFilter.sessionCreated(session);
     }
 
     @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session,
             IdleStatus status) throws Exception {
-        getLogLevel(IoEventType.SESSION_IDLE).log(session, "IDLE: " + status);
+        getLogLevel(IoEventType.SESSION_IDLE).log(session, logger, "IDLE: " + status);
         nextFilter.sessionIdle(session, status);
     }
 
     @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session)
             throws Exception {
-        getLogLevel(IoEventType.SESSION_OPENED).log(session, "OPENED");
+        getLogLevel(IoEventType.SESSION_OPENED).log(session, logger, "OPENED");
         nextFilter.sessionOpened(session);
     }
 
@@ -416,8 +440,8 @@ public class LoggingFilter extends IoFilterAdapter {
         private LogLevel() {
         }
 
-        abstract void log(IoSession session, String message);
+        abstract void log(IoSession session, Logger logger, String message);
 
-        abstract void log(IoSession session, String message, Throwable cause);
+        abstract void log(IoSession session, Logger logger, String message, Throwable cause);
     }
 }

@@ -26,9 +26,9 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.util.Queue;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
@@ -69,7 +69,7 @@ class NioDatagramSession extends NioSession implements DatagramSession {
     private final InetSocketAddress localAddress;
 
     private final InetSocketAddress remoteAddress;
-    
+
     private final IoProcessor processor;
 
     private SelectionKey key;

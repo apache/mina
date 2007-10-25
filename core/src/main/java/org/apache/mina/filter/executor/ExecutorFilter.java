@@ -108,7 +108,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
             getExecutor().execute(new ProcessEventsRunnable(buf));
         }
     }
-    
+
     private SessionBuffer getSessionBuffer(IoSession session) {
         synchronized (session) {
             SessionBuffer buf = (SessionBuffer) session.getAttribute(BUFFER);

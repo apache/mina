@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec.textline;
 
@@ -32,7 +32,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
  * A {@link ProtocolDecoder} which decodes a text line into a string.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$,
  */
@@ -140,7 +140,7 @@ public class TextLineDecoder implements ProtocolDecoder {
             throws CharacterCodingException {
 
         int matchCount = ctx.getMatchCount();
-        
+
         // Try to find a match
         int oldPos = in.position();
         int oldLimit = in.limit();
@@ -205,7 +205,7 @@ public class TextLineDecoder implements ProtocolDecoder {
             throws CharacterCodingException {
 
         int matchCount = ctx.getMatchCount();
-        
+
         // Convert delimiter to ByteBuffer if not done yet.
         if (delimBuf == null) {
             IoBuffer tmp = IoBuffer.allocate(2).setAutoExpand(true);
@@ -228,7 +228,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                     in.position(oldPos);
 
                     ctx.append(in);
-                    
+
                     in.limit(oldLimit);
                     in.position(pos);
                     if (ctx.getOverflowPosition() == 0) {
@@ -280,11 +280,11 @@ public class TextLineDecoder implements ProtocolDecoder {
         public IoBuffer getBuffer() {
             return buf;
         }
-        
+
         public int getOverflowPosition() {
             return overflowPosition;
         }
-        
+
         public int getMatchCount() {
             return matchCount;
         }
@@ -292,13 +292,13 @@ public class TextLineDecoder implements ProtocolDecoder {
         public void setMatchCount(int matchCount) {
             this.matchCount = matchCount;
         }
-        
+
         public void reset() {
             overflowPosition = 0;
             matchCount = 0;
             decoder.reset();
         }
-        
+
         public void append(IoBuffer in) {
             if (overflowPosition != 0) {
                 discard(in);

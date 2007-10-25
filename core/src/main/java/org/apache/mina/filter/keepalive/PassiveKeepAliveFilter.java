@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 /**
  * A protocol level filter which filters keepalive messages and sends
  * keepalive responses. This class is stateless and may be shared by
- * several connections. 
- * 
+ * several connections.
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -34,15 +34,17 @@ public class PassiveKeepAliveFilter extends AbstractKeepAliveFilter {
     /**
      * If <code>pingMessage</code> equals <code>message</code>  ,
      * reply with <code>pongMessage</code>. Otherwise forward to
-     * <code>next</code>.  
+     * <code>next</code>.
      */
     public void execute(NextCommand next, IoSession session, Object message)
             throws Exception {
         if (pingMessage.equals(message)) {
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("Replying PONG");
+            }
             session.write(pongMessage);
-        } else
+        } else {
             next.execute(session, message);
+        }
     }
 }

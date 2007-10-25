@@ -46,7 +46,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        IoSessionLogger.error(session, "", cause);
+        IoSessionLogger.getLogger(session).warn(cause);
         // Close connection when unexpected exception is caught.
         session.close();
     }
@@ -109,12 +109,12 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
                 }
                 break;
             default:
-                IoSessionLogger.info(session, "Unhandled command: " + command);
+                IoSessionLogger.getLogger(session).info("Unhandled command: " + command);
                 break;
             }
 
         } catch (IllegalArgumentException e) {
-            IoSessionLogger.debug(session, e.getMessage());
+            IoSessionLogger.getLogger(session).debug(e);
         }
     }
 

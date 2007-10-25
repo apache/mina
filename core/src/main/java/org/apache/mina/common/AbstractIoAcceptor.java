@@ -121,10 +121,11 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
             }
             bound = false;
         }
-        
+
         getListeners().fireServiceDeactivated();
     }
 
+    @Override
     public boolean isActive() {
         synchronized (bindLock) {
             return bound;

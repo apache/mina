@@ -44,7 +44,7 @@ public abstract class AbstractIoService implements IoService {
      * Maintains the {@link IoServiceListener}s of this service.
      */
     private final IoServiceListenerSupport listeners;
-    
+
     private volatile long activationTime;
     private final AtomicLong readBytes = new AtomicLong();
     private final AtomicLong writtenBytes = new AtomicLong();
@@ -118,7 +118,7 @@ public abstract class AbstractIoService implements IoService {
         if (handler == null) {
             throw new NullPointerException("handler");
         }
-        
+
         if (isActive()) {
             throw new IllegalStateException("handler cannot be set while the service is active.");
         }
@@ -133,11 +133,11 @@ public abstract class AbstractIoService implements IoService {
     public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }
-    
+
     public long getReadBytes() {
         return readBytes.get();
     }
-    
+
     protected void increaseReadBytes(long increment) {
         readBytes.addAndGet(increment);
     }
@@ -145,7 +145,7 @@ public abstract class AbstractIoService implements IoService {
     public long getReadMessages() {
         return readMessages.get();
     }
-    
+
     protected void increaseReadMessages() {
         readMessages.incrementAndGet();
     }
@@ -153,7 +153,7 @@ public abstract class AbstractIoService implements IoService {
     public long getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
-    
+
     protected void increaseScheduledWriteBytes(long increment) {
         scheduledWriteBytes.addAndGet(increment);
     }
@@ -161,7 +161,7 @@ public abstract class AbstractIoService implements IoService {
     public long getScheduledWriteMessages() {
         return scheduledWriteMessages.get();
     }
-    
+
     protected void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
     }
@@ -169,7 +169,7 @@ public abstract class AbstractIoService implements IoService {
     public long getActivationTime() {
         return activationTime;
     }
-    
+
     protected void setActivationTime(long activationTime) {
         this.activationTime = activationTime;
     }
@@ -177,7 +177,7 @@ public abstract class AbstractIoService implements IoService {
     public long getWrittenBytes() {
         return writtenBytes.get();
     }
-    
+
     protected void increaseWrittenBytes(long increment) {
         writtenBytes.addAndGet(increment);
         scheduledWriteBytes.addAndGet(-increment);
@@ -186,7 +186,7 @@ public abstract class AbstractIoService implements IoService {
     public long getWrittenMessages() {
         return writtenMessages.get();
     }
-    
+
     protected void increaseWrittenMessages() {
         writtenMessages.incrementAndGet();
         scheduledWriteMessages.decrementAndGet();
@@ -196,15 +196,15 @@ public abstract class AbstractIoService implements IoService {
         public ServiceOperationFuture() {
             super(null);
         }
-        
+
         public boolean isDone() {
-            return (getValue() == Boolean.TRUE);
+            return getValue() == Boolean.TRUE;
         }
-        
+
         public void setDone() {
             setValue(Boolean.TRUE);
         }
-        
+
         public Exception getException() {
             if (getValue() instanceof Exception) {
                 return (Exception) getValue();
@@ -212,7 +212,7 @@ public abstract class AbstractIoService implements IoService {
                 return null;
             }
         }
-        
+
         public void setException(Exception cause) {
             setValue(cause);
         }

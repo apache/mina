@@ -152,6 +152,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
         return serviceAddress;
     }
 
+    @Override
     protected Queue<WriteRequest> getWriteRequestQueue() {
         return super.getWriteRequestQueue();
     }

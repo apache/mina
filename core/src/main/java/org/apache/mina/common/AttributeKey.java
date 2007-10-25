@@ -19,6 +19,8 @@
  */
 package org.apache.mina.common;
 
+import java.util.Map;
+
 /**
  * A key that makes its parent {@link Map} or session attribute to search
  * fast while being debug-friendly by providing the spring representation.
@@ -28,7 +30,7 @@ package org.apache.mina.common;
  */
 public final class AttributeKey {
     private final String name;
-    
+
     /**
      * Creates a new instance.
      */
@@ -36,7 +38,7 @@ public final class AttributeKey {
         this.name = source.getName() + '.' + String.valueOf(name) + '@' +
                 Integer.toHexString(System.identityHashCode(this));
     }
-    
+
     @Override
     public String toString() {
         return name;

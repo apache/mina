@@ -100,10 +100,10 @@ public class RequestResponseFilter extends WriteRequestFilter {
     public void onPostRemove(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
         IoSession session = parent.getSession();
-        
+
         destroyUnrespondedRequestStore(getUnrespondedRequestStore(session));
         destroyRequestStore(getRequestStore(session));
-        
+
         session.removeAttribute(UNRESPONDED_REQUEST_STORE);
         session.removeAttribute(REQUEST_STORE);
         session.removeAttribute(RESPONSE_INSPECTOR);
@@ -151,8 +151,9 @@ public class RequestResponseFilter extends WriteRequestFilter {
         if (request == null) {
             // A response message without request. Swallow the event because
             // the response might have arrived too late.
-            if (IoSessionLogger.isWarnEnabled(session)) {
-                IoSessionLogger.warn(session, "Unknown request ID '" + requestId
+            IoSessionLogger logger = IoSessionLogger.getLogger(session, getClass());
+            if (logger.isWarnEnabled()) {
+                logger.warn("Unknown request ID '" + requestId
                         + "' for the response message. Timed out already?: "
                         + message);
             }
@@ -176,7 +177,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
             nextFilter.messageReceived(session, response);
         }
     }
-    
+
     @Override
     protected Object doFilterWrite(
             final NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
@@ -184,7 +185,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
         if (!(message instanceof Request)) {
             return null;
         }
-        
+
         final Request request = (Request) message;
         if (request.getTimeoutFuture() != null) {
             throw new IllegalArgumentException("Request can not be reused.");
@@ -203,7 +204,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
             throw new IllegalStateException(
                     "Duplicate request ID: " + request.getId());
         }
-        
+
         // Schedule a task to be executed on timeout.
         // Find the timeout date avoiding overflow.
         Date timeoutDate = new Date(System.currentTimeMillis());
@@ -230,7 +231,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
         synchronized (unrespondedRequests) {
             unrespondedRequests.add(request);
         }
-        
+
         return request.getMessage();
     }
 
@@ -273,7 +274,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
     private Set<Request> getUnrespondedRequestStore(IoSession session) {
         return (Set<Request>) session.getAttribute(UNRESPONDED_REQUEST_STORE);
     }
-    
+
     /**
      * Returns a {@link Map} which stores {@code messageId}-{@link Request}
      * pairs whose {@link Response}s are not received yet.  Please override
@@ -301,12 +302,12 @@ public class RequestResponseFilter extends WriteRequestFilter {
             @SuppressWarnings("unused") IoSession session) {
         return new LinkedHashSet<Request>();
     }
-    
+
     /**
      * Releases any resources related with the {@link Map} created by
      * {@link #createRequestStore(IoSession)}.  This method is useful
      * if you override {@link #createRequestStore(IoSession)}.
-     * 
+     *
      * @param requestStore what you returned in {@link #createRequestStore(IoSession)}
      */
     protected void destroyRequestStore(
@@ -318,7 +319,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      * Releases any resources related with the {@link Set} created by
      * {@link #createUnrespondedRequestStore(IoSession)}.  This method is
      * useful if you override {@link #createUnrespondedRequestStore(IoSession)}.
-     * 
+     *
      * @param requestStore what you returned in {@link #createUnrespondedRequestStore(IoSession)}
      */
     protected void destroyUnrespondedRequestStore(

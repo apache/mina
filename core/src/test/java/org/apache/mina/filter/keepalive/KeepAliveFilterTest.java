@@ -40,7 +40,7 @@ import org.apache.mina.transport.vmpipe.VmPipeConnector;
 /**
  * Tests if (Active)KeepAliveFilter is working. The test makes a simple
  * server-client setup where the client will reply to three pings.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -61,6 +61,7 @@ public class KeepAliveFilterTest extends TestCase {
         return new TestSuite(KeepAliveFilterTest.class);
     }
 
+    @Override
     protected void setUp() {
         this.scheduler = new ScheduledThreadPoolExecutor(1);
         this.factory = new KeepAliveFilterFactory(scheduler);
@@ -70,6 +71,7 @@ public class KeepAliveFilterTest extends TestCase {
         this.clientReceiveCounter = 0;
     }
 
+    @Override
     protected void tearDown() {
         this.factory = null;
         this.serverSentCounter = 0;
@@ -95,8 +97,9 @@ public class KeepAliveFilterTest extends TestCase {
         server.getSemaphore().acquireUninterruptibly();
         // the semaphore is released when the connection is closed
 
-        if (clientReceiveCounter != 4)
+        if (clientReceiveCounter != 4) {
             fail("Connection terminated prematurely");
+        }
 
         acceptor.unbind();
         scheduler.shutdownNow();
@@ -121,10 +124,12 @@ public class KeepAliveFilterTest extends TestCase {
         public void messageSent(IoSession session, Object message)
                 throws Exception {
             super.messageSent(session, message);
-            if (serverSentCounter > 1 && clientReceiveCounter < 1)
+            if (serverSentCounter > 1 && clientReceiveCounter < 1) {
                 fail("Something wrong with test. Client not receiving");
-            if (serverSentCounter - clientReceiveCounter > 4)
+            }
+            if (serverSentCounter - clientReceiveCounter > 4) {
                 fail("ActiveFilter should have broken connection");
+            }
             serverSentCounter++;
         }
 
@@ -153,8 +158,9 @@ public class KeepAliveFilterTest extends TestCase {
         @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {
-            if (clientReceiveCounter >= 4)
+            if (clientReceiveCounter >= 4) {
                 return;
+            }
             super.messageReceived(session, message);
             clientReceiveCounter++;
         }

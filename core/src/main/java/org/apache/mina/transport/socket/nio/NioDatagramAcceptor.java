@@ -120,7 +120,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
-    
+
     public void setLocalAddress(InetSocketAddress localAddress) {
         setLocalAddress((SocketAddress) localAddress);
     }
@@ -138,7 +138,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         if (request.getException() != null) {
             throw request.getException();
         }
-        
+
         setLocalAddress(channel.socket().getLocalSocketAddress());
     }
 
@@ -151,7 +151,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         selector.wakeup();
 
         request.awaitUninterruptibly();
-        
+
         if (request.getException() != null) {
             throw request.getException();
         }

@@ -129,7 +129,7 @@ public abstract class AbstractTest extends TestCase {
                         if (session.getFilterChain().contains("SSL")
                                 && buf.remaining() == 1
                                 && buf.get() == (byte) '.') {
-                            IoSessionLogger.info(session, "TLS Reentrance");
+                            IoSessionLogger.getLogger(session).info("TLS Reentrance");
                             ((SslFilter) session.getFilterChain().get("SSL"))
                                     .startSsl(session);
 

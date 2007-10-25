@@ -68,13 +68,13 @@ public class ClientSessionHandler extends IoHandlerAdapter {
             // it is time to disconnect.
             if (rm.getSequence() == values.length - 1) {
                 // print the sum and disconnect.
-                IoSessionLogger.info(session, "The sum: " + rm.getValue());
+                IoSessionLogger.getLogger(session).info("The sum: " + rm.getValue());
                 session.close();
                 finished = true;
             }
         } else {
             // seever returned error code because of overflow, etc.
-            IoSessionLogger.warn(session, "Server error, disconnecting...");
+            IoSessionLogger.getLogger(session).warn("Server error, disconnecting...");
             session.close();
             finished = true;
         }

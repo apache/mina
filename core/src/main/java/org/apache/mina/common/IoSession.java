@@ -105,7 +105,7 @@ public interface IoSession {
      *
      * @param destination <tt>null</tt> if you want the message sent to the
      *                    default remote address
-     *                    
+     *
      * @throws UnsupportedOperationException if this operation is not supported
      */
     WriteFuture write(Object message, SocketAddress destination);
@@ -116,19 +116,19 @@ public interface IoSession {
      * the session actually closed.
      */
     CloseFuture close();
-    
+
     /**
      * Closes this session after all queued write requests are flushed.
      * This operation is asynchronous.  Wait for the returned {@link CloseFuture}
      * if you want to wait for the session actually closed.
      */
     CloseFuture closeOnFlush();
-    
+
     /**
      * Closes this session immediately or after all queued write requests
      * are flushed.  This operation is asynchronous.  Wait for the returned
      * {@link CloseFuture} if you want to wait for the session actually closed.
-     * 
+     *
      * @param immediately {@code true} to close this session immediately
      *                    (i.e. {@link #close()}).
      *                    {@code false} to close this session after all queued

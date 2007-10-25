@@ -5,7 +5,7 @@ import org.apache.mina.handler.chain.IoHandlerCommand;
 /**
  * Abstract superclass for KeepAliveFilters.
  * Implements a few common variables and constructors.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */

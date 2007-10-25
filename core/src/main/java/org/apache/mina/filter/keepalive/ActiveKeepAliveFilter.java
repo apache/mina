@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
  * and filter keepalive responses. If no responses are received
  * in a specified timeframe, the filter will close the IoSession.
  * This filter has state information so it should not be shared by
- * multiple connections.  
- * 
+ * multiple connections.
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
+ *
  * FIXME: Convert to IoFilter
- * 
+ *
  * @see org.apache.mina.handler.chain.ChainedIoHandler
  */
 public class ActiveKeepAliveFilter extends AbstractKeepAliveFilter {
@@ -70,8 +70,9 @@ public class ActiveKeepAliveFilter extends AbstractKeepAliveFilter {
     private Runnable createUpdateTask() {
         return new Runnable() {
             public void run() {
-                if (session.isClosing())
+                if (session.isClosing()) {
                     return;
+                }
                 final long currentTime = System.currentTimeMillis();
 
                 // check whether to break connection
@@ -98,8 +99,9 @@ public class ActiveKeepAliveFilter extends AbstractKeepAliveFilter {
                 }
 
                 // schedule next update
-                if (delayToBreak < delayToPing)
+                if (delayToBreak < delayToPing) {
                     delayToPing = delayToBreak;
+                }
                 scheduler.schedule(this, delayToPing, TimeUnit.MILLISECONDS);
             }
         };
@@ -112,11 +114,13 @@ public class ActiveKeepAliveFilter extends AbstractKeepAliveFilter {
     public void execute(NextCommand next, IoSession session, Object message)
             throws Exception {
         if (pongMessage.equals(message)) {
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("Received pong message from "
                         + session.getRemoteAddress());
+            }
             lastResponseTime = System.currentTimeMillis();
-        } else
+        } else {
             next.execute(session, message);
+        }
     }
 }

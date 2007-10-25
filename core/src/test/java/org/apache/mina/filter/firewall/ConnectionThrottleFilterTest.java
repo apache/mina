@@ -35,15 +35,15 @@ import org.apache.mina.common.DummySession;
 public class ConnectionThrottleFilterTest extends TestCase
 {
     private ConnectionThrottleFilter filter;
-    
+
     private DummySession sessionOne;
     private DummySession sessionTwo;
-    
+
     @Override
     protected void setUp() throws Exception
     {
         filter = new ConnectionThrottleFilter();
-        
+
         sessionOne = new DummySession();
         sessionOne.setRemoteAddress( new InetSocketAddress(1234) );
         sessionTwo = new DummySession();
@@ -67,18 +67,18 @@ public class ConnectionThrottleFilterTest extends TestCase
         {
             e.printStackTrace();
         }
-        
+
         boolean result = filter.isConnectionOk( sessionOne );
         assertTrue( result );
     }
-    
+
     public void testBadConnection(){
         filter.setAllowedInterval( 1000 );
         filter.isConnectionOk( sessionTwo );
         assertFalse(filter.isConnectionOk( sessionTwo ));
     }
-    
+
     public static void main(String[] args) {
-     junit.textui.TestRunner.run( ConnectionThrottleFilterTest.class );   
+     junit.textui.TestRunner.run( ConnectionThrottleFilterTest.class );
     }
 }

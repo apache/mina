@@ -20,11 +20,11 @@
 package org.apache.mina.filter.logging;
 
 import java.net.InetSocketAddress;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.EnumSet;
 
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterEvent;
@@ -130,7 +130,7 @@ public class MdcInjectionFilter extends WrappingFilter {
                 MDC.put(e.getKey(), e.getValue());
             }
         }
-        
+
         try {
             /* propagate event down the filter chain */
             event.fire();
@@ -218,7 +218,7 @@ public class MdcInjectionFilter extends WrappingFilter {
         if (answer != null) {
             return answer;
         }
-        
+
         return MDC.get(key);
     }
 

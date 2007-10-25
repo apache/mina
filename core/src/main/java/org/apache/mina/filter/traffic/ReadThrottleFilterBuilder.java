@@ -22,8 +22,8 @@ package org.apache.mina.filter.traffic;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
