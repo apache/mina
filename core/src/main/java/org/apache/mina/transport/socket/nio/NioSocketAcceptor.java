@@ -259,7 +259,7 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
             if (worker == null) {
                 worker = new Worker();
 
-                executor.execute(new NamePreservingRunnable(worker));
+                executor.execute(new NamePreservingRunnable(worker, threadName));
             }
         }
     }
@@ -284,8 +284,6 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
      */
     private class Worker implements Runnable {
         public void run() {
-            Thread.currentThread().setName(NioSocketAcceptor.this.threadName);
-
             for (; ;) {
                 try {
                     // gets the number of keys that are ready to go

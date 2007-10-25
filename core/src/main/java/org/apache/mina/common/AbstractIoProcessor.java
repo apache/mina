@@ -158,7 +158,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
-                executor.execute(new NamePreservingRunnable(worker));
+                executor.execute(new NamePreservingRunnable(worker, threadName));
             }
         }
         wakeup();
@@ -519,8 +519,6 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     private class Worker implements Runnable {
         public void run() {
             int nSessions = 0;
-
-            Thread.currentThread().setName(AbstractIoProcessor.this.threadName);
             lastIdleCheckTime = System.currentTimeMillis();
 
             for (;;) {

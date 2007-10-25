@@ -202,7 +202,7 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
-                executor.execute(new NamePreservingRunnable(worker));
+                executor.execute(new NamePreservingRunnable(worker, threadName));
             }
         }
     }
@@ -327,8 +327,6 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
         private long lastActive = System.currentTimeMillis();
 
         public void run() {
-            Thread.currentThread().setName(NioSocketConnector.this.threadName);
-
             for (; ;) {
                 try {
                     int nKeys = selector.select(1000);

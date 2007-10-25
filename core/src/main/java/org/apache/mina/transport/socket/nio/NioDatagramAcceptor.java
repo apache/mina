@@ -32,11 +32,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoAcceptor;
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.ExpiringSessionRecycler;
 import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
@@ -256,7 +256,8 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
     private synchronized void startupWorker() {
         if (worker == null) {
             worker = new Worker();
-            executor.execute(new NamePreservingRunnable(worker));
+            executor.execute(
+                    new NamePreservingRunnable(worker, "DatagramAcceptor-" + id));
         }
     }
 
@@ -271,7 +272,6 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
 
     private class Worker implements Runnable {
         public void run() {
-            Thread.currentThread().setName("DatagramAcceptor-" + id);
             lastIdleCheckTime = System.currentTimeMillis();
 
             for (; ;) {
