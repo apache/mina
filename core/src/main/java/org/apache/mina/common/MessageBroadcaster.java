@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A utility class that provides various convenience methods related with
@@ -105,6 +106,68 @@ public class MessageBroadcaster {
         }
     }
     
+    public static void await(Iterable<WriteFuture> futures) throws InterruptedException {
+        for (WriteFuture f: futures) {
+            f.await();
+        }
+    }
+    
+    public static void awaitUninterruptably(Iterable<WriteFuture> futures) {
+        for (WriteFuture f: futures) {
+            f.awaitUninterruptibly();
+        }
+    }
+    
+    public static boolean await(Iterable<WriteFuture> futures, long timeout, TimeUnit unit) throws InterruptedException {
+        return await(futures, unit.toMillis(timeout));
+    }
+
+    public static boolean await(Iterable<WriteFuture> futures, long timeoutMillis) throws InterruptedException {
+        return await0(futures, timeoutMillis, true);
+    }
+
+    public static boolean awaitUninterruptibly(Iterable<WriteFuture> futures, long timeout, TimeUnit unit) {
+        return awaitUninterruptibly(futures, unit.toMillis(timeout));
+    }
+
+    public static boolean awaitUninterruptibly(Iterable<WriteFuture> futures, long timeoutMillis) {
+        try {
+            return await0(futures, timeoutMillis, false);
+        } catch (InterruptedException e) {
+            throw new InternalError();
+        }
+    }
+
+    private static boolean await0(Iterable<WriteFuture> futures, long timeoutMillis, boolean interruptable) throws InterruptedException {
+        long startTime = timeoutMillis <= 0 ? 0 : System.currentTimeMillis();
+        long waitTime = timeoutMillis;
+        
+        boolean lastComplete = true;
+        Iterator<WriteFuture> i = futures.iterator();
+        while (i.hasNext()) {
+            WriteFuture f = i.next();
+            do {
+                if (interruptable) {
+                    lastComplete = f.await(waitTime);
+                } else {
+                    lastComplete = f.awaitUninterruptibly(waitTime);
+                }
+                
+                waitTime = timeoutMillis - (System.currentTimeMillis() - startTime);
+
+                if (lastComplete || waitTime <= 0) {
+                    break;
+                }
+            } while (!lastComplete);
+            
+            if (waitTime <= 0) {
+                break;
+            }
+        }
+        
+        return lastComplete && !i.hasNext();
+    }
+
     private MessageBroadcaster() {
     }
 }
