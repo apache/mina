@@ -65,6 +65,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      * Sets the addresses to be blacklisted.
      *
      * NOTE: this call will remove any previously blacklisted addresses.
+     * FIXME: Change the parameter type to Iterable
      *
      * @param addresses a collection of InetAddress objects representing the
      *        addresses to be blacklisted.
