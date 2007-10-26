@@ -32,8 +32,7 @@ import org.easymock.MockControl;
  */
 public class IoFilterMappingTest extends TestCase {
     public void testConstructor() throws Exception {
-        IoFilter filter = (IoFilter) MockControl.createControl(IoFilter.class)
-                .getMock();
+        IoFilter filter = MockControl.createControl(IoFilter.class).getMock();
 
         try {
             new IoFilterMapping(null, filter);

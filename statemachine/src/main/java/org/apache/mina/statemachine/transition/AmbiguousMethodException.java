@@ -28,6 +28,8 @@ package org.apache.mina.statemachine.transition;
  */
 public class AmbiguousMethodException extends RuntimeException {
 
+    private static final long serialVersionUID = -3926582218186692464L;
+
     /**
      * Creates a new instance using the specified method name as message.
      * 

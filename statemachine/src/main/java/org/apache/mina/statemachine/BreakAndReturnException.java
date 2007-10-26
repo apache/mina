@@ -26,6 +26,8 @@ package org.apache.mina.statemachine;
  * @version $Rev$, $Date$
  */
 class BreakAndReturnException extends BreakException {
+    private static final long serialVersionUID = -2662100444922292796L;
+
     private final boolean now;
 
     public BreakAndReturnException(boolean now) {

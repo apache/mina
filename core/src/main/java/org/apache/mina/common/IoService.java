@@ -167,4 +167,10 @@ public interface IoService {
      */
     long getScheduledWriteMessages();
 
+    /**
+     * Writes the specified {@code message} to all the {@link IoSession}s
+     * managed by this service.  This method is a convenience shortcut for
+     * {@link IoSessions#broadcast(Object, java.util.Collection)}.
+     */
+    Set<WriteFuture> broadcast(Object message);
 }

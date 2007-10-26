@@ -28,6 +28,7 @@ package org.apache.mina.statemachine.transition;
  * @version $Rev$, $Date$
  */
 public class NoSuchMethodException extends RuntimeException {
+    private static final long serialVersionUID = -8877979996892420479L;
 
     /**
      * Creates a new instance using the specified method name as message.

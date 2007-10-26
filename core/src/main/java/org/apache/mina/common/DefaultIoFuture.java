@@ -36,8 +36,8 @@ public class DefaultIoFuture implements IoFuture {
 
     private final IoSession session;
     private final Object lock;
-    private IoFutureListener firstListener;
-    private List<IoFutureListener> otherListeners;
+    private IoFutureListener<?> firstListener;
+    private List<IoFutureListener<?>> otherListeners;
     private Object result;
     private boolean ready;
     private int waiters;
@@ -224,7 +224,7 @@ public class DefaultIoFuture implements IoFuture {
         }
     }
 
-    public IoFuture addListener(IoFutureListener listener) {
+    public IoFuture addListener(IoFutureListener<?> listener) {
         if (listener == null) {
             throw new NullPointerException("listener");
         }
@@ -238,7 +238,7 @@ public class DefaultIoFuture implements IoFuture {
                     firstListener = listener;
                 } else {
                     if (otherListeners == null) {
-                        otherListeners = new ArrayList<IoFutureListener>(1);
+                        otherListeners = new ArrayList<IoFutureListener<?>>(1);
                     }
                     otherListeners.add(listener);
                 }
@@ -251,7 +251,7 @@ public class DefaultIoFuture implements IoFuture {
         return this;
     }
 
-    public IoFuture removeListener(IoFutureListener listener) {
+    public IoFuture removeListener(IoFutureListener<?> listener) {
         if (listener == null) {
             throw new NullPointerException("listener");
         }
@@ -282,7 +282,7 @@ public class DefaultIoFuture implements IoFuture {
             firstListener = null;
 
             if (otherListeners != null) {
-                for (IoFutureListener l : otherListeners) {
+                for (IoFutureListener<?> l : otherListeners) {
                     notifyListener(l);
                 }
                 otherListeners = null;
@@ -290,6 +290,7 @@ public class DefaultIoFuture implements IoFuture {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void notifyListener(IoFutureListener l) {
         try {
             l.operationComplete(this);

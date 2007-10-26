@@ -29,6 +29,8 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
  * @version $Rev$, $Date$
  */
 public class CommandSyntaxException extends ProtocolDecoderException {
+    private static final long serialVersionUID = 4903547501059093765L;
+
     private final String message;
     
     public CommandSyntaxException(String message) {

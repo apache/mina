@@ -27,6 +27,7 @@ package org.apache.mina.statemachine;
  * @version $Rev$, $Date$
  */
 public class NoSuchStateException extends RuntimeException {
+    private static final long serialVersionUID = -886869696039996478L;
 
     /**
      * Creates a new instance.

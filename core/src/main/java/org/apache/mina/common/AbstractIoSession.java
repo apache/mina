@@ -44,9 +44,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class AbstractIoSession implements IoSession {
 
-    private static final IoFutureListener SCHEDULED_COUNTER_RESETTER =
-        new IoFutureListener() {
-            public void operationComplete(IoFuture future) {
+    private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER =
+        new IoFutureListener<CloseFuture>() {
+            public void operationComplete(CloseFuture future) {
                 AbstractIoSession s = (AbstractIoSession) future.getSession();
                 s.scheduledWriteBytes.set(0);
                 s.scheduledWriteMessages.set(0);
@@ -245,8 +245,8 @@ public abstract class AbstractIoSession implements IoSession {
 
         if (message instanceof File) {
             final FileChannel finalChannel = channel;
-            future.addListener(new IoFutureListener() {
-                public void operationComplete(IoFuture future) {
+            future.addListener(new IoFutureListener<WriteFuture>() {
+                public void operationComplete(WriteFuture future) {
                     try {
                         finalChannel.close();
                     } catch (IOException e) {

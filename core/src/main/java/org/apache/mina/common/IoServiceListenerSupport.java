@@ -200,7 +200,7 @@ public class IoServiceListenerSupport {
         }
 
         Object lock = new Object();
-        IoFutureListener listener = new LockNotifyingListener(lock);
+        IoFutureListener<IoFuture> listener = new LockNotifyingListener(lock);
 
         for (IoSession s : managedSessions) {
             s.close().addListener(listener);
@@ -217,7 +217,7 @@ public class IoServiceListenerSupport {
         }
     }
 
-    private static class LockNotifyingListener implements IoFutureListener {
+    private static class LockNotifyingListener implements IoFutureListener<IoFuture> {
         private final Object lock;
 
         public LockNotifyingListener(Object lock) {

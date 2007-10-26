@@ -21,11 +21,10 @@ package org.apache.mina.example.udp.client;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
@@ -68,10 +67,9 @@ public class MemMonClient extends IoHandlerAdapter {
         connFuture.awaitUninterruptibly();
 
         log.debug("Adding a future listener.");
-        connFuture.addListener(new IoFutureListener() {
-            public void operationComplete(IoFuture future) {
-                ConnectFuture connFuture = (ConnectFuture) future;
-                if (connFuture.isConnected()) {
+        connFuture.addListener(new IoFutureListener<ConnectFuture>() {
+            public void operationComplete(ConnectFuture future) {
+                if (future.isConnected()) {
                     log.debug("...connected");
                     session = future.getSession();
                     try {

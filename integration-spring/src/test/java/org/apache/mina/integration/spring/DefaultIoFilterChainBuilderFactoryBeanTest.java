@@ -49,9 +49,9 @@ public class DefaultIoFilterChainBuilderFactoryBeanTest extends TestCase {
         mockChain = MockControl.createControl(IoFilterChain.class);
         chain = (IoFilterChain) mockChain.getMock();
         filters = new IoFilter[] {
-                (IoFilter) MockControl.createControl(IoFilter.class).getMock(),
-                (IoFilter) MockControl.createControl(IoFilter.class).getMock(),
-                (IoFilter) MockControl.createControl(IoFilter.class).getMock() };
+                MockControl.createControl(IoFilter.class).getMock(),
+                MockControl.createControl(IoFilter.class).getMock(),
+                MockControl.createControl(IoFilter.class).getMock() };
     }
 
     public void testUnnamedFilters() throws Exception {

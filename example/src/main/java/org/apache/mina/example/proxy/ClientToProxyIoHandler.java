@@ -23,7 +23,6 @@ import java.net.SocketAddress;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
@@ -53,9 +52,8 @@ public class ClientToProxyIoHandler extends AbstractProxyIoHandler {
     @Override
     public void sessionOpened(final IoSession session) throws Exception {
 
-        connector.connect(remoteAddress).addListener(new IoFutureListener() {
-            public void operationComplete(IoFuture f) {
-                ConnectFuture future = (ConnectFuture) f;
+        connector.connect(remoteAddress).addListener(new IoFutureListener<ConnectFuture>() {
+            public void operationComplete(ConnectFuture future) {
                 try {
                     future.getSession().setAttachment(session);
                     session.setAttachment(future.getSession());

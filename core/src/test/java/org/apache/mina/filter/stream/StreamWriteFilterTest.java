@@ -558,11 +558,11 @@ public class StreamWriteFilterTest extends TestCase {
             return true;
         }
 
-        public WriteFuture addListener(IoFutureListener listener) {
+        public WriteFuture addListener(IoFutureListener<?> listener) {
             return this;
         }
 
-        public WriteFuture removeListener(IoFutureListener listener) {
+        public WriteFuture removeListener(IoFutureListener<?> listener) {
             return this;
         }
 

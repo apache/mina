@@ -28,6 +28,7 @@ package org.apache.mina.statemachine;
  */
 
 public class StateMachineCreationException extends RuntimeException {
+    private static final long serialVersionUID = 4103502727376992746L;
 
     /**
      * Creates a new instance.

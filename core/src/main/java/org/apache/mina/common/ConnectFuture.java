@@ -86,7 +86,7 @@ public interface ConnectFuture extends IoFuture {
 
     ConnectFuture awaitUninterruptibly();
 
-    ConnectFuture addListener(IoFutureListener listener);
+    ConnectFuture addListener(IoFutureListener<?> listener);
 
-    ConnectFuture removeListener(IoFutureListener listener);
+    ConnectFuture removeListener(IoFutureListener<?> listener);
 }

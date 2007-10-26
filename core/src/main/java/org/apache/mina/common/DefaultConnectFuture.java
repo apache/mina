@@ -102,12 +102,12 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
     }
 
     @Override
-    public ConnectFuture addListener(IoFutureListener listener) {
+    public ConnectFuture addListener(IoFutureListener<?> listener) {
         return (ConnectFuture) super.addListener(listener);
     }
 
     @Override
-    public ConnectFuture removeListener(IoFutureListener listener) {
+    public ConnectFuture removeListener(IoFutureListener<?> listener) {
         return (ConnectFuture) super.removeListener(listener);
     }
 }

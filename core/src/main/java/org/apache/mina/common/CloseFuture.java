@@ -52,7 +52,7 @@ public interface CloseFuture extends IoFuture {
 
     CloseFuture awaitUninterruptibly();
 
-    CloseFuture addListener(IoFutureListener listener);
+    CloseFuture addListener(IoFutureListener<?> listener);
 
-    CloseFuture removeListener(IoFutureListener listener);
+    CloseFuture removeListener(IoFutureListener<?> listener);
 }

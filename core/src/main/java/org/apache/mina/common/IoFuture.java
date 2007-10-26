@@ -94,11 +94,11 @@ public interface IoFuture {
      * Adds an event <tt>listener</tt> which is notified when
      * the state of this future changes.
      */
-    IoFuture addListener(IoFutureListener listener);
+    IoFuture addListener(IoFutureListener<?> listener);
 
     /**
      * Removes an existing event <tt>listener</tt> which is notified when
      * the state of this future changes.
      */
-    IoFuture removeListener(IoFutureListener listener);
+    IoFuture removeListener(IoFutureListener<?> listener);
 }

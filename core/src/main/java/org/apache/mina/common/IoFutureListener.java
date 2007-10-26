@@ -28,12 +28,12 @@ import java.util.EventListener;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoFutureListener extends EventListener {
+public interface IoFutureListener<F extends IoFuture> extends EventListener {
     /**
      * An {@link IoFutureListener} that closes the {@link IoSession} which is
      * associated with the specified {@link IoFuture}.
      */
-    static IoFutureListener CLOSE = new IoFutureListener() {
+    static IoFutureListener<IoFuture> CLOSE = new IoFutureListener<IoFuture>() {
         public void operationComplete(IoFuture future) {
             future.getSession().close();
         }
@@ -46,5 +46,5 @@ public interface IoFutureListener extends EventListener {
      * @param future  The source {@link IoFuture} which called this
      *                callback.
      */
-    void operationComplete(IoFuture future);
+    void operationComplete(F future);
 }

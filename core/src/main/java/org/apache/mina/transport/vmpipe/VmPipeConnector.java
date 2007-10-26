@@ -127,7 +127,7 @@ public class VmPipeConnector extends AbstractIoConnector {
 
     private static int nextLocalPort = -1;
 
-    private static final IoFutureListener LOCAL_ADDRESS_RECLAIMER = new LocalAddressReclaimer();
+    private static final IoFutureListener<IoFuture> LOCAL_ADDRESS_RECLAIMER = new LocalAddressReclaimer();
 
     private static VmPipeAddress nextLocalAddress() throws IOException {
         synchronized (TAKEN_LOCAL_ADDRESSES) {
@@ -146,7 +146,7 @@ public class VmPipeConnector extends AbstractIoConnector {
         throw new IOException("Can't assign a local VM pipe port.");
     }
 
-    private static class LocalAddressReclaimer implements IoFutureListener {
+    private static class LocalAddressReclaimer implements IoFutureListener<IoFuture> {
         public void operationComplete(IoFuture future) {
             synchronized (TAKEN_LOCAL_ADDRESSES) {
                 TAKEN_LOCAL_ADDRESSES.remove(future.getSession()

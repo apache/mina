@@ -26,4 +26,5 @@ package org.apache.mina.statemachine;
  * @version $Rev$, $Date$
  */
 class BreakAndContinueException extends BreakException {
+    private static final long serialVersionUID = -6166471981111377775L;
 }

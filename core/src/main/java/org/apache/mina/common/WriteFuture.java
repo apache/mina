@@ -59,7 +59,7 @@ public interface WriteFuture extends IoFuture {
 
     WriteFuture awaitUninterruptibly();
 
-    WriteFuture addListener(IoFutureListener listener);
+    WriteFuture addListener(IoFutureListener<?> listener);
 
-    WriteFuture removeListener(IoFutureListener listener);
+    WriteFuture removeListener(IoFutureListener<?> listener);
 }

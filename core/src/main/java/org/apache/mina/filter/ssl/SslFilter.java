@@ -552,7 +552,7 @@ public class SslFilter extends IoFilterAdapter {
             synchronized (handler) {
                 if (isSslStarted(session)) {
                     future = initiateClosure(nextFilter, session);
-                    future.addListener(new IoFutureListener() {
+                    future.addListener(new IoFutureListener<IoFuture>() {
                         public void operationComplete(IoFuture future) {
                             nextFilter.filterClose(session);
                         }

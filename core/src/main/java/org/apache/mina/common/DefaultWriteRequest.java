@@ -52,12 +52,12 @@ public class DefaultWriteRequest implements WriteRequest {
             return true;
         }
 
-        public WriteFuture addListener(IoFutureListener listener) {
+        public WriteFuture addListener(IoFutureListener<?> listener) {
             throw new IllegalStateException(
                     "You can't add a listener to a dummy future.");
         }
 
-        public WriteFuture removeListener(IoFutureListener listener) {
+        public WriteFuture removeListener(IoFutureListener<?> listener) {
             throw new IllegalStateException(
                     "You can't add a listener to a dummy future.");
         }

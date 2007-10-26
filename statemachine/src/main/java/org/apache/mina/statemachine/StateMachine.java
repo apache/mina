@@ -156,7 +156,7 @@ public class StateMachine {
 
     private void processEvents(LinkedList<Event> eventQueue) {
         while (!eventQueue.isEmpty()) {
-            Event event = (Event) eventQueue.removeFirst();
+            Event event = eventQueue.removeFirst();
             StateContext context = event.getContext();
             handle(context.getCurrentState(), event);
         }

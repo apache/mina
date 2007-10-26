@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
  * @version $Rev$, $Date$
  */
 public class MethodInvocationException extends RuntimeException {
+    private static final long serialVersionUID = 4288548621384649704L;
 
     /**
      * Creates a new instance for the specified {@link Method} and 

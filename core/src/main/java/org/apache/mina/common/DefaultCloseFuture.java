@@ -57,12 +57,12 @@ public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture {
     }
 
     @Override
-    public CloseFuture addListener(IoFutureListener listener) {
+    public CloseFuture addListener(IoFutureListener<?> listener) {
         return (CloseFuture) super.addListener(listener);
     }
 
     @Override
-    public CloseFuture removeListener(IoFutureListener listener) {
+    public CloseFuture removeListener(IoFutureListener<?> listener) {
         return (CloseFuture) super.removeListener(listener);
     }
 }

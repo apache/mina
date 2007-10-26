@@ -74,12 +74,12 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     }
 
     @Override
-    public WriteFuture addListener(IoFutureListener listener) {
+    public WriteFuture addListener(IoFutureListener<?> listener) {
         return (WriteFuture) super.addListener(listener);
     }
 
     @Override
-    public WriteFuture removeListener(IoFutureListener listener) {
+    public WriteFuture removeListener(IoFutureListener<?> listener) {
         return (WriteFuture) super.removeListener(listener);
     }
 }

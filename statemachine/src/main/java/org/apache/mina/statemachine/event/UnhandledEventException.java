@@ -26,6 +26,8 @@ package org.apache.mina.statemachine.event;
  * @version $Rev$, $Date$
  */
 public class UnhandledEventException extends RuntimeException {
+    private static final long serialVersionUID = -717373229954175430L;
+    
     private final Event event;
 
     public UnhandledEventException(Event event) {

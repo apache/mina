@@ -222,7 +222,7 @@ public class FutureTest extends TestCase {
         }
     }
 
-    private static class TestListener implements IoFutureListener {
+    private static class TestListener implements IoFutureListener<IoFuture> {
         private IoFuture notifiedFuture;
 
         public void operationComplete(IoFuture future) {

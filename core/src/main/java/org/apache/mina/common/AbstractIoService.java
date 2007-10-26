@@ -19,6 +19,9 @@
  */
 package org.apache.mina.common;
 
+import java.util.AbstractSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -190,6 +193,25 @@ public abstract class AbstractIoService implements IoService {
     protected void increaseWrittenMessages() {
         writtenMessages.incrementAndGet();
         scheduledWriteMessages.decrementAndGet();
+    }
+
+    public Set<WriteFuture> broadcast(Object message) {
+        // Convert to Set.  We do not return a List here because only the 
+        // direct caller of MessageBroadcaster knows the order of write
+        // operations.
+        final List<WriteFuture> futures = MessageBroadcaster.broadcast(
+                message, getManagedSessions());
+        return new AbstractSet<WriteFuture>() {
+            @Override
+            public Iterator<WriteFuture> iterator() {
+                return futures.iterator();
+            }
+
+            @Override
+            public int size() {
+                return futures.size();
+            }
+        };
     }
 
     protected static class ServiceOperationFuture extends DefaultIoFuture {

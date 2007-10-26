@@ -21,7 +21,6 @@ package org.apache.mina.example.tapedeck;
 
 import static org.apache.mina.statemachine.mina.Events.*;
 
-import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.statemachine.StateControl;
@@ -121,11 +120,7 @@ public class TapeDeckServer {
     
     @Handler(on = MESSAGE_RECEIVED, in = ROOT)
     public void quit(TapeDeckContext context, IoSession session, QuitCommand cmd) {
-        session.write("+ Bye! Please come back!").addListener(new IoFutureListener() {
-            public void operationComplete(IoFuture future) {
-                future.getSession().close();
-            }
-        });
+        session.write("+ Bye! Please come back!").addListener(IoFutureListener.CLOSE);
     }
     
     @Handler(on = MESSAGE_RECEIVED, in = ROOT, weight = 10)

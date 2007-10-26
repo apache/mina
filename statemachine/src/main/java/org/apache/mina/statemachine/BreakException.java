@@ -29,6 +29,8 @@ package org.apache.mina.statemachine;
  * @version $Rev$, $Date$
  */
 public class BreakException extends RuntimeException {
+    private static final long serialVersionUID = -1898782004087949199L;
+
     protected BreakException() {
     }
 }
