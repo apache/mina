@@ -22,7 +22,6 @@ package org.apache.mina.filter.firewall;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,26 +64,21 @@ public class BlacklistFilter extends IoFilterAdapter {
      * Sets the addresses to be blacklisted.
      *
      * NOTE: this call will remove any previously blacklisted addresses.
-     * FIXME: Change the parameter type to Iterable
      *
      * @param addresses a collection of InetAddress objects representing the
      *        addresses to be blacklisted.
      * @throws IllegalArgumentException if the specified collections contains
      *         non-{@link InetAddress} objects.
      */
-    public void setBlacklist(Collection<InetAddress> addresses) {
+    public void setBlacklist(Iterable<InetAddress> addresses) {
         if (addresses == null) {
             throw new NullPointerException("addresses");
         }
 
-        InetAddress[] inetAddresses = new InetAddress[addresses.size()];
-        try {
-            setBlacklist(addresses.toArray(inetAddresses));
-        } catch (ArrayStoreException ase) {
-            IllegalArgumentException iae = new IllegalArgumentException(
-                    "Collection of addresses must contain only InetAddress instances.");
-            iae.initCause(ase);
-            throw iae;
+        blacklist.clear();
+        
+        for( InetAddress address : addresses ){
+            block( address, address.getHostName() );
         }
     }
 
