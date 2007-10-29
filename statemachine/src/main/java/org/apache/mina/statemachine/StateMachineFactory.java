@@ -19,6 +19,7 @@
  */
 package org.apache.mina.statemachine;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import org.apache.mina.statemachine.annotation.Handler;
 import org.apache.mina.statemachine.annotation.Handlers;
+import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.MethodTransition;
 import org.apache.mina.statemachine.transition.Transition;
 
@@ -102,6 +104,31 @@ public class StateMachineFactory {
      * @return the {@link StateMachine} object.
      */
     public static StateMachine create(String start, Object handler, Object... handlers) {
+        return create(Handler.class, Handlers.class, start, handler, handlers);
+    }
+    
+    /**
+     * Creates a new {@link StateMachine} from the specified handler objects and
+     * using the {@link State} with the specified id as start state. Use this
+     * method if you want to use your own alternatives to the {@link Handler}
+     * and {@link Handlers} annotations.
+     * 
+     * @param handlerAnnotation the annotation to use instead of {@link Handler}. 
+     *        The annotation must have the same parameters as {@link Handler} 
+     *        but the <code>on</code> parameter may be of an enum type instead of string.
+     * @param handlersAnnotation the annotation to use instead of {@link Handlers}. 
+     *        The annotation must have the same parameters as {@link Handlers}. 
+     * @param start the id of the start {@link State} to use.
+     * @param handler the first object containing the annotations describing the 
+     *        state machine.
+     * @param handlers zero or more additional objects containing the 
+     *        annotations describing the state machine.
+     * @return the {@link StateMachine} object.
+     */
+    public static StateMachine create(Class<? extends Annotation> handlerAnnotation, 
+            Class<? extends Annotation> handlersAnnotation, 
+            String start, Object handler, Object... handlers) {
+        
         Map<String, State> states = new HashMap<String, State>();
         List<Object> handlersList = new ArrayList<Object>(1 + handlers.length);
         handlersList.add(handler);
@@ -119,18 +146,21 @@ public class StateMachineFactory {
             throw new StateMachineCreationException("Start state '" + start + "' not found.");
         }
 
-        setupTransitions(states, handlersList);
+        setupTransitions(handlerAnnotation, handlersAnnotation, states, handlersList);
 
         return new StateMachine(states.values(), start);
     }
 
-    private static void setupTransitions(Map<String, State> states, List<Object> handlers) {
+    private static void setupTransitions(Class<? extends Annotation> handlerAnnotation, 
+            Class<? extends Annotation> handlersAnnotation, Map<String, State> states, List<Object> handlers) {
         for (Object handler : handlers) {
-            setupTransitions(states, handler);
+            setupTransitions(handlerAnnotation, handlersAnnotation, states, handler);
         }
     }
-
-    private static void setupTransitions(Map<String, State> states, Object handler) {
+    
+    private static void setupTransitions(Class<? extends Annotation> handlerAnnotation, 
+            Class<? extends Annotation> handlersAnnotation, Map<String, State> states, Object handler) {
+        
         Method[] methods = handler.getClass().getDeclaredMethods();
         Arrays.sort(methods, new Comparator<Method>() {
             public int compare(Method m1, Method m2) {
@@ -139,20 +169,21 @@ public class StateMachineFactory {
         });
         
         for (Method m : methods) {
-            List<Handler> handlerAnnotations = new ArrayList<Handler>();
-            if (m.isAnnotationPresent(Handler.class)) {
-                handlerAnnotations.add(m.getAnnotation(Handler.class));
+            List<HandlerWrapper> handlerAnnotations = new ArrayList<HandlerWrapper>();
+            if (m.isAnnotationPresent(handlerAnnotation)) {
+                handlerAnnotations.add(new HandlerWrapper(handlerAnnotation, m.getAnnotation(handlerAnnotation)));
             }
-            if (m.isAnnotationPresent(Handlers.class)) {
-                handlerAnnotations.addAll(Arrays.asList(m.getAnnotation(Handlers.class).value()));
+            if (m.isAnnotationPresent(handlersAnnotation)) {
+                handlerAnnotations.addAll(Arrays.asList(new HandlersWrapper(handlerAnnotation, 
+                        handlersAnnotation, m.getAnnotation(handlersAnnotation)).value()));
             }
             
             if (handlerAnnotations.isEmpty()) {
                 continue;
             }
             
-            for (Handler annotation : handlerAnnotations) {
-                String[] eventIds = annotation.on();
+            for (HandlerWrapper annotation : handlerAnnotations) {
+                Object[] eventIds = annotation.on();
                 if (eventIds.length == 0) {
                     throw new StateMachineCreationException("Error encountered " 
                             + "when processing method " + m
@@ -174,7 +205,10 @@ public class StateMachineFactory {
                     }
                 }
                 
-                for (String event : eventIds) {
+                for (Object event : eventIds) {
+                    if (event == null) {
+                        event = Event.WILDCARD_EVENT_ID;
+                    }
                     for (String in : annotation.in()) {
                         State state = states.get(in);
                         if (state == null) {
@@ -263,4 +297,70 @@ public class StateMachineFactory {
         return states.values().toArray(new State[0]);
     }
     
+    private static class HandlerWrapper {
+        private final Class<? extends Annotation> handlerClazz;
+        private final Annotation annotation;
+        public HandlerWrapper(Class<? extends Annotation> handlerClazz, Annotation annotation) {
+            this.handlerClazz = handlerClazz;
+            this.annotation = annotation;
+        }
+        Object[] on() {
+            return getParameter("on", Object[].class);
+        }
+        String[] in() {
+            return getParameter("in", String[].class);
+        }
+        String next() {
+            return getParameter("next", String.class);
+        }
+        int weight() {
+            return getParameter("weight", Integer.TYPE);
+        }
+        @SuppressWarnings("unchecked")
+        private <T> T getParameter(String name, Class<T> returnType) {
+            try {
+                Method m = handlerClazz.getMethod(name);
+                if (!returnType.isAssignableFrom(m.getReturnType())) {
+                    throw new NoSuchMethodException();
+                }
+                return (T) m.invoke(annotation);
+            } catch (Throwable t) {
+                throw new StateMachineCreationException("Could not get parameter '" 
+                        + name + "' from Handler annotation " + handlerClazz);
+            }
+        }
+    }
+    
+    private static class HandlersWrapper {
+        private final Class<? extends Annotation> handlersclazz;
+        private final Class<? extends Annotation> handlerClazz;
+        private final Annotation annotation;
+        public HandlersWrapper(Class<? extends Annotation> handlerClazz, 
+                Class<? extends Annotation> handlersclazz, Annotation annotation) {
+            this.handlerClazz = handlerClazz;
+            this.handlersclazz = handlersclazz;
+            this.annotation = annotation;
+        }
+        HandlerWrapper[] value() {
+            Annotation[] annos = getParameter("value", Annotation[].class);
+            HandlerWrapper[] wrappers = new HandlerWrapper[annos.length];
+            for (int i = 0; i < annos.length; i++) {
+                wrappers[i] = new HandlerWrapper(handlerClazz, annos[i]);
+            }
+            return wrappers;
+        }
+        @SuppressWarnings("unchecked")
+        private <T> T getParameter(String name, Class<T> returnType) {
+            try {
+                Method m = handlersclazz.getMethod(name);
+                if (!returnType.isAssignableFrom(m.getReturnType())) {
+                    throw new NoSuchMethodException();
+                }
+                return (T) m.invoke(annotation);
+            } catch (Throwable t) {
+                throw new StateMachineCreationException("Could not get parameter '" 
+                        + name + "' from Handlers annotation " + handlersclazz);
+            }
+        }
+    }
 }
