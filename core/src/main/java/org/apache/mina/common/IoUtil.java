@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class MessageBroadcaster {
+public class IoUtil {
     
     private static final IoSession[] EMPTY_SESSIONS = new IoSession[0];
 
@@ -106,31 +106,31 @@ public class MessageBroadcaster {
         }
     }
     
-    public static void await(Iterable<WriteFuture> futures) throws InterruptedException {
-        for (WriteFuture f: futures) {
+    public static void await(Iterable<? extends IoFuture> futures) throws InterruptedException {
+        for (IoFuture f: futures) {
             f.await();
         }
     }
     
-    public static void awaitUninterruptably(Iterable<WriteFuture> futures) {
-        for (WriteFuture f: futures) {
+    public static void awaitUninterruptably(Iterable<? extends IoFuture> futures) {
+        for (IoFuture f: futures) {
             f.awaitUninterruptibly();
         }
     }
     
-    public static boolean await(Iterable<WriteFuture> futures, long timeout, TimeUnit unit) throws InterruptedException {
+    public static boolean await(Iterable<? extends IoFuture> futures, long timeout, TimeUnit unit) throws InterruptedException {
         return await(futures, unit.toMillis(timeout));
     }
 
-    public static boolean await(Iterable<WriteFuture> futures, long timeoutMillis) throws InterruptedException {
+    public static boolean await(Iterable<? extends IoFuture> futures, long timeoutMillis) throws InterruptedException {
         return await0(futures, timeoutMillis, true);
     }
 
-    public static boolean awaitUninterruptibly(Iterable<WriteFuture> futures, long timeout, TimeUnit unit) {
+    public static boolean awaitUninterruptibly(Iterable<? extends IoFuture> futures, long timeout, TimeUnit unit) {
         return awaitUninterruptibly(futures, unit.toMillis(timeout));
     }
 
-    public static boolean awaitUninterruptibly(Iterable<WriteFuture> futures, long timeoutMillis) {
+    public static boolean awaitUninterruptibly(Iterable<? extends IoFuture> futures, long timeoutMillis) {
         try {
             return await0(futures, timeoutMillis, false);
         } catch (InterruptedException e) {
@@ -138,14 +138,14 @@ public class MessageBroadcaster {
         }
     }
 
-    private static boolean await0(Iterable<WriteFuture> futures, long timeoutMillis, boolean interruptable) throws InterruptedException {
+    private static boolean await0(Iterable<? extends IoFuture> futures, long timeoutMillis, boolean interruptable) throws InterruptedException {
         long startTime = timeoutMillis <= 0 ? 0 : System.currentTimeMillis();
         long waitTime = timeoutMillis;
         
         boolean lastComplete = true;
-        Iterator<WriteFuture> i = futures.iterator();
+        Iterator<? extends IoFuture> i = futures.iterator();
         while (i.hasNext()) {
-            WriteFuture f = i.next();
+            IoFuture f = i.next();
             do {
                 if (interruptable) {
                     lastComplete = f.await(waitTime);
@@ -168,6 +168,6 @@ public class MessageBroadcaster {
         return lastComplete && !i.hasNext();
     }
 
-    private MessageBroadcaster() {
+    private IoUtil() {
     }
 }

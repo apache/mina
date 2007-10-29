@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * An {@link IoFuture} of {@link IoFuture}s.  It is useful when you want to
  * get notified when all {@link IoFuture}s are complete.  It is not recommended
  * to use {@link CompositeIoFuture} if you just want to wait for all futures.
- * In that case, please use {@link MessageBroadcaster#await(Iterable)} instead
+ * In that case, please use {@link IoUtil#await(Iterable)} instead
  * for better performance.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)

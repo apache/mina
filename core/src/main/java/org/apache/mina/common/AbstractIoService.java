@@ -199,7 +199,7 @@ public abstract class AbstractIoService implements IoService {
         // Convert to Set.  We do not return a List here because only the 
         // direct caller of MessageBroadcaster knows the order of write
         // operations.
-        final List<WriteFuture> futures = MessageBroadcaster.broadcast(
+        final List<WriteFuture> futures = IoUtil.broadcast(
                 message, getManagedSessions());
         return new AbstractSet<WriteFuture>() {
             @Override
