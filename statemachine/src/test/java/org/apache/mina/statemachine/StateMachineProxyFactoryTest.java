@@ -85,7 +85,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
         player.stop();
         player.eject();
 
-        LinkedList messages = handler.messages;
+        LinkedList<String> messages = handler.messages;
         assertEquals("Tape 'Kings of convenience - Riot on an empty street' inserted", messages.removeFirst());
         assertEquals("Playing", messages.removeFirst());
         assertEquals("Paused", messages.removeFirst());
@@ -110,7 +110,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
         player.stop();
         player.eject();
 
-        LinkedList messages = handler.messages;
+        LinkedList<String> messages = handler.messages;
         assertEquals("Tape 'Kings of convenience - Riot on an empty street' inserted", messages.removeFirst());
         assertEquals("Playing", messages.removeFirst());
         assertEquals("Paused", messages.removeFirst());
@@ -138,7 +138,8 @@ public class StateMachineProxyFactoryTest extends TestCase {
             proxy.call3(proxy);
         }
 
-        public void call3(Reentrant proxy) {
+        public void call3(
+                @SuppressWarnings("unused") Reentrant proxy) {
             finished = true;
         }
     }

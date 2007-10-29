@@ -69,7 +69,7 @@ public class MinaStateContextLookup extends AbstractStateContextLookup {
         session.setAttribute(STATE_CONTEXT, context);
     }
 
-    protected boolean supports(Class c) {
+    protected boolean supports(Class<?> c) {
         return IoSession.class.isAssignableFrom(c);
     }
 }

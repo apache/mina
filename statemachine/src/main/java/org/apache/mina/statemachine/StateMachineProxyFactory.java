@@ -48,34 +48,34 @@ public class StateMachineProxyFactory {
     private StateMachineProxyFactory() {
     }
 
-    public static Object create(Class iface, StateMachine sm) {
+    public static Object create(Class<?> iface, StateMachine sm) {
         return create(new Class[] { iface }, sm);
     }
     
-    public static Object create(Class iface, StateMachine sm, StateContextLookup contextLookup) {
+    public static Object create(Class<?> iface, StateMachine sm, StateContextLookup contextLookup) {
         return create(new Class[] { iface }, sm, contextLookup);
     }
     
-    public static Object create(Class iface, StateMachine sm, StateContextLookup contextLookup,
+    public static Object create(Class<?> iface, StateMachine sm, StateContextLookup contextLookup,
             EventArgumentsInterceptor interceptor) {
         return create(new Class[] { iface }, sm, contextLookup, interceptor, new DefaultEventFactory());
     }
 
-    public static Object create(Class iface, StateMachine sm, StateContextLookup contextLookup,
+    public static Object create(Class<?> iface, StateMachine sm, StateContextLookup contextLookup,
             EventArgumentsInterceptor interceptor, EventFactory eventFactory) {
         return create(new Class[] { iface }, sm, contextLookup, interceptor, eventFactory);
     }
     
-    public static Object create(Class[] ifaces, StateMachine sm) {
+    public static Object create(Class<?>[] ifaces, StateMachine sm) {
         return create(ifaces, sm, new SingletonStateContextLookup());
     }
     
-    public static Object create(Class[] ifaces, StateMachine sm, StateContextLookup contextLookup) {
+    public static Object create(Class<?>[] ifaces, StateMachine sm, StateContextLookup contextLookup) {
 
         return create(ifaces, sm, contextLookup, null, new DefaultEventFactory());
     }
     
-    public static Object create(Class[] ifaces, StateMachine sm, StateContextLookup contextLookup,
+    public static Object create(Class<?>[] ifaces, StateMachine sm, StateContextLookup contextLookup,
             EventArgumentsInterceptor interceptor, EventFactory eventFactory) {
 
         ClassLoader cl = StateMachineProxyFactory.class.getClassLoader();

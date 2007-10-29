@@ -109,7 +109,7 @@ public class StateMachineFactory {
         
         LinkedList<Field> fields = new LinkedList<Field>();
         for (Object h : handlersList) {
-            fields.addAll(getFields(h instanceof Class ? (Class) h : h.getClass()));
+            fields.addAll(getFields(h instanceof Class ? (Class<?>) h : h.getClass()));
         }
         for (State state : createStates(fields)) {
             states.put(state.getId(), state);
@@ -191,7 +191,7 @@ public class StateMachineFactory {
         }
     }
 
-    static List<Field> getFields(Class clazz) {
+    static List<Field> getFields(Class<?> clazz) {
         LinkedList<Field> fields = new LinkedList<Field>();
 
         for (Field f : clazz.getDeclaredFields()) {

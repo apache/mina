@@ -196,7 +196,7 @@ public class MethodTransition extends AbstractTransition {
     }
 
     public boolean doExecute(Event event) {
-        Class[] types = method.getParameterTypes();
+        Class<?>[] types = method.getParameterTypes();
         
         if (types.length == 0) {
             invokeMethod(EMPTY_ARGUMENTS);
@@ -232,7 +232,8 @@ public class MethodTransition extends AbstractTransition {
         return true;
     }
     
-    private boolean match(Class paramType, Object arg, Class argType) {
+    @SuppressWarnings("unchecked")
+    private boolean match(Class<?> paramType, Object arg, Class argType) {
         if (paramType.isPrimitive()) {
             if (paramType.equals(Boolean.TYPE)) {
                 return arg instanceof Boolean;

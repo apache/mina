@@ -89,5 +89,5 @@ public abstract class AbstractStateContextLookup implements StateContextLookup {
      * @param c the class.
      * @return <code>true</code> or <code>false</code>.
      */
-    protected abstract boolean supports(Class c);
+    protected abstract boolean supports(Class<?> c);
 }

@@ -37,18 +37,20 @@ import junit.framework.TestCase;
 public class AbstractStateContextLookupTest extends TestCase {
 
     public void testLookup() throws Exception {
-        Map map = new HashMap();
+        Map<String, StateContext> map = new HashMap<String, StateContext>();
         AbstractStateContextLookup lookup = new AbstractStateContextLookup(
                                              new DefaultStateContextFactory()) {
-            protected boolean supports(Class c) {
+            protected boolean supports(Class<?> c) {
                 return Map.class.isAssignableFrom(c);
             }
+            @SuppressWarnings("unchecked")
             protected StateContext lookup(Object eventArg) {
-                Map map = (Map) eventArg;
-                return (StateContext) map.get("context");
+                Map<String, StateContext> map = (Map<String, StateContext>) eventArg;
+                return map.get("context");
             }
+            @SuppressWarnings("unchecked")
             protected void store(Object eventArg, StateContext context) {
-                Map map = (Map) eventArg;
+                Map<String, StateContext> map = (Map<String, StateContext>) eventArg;
                 map.put("context", context);
             }
         };
