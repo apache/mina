@@ -17,14 +17,9 @@
  *  under the License.
  *
  */
-package org.apache.mina.statemachine.mina;
+package org.apache.mina.statemachine.context;
 
 import org.apache.mina.common.IoSession;
-import org.apache.mina.statemachine.context.AbstractStateContextLookup;
-import org.apache.mina.statemachine.context.DefaultStateContextFactory;
-import org.apache.mina.statemachine.context.StateContext;
-import org.apache.mina.statemachine.context.StateContextFactory;
-import org.apache.mina.statemachine.context.StateContextLookup;
 
 /**
  * MINA specific {@link StateContextLookup} which uses an {@link IoSession}
@@ -33,19 +28,19 @@ import org.apache.mina.statemachine.context.StateContextLookup;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class MinaStateContextLookup extends AbstractStateContextLookup {
+public class IoSessionStateContextLookup extends AbstractStateContextLookup {
     /**
      * The name of the {@link IoSession} attribute used to store the
      * {@link StateContext} object.
      */
     public static final String STATE_CONTEXT = 
-        MinaStateContextLookup.class.getName() + ".stateContext";
+        IoSessionStateContextLookup.class.getName() + ".stateContext";
     
     /**
      * Creates a new instance using a {@link DefaultStateContextFactory} to
      * create {@link StateContext} objects for new {@link IoSession}s.
      */
-    public MinaStateContextLookup() {
+    public IoSessionStateContextLookup() {
         this(new DefaultStateContextFactory());
     }
 
@@ -55,7 +50,7 @@ public class MinaStateContextLookup extends AbstractStateContextLookup {
      * 
      * @param contextFactory the {@link StateContextFactory}.
      */
-    public MinaStateContextLookup(StateContextFactory contextFactory) {
+    public IoSessionStateContextLookup(StateContextFactory contextFactory) {
         super(contextFactory);
     }
 

@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.statemachine.mina;
+package org.apache.mina.statemachine.event;
 
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.statemachine.annotation.Handler;
@@ -29,7 +29,7 @@ import org.apache.mina.statemachine.annotation.Handler;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public final class Events {
+public final class IoSessionEvents {
     public static final String SESSION_CREATED = "sessionCreated";
 
     public static final String SESSION_OPENED = "sessionOpened";
@@ -44,6 +44,6 @@ public final class Events {
 
     public static final String EXCEPTION_CAUGHT = "exceptionCaught";
 
-    private Events() {
+    private IoSessionEvents() {
     }
 }
