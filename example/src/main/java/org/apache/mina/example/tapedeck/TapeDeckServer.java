@@ -19,7 +19,7 @@
  */
 package org.apache.mina.example.tapedeck;
 
-import static org.apache.mina.statemachine.mina.Events.*;
+import static org.apache.mina.statemachine.event.IoSessionEvents.*;
 
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;

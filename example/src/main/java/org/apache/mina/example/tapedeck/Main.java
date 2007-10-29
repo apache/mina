@@ -27,9 +27,9 @@ import org.apache.mina.filter.codec.textline.TextLineEncoder;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.StateMachineFactory;
 import org.apache.mina.statemachine.StateMachineProxyFactory;
+import org.apache.mina.statemachine.context.IoSessionStateContextLookup;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.context.StateContextFactory;
-import org.apache.mina.statemachine.mina.MinaStateContextLookup;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
@@ -48,7 +48,7 @@ public class Main {
         StateMachine sm = StateMachineFactory.create(TapeDeckServer.EMPTY, new TapeDeckServer());
         
         return (IoHandler) StateMachineProxyFactory.create(IoHandler.class, sm, 
-                new MinaStateContextLookup(new StateContextFactory() {
+                new IoSessionStateContextLookup(new StateContextFactory() {
                     public StateContext create() {
                         return new TapeDeckServer.TapeDeckContext();
                     }
