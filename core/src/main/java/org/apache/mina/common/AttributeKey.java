@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -28,7 +29,9 @@ import java.util.Map;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public final class AttributeKey {
+public final class AttributeKey implements Serializable {
+    private static final long serialVersionUID = -583377473376683096L;
+    
     private final String name;
 
     /**
