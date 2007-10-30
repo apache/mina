@@ -22,13 +22,13 @@ package org.apache.mina.filter.codec.demux;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.UnknownMessageTypeException;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
+import org.apache.mina.util.CopyOnWriteMap;
 import org.apache.mina.util.IdentityHashSet;
 
 /**
@@ -51,7 +51,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     private final AttributeKey STATE = new AttributeKey(getClass(), "state");
 
     @SuppressWarnings("unchecked")
-    private final ConcurrentMap<Class<?>, MessageEncoderFactory> type2encoderFactory = new ConcurrentHashMap<Class<?>, MessageEncoderFactory>();
+    private final Map<Class<?>, MessageEncoderFactory> type2encoderFactory = new CopyOnWriteMap<Class<?>, MessageEncoderFactory>();
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
@@ -97,9 +97,13 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
             throw new NullPointerException("factory");
         }
         
-        if (type2encoderFactory.putIfAbsent(messageType, factory) != null) {
-            throw new IllegalStateException(
-                    "The specified message type (" + messageType.getName() + ") is registered already.");
+        synchronized (type2encoderFactory) {
+            if (type2encoderFactory.containsKey(messageType)) {
+                throw new IllegalStateException(
+                        "The specified message type (" + messageType.getName() + ") is registered already.");
+            }
+            
+            type2encoderFactory.put(messageType, factory);
         }
     }
 
