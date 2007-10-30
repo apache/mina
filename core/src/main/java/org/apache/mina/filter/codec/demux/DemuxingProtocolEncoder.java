@@ -22,7 +22,6 @@ package org.apache.mina.filter.codec.demux;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoSession;
