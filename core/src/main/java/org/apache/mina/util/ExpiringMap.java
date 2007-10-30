@@ -30,7 +30,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * A map with expiration.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 public class ExpiringMap<K, V> implements Map<K, V> {
     public static final int DEFAULT_TIME_TO_LIVE = 60;

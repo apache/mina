@@ -26,7 +26,7 @@ import java.util.Map;
  * A key that makes its parent {@link Map} or session attribute to search
  * fast while being debug-friendly by providing the spring representation.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public final class AttributeKey implements Serializable {

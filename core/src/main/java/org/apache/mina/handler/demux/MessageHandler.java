@@ -27,7 +27,7 @@ import org.apache.mina.common.IoSession;
  * handler with the type of message you want to get notified using
  * {@link DemuxingIoHandler#addMessageHandler(Class, MessageHandler)}.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface MessageHandler<E> {

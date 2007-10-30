@@ -35,7 +35,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
 /**
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 class VmPipeFilterChain extends DefaultIoFilterChain {

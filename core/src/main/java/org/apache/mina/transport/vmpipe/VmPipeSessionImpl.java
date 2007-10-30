@@ -39,7 +39,7 @@ import org.apache.mina.common.WriteRequest;
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {

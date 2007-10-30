@@ -73,7 +73,7 @@ import org.apache.mina.util.IdentityHashSet;
  * {@link #removeMessageHandler(Class)} clear this cache.
  * </p>
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DemuxingIoHandler extends IoHandlerAdapter {

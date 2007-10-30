@@ -33,7 +33,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 /**
  * A {@link ProtocolDecoder} which decodes a text line into a string.
  *
- * @author The Apache Directory Project (mina-dev@directory.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
 public class TextLineDecoder implements ProtocolDecoder {

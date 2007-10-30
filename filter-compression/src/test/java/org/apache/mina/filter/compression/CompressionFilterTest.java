@@ -199,8 +199,6 @@ public class CompressionFilterTest extends TestCase {
 
     /**
      * A matcher used to check if the actual and expected outputs matched
-     *
-     * @author The Apache Directory MINA subproject (mina-dev@directory.apache.org)
      */
     class DataMatcher extends AbstractMatcher {
         @Override
