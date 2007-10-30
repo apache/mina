@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.mina.common.AbstractIoAcceptor;
+import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
@@ -110,5 +111,11 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
 
     public IoSession newSession(SocketAddress remoteAddress) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void finishSessionInitialization(IoSession session,
+            IoFuture future) {
+        super.finishSessionInitialization(session, future);
     }
 }

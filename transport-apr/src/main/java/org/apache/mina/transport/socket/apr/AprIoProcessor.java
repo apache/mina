@@ -27,8 +27,8 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoProcessor;
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.FileRegion;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.tomcat.jni.Error;
 import org.apache.tomcat.jni.Poll;
@@ -58,7 +58,7 @@ class AprIoProcessor extends AbstractIoProcessor {
 
         public AbstractIoSession next() {
             AprSessionImpl sess = i.next();
-            return (AbstractIoSession) sess;
+            return sess;
         }
 
         public void remove() {

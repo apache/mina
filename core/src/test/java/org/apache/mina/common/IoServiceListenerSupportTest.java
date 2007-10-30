@@ -146,7 +146,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         IoFilterChain chain = (IoFilterChain) chainControl.getMock();
         session.setFilterChain(chain);
 
-        MockControl listenerControl = MockControl
+        final MockControl listenerControl = MockControl
                 .createStrictControl(IoServiceListener.class);
         IoServiceListener listener = (IoServiceListener) listenerControl
                 .getMock();
@@ -190,12 +190,19 @@ public class IoServiceListenerSupportTest extends TestCase {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                support.fireSessionDestroyed(session);
+                // This synchronization block is a workaround for
+                // the visibility problem of simultaneous EasyMock
+                // state update. (not sure if it fixes the failing test yet.)
+                synchronized (listenerControl) {
+                    support.fireSessionDestroyed(session);
+                }
             }
         }.start();
         support.fireServiceDeactivated();
 
-        listenerControl.verify();
+        synchronized (listenerControl) {
+            listenerControl.verify();
+        }
         acceptorControl.verify();
         chainControl.verify();
 

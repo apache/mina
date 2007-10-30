@@ -91,8 +91,8 @@ public class SerialConnector extends AbstractIoConnector {
                         ConnectFuture future = new DefaultConnectFuture();
                         SerialSessionImpl session = new SerialSessionImpl(
                                 this, portAddress, serialPort);
+                        finishSessionInitialization(session, future);
                         session.start();
-                        future.setSession(session);
                         return future;
                     } catch (PortInUseException e) {
                         if (log.isDebugEnabled()) {

@@ -24,10 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.FileChannel;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -62,8 +58,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     private final Object lock = new Object();
 
-    private final Map<Object, Object> attributes = Collections
-            .synchronizedMap(new HashMap<Object, Object>(4));
+    private IoSessionAttributeMap attributes;
 
     private final Queue<WriteRequest> writeRequestQueue =
         new ConcurrentLinkedQueue<WriteRequest>() {
@@ -268,115 +263,47 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     public Object getAttribute(Object key) {
-        if (key == null) {
-            throw new NullPointerException("key");
-        }
-
-        return attributes.get(key);
+        return attributes.getAttribute(this, key);
     }
 
     public Object getAttribute(Object key, Object defaultValue) {
-        if (key == null) {
-            throw new NullPointerException("key");
-        }
-        if (defaultValue == null) {
-            return attributes.get(key);
-        }
-
-        Object answer = attributes.get(key);
-        if (answer == null) {
-            return defaultValue;
-        } else {
-            return answer;
-        }
+        return attributes.getAttribute(this, key, defaultValue);
     }
 
     public Object setAttribute(Object key, Object value) {
-        if (key == null) {
-            throw new NullPointerException("key");
-        }
-
-        if (value == null) {
-            return attributes.remove(key);
-        } else {
-            return attributes.put(key, value);
-        }
+        return attributes.setAttribute(this, key, value);
     }
 
     public Object setAttribute(Object key) {
-        return setAttribute(key, Boolean.TRUE);
+        return attributes.setAttribute(this, key);
     }
 
     public Object setAttributeIfAbsent(Object key, Object value) {
-        if (key == null) {
-            throw new NullPointerException("key");
-        }
-
-        if (value == null) {
-            return null;
-        }
-
-        Object oldValue;
-        synchronized (attributes) {
-            oldValue = attributes.get(key);
-            if (oldValue == null) {
-                attributes.put(key, value);
-            }
-        }
-        return oldValue;
+        return attributes.setAttributeIfAbsent(this, key, value);
     }
 
     public Object removeAttribute(Object key) {
-        if (key == null) {
-            throw new NullPointerException("key");
-        }
-
-        return attributes.remove(key);
+        return attributes.removeAttribute(this, key);
     }
 
     public boolean removeAttribute(Object key, Object value) {
-        if (key == null) {
-            throw new NullPointerException("key");
-        }
-
-        if (value == null) {
-            return false;
-        }
-
-        synchronized (attributes) {
-            if (value.equals(attributes.get(key))) {
-                attributes.remove(key);
-                return true;
-            }
-        }
-
-        return false;
+        return attributes.removeAttribute(this, key, value);
     }
 
     public boolean replaceAttribute(Object key, Object oldValue, Object newValue) {
-        synchronized (attributes) {
-            Object actualOldValue = attributes.get(key);
-            if (actualOldValue == null) {
-                return false;
-            }
-
-            if (actualOldValue.equals(oldValue)) {
-                attributes.put(key, newValue);
-                return true;
-            } else {
-                return false;
-            }
-        }
+        return attributes.replaceAttribute(this, key, oldValue, newValue);
     }
 
     public boolean containsAttribute(Object key) {
-        return attributes.containsKey(key);
+        return attributes.containsAttribute(this, key);
     }
 
     public Set<Object> getAttributeKeys() {
-        synchronized (attributes) {
-            return new HashSet<Object>(attributes.keySet());
-        }
+        return attributes.getAttributeKeys(this);
+    }
+    
+    protected void setAttributeMap(IoSessionAttributeMap attributes) {
+        this.attributes = attributes;
     }
 
     public TrafficMask getTrafficMask() {

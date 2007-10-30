@@ -102,6 +102,7 @@ public class VmPipeConnector extends AbstractIoConnector {
 
         // initialize acceptor session
         VmPipeSessionImpl remoteSession = localSession.getRemoteSession();
+        ((VmPipeAcceptor) remoteSession.getService()).finishSessionInitialization(remoteSession, null);
         try {
             IoFilterChain filterChain = remoteSession.getFilterChain();
             entry.getAcceptor().getFilterChainBuilder().buildFilterChain(

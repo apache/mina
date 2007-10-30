@@ -97,10 +97,9 @@ public abstract class AbstractIoConnector extends AbstractIoService implements
      * related with event notifications to the specified {@code session}
      * and {@code future}.
      */
-    protected static void finishSessionInitialization(
-            final IoSession session, ConnectFuture future) {
-        // DefaultIoFilterChain will notify the connect future.
-        session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);
+    protected void finishSessionInitialization(
+            final IoSession session, IoFuture future) {
+        super.finishSessionInitialization(session, future);
 
         // In case that ConnectFuture.cancel() is invoked before
         // setSession() is invoked, add a listener that closes the

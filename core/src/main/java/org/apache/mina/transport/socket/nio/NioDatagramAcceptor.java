@@ -194,6 +194,8 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
             session = datagramSession;
         }
 
+        finishSessionInitialization(session, null);
+
         try {
             this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
             getListeners().fireSessionCreated(session);

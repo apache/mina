@@ -139,19 +139,22 @@ public interface IoSession {
     /**
      * Returns an attachment of this session.
      * This method is identical with <tt>getAttribute( "" )</tt>.
+     * 
+     * @deprecated Use {@link #getAttribute(Object)} instead.
      */
-    Object getAttachment();
+    @Deprecated Object getAttachment();
 
     /**
      * Sets an attachment of this session.
      * This method is identical with <tt>setAttribute( "", attachment )</tt>.
      *
      * @return Old attachment.  <tt>null</tt> if it is new.
+     * @deprecated Use {@link #setAttribute(Object, Object)} instead.
      */
-    Object setAttachment(Object attachment);
+    @Deprecated Object setAttachment(Object attachment);
 
     /**
-     * Returns the value of user-defined attribute of this session.
+     * Returns the value of the user-defined attribute of this session.
      *
      * @param key the key of the attribute
      * @return <tt>null</tt> if there is no attribute with the specified key
@@ -160,7 +163,7 @@ public interface IoSession {
 
     /**
      * Returns the value of user defined attribute associated with the
-     * specified key.  If there's no such attribute, the specified defalut
+     * specified key.  If there's no such attribute, the specified default
      * value is associated with the specified key, and the default value is
      * returned.  This method is same with the following code except that the
      * operation is performed atomically.

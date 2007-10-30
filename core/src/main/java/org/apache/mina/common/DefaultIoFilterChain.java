@@ -37,12 +37,12 @@ import org.apache.mina.common.IoFilter.NextFilter;
  */
 public class DefaultIoFilterChain implements IoFilterChain {
     /**
-     * A session attribute that stores a {@link ConnectFuture} related with
+     * A session attribute that stores an {@link IoFuture} related with
      * the {@link IoSession}.  {@link DefaultIoFilterChain} clears this
      * attribute and notifies the future when {@link #fireSessionOpened()}
-     * or {@link #fireExceptionCaught(Throwable)} is invoked
+     * or {@link #fireExceptionCaught(Throwable)} is invoked.
      */
-    public static final AttributeKey CONNECT_FUTURE = new AttributeKey(DefaultIoFilterChain.class, "connectFuture");
+    static final AttributeKey SESSION_OPENED_FUTURE = new AttributeKey(DefaultIoFilterChain.class, "connectFuture");
 
     private final AbstractIoSession session;
 
@@ -434,10 +434,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public void fireExceptionCaught(Throwable cause) {
-        // Notify the related ConnectFuture
-        // if the session is created from SocketConnector.
-        ConnectFuture future = (ConnectFuture) session
-                .removeAttribute(CONNECT_FUTURE);
+        // Notify the related future.
+        ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_OPENED_FUTURE);
         if (future == null) {
             Entry head = this.head;
             callNextExceptionCaught(head, session, cause);
@@ -655,10 +653,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
             try {
                 session.getHandler().sessionOpened(session);
             } finally {
-                // Notify the related ConnectFuture
-                // if the session is created from SocketConnector.
-                ConnectFuture future = (ConnectFuture) session
-                        .removeAttribute(CONNECT_FUTURE);
+                // Notify the related future.
+                ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_OPENED_FUTURE);
                 if (future != null) {
                     future.setSession(session);
                 }

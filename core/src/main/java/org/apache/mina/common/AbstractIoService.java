@@ -42,6 +42,9 @@ public abstract class AbstractIoService implements IoService {
      * Current handler.
      */
     private IoHandler handler;
+    
+    private IoSessionAttributeMapFactory sessionAttributeMapFactory =
+        new DefaultIoSessionAttributeMapFactory();
 
     /**
      * Maintains the {@link IoServiceListener}s of this service.
@@ -137,6 +140,23 @@ public abstract class AbstractIoService implements IoService {
         return sessionConfig;
     }
 
+    public IoSessionAttributeMapFactory getSessionAttributeMapFactory() {
+        return sessionAttributeMapFactory;
+    }
+
+    public void setSessionAttributeMapFactory(IoSessionAttributeMapFactory sessionAttributeMapFactory) {
+        if (sessionAttributeMapFactory == null) {
+            throw new NullPointerException("sessionAttributeMapFactory");
+        }
+
+        if (isActive()) {
+            throw new IllegalStateException(
+                    "sessionAttributeMapFactory cannot be set while the service is active.");
+        }
+
+        this.sessionAttributeMapFactory = sessionAttributeMapFactory;
+    }
+
     public long getReadBytes() {
         return readBytes.get();
     }
@@ -212,6 +232,27 @@ public abstract class AbstractIoService implements IoService {
                 return futures.size();
             }
         };
+    }
+    
+    protected void finishSessionInitialization(IoSession session, IoFuture future) {
+        // Every property but attributeMap should be set now.
+        // Now initialize the attributeMap.  The reason why we initialize
+        // the attributeMap at last is to make sure all session properties
+        // such as remoteAddress are provided to IoSessionAttributeMapFactory.
+        try {
+            ((AbstractIoSession) session).setAttributeMap(
+                    session.getService().getSessionAttributeMapFactory().getAttributeMap(session));
+        } catch (IoSessionInitializationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IoSessionInitializationException(
+                    "Failed to initialize sessionAttributeMap.", e);
+        }
+
+        if (future != null && future instanceof ConnectFuture) {
+            // DefaultIoFilterChain will notify the future. (We support ConnectFuture only for now).
+            session.setAttribute(DefaultIoFilterChain.SESSION_OPENED_FUTURE, future);
+        }
     }
 
     protected static class ServiceOperationFuture extends DefaultIoFuture {

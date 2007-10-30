@@ -358,6 +358,8 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
                     // BaseIoSession and is custom for socket-based sessions.
                     NioSocketSession session = new NioSocketSession(
                             NioSocketAcceptor.this, nextProcessor(), ch);
+                    
+                    finishSessionInitialization(session, null);
 
                     // add the session to the SocketIoProcessor
                     session.getProcessor().add(session);

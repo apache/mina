@@ -114,6 +114,12 @@ public class DummySession extends AbstractIoSession {
             public void updateTrafficMask(IoSession session) {
             }
         };
+
+        try {
+            setAttributeMap(new DefaultIoSessionAttributeMapFactory().getAttributeMap(this));
+        } catch (Exception e) {
+            throw new InternalError();
+        }
     }
 
     public IoSessionConfig getConfig() {

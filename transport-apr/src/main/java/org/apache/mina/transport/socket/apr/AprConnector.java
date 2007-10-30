@@ -27,7 +27,6 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
-import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.TransportMetadata;
@@ -147,6 +146,8 @@ public class AprConnector extends AbstractIoConnector {
             System.err.println("proc : "+proc);
             AprSessionImpl session = new AprSessionImpl(this,proc ,
                     clientSock, sockAddr, (InetSocketAddress) localAddress);
+            
+            finishSessionInitialization(session, future);
 
             try {
                 getFilterChainBuilder().buildFilterChain(
@@ -156,12 +157,8 @@ public class AprConnector extends AbstractIoConnector {
                         "Failed to create a session.").initCause(e);
             }
 
-            // Set the ConnectFuture of the specified session, which will be
-            // removed and notified by AbstractIoFilterChain eventually.
-            session.setAttribute(DefaultIoFilterChain.CONNECT_FUTURE, future);
-
             // Forward the remaining process to the APRIoProcessor.
-            // it's will validate the COnnectFuture when the session is in the poll set
+            // it's will validate the ConnectFuture when the session is in the poll set
             session.getIoProcessor().add(session);
             return future;
         } catch (Exception e) {
