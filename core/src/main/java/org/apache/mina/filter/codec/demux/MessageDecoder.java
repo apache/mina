@@ -24,12 +24,16 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * Decodes specific messages.
+ * Decodes a certain type of messages.
+ * <p>
+ * We didn't provide any <tt>dispose</tt> method for {@link MessageDecoder}
+ * because it can give you  performance penalty in case you have a lot of
+ * message types to handle.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
- * @see DemuxingProtocolCodecFactory
+ * @see DemuxingProtocolDecoder
  * @see MessageDecoderFactory
  */
 public interface MessageDecoder {

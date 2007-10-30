@@ -19,27 +19,24 @@
  */
 package org.apache.mina.filter.codec.demux;
 
-import java.util.Set;
-
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
- * Encodes messages of specific types specified by {@link #getMessageTypes()}.
- *
+ * Encodes a certain type of messages.
+ * <p>
+ * We didn't provide any <tt>dispose</tt> method for {@link MessageEncoder}
+ * because it can give you  performance penalty in case you have a lot of
+ * message types to handle.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
- * @see DemuxingProtocolCodecFactory
+ * @see DemuxingProtocolEncoder
  * @see MessageEncoderFactory
  */
 public interface MessageEncoder<T> {
-    /**
-     * Returns the set of message classes this encoder can encode.
-     */
-    Set<Class<? extends T>> getMessageTypes();
-
     /**
      * Encodes higher-level message objects into binary or protocol-specific data.
      * MINA invokes {@link #encode(IoSession, Object, ProtocolEncoderOutput)}

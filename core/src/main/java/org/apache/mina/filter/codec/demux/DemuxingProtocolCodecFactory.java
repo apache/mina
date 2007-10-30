@@ -19,390 +19,59 @@
  */
 package org.apache.mina.filter.codec.demux;
 
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
-import org.apache.mina.filter.codec.ProtocolDecoderException;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.filter.codec.ProtocolEncoderException;
-import org.apache.mina.filter.codec.ProtocolEncoderOutput;
-import org.apache.mina.util.IdentityHashSet;
 
 /**
- * A composite {@link ProtocolCodecFactory} that consists of multiple
- * {@link MessageEncoder}s and {@link MessageDecoder}s.
- * {@link ProtocolEncoder} and {@link ProtocolDecoder} this factory
- * returns demultiplex incoming messages and buffers to
- * appropriate {@link MessageEncoder}s and {@link MessageDecoder}s.
- *
- * <h2>Disposing resources acquired by {@link MessageEncoder} and {@link MessageDecoder}</h2>
+ * A convenience {@link ProtocolCodecFactory} that provides {@link DemuxingProtocolEncoder}
+ * and {@link DemuxingProtocolDecoder} as a pair.
  * <p>
- * Make your {@link MessageEncoder} and {@link MessageDecoder} to put all
- * resources that need to be released as a session attribute.  {@link #disposeCodecResources(IoSession)}
- * method will be invoked when a session is closed.  Override {@link #disposeCodecResources(IoSession)}
- * to release the resources you've put as an attribute.
- * <p>
- * We didn't provide any <tt>dispose</tt> method for {@link MessageEncoder} and {@link MessageDecoder}
- * because they can give you a big performance penalty in case you have a lot of
- * message types to handle.
+ * {@link DemuxingProtocolEncoder} and {@link DemuxingProtocolDecoder} demultiplex
+ * incoming messages and buffers to appropriate {@link MessageEncoder}s and 
+ * {@link MessageDecoder}s.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- *
- * @see MessageEncoder
- * @see MessageDecoder
  */
 public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
-    private MessageDecoderFactory[] decoderFactories = new MessageDecoderFactory[0];
 
-    private MessageEncoderFactory<?>[] encoderFactories = new MessageEncoderFactory[0];
-
-    private static final Class<?>[] EMPTY_PARAMS = new Class[0];
+    private final DemuxingProtocolEncoder encoder = new DemuxingProtocolEncoder();
+    private final DemuxingProtocolDecoder decoder = new DemuxingProtocolDecoder();
 
     public DemuxingProtocolCodecFactory() {
     }
 
-    public void register(Class<?> encoderOrDecoderClass) {
-        if (encoderOrDecoderClass == null) {
-            throw new NullPointerException("encoderOrDecoderClass");
-        }
-
-        try {
-            encoderOrDecoderClass.getConstructor(EMPTY_PARAMS);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(
-                    "The specifiec class doesn't have a public default constructor.");
-        }
-
-        boolean registered = false;
-        if (MessageEncoder.class.isAssignableFrom(encoderOrDecoderClass)) {
-            register(new DefaultConstructorMessageEncoderFactory(encoderOrDecoderClass));
-            registered = true;
-        }
-
-        if (MessageDecoder.class.isAssignableFrom(encoderOrDecoderClass)) {
-            register(new DefaultConstructorMessageDecoderFactory(
-                    encoderOrDecoderClass));
-            registered = true;
-        }
-
-        if (!registered) {
-            throw new IllegalArgumentException("Unregisterable type: "
-                    + encoderOrDecoderClass);
-        }
-    }
-
-    public <T> void register(MessageEncoder<T> encoder) {
-        register(new SingletonMessageEncoderFactory<T>(encoder));
-    }
-
-    public void register(MessageEncoderFactory<?> factory) {
-        if (factory == null) {
-            throw new NullPointerException("factory");
-        }
-        MessageEncoderFactory<?>[] encoderFactories = this.encoderFactories;
-        MessageEncoderFactory<?>[] newEncoderFactories = new MessageEncoderFactory[encoderFactories.length + 1];
-        System.arraycopy(encoderFactories, 0, newEncoderFactories, 0,
-                encoderFactories.length);
-        newEncoderFactories[encoderFactories.length] = factory;
-        this.encoderFactories = newEncoderFactories;
-    }
-
-    public void register(MessageDecoder decoder) {
-        register(new SingletonMessageDecoderFactory(decoder));
-    }
-
-    public void register(MessageDecoderFactory factory) {
-        if (factory == null) {
-            throw new NullPointerException("factory");
-        }
-        MessageDecoderFactory[] decoderFactories = this.decoderFactories;
-        MessageDecoderFactory[] newDecoderFactories = new MessageDecoderFactory[decoderFactories.length + 1];
-        System.arraycopy(decoderFactories, 0, newDecoderFactories, 0,
-                decoderFactories.length);
-        newDecoderFactories[decoderFactories.length] = factory;
-        this.decoderFactories = newDecoderFactories;
-    }
-
     public ProtocolEncoder getEncoder() throws Exception {
-        return new ProtocolEncoderImpl();
+        return encoder;
     }
 
     public ProtocolDecoder getDecoder() throws Exception {
-        return new ProtocolDecoderImpl();
+        return decoder;
     }
-
-    /**
-     * Implement this method to release all resources acquired to perform
-     * encoding and decoding messages for the specified <tt>session</tt>.
-     * By default, this method does nothing.
-     *
-     * @param session the session that requires resource deallocation now
-     */
-    protected void disposeCodecResources(IoSession session) {
-        // Do nothing by default; let users implement it as they want.
-
-        // This statement is just to avoid compiler warning.  Please ignore.
-        session.getService();
-    }
-
+    
     @SuppressWarnings("unchecked")
-    private class ProtocolEncoderImpl implements ProtocolEncoder {
-        private final Map<Class<?>, MessageEncoder> encoders =
-            new IdentityHashMap<Class<?>, MessageEncoder>();
-
-        private ProtocolEncoderImpl() throws Exception {
-            MessageEncoderFactory[] encoderFactories =
-                DemuxingProtocolCodecFactory.this.encoderFactories;
-            for (int i = encoderFactories.length - 1; i >= 0; i--) {
-                MessageEncoder encoder = encoderFactories[i].getEncoder();
-                Set<Class<?>> messageTypes = encoder.getMessageTypes();
-                if (messageTypes == null) {
-                    throw new IllegalStateException(encoder.getClass()
-                            .getName()
-                            + "#getMessageTypes() may not return null.");
-                }
-
-                Iterator<Class<?>> it = messageTypes.iterator();
-                while (it.hasNext()) {
-                    Class<?> type = it.next();
-                    encoders.put(type, encoder);
-                }
-            }
-        }
-
-        public void encode(IoSession session, Object message,
-                ProtocolEncoderOutput out) throws Exception {
-            Class<?> type = message.getClass();
-            MessageEncoder encoder = findEncoder(type);
-            if (encoder == null) {
-                throw new ProtocolEncoderException("Unexpected message type: "
-                        + type);
-            }
-
-            encoder.encode(session, message, out);
-        }
-
-        private MessageEncoder findEncoder(Class<?> type) {
-            MessageEncoder encoder = encoders.get(type);
-            if (encoder == null) {
-                encoder = findEncoder(type, new IdentityHashSet<Class<?>>());
-            }
-
-            return encoder;
-        }
-
-        private MessageEncoder findEncoder(Class<?> type,
-                Set<Class<?>> triedClasses) {
-            MessageEncoder encoder;
-
-            if (triedClasses.contains(type)) {
-                return null;
-            }
-            triedClasses.add(type);
-
-            encoder = encoders.get(type);
-            if (encoder == null) {
-                encoder = findEncoder(type, triedClasses);
-                if (encoder != null) {
-                    return encoder;
-                }
-
-                Class<?>[] interfaces = type.getInterfaces();
-                for (Class<?> element : interfaces) {
-                    encoder = findEncoder(element, triedClasses);
-                    if (encoder != null) {
-                        return encoder;
-                    }
-                }
-
-                return null;
-            } else {
-                return encoder;
-            }
-        }
-
-        public void dispose(IoSession session) throws Exception {
-            DemuxingProtocolCodecFactory.this.disposeCodecResources(session);
-        }
+    public void addMessageEncoder(Class<?> messageType, Class<? extends MessageEncoder> encoderClass) {
+        this.encoder.addMessageEncoder(messageType, encoderClass);
     }
 
-    private class ProtocolDecoderImpl extends CumulativeProtocolDecoder {
-        private final MessageDecoder[] decoders;
-
-        private MessageDecoder currentDecoder;
-
-        protected ProtocolDecoderImpl() throws Exception {
-            MessageDecoderFactory[] decoderFactories = DemuxingProtocolCodecFactory.this.decoderFactories;
-            decoders = new MessageDecoder[decoderFactories.length];
-            for (int i = decoderFactories.length - 1; i >= 0; i--) {
-                decoders[i] = decoderFactories[i].getDecoder();
-            }
-        }
-
-        @Override
-        protected boolean doDecode(IoSession session, IoBuffer in,
-                ProtocolDecoderOutput out) throws Exception {
-            if (currentDecoder == null) {
-                MessageDecoder[] decoders = this.decoders;
-                int undecodables = 0;
-                for (int i = decoders.length - 1; i >= 0; i--) {
-                    MessageDecoder decoder = decoders[i];
-                    int limit = in.limit();
-                    int pos = in.position();
-
-                    MessageDecoderResult result;
-                    try {
-                        result = decoder.decodable(session, in);
-                    } finally {
-                        in.position(pos);
-                        in.limit(limit);
-                    }
-
-                    if (result == MessageDecoder.OK) {
-                        currentDecoder = decoder;
-                        break;
-                    } else if (result == MessageDecoder.NOT_OK) {
-                        undecodables++;
-                    } else if (result != MessageDecoder.NEED_DATA) {
-                        throw new IllegalStateException(
-                                "Unexpected decode result (see your decodable()): "
-                                        + result);
-                    }
-                }
-
-                if (undecodables == decoders.length) {
-                    // Throw an exception if all decoders cannot decode data.
-                    String dump = in.getHexDump();
-                    in.position(in.limit()); // Skip data
-                    throw new ProtocolDecoderException(
-                            "No appropriate message decoder: " + dump);
-                }
-
-                if (currentDecoder == null) {
-                    // Decoder is not determined yet (i.e. we need more data)
-                    return false;
-                }
-            }
-
-            MessageDecoderResult result = currentDecoder.decode(session, in,
-                    out);
-            if (result == MessageDecoder.OK) {
-                currentDecoder = null;
-                return true;
-            } else if (result == MessageDecoder.NEED_DATA) {
-                return false;
-            } else if (result == MessageDecoder.NOT_OK) {
-                currentDecoder = null;
-                throw new ProtocolDecoderException(
-                        "Message decoder returned NOT_OK.");
-            } else {
-                currentDecoder = null;
-                throw new IllegalStateException(
-                        "Unexpected decode result (see your decode()): "
-                                + result);
-            }
-        }
-
-        @Override
-        public void finishDecode(IoSession session, ProtocolDecoderOutput out)
-                throws Exception {
-            if (currentDecoder == null) {
-                return;
-            }
-
-            currentDecoder.finishDecode(session, out);
-        }
-
-        @Override
-        public void dispose(IoSession session) throws Exception {
-            super.dispose(session);
-
-            // ProtocolEncoder.dispose() already called disposeCodec(),
-            // so there's nothing more we need to do.
-        }
+    public <T> void addMessageEncoder(Class<T> messageType, MessageEncoder<? super T> encoder) {
+        this.encoder.addMessageEncoder(messageType, encoder);
     }
 
-    private static class SingletonMessageEncoderFactory<T> implements
-            MessageEncoderFactory<T> {
-        private final MessageEncoder<T> encoder;
-
-        private SingletonMessageEncoderFactory(MessageEncoder<T> encoder) {
-            if (encoder == null) {
-                throw new NullPointerException("encoder");
-            }
-            this.encoder = encoder;
-        }
-
-        public MessageEncoder<T> getEncoder() {
-            return encoder;
-        }
+    public <T> void addMessageEncoder(Class<T> messageType, MessageEncoderFactory<? super T> factory) {
+        this.encoder.addMessageEncoder(messageType, factory);
     }
 
-    private static class SingletonMessageDecoderFactory implements
-            MessageDecoderFactory {
-        private final MessageDecoder decoder;
-
-        private SingletonMessageDecoderFactory(MessageDecoder decoder) {
-            if (decoder == null) {
-                throw new NullPointerException("decoder");
-            }
-            this.decoder = decoder;
-        }
-
-        public MessageDecoder getDecoder() {
-            return decoder;
-        }
+    public void addMessageDecoder(Class<? extends MessageDecoder> decoderClass) {
+        this.decoder.addMessageDecoder(decoderClass);
     }
 
-    @SuppressWarnings("unchecked")
-    private static class DefaultConstructorMessageEncoderFactory implements
-            MessageEncoderFactory {
-        private final Class encoderClass;
-
-        private DefaultConstructorMessageEncoderFactory(Class encoderClass) {
-            if (encoderClass == null) {
-                throw new NullPointerException("encoderClass");
-            }
-
-            if (!MessageEncoder.class.isAssignableFrom(encoderClass)) {
-                throw new IllegalArgumentException(
-                        "encoderClass is not assignable to MessageEncoder");
-            }
-            this.encoderClass = encoderClass;
-        }
-
-        public MessageEncoder getEncoder() throws Exception {
-            return (MessageEncoder) encoderClass.newInstance();
-        }
+    public void addMessageDecoder(MessageDecoder decoder) {
+        this.decoder.addMessageDecoder(decoder);
     }
 
-    private static class DefaultConstructorMessageDecoderFactory implements
-            MessageDecoderFactory {
-        private final Class<?> decoderClass;
-
-        private DefaultConstructorMessageDecoderFactory(Class<?> decoderClass) {
-            if (decoderClass == null) {
-                throw new NullPointerException("decoderClass");
-            }
-
-            if (!MessageDecoder.class.isAssignableFrom(decoderClass)) {
-                throw new IllegalArgumentException(
-                        "decoderClass is not assignable to MessageDecoder");
-            }
-            this.decoderClass = decoderClass;
-        }
-
-        public MessageDecoder getDecoder() throws Exception {
-            return (MessageDecoder) decoderClass.newInstance();
-        }
+    public void addMessageDecoder(MessageDecoderFactory factory) {
+        this.decoder.addMessageDecoder(factory);
     }
 }

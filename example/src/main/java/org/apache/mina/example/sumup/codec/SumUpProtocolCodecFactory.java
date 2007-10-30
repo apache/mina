@@ -19,6 +19,8 @@
  */
 package org.apache.mina.example.sumup.codec;
 
+import org.apache.mina.example.sumup.message.AddMessage;
+import org.apache.mina.example.sumup.message.ResultMessage;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;
 
@@ -33,12 +35,12 @@ public class SumUpProtocolCodecFactory extends DemuxingProtocolCodecFactory {
 
     public SumUpProtocolCodecFactory(boolean server) {
         if (server) {
-            super.register(AddMessageDecoder.class);
-            super.register(ResultMessageEncoder.class);
+            super.addMessageDecoder(AddMessageDecoder.class);
+            super.addMessageEncoder(ResultMessage.class, ResultMessageEncoder.class);
         } else // Client
         {
-            super.register(AddMessageEncoder.class);
-            super.register(ResultMessageDecoder.class);
+            super.addMessageEncoder(AddMessage.class, AddMessageEncoder.class);
+            super.addMessageDecoder(ResultMessageDecoder.class);
         }
     }
 }

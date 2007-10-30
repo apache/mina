@@ -19,13 +19,8 @@
  */
 package org.apache.mina.example.sumup.codec;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.example.sumup.message.AbstractMessage;
 import org.apache.mina.example.sumup.message.AddMessage;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
 
@@ -35,28 +30,14 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class AddMessageEncoder extends AbstractMessageEncoder {
-    private static final Set<Class<?>> TYPES;
-
-    static {
-        Set<Class<?>> types = new HashSet<Class<?>>();
-        types.add(AddMessage.class);
-        TYPES = Collections.unmodifiableSet(types);
-    }
-
+public class AddMessageEncoder<T extends AddMessage> extends AbstractMessageEncoder<T> {
     public AddMessageEncoder() {
         super(Constants.ADD);
     }
 
     @Override
-    protected void encodeBody(IoSession session, AbstractMessage message,
-            IoBuffer out) {
-        AddMessage m = (AddMessage) message;
-        out.putInt(m.getValue());
-    }
-
-    public Set<Class<?>> getMessageTypes() {
-        return TYPES;
+    protected void encodeBody(IoSession session, T message, IoBuffer out) {
+        out.putInt(message.getValue());
     }
 
     public void dispose() throws Exception {

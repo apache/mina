@@ -17,14 +17,11 @@
  *  under the License.
  *
  */
-package org.apache.mina.handler.demux;
+package org.apache.mina.common;
+
 
 /**
- * An exception that is thrown when {@link DemuxingIoHandler}
- * cannot find any {@link MessageHandler}s associated with the specific
- * message type.  You have to use
- * {@link DemuxingIoHandler#addMessageHandler(Class, MessageHandler)}
- * to associate a message type and a message handler.
+ * An exception that is thrown when the type of the message cannot be determined.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

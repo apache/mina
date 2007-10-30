@@ -25,7 +25,7 @@ package org.apache.mina.filter.codec.demux;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  *
- * @see DemuxingProtocolCodecFactory
+ * @see DemuxingProtocolDecoder
  */
 public interface MessageDecoderFactory {
     /**

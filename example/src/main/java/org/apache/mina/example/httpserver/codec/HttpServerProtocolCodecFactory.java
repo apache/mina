@@ -30,7 +30,7 @@ import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;
 public class HttpServerProtocolCodecFactory extends
         DemuxingProtocolCodecFactory {
     public HttpServerProtocolCodecFactory() {
-        super.register(HttpRequestDecoder.class);
-        super.register(HttpResponseEncoder.class);
+        super.addMessageDecoder(HttpRequestDecoder.class);
+        super.addMessageEncoder(HttpResponseMessage.class, HttpResponseEncoder.class);
     }
 }
