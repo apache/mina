@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filter.codec.demux;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -206,10 +207,10 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     
     private class State {
         @SuppressWarnings("unchecked")
-        private final Map<Class<?>, MessageEncoder> findEncoderCache = new ConcurrentHashMap<Class<?>, MessageEncoder>();
+        private final Map<Class<?>, MessageEncoder> findEncoderCache = new HashMap<Class<?>, MessageEncoder>();
 
         @SuppressWarnings("unchecked")
-        private final Map<Class<?>, MessageEncoder> type2encoder = new ConcurrentHashMap<Class<?>, MessageEncoder>();
+        private final Map<Class<?>, MessageEncoder> type2encoder = new HashMap<Class<?>, MessageEncoder>();
         
         @SuppressWarnings("unchecked")
         private State() throws Exception {
