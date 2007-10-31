@@ -33,6 +33,10 @@ public class IdentityHashSet<E> extends MapBackedSet<E> {
     public IdentityHashSet() {
         super(new IdentityHashMap<E, Boolean>());
     }
+    
+    public IdentityHashSet(int expectedMaxSize) {
+        super(new IdentityHashMap<E, Boolean>(expectedMaxSize));
+    }
 
     public IdentityHashSet(Collection<E> c) {
         super(new IdentityHashMap<E, Boolean>(), c);
