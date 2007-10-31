@@ -670,8 +670,12 @@ public class DefaultIoFilterChain implements IoFilterChain {
             try {
                 session.getHandler().sessionClosed(session);
             } finally {
-                // Remove all filters.
-                session.getFilterChain().clear();
+                try {
+                    ((AbstractIoSession) session).getAttributeMap().dispose(session);
+                } finally {
+                    // Remove all filters.
+                    session.getFilterChain().clear();
+                }
             }
         }
 

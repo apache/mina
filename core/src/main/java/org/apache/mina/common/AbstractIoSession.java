@@ -302,6 +302,10 @@ public abstract class AbstractIoSession implements IoSession {
         return attributes.getAttributeKeys(this);
     }
     
+    protected IoSessionAttributeMap getAttributeMap() {
+        return attributes;
+    }
+
     protected void setAttributeMap(IoSessionAttributeMap attributes) {
         this.attributes = attributes;
     }
