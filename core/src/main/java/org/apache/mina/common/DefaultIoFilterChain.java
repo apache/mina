@@ -809,5 +809,21 @@ public class DefaultIoFilterChain implements IoFilterChain {
         public String toString() {
             return "(" + getName() + ':' + filter + ')';
         }
+
+        public void addAfter(String name, IoFilter filter) {
+            DefaultIoFilterChain.this.addAfter(getName(), name, filter);
+        }
+
+        public void addBefore(String name, IoFilter filter) {
+            DefaultIoFilterChain.this.addBefore(getName(), name, filter);
+        }
+
+        public void remove() {
+            DefaultIoFilterChain.this.remove(getName());
+        }
+
+        public void replace(IoFilter newFilter) {
+            DefaultIoFilterChain.this.replace(getName(), newFilter);
+        }
     }
 }

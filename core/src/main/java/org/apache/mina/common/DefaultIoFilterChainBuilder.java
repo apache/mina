@@ -369,7 +369,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         entries.add(index, e);
     }
 
-    private static class EntryImpl implements Entry {
+    private class EntryImpl implements Entry {
         private final String name;
         private volatile IoFilter filter;
 
@@ -404,6 +404,22 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         @Override
         public String toString() {
             return "(" + getName() + ':' + filter + ')';
+        }
+
+        public void addAfter(String name, IoFilter filter) {
+            DefaultIoFilterChainBuilder.this.addAfter(getName(), name, filter);
+        }
+
+        public void addBefore(String name, IoFilter filter) {
+            DefaultIoFilterChainBuilder.this.addBefore(getName(), name, filter);
+        }
+
+        public void remove() {
+            DefaultIoFilterChainBuilder.this.remove(getName());
+        }
+
+        public void replace(IoFilter newFilter) {
+            DefaultIoFilterChainBuilder.this.replace(getName(), newFilter);
         }
     }
 }

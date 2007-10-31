@@ -298,5 +298,34 @@ public interface IoFilterChain {
          * @throws IllegalStateException if the {@link NextFilter} is not available
          */
         NextFilter getNextFilter();
+        
+        /**
+         * Adds the specified filter with the specified name just before this entry.
+         * @throws IoFilterLifeCycleException
+         *             if {@link IoFilter#onPostAdd(IoFilterChain, String, NextFilter)} or
+         *             {@link IoFilter#init()} throws an exception.
+         */
+        void addBefore(String name, IoFilter filter);
+
+        /**
+         * Adds the specified filter with the specified name just after this entry.
+         * @throws IoFilterLifeCycleException
+         *             if {@link IoFilter#onPostAdd(IoFilterChain, String, NextFilter)} or
+         *             {@link IoFilter#init()} throws an exception.
+         */
+        void addAfter(String name, IoFilter filter);
+
+        /**
+         * Replace the filter of this entry with the specified new filter.
+         *
+         * @return the old filter
+         * @throws IllegalArgumentException if there's no such filter
+         */
+        void replace(IoFilter newFilter);
+        
+        /**
+         * Removes this entry from the chain it belongs to.
+         */
+        void remove();
     }
 }
