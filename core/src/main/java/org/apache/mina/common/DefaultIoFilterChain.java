@@ -238,7 +238,10 @@ public class DefaultIoFilterChain implements IoFilterChain {
         Iterator<String> it = new ArrayList<String>(name2entry.keySet())
                 .iterator();
         while (it.hasNext()) {
-            this.remove(it.next());
+            String name = it.next();
+            if (contains(name)) {
+                remove(name);
+            }
         }
     }
 
