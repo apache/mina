@@ -20,7 +20,9 @@
 package org.apache.mina.filter.traffic;
 
 import org.apache.mina.common.IoFilter;
+import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
  * An {@link IoFilter} interface that provides access to the properties related
@@ -37,11 +39,47 @@ import org.apache.mina.common.IoSession;
  * @version $Rev$, $Date$
  */
 public interface ReadThrottleFilter extends IoFilter {
+    /**
+     * Returns the maximum amount of data in the buffer of the {@link ExecutorFilter}
+     * per {@link IoSession}.  {@code 0} means 'disabled'.
+     */
     int getLocalMaxBufferSize();
+
+    /**
+     * Returns the maximum amount of data in the buffer of the {@link ExecutorFilter}
+     * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
+     * this builder. {@code 0} means 'disabled'.
+     */
     int getGlobalMaxBufferSize();
+
+    /**
+     * Sets the maximum amount of data in the buffer of the {@link ExecutorFilter}
+     * per {@link IoSession}.  Specify {@code 0} or a smaller value to disable.
+     */
     void setLocalMaxBufferSize(int localMaxBufferSize);
+    
+    /**
+     * Sets the maximum amount of data in the buffer of the {@link ExecutorFilter}
+     * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
+     * this builder. Specify {@code 0} or a smaller value to disable.
+     */
     void setGlobalMaxBufferSize(int globalMaxBufferSize);
+
+    /**
+     * Returns the current amount of data in the buffer of the {@link ExecutorFilter}
+     * for the specified {@link IoSession}.
+     */
     int getLocalBufferSize(IoSession session);
+
+    /**
+     * Returns the current amount of data in the buffer of the {@link ExecuorFilter}
+     * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
+     * this builder.
+     */
     int getGlobalBufferSize();
+    
+    /**
+     * Returns the size estimator currently in use.
+     */
     MessageSizeEstimator getMessageSizeEstimator();
 }
