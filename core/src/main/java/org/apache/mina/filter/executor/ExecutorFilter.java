@@ -82,6 +82,11 @@ public class ExecutorFilter extends AbstractExecutorFilter {
     public ExecutorFilter(Executor executor, IoEventType... eventTypes) {
         super(executor, eventTypes);
     }
+    
+    @Override
+    public String toString() {
+        return "ordered";
+    }
 
     @Override
     protected void fireEvent(IoFilterEvent event) {

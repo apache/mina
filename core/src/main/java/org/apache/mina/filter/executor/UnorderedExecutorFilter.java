@@ -68,6 +68,11 @@ public class UnorderedExecutorFilter extends AbstractExecutorFilter {
     }
 
     @Override
+    public String toString() {
+        return "unordered";
+    }
+
+    @Override
     protected void fireEvent(IoFilterEvent event) {
         getExecutor().execute(new ProcessEventRunnable(event));
     }
