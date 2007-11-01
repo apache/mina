@@ -149,7 +149,9 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             this.buf = newBuf;
             
             // Add to the cache.
-            localRecyclables.get().get(oldBuf.capacity()).offer(oldBuf);
+            if (!isDirect()) {
+                localRecyclables.get().get(oldBuf.capacity()).offer(oldBuf);
+            }
         }
 
         @Override
