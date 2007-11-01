@@ -60,12 +60,7 @@ public class MapBackedSet<E> extends AbstractSet<E> {
 
     @Override
     public boolean add(E o) {
-        if (map.containsKey(o)) {
-            return false;
-        }
-
-        map.put(o, Boolean.TRUE);
-        return true;
+        return map.put(o, Boolean.TRUE) == null;
     }
 
     @Override
