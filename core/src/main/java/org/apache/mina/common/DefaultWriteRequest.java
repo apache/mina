@@ -34,7 +34,7 @@ public class DefaultWriteRequest implements WriteRequest {
             return false;
         }
 
-        public void setWritten(boolean written) {
+        public void setWritten() {
         }
 
         public IoSession getSession() {
@@ -85,6 +85,13 @@ public class DefaultWriteRequest implements WriteRequest {
 
         public boolean awaitUninterruptibly(long timeoutMillis) {
             return true;
+        }
+
+        public Throwable getException() {
+            return null;
+        }
+
+        public void setException(Throwable cause) {
         }
     };
 

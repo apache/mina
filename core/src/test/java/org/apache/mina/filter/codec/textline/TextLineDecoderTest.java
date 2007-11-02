@@ -25,10 +25,10 @@ import java.nio.charset.CharsetEncoder;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.BufferDataException;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
 
 /**
  * Tests {@link TextLineDecoder}.
@@ -273,7 +273,7 @@ public class TextLineDecoderTest extends TestCase {
         try {
             decoder.decode(session, in, out);
             Assert.fail();
-        } catch (BufferDataException e) {
+        } catch (RecoverableProtocolDecoderException e) {
             // Success!
         }
 
@@ -296,7 +296,7 @@ public class TextLineDecoderTest extends TestCase {
         try {
             decoder.decode(session, in, out);
             Assert.fail();
-        } catch (BufferDataException e) {
+        } catch (RecoverableProtocolDecoderException e) {
             // Success!
         }
 

@@ -31,6 +31,7 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
+import org.apache.mina.common.NothingWrittenException;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestWrapper;
@@ -223,7 +224,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         try {
             encoder.encode(session, message, encoderOut);
-            encoderOut.flush();
+            encoderOut.flushWithoutFuture();
             nextFilter.filterWrite(session, new MessageWriteRequest(
                     writeRequest));
         } catch (Throwable t) {
@@ -403,10 +404,28 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             }
 
             if (future == null) {
-                future = DefaultWriteFuture.newNotWrittenFuture(session);
+                future = DefaultWriteFuture.newNotWrittenFuture(
+                        session, new NothingWrittenException(writeRequest));
             }
 
             return future;
+        }
+        
+        public void flushWithoutFuture() {
+            Queue<IoBuffer> bufferQueue = getBufferQueue();
+            for (;;) {
+                IoBuffer buf = bufferQueue.poll();
+                if (buf == null) {
+                    break;
+                }
+
+                // Flush only when the buffer has remaining.
+                if (buf.hasRemaining()) {
+                    nextFilter.filterWrite(
+                            session, new EncodedWriteRequest(
+                                    buf, null, writeRequest.getDestination()));
+                }
+            }
         }
     }
 }

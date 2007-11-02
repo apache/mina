@@ -32,16 +32,16 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
      */
     public static WriteFuture newWrittenFuture(IoSession session) {
         DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture(session);
-        unwrittenFuture.setWritten(true);
+        unwrittenFuture.setWritten();
         return unwrittenFuture;
     }
 
     /**
      * Returns a new {@link DefaultWriteFuture} which is already marked as 'not written'.
      */
-    public static WriteFuture newNotWrittenFuture(IoSession session) {
+    public static WriteFuture newNotWrittenFuture(IoSession session, Throwable cause) {
         DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture(session);
-        unwrittenFuture.setWritten(false);
+        unwrittenFuture.setException(cause);
         return unwrittenFuture;
     }
 
@@ -54,13 +54,30 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
 
     public boolean isWritten() {
         if (isReady()) {
-            return ((Boolean) getValue()).booleanValue();
+            Object v = getValue();
+            if (v instanceof Boolean) {
+                return ((Boolean) v).booleanValue();
+            }
         }
         return false;
     }
+    
+    public Throwable getException() {
+        if (isReady()) {
+            Object v = getValue();
+            if (v instanceof Throwable) {
+                return (Throwable) v;
+            }
+        }
+        return null;
+    }
 
-    public void setWritten(boolean written) {
-        setValue(written);
+    public void setWritten() {
+        setValue(Boolean.TRUE);
+    }
+    
+    public void setException(Throwable cause) {
+        setValue(cause);
     }
 
     @Override

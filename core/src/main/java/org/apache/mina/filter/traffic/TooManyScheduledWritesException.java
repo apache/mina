@@ -17,53 +17,60 @@
  *  under the License.
  *
  */
-package org.apache.mina.common;
+package org.apache.mina.filter.traffic;
 
 import java.util.Collection;
 
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteException;
+import org.apache.mina.common.WriteRequest;
 
 /**
- * An exception which is thrown when write buffer is not flushed for
- * {@link IoSessionConfig#getWriteTimeout()} seconds.
- *
+ * An exception that is thrown by {@link WriteThrottleFilter} when
+ * there are too many scheduled write requests or too much amount 
+ * of scheduled write data in an {@link IoSession}'s internal write
+ * request queue.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
+ * @version $Rev$, $Date$
  */
-public class WriteTimeoutException extends WriteException {
-    private static final long serialVersionUID = 3906931157944579121L;
+public class TooManyScheduledWritesException extends WriteException {
 
-    public WriteTimeoutException(Collection<WriteRequest> requests,
+    private static final long serialVersionUID = 7377810360950976904L;
+
+    public TooManyScheduledWritesException(Collection<WriteRequest> requests,
             String message, Throwable cause) {
         super(requests, message, cause);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests, String s) {
+    public TooManyScheduledWritesException(Collection<WriteRequest> requests,
+            String s) {
         super(requests, s);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests,
+    public TooManyScheduledWritesException(Collection<WriteRequest> requests,
             Throwable cause) {
         super(requests, cause);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests) {
+    public TooManyScheduledWritesException(Collection<WriteRequest> requests) {
         super(requests);
     }
 
-    public WriteTimeoutException(WriteRequest request, String message,
-            Throwable cause) {
+    public TooManyScheduledWritesException(WriteRequest request,
+            String message, Throwable cause) {
         super(request, message, cause);
     }
 
-    public WriteTimeoutException(WriteRequest request, String s) {
+    public TooManyScheduledWritesException(WriteRequest request, String s) {
         super(request, s);
     }
 
-    public WriteTimeoutException(WriteRequest request, Throwable cause) {
+    public TooManyScheduledWritesException(WriteRequest request, Throwable cause) {
         super(request, cause);
     }
 
-    public WriteTimeoutException(WriteRequest request) {
+    public TooManyScheduledWritesException(WriteRequest request) {
         super(request);
     }
 }

@@ -21,49 +21,49 @@ package org.apache.mina.common;
 
 import java.util.Collection;
 
-
 /**
- * An exception which is thrown when write buffer is not flushed for
- * {@link IoSessionConfig#getWriteTimeout()} seconds.
- *
+ * An exception which is thrown when one or more write requests resulted
+ * in no actual write operation.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class WriteTimeoutException extends WriteException {
-    private static final long serialVersionUID = 3906931157944579121L;
+public class NothingWrittenException extends WriteException {
 
-    public WriteTimeoutException(Collection<WriteRequest> requests,
+    private static final long serialVersionUID = -6331979307737691005L;
+
+    public NothingWrittenException(Collection<WriteRequest> requests,
             String message, Throwable cause) {
         super(requests, message, cause);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests, String s) {
+    public NothingWrittenException(Collection<WriteRequest> requests, String s) {
         super(requests, s);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests,
+    public NothingWrittenException(Collection<WriteRequest> requests,
             Throwable cause) {
         super(requests, cause);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests) {
+    public NothingWrittenException(Collection<WriteRequest> requests) {
         super(requests);
     }
 
-    public WriteTimeoutException(WriteRequest request, String message,
+    public NothingWrittenException(WriteRequest request, String message,
             Throwable cause) {
         super(request, message, cause);
     }
 
-    public WriteTimeoutException(WriteRequest request, String s) {
+    public NothingWrittenException(WriteRequest request, String s) {
         super(request, s);
     }
 
-    public WriteTimeoutException(WriteRequest request, Throwable cause) {
+    public NothingWrittenException(WriteRequest request, Throwable cause) {
         super(request, cause);
     }
 
-    public WriteTimeoutException(WriteRequest request) {
+    public NothingWrittenException(WriteRequest request) {
         super(request);
     }
 }

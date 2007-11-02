@@ -21,7 +21,9 @@ package org.apache.mina.common;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
@@ -383,6 +385,8 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     private void clearWriteRequestQueue(AbstractIoSession session) {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
+        
+        List<WriteRequest> failedRequests = new ArrayList<WriteRequest>();
 
         if ((req = writeRequestQueue.poll()) != null) {
             Object m = req.getMessage();
@@ -392,18 +396,27 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 // The first unwritten empty buffer must be
                 // forwarded to the filter chain.
                 if (buf.hasRemaining()) {
-                    req.getFuture().setWritten(false);
+                    failedRequests.add(req);
                 } else {
                     session.getFilterChain().fireMessageSent(req);
                 }
             } else {
-                req.getFuture().setWritten(false);
+                failedRequests.add(req);
             }
 
             // Discard others.
             while ((req = writeRequestQueue.poll()) != null) {
-                req.getFuture().setWritten(false);
+                failedRequests.add(req);
             }
+        }
+        
+        // Create an exception and notify.
+        if (!failedRequests.isEmpty()) {
+            WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
+            for (WriteRequest r: failedRequests) {
+                r.getFuture().setException(cause);
+            }
+            session.getFilterChain().fireExceptionCaught(cause);
         }
     }
 

@@ -417,7 +417,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
 
         try {
-            request.getFuture().setWritten(true);
+            request.getFuture().setWritten();
         } catch (Throwable t) {
             fireExceptionCaught(t);
         }
@@ -471,7 +471,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             entry.getFilter().filterWrite(entry.getNextFilter(), session,
                     writeRequest);
         } catch (Throwable e) {
-            writeRequest.getFuture().setWritten(false);
+            writeRequest.getFuture().setException(e);
             fireExceptionCaught(e);
         }
     }

@@ -23,13 +23,14 @@ import java.net.InetSocketAddress;
 
 import junit.framework.Assert;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.common.WriteException;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
@@ -50,6 +51,7 @@ public class ConnectorTest extends AbstractTest {
 
     private final int DATA_SIZE = 16;
 
+    private EchoConnectorHandler handler;
     private SslFilter connectorSSLFilter;
 
     public ConnectorTest() {
@@ -58,7 +60,7 @@ public class ConnectorTest extends AbstractTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
+        handler = new EchoConnectorHandler();
         connectorSSLFilter = new SslFilter(BogusSslContextFactory
                 .getInstance(false));
         connectorSSLFilter.setUseClientMode(true); // set client mode
@@ -85,6 +87,8 @@ public class ConnectorTest extends AbstractTest {
     }
 
     private void testConnector(IoConnector connector) throws Exception {
+        connector.setHandler(handler);
+
         System.out.println("* Without localAddress");
         testConnector(connector, false);
 
@@ -94,11 +98,8 @@ public class ConnectorTest extends AbstractTest {
 
     private void testConnector(IoConnector connector, boolean useLocalAddress)
             throws Exception {
-        EchoConnectorHandler handler = new EchoConnectorHandler();
-
         IoSession session = null;
         if (!useLocalAddress) {
-            connector.setHandler(handler);
             ConnectFuture future = connector.connect(new InetSocketAddress(
                     "localhost", port));
             future.awaitUninterruptibly();
@@ -109,7 +110,6 @@ public class ConnectorTest extends AbstractTest {
                 clientPort = AvailablePortFinder
                         .getNextAvailable(clientPort + 1);
                 try {
-                    connector.setHandler(handler);
                     ConnectFuture future = connector.connect(
                             new InetSocketAddress("localhost", port),
                             new InetSocketAddress(clientPort));
@@ -245,7 +245,11 @@ public class ConnectorTest extends AbstractTest {
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
-            cause.printStackTrace();
+            IoSessionLogger.getLogger(session).warn(cause);
+            if (cause instanceof WriteException) {
+                WriteException e = (WriteException) cause;
+                IoSessionLogger.getLogger(session).warn("Failed write requests: {}", e.getRequests());
+            }
         }
     }
 }

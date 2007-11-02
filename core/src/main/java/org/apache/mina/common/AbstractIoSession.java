@@ -208,7 +208,10 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         if (isClosing() || !isConnected()) {
-            return DefaultWriteFuture.newNotWrittenFuture(this);
+            WriteFuture future = new DefaultWriteFuture(this);
+            WriteRequest request = new DefaultWriteRequest(message, future, remoteAddress);
+            future.setException(new WriteToClosedSessionException(request));
+            return future;
         }
 
         FileChannel channel = null;
@@ -222,7 +225,7 @@ public abstract class AbstractIoSession implements IoSession {
                 message = new DefaultFileRegion(channel, 0, channel.size());
             } catch (IOException e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
-                return DefaultWriteFuture.newNotWrittenFuture(this);
+                return DefaultWriteFuture.newNotWrittenFuture(this, e);
             }
         } else if (message instanceof File) {
             File file = (File) message;
@@ -230,7 +233,7 @@ public abstract class AbstractIoSession implements IoSession {
                 channel = new FileInputStream(file).getChannel();
             } catch (IOException e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
-                return DefaultWriteFuture.newNotWrittenFuture(this);
+                return DefaultWriteFuture.newNotWrittenFuture(this, e);
             }
         }
 

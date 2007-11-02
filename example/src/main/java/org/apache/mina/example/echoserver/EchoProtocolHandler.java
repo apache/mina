@@ -19,16 +19,16 @@
  */
 package org.apache.mina.example.echoserver;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionLogger;
+import org.apache.mina.common.WriteException;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.SocketSession;
 import org.apache.mina.transport.socket.SocketSessionConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link IoHandler} implementation for echo server.
@@ -37,9 +37,6 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$,
  */
 public class EchoProtocolHandler extends IoHandlerAdapter {
-    private static final Logger log = LoggerFactory
-            .getLogger(EchoProtocolHandler.class);
-
     @Override
     public void sessionCreated(IoSession session) {
         if (session instanceof SocketSession) {
@@ -55,13 +52,17 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
-        log.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE)
-                + " ***");
+        IoSessionLogger.getLogger(session).info(
+                "*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE) + " ***");
     }
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        cause.printStackTrace();
+        IoSessionLogger.getLogger(session).warn(cause);
+        if (cause instanceof WriteException) {
+            WriteException e = (WriteException) cause;
+            IoSessionLogger.getLogger(session).warn("Failed write requests: {}", e.getRequests());
+        }
         session.close();
     }
 

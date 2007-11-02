@@ -535,8 +535,8 @@ public class StreamWriteFilterTest extends TestCase {
             return written;
         }
 
-        public void setWritten(boolean written) {
-            this.written = written;
+        public void setWritten() {
+            this.written = true;
         }
 
         public IoSession getSession() {
@@ -589,6 +589,14 @@ public class StreamWriteFilterTest extends TestCase {
 
         public boolean awaitUninterruptibly(long timeoutMillis) {
             return true;
+        }
+
+        public Throwable getException() {
+            return null;
+        }
+
+        public void setException(Throwable cause) {
+            throw new IllegalStateException();
         }
     }
 }

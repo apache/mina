@@ -47,13 +47,27 @@ public interface WriteFuture extends IoFuture {
      * Returns <tt>true</tt> if the write operation is finished successfully.
      */
     boolean isWritten();
+    
+    /**
+     * Returns the cause of the write failure if and only if the write
+     * operation has failed due to an {@link Exception}.  Otherwise,
+     * <tt>null</tt> is returned.
+     */
+    Throwable getException();
 
     /**
-     * Sets whether the message is written or not, and notifies all threads
-     * waiting for this future.  This method is invoked by MINA internally.
-     * Please do not call this method directly.
+     * Sets the message is written, and notifies all threads waiting for
+     * this future.  This method is invoked by MINA internally.  Please do
+     * not call this method directly.
      */
-    void setWritten(boolean written);
+    void setWritten();
+    
+    /**
+     * Sets the cause of the write failure, and notifies all threads waiting
+     * for this future.  This method is invoked by MINA internally.  Please
+     * do not call this method directly.
+     */
+    void setException(Throwable cause);
 
     WriteFuture await() throws InterruptedException;
 

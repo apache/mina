@@ -21,49 +21,50 @@ package org.apache.mina.common;
 
 import java.util.Collection;
 
-
 /**
- * An exception which is thrown when write buffer is not flushed for
- * {@link IoSessionConfig#getWriteTimeout()} seconds.
- *
+ * An exception which is thrown when one or more write operations were
+ * attempted on a closed session.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class WriteTimeoutException extends WriteException {
-    private static final long serialVersionUID = 3906931157944579121L;
+public class WriteToClosedSessionException extends WriteException {
 
-    public WriteTimeoutException(Collection<WriteRequest> requests,
+    private static final long serialVersionUID = 5550204573739301393L;
+
+    public WriteToClosedSessionException(Collection<WriteRequest> requests,
             String message, Throwable cause) {
         super(requests, message, cause);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests, String s) {
+    public WriteToClosedSessionException(Collection<WriteRequest> requests,
+            String s) {
         super(requests, s);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests,
+    public WriteToClosedSessionException(Collection<WriteRequest> requests,
             Throwable cause) {
         super(requests, cause);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests) {
+    public WriteToClosedSessionException(Collection<WriteRequest> requests) {
         super(requests);
     }
 
-    public WriteTimeoutException(WriteRequest request, String message,
+    public WriteToClosedSessionException(WriteRequest request, String message,
             Throwable cause) {
         super(request, message, cause);
     }
 
-    public WriteTimeoutException(WriteRequest request, String s) {
+    public WriteToClosedSessionException(WriteRequest request, String s) {
         super(request, s);
     }
 
-    public WriteTimeoutException(WriteRequest request, Throwable cause) {
+    public WriteToClosedSessionException(WriteRequest request, Throwable cause) {
         super(request, cause);
     }
 
-    public WriteTimeoutException(WriteRequest request) {
+    public WriteToClosedSessionException(WriteRequest request) {
         super(request);
     }
 }

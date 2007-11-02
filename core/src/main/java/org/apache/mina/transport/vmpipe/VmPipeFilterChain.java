@@ -33,6 +33,7 @@ import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.WriteToClosedSessionException;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -199,9 +200,13 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                     flushPendingDataQueues(s);
                 }
             } else {
-                WriteRequest req;
-                while ((req = queue.poll()) != null) {
-                    req.getFuture().setWritten(false);
+                List<WriteRequest> failedRequests = new ArrayList<WriteRequest>(queue);
+                if (!failedRequests.isEmpty()) {
+                    WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
+                    for (WriteRequest r: failedRequests) {
+                        r.getFuture().setException(cause);
+                    }
+                    s.getFilterChain().fireExceptionCaught(cause);
                 }
             }
         }

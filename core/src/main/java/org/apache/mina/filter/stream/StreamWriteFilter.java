@@ -31,6 +31,7 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.IoFilter.NextFilter;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -105,7 +106,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
             IoBuffer buffer = getNextBuffer(inputStream);
             if (buffer == null) {
                 // End of stream reached.
-                writeRequest.getFuture().setWritten(true);
+                writeRequest.getFuture().setWritten();
                 nextFilter.messageSent(session, writeRequest);
             } else {
                 session.setAttribute(CURRENT_STREAM, inputStream);
@@ -156,7 +157,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
                     }
                 }
 
-                currentWriteRequest.getFuture().setWritten(true);
+                currentWriteRequest.getFuture().setWritten();
                 nextFilter.messageSent(session, currentWriteRequest);
             } else {
                 nextFilter.filterWrite(session, new DefaultWriteRequest(

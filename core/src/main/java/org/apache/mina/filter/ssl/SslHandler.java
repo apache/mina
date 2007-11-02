@@ -540,7 +540,7 @@ class SslHandler {
         // Check if any net data needed to be writen
         if (!getOutNetBuffer().hasRemaining()) {
             // no; bail out
-            return DefaultWriteFuture.newNotWrittenFuture(session);
+            return null;
         }
 
         // set flag that we are writing encrypted data
@@ -555,7 +555,7 @@ class SslHandler {
                 logger.debug( " write outNetBuffer: "
                         + getOutNetBuffer());
             }
-            org.apache.mina.common.IoBuffer writeBuffer = copy(getOutNetBuffer());
+            IoBuffer writeBuffer = copy(getOutNetBuffer());
             if (logger.isDebugEnabled()) {
                 logger.debug( " session write: " + writeBuffer);
             }
@@ -580,7 +580,7 @@ class SslHandler {
                         logger.debug( " write outNetBuffer2: "
                                 + getOutNetBuffer());
                     }
-                    org.apache.mina.common.IoBuffer writeBuffer2 = copy(getOutNetBuffer());
+                    IoBuffer writeBuffer2 = copy(getOutNetBuffer());
                     writeFuture = new DefaultWriteFuture(session);
                     parent.filterWrite(nextFilter, session,
                             new DefaultWriteRequest(writeBuffer2, writeFuture));
@@ -590,11 +590,7 @@ class SslHandler {
             writingEncryptedData = false;
         }
 
-        if (writeFuture != null) {
-            return writeFuture;
-        } else {
-            return DefaultWriteFuture.newNotWrittenFuture(session);
-        }
+        return writeFuture;
     }
 
     private void unwrap(NextFilter nextFilter) throws SSLException {

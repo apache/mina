@@ -20,6 +20,8 @@
 package org.apache.mina.filter.ssl;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -40,6 +42,7 @@ import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestWrapper;
+import org.apache.mina.common.WriteToClosedSessionException;
 
 /**
  * An SSL filter that encrypts and decrypts the data exchanged in the session.
@@ -464,6 +467,63 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     @Override
+    public void exceptionCaught(NextFilter nextFilter, IoSession session,
+            Throwable cause) throws Exception {
+
+        if (cause instanceof WriteToClosedSessionException) {
+            // Filter out SSL close notify, which is likely to fail to flush
+            // due to disconnection.
+            WriteToClosedSessionException e = (WriteToClosedSessionException) cause;
+            List<WriteRequest> failedRequests = e.getRequests();
+            boolean containsCloseNotify = false;
+            for (WriteRequest r: failedRequests) {
+                if (isCloseNotify(r.getMessage())) {
+                    containsCloseNotify = true;
+                    break;
+                }
+            }
+            
+            if (containsCloseNotify) {
+                if (failedRequests.size() == 1) {
+                    // close notify is the only failed request; bail out.
+                    return;
+                }
+                
+                List<WriteRequest> newFailedRequests =
+                    new ArrayList<WriteRequest>(failedRequests.size() - 1);
+                for (WriteRequest r: failedRequests) {
+                    if (!isCloseNotify(r.getMessage())) {
+                        newFailedRequests.add(r);
+                    }
+                }
+                
+                if (newFailedRequests.isEmpty()) {
+                    // the failedRequests were full with close notify; bail out.
+                    return;
+                }
+                
+                cause = new WriteToClosedSessionException(
+                        newFailedRequests, cause.getMessage(), cause.getCause());
+            }
+        }
+        
+        nextFilter.exceptionCaught(session, cause);
+    }
+        
+    private boolean isCloseNotify(Object message) {
+        if (!(message instanceof IoBuffer)) {
+            return false;
+        }
+        
+        IoBuffer buf = (IoBuffer) message;
+        int offset = buf.position();
+        return buf.remaining() == 23 &&
+               buf.get(offset + 0) == 0x15 && buf.get(offset + 1) == 0x03 &&
+               buf.get(offset + 2) == 0x01 && buf.get(offset + 3) == 0x00 &&
+               buf.get(offset + 4) == 0x12;
+    }
+
+    @Override
     public void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws SSLException {
         boolean needsFlush = true;
@@ -582,11 +642,15 @@ public class SslFilter extends IoFilterAdapter {
         SslHandler handler = getSslSessionHandler(session);
         // if already shut down
         if (!handler.closeOutbound()) {
-            return DefaultWriteFuture.newNotWrittenFuture(session);
+            return DefaultWriteFuture.newNotWrittenFuture(
+                    session, new IllegalStateException("SSL session is shut down already."));
         }
 
         // there might be data to write out here?
         WriteFuture future = handler.writeNetBuffer(nextFilter);
+        if (future == null) {
+            future = DefaultWriteFuture.newWrittenFuture(session);
+        }
 
         if (handler.isInboundDone()) {
             handler.destroy();

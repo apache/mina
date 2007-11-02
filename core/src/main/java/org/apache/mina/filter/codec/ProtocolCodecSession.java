@@ -60,7 +60,7 @@ import org.apache.mina.common.WriteFuture;
 public class ProtocolCodecSession extends DummySession {
 
     private final WriteFuture notWrittenFuture =
-        DefaultWriteFuture.newNotWrittenFuture(this);
+        DefaultWriteFuture.newNotWrittenFuture(this, new UnsupportedOperationException());
 
     private final AbstractProtocolEncoderOutput encoderOutput =
         new AbstractProtocolEncoderOutput() {

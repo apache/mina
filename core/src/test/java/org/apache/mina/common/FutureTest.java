@@ -94,7 +94,7 @@ public class FutureTest extends TestCase {
         TestThread thread = new TestThread(future);
         thread.start();
 
-        future.setWritten(true);
+        future.setWritten();
         thread.join();
 
         assertTrue(thread.success);
@@ -105,12 +105,13 @@ public class FutureTest extends TestCase {
         thread = new TestThread(future);
         thread.start();
 
-        future.setWritten(false);
+        future.setException(new Exception());
         thread.join();
 
         assertTrue(thread.success);
         assertTrue(future.isReady());
         assertFalse(future.isWritten());
+        assertTrue(future.getException().getClass() == Exception.class);
     }
 
     public void testAddListener() throws Exception {
