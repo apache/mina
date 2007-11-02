@@ -19,10 +19,9 @@
  */
 package org.apache.mina.common;
 
-import java.io.IOException;
 
 /**
- * An {@link IOException} which is thrown when write buffer is not flushed for
+ * A {@link RuntimeIoException} which is thrown when write buffer is not flushed for
  * {@link IoSession#getWriteTimeout()} seconds.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
