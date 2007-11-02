@@ -35,8 +35,8 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  * @version $Rev$, $Date$
  */
 public class TextLineCodecFactory implements ProtocolCodecFactory {
-    private final TextLineEncoder encoder;
 
+    private final TextLineEncoder encoder;
     private final TextLineDecoder decoder;
 
     /**
@@ -57,6 +57,23 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
     public TextLineCodecFactory(Charset charset) {
         encoder = new TextLineEncoder(charset, LineDelimiter.UNIX);
         decoder = new TextLineDecoder(charset, LineDelimiter.AUTO);
+    }
+
+    /**
+     * Creates a new instance of TextLineCodecFactory.  This constructor
+     * provides more flexibility for the developer.
+     *
+     * @param charset
+     *  The charset to use in the encoding and decoding
+     * @param encodingDelimiter
+     *  The line delimeter for the encoder
+     * @param decodingDelimiter
+     *  The line delimeter for the decoder
+     */
+    public TextLineCodecFactory(Charset charset,
+            String encodingDelimiter, String decodingDelimiter) {
+        encoder = new TextLineEncoder(charset, encodingDelimiter);
+        decoder = new TextLineDecoder(charset, decodingDelimiter);
     }
 
     /**

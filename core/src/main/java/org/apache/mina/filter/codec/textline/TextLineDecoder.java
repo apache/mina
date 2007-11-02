@@ -54,7 +54,23 @@ public class TextLineDecoder implements ProtocolDecoder {
      * and {@link LineDelimiter#AUTO} delimiter.
      */
     public TextLineDecoder() {
-        this(Charset.defaultCharset(), LineDelimiter.AUTO);
+        this(LineDelimiter.AUTO);
+    }
+    
+    /**
+     * Creates a new instance with the current default {@link Charset}
+     * and the specified <tt>delimiter</tt>.
+     */
+    public TextLineDecoder(String delimiter) {
+        this(new LineDelimiter(delimiter));
+    }
+    
+    /**
+     * Creates a new instance with the current default {@link Charset}
+     * and the specified <tt>delimiter</tt>.
+     */
+    public TextLineDecoder(LineDelimiter delimiter) {
+        this(Charset.defaultCharset(), delimiter);
     }
 
     /**
@@ -64,7 +80,15 @@ public class TextLineDecoder implements ProtocolDecoder {
     public TextLineDecoder(Charset charset) {
         this(charset, LineDelimiter.AUTO);
     }
-
+    
+    /**
+     * Creates a new instance with the spcified <tt>charset</tt>
+     * and the specified <tt>delimiter</tt>.
+     */
+    public TextLineDecoder(Charset charset, String delimiter) {
+        this(charset, new LineDelimiter(delimiter));
+    }
+    
     /**
      * Creates a new instance with the specified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.

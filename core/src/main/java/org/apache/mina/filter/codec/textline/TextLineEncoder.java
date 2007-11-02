@@ -45,18 +45,50 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
 
     private int maxLineLength = Integer.MAX_VALUE;
 
+    /**
+     * Creates a new instance with the current default {@link Charset}
+     * and {@link LineDelimiter#UNIX} delimiter.
+     */
     public TextLineEncoder() {
         this(Charset.defaultCharset(), LineDelimiter.UNIX);
     }
+    
+    /**
+     * Creates a new instance with the current default {@link Charset}
+     * and the specified <tt>delimiter</tt>.
+     */
+    public TextLineEncoder(String delimiter) {
+        this(new LineDelimiter(delimiter));
+    }
 
+    /**
+     * Creates a new instance with the current default {@link Charset}
+     * and the specified <tt>delimiter</tt>.
+     */
     public TextLineEncoder(LineDelimiter delimiter) {
         this(Charset.defaultCharset(), delimiter);
     }
 
+    /**
+     * Creates a new instance with the spcified <tt>charset</tt>
+     * and {@link LineDelimiter#UNIX} delimiter.
+     */
     public TextLineEncoder(Charset charset) {
         this(charset, LineDelimiter.UNIX);
     }
 
+    /**
+     * Creates a new instance with the spcified <tt>charset</tt>
+     * and the specified <tt>delimiter</tt>.
+     */
+    public TextLineEncoder(Charset charset, String delimiter) {
+        this(charset, new LineDelimiter(delimiter));
+    }
+    
+    /**
+     * Creates a new instance with the spcified <tt>charset</tt>
+     * and the specified <tt>delimiter</tt>.
+     */
     public TextLineEncoder(Charset charset, LineDelimiter delimiter) {
         if (charset == null) {
             throw new NullPointerException("charset");
