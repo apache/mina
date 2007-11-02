@@ -28,7 +28,9 @@ import org.apache.mina.common.BufferDataException;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
 
 /**
  * A {@link ProtocolDecoder} which decodes a text line into a string.
@@ -137,7 +139,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     private void decodeAuto(Context ctx, IoBuffer in, ProtocolDecoderOutput out)
-            throws CharacterCodingException {
+            throws CharacterCodingException, ProtocolDecoderException {
 
         int matchCount = ctx.getMatchCount();
 
@@ -185,7 +187,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                 } else {
                     int overflowPosition = ctx.getOverflowPosition();
                     ctx.reset();
-                    throw new BufferDataException(
+                    throw new RecoverableProtocolDecoderException(
                             "Line is too long: " + overflowPosition);
                 }
 
@@ -202,7 +204,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     private void decodeNormal(Context ctx, IoBuffer in, ProtocolDecoderOutput out)
-            throws CharacterCodingException {
+            throws CharacterCodingException, ProtocolDecoderException {
 
         int matchCount = ctx.getMatchCount();
 
@@ -243,7 +245,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                     } else {
                         int overflowPosition = ctx.getOverflowPosition();
                         ctx.reset();
-                        throw new BufferDataException(
+                        throw new RecoverableProtocolDecoderException(
                                 "Line is too long: " + overflowPosition);
                     }
 
