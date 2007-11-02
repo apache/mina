@@ -19,6 +19,8 @@
  */
 package org.apache.mina.filter.traffic;
 
+import org.apache.mina.common.WriteFuture;
+
 /**
  * Tells {@link WriteThrottleFilter} what to do when there are too many
  * scheduled write requests in the session buffer.
@@ -47,7 +49,12 @@ public enum WriteThrottlePolicy {
      */
     LOG_AND_BLOCK,
     /**
-     * Raise a {@link TooManyScheduledWritesException}.
+     * Raise a {@link TooManyScheduledWritesException}.  Please note that
+     * the exception is <strong>not</strong> thrown back directly to the
+     * caller.  Instead, the {@link WriteFuture#getException() exception}
+     * property of the returned {@link WriteFuture} will return the exception.
+     * The exception will also be notified as an <tt>exceptionCaught</tt>
+     * event.
      */
     EXCEPTION,
 }
