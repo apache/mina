@@ -19,47 +19,25 @@
  */
 package org.apache.mina.filter.traffic;
 
+import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteException;
 import org.apache.mina.common.WriteRequest;
 
 /**
- * This filter will turn the asynchronous write method in to a blocking send when there are more than
- * the prescribed number of messages awaiting sending. It should be used in conjunction with the
- * {@link ReadThrottleFilterBuilder} on a server as the blocking writes will allow the read thread to
- * cause an Out of Memory exception due to a back log of unprocessed messages.
- *
- * This is should only be viewed as a temporary work around for DIRMINA-302.
- *
- * A true solution should not be implemented as a filter as this issue will always occur. On a machine
- * where the network is slower than the local producer.
- *
- * Suggested improvement is to allow implementation of policices on what to do when buffer is full.
- *
- *  They could be:
- *          Block - As this does
- *          Wait on a given Future - to drain more of the queue.. in essence this filter with high/low watermarks
- *          Throw Exception - through the client write() method to allow them to get immediate feedback on buffer state
- * 
- * <p/>
- * <p>Usage:
- * <p/>
- * <pre><code>
- * DefaultFilterChainBuilder builder = ...
- * WriteBufferLimitFilterBuilder filter = new WriteBufferLimitFilterBuilder();
- * filter.attach( builder );
- * </code></pre>
- * <p/>
- * or
- * <p/>
- * <pre><code>
- * IoFilterChain chain = ...
- * WriteBufferLimitFilterBuilder filter = new WriteBufferLimitFilterBuilder();
- * filter.attach( chain );
- * </code></pre>
- *
+ * An {@link IoFilter} that throttles outgoing traffic to prevent a unwanted
+ * {@link OutOfMemoryError} under heavy load.
+ * <p>
+ * This filter will automatically enforce the specified {@link WriteThrottlePolicy}
+ * when the {@link IoSession#getScheduledWriteBytes() localScheduledWriteBytes},
+ * {@link IoSession#getScheduledWriteMessages() localScheduledWriteMessages},
+ * {@link IoService#getScheduledWriteBytes() globalScheduledWriteBytes} or
+ * {@link IoService#getScheduledWriteMessages() globalScheduledWriteMessages}
+ * exceeds the specified limit values.
+
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -78,14 +56,26 @@ public class WriteThrottleFilter extends IoFilterAdapter {
     private volatile int globalMaxScheduledWriteMessages;
     private volatile long globalMaxScheduledWriteBytes;
     
+    /**
+     * Creates a new instance with the default policy
+     * ({@link WriteThrottlePolicy#LOG}) and limit values.
+     */
     public WriteThrottleFilter() {
         this(WriteThrottlePolicy.LOG);
     }
     
+    /**
+     * Creates a new instance with the specified <tt>policy</tt> and the
+     * default limit values.
+     */
     public WriteThrottleFilter(WriteThrottlePolicy policy) {
         this(policy, 4096, 65536, 131072, 1048576 * 128);
     }
     
+    /**
+     * Creates a new instance with the default policy
+     * ({@link WriteThrottlePolicy#LOG}) and the specified limit values.
+     */
     public WriteThrottleFilter(
             int localMaxScheduledWriteMessages, long localMaxScheduledWriteBytes,
             int globalMaxScheduledWriteMessages, long globalMaxScheduledWriteBytes) {
@@ -94,6 +84,10 @@ public class WriteThrottleFilter extends IoFilterAdapter {
              globalMaxScheduledWriteMessages, globalMaxScheduledWriteBytes);
     }
     
+    /**
+     * Creates a new instance with the specified <tt>policy</tt> and limit
+     * values.
+     */
     public WriteThrottleFilter(
             WriteThrottlePolicy policy,
             int localMaxScheduledWriteMessages, long localMaxScheduledWriteBytes,

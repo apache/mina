@@ -35,6 +35,8 @@ public enum WriteThrottlePolicy {
     OFF,
     /**
      * Log a warning message, but doesn't limit anything.
+     * The warning message is logged at most every 3 seconds to avoid
+     * log flooding.
      */
     LOG,
     /**

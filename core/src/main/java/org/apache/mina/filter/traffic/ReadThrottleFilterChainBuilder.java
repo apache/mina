@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filter.traffic;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.AttributeKey;
@@ -34,7 +35,8 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
  * An {@link IoFilterChainBuilder} that configures an {IoFilterChain} or
- * {@link DefaultIoFilterChainBuilder} to control inflow traffic.
+ * {@link DefaultIoFilterChainBuilder} to control incoming traffic to
+ * prevent a unwanted {@link OutOfMemoryError} under heavy load.
  * <p>
  * The filters that this builder inserts will automatically disable reads
  * on an {@link IoSession} once the data batched for that session in the

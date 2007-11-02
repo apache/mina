@@ -26,7 +26,8 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
  * An {@link IoFilter} interface that provides access to the properties related
- * with inflow traffic control.  Please build the {@link IoFilterChain} with
+ * with incoming traffic control to prevent a unwanted {@link OutOfMemoryError}
+ * under heavy load.  Please build the {@link IoFilterChain} with
  * {@link ReadThrottleFilterChainBuilder} to access this filter.  Once properly
  * installed, you can access this filter using the following code:
  * <pre><code>
