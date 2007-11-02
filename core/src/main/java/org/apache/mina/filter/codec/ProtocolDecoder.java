@@ -35,6 +35,8 @@ import org.apache.mina.common.IoSession;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @see ProtocolDecoderException
  */
 public interface ProtocolDecoder {
     /**

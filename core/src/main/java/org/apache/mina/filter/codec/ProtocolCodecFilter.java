@@ -180,9 +180,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 decoderOut.flush();
                 nextFilter.exceptionCaught(session, pde);
 
-                // Stop retrying if the buffer position didn't change
-                // because retrying will cause an infinite loop.
-                if (in.position() == oldPos) {
+                // Retry only if the type of the caught exception is
+                // recoverable and the buffer position has changed.
+                // We check buffer position additionally to prevent an
+                // infinite loop.
+                if (!(t instanceof RecoverableProtocolDecoderException) ||
+                        in.position() == oldPos) {
                     break;
                 }
             }
