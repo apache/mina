@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class WriteTimeoutException extends IOException {
+public class WriteTimeoutException extends RuntimeIoException {
     private static final long serialVersionUID = 3906931157944579121L;
 
     /**
