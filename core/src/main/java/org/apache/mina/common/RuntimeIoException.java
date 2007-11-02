@@ -19,8 +19,14 @@
  */
 package org.apache.mina.common;
 
+import java.io.IOException;
+
 /**
- * A unchecked version of {@link java.io.IOException}.
+ * A unchecked version of {@link IOException}.
+ * <p>
+ * Please note that {@link RuntimeIoException} is different from
+ * {@link IOException} in that doesn't trigger force session close,
+ * while {@link IOException} forces disconnection.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
