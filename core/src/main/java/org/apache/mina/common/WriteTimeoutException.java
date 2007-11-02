@@ -19,15 +19,16 @@
  */
 package org.apache.mina.common;
 
+import java.io.IOException;
 
 /**
- * A {@link RuntimeIoException} which is thrown when write buffer is not flushed for
- * {@link IoSession#getWriteTimeout()} seconds.
+ * An {@link IOException} which is thrown when write buffer is not flushed for
+ * {@link IoSessionConfig#getWriteTimeout()} seconds.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$,
  */
-public class WriteTimeoutException extends RuntimeIoException {
+public class WriteTimeoutException extends IOException {
     private static final long serialVersionUID = 3906931157944579121L;
 
     /**
