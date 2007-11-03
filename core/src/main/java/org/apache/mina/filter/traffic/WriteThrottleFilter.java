@@ -382,7 +382,7 @@ public class WriteThrottleFilter extends IoFilterAdapter {
     }
 
     private void fail(IoSession session, WriteRequest writeRequest) throws WriteException {
-        throw new TooManyScheduledWritesException(writeRequest, getMessage(session));
+        throw new WriteFloodException(writeRequest, getMessage(session));
     }
     
     private String getMessage(IoSession session) {

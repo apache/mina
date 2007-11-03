@@ -34,43 +34,43 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class TooManyScheduledWritesException extends WriteException {
+public class WriteFloodException extends WriteException {
 
     private static final long serialVersionUID = 7377810360950976904L;
 
-    public TooManyScheduledWritesException(Collection<WriteRequest> requests,
+    public WriteFloodException(Collection<WriteRequest> requests,
             String message, Throwable cause) {
         super(requests, message, cause);
     }
 
-    public TooManyScheduledWritesException(Collection<WriteRequest> requests,
+    public WriteFloodException(Collection<WriteRequest> requests,
             String s) {
         super(requests, s);
     }
 
-    public TooManyScheduledWritesException(Collection<WriteRequest> requests,
+    public WriteFloodException(Collection<WriteRequest> requests,
             Throwable cause) {
         super(requests, cause);
     }
 
-    public TooManyScheduledWritesException(Collection<WriteRequest> requests) {
+    public WriteFloodException(Collection<WriteRequest> requests) {
         super(requests);
     }
 
-    public TooManyScheduledWritesException(WriteRequest request,
+    public WriteFloodException(WriteRequest request,
             String message, Throwable cause) {
         super(request, message, cause);
     }
 
-    public TooManyScheduledWritesException(WriteRequest request, String s) {
+    public WriteFloodException(WriteRequest request, String s) {
         super(request, s);
     }
 
-    public TooManyScheduledWritesException(WriteRequest request, Throwable cause) {
+    public WriteFloodException(WriteRequest request, Throwable cause) {
         super(request, cause);
     }
 
-    public TooManyScheduledWritesException(WriteRequest request) {
+    public WriteFloodException(WriteRequest request) {
         super(request);
     }
 }

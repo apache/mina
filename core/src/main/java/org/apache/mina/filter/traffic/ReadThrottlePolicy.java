@@ -28,7 +28,7 @@ import org.apache.mina.common.WriteFuture;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public enum WriteThrottlePolicy {
+public enum ReadThrottlePolicy {
     /**
      * Do nothing; disables the filter.
      */
@@ -57,9 +57,12 @@ public enum WriteThrottlePolicy {
      * The exception will also be notified as an <tt>exceptionCaught</tt>
      * event.
      */
-    FAIL,
+    CLOSE,
     /**
-     * Combination of {@link #LOG} and {@link #FAIL}.
+     * Combination of {@link #LOG} and {@link #CLOSE}.
      */
-    LOG_AND_FAIL,
+    LOG_AND_CLOSE,
+    EXCEPTION,
+    LOG_AND_EXCEPTION,
+    
 }
