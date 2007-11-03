@@ -19,32 +19,27 @@
  */
 package org.apache.mina.filter.traffic;
 
-import org.apache.mina.common.RuntimeIoException;
-
 /**
- * An exception that is thrown by {@link ReadThrottleFilter} when
- * the buffer size grows up too much.
- * 
+ * A tagging interface for identifying {@link ReadFloodException}
+ * and {@link WriteFloodException}; It's not really an exception.
+ * <p>
+ * This interface is useful when you want to do something if either
+ * reader or writer side is flooded:
+ * <pre><code>
+ * if (exception instanceof IoFloodException) {
+ *     session.close();
+ * }
+ * </code></pre>
+ * which is a way simpler than:
+ * <pre><code>
+ * if (exception instanceof ReadFloodException ||
+ *     exception instanceof WriteFloodException) {
+ *     
+ *     session.close();
+ * }
+ * </code></pre>
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ReadFloodException extends RuntimeIoException implements IoFloodException {
-
-    private static final long serialVersionUID = -4068832261253453437L;
-
-    public ReadFloodException() {
-        super();
-    }
-
-    public ReadFloodException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ReadFloodException(String message) {
-        super(message);
-    }
-
-    public ReadFloodException(Throwable cause) {
-        super(cause);
-    }
+public interface IoFloodException {
 }

@@ -34,7 +34,7 @@ import org.apache.mina.common.WriteRequest;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class WriteFloodException extends WriteException {
+public class WriteFloodException extends WriteException implements IoFloodException {
 
     private static final long serialVersionUID = 7377810360950976904L;
 
