@@ -270,8 +270,13 @@ public class WriteThrottleFilter extends IoFilterAdapter {
                     log(session);
                     block(session);
                     break;
-                case EXCEPTION:
-                    raiseException(session, writeRequest);
+                case FAIL:
+                    fail(session, writeRequest);
+                    break;
+                case LOG_AND_FAIL:
+                    log(session);
+                    fail(session, writeRequest);
+                    break;
                 default:
                     throw new InternalError();    
                 }
@@ -366,7 +371,7 @@ public class WriteThrottleFilter extends IoFilterAdapter {
         }
     }
 
-    private void raiseException(IoSession session, WriteRequest writeRequest) throws WriteException {
+    private void fail(IoSession session, WriteRequest writeRequest) throws WriteException {
         throw new TooManyScheduledWritesException(writeRequest, getMessage(session));
     }
     

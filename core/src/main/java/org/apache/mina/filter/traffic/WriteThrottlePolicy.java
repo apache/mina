@@ -47,16 +47,19 @@ public enum WriteThrottlePolicy {
      */
     BLOCK,
     /**
-     * Combination of {@link #WARN} and {@link #BLOCK}.
+     * Combination of {@link #LOG} and {@link #BLOCK}.
      */
     LOG_AND_BLOCK,
     /**
-     * Raise a {@link TooManyScheduledWritesException}.  Please note that
-     * the exception is <strong>not</strong> thrown back directly to the
-     * caller.  Instead, the {@link WriteFuture#getException() exception}
-     * property of the returned {@link WriteFuture} will return the exception.
+     * Make the write operation fail immediately.
+     * The '{@link WriteFuture#getException() exception}' property of
+     * the returned {@link WriteFuture} will be {@link TooManyScheduledWritesException}.
      * The exception will also be notified as an <tt>exceptionCaught</tt>
      * event.
      */
-    EXCEPTION,
+    FAIL,
+    /**
+     * Combination of {@link #LOG} and {@link #FAIL}.
+     */
+    LOG_AND_FAIL,
 }
