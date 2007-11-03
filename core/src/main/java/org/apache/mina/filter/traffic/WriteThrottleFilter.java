@@ -269,26 +269,17 @@ public class WriteThrottleFilter extends IoFilterAdapter {
         WriteThrottlePolicy policy = getPolicy();
         if (policy != WriteThrottlePolicy.OFF) {
             if (!readyToWrite(session)) {
-                switch (getPolicy()) {
-                case LOG:
-                    log(session);
-                    break;
-                case BLOCK:
-                    block(session);
-                    break;
-                case LOG_AND_BLOCK:
-                    log(session);
-                    block(session);
-                    break;
+                switch (policy) {
                 case FAIL:
                     fail(session, writeRequest);
                     break;
-                case LOG_AND_FAIL:
+                case BLOCK:
                     log(session);
-                    fail(session, writeRequest);
+                    block(session);
                     break;
-                default:
-                    throw new InternalError();    
+                case LOG:
+                    log(session);
+                    break;
                 }
             }
         }

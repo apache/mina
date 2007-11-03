@@ -384,34 +384,25 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         
         synchronized (state) {
             int sessionBufferSize = (state.sessionBufferSize += size);
-            if ((policy == ReadThrottlePolicy.BLOCK || policy == ReadThrottlePolicy.LOG_AND_BLOCK) && (
-                    (maxSessionBufferSize != 0 && sessionBufferSize >= maxSessionBufferSize) ||
+            switch (policy) {
+            case BLOCK:
+            case EXCEPTION:
+                if ((maxSessionBufferSize != 0 && sessionBufferSize >= maxSessionBufferSize) ||
                     (maxServiceBufferSize != 0 && serviceBufferSize >= maxServiceBufferSize) ||
-                    (maxGlobalBufferSize  != 0 && globalBufferSize  >= maxGlobalBufferSize))) {
-                session.suspendRead();
-                state.suspendedRead = true;
+                    (maxGlobalBufferSize  != 0 && globalBufferSize  >= maxGlobalBufferSize)) {
+                    session.suspendRead();
+                    state.suspendedRead = true;
+                }
             }
         }
-
-        switch (getPolicy()) {
-        case LOG:
-        case LOG_AND_BLOCK:
-            log(session);
-            break;
+        
+        switch (policy) {
         case CLOSE:
             session.close();
-            break;
-        case LOG_AND_CLOSE:
-            log(session);
-            session.close();
-            break;
         case EXCEPTION:
             raiseException(session);
-            break;
-        case LOG_AND_EXCEPTION:
+        case LOG:
             log(session);
-            raiseException(session);
-            break;
         }
     }
     

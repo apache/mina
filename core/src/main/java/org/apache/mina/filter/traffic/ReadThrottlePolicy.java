@@ -19,11 +19,10 @@
  */
 package org.apache.mina.filter.traffic;
 
-import org.apache.mina.common.WriteFuture;
 
 /**
- * Tells {@link WriteThrottleFilter} what to do when there are too many
- * scheduled write requests in the session buffer.
+ * Tells {@link ReadThrottleFilter} what to do when the read buffer
+ * grows up too much.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -46,23 +45,6 @@ public enum ReadThrottlePolicy {
      * {@link OutOfMemoryError} on the reader side.
      */
     BLOCK,
-    /**
-     * Combination of {@link #LOG} and {@link #BLOCK}.
-     */
-    LOG_AND_BLOCK,
-    /**
-     * Make the write operation fail immediately.
-     * The '{@link WriteFuture#getException() exception}' property of
-     * the returned {@link WriteFuture} will be {@link WriteFloodException}.
-     * The exception will also be notified as an <tt>exceptionCaught</tt>
-     * event.
-     */
-    CLOSE,
-    /**
-     * Combination of {@link #LOG} and {@link #CLOSE}.
-     */
-    LOG_AND_CLOSE,
     EXCEPTION,
-    LOG_AND_EXCEPTION,
-    
+    CLOSE,
 }

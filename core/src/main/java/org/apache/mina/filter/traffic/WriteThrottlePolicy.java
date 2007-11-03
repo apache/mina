@@ -47,10 +47,6 @@ public enum WriteThrottlePolicy {
      */
     BLOCK,
     /**
-     * Combination of {@link #LOG} and {@link #BLOCK}.
-     */
-    LOG_AND_BLOCK,
-    /**
      * Make the write operation fail immediately.
      * The '{@link WriteFuture#getException() exception}' property of
      * the returned {@link WriteFuture} will be {@link WriteFloodException}.
@@ -58,8 +54,4 @@ public enum WriteThrottlePolicy {
      * event.
      */
     FAIL,
-    /**
-     * Combination of {@link #LOG} and {@link #FAIL}.
-     */
-    LOG_AND_FAIL,
 }
