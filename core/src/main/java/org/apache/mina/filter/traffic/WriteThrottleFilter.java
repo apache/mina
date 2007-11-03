@@ -19,6 +19,10 @@
  */
 package org.apache.mina.filter.traffic;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoService;
@@ -26,6 +30,8 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteException;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.util.CopyOnWriteMap;
+import org.apache.mina.util.MapBackedSet;
 
 /**
  * An {@link IoFilter} that throttles outgoing traffic to prevent a unwanted
@@ -42,11 +48,68 @@ import org.apache.mina.common.WriteRequest;
 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
- * TODO provide global limitation
  */
 public class WriteThrottleFilter extends IoFilterAdapter {
 
+    private static final Set<IoService> activeServices =
+        new MapBackedSet<IoService>(new CopyOnWriteMap<IoService, Boolean>()); 
+    
+    public static int getGlobalScheduledWriteMessages() {
+        int answer = 0;
+        List<IoService> inactiveServices = null;
+        for (IoService s: activeServices) {
+            if (s.isActive()) {
+                answer += s.getScheduledWriteMessages();
+            } else {
+                if (inactiveServices == null) {
+                    inactiveServices = new ArrayList<IoService>();
+                }
+                inactiveServices.add(s);
+            }
+        }
+        
+        if (inactiveServices != null) {
+            activeServices.removeAll(inactiveServices);
+        }
+        
+        return answer;
+    }
+    
+    public static long getGlobalScheduledWriteBytes() {
+        long answer = 0;
+        List<IoService> inactiveServices = null;
+        for (IoService s: activeServices) {
+            if (s.isActive()) {
+                answer += s.getScheduledWriteBytes();
+            } else {
+                if (inactiveServices == null) {
+                    inactiveServices = new ArrayList<IoService>();
+                }
+                inactiveServices.add(s);
+            }
+        }
+        
+        if (inactiveServices != null) {
+            activeServices.removeAll(inactiveServices);
+        }
+        
+        return answer;
+    }
+    
+    private static int getGlobalScheduledWriteMessages(IoService service) {
+        if (!activeServices.contains(service)) {
+            activeServices.add(service);
+        }
+        return getGlobalScheduledWriteMessages();
+    }
+    
+    private static long getGlobalScheduledWriteBytes(IoService service) {
+        if (!activeServices.contains(service)) {
+            activeServices.add(service);
+        }
+        return getGlobalScheduledWriteBytes();
+    }
+    
     private final Object logLock = new Object();
     private final Object blockLock = new Object();
 
@@ -59,6 +122,8 @@ public class WriteThrottleFilter extends IoFilterAdapter {
     private volatile long maxSessionScheduledWriteBytes;
     private volatile int maxServiceScheduledWriteMessages;
     private volatile long maxServiceScheduledWriteBytes;
+    private volatile int maxGlobalScheduledWriteMessages;
+    private volatile long maxGlobalScheduledWriteBytes;
     
     /**
      * Creates a new instance with the default policy
@@ -73,7 +138,8 @@ public class WriteThrottleFilter extends IoFilterAdapter {
      * default limit values.
      */
     public WriteThrottleFilter(WriteThrottlePolicy policy) {
-        this(policy, 4096, 65536, 131072, 1048576 * 128);
+        // 4K, 64K, 128K, 64M, 256K, 128M
+        this(policy, 4096, 65536, 1024 * 128, 1048576 * 64, 1024 * 256, 1028576 * 128);
     }
     
     /**
@@ -82,10 +148,12 @@ public class WriteThrottleFilter extends IoFilterAdapter {
      */
     public WriteThrottleFilter(
             int maxSessionScheduledWriteMessages, long maxSessionScheduledWriteBytes,
-            int globalMaxScheduledWriteMessages, long globalMaxScheduledWriteBytes) {
+            int maxServiceScheduledWriteMessages, long maxServiceScheduledWriteBytes,
+            int maxGlobalScheduledWriteMessages,  long maxGlobalScheduledWriteBytes) {
         this(WriteThrottlePolicy.LOG,
              maxSessionScheduledWriteMessages, maxSessionScheduledWriteBytes,
-             globalMaxScheduledWriteMessages, globalMaxScheduledWriteBytes);
+             maxServiceScheduledWriteMessages, maxServiceScheduledWriteBytes,
+             maxGlobalScheduledWriteMessages,  maxGlobalScheduledWriteBytes);
     }
     
     /**
@@ -95,13 +163,16 @@ public class WriteThrottleFilter extends IoFilterAdapter {
     public WriteThrottleFilter(
             WriteThrottlePolicy policy,
             int maxSessionScheduledWriteMessages, long maxSessionScheduledWriteBytes,
-            int maxServiceScheduledWriteMessages, long maxServiceScheduledWriteBytes) {
+            int maxServiceScheduledWriteMessages, long maxServiceScheduledWriteBytes,
+            int maxGlobalScheduledWriteMessages,  long maxGlobalScheduledWriteBytes) {
 
         setPolicy(policy);
         setMaxSessionScheduledWriteMessages(maxSessionScheduledWriteMessages);
         setMaxSessionScheduledWriteBytes(maxSessionScheduledWriteBytes);
         setMaxServiceScheduledWriteMessages(maxServiceScheduledWriteMessages);
         setMaxServiceScheduledWriteBytes(maxServiceScheduledWriteBytes);
+        setMaxGlobalScheduledWriteMessages(maxGlobalScheduledWriteMessages);
+        setMaxGlobalScheduledWriteBytes(maxGlobalScheduledWriteBytes);
     }
     
     public WriteThrottlePolicy getPolicy() {
@@ -159,6 +230,28 @@ public class WriteThrottleFilter extends IoFilterAdapter {
         this.maxServiceScheduledWriteBytes = maxServiceScheduledWriteBytes;
     }
 
+    public int getMaxGlobalScheduledWriteMessages() {
+        return maxGlobalScheduledWriteMessages;
+    }
+
+    public void setMaxGlobalScheduledWriteMessages(int maxGlobalScheduledWriteMessages) {
+        if (maxGlobalScheduledWriteMessages < 0) {
+            maxGlobalScheduledWriteMessages = 0;
+        }
+        this.maxGlobalScheduledWriteMessages = maxGlobalScheduledWriteMessages;
+    }
+
+    public long getMaxGlobalScheduledWriteBytes() {
+        return maxGlobalScheduledWriteBytes;
+    }
+
+    public void setMaxGlobalScheduledWriteBytes(long maxGlobalScheduledWriteBytes) {
+        if (maxGlobalScheduledWriteBytes < 0) {
+            maxGlobalScheduledWriteBytes = 0;
+        }
+        this.maxGlobalScheduledWriteBytes = maxGlobalScheduledWriteBytes;
+    }
+
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception {
@@ -193,15 +286,19 @@ public class WriteThrottleFilter extends IoFilterAdapter {
             return true;
         }
 
-        int lmswm = maxSessionScheduledWriteMessages;
-        long lmswb = maxSessionScheduledWriteBytes;
-        int gmswm = maxServiceScheduledWriteMessages;
-        long gmswb = maxServiceScheduledWriteBytes;
+        int  mSession = maxSessionScheduledWriteMessages;
+        long bSession = maxSessionScheduledWriteBytes;
+        int  mService = maxServiceScheduledWriteMessages;
+        long bService = maxServiceScheduledWriteBytes;
+        int  mGlobal  = maxGlobalScheduledWriteMessages;
+        long bGlobal  = maxGlobalScheduledWriteBytes;
         
-        return (lmswm == 0 || session.getScheduledWriteMessages() < lmswm) &&
-               (lmswb == 0 || session.getScheduledWriteBytes() < lmswb) &&
-               (gmswm == 0 || session.getService().getScheduledWriteMessages() < gmswm) &&
-               (gmswb == 0 || session.getService().getScheduledWriteBytes() < gmswb);
+        return (mSession == 0 || session.getScheduledWriteMessages() < mSession) &&
+               (bSession == 0 || session.getScheduledWriteBytes() < bSession) &&
+               (mService == 0 || session.getService().getScheduledWriteMessages() < mService) &&
+               (bService == 0 || session.getService().getScheduledWriteBytes() < bService) &&
+               (mGlobal  == 0 || getGlobalScheduledWriteMessages(session.getService()) < mGlobal) &&
+               (bGlobal  == 0 || getGlobalScheduledWriteBytes(session.getService()) < bGlobal);
     }
     
     private void log(IoSession session) {
@@ -274,52 +371,75 @@ public class WriteThrottleFilter extends IoFilterAdapter {
     }
     
     private String getMessage(IoSession session) {
-        int lmswm = maxSessionScheduledWriteMessages;
-        long lmswb = maxSessionScheduledWriteBytes;
-        int gmswm = maxServiceScheduledWriteMessages;
-        long gmswb = maxServiceScheduledWriteBytes;
+        int  mSession = maxSessionScheduledWriteMessages;
+        long bSession = maxSessionScheduledWriteBytes;
+        int  mService = maxServiceScheduledWriteMessages;
+        long bService = maxServiceScheduledWriteBytes;
+        int  mGlobal  = maxGlobalScheduledWriteMessages;
+        long bGlobal  = maxGlobalScheduledWriteBytes;
 
         StringBuilder buf = new StringBuilder(512);
-        buf.append("Write requests flooded - local: ");
-        if (lmswm != 0) {
+        buf.append("Write requests flooded - session: ");
+        if (mSession != 0) {
             buf.append(session.getScheduledWriteMessages());
             buf.append(" / ");
-            buf.append(lmswm);
+            buf.append(mSession);
             buf.append(" msgs, ");
         } else {
             buf.append(session.getScheduledWriteMessages());
             buf.append(" / unlimited msgs, ");
         }
         
-        if (lmswb != 0) {
+        if (bSession != 0) {
             buf.append(session.getScheduledWriteBytes());
             buf.append(" / ");
-            buf.append(lmswb);
+            buf.append(bSession);
             buf.append(" bytes, ");
         } else {
             buf.append(session.getScheduledWriteBytes());
             buf.append(" / unlimited bytes, ");
         }
         
-        buf.append("global: ");
-        if (gmswm != 0) {
+        buf.append("service: ");
+        if (mService != 0) {
             buf.append(session.getService().getScheduledWriteMessages());
             buf.append(" / ");
-            buf.append(gmswm);
+            buf.append(mService);
             buf.append(" msgs, ");
         } else {
             buf.append(session.getService().getScheduledWriteMessages());
             buf.append(" / unlimited msgs, ");
         }
         
-        if (gmswb != 0) {
+        if (bService != 0) {
             buf.append(session.getService().getScheduledWriteBytes());
             buf.append(" / ");
-            buf.append(gmswb);
-            buf.append(" bytes");
+            buf.append(bService);
+            buf.append(" bytes, ");
         } else {
             buf.append(session.getService().getScheduledWriteBytes());
-            buf.append(" / unlimited bytes");
+            buf.append(" / unlimited bytes, ");
+        }
+        
+        buf.append("global: ");
+        if (mGlobal != 0) {
+            buf.append(getGlobalScheduledWriteMessages());
+            buf.append(" / ");
+            buf.append(mGlobal);
+            buf.append(" msgs.");
+        } else {
+            buf.append(getGlobalScheduledWriteMessages());
+            buf.append(" / unlimited msgs.");
+        }
+        
+        if (bGlobal != 0) {
+            buf.append(getGlobalScheduledWriteBytes());
+            buf.append(" / ");
+            buf.append(bGlobal);
+            buf.append(" bytes.");
+        } else {
+            buf.append(getGlobalScheduledWriteBytes());
+            buf.append(" / unlimited bytes.");
         }
         
         return buf.toString();
