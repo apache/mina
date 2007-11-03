@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
+import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
@@ -250,6 +251,15 @@ public class WriteThrottleFilter extends IoFilterAdapter {
             maxGlobalScheduledWriteBytes = 0;
         }
         this.maxGlobalScheduledWriteBytes = maxGlobalScheduledWriteBytes;
+    }
+
+    @Override
+    public void onPreAdd(
+            IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
+        if (parent.contains(WriteThrottleFilter.class)) {
+            throw new IllegalStateException(
+                    "Only one " + WriteThrottleFilter.class.getName() + " is allowed per chain.");
+        }
     }
 
     @Override
