@@ -20,16 +20,13 @@
 package org.apache.mina.filter.traffic;
 
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
@@ -38,14 +35,12 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.util.CopyOnWriteMap;
 
 /**
- * An {@link IoFilterChainBuilder} that configures an {IoFilterChain} or
- * {@link DefaultIoFilterChainBuilder} to control incoming traffic to
+ * An {@link IoFilter} that throttles incoming traffic to
  * prevent a unwanted {@link OutOfMemoryError} under heavy load.
  * <p>
- * The filters that this builder inserts will automatically disable reads
- * on an {@link IoSession} once the data batched for that session in the
- * {@link ExecutorFilter} reaches a defined threshold. It accomplishes this
- * by adding one filter before the {@link Executor} and the other after the
+ * This filter will automatically disable reads on an {@link IoSession} once
+ * the amount of the read data batched for that session in the {@link ExecutorFilter}
+ * reaches a defined threshold. It accomplishes this by adding one filter before the
  * {@link ExecutorFilter}.
  * <p>
  * The size of the received data is calculated by {@link MessageSizeEstimator}.
@@ -54,25 +49,10 @@ import org.apache.mina.util.CopyOnWriteMap;
  * calculation.  However, the {@link DefaultMessageSizeEstimator} will suffice
  * in most cases.
  * <p>
- * It is recommended to use this builder at the end of your filter chain
- * construction because it is possible to subvert the behavior of the added
- * filters by adding filters immediately after the {@link ExecutorFilter}
- * after using this builder, consequently leading to a unexpected behavior.
- *
- * <h3>Usage</h3>
- * <pre><code>
- * DefaultFilterChainBuilder chain = ...
- * ReadThrottleFilterChainBuilder builder = new ReadThrottleFilterChainBuilder();
- * filter.buildFilerChain( chain );
- * </code></pre>
- *
- * or
- *
- * <pre><code>
- * IoFilterChain chain = ...
- * ReadThrottleFilterChainBuilder builder = new ReadThrottleFilterChainBuilder();
- * filter.buildFilerChain( chain );
- * </code></pre>
+ * It is recommended to add this filter at the end of your filter chain
+ * configuration because it is possible to subvert the behavior of the added
+ * filters by adding a filter immediately before/after the {@link ExecutorFilter}
+ * after inserting this builder, consequently leading to a unexpected behavior.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
