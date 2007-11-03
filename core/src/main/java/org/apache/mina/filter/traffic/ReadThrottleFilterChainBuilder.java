@@ -72,44 +72,48 @@ import org.apache.mina.filter.executor.ExecutorFilter;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * 
+ * TODO Provide per-service limitation
  */
 public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
+    
+    private static final AtomicInteger globalBufferSize = new AtomicInteger();
+
     private final AttributeKey STATE = new AttributeKey(getClass(), "state");
 
     private final IoFilter enterFilter = new EnterFilter();
     private final IoFilter exitFilter = new ExitFilter();
-    private final AtomicInteger globalBufferSize = new AtomicInteger();
     
     private final MessageSizeEstimator messageSizeEstimator;
-    private volatile int localMaxBufferSize;
-    private volatile int globalMaxBufferSize;
+    private volatile int maxSessionBufferSize;
+    private volatile int maxGlobalBufferSize;
     
     /**
-     * Creates a new instance with 64KB <tt>localMaxBufferSize</tt>,
-     * 128MB <tt>globalMaxBufferSize</tt> and a new {@link DefaultMessageSizeEstimator}.
+     * Creates a new instance with 64KB <tt>maxSessionBufferSize</tt>,
+     * 128MB <tt>maxGlobalBufferSize</tt> and a new {@link DefaultMessageSizeEstimator}.
      */
     public ReadThrottleFilterChainBuilder() {
-        // localMax = 64KB, globalMax = 128MB
+        // 64KB, 128MB
         this(65536, 1048576 * 128);
     }
     
     /**
-     * Creates a new instance with the specified <tt>localMaxBufferSize</tt>,
-     * <tt>globalMaxBufferSize</tt> and a new {@link DefaultMessageSizeEstimator}.
+     * Creates a new instance with the specified <tt>maxSessionBufferSize</tt>,
+     * <tt>maxGlobalBufferSize</tt> and a new {@link DefaultMessageSizeEstimator}.
      * 
      */
-    public ReadThrottleFilterChainBuilder(int localMaxBufferSize, int globalMaxBufferSize) {
-        this(localMaxBufferSize, globalMaxBufferSize, null);
+    public ReadThrottleFilterChainBuilder(int maxSessionBufferSize, int maxGlobalBufferSize) {
+        this(maxSessionBufferSize, maxGlobalBufferSize, null);
     }
 
     /**
-     * Creates a new instance with the specified <tt>localMaxBufferSize</tt>,
-     * <tt>globalMaxBufferSize</tt> and {@link MessageSizeEstimator}.
+     * Creates a new instance with the specified <tt>maxSessionBufferSize</tt>,
+     * <tt>maxGlobalBufferSize</tt> and {@link MessageSizeEstimator}.
      * 
-     * @param localMaxBufferSize the maximum amount of data in the buffer of
+     * @param maxSessionBufferSize the maximum amount of data in the buffer of
      *                           the {@link ExecutorFilter} per {@link IoSession}.
      *                           Specify {@code 0} or a smaller value to disable.
-     * @param globalMaxBufferSize the maximum amount of data in the buffer of
+     * @param maxGlobalBufferSize the maximum amount of data in the buffer of
      *                            the {@link ExecutorFilter} for all {@link IoSession}
      *                            whose {@link IoFilterChain} has been configured by
      *                            this builder.
@@ -118,21 +122,21 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
      *                             a new {@link DefaultMessageSizeEstimator} is created.
      */
     public ReadThrottleFilterChainBuilder(
-            int localMaxBufferSize, int globalMaxBufferSize, MessageSizeEstimator messageSizeEstimator) {
+            int maxSessionBufferSize, int maxGlobalBufferSize, MessageSizeEstimator messageSizeEstimator) {
         if (messageSizeEstimator == null) {
             messageSizeEstimator = new DefaultMessageSizeEstimator();
         }
         this.messageSizeEstimator = messageSizeEstimator;
-        setLocalMaxBufferSize(localMaxBufferSize);
-        setGlobalMaxBufferSize(globalMaxBufferSize);
+        setMaxSessionBufferSize(maxSessionBufferSize);
+        setMaxGlobalBufferSize(maxGlobalBufferSize);
     }
 
     /**
      * Returns the maximum amount of data in the buffer of the {@link ExecutorFilter}
      * per {@link IoSession}.  {@code 0} means 'disabled'.
      */
-    public int getLocalMaxBufferSize() {
-        return localMaxBufferSize;
+    public int getMaxSessionBufferSize() {
+        return maxSessionBufferSize;
     }
     
     /**
@@ -140,8 +144,8 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
      * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
      * this builder. {@code 0} means 'disabled'.
      */
-    public int getGlobalMaxBufferSize() {
-        return globalMaxBufferSize;
+    public int getMaxGlobalBufferSize() {
+        return maxGlobalBufferSize;
     }
     
     /**
@@ -164,7 +168,7 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
         }
         
         synchronized (state) {
-            return state.bufferSize;
+            return state.sessionBufferSize;
         }
     }
     
@@ -172,11 +176,11 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
      * Sets the maximum amount of data in the buffer of the {@link ExecutorFilter}
      * per {@link IoSession}.  Specify {@code 0} or a smaller value to disable.
      */
-    public void setLocalMaxBufferSize(int localMaxBufferSize) {
-        if (localMaxBufferSize < 0) {
-            localMaxBufferSize = 0;
+    public void setMaxSessionBufferSize(int maxSessionBufferSize) {
+        if (maxSessionBufferSize < 0) {
+            maxSessionBufferSize = 0;
         }
-        this.localMaxBufferSize = localMaxBufferSize;
+        this.maxSessionBufferSize = maxSessionBufferSize;
     }
 
     /**
@@ -184,11 +188,11 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
      * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
      * this builder. Specify {@code 0} or a smaller value to disable.
      */
-    public void setGlobalMaxBufferSize(int globalMaxBufferSize) {
-        if (globalMaxBufferSize < 0) {
-            globalMaxBufferSize = 0;
+    public void setMaxGlobalBufferSize(int maxGlobalBufferSize) {
+        if (maxGlobalBufferSize < 0) {
+            maxGlobalBufferSize = 0;
         }
-        this.globalMaxBufferSize = globalMaxBufferSize;
+        this.maxGlobalBufferSize = maxGlobalBufferSize;
     }
     
     /**
@@ -249,46 +253,46 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
         buildFilterChain(chain.getEntry(AbstractExecutorFilter.class));
     }
     
-    private void acquire(IoSession session, int size) {
+    private void enter(IoSession session, int size) {
         State state = getState(session);
         
-        int globalBufferSize = this.globalBufferSize.addAndGet(size);
+        int globalBufferSize = ReadThrottleFilterChainBuilder.globalBufferSize.addAndGet(size);
         
-        int globalMaxBufferSize = this.globalMaxBufferSize;
-        int localMaxBufferSize = this.localMaxBufferSize;
+        int maxGlobalBufferSize = this.maxGlobalBufferSize;
+        int maxSessionBufferSize = this.maxSessionBufferSize;
         
         synchronized (state) {
-            int bufferSize = (state.bufferSize += size);
-            if ((localMaxBufferSize != 0 && bufferSize >= localMaxBufferSize) ||
-                (globalMaxBufferSize != 0 && globalBufferSize >= globalMaxBufferSize)) {
+            int bufferSize = (state.sessionBufferSize += size);
+            if ((maxSessionBufferSize != 0 && bufferSize >= maxSessionBufferSize) ||
+                (maxGlobalBufferSize != 0 && globalBufferSize >= maxGlobalBufferSize)) {
                 session.suspendRead();
                 state.suspendedRead = true;
             }
         }
     }
 
-    private void release(IoSession session, int size) {
+    private void exit(IoSession session, int size) {
         State state = getState(session);
 
-        int globalBufferSize = this.globalBufferSize.addAndGet(-size);
+        int globalBufferSize = ReadThrottleFilterChainBuilder.globalBufferSize.addAndGet(-size);
         if (globalBufferSize < 0) {
-            this.globalBufferSize.set(0);
+            ReadThrottleFilterChainBuilder.globalBufferSize.set(0);
             throw new IllegalStateException("globalBufferSize < 0");
         }
         
-        int globalMaxBufferSize = this.globalMaxBufferSize;
-        int localMaxBufferSize = this.localMaxBufferSize;
+        int maxGlobalBufferSize = this.maxGlobalBufferSize;
+        int maxSessionBufferSize = this.maxSessionBufferSize;
 
         synchronized (state) {
-            int bufferSize = (state.bufferSize -= size);
+            int bufferSize = (state.sessionBufferSize -= size);
             if (bufferSize < 0) {
-                state.bufferSize = 0;
-                throw new IllegalStateException("bufferSize < 0");
+                state.sessionBufferSize = 0;
+                throw new IllegalStateException("sessionBufferSize < 0");
             }
     
             if (state.suspendedRead &&
-                (localMaxBufferSize == 0 || bufferSize < localMaxBufferSize) &&
-                (globalMaxBufferSize == 0 || globalBufferSize < globalMaxBufferSize)) {
+                (maxSessionBufferSize == 0 || bufferSize < maxSessionBufferSize) &&
+                (maxGlobalBufferSize == 0 || globalBufferSize < maxGlobalBufferSize)) {
                 session.resumeRead();
                 state.suspendedRead = false;
             }
@@ -328,7 +332,7 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
         @Override
         public void messageReceived(
                 NextFilter nextFilter, IoSession session, Object message) throws Exception {
-            acquire(session, messageSizeEstimator.estimateSize(message));
+            enter(session, messageSizeEstimator.estimateSize(message));
             nextFilter.messageReceived(session, message);
         }
 
@@ -336,33 +340,33 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
             return ReadThrottleFilterChainBuilder.this.getGlobalBufferSize();
         }
 
-        public int getGlobalMaxBufferSize() {
-            return ReadThrottleFilterChainBuilder.this.getGlobalMaxBufferSize();
+        public int getMaxGlobalBufferSize() {
+            return ReadThrottleFilterChainBuilder.this.getMaxGlobalBufferSize();
         }
 
         public int getLocalBufferSize(IoSession session) {
             return ReadThrottleFilterChainBuilder.this.getLocalBufferSize(session);
         }
 
-        public int getLocalMaxBufferSize() {
-            return ReadThrottleFilterChainBuilder.this.getLocalMaxBufferSize();
+        public int getMaxSessionBufferSize() {
+            return ReadThrottleFilterChainBuilder.this.getMaxSessionBufferSize();
         }
 
         public MessageSizeEstimator getMessageSizeEstimator() {
             return ReadThrottleFilterChainBuilder.this.getMessageSizeEstimator();
         }
 
-        public void setGlobalMaxBufferSize(int globalMaxBufferSize) {
-            ReadThrottleFilterChainBuilder.this.setGlobalMaxBufferSize(globalMaxBufferSize);
+        public void setMaxGlobalBufferSize(int maxGlobalBufferSize) {
+            ReadThrottleFilterChainBuilder.this.setMaxGlobalBufferSize(maxGlobalBufferSize);
         }
 
-        public void setLocalMaxBufferSize(int localMaxBufferSize) {
-            ReadThrottleFilterChainBuilder.this.setLocalMaxBufferSize(localMaxBufferSize);
+        public void setMaxSessionBufferSize(int maxSessionBufferSize) {
+            ReadThrottleFilterChainBuilder.this.setMaxSessionBufferSize(maxSessionBufferSize);
         }
         
         @Override
         public String toString() {
-            return String.valueOf(getGlobalBufferSize()) + '/' + getGlobalMaxBufferSize();
+            return String.valueOf(getGlobalBufferSize()) + '/' + getMaxGlobalBufferSize();
         }
     }
 
@@ -381,18 +385,18 @@ public class ReadThrottleFilterChainBuilder implements IoFilterChainBuilder {
         @Override
         public void messageReceived(
                 NextFilter nextFilter, IoSession session, Object message) throws Exception {
-            release(session, messageSizeEstimator.estimateSize(message));
+            exit(session, messageSizeEstimator.estimateSize(message));
             nextFilter.messageReceived(session, message);
         }
         
         @Override
         public String toString() {
-            return String.valueOf(getGlobalBufferSize()) + '/' + getGlobalMaxBufferSize();
+            return String.valueOf(getGlobalBufferSize()) + '/' + getMaxGlobalBufferSize();
         }
     }
     
     private static class State {
-        private int bufferSize;
+        private int sessionBufferSize;
         private boolean suspendedRead;
     }
 }

@@ -32,14 +32,18 @@ import org.apache.mina.common.WriteRequest;
  * {@link OutOfMemoryError} under heavy load.
  * <p>
  * This filter will automatically enforce the specified {@link WriteThrottlePolicy}
- * when the {@link IoSession#getScheduledWriteBytes() localScheduledWriteBytes},
- * {@link IoSession#getScheduledWriteMessages() localScheduledWriteMessages},
- * {@link IoService#getScheduledWriteBytes() globalScheduledWriteBytes} or
- * {@link IoService#getScheduledWriteMessages() globalScheduledWriteMessages}
+ * when the {@link IoSession#getScheduledWriteBytes() sessionScheduledWriteBytes},
+ * {@link IoSession#getScheduledWriteMessages() sessionScheduledWriteMessages},
+ * {@link IoService#getScheduledWriteBytes() serviceScheduledWriteBytes} or
+ * {@link IoService#getScheduledWriteMessages() serviceScheduledWriteMessages}
  * exceeds the specified limit values.
+ * <p>
+ * Please add this filter at the end of the filter chain.
 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * 
+ * TODO provide global limitation
  */
 public class WriteThrottleFilter extends IoFilterAdapter {
 
@@ -51,10 +55,10 @@ public class WriteThrottleFilter extends IoFilterAdapter {
     
     private volatile WriteThrottlePolicy policy;
     
-    private volatile int localMaxScheduledWriteMessages;
-    private volatile long localMaxScheduledWriteBytes;
-    private volatile int globalMaxScheduledWriteMessages;
-    private volatile long globalMaxScheduledWriteBytes;
+    private volatile int maxSessionScheduledWriteMessages;
+    private volatile long maxSessionScheduledWriteBytes;
+    private volatile int maxServiceScheduledWriteMessages;
+    private volatile long maxServiceScheduledWriteBytes;
     
     /**
      * Creates a new instance with the default policy
@@ -77,10 +81,10 @@ public class WriteThrottleFilter extends IoFilterAdapter {
      * ({@link WriteThrottlePolicy#LOG}) and the specified limit values.
      */
     public WriteThrottleFilter(
-            int localMaxScheduledWriteMessages, long localMaxScheduledWriteBytes,
+            int maxSessionScheduledWriteMessages, long maxSessionScheduledWriteBytes,
             int globalMaxScheduledWriteMessages, long globalMaxScheduledWriteBytes) {
         this(WriteThrottlePolicy.LOG,
-             localMaxScheduledWriteMessages, localMaxScheduledWriteBytes,
+             maxSessionScheduledWriteMessages, maxSessionScheduledWriteBytes,
              globalMaxScheduledWriteMessages, globalMaxScheduledWriteBytes);
     }
     
@@ -90,14 +94,14 @@ public class WriteThrottleFilter extends IoFilterAdapter {
      */
     public WriteThrottleFilter(
             WriteThrottlePolicy policy,
-            int localMaxScheduledWriteMessages, long localMaxScheduledWriteBytes,
-            int globalMaxScheduledWriteMessages, long globalMaxScheduledWriteBytes) {
+            int maxSessionScheduledWriteMessages, long maxSessionScheduledWriteBytes,
+            int maxServiceScheduledWriteMessages, long maxServiceScheduledWriteBytes) {
 
         setPolicy(policy);
-        setLocalMaxScheduledWriteMessages(localMaxScheduledWriteMessages);
-        setLocalMaxScheduledWriteBytes(localMaxScheduledWriteBytes);
-        setGlobalMaxScheduledWriteMessages(globalMaxScheduledWriteMessages);
-        setGlobalMaxScheduledWriteBytes(globalMaxScheduledWriteBytes);
+        setMaxSessionScheduledWriteMessages(maxSessionScheduledWriteMessages);
+        setMaxSessionScheduledWriteBytes(maxSessionScheduledWriteBytes);
+        setMaxServiceScheduledWriteMessages(maxServiceScheduledWriteMessages);
+        setMaxServiceScheduledWriteBytes(maxServiceScheduledWriteBytes);
     }
     
     public WriteThrottlePolicy getPolicy() {
@@ -111,48 +115,48 @@ public class WriteThrottleFilter extends IoFilterAdapter {
         this.policy = policy;
     }
 
-    public int getLocalMaxScheduledWriteMessages() {
-        return localMaxScheduledWriteMessages;
+    public int getMaxSessionScheduledWriteMessages() {
+        return maxSessionScheduledWriteMessages;
     }
 
-    public void setLocalMaxScheduledWriteMessages(int localMaxScheduledWriteMessages) {
-        if (localMaxScheduledWriteMessages < 0) {
-            localMaxScheduledWriteMessages = 0;
+    public void setMaxSessionScheduledWriteMessages(int maxSessionScheduledWriteMessages) {
+        if (maxSessionScheduledWriteMessages < 0) {
+            maxSessionScheduledWriteMessages = 0;
         }
-        this.localMaxScheduledWriteMessages = localMaxScheduledWriteMessages;
+        this.maxSessionScheduledWriteMessages = maxSessionScheduledWriteMessages;
     }
 
-    public long getLocalMaxScheduledWriteBytes() {
-        return localMaxScheduledWriteBytes;
+    public long getMaxSessionScheduledWriteBytes() {
+        return maxSessionScheduledWriteBytes;
     }
 
-    public void setLocalMaxScheduledWriteBytes(long localMaxScheduledWriteBytes) {
-        if (localMaxScheduledWriteBytes < 0) {
-            localMaxScheduledWriteBytes = 0;
+    public void setMaxSessionScheduledWriteBytes(long maxSessionScheduledWriteBytes) {
+        if (maxSessionScheduledWriteBytes < 0) {
+            maxSessionScheduledWriteBytes = 0;
         }
-        this.localMaxScheduledWriteBytes = localMaxScheduledWriteBytes;
+        this.maxSessionScheduledWriteBytes = maxSessionScheduledWriteBytes;
     }
 
-    public int getGlobalMaxScheduledWriteMessages() {
-        return globalMaxScheduledWriteMessages;
+    public int getMaxServiceScheduledWriteMessages() {
+        return maxServiceScheduledWriteMessages;
     }
 
-    public void setGlobalMaxScheduledWriteMessages(int globalMaxScheduledWriteMessages) {
-        if (globalMaxScheduledWriteMessages < 0) {
-            globalMaxScheduledWriteMessages = 0;
+    public void setMaxServiceScheduledWriteMessages(int maxServiceScheduledWriteMessages) {
+        if (maxServiceScheduledWriteMessages < 0) {
+            maxServiceScheduledWriteMessages = 0;
         }
-        this.globalMaxScheduledWriteMessages = globalMaxScheduledWriteMessages;
+        this.maxServiceScheduledWriteMessages = maxServiceScheduledWriteMessages;
     }
 
-    public long getGlobalMaxScheduledWriteBytes() {
-        return globalMaxScheduledWriteBytes;
+    public long getMaxServiceScheduledWriteBytes() {
+        return maxServiceScheduledWriteBytes;
     }
 
-    public void setGlobalMaxScheduledWriteBytes(long globalMaxScheduledWriteBytes) {
-        if (globalMaxScheduledWriteBytes < 0) {
-            globalMaxScheduledWriteBytes = 0;
+    public void setMaxServiceScheduledWriteBytes(long maxServiceScheduledWriteBytes) {
+        if (maxServiceScheduledWriteBytes < 0) {
+            maxServiceScheduledWriteBytes = 0;
         }
-        this.globalMaxScheduledWriteBytes = globalMaxScheduledWriteBytes;
+        this.maxServiceScheduledWriteBytes = maxServiceScheduledWriteBytes;
     }
 
     @Override
@@ -189,10 +193,10 @@ public class WriteThrottleFilter extends IoFilterAdapter {
             return true;
         }
 
-        int lmswm = localMaxScheduledWriteMessages;
-        long lmswb = localMaxScheduledWriteBytes;
-        int gmswm = globalMaxScheduledWriteMessages;
-        long gmswb = globalMaxScheduledWriteBytes;
+        int lmswm = maxSessionScheduledWriteMessages;
+        long lmswb = maxSessionScheduledWriteBytes;
+        int gmswm = maxServiceScheduledWriteMessages;
+        long gmswb = maxServiceScheduledWriteBytes;
         
         return (lmswm == 0 || session.getScheduledWriteMessages() < lmswm) &&
                (lmswb == 0 || session.getScheduledWriteBytes() < lmswb) &&
@@ -270,10 +274,10 @@ public class WriteThrottleFilter extends IoFilterAdapter {
     }
     
     private String getMessage(IoSession session) {
-        int lmswm = localMaxScheduledWriteMessages;
-        long lmswb = localMaxScheduledWriteBytes;
-        int gmswm = globalMaxScheduledWriteMessages;
-        long gmswb = globalMaxScheduledWriteBytes;
+        int lmswm = maxSessionScheduledWriteMessages;
+        long lmswb = maxSessionScheduledWriteBytes;
+        int gmswm = maxServiceScheduledWriteMessages;
+        long gmswb = maxServiceScheduledWriteBytes;
 
         StringBuilder buf = new StringBuilder(512);
         buf.append("Write requests flooded - local: ");

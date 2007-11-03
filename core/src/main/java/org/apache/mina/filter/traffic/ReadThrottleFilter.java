@@ -44,27 +44,27 @@ public interface ReadThrottleFilter extends IoFilter {
      * Returns the maximum amount of data in the buffer of the {@link ExecutorFilter}
      * per {@link IoSession}.  {@code 0} means 'disabled'.
      */
-    int getLocalMaxBufferSize();
+    int getMaxSessionBufferSize();
 
     /**
      * Returns the maximum amount of data in the buffer of the {@link ExecutorFilter}
      * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
      * this builder. {@code 0} means 'disabled'.
      */
-    int getGlobalMaxBufferSize();
+    int getMaxGlobalBufferSize();
 
     /**
      * Sets the maximum amount of data in the buffer of the {@link ExecutorFilter}
      * per {@link IoSession}.  Specify {@code 0} or a smaller value to disable.
      */
-    void setLocalMaxBufferSize(int localMaxBufferSize);
+    void setMaxSessionBufferSize(int localMaxBufferSize);
     
     /**
      * Sets the maximum amount of data in the buffer of the {@link ExecutorFilter}
      * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
      * this builder. Specify {@code 0} or a smaller value to disable.
      */
-    void setGlobalMaxBufferSize(int globalMaxBufferSize);
+    void setMaxGlobalBufferSize(int globalMaxBufferSize);
 
     /**
      * Returns the current amount of data in the buffer of the {@link ExecutorFilter}
@@ -73,7 +73,7 @@ public interface ReadThrottleFilter extends IoFilter {
     int getLocalBufferSize(IoSession session);
 
     /**
-     * Returns the current amount of data in the buffer of the {@link ExecuorFilter}
+     * Returns the current amount of data in the buffer of the {@link ExecutorFilter}
      * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
      * this builder.
      */
