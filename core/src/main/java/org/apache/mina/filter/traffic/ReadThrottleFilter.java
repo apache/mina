@@ -378,10 +378,12 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         
         switch (policy) {
         case CLOSE:
+            log(session);
             session.close();
             raiseException(session);
             break;
         case EXCEPTION:
+            log(session);
             raiseException(session);
             break;
         case LOG:

@@ -271,6 +271,7 @@ public class WriteThrottleFilter extends IoFilterAdapter {
             if (!readyToWrite(session)) {
                 switch (policy) {
                 case FAIL:
+                    log(session);
                     fail(session, writeRequest);
                     break;
                 case BLOCK:
