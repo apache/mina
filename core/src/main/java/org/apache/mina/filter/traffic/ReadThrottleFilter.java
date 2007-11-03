@@ -76,8 +76,6 @@ import org.apache.mina.util.CopyOnWriteMap;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
- * TODO Provide per-service limitation
  */
 public class ReadThrottleFilter extends IoFilterAdapter {
     
