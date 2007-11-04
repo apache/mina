@@ -27,11 +27,11 @@ import java.util.Queue;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.IoFilter.NextFilter;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -39,7 +39,7 @@ import org.apache.mina.common.IoFilter.NextFilter;
  * {@link InputStream} is written to a session this filter will read the bytes
  * from the stream into {@link IoBuffer} objects and write those buffers
  * to the next filter. When end of stream has been reached this filter will
- * call {@link NextFilter#messageSent(IoSession,WriteRequest)} using the original
+ * call {@link IoFilter.NextFilter#messageSent(IoSession,WriteRequest)} using the original
  * {@link InputStream} written to the session and notifies
  * {@link org.apache.mina.common.WriteFuture} on the
  * original {@link org.apache.mina.common.WriteRequest}.
