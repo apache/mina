@@ -114,7 +114,7 @@ public class WriteThrottleFilter extends IoFilterAdapter {
     private final Object logLock = new Object();
     private final Object blockLock = new Object();
 
-    private long lastLogTime = -1;
+    private long lastLogTime = 0;
     private int blockWaiters = 0;
     
     private volatile WriteThrottlePolicy policy;

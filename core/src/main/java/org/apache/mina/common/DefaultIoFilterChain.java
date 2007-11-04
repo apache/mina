@@ -489,6 +489,19 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
     }
 
+    public void fireFilterSetTrafficMask(TrafficMask trafficMask) {
+        Entry tail = this.tail;
+        callPreviousFilterSetTrafficMask(tail, session, trafficMask);
+    }
+
+    private void callPreviousFilterSetTrafficMask(Entry entry, IoSession session, TrafficMask trafficMask) {
+        try {
+            entry.getFilter().filterSetTrafficMask(entry.getNextFilter(), session, trafficMask);
+        } catch (Throwable e) {
+            fireExceptionCaught(e);
+        }
+    }
+    
     public List<Entry> getAll() {
         List<Entry> list = new ArrayList<Entry>();
         EntryImpl e = head.nextEntry;
@@ -641,6 +654,15 @@ public class DefaultIoFilterChain implements IoFilterChain {
             AbstractIoSession s = (AbstractIoSession) session;
             s.getProcessor().remove(s);
         }
+
+        @Override
+        public void filterSetTrafficMask(NextFilter nextFilter,
+                IoSession session, TrafficMask trafficMask) throws Exception {
+            AbstractIoSession s = (AbstractIoSession) session;
+            s.setTrafficMaskNow(trafficMask);
+            s.getProcessor().updateTrafficMask(session);
+        }
+        
     }
 
     private static class TailFilter extends IoFilterAdapter {
@@ -788,6 +810,12 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 public void filterClose(IoSession session) {
                     Entry nextEntry = EntryImpl.this.prevEntry;
                     callPreviousFilterClose(nextEntry, session);
+                }
+
+                public void filterSetTrafficMask(IoSession session,
+                        TrafficMask trafficMask) {
+                    Entry nextEntry = EntryImpl.this.prevEntry;
+                    callPreviousFilterSetTrafficMask(nextEntry, session, trafficMask);
                 }
             };
         }

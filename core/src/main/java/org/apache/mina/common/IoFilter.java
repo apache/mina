@@ -202,6 +202,12 @@ public interface IoFilter {
      */
     void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception;
+    
+    /**
+     * Filters {@link IoSession#setTrafficMask(TrafficMask)} method invocation.
+     */
+    void filterSetTrafficMask(
+            NextFilter nextFilter, IoSession session, TrafficMask trafficMask) throws Exception;
 
     /**
      * Represents the next {@link IoFilter} in {@link IoFilterChain}.
@@ -251,5 +257,10 @@ public interface IoFilter {
          * Forwards <tt>filterClose</tt> event to next filter.
          */
         void filterClose(IoSession session);
+        
+        /**
+         * Forwards <tt>filterSetTrafficMask</tt> event to next filter.
+         */
+        void filterSetTrafficMask(IoSession session, TrafficMask trafficMask);
     }
 }

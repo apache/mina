@@ -276,6 +276,13 @@ public interface IoFilterChain {
     public void fireFilterClose();
 
     /**
+     * Fires a {@link IoSession#setTrafficMask(TrafficMask)} event.  Most users don't need to call this method at
+     * all.  Please use this method only when you implement a new transport or fire a virtual
+     * event.
+     */
+    public void fireFilterSetTrafficMask(TrafficMask trafficMask);
+
+    /**
      * Represents a name-filter pair that an {@link IoFilterChain} contains.
      *
      * @author The Apache MINA Project (dev@mina.apache.org)

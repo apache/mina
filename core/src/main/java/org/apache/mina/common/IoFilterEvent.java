@@ -59,6 +59,9 @@ public class IoFilterEvent extends IoEvent {
         case WRITE:
             getNextFilter().filterWrite(getSession(), (WriteRequest) getParameter());
             break;
+        case SET_TRAFFIC_MASK:
+            getNextFilter().filterSetTrafficMask(getSession(), (TrafficMask) getParameter());
+            break;
         case CLOSE:
             getNextFilter().filterClose(getSession());
             break;

@@ -94,4 +94,9 @@ public class IoFilterAdapter implements IoFilter {
             throws Exception {
         nextFilter.filterClose(session);
     }
+
+    public void filterSetTrafficMask(NextFilter nextFilter, IoSession session,
+            TrafficMask trafficMask) throws Exception {
+        nextFilter.filterSetTrafficMask(session, trafficMask);
+    }
 }

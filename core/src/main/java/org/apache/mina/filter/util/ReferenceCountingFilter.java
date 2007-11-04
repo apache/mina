@@ -23,6 +23,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.WriteRequest;
 
 /**
@@ -124,5 +125,10 @@ public class ReferenceCountingFilter implements IoFilter {
     public void sessionOpened(NextFilter nextFilter, IoSession session)
             throws Exception {
         filter.sessionOpened(nextFilter, session);
+    }
+
+    public void filterSetTrafficMask(NextFilter nextFilter, IoSession session,
+            TrafficMask trafficMask) throws Exception {
+        filter.filterSetTrafficMask(nextFilter, session, trafficMask);
     }
 }

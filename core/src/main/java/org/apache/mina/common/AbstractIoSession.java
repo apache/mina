@@ -97,7 +97,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     private volatile boolean closing;
 
-    private TrafficMask trafficMask = TrafficMask.ALL;
+    private volatile TrafficMask trafficMask = TrafficMask.ALL;
 
     // Status variables
     private final AtomicBoolean scheduledForFlush = new AtomicBoolean();
@@ -321,13 +321,12 @@ public abstract class AbstractIoSession implements IoSession {
         if (trafficMask == null) {
             throw new NullPointerException("trafficMask");
         }
-
-        if (this.trafficMask == trafficMask) {
-            return;
-        }
-
+        
+        getFilterChain().fireFilterSetTrafficMask(trafficMask);
+    }
+    
+    protected void setTrafficMaskNow(TrafficMask trafficMask) {
         this.trafficMask = trafficMask;
-        getProcessor().updateTrafficMask(this);
     }
 
     public void suspendRead() {

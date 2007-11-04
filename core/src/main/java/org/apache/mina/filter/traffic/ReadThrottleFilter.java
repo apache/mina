@@ -30,6 +30,7 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
+import org.apache.mina.common.TrafficMask;
 import org.apache.mina.filter.executor.AbstractExecutorFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.util.CopyOnWriteMap;
@@ -119,7 +120,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     }
     
     private final Object logLock = new Object();
-    private long lastLogTime = -1;
+    private long lastLogTime = 0;
     
     private volatile ReadThrottlePolicy policy;
     private final MessageSizeEstimator messageSizeEstimator;
@@ -324,6 +325,26 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         nextFilter.messageReceived(session, message);
     }
 
+    @Override
+    public void filterSetTrafficMask(NextFilter nextFilter, IoSession session,
+            TrafficMask trafficMask) throws Exception {
+        
+        if (trafficMask.isReadable()) {
+            State state = getState(session);
+            boolean suspendedRead;
+            synchronized (state) {
+                suspendedRead = state.suspendedRead;
+            }
+            
+            // Suppress resumeRead() if read is suspended by this filter.
+            if (suspendedRead) {
+                trafficMask = trafficMask.and(TrafficMask.WRITE);
+            }
+        }
+        
+        nextFilter.filterSetTrafficMask(session, trafficMask);
+    }
+
     private class EnterFilter extends IoFilterAdapter {
         @Override
         public void onPreRemove(
@@ -362,33 +383,41 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         
         ReadThrottlePolicy policy = getPolicy();
         
+        boolean enforcePolicy = false;
         synchronized (state) {
             int sessionBufferSize = (state.sessionBufferSize += size);
-            switch (policy) {
-            case BLOCK:
-            case EXCEPTION:
-                if ((maxSessionBufferSize != 0 && sessionBufferSize >= maxSessionBufferSize) ||
-                    (maxServiceBufferSize != 0 && serviceBufferSize >= maxServiceBufferSize) ||
-                    (maxGlobalBufferSize  != 0 && globalBufferSize  >= maxGlobalBufferSize)) {
-                    session.suspendRead();
+            if ((maxSessionBufferSize != 0 && sessionBufferSize >= maxSessionBufferSize) ||
+                (maxServiceBufferSize != 0 && serviceBufferSize >= maxServiceBufferSize) ||
+                (maxGlobalBufferSize  != 0 && globalBufferSize  >= maxGlobalBufferSize)) {
+                enforcePolicy = true;
+                switch (policy) {
+                case EXCEPTION:
+                case BLOCK:
                     state.suspendedRead = true;
                 }
             }
         }
         
-        switch (policy) {
-        case CLOSE:
-            log(session);
-            session.close();
-            raiseException(session);
-            break;
-        case EXCEPTION:
-            log(session);
-            raiseException(session);
-            break;
-        case LOG:
-            log(session);
-            break;
+        if (enforcePolicy) {
+            switch (policy) {
+            case CLOSE:
+                log(session);
+                session.close();
+                raiseException(session);
+                break;
+            case EXCEPTION:
+                log(session);
+                session.suspendRead();
+                raiseException(session);
+                break;
+            case BLOCK:
+                log(session);
+                session.suspendRead();
+                break;
+            case LOG:
+                log(session);
+                break;
+            }
         }
     }
     
@@ -411,6 +440,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         int maxServiceBufferSize = this.maxServiceBufferSize;
         int maxSessionBufferSize = this.maxSessionBufferSize;
         
+        boolean enforcePolicy = false;
         synchronized (state) {
             int sessionBufferSize = (state.sessionBufferSize -= size);
             if (sessionBufferSize < 0) {
@@ -422,9 +452,13 @@ public class ReadThrottleFilter extends IoFilterAdapter {
                 (maxSessionBufferSize == 0 || sessionBufferSize < maxSessionBufferSize) &&
                 (maxServiceBufferSize == 0 || serviceBufferSize < maxServiceBufferSize) &&
                 (maxGlobalBufferSize  == 0 || globalBufferSize  < maxGlobalBufferSize)) {
-                session.resumeRead();
                 state.suspendedRead = false;
+                enforcePolicy = true;
             }
+        }
+        
+        if (enforcePolicy) {
+            session.resumeRead();
         }
     }
 
