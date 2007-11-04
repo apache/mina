@@ -277,34 +277,27 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     @Override
     public void onPostAdd(
             IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
-        IoFilterChain.Entry firstExecutorFilterEntry =
-            parent.getEntry(AbstractExecutorFilter.class);
-        if (firstExecutorFilterEntry == null) {
-            throw new InternalError(); // Shouldn't happen.
-        }
         
-        IoFilter firstExecutorFilter = firstExecutorFilterEntry.getFilter();
-        
-        // My previous filter must be the firstExecutorFilter.
+        // My previous filter must be an ExecutorFilter.
         IoFilter lastFilter = null;
         for (IoFilterChain.Entry e: parent.getAll()) {
             IoFilter currentFilter = e.getFilter();
             if (currentFilter == this) {
-                if (lastFilter == firstExecutorFilter) {
+                if (lastFilter instanceof AbstractExecutorFilter) {
                     // Good!
                     break;
                 } else {
                     throw new IllegalStateException(
                             ReadThrottleFilter.class.getName() + " must be placed after " +
-                            "the first " + ExecutorFilter.class.getName() + " in the chain");
+                            "an " + ExecutorFilter.class.getName() + " in the chain");
                 }
             }
             
             lastFilter = currentFilter;
         }
         
-        firstExecutorFilterEntry.addBefore(
-                name + ".preprocessor", enterFilter);
+        // Add an entering filter before the ExecutorFilter.
+        parent.getEntry(lastFilter).addBefore(name + ".preprocessor", enterFilter);
     }
 
     @Override
