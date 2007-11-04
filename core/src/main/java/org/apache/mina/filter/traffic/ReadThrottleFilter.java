@@ -64,9 +64,6 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     private static final Map<IoService, AtomicInteger> serviceBufferSizes =
         new CopyOnWriteMap<IoService, AtomicInteger>();
     
-    private static final AttributeKey STATE =
-        new AttributeKey(ReadThrottleFilter.class, "state");
-
     /**
      * Returns the current amount of data in the buffer of the {@link ExecuorFilter}
      * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
@@ -104,21 +101,9 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         serviceBufferSizes.remove(service);
     }
     
-    /**
-     * Returns the current amount of data in the buffer of the {@link ExecutorFilter}
-     * for the specified {@link IoSession}.
-     */
-    public static int getSessionBufferSize(IoSession session) {
-        State state = (State) session.getAttribute(STATE);
-        if (state == null) {
-            return 0;
-        }
-        
-        synchronized (state) {
-            return state.sessionBufferSize;
-        }
-    }
-    
+    private final AttributeKey STATE =
+        new AttributeKey(ReadThrottleFilter.class, "state");
+
     private final Object logLock = new Object();
     private long lastLogTime = 0;
     
@@ -260,14 +245,24 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         return messageSizeEstimator;
     }
     
+    /**
+     * Returns the current amount of data in the buffer of the {@link ExecutorFilter}
+     * for the specified {@link IoSession}.
+     */
+    public int getSessionBufferSize(IoSession session) {
+        State state = (State) session.getAttribute(STATE);
+        if (state == null) {
+            return 0;
+        }
+        
+        synchronized (state) {
+            return state.sessionBufferSize;
+        }
+    }
+    
     @Override
     public void onPreAdd(
             IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
-        if (parent.contains(ReadThrottleFilter.class)) {
-            throw new IllegalStateException(
-                    "Only one " + ReadThrottleFilter.class.getName() + " is allowed.");
-        }
-        
         if (!parent.contains(AbstractExecutorFilter.class)) {
             throw new IllegalStateException(
                     "At least one " + ExecutorFilter.class.getName() + " must exist in the chain.");
