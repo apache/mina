@@ -269,7 +269,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         }
         if (parent.contains(this)) {
             throw new IllegalArgumentException(
-                    "You can't add the same filter instance more than once.");
+                    "You can't add the same filter instance more than once.  Create another instance and add it.");
         }
     }
     
