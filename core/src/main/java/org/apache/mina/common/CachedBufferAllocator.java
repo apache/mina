@@ -59,7 +59,8 @@ import java.util.Queue;
  * @version $Rev$, $Date$
  */
 public class CachedBufferAllocator implements IoBufferAllocator {
-
+    private static final int MAX_POOL_SIZE = 2;
+    
     private final ThreadLocal<Map<Integer, Queue<ByteBuffer>>> localRecyclables =
         new ThreadLocal<Map<Integer, Queue<ByteBuffer>>>() {
             @Override
@@ -85,11 +86,16 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             buf = ByteBuffer.allocateDirect(capacity);
         } else {
             // Recycle if possible.
-            buf = localRecyclables.get().get(capacity).poll();
+            Queue<ByteBuffer> pool = localRecyclables.get().get(capacity);
+            buf = pool.poll();
             if (buf != null) {
                 buf.clear();
             } else {
                 buf = ByteBuffer.allocate(capacity);
+                // Create one just in case it is used again.
+                if (pool.size() < MAX_POOL_SIZE) {
+                    pool.offer(ByteBuffer.allocate(capacity));
+                }
             }
         }
         return buf;
@@ -149,8 +155,12 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             this.buf = newBuf;
             
             // Add to the cache.
-            if (!isDirect()) {
-                localRecyclables.get().get(oldBuf.capacity()).offer(oldBuf);
+            if (!buf.isDirect() && !buf.isReadOnly()) {
+                Queue<ByteBuffer> pool = localRecyclables.get().get(buf.capacity());
+                // Restrict the size of the pool to prevent OOM.
+                if (pool.size() < MAX_POOL_SIZE) {
+                    pool.offer(buf);
+                }
             }
         }
 
