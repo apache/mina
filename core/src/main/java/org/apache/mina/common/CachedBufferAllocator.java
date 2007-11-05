@@ -59,7 +59,7 @@ import java.util.Queue;
  * @version $Rev$, $Date$
  */
 public class CachedBufferAllocator implements IoBufferAllocator {
-    private static final int MAX_POOL_SIZE = 2;
+    private static final int MAX_POOL_SIZE = 4;
     
     private final ThreadLocal<Map<Integer, Queue<ByteBuffer>>> localRecyclables =
         new ThreadLocal<Map<Integer, Queue<ByteBuffer>>>() {
@@ -92,10 +92,6 @@ public class CachedBufferAllocator implements IoBufferAllocator {
                 buf.clear();
             } else {
                 buf = ByteBuffer.allocate(capacity);
-                // Create one just in case it is used again.
-                if (pool.size() < MAX_POOL_SIZE) {
-                    pool.offer(ByteBuffer.allocate(capacity));
-                }
             }
         }
         return buf;
