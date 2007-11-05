@@ -26,10 +26,12 @@ import java.net.SocketAddress;
 import java.nio.channels.FileChannel;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.mina.util.CircularQueue;
+import org.apache.mina.util.SynchronizedQueue;
 
 
 /**
@@ -61,12 +63,13 @@ public abstract class AbstractIoSession implements IoSession {
     private IoSessionAttributeMap attributes;
 
     private final Queue<WriteRequest> writeRequestQueue =
-        new ConcurrentLinkedQueue<WriteRequest>() {
-            private static final long serialVersionUID = -3899506857975733565L;
+        new SynchronizedQueue<WriteRequest>(new CircularQueue<WriteRequest>(512)) {
+
+            private static final long serialVersionUID = 6579730560333933524L;
 
             // Discard close request offered by closeOnFlush() silently.
             @Override
-            public WriteRequest peek() {
+            public synchronized WriteRequest peek() {
                 WriteRequest answer = super.peek();
                 if (answer == CLOSE_REQUEST) {
                     AbstractIoSession.this.close();
@@ -77,7 +80,7 @@ public abstract class AbstractIoSession implements IoSession {
             }
 
             @Override
-            public WriteRequest poll() {
+            public synchronized WriteRequest poll() {
                 WriteRequest answer = super.poll();
                 if (answer == CLOSE_REQUEST) {
                     AbstractIoSession.this.close();
