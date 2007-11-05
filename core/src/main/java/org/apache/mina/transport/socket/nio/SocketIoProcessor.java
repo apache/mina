@@ -450,9 +450,10 @@ class SocketIoProcessor {
                     continue;
                 }
     
-                writtenBytes += ch.write(buf.buf());
-    
-                if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
+                int localWrittenBytes = ch.write(buf.buf());
+                writtenBytes += localWrittenBytes;
+
+                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
                     return false;
