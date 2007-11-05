@@ -120,7 +120,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
 
     @Override
     public boolean isEmpty() {
-        return first == last & !full;
+        return (first == last) && !full;
     }
 
     @Override
