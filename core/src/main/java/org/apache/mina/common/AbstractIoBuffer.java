@@ -41,8 +41,8 @@ import java.nio.ShortBuffer;
  * @see IoBufferAllocator
  */
 public abstract class AbstractIoBuffer extends IoBuffer {
+    private final boolean derived;
     private boolean autoExpand;
-
     private boolean autoExpandAllowed = true;
 
     /**
@@ -51,12 +51,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     private int mark = -1;
 
-    protected AbstractIoBuffer() {
-        this(true);
-    }
-
     protected AbstractIoBuffer(boolean autoExpandAllowed) {
         this.autoExpandAllowed = autoExpandAllowed;
+        this.derived = !autoExpandAllowed;
     }
 
     @Override
@@ -108,7 +105,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     
     @Override
     public boolean isDerived() {
-        return !autoExpandAllowed;
+        return derived;
     }
 
     @Override
