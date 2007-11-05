@@ -43,6 +43,9 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  * @version $Rev$, $Date$,
  */
 class SocketIoProcessor {
+
+    private static final int IO_SPIN_COUNT = 3;
+    
     private final Object lock = new Object();
 
     private final String threadName;
@@ -238,11 +241,16 @@ class SocketIoProcessor {
 
         try {
             int readBytes = 0;
-            int ret;
+            int ret = 0;
 
             try {
-                while ((ret = ch.read(buf.buf())) > 0) {
-                    readBytes += ret;
+                for (int i = IO_SPIN_COUNT; i > 0; i --) {
+                    while ((ret = ch.read(buf.buf())) > 0) {
+                        readBytes += ret;
+                    }
+                    if (readBytes != 0) {
+                        break;
+                    }
                 }
             } finally {
                 buf.flip();
@@ -450,7 +458,14 @@ class SocketIoProcessor {
                     continue;
                 }
     
-                int localWrittenBytes = ch.write(buf.buf());
+                int localWrittenBytes = 0;
+                for (int i = IO_SPIN_COUNT; i > 0; i --) {
+                    localWrittenBytes = ch.write(buf.buf());
+                    if (localWrittenBytes != 0 || !buf.hasRemaining()) {
+                        break;
+                    }
+                }
+
                 writtenBytes += localWrittenBytes;
 
                 if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
