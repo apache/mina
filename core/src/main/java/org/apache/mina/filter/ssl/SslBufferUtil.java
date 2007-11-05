@@ -23,6 +23,8 @@ import java.nio.ByteBuffer;
 
 import javax.net.ssl.SSLEngine;
 
+import org.apache.mina.common.IoBuffer;
+
 /**
  * Simple buffer pool used by SSLHandler.
  *
@@ -107,7 +109,7 @@ class SslBufferUtil {
     }
 
     private static ByteBuffer createBuffer(int capacity) {
-        if (org.apache.mina.common.IoBuffer.isUseDirectBuffer()) {
+        if (IoBuffer.isUseDirectBuffer()) {
             try {
                 return ByteBuffer.allocateDirect(capacity);
             } catch (OutOfMemoryError e) {
