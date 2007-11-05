@@ -20,12 +20,13 @@
 package org.apache.mina.example.echoserver;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
-import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
@@ -42,7 +43,7 @@ public class Main {
     private static final boolean USE_SSL = false;
 
     public static void main(String[] args) throws Exception {
-        IoAcceptor acceptor = new NioSocketAcceptor();
+        SocketAcceptor acceptor = new NioSocketAcceptor(Executors.newCachedThreadPool());
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
 
         // Add SSL filter if SSL is enabled.
@@ -51,7 +52,7 @@ public class Main {
         }
 
         addLogger(chain);
-
+        
         // Bind
         acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new EchoProtocolHandler());

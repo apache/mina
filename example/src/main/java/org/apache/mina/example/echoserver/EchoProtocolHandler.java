@@ -25,10 +25,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
-import org.apache.mina.common.WriteException;
 import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.transport.socket.SocketSession;
-import org.apache.mina.transport.socket.SocketSessionConfig;
 
 /**
  * {@link IoHandler} implementation for echo server.
@@ -39,11 +36,6 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
 public class EchoProtocolHandler extends IoHandlerAdapter {
     @Override
     public void sessionCreated(IoSession session) {
-        if (session instanceof SocketSession) {
-            SocketSessionConfig config = ((SocketSession) session).getConfig();
-            config.setReceiveBufferSize(2048);
-        }
-
         session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 
         // We're going to use SSL negotiation notification.
@@ -58,26 +50,13 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        IoSessionLogger.getLogger(session).warn(cause);
-        if (cause instanceof WriteException) {
-            WriteException e = (WriteException) cause;
-            IoSessionLogger.getLogger(session).warn("Failed write requests: {}", e.getRequests());
-        }
         session.close();
     }
 
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
-        if (!(message instanceof IoBuffer)) {
-            return;
-        }
-
-        IoBuffer rb = (IoBuffer) message;
         // Write the received data back to remote peer
-        IoBuffer wb = IoBuffer.allocate(rb.remaining());
-        wb.put(rb);
-        wb.flip();
-        session.write(wb);
+        session.write(((IoBuffer) message).duplicate());
     }
 }

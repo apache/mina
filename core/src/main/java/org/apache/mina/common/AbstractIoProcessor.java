@@ -421,8 +421,13 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     }
 
     private boolean flush(AbstractIoSession session) throws Exception {
+        if (!session.isConnected()) {
+            scheduleRemove(session);
+            return false;
+        }
+
         // Clear OP_WRITE
-        setOpWrite(session,false);
+        setOpWrite(session, false);
 
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
@@ -450,11 +455,9 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     continue;
                 }
 
-                if (isWritable(session)) {
-                    long localWrittenBytes = transferFile(session, region);
-                    region.setPosition(region.getPosition() + localWrittenBytes);
-                    writtenBytes += localWrittenBytes;
-                }
+                long localWrittenBytes = transferFile(session, region);
+                region.setPosition(region.getPosition() + localWrittenBytes);
+                writtenBytes += localWrittenBytes;
 
                 if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
@@ -472,9 +475,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     continue;
                 }
 
-                if (isWritable(session)) {
-                    writtenBytes += write(session, buf);
-                }
+                writtenBytes += write(session, buf);
 
                 if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
