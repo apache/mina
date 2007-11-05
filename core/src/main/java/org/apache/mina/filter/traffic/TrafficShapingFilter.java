@@ -120,6 +120,7 @@ public class TrafficShapingFilter extends IoFilterAdapter {
                     "You can't add the same filter instance more than once.  Create another instance and add it.");
         }
         parent.getSession().setAttribute(STATE, new State());
+        adjustReadBufferSize(parent.getSession());
     }
 
     @Override
@@ -163,19 +164,13 @@ public class TrafficShapingFilter extends IoFilterAdapter {
                     state.readStartTime = 0;
                     state.suspendedRead = suspendTime != 0;
 
-                    if (session.getConfig().getReadBufferSize() > maxReadThroughput) {
-                        session.getConfig().setReadBufferSize(maxReadThroughput);
-                    }
-                    if (session.getConfig().getMaxReadBufferSize() > maxReadThroughput) {
-                        session.getConfig().setMaxReadBufferSize(maxReadThroughput);
-                    }
+                    adjustReadBufferSize(session);
                 }
             }
         }
         
         if (suspendTime != 0) {
             session.suspendRead();
-            System.out.println(messageSizeEstimator.estimateSize(message) + ", " + suspendTime);
             scheduledExecutor.schedule(new Runnable() {
                 public void run() {
                     synchronized (state) {
@@ -187,6 +182,20 @@ public class TrafficShapingFilter extends IoFilterAdapter {
         }
         
         nextFilter.messageReceived(session, message);
+    }
+
+    private void adjustReadBufferSize(IoSession session) {
+        int maxReadThroughput = this.maxReadThroughput;
+        if (maxReadThroughput == 0) {
+            return;
+        }
+
+        if (session.getConfig().getReadBufferSize() > maxReadThroughput) {
+            session.getConfig().setReadBufferSize(maxReadThroughput);
+        }
+        if (session.getConfig().getMaxReadBufferSize() > maxReadThroughput) {
+            session.getConfig().setMaxReadBufferSize(maxReadThroughput);
+        }
     }
 
     @Override
