@@ -25,7 +25,7 @@ import org.apache.mina.statemachine.transition.Transition;
 import com.agical.rmock.extension.junit.RMockTestCase;
 
 /**
- * Tests {@link FsmState}.
+ * Tests {@link State}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

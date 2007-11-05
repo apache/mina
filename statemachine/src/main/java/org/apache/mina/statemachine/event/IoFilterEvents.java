@@ -17,21 +17,39 @@
  *  under the License.
  *
  */
-package org.apache.mina.statemachine.annotation;
+package org.apache.mina.statemachine.event;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.mina.common.IoFilter;
+import org.apache.mina.statemachine.annotation.IoFilterTransition;
 
 /**
- * Annotation used to annotate a method with several {@link Handler}s.
+ * Defines all possible MINA {@link IoFilter} events for use in {@link IoFilterTransition}
+ * annotations.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Handlers {
-    Handler[] value();
+public enum IoFilterEvents {
+    ANY(Event.WILDCARD_EVENT_ID),
+    SESSION_CREATED("sessionCreated"),
+    SESSION_OPENED("sessionOpened"),
+    SESSION_CLOSED("sessionClosed"),
+    SESSION_IDLE("sessionIdle"),
+    MESSAGE_RECEIVED("messageReceived"),
+    MESSAGE_SENT("messageSent"),
+    FILTER_CLOSE("filterClose"),
+    FILTER_WRITE("filterWrite"),
+    FILTER_SET_TRAFFIC_MASK("filterSetTrafficMask"),
+    EXCEPTION_CAUGHT("exceptionCaught");
+
+    private final String value;
+    
+    private IoFilterEvents(String value) {
+        this.value = value;
+    }
+    
+    @Override
+    public String toString() {
+        return value;
+    }
 }

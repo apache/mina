@@ -17,33 +17,26 @@
  *  under the License.
  *
  */
-package org.apache.mina.statemachine.event;
+package org.apache.mina.statemachine.annotation;
 
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.statemachine.annotation.Handler;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.apache.mina.common.IoFilter;
+import org.apache.mina.statemachine.StateMachine;
 
 /**
- * Defines all possible MINA {@link IoHandler} events for use in {@link Handler}
- * annotations.
- *
+ * Annotation used to annotate a method with several {@link IoFilterTransition}s.
+ * This should be used when creating {@link StateMachine}s for MINA's 
+ * {@link IoFilter} interface.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public final class IoSessionEvents {
-    public static final String SESSION_CREATED = "sessionCreated";
-
-    public static final String SESSION_OPENED = "sessionOpened";
-
-    public static final String SESSION_CLOSED = "sessionClosed";
-
-    public static final String SESSION_IDLE = "sessionIdle";
-
-    public static final String MESSAGE_RECEIVED = "messageReceived";
-
-    public static final String MESSAGE_SENT = "messageSent";
-
-    public static final String EXCEPTION_CAUGHT = "exceptionCaught";
-
-    private IoSessionEvents() {
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface IoFilterTransitions {
+    IoFilterTransition[] value();
 }

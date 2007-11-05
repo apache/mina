@@ -19,7 +19,6 @@
  */
 package org.apache.mina.statemachine;
 
-import org.apache.mina.statemachine.annotation.Handler;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.Transition;
 
@@ -30,7 +29,7 @@ import org.apache.mina.statemachine.transition.Transition;
  * immediately and let the new {@link State} handle the current {@link Event}.
  * The <code>*Next()</code> family on the other hand let the new {@link State}
  * handle the next {@link Event} which is generated which make these method the 
- * programmatic equivalent of using the {@link Handler} annotation.
+ * programmatic equivalent of using the {@link org.apache.mina.statemachine.annotation.Transition} annotation.
  * </p>
  * <p>
  * Using the <code>breakAndCall*()</code> and <code>breakAndReturn*</code> methods one
@@ -68,7 +67,7 @@ public class StateControl {
      * Breaks the execution of the current {@link Transition} and lets the
      * {@link State} with the specified id handle the <strong>next</strong> {@link Event}.
      * Using this method is the programmatic equivalent of using the
-     * {@link Handler} annotation.
+     * {@link org.apache.mina.statemachine.annotation.Transition} annotation.
      * 
      * @param state the id of the {@link State} to go to.
      */

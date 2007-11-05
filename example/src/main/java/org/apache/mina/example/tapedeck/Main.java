@@ -45,7 +45,7 @@ public class Main {
     private static final int PORT = 12345;
     
     private static IoHandler createIoHandler() {
-        StateMachine sm = StateMachineFactory.create(TapeDeckServer.EMPTY, new TapeDeckServer());
+        StateMachine sm = StateMachineFactory.createForIoHandler(TapeDeckServer.EMPTY, new TapeDeckServer());
         
         return (IoHandler) StateMachineProxyFactory.create(IoHandler.class, sm, 
                 new IoSessionStateContextLookup(new StateContextFactory() {

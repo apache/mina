@@ -28,10 +28,9 @@ import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.StateMachineCreationException;
 import org.apache.mina.statemachine.StateMachineFactory;
-import org.apache.mina.statemachine.annotation.Handler;
-import org.apache.mina.statemachine.annotation.Handlers;
+import org.apache.mina.statemachine.annotation.Transition;
+import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.transition.MethodTransition;
-import org.apache.mina.statemachine.transition.Transition;
 
 /**
  * Tests {@link StateMachineFactory}.
@@ -74,7 +73,7 @@ public class StateMachineFactoryTest extends TestCase {
         assertEquals(States.D, d.getId());
         assertSame(a, d.getParent());
 
-        List<Transition> trans = null;
+        List<org.apache.mina.statemachine.transition.Transition> trans = null;
 
         trans = a.getTransitions();
         assertEquals(3, trans.size());
@@ -127,27 +126,27 @@ public class StateMachineFactoryTest extends TestCase {
         @org.apache.mina.statemachine.annotation.State(A)
         protected static final String D = "d";
         
-        @Handler(on = "bar", in = A)
+        @Transition(on = "bar", in = A)
         protected void barInA() {
         }
 
-        @Handler(on = "bar", in = C, next = A)
+        @Transition(on = "bar", in = C, next = A)
         protected void barInC() {
         }
 
-        @Handler(in = A)
+        @Transition(in = A)
         protected void error() {
         }
 
-        @Handler(on = "foo", in = A, next = B)
+        @Transition(on = "foo", in = A, next = B)
         protected void fooInA() {
         }
 
-        @Handler(on = "foo", in = B, next = C)
+        @Transition(on = "foo", in = B, next = C)
         protected void fooInB() {
         }
 
-        @Handlers( { @Handler(on = { "foo", "bar" }, in = C, next = D), @Handler(on = "foo", in = D) })
+        @Transitions( { @Transition(on = { "foo", "bar" }, in = C, next = D), @Transition(on = "foo", in = D) })
         protected void fooOrBarInCOrFooInD() {
         }
       

@@ -19,13 +19,13 @@
  */
 package org.apache.mina.example.tapedeck;
 
-import static org.apache.mina.statemachine.event.IoSessionEvents.*;
+import static org.apache.mina.statemachine.event.IoHandlerEvents.*;
 
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.statemachine.StateControl;
-import org.apache.mina.statemachine.annotation.Handler;
-import org.apache.mina.statemachine.annotation.Handlers;
+import org.apache.mina.statemachine.annotation.IoHandlerTransition;
+import org.apache.mina.statemachine.annotation.IoHandlerTransitions;
 import org.apache.mina.statemachine.annotation.State;
 import org.apache.mina.statemachine.context.AbstractStateContext;
 import org.apache.mina.statemachine.context.StateContext;
@@ -53,12 +53,12 @@ public class TapeDeckServer {
         public String tapeName;
     }
     
-    @Handler(on = SESSION_OPENED, in = EMPTY)
+    @IoHandlerTransition(on = SESSION_OPENED, in = EMPTY)
     public void connect(IoSession session) {
         session.write("+ Greetings from your tape deck!");
     }
     
-    @Handler(on = MESSAGE_RECEIVED, in = EMPTY, next = LOADED)
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = EMPTY, next = LOADED)
     public void loadTape(TapeDeckContext context, IoSession session, LoadCommand cmd) {
         if (cmd.getTapeNumber() < 1 || cmd.getTapeNumber() > tapes.length) {
             session.write("- Unknown tape number: " + cmd.getTapeNumber());
@@ -69,31 +69,31 @@ public class TapeDeckServer {
         }
     }
 
-    @Handlers({
-        @Handler(on = MESSAGE_RECEIVED, in = LOADED, next = PLAYING),
-        @Handler(on = MESSAGE_RECEIVED, in = PAUSED, next = PLAYING)
+    @IoHandlerTransitions({
+        @IoHandlerTransition(on = MESSAGE_RECEIVED, in = LOADED, next = PLAYING),
+        @IoHandlerTransition(on = MESSAGE_RECEIVED, in = PAUSED, next = PLAYING)
     })
     public void playTape(TapeDeckContext context, IoSession session, PlayCommand cmd) {
         session.write("+ Playing \"" + context.tapeName + "\"");
     }
     
-    @Handler(on = MESSAGE_RECEIVED, in = PLAYING, next = PAUSED)
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = PLAYING, next = PAUSED)
     public void pauseTape(TapeDeckContext context, IoSession session, PauseCommand cmd) {
         session.write("+ \"" + context.tapeName + "\" paused");
     }
     
-    @Handler(on = MESSAGE_RECEIVED, in = PLAYING, next = LOADED)
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = PLAYING, next = LOADED)
     public void stopTape(TapeDeckContext context, IoSession session, StopCommand cmd) {
         session.write("+ \"" + context.tapeName + "\" stopped");
     }
     
-    @Handler(on = MESSAGE_RECEIVED, in = LOADED, next = EMPTY)
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = LOADED, next = EMPTY)
     public void ejectTape(TapeDeckContext context, IoSession session, EjectCommand cmd) {
         session.write("+ \"" + context.tapeName + "\" ejected");
         context.tapeName = null;
     }
     
-    @Handler(on = MESSAGE_RECEIVED, in = ROOT)
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = ROOT)
     public void listTapes(IoSession session, ListCommand cmd) {
         StringBuilder response = new StringBuilder("+ (");
         for (int i = 0; i < tapes.length; i++) {
@@ -107,7 +107,7 @@ public class TapeDeckServer {
         session.write(response);
     }
     
-    @Handler(on = MESSAGE_RECEIVED, in = ROOT)
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = ROOT)
     public void info(TapeDeckContext context, IoSession session, InfoCommand cmd) {
         String state = context.getCurrentState().getId().toLowerCase();
         if (context.tapeName == null) {
@@ -118,29 +118,29 @@ public class TapeDeckServer {
         }
     }
     
-    @Handler(on = MESSAGE_RECEIVED, in = ROOT)
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = ROOT)
     public void quit(TapeDeckContext context, IoSession session, QuitCommand cmd) {
         session.write("+ Bye! Please come back!").addListener(IoFutureListener.CLOSE);
     }
     
-    @Handler(on = MESSAGE_RECEIVED, in = ROOT, weight = 10)
+    @IoHandlerTransition(on = MESSAGE_RECEIVED, in = ROOT, weight = 10)
     public void error(Event event, StateContext context, IoSession session, Command cmd) {
         session.write("- Cannot " + cmd.getName() 
                 + " while " + context.getCurrentState().getId().toLowerCase());
     }
     
-    @Handler(on = EXCEPTION_CAUGHT, in = ROOT)
+    @IoHandlerTransition(on = EXCEPTION_CAUGHT, in = ROOT)
     public void commandSyntaxError(IoSession session, CommandSyntaxException e) {
         session.write("- " + e.getMessage());
     }
     
-    @Handler(on = EXCEPTION_CAUGHT, in = ROOT, weight = 10)
+    @IoHandlerTransition(on = EXCEPTION_CAUGHT, in = ROOT, weight = 10)
     public void exceptionCaught(IoSession session, Exception e) {
         e.printStackTrace();
         session.close();
     }
     
-    @Handler(in = ROOT, weight = 100)
+    @IoHandlerTransition(in = ROOT, weight = 100)
     public void unhandledEvent() {
     }
     

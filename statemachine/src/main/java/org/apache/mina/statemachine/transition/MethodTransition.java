@@ -29,7 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.StateMachineFactory;
-import org.apache.mina.statemachine.annotation.Handler;
+import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.event.Event;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  * <p>
  * Normally you wouldn't create instances of this class directly but rather use the 
- * {@link Handler} annotation to define the methods which should be used as
+ * {@link Transition} annotation to define the methods which should be used as
  * transitions in your state machine and then let {@link StateMachineFactory} create a 
  * {@link StateMachine} for you.
  * </p>

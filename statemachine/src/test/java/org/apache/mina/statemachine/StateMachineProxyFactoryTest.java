@@ -27,8 +27,8 @@ import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.StateMachineFactory;
 import org.apache.mina.statemachine.StateMachineProxyFactory;
-import org.apache.mina.statemachine.annotation.Handler;
-import org.apache.mina.statemachine.annotation.Handlers;
+import org.apache.mina.statemachine.annotation.Transition;
+import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.MethodTransition;
 
@@ -162,33 +162,33 @@ public class StateMachineProxyFactoryTest extends TestCase {
         
         private LinkedList<String> messages = new LinkedList<String>();
         
-        @Handler(on = "insert", in = "s1", next = "s2")
+        @Transition(on = "insert", in = "s1", next = "s2")
         public void inserted(String name) {
             messages.add("Tape '" + name + "' inserted");
         }
 
-        @Handler(on = "eject", in = "s4", next = "s1")
+        @Transition(on = "eject", in = "s4", next = "s1")
         public void ejected() {
             messages.add("Tape ejected");
         }
         
-        @Handlers({@Handler( on = "start", in = "s2", next = "s3" ),
-                   @Handler( on = "pause", in = "s5", next = "s3" )})
+        @Transitions({@Transition( on = "start", in = "s2", next = "s3" ),
+                   @Transition( on = "pause", in = "s5", next = "s3" )})
         public void playing() {
             messages.add("Playing");
         }
         
-        @Handler(on = "pause", in = "s3", next = "s5")
+        @Transition(on = "pause", in = "s3", next = "s5")
         public void paused() {
             messages.add("Paused");
         }
 
-        @Handler(on = "stop", in = "s3", next = "s4")
+        @Transition(on = "stop", in = "s3", next = "s4")
         public void stopped() {
             messages.add("Stopped");
         }
 
-        @Handler(on = "*", in = "parent")
+        @Transition(on = "*", in = "parent")
         public void error(Event event) {
             messages.add("Error: Cannot " + event.getId() + " at this time");
         }
