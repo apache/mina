@@ -152,6 +152,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             this.buf = newBuf;
             
             free(oldBuf);
+            free(buf);
         }
 
         @Override

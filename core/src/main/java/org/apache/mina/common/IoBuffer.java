@@ -136,7 +136,7 @@ import java.util.Set;
 public abstract class IoBuffer implements Comparable<IoBuffer> {
     private static IoBufferAllocator allocator = new SimpleBufferAllocator();
 
-    private static boolean preferDirectBuffers = false;
+    private static boolean useDirectBuffer = false;
 
     /**
      * An immutable empty buffer.
@@ -172,8 +172,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * by default when the type of the new buffer is not specified.  The
      * default value is <tt>false</tt>.
      */
-    public static boolean isPreferDirectBuffers() {
-        return preferDirectBuffers;
+    public static boolean isUseDirectBuffer() {
+        return useDirectBuffer;
     }
 
     /**
@@ -181,30 +181,20 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * type of the new buffer is not specified.  The default value is
      * <tt>false</tt>.
      */
-    public static void setPreferDirectBuffers(boolean preferDirectBuffers) {
-        IoBuffer.preferDirectBuffers = preferDirectBuffers;
+    public static void setUseDirectBuffer(boolean useDirectBuffer) {
+        IoBuffer.useDirectBuffer = useDirectBuffer;
     }
 
     /**
-     * Returns the direct or heap buffer which is capable of the specified
-     * size.  This method tries to allocate a buffer of the preferred type
-     * first, and then tries the other type of buffer if the buffer memory
-     * of the preferred type is exhausted.  Please use
-     * {@link #allocate(int, boolean)} to allocate buffers of specific type.
+     * Returns the direct or heap buffer which is capable to store the
+     * specified amount of bytes.
      *
      * @param capacity the capacity of the buffer
      *
-     * @see #setPreferDirectBuffers(boolean)
+     * @see #setUseDirectBuffer(boolean)
      */
     public static IoBuffer allocate(int capacity) {
-        try {
-            // first try to allocate a buffer of the preferred type.
-            return allocate(capacity, preferDirectBuffers);
-        } catch (OutOfMemoryError e) {
-            // fall through to the alternative type.
-        }
-
-        return allocate(capacity, !preferDirectBuffers);
+        return allocate(capacity, useDirectBuffer);
     }
 
     /**
