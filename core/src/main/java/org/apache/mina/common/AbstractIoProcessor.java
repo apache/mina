@@ -297,7 +297,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                         while ((ret = read(session, buf)) > 0) {
                             readBytes += ret;
                         }
-                        if (readBytes != 0) {
+                        if (readBytes != 0 || ret < 0) {
                             break;
                         }
                     }
