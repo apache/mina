@@ -337,10 +337,6 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     }
 
     private void flush() {
-        if (flushingSessions.size() == 0) {
-            return;
-        }
-
         for (; ;) {
             AbstractIoSession session = flushingSessions.poll();
 
