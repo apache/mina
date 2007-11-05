@@ -88,6 +88,10 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         Object ret = items[first];
         items[first] = null;
         decreaseSize();
+        
+        if (first == last) {
+            first = last = 0;
+        }
 
         return (E) ret;
     }

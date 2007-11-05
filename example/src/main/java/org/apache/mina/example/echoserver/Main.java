@@ -60,7 +60,6 @@ public class Main {
         // Bind
         acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new EchoProtocolHandler());
-        // acceptor.getFilterChain().addLast("x", new WriteThrottleFilter(WriteThrottlePolicy.LOG, 0, 1048576, 0, 0, 0, 0));
         acceptor.bind();
 
         System.out.println("Listening on port " + PORT);

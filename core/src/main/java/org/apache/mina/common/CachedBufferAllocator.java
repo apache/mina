@@ -62,6 +62,7 @@ import org.apache.mina.util.CircularQueue;
 public class CachedBufferAllocator implements IoBufferAllocator {
 
     private static final int MAX_POOL_SIZE = 8;
+    private static final int MAX_CACHED_BUFFER_SIZE = 1 << 18; // 256KB
     
     private static Map<Integer, Queue<CachedBuffer>> newPoolMap() {
         Map<Integer, Queue<CachedBuffer>> poolMap =
@@ -92,24 +93,33 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             
     public IoBuffer allocate(int capacity, boolean direct) {
         capacity = normalizeCapacity(capacity);
-        Queue<CachedBuffer> pool;
-        if (direct) {
-            pool = directBuffers.get().get(capacity);
-        } else {
-            pool = heapBuffers.get().get(capacity);
-        }
-        
-        // Recycle if possible.
-        IoBuffer buf = pool.poll();
-        if (buf != null) {
-            buf.clear();
-            buf.setAutoExpand(false);
-            buf.order(ByteOrder.BIG_ENDIAN);
-        } else {
+        IoBuffer buf ;
+        if (capacity > MAX_CACHED_BUFFER_SIZE) {
             if (direct) {
                 buf = wrap(ByteBuffer.allocateDirect(capacity));
             } else {
                 buf = wrap(ByteBuffer.allocate(capacity));
+            }
+        } else {
+            Queue<CachedBuffer> pool;
+            if (direct) {
+                pool = directBuffers.get().get(capacity);
+            } else {
+                pool = heapBuffers.get().get(capacity);
+            }
+            
+            // Recycle if possible.
+            buf = pool.poll();
+            if (buf != null) {
+                buf.clear();
+                buf.setAutoExpand(false);
+                buf.order(ByteOrder.BIG_ENDIAN);
+            } else {
+                if (direct) {
+                    buf = wrap(ByteBuffer.allocateDirect(capacity));
+                } else {
+                    buf = wrap(ByteBuffer.allocate(capacity));
+                }
             }
         }
         return buf;

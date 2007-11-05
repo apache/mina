@@ -38,7 +38,9 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoProcessor implements IoProcessor {
-
+    
+    private static final int IO_SPIN_COUNT = 3;
+    
     private final Object lock = new Object();
     private final String threadName;
     private final Executor executor;
@@ -287,15 +289,25 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
         try {
             int readBytes = 0;
-            int ret;
+            int ret = 0;
 
             try {
                 if (session.getTransportMetadata().hasFragmentation()) {
-                    while ((ret = read(session, buf)) > 0) {
-                        readBytes += ret;
+                    for (int i = IO_SPIN_COUNT; i > 0; i --) {
+                        while ((ret = read(session, buf)) > 0) {
+                            readBytes += ret;
+                        }
+                        if (readBytes != 0) {
+                            break;
+                        }
                     }
                 } else {
-                    ret = read(session, buf);
+                    for (int i = IO_SPIN_COUNT; i > 0; i --) {
+                        ret = read(session, buf);
+                        if (ret != 0) {
+                            break;
+                        }
+                    }
                     if (ret > 0) {
                         readBytes = ret;
                     }
@@ -442,7 +454,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 break;
             }
 
-            long localWrittenBytes;
+            long localWrittenBytes = 0;
             Object message = req.getMessage();
             if (message instanceof FileRegion) {
                 FileRegion region = (FileRegion) message;
@@ -466,7 +478,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     continue;
                 }
 
-                localWrittenBytes = write(session, buf);
+                for (int i = IO_SPIN_COUNT; i > 0; i --) {
+                    localWrittenBytes = write(session, buf);
+                    if (localWrittenBytes != 0 || !buf.hasRemaining()) {
+                        break;
+                    }
+                }
             }
             
             writtenBytes += localWrittenBytes;
