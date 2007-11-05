@@ -116,12 +116,14 @@ class NioProcessor extends AbstractIoProcessor {
 
     @Override
     protected boolean isReadable(IoSession session) throws Exception {
-        return getSelectionKey(session).isReadable();
+        SelectionKey key = getSelectionKey(session);
+        return key.isValid() && key.isReadable();
     }
 
     @Override
     protected boolean isWritable(IoSession session) throws Exception {
-        return getSelectionKey(session).isWritable();
+        SelectionKey key = getSelectionKey(session);
+        return key.isValid() && key.isWritable();
     }
 
     @Override
