@@ -245,6 +245,14 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      */
     protected IoBuffer() {
     }
+    
+    /**
+     * Declares this buffer and all its derived buffers are not used anymore
+     * so that it can be reused by some {@link IoBufferAllocator} implementations.
+     * It is not mandatory to call this method, but you might want to invoke this
+     * method for maximum performance. 
+     */
+    public abstract void free();
 
     /**
      * Returns the underlying NIO buffer instance.
@@ -255,6 +263,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @see ByteBuffer#isDirect()
      */
     public abstract boolean isDirect();
+    
+    /**
+     * returns <tt>true</tt> if and only if this buffer is derived from other buffer
+     * via {@link #duplicate()}, {@link #slice()} or {@link #asReadOnlyBuffer()}.
+     */
+    public abstract boolean isDerived();
 
     /**
      * @see ByteBuffer#isReadOnly()

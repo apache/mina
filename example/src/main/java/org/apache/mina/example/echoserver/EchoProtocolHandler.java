@@ -21,10 +21,12 @@ package org.apache.mina.example.echoserver;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
+import org.apache.mina.common.WriteFuture;
 import org.apache.mina.filter.ssl.SslFilter;
 
 /**
@@ -43,6 +45,16 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
     }
 
     @Override
+    public void sessionClosed(IoSession session) throws Exception {
+        IoSessionLogger.getLogger(session).info("CLOSED");
+    }
+
+    @Override
+    public void sessionOpened(IoSession session) throws Exception {
+        IoSessionLogger.getLogger(session).info("OPENED");
+    }
+
+    @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
         IoSessionLogger.getLogger(session).info(
                 "*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE) + " ***");
@@ -57,6 +69,11 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
     public void messageReceived(IoSession session, Object message)
             throws Exception {
         // Write the received data back to remote peer
-        session.write(((IoBuffer) message).duplicate());
+        final IoBuffer src = (IoBuffer) message;
+        session.write(src.duplicate()).addListener(new IoFutureListener<WriteFuture>() {
+            public void operationComplete(WriteFuture future) {
+                src.free();
+            }
+        });
     }
 }

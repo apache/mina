@@ -59,7 +59,7 @@ import java.util.Queue;
  * @version $Rev$, $Date$
  */
 public class CachedBufferAllocator implements IoBufferAllocator {
-    private static final int MAX_POOL_SIZE = 4;
+    private static final int MAX_POOL_SIZE = 8;
     
     private final ThreadLocal<Map<Integer, Queue<ByteBuffer>>> localRecyclables =
         new ThreadLocal<Map<Integer, Queue<ByteBuffer>>>() {
@@ -150,14 +150,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             newBuf.put(oldBuf);
             this.buf = newBuf;
             
-            // Add to the cache.
-            if (!buf.isDirect() && !buf.isReadOnly()) {
-                Queue<ByteBuffer> pool = localRecyclables.get().get(buf.capacity());
-                // Restrict the size of the pool to prevent OOM.
-                if (pool.size() < MAX_POOL_SIZE) {
-                    pool.offer(buf);
-                }
-            }
+            free(oldBuf);
         }
 
         @Override
@@ -189,6 +182,22 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         public boolean hasArray() {
             return buf.hasArray();
         }
-    }
 
+        @Override
+        public void free() {
+            free(buf);
+            buf = null; // FIXME better sanity check scheme.
+        }
+        
+        private void free(ByteBuffer buf) {
+            // Add to the cache.
+            if (!buf.isDirect() && !buf.isReadOnly() && !isDerived()) {
+                Queue<ByteBuffer> pool = localRecyclables.get().get(buf.capacity());
+                // Restrict the size of the pool to prevent OOM.
+                if (pool.size() < MAX_POOL_SIZE) {
+                    pool.offer(buf);
+                }
+            }
+        }
+    }
 }

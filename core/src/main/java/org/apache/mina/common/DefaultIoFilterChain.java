@@ -404,17 +404,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public void fireMessageSent(WriteRequest request) {
-        Object message = request.getMessage();
-        if (message instanceof IoBuffer) {
-            IoBuffer b = (IoBuffer) message;
-            if (b.hasRemaining()) {
-                session.increaseWrittenBytes(((IoBuffer) message).remaining());
-            } else {
-                session.increaseWrittenMessages();
-            }
-        } else {
-            session.increaseWrittenMessages();
-        }
+        session.increaseWrittenBytesAndMessages(request);
 
         try {
             request.getFuture().setWritten();

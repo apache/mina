@@ -636,4 +636,14 @@ public class IoBufferWrapper extends IoBuffer {
     public boolean hasArray() {
         return buf.hasArray();
     }
+
+    @Override
+    public void free() {
+        buf.free();
+    }
+
+    @Override
+    public boolean isDerived() {
+        return buf.isDerived();
+    }
 }

@@ -381,7 +381,21 @@ public abstract class AbstractIoSession implements IoSession {
             }
         }
     }
-
+    
+    protected void increaseWrittenBytesAndMessages(WriteRequest request) {
+        Object message = request.getMessage();
+        if (message instanceof IoBuffer) {
+            IoBuffer b = (IoBuffer) message;
+            if (b.hasRemaining()) {
+                increaseWrittenBytes(((IoBuffer) message).remaining());
+            } else {
+                increaseWrittenMessages();
+            }
+        } else {
+            increaseWrittenMessages();
+        }
+    }
+    
     protected void increaseWrittenBytes(long increment) {
         if (increment > 0) {
             writtenBytes += increment;
@@ -389,11 +403,11 @@ public abstract class AbstractIoSession implements IoSession {
             idleCountForBoth = 0;
             idleCountForWrite = 0;
 
-            scheduledWriteBytes.addAndGet(-increment);
-
             if (getService() instanceof AbstractIoService) {
                 ((AbstractIoService) getService()).increaseWrittenBytes(increment);
             }
+
+            increaseScheduledWriteBytes(-increment);
         }
     }
 
@@ -406,10 +420,11 @@ public abstract class AbstractIoSession implements IoSession {
 
     protected void increaseWrittenMessages() {
         writtenMessages++;
-        scheduledWriteMessages.decrementAndGet();
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).increaseWrittenMessages();
         }
+
+        decreaseScheduledWriteMessages();
     }
 
     protected void increaseScheduledWriteBytes(long increment) {
@@ -423,6 +438,27 @@ public abstract class AbstractIoSession implements IoSession {
         scheduledWriteMessages.incrementAndGet();
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).increaseScheduledWriteMessages();
+        }
+    }
+
+    protected void decreaseScheduledWriteMessages() {
+        scheduledWriteMessages.decrementAndGet();
+        if (getService() instanceof AbstractIoService) {
+            ((AbstractIoService) getService()).decreaseScheduledWriteMessages();
+        }
+    }
+
+    protected void decreaseScheduledBytesAndMessages(WriteRequest request) {
+        Object message = request.getMessage();
+        if (message instanceof IoBuffer) {
+            IoBuffer b = (IoBuffer) message;
+            if (b.hasRemaining()) {
+                increaseScheduledWriteBytes(-((IoBuffer) message).remaining());
+            } else {
+                decreaseScheduledWriteMessages();
+            }
+        } else {
+            decreaseScheduledWriteMessages();
         }
     }
 

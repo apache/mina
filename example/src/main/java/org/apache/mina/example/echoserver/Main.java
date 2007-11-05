@@ -22,7 +22,9 @@ package org.apache.mina.example.echoserver;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import org.apache.mina.common.CachedBufferAllocator;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.ssl.SslFilter;
@@ -45,6 +47,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         SocketAcceptor acceptor = new NioSocketAcceptor(Executors.newCachedThreadPool());
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+        
+        IoBuffer.setAllocator(new CachedBufferAllocator());
 
         // Add SSL filter if SSL is enabled.
         if (USE_SSL) {
@@ -56,6 +60,7 @@ public class Main {
         // Bind
         acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new EchoProtocolHandler());
+        // acceptor.getFilterChain().addLast("x", new WriteThrottleFilter(WriteThrottlePolicy.LOG, 0, 1048576, 0, 0, 0, 0));
         acceptor.bind();
 
         System.out.println("Listening on port " + PORT);

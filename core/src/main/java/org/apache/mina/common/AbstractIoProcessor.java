@@ -414,6 +414,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         if (!failedRequests.isEmpty()) {
             WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
             for (WriteRequest r: failedRequests) {
+                session.decreaseScheduledBytesAndMessages(r);
                 r.getFuture().setException(cause);
             }
             session.getFilterChain().fireExceptionCaught(cause);

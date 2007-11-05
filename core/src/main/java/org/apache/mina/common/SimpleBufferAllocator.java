@@ -133,5 +133,9 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
         public boolean hasArray() {
             return buf.hasArray();
         }
+
+        @Override
+        public void free() {
+        }
     }
 }

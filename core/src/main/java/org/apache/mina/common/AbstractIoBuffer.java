@@ -105,6 +105,11 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public boolean isAutoExpand() {
         return autoExpand && autoExpandAllowed;
     }
+    
+    @Override
+    public boolean isDerived() {
+        return !autoExpandAllowed;
+    }
 
     @Override
     public IoBuffer setAutoExpand(boolean autoExpand) {

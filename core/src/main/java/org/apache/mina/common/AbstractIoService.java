@@ -189,6 +189,10 @@ public abstract class AbstractIoService implements IoService {
         scheduledWriteMessages.incrementAndGet();
     }
 
+    protected void decreaseScheduledWriteMessages() {
+        scheduledWriteMessages.decrementAndGet();
+    }
+
     public long getActivationTime() {
         return activationTime;
     }
@@ -203,7 +207,6 @@ public abstract class AbstractIoService implements IoService {
 
     protected void increaseWrittenBytes(long increment) {
         writtenBytes.addAndGet(increment);
-        scheduledWriteBytes.addAndGet(-increment);
     }
 
     public long getWrittenMessages() {
@@ -212,7 +215,6 @@ public abstract class AbstractIoService implements IoService {
 
     protected void increaseWrittenMessages() {
         writtenMessages.incrementAndGet();
-        scheduledWriteMessages.decrementAndGet();
     }
 
     public Set<WriteFuture> broadcast(Object message) {
