@@ -69,12 +69,11 @@ import java.util.Set;
  * <pre>
  * IoBuffer buf = IoBuffer.allocate(1024, true);
  * </pre>
- * or you can set your preference.
+ * or you can set the default buffer type.
  * <pre>
- * // Prefer heap buffers to direct buffers.
- * IoBuffer.setPreferDirectBuffer(false);
- *
- * // Try to allocate a heap buffer first, and then a direct buffer.
+ * // Allocate heap buffer by default.
+ * IoBuffer.setUseDirectBuffer(false);
+ * // A new heap buffer is returned.
  * IoBuffer buf = IoBuffer.allocate(1024);
  * </pre>
  * </p>
