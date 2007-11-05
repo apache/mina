@@ -441,9 +441,10 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
         // Set limitation for the number of written bytes for read-write
-        // fairness.  I doubled the maxReadBufferSize which yields best
-        // performance in my experience, while not breaking fairness much.
-        int maxWrittenBytes = session.getConfig().getMaxReadBufferSize() << 1;
+        // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
+        // performance in my experience while not breaking fairness much.
+        int maxWrittenBytes = session.getConfig().getMaxReadBufferSize() +
+                              (session.getConfig().getMaxReadBufferSize() >>> 1);
         int writtenBytes = 0;
 
         do {
