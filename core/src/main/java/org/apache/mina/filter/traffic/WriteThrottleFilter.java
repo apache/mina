@@ -433,10 +433,10 @@ public class WriteThrottleFilter extends IoFilterAdapter {
             buf.append(getGlobalScheduledWriteMessages());
             buf.append(" / ");
             buf.append(mGlobal);
-            buf.append(" msgs.");
+            buf.append(" msgs, ");
         } else {
             buf.append(getGlobalScheduledWriteMessages());
-            buf.append(" / unlimited msgs.");
+            buf.append(" / unlimited msgs, ");
         }
         
         if (bGlobal != 0) {
