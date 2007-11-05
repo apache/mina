@@ -248,7 +248,7 @@ class SocketIoProcessor {
                     while ((ret = ch.read(buf.buf())) > 0) {
                         readBytes += ret;
                     }
-                    if (readBytes != 0) {
+                    if (readBytes != 0 || ret < 0) {
                         break;
                     }
                 }
