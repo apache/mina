@@ -29,10 +29,11 @@ import java.util.Set;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.common.WriteTimeoutException;
+import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.Queue;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -408,11 +409,16 @@ class SocketIoProcessor {
     }
 
     private boolean doFlush(SocketSessionImpl session) throws IOException {
+        SocketChannel ch = session.getChannel();
+        if (!ch.isConnected()) {
+            scheduleRemove(session);
+            return false;
+        }
+        
         // Clear OP_WRITE
         SelectionKey key = session.getSelectionKey();
         key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
 
-        SocketChannel ch = session.getChannel();
         Queue writeRequestQueue = session.getWriteRequestQueue();
 
         int writtenBytes = 0;
@@ -444,9 +450,7 @@ class SocketIoProcessor {
                     continue;
                 }
     
-                if (key.isWritable()) {
-                    writtenBytes += ch.write(buf.buf());
-                }
+                writtenBytes += ch.write(buf.buf());
     
                 if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
