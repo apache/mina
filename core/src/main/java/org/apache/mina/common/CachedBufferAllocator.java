@@ -22,9 +22,10 @@ package org.apache.mina.common;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+
+import org.apache.mina.util.CircularQueue;
 
 /**
  * An {@link IoBufferAllocator} that caches the buffers which are likely to
@@ -68,9 +69,9 @@ public class CachedBufferAllocator implements IoBufferAllocator {
                 Map<Integer, Queue<ByteBuffer>> queues =
                     new HashMap<Integer, Queue<ByteBuffer>>();
                 for (int i = 0; i < 31; i ++) {
-                    queues.put(1 << i, new LinkedList<ByteBuffer>());
+                    queues.put(1 << i, new CircularQueue<ByteBuffer>(MAX_POOL_SIZE));
                 }
-                queues.put(Integer.MAX_VALUE, new LinkedList<ByteBuffer>());
+                queues.put(Integer.MAX_VALUE, new CircularQueue<ByteBuffer>(MAX_POOL_SIZE));
                 return queues;
             }
         };
