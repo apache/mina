@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filter.executor;
 
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 
@@ -28,6 +27,7 @@ import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.util.CircularQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +128,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
     private static class SessionBuffer {
         private final IoSession session;
 
-        private final Queue<IoFilterEvent> eventQueue = new LinkedList<IoFilterEvent>();
+        private final Queue<IoFilterEvent> eventQueue = new CircularQueue<IoFilterEvent>();
 
         private boolean processingCompleted = true;
 

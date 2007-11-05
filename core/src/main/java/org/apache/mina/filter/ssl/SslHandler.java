@@ -21,7 +21,6 @@ package org.apache.mina.filter.ssl;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -42,6 +41,7 @@ import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
+import org.apache.mina.util.CircularQueue;
 import org.slf4j.Logger;
 
 /**
@@ -64,7 +64,7 @@ class SslHandler {
 
     private final IoSession session;
 
-    private final Queue<IoFilterEvent> preHandshakeEventQueue = new LinkedList<IoFilterEvent>();
+    private final Queue<IoFilterEvent> preHandshakeEventQueue = new CircularQueue<IoFilterEvent>();
 
     private final Queue<IoFilterEvent> filterWriteEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
 

@@ -21,7 +21,6 @@ package org.apache.mina.filter.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
 import java.util.Queue;
 
 import org.apache.mina.common.AttributeKey;
@@ -32,6 +31,7 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.util.CircularQueue;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -90,7 +90,7 @@ public class StreamWriteFilter extends IoFilterAdapter {
         if (session.getAttribute(CURRENT_STREAM) != null) {
             Queue<WriteRequest> queue = getWriteRequestQueue(session);
             if (queue == null) {
-                queue = new LinkedList<WriteRequest>();
+                queue = new CircularQueue<WriteRequest>();
                 session.setAttribute(WRITE_REQUEST_QUEUE, queue);
             }
             queue.add(writeRequest);

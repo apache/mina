@@ -19,10 +19,10 @@
  */
 package org.apache.mina.filter.codec;
 
-import java.util.LinkedList;
 import java.util.Queue;
 
 import org.apache.mina.common.IoBuffer;
+import org.apache.mina.util.CircularQueue;
 
 /**
  * A {@link ProtocolEncoderOutput} based on queue.
@@ -32,7 +32,7 @@ import org.apache.mina.common.IoBuffer;
  */
 public abstract class AbstractProtocolEncoderOutput implements
         ProtocolEncoderOutput {
-    private final Queue<IoBuffer> bufferQueue = new LinkedList<IoBuffer>();
+    private final Queue<IoBuffer> bufferQueue = new CircularQueue<IoBuffer>();
 
     public AbstractProtocolEncoderOutput() {
     }
