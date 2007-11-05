@@ -433,8 +433,9 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
 
         // Set limitation for the number of written bytes for read-write
-        // fairness.
-        int maxWrittenBytes = session.getConfig().getMaxReadBufferSize();
+        // fairness.  I doubled the maxReadBufferSize which yields best
+        // performance in my experience, while not breaking fairness much.
+        int maxWrittenBytes = session.getConfig().getMaxReadBufferSize() << 1;
         int writtenBytes = 0;
 
         do {
@@ -445,6 +446,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 break;
             }
 
+            long localWrittenBytes;
             Object message = req.getMessage();
             if (message instanceof FileRegion) {
                 FileRegion region = (FileRegion) message;
@@ -456,16 +458,8 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     continue;
                 }
 
-                long localWrittenBytes = transferFile(session, region);
+                localWrittenBytes = transferFile(session, region);
                 region.setPosition(region.getPosition() + localWrittenBytes);
-                writtenBytes += localWrittenBytes;
-
-                if (region.getCount() > 0 || writtenBytes >= maxWrittenBytes) {
-                    // Kernel buffer is full or wrote too much.
-                    setOpWrite(session, true);
-                    return false;
-                }
-
             } else {
                 IoBuffer buf = (IoBuffer) message;
                 if (buf.remaining() == 0) {
@@ -476,13 +470,15 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                     continue;
                 }
 
-                writtenBytes += write(session, buf);
+                localWrittenBytes = write(session, buf);
+            }
+            
+            writtenBytes += localWrittenBytes;
 
-                if (buf.hasRemaining() || writtenBytes >= maxWrittenBytes) {
-                    // Kernel buffer is full or wrote too much.
-                    setOpWrite(session, true);
-                    return false;
-                }
+            if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
+                // Kernel buffer is full or wrote too much.
+                setOpWrite(session, true);
+                return false;
             }
         } while (writtenBytes < maxWrittenBytes);
 
