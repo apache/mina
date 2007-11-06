@@ -31,6 +31,7 @@ import java.util.concurrent.Executor;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteTimeoutException;
 import org.apache.mina.common.IoFilter.WriteRequest;
 import org.apache.mina.util.NamePreservingRunnable;
@@ -43,7 +44,13 @@ import org.apache.mina.util.NamePreservingRunnable;
  */
 class SocketIoProcessor {
 
-    private static final int IO_SPIN_COUNT = 3;
+    /**
+     * The maximum loop count for a write operation until
+     * {@link #write(IoSession, IoBuffer)} returns non-zero value.
+     * It is similar to what a spin lock is for in concurrency programming.
+     * It improves memory utilization and write throughput significantly.
+     */
+    private static final int WRITE_SPIN_COUNT = 256;
     
     private final Object lock = new Object();
 
@@ -205,16 +212,11 @@ class SocketIoProcessor {
 
         try {
             int readBytes = 0;
-            int ret = 0;
+            int ret;
 
             try {
-                for (int i = IO_SPIN_COUNT; i > 0; i --) {
-                    while ((ret = ch.read(buf.buf())) > 0) {
-                        readBytes += ret;
-                    }
-                    if (readBytes != 0 || ret < 0) {
-                        break;
-                    }
+                while ((ret = ch.read(buf.buf())) > 0) {
+                    readBytes += ret;
                 }
             } finally {
                 buf.flip();
@@ -408,7 +410,7 @@ class SocketIoProcessor {
                 }
 
                 int localWrittenBytes = 0;
-                for (int i = IO_SPIN_COUNT; i > 0; i --) {
+                for (int i = WRITE_SPIN_COUNT; i > 0; i --) {
                     localWrittenBytes = ch.write(buf.buf());
                     if (localWrittenBytes != 0 || !buf.hasRemaining()) {
                         break;
