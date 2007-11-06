@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common;
 
+import java.util.Comparator;
 import java.util.Queue;
 
 /**
@@ -28,6 +29,18 @@ import java.util.Queue;
  * @version $Rev$, $Date$
  */
 public interface IoSessionDataStructureFactory {
+    /**
+     * Returns an {@link IoSessionAttributeMap} which is going to be associated
+     * with the specified <tt>session</tt>.
+     */
     IoSessionAttributeMap getAttributeMap(IoSession session) throws Exception;
+    
+    /**
+     * Returns an {@link Queue} of {@link WriteRequest}s which is going to be
+     * associated with the specified <tt>session</tt>.  Please note that the
+     * returned implementation must robust enough to deal with various types,
+     * especially when you are going to implement a priority queue which involves
+     * {@link Comparator}.
+     */
     Queue<WriteRequest> getWriteRequestQueue(IoSession session) throws Exception;
 }
