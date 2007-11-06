@@ -404,6 +404,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 // The first unwritten empty buffer must be
                 // forwarded to the filter chain.
                 if (buf.hasRemaining()) {
+                    buf.reset();
                     failedRequests.add(req);
                 } else {
                     session.getFilterChain().fireMessageSent(req);
