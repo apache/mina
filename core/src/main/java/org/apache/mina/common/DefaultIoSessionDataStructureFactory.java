@@ -23,24 +23,34 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
+import org.apache.mina.util.CircularQueue;
+import org.apache.mina.util.SynchronizedQueue;
+
 /**
- * The default {@link IoSessionAttributeMapFactory} implementation
+ * The default {@link IoSessionDataStructureFactory} implementation
  * that creates a new {@link HashMap}-based {@link IoSessionAttributeMap}
- * instance per {@link IoSession}.
+ * instance and a new synchronized {@link CircularQueue} instance per
+ * {@link IoSession}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoSessionAttributeMapFactory implements
-        IoSessionAttributeMapFactory {
+public class DefaultIoSessionDataStructureFactory implements
+        IoSessionDataStructureFactory {
 
     public IoSessionAttributeMap getAttributeMap(IoSession session)
             throws Exception {
         return new DefaultIoSessionAttributeMap();
     }
     
+    public Queue<WriteRequest> getWriteRequestQueue(IoSession session)
+            throws Exception {
+        return new SynchronizedQueue<WriteRequest>(new CircularQueue<WriteRequest>(128));
+    }
+
     private static class DefaultIoSessionAttributeMap implements IoSessionAttributeMap {
 
         private final Map<Object, Object> attributes =

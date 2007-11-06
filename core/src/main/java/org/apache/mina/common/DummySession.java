@@ -116,7 +116,9 @@ public class DummySession extends AbstractIoSession {
         };
 
         try {
-            setAttributeMap(new DefaultIoSessionAttributeMapFactory().getAttributeMap(this));
+            IoSessionDataStructureFactory factory = new DefaultIoSessionDataStructureFactory();
+            setAttributeMap(factory.getAttributeMap(this));
+            setWriteRequestQueue(factory.getWriteRequestQueue(this));
         } catch (Exception e) {
             throw new InternalError();
         }

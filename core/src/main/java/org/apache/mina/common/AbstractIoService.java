@@ -43,8 +43,8 @@ public abstract class AbstractIoService implements IoService {
      */
     private IoHandler handler;
     
-    private IoSessionAttributeMapFactory sessionAttributeMapFactory =
-        new DefaultIoSessionAttributeMapFactory();
+    private IoSessionDataStructureFactory sessionDataStructureFactory =
+        new DefaultIoSessionDataStructureFactory();
 
     /**
      * Maintains the {@link IoServiceListener}s of this service.
@@ -140,21 +140,21 @@ public abstract class AbstractIoService implements IoService {
         return sessionConfig;
     }
 
-    public IoSessionAttributeMapFactory getSessionAttributeMapFactory() {
-        return sessionAttributeMapFactory;
+    public IoSessionDataStructureFactory getSessionDataStructureFactory() {
+        return sessionDataStructureFactory;
     }
 
-    public void setSessionAttributeMapFactory(IoSessionAttributeMapFactory sessionAttributeMapFactory) {
-        if (sessionAttributeMapFactory == null) {
-            throw new NullPointerException("sessionAttributeMapFactory");
+    public void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory) {
+        if (sessionDataStructureFactory == null) {
+            throw new NullPointerException("sessionDataStructureFactory");
         }
 
         if (isActive()) {
             throw new IllegalStateException(
-                    "sessionAttributeMapFactory cannot be set while the service is active.");
+                    "sessionDataStructureFactory cannot be set while the service is active.");
         }
 
-        this.sessionAttributeMapFactory = sessionAttributeMapFactory;
+        this.sessionDataStructureFactory = sessionDataStructureFactory;
     }
 
     public long getReadBytes() {
@@ -240,15 +240,25 @@ public abstract class AbstractIoService implements IoService {
         // Every property but attributeMap should be set now.
         // Now initialize the attributeMap.  The reason why we initialize
         // the attributeMap at last is to make sure all session properties
-        // such as remoteAddress are provided to IoSessionAttributeMapFactory.
+        // such as remoteAddress are provided to IoSessionDataStructureFactory.
         try {
             ((AbstractIoSession) session).setAttributeMap(
-                    session.getService().getSessionAttributeMapFactory().getAttributeMap(session));
+                    session.getService().getSessionDataStructureFactory().getAttributeMap(session));
         } catch (IoSessionInitializationException e) {
             throw e;
         } catch (Exception e) {
             throw new IoSessionInitializationException(
-                    "Failed to initialize sessionAttributeMap.", e);
+                    "Failed to initialize an attributeMap.", e);
+        }
+
+        try {
+            ((AbstractIoSession) session).setWriteRequestQueue(
+                    session.getService().getSessionDataStructureFactory().getWriteRequestQueue(session));
+        } catch (IoSessionInitializationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IoSessionInitializationException(
+                    "Failed to initialize a writeRequestQueue.", e);
         }
 
         if (future != null && future instanceof ConnectFuture) {

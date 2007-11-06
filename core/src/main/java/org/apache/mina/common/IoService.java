@@ -175,14 +175,14 @@ public interface IoService {
     Set<WriteFuture> broadcast(Object message);
     
     /**
-     * Returns the {@link IoSessionAttributeMapFactory} that provides an
-     * {@link IoSessionAttributeMap} for a new session created by this service.
+     * Returns the {@link IoSessionDataStructureFactory} that provides
+     * related data structures for a new session created by this service.
      */
-    IoSessionAttributeMapFactory getSessionAttributeMapFactory();
+    IoSessionDataStructureFactory getSessionDataStructureFactory();
     
     /**
-     * Sets the {@link IoSessionAttributeMapFactory} that provides an
-     * {@link IoSessionAttributeMap} for a new session created by this service.
+     * Sets the {@link IoSessionDataStructureFactory} that provides
+     * related data structures for a new session created by this service.
      */
-    void setSessionAttributeMapFactory(IoSessionAttributeMapFactory sessionAttributeMapFactory);
+    void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory);
 }

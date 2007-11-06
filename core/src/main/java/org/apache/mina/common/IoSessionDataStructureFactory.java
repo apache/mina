@@ -19,6 +19,15 @@
  */
 package org.apache.mina.common;
 
-public interface IoSessionAttributeMapFactory {
+import java.util.Queue;
+
+/**
+ * Provides data structures to a newly created session.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
+public interface IoSessionDataStructureFactory {
     IoSessionAttributeMap getAttributeMap(IoSession session) throws Exception;
+    Queue<WriteRequest> getWriteRequestQueue(IoSession session) throws Exception;
 }

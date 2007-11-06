@@ -24,14 +24,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.FileChannel;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.mina.util.CircularQueue;
-import org.apache.mina.util.SynchronizedQueue;
 
 
 /**
@@ -59,37 +58,9 @@ public abstract class AbstractIoSession implements IoSession {
         new DefaultWriteRequest(new Object());
 
     private final Object lock = new Object();
-
+    
     private IoSessionAttributeMap attributes;
-
-    private final Queue<WriteRequest> writeRequestQueue =
-        new SynchronizedQueue<WriteRequest>(new CircularQueue<WriteRequest>(512)) {
-
-            private static final long serialVersionUID = 6579730560333933524L;
-
-            // Discard close request offered by closeOnFlush() silently.
-            @Override
-            public synchronized WriteRequest peek() {
-                WriteRequest answer = super.peek();
-                if (answer == CLOSE_REQUEST) {
-                    AbstractIoSession.this.close();
-                    clear();
-                    answer = null;
-                }
-                return answer;
-            }
-
-            @Override
-            public synchronized WriteRequest poll() {
-                WriteRequest answer = super.poll();
-                if (answer == CLOSE_REQUEST) {
-                    AbstractIoSession.this.close();
-                    clear();
-                    answer = null;
-                }
-                return answer;
-            }
-    };
+    private Queue<WriteRequest> writeRequestQueue;
 
     private final long creationTime;
 
@@ -99,7 +70,6 @@ public abstract class AbstractIoSession implements IoSession {
     private final CloseFuture closeFuture = new DefaultCloseFuture(this);
 
     private volatile boolean closing;
-
     private volatile TrafficMask trafficMask = TrafficMask.ALL;
 
     // Status variables
@@ -314,6 +284,10 @@ public abstract class AbstractIoSession implements IoSession {
 
     protected void setAttributeMap(IoSessionAttributeMap attributes) {
         this.attributes = attributes;
+    }
+    
+    protected void setWriteRequestQueue(Queue<WriteRequest> writeRequestQueue) {
+        this.writeRequestQueue = new WriteRequestQueue(writeRequestQueue);
     }
 
     public TrafficMask getTrafficMask() {
@@ -612,6 +586,100 @@ public abstract class AbstractIoSession implements IoSession {
             return "null";
         } else {
             return tm.getName();
+        }
+    }
+    
+    private class WriteRequestQueue implements Queue<WriteRequest> {
+        
+        private final Queue<WriteRequest> q;
+        
+        public WriteRequestQueue(Queue<WriteRequest> q) {
+            this.q = q;
+        }
+
+        // Discard close request offered by closeOnFlush() silently.
+        public WriteRequest peek() {
+            WriteRequest answer = q.peek();
+            if (answer == CLOSE_REQUEST) {
+                AbstractIoSession.this.close();
+                clear();
+                answer = null;
+            }
+            return answer;
+        }
+
+        public synchronized WriteRequest poll() {
+            WriteRequest answer = q.poll();
+            if (answer == CLOSE_REQUEST) {
+                AbstractIoSession.this.close();
+                clear();
+                answer = null;
+            }
+            return answer;
+        }
+
+        public boolean add(WriteRequest e) {
+            return q.add(e);
+        }
+
+        public WriteRequest element() {
+            return q.element();
+        }
+
+        public boolean offer(WriteRequest e) {
+            return q.offer(e);
+        }
+
+        public WriteRequest remove() {
+            return q.remove();
+        }
+
+        public boolean addAll(Collection<? extends WriteRequest> c) {
+            return q.addAll(c);
+        }
+
+        public void clear() {
+            q.clear();
+        }
+
+        public boolean contains(Object o) {
+            return q.contains(o);
+        }
+
+        public boolean containsAll(Collection<?> c) {
+            return q.containsAll(c);
+        }
+
+        public boolean isEmpty() {
+            return q.isEmpty();
+        }
+
+        public Iterator<WriteRequest> iterator() {
+            return q.iterator();
+        }
+
+        public boolean remove(Object o) {
+            return q.remove(o);
+        }
+
+        public boolean removeAll(Collection<?> c) {
+            return q.removeAll(c);
+        }
+
+        public boolean retainAll(Collection<?> c) {
+            return q.retainAll(c);
+        }
+
+        public int size() {
+            return q.size();
+        }
+
+        public Object[] toArray() {
+            return q.toArray();
+        }
+
+        public <T> T[] toArray(T[] a) {
+            return q.toArray(a);
         }
     }
 }
