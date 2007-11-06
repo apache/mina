@@ -440,8 +440,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
                 throw new IllegalStateException("sessionBufferSize < 0");
             }
     
-            if (state.suspendedRead &&
-                (maxSessionBufferSize == 0 || sessionBufferSize < maxSessionBufferSize) &&
+            if ((maxSessionBufferSize == 0 || sessionBufferSize < maxSessionBufferSize) &&
                 (maxServiceBufferSize == 0 || serviceBufferSize < maxServiceBufferSize) &&
                 (maxGlobalBufferSize  == 0 || globalBufferSize  < maxGlobalBufferSize)) {
                 state.suspendedRead = false;
