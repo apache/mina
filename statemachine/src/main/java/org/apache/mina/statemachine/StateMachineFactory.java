@@ -32,10 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.statemachine.annotation.IoFilterTransition;
-import org.apache.mina.statemachine.annotation.IoFilterTransitions;
-import org.apache.mina.statemachine.annotation.IoHandlerTransition;
-import org.apache.mina.statemachine.annotation.IoHandlerTransitions;
 import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.event.Event;
@@ -108,40 +104,6 @@ public class StateMachineFactory {
      */
     public static StateMachine create(String start, Object handler, Object... handlers) {
         return create(Transition.class, Transitions.class, start, handler, handlers);
-    }
-    
-    /**
-     * Creates a new {@link StateMachine} from the specified handler objects and
-     * using the {@link State} with the specified id as start state. This method
-     * should be used when using the {@link IoHandlerTransition} and
-     * {@link IoHandlerTransitions} annotations.
-     * 
-     * @param start the id of the start {@link State} to use.
-     * @param handler the first object containing the annotations describing the 
-     *        state machine.
-     * @param handlers zero or more additional objects containing the 
-     *        annotations describing the state machine.
-     * @return the {@link StateMachine} object.
-     */
-    public static StateMachine createForIoHandler(String start, Object handler, Object... handlers) {
-        return create(IoHandlerTransition.class, IoHandlerTransitions.class, start, handler, handlers);
-    }
-    
-    /**
-     * Creates a new {@link StateMachine} from the specified handler objects and
-     * using the {@link State} with the specified id as start state. This method
-     * should be used when using the {@link IoFilterTransition} and
-     * {@link IoFilterTransitions} annotations.
-     * 
-     * @param start the id of the start {@link State} to use.
-     * @param handler the first object containing the annotations describing the 
-     *        state machine.
-     * @param handlers zero or more additional objects containing the 
-     *        annotations describing the state machine.
-     * @return the {@link StateMachine} object.
-     */
-    public static StateMachine createForIoFilter(String start, Object handler, Object... handlers) {
-        return create(IoFilterTransition.class, IoFilterTransitions.class, start, handler, handlers);
     }
     
     /**

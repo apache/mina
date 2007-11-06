@@ -24,8 +24,8 @@ import java.net.InetSocketAddress;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineEncoder;
+import org.apache.mina.statemachine.IoHandlerStateMachineFactory;
 import org.apache.mina.statemachine.StateMachine;
-import org.apache.mina.statemachine.StateMachineFactory;
 import org.apache.mina.statemachine.StateMachineProxyFactory;
 import org.apache.mina.statemachine.context.IoSessionStateContextLookup;
 import org.apache.mina.statemachine.context.StateContext;
@@ -45,7 +45,7 @@ public class Main {
     private static final int PORT = 12345;
     
     private static IoHandler createIoHandler() {
-        StateMachine sm = StateMachineFactory.createForIoHandler(TapeDeckServer.EMPTY, new TapeDeckServer());
+        StateMachine sm = IoHandlerStateMachineFactory.create(TapeDeckServer.EMPTY, new TapeDeckServer());
         
         return (IoHandler) StateMachineProxyFactory.create(IoHandler.class, sm, 
                 new IoSessionStateContextLookup(new StateContextFactory() {

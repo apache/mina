@@ -37,10 +37,10 @@ public enum IoFilterEvents {
     SESSION_IDLE("sessionIdle"),
     MESSAGE_RECEIVED("messageReceived"),
     MESSAGE_SENT("messageSent"),
-    FILTER_CLOSE("filterClose"),
-    FILTER_WRITE("filterWrite"),
-    FILTER_SET_TRAFFIC_MASK("filterSetTrafficMask"),
-    EXCEPTION_CAUGHT("exceptionCaught");
+    EXCEPTION_CAUGHT("exceptionCaught"),
+    CLOSE("filterClose"),
+    WRITE("filterWrite"),
+    SET_TRAFFIC_MASK("filterSetTrafficMask");
 
     private final String value;
     
