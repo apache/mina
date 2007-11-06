@@ -276,7 +276,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         }
         
         private void free(ByteBuffer oldBuf) {
-            if (oldBuf == null || oldBuf.capacity() > ' ||
+            if (oldBuf == null || oldBuf.capacity() > maxCachedBufferSize ||
                 oldBuf.isReadOnly() || isDerived() ||
                 Thread.currentThread() != ownerThread) {
                 return;
