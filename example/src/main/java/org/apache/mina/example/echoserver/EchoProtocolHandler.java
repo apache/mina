@@ -21,12 +21,10 @@ package org.apache.mina.example.echoserver;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
-import org.apache.mina.common.WriteFuture;
 import org.apache.mina.filter.ssl.SslFilter;
 
 /**
@@ -69,11 +67,6 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
     public void messageReceived(IoSession session, Object message)
             throws Exception {
         // Write the received data back to remote peer
-        final IoBuffer src = (IoBuffer) message;
-        session.write(src.duplicate()).addListener(new IoFutureListener<WriteFuture>() {
-            public void operationComplete(WriteFuture future) {
-                src.free();
-            }
-        });
+        session.write(((IoBuffer) message).duplicate());
     }
 }

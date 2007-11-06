@@ -22,9 +22,7 @@ package org.apache.mina.example.echoserver;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-import org.apache.mina.common.CachedBufferAllocator;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.ssl.SslFilter;
@@ -48,8 +46,6 @@ public class Main {
         SocketAcceptor acceptor = new NioSocketAcceptor(Executors.newCachedThreadPool());
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
         
-        IoBuffer.setAllocator(new CachedBufferAllocator());
-
         // Add SSL filter if SSL is enabled.
         if (USE_SSL) {
             addSSLSupport(chain);
