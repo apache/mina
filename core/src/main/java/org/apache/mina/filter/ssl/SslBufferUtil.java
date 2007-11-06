@@ -110,17 +110,9 @@ class SslBufferUtil {
 
     private static ByteBuffer createBuffer(int capacity) {
         if (IoBuffer.isUseDirectBuffer()) {
-            try {
-                return ByteBuffer.allocateDirect(capacity);
-            } catch (OutOfMemoryError e) {
-                return ByteBuffer.allocate(capacity);
-            }
+            return ByteBuffer.allocateDirect(capacity);
         } else {
-            try {
-                return ByteBuffer.allocate(capacity);
-            } catch (OutOfMemoryError e) {
-                return ByteBuffer.allocateDirect(capacity);
-            }
+            return ByteBuffer.allocate(capacity);
         }
     }
 }
