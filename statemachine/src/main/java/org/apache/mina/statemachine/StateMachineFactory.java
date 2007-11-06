@@ -58,6 +58,14 @@ public class StateMachineFactory {
         this.transitionsAnnotation = transitionsAnnotation;
     }
     
+    /**
+     * Returns a new {@link StateMachineFactory} instance which creates 
+     * {@link StateMachine}s by reading the specified {@link Transition}
+     * equivalent annotation.
+     * 
+     * @param transitionAnnotation the {@link Transition} equivalent annotation.
+     * @return the {@link StateMachineFactory}.
+     */
     public static StateMachineFactory getInstance(Class<? extends Annotation> transitionAnnotation) {
         TransitionAnnotation a = transitionAnnotation.getAnnotation(TransitionAnnotation.class);
         if (a == null) {
