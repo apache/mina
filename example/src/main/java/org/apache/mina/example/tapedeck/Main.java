@@ -24,9 +24,10 @@ import java.net.InetSocketAddress;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineEncoder;
-import org.apache.mina.statemachine.IoHandlerStateMachineFactory;
 import org.apache.mina.statemachine.StateMachine;
+import org.apache.mina.statemachine.StateMachineFactory;
 import org.apache.mina.statemachine.StateMachineProxyFactory;
+import org.apache.mina.statemachine.annotation.IoHandlerTransition;
 import org.apache.mina.statemachine.context.IoSessionStateContextLookup;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.context.StateContextFactory;
@@ -34,8 +35,8 @@ import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
- * Simple example on how to build a state machine for MINA's {@link IoHandler}
- * interface.
+ * Simple example demonstrating how to build a state machine for MINA's 
+ * {@link IoHandler} interface.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -45,7 +46,8 @@ public class Main {
     private static final int PORT = 12345;
     
     private static IoHandler createIoHandler() {
-        StateMachine sm = IoHandlerStateMachineFactory.create(TapeDeckServer.EMPTY, new TapeDeckServer());
+        StateMachine sm = StateMachineFactory.getInstance(IoHandlerTransition.class)
+                                .create(TapeDeckServer.EMPTY, new TapeDeckServer());
         
         return (IoHandler) StateMachineProxyFactory.create(IoHandler.class, sm, 
                 new IoSessionStateContextLookup(new StateContextFactory() {

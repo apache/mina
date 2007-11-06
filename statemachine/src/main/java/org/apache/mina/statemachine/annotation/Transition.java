@@ -36,6 +36,7 @@ import org.apache.mina.statemachine.event.Event;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
+@TransitionAnnotation(Transitions.class)
 public @interface Transition {
     public static final String SELF = "__self__";
 

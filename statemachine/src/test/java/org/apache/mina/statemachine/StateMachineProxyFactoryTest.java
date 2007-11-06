@@ -99,7 +99,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
     public void testTapeDeckStateMachineAnnotations() throws Exception {
         TapeDeckStateMachineHandler handler = new TapeDeckStateMachineHandler();
 
-        StateMachine sm = StateMachineFactory.create(TapeDeckStateMachineHandler.S1, handler);
+        StateMachine sm = StateMachineFactory.getInstance(Transition.class).create(TapeDeckStateMachineHandler.S1, handler);
 
         TapeDeck player = (TapeDeck) StateMachineProxyFactory.create(TapeDeck.class, sm);
         player.insert("Kings of convenience - Riot on an empty street");

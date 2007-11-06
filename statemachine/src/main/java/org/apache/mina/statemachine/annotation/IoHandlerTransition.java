@@ -39,9 +39,8 @@ import org.apache.mina.statemachine.event.IoHandlerEvents;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
+@TransitionAnnotation(IoHandlerTransitions.class)
 public @interface IoHandlerTransition {
-    public static final String SELF = "__self__";
-
     /**
      * Specifies the ids of one or more events handled by the annotated method. If
      * not specified the handler method will be executed for any event.
@@ -59,7 +58,7 @@ public @interface IoHandlerTransition {
      * executing the annotated method. If not specified the {@link StateMachine}
      * will remain in the same state.
      */
-    String next() default SELF;
+    String next() default Transition.SELF;
 
     /**
      * The weight used to order handler annotations which match the same event 

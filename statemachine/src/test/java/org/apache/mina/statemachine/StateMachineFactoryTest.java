@@ -57,7 +57,7 @@ public class StateMachineFactoryTest extends TestCase {
 
     public void testCreate() throws Exception {
         States states = new States();
-        StateMachine sm = StateMachineFactory.create(States.A, states);
+        StateMachine sm = StateMachineFactory.getInstance(Transition.class).create(States.A, states);
 
         State a = sm.getState(States.A);
         State b = sm.getState(States.B);

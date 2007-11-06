@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.statemachine.annotation.Transition;
+import org.apache.mina.statemachine.annotation.TransitionAnnotation;
 import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.MethodTransition;
@@ -40,7 +41,7 @@ import org.apache.mina.statemachine.transition.MethodTransition;
 
 /**
  * Creates {@link StateMachine}s by reading {@link org.apache.mina.statemachine.annotation.State},
- * {@link Transition} and {@link Transitions} annotations from one or more arbitrary 
+ * {@link Transition} and {@link Transitions} (or equivalent) annotations from one or more arbitrary 
  * objects.
  * 
  *
@@ -48,8 +49,23 @@ import org.apache.mina.statemachine.transition.MethodTransition;
  * @version $Rev$, $Date$
  */
 public class StateMachineFactory {
+    private final Class<? extends Annotation> transitionAnnotation;
+    private final Class<? extends Annotation> transitionsAnnotation;
 
-    private StateMachineFactory() {
+    protected StateMachineFactory(Class<? extends Annotation> transitionAnnotation, 
+                Class<? extends Annotation> transitionsAnnotation) {
+        this.transitionAnnotation = transitionAnnotation;
+        this.transitionsAnnotation = transitionsAnnotation;
+    }
+    
+    public static StateMachineFactory getInstance(Class<? extends Annotation> transitionAnnotation) {
+        TransitionAnnotation a = transitionAnnotation.getAnnotation(TransitionAnnotation.class);
+        if (a == null) {
+            throw new IllegalArgumentException("The annotation class " 
+                    + transitionAnnotation + " has not been annotated with the " 
+                    + TransitionAnnotation.class.getName() + " annotation");
+        }
+        return new StateMachineFactory(transitionAnnotation, a.value());
     }
     
     /**
@@ -60,7 +76,7 @@ public class StateMachineFactory {
      *        state machine.
      * @return the {@link StateMachine} object.
      */
-    public static StateMachine create(Object handler) {
+    public StateMachine create(Object handler) {
         return create(handler, new Object[0]);
     }
 
@@ -73,7 +89,7 @@ public class StateMachineFactory {
      *        state machine.
      * @return the {@link StateMachine} object.
      */
-    public static StateMachine create(String start, Object handler) {
+    public StateMachine create(String start, Object handler) {
         return create(start, handler, new Object[0]);
     }
 
@@ -87,7 +103,7 @@ public class StateMachineFactory {
      *        annotations describing the state machine.
      * @return the {@link StateMachine} object.
      */
-    public static StateMachine create(Object handler, Object... handlers) {
+    public StateMachine create(Object handler, Object... handlers) {
         return create("start", handler, handlers);
     }
     
@@ -102,31 +118,7 @@ public class StateMachineFactory {
      *        annotations describing the state machine.
      * @return the {@link StateMachine} object.
      */
-    public static StateMachine create(String start, Object handler, Object... handlers) {
-        return create(Transition.class, Transitions.class, start, handler, handlers);
-    }
-    
-    /**
-     * Creates a new {@link StateMachine} from the specified handler objects and
-     * using the {@link State} with the specified id as start state. Use this
-     * method if you want to use your own alternatives to the {@link Transition}
-     * and {@link Transitions} annotations.
-     * 
-     * @param transitionAnnotation the annotation to use instead of {@link Transition}. 
-     *        The annotation must have the same parameters as {@link Transition} 
-     *        but the <code>on</code> parameter may be of an enum type instead of string.
-     * @param transitionsAnnotation the annotation to use instead of {@link Transitions}. 
-     *        The annotation must have the same parameters as {@link Transitions}. 
-     * @param start the id of the start {@link State} to use.
-     * @param handler the first object containing the annotations describing the 
-     *        state machine.
-     * @param handlers zero or more additional objects containing the 
-     *        annotations describing the state machine.
-     * @return the {@link StateMachine} object.
-     */
-    public static StateMachine create(Class<? extends Annotation> transitionAnnotation, 
-            Class<? extends Annotation> transitionsAnnotation, 
-            String start, Object handler, Object... handlers) {
+    public StateMachine create(String start, Object handler, Object... handlers) {
         
         Map<String, State> states = new HashMap<String, State>();
         List<Object> handlersList = new ArrayList<Object>(1 + handlers.length);
