@@ -385,6 +385,14 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
     
+    protected void increaseReadMessages() {
+        readMessages++;
+        lastWriteTime = System.currentTimeMillis();
+        if (getService() instanceof AbstractIoService) {
+            ((AbstractIoService) getService()).increaseReadMessages();
+        }
+    }
+
     protected void increaseWrittenBytesAndMessages(WriteRequest request) {
         Object message = request.getMessage();
         if (message instanceof IoBuffer) {
@@ -414,15 +422,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    protected void increaseReadMessages() {
-        readMessages++;
-        if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseReadMessages();
-        }
-    }
-
     protected void increaseWrittenMessages() {
         writtenMessages++;
+        lastWriteTime = System.currentTimeMillis();
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).increaseWrittenMessages();
         }
