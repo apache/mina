@@ -368,10 +368,12 @@ public abstract class BaseIoSession implements IoSession {
     
     public void increaseReadMessages() {
         readMessages++;
+        lastReadTime = System.currentTimeMillis();
     }
 
     public void increaseWrittenMessages() {
         writtenMessages++;
+        lastWriteTime = System.currentTimeMillis();
         scheduledWriteRequests.decrementAndGet();
     }
     
