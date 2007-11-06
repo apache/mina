@@ -61,41 +61,90 @@ import org.apache.mina.util.CircularQueue;
  */
 public class CachedBufferAllocator implements IoBufferAllocator {
 
-    // FIXME: Make these constructor params.
-    private static final int MAX_POOL_SIZE = 8;
-    private static final int MAX_CACHED_BUFFER_SIZE = 1 << 18; // 256KB
+    private static final int DEFAULT_MAX_POOL_SIZE = 8;
+    private static final int DEFAULT_MAX_CACHED_BUFFER_SIZE = 1 << 18; // 256KB
     
-    private static Map<Integer, Queue<CachedBuffer>> newPoolMap() {
+    private final int maxPoolSize;
+    private final int maxCachedBufferSize;
+
+    private final ThreadLocal<Map<Integer, Queue<CachedBuffer>>> heapBuffers;
+    private final ThreadLocal<Map<Integer, Queue<CachedBuffer>>> directBuffers;
+    
+    /**
+     * Creates a new instance with the default parameters
+     * ({@literal #DEFAULT_MAX_POOL_SIZE} and {@literal #DEFAULT_MAX_CACHED_BUFFER_SIZE}). 
+     */
+    public CachedBufferAllocator() {
+        this(DEFAULT_MAX_POOL_SIZE, DEFAULT_MAX_CACHED_BUFFER_SIZE);
+    }
+    
+    /**
+     * Creates a new instance.
+     * 
+     * @param maxPoolSize the maximum number of buffers with the same capacity per thread.
+     *                    <tt>0</tt> disables this limitation.
+     * @param maxCachedBufferSize the maximum capacity of a cached buffer.
+     *                            A buffer whose capacity is bigger than this value is
+     *                            not pooled. <tt>0</tt> disables this limitation.
+     */
+    public CachedBufferAllocator(int maxPoolSize, int maxCachedBufferSize) {
+        if (maxPoolSize < 0) {
+            throw new IllegalArgumentException("maxPoolSize: " + maxPoolSize);
+        }
+        if (maxCachedBufferSize < 0) {
+            throw new IllegalArgumentException("maxCachedBufferSize: " + maxCachedBufferSize);
+        }
+        
+        this.maxPoolSize = maxPoolSize;
+        this.maxCachedBufferSize = maxCachedBufferSize;
+        
+        this.heapBuffers = new ThreadLocal<Map<Integer, Queue<CachedBuffer>>>() {
+            @Override
+            protected Map<Integer, Queue<CachedBuffer>> initialValue() {
+                return newPoolMap();
+            }
+        };
+        this.directBuffers = new ThreadLocal<Map<Integer, Queue<CachedBuffer>>>() {
+            @Override
+            protected Map<Integer, Queue<CachedBuffer>> initialValue() {
+                return newPoolMap();
+            }
+        };
+    }
+    
+    /**
+     * Returns the maximum number of buffers with the same capacity per thread.
+     * <tt>0</tt> means 'no limitation'.
+     */
+    public int getMaxPoolSize() {
+        return maxPoolSize;
+    }
+
+    /**
+     * Returns the maximum capacity of a cached buffer.  A buffer whose
+     * capacity is bigger than this value is not pooled.  <tt>0</tt> means
+     * 'no limitation'.
+     */
+    public int getMaxCachedBufferSize() {
+        return maxCachedBufferSize;
+    }
+
+    private Map<Integer, Queue<CachedBuffer>> newPoolMap() {
         Map<Integer, Queue<CachedBuffer>> poolMap =
             new HashMap<Integer, Queue<CachedBuffer>>();
+        int poolSize = maxPoolSize == 0? DEFAULT_MAX_POOL_SIZE : maxPoolSize;
         for (int i = 0; i < 31; i ++) {
-            poolMap.put(1 << i, new CircularQueue<CachedBuffer>(MAX_POOL_SIZE));
+            poolMap.put(1 << i, new CircularQueue<CachedBuffer>(poolSize));
         }
-        poolMap.put(0, new CircularQueue<CachedBuffer>(MAX_POOL_SIZE));
-        poolMap.put(Integer.MAX_VALUE, new CircularQueue<CachedBuffer>(MAX_POOL_SIZE));
+        poolMap.put(0, new CircularQueue<CachedBuffer>(poolSize));
+        poolMap.put(Integer.MAX_VALUE, new CircularQueue<CachedBuffer>(poolSize));
         return poolMap;
     }
 
-    private final ThreadLocal<Map<Integer, Queue<CachedBuffer>>> heapBuffers =
-        new ThreadLocal<Map<Integer, Queue<CachedBuffer>>>() {
-            @Override
-            protected Map<Integer, Queue<CachedBuffer>> initialValue() {
-                return newPoolMap();
-            }
-    };
-        
-    private final ThreadLocal<Map<Integer, Queue<CachedBuffer>>> directBuffers =
-        new ThreadLocal<Map<Integer, Queue<CachedBuffer>>>() {
-            @Override
-            protected Map<Integer, Queue<CachedBuffer>> initialValue() {
-                return newPoolMap();
-            }
-    };
-            
     public IoBuffer allocate(int requestedCapacity, boolean direct) {
         int actualCapacity = normalizeCapacity(requestedCapacity);
         IoBuffer buf ;
-        if (actualCapacity > MAX_CACHED_BUFFER_SIZE) {
+        if (maxCachedBufferSize != 0 && actualCapacity > maxCachedBufferSize) {
             if (direct) {
                 buf = wrap(ByteBuffer.allocateDirect(actualCapacity));
             } else {
@@ -227,33 +276,27 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         }
         
         private void free(ByteBuffer oldBuf) {
-            if (oldBuf == null) {
-                return;
-            }
-            if (oldBuf.capacity() > MAX_CACHED_BUFFER_SIZE) {
-                return;
-            }
-            if (Thread.currentThread() != ownerThread) {
+            if (oldBuf == null || oldBuf.capacity() > ' ||
+                oldBuf.isReadOnly() || isDerived() ||
+                Thread.currentThread() != ownerThread) {
                 return;
             }
 
             // Add to the cache.
-            if (!oldBuf.isReadOnly() && !isDerived()) {
-                Queue<CachedBuffer> pool;
-                if (oldBuf.isDirect()) {
-                    pool = directBuffers.get().get(oldBuf.capacity());
-                } else {
-                    pool = heapBuffers.get().get(oldBuf.capacity());
-                }
-                
-                if (pool == null) {
-                    return;
-                }
+            Queue<CachedBuffer> pool;
+            if (oldBuf.isDirect()) {
+                pool = directBuffers.get().get(oldBuf.capacity());
+            } else {
+                pool = heapBuffers.get().get(oldBuf.capacity());
+            }
+            
+            if (pool == null) {
+                return;
+            }
 
-                // Restrict the size of the pool to prevent OOM.
-                if (pool.size() < MAX_POOL_SIZE) {
-                    pool.offer(new CachedBuffer(oldBuf, true));
-                }
+            // Restrict the size of the pool to prevent OOM.
+            if (maxPoolSize == 0 || pool.size() < maxPoolSize) {
+                pool.offer(new CachedBuffer(oldBuf, true));
             }
         }
     }
