@@ -92,21 +92,21 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             }
     };
             
-    public IoBuffer allocate(int capacity, boolean direct) {
-        capacity = normalizeCapacity(capacity);
+    public IoBuffer allocate(int requestedCapacity, boolean direct) {
+        int actualCapacity = normalizeCapacity(requestedCapacity);
         IoBuffer buf ;
-        if (capacity > MAX_CACHED_BUFFER_SIZE) {
+        if (actualCapacity > MAX_CACHED_BUFFER_SIZE) {
             if (direct) {
-                buf = wrap(ByteBuffer.allocateDirect(capacity));
+                buf = wrap(ByteBuffer.allocateDirect(actualCapacity));
             } else {
-                buf = wrap(ByteBuffer.allocate(capacity));
+                buf = wrap(ByteBuffer.allocate(actualCapacity));
             }
         } else {
             Queue<CachedBuffer> pool;
             if (direct) {
-                pool = directBuffers.get().get(capacity);
+                pool = directBuffers.get().get(actualCapacity);
             } else {
-                pool = heapBuffers.get().get(capacity);
+                pool = heapBuffers.get().get(actualCapacity);
             }
             
             // Recycle if possible.
@@ -117,12 +117,14 @@ public class CachedBufferAllocator implements IoBufferAllocator {
                 buf.order(ByteOrder.BIG_ENDIAN);
             } else {
                 if (direct) {
-                    buf = wrap(ByteBuffer.allocateDirect(capacity));
+                    buf = wrap(ByteBuffer.allocateDirect(actualCapacity));
                 } else {
-                    buf = wrap(ByteBuffer.allocate(capacity));
+                    buf = wrap(ByteBuffer.allocate(actualCapacity));
                 }
             }
         }
+        
+        buf.limit(requestedCapacity);
         return buf;
     }
     
@@ -226,6 +228,9 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         
         private void free(ByteBuffer oldBuf) {
             if (oldBuf == null) {
+                return;
+            }
+            if (oldBuf.capacity() > MAX_CACHED_BUFFER_SIZE) {
                 return;
             }
             if (Thread.currentThread() != ownerThread) {
