@@ -61,6 +61,7 @@ import org.apache.mina.util.CircularQueue;
  */
 public class CachedBufferAllocator implements IoBufferAllocator {
 
+    // FIXME: Make these constructor params.
     private static final int MAX_POOL_SIZE = 8;
     private static final int MAX_CACHED_BUFFER_SIZE = 1 << 18; // 256KB
     
