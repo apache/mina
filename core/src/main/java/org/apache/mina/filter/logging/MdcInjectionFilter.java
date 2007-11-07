@@ -94,7 +94,7 @@ public class MdcInjectionFilter extends WrappingFilter {
      * @see #setProperty(org.apache.mina.common.IoSession, String, String)
      */
     public MdcInjectionFilter(EnumSet<MdcKey> keys) {
-        this.mdcKeys = keys;
+        this.mdcKeys = keys.clone();
     }
 
     /**
