@@ -160,14 +160,17 @@ class SerialSessionImpl extends AbstractIoSession implements
 
     private void flushWrites() {
         for (; ;) {
-            WriteRequest req = getWriteRequestQueue().peek();
+            WriteRequest req = getCurrentWriteRequest();
             if (req == null) {
-                break;
+                req = getWriteRequestQueue().poll(this);
+                if (req == null) {
+                    break;
+                }
             }
 
             IoBuffer buf = (IoBuffer) req.getMessage();
             if (buf.remaining() == 0) {
-                getWriteRequestQueue().poll();
+                setCurrentWriteRequest(null);
                 buf.reset();
 
                 this.getFilterChain().fireMessageSent(req);
