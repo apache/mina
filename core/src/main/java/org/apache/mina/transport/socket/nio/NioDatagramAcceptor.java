@@ -44,6 +44,7 @@ import org.apache.mina.common.IoSessionRecycler;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.WriteRequestQueue;
 import org.apache.mina.transport.socket.DatagramAcceptor;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
@@ -366,7 +367,8 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
 
             try {
                 boolean flushedAll = flush(session);
-                if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.isScheduledForFlush()) {
+                if (flushedAll && !session.getWriteRequestQueue().isEmpty(session) &&
+                    !session.isScheduledForFlush()) {
                     scheduleFlush(session);
                 }
             } catch (IOException e) {
@@ -388,20 +390,24 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
 
         DatagramChannel ch = session.getChannel();
-        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
+        WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
 
         int writtenBytes = 0;
         int maxWrittenBytes = session.getConfig().getSendBufferSize() << 1;
         for (; ;) {
-            WriteRequest req = writeRequestQueue.peek();
+            WriteRequest req = session.getCurrentWriteRequest();
             if (req == null) {
-                break;
+                req = writeRequestQueue.poll(session);
+                if (req == null) {
+                    break;
+                }
+                session.setCurrentWriteRequest(req);
             }
 
             IoBuffer buf = (IoBuffer) req.getMessage();
             if (buf.remaining() == 0) {
-                // pop and fire event
-                writeRequestQueue.poll();
+                // Clear and fire event
+                session.setCurrentWriteRequest(null);
                 buf.reset();
                 session.getFilterChain().fireMessageSent(req);
                 continue;
@@ -420,8 +426,8 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
             } else {
                 key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
 
-                // pop and fire event
-                writeRequestQueue.poll();
+                // Clear and fire event
+                session.setCurrentWriteRequest(null);
                 writtenBytes += localWrittenBytes;
                 buf.reset();
                 session.getFilterChain().fireMessageSent(req);

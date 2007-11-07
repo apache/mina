@@ -24,9 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.FileChannel;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,8 +57,8 @@ public abstract class AbstractIoSession implements IoSession {
     private final Object lock = new Object();
     
     private IoSessionAttributeMap attributes;
-    private Queue<WriteRequest> writeRequestQueue;
-
+    private WriteRequestQueue writeRequestQueue;
+    private WriteRequest currentWriteRequest;
     private final long creationTime;
 
     /**
@@ -74,33 +71,22 @@ public abstract class AbstractIoSession implements IoSession {
 
     // Status variables
     private final AtomicBoolean scheduledForFlush = new AtomicBoolean();
-
     private final AtomicLong scheduledWriteBytes = new AtomicLong();
-
     private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
 
     private long readBytes;
-
     private long writtenBytes;
-
     private long readMessages;
-
     private long writtenMessages;
-
     private long lastReadTime;
-
     private long lastWriteTime;
 
     private int idleCountForBoth;
-
     private int idleCountForRead;
-
     private int idleCountForWrite;
 
     private long lastIdleTimeForBoth;
-
     private long lastIdleTimeForRead;
-
     private long lastIdleTimeForWrite;
 
     private boolean deferDecreaseReadBuffer = true;
@@ -161,7 +147,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     public CloseFuture closeOnFlush() {
-        getWriteRequestQueue().offer(CLOSE_REQUEST);
+        getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);
         return closeFuture;
     }
@@ -286,8 +272,9 @@ public abstract class AbstractIoSession implements IoSession {
         this.attributes = attributes;
     }
     
-    protected void setWriteRequestQueue(Queue<WriteRequest> writeRequestQueue) {
-        this.writeRequestQueue = new WriteRequestQueue(writeRequestQueue);
+    protected void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
+        this.writeRequestQueue =
+            new CloseRequestAwareWriteRequestQueue(writeRequestQueue);
     }
 
     public TrafficMask getTrafficMask() {
@@ -441,8 +428,16 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    protected Queue<WriteRequest> getWriteRequestQueue() {
+    protected WriteRequestQueue getWriteRequestQueue() {
         return writeRequestQueue;
+    }
+    
+    protected WriteRequest getCurrentWriteRequest() {
+        return currentWriteRequest;
+    }
+    
+    protected void setCurrentWriteRequest(WriteRequest currentWriteRequest) {
+        this.currentWriteRequest = currentWriteRequest;
     }
 
     protected void increaseReadBufferSize() {
@@ -589,97 +584,38 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
     
-    private class WriteRequestQueue implements Queue<WriteRequest> {
+    private class CloseRequestAwareWriteRequestQueue implements WriteRequestQueue {
         
-        private final Queue<WriteRequest> q;
+        private final WriteRequestQueue q;
         
-        public WriteRequestQueue(Queue<WriteRequest> q) {
+        public CloseRequestAwareWriteRequestQueue(WriteRequestQueue q) {
             this.q = q;
         }
 
-        // Discard close request offered by closeOnFlush() silently.
-        public WriteRequest peek() {
-            WriteRequest answer = q.peek();
+        public synchronized WriteRequest poll(IoSession session) {
+            WriteRequest answer = q.poll(session);
             if (answer == CLOSE_REQUEST) {
                 AbstractIoSession.this.close();
-                clear();
+                dispose(session);
                 answer = null;
             }
             return answer;
         }
-
-        public synchronized WriteRequest poll() {
-            WriteRequest answer = q.poll();
-            if (answer == CLOSE_REQUEST) {
-                AbstractIoSession.this.close();
-                clear();
-                answer = null;
-            }
-            return answer;
+        
+        public void offer(IoSession session, WriteRequest e) {
+            q.offer(session, e);
         }
 
-        public boolean add(WriteRequest e) {
-            return q.add(e);
+        public boolean isEmpty(IoSession session) {
+            return q.isEmpty(session);
+        }
+        
+        public void clear(IoSession session) {
+            q.clear(session);
         }
 
-        public WriteRequest element() {
-            return q.element();
-        }
-
-        public boolean offer(WriteRequest e) {
-            return q.offer(e);
-        }
-
-        public WriteRequest remove() {
-            return q.remove();
-        }
-
-        public boolean addAll(Collection<? extends WriteRequest> c) {
-            return q.addAll(c);
-        }
-
-        public void clear() {
-            q.clear();
-        }
-
-        public boolean contains(Object o) {
-            return q.contains(o);
-        }
-
-        public boolean containsAll(Collection<?> c) {
-            return q.containsAll(c);
-        }
-
-        public boolean isEmpty() {
-            return q.isEmpty();
-        }
-
-        public Iterator<WriteRequest> iterator() {
-            return q.iterator();
-        }
-
-        public boolean remove(Object o) {
-            return q.remove(o);
-        }
-
-        public boolean removeAll(Collection<?> c) {
-            return q.removeAll(c);
-        }
-
-        public boolean retainAll(Collection<?> c) {
-            return q.retainAll(c);
-        }
-
-        public int size() {
-            return q.size();
-        }
-
-        public Object[] toArray() {
-            return q.toArray();
-        }
-
-        public <T> T[] toArray(T[] a) {
-            return q.toArray(a);
+        public void dispose(IoSession session) {
+            q.dispose(session);
         }
     }
 }

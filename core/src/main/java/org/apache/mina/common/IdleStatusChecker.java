@@ -21,7 +21,6 @@ package org.apache.mina.common;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -137,12 +136,12 @@ public class IdleStatusChecker {
 
         AbstractIoSession s = (AbstractIoSession) session;
         if (writeTimeout > 0 && currentTime - lastIoTime >= writeTimeout &&
-                !s.getWriteRequestQueue().isEmpty()) {
-            Queue<WriteRequest> queue = s.getWriteRequestQueue();
-            WriteRequest request = queue.peek();
+                !s.getWriteRequestQueue().isEmpty(session)) {
+            WriteRequest request = s.getCurrentWriteRequest();
             if (request != null) {
+                s.setCurrentWriteRequest(null);
                 WriteTimeoutException cause = new WriteTimeoutException(request);
-                queue.poll().getFuture().setException(cause);
+                request.getFuture().setException(cause);
                 s.getFilterChain().fireExceptionCaught(cause);
                 // WriteException is an IOException, so we close the session.
                 s.close();

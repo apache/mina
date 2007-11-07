@@ -27,7 +27,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.apache.mina.util.CircularQueue;
-import org.apache.mina.util.SynchronizedQueue;
 
 /**
  * The default {@link IoSessionDataStructureFactory} implementation
@@ -46,9 +45,9 @@ public class DefaultIoSessionDataStructureFactory implements
         return new DefaultIoSessionAttributeMap();
     }
     
-    public Queue<WriteRequest> getWriteRequestQueue(IoSession session)
+    public WriteRequestQueue getWriteRequestQueue(IoSession session)
             throws Exception {
-        return new SynchronizedQueue<WriteRequest>(new CircularQueue<WriteRequest>(128));
+        return new DefaultWriteRequestQueue();
     }
 
     private static class DefaultIoSessionAttributeMap implements IoSessionAttributeMap {
@@ -169,6 +168,35 @@ public class DefaultIoSessionDataStructureFactory implements
         }
 
         public void dispose(IoSession session) throws Exception {
+        }
+    }
+    
+    private static class DefaultWriteRequestQueue implements WriteRequestQueue {
+
+        private final Queue<WriteRequest> q = new CircularQueue<WriteRequest>(128);
+        
+        public void dispose(IoSession session) {
+        }
+        
+        public void clear(IoSession session) {
+            q.clear();
+        }
+
+        public synchronized boolean isEmpty(IoSession session) {
+            return q.isEmpty();
+        }
+
+        public synchronized void offer(IoSession session, WriteRequest writeRequest) {
+            q.offer(writeRequest);
+        }
+
+        public synchronized WriteRequest poll(IoSession session) {
+            return q.poll();
+        }
+        
+        @Override
+        public String toString() {
+            return q.toString();
         }
     }
 }

@@ -282,8 +282,9 @@ public class TextLineDecoderTest extends TestCase {
         Assert.assertEquals("B", session.getDecoderOutputQueue().poll());
 
         // Make sure OOM is not thrown.
+        System.gc();
         long oldFreeMemory = Runtime.getRuntime().freeMemory();
-        in = IoBuffer.allocate(1048576 * 16).mark();
+        in = IoBuffer.allocate(1048576 * 16).sweep((byte) ' ').mark();
         for (int i = 0; i < 10; i ++) {
             decoder.decode(session, in.reset().mark(), out);
             Assert.assertEquals(0, session.getDecoderOutputQueue().size());

@@ -73,10 +73,12 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
 
     @Override
     public void clear() {
-        Arrays.fill(items, null);
-        first = 0;
-        last = 0;
-        full = false;
+        if (!isEmpty()) {
+            Arrays.fill(items, null);
+            first = 0;
+            last = 0;
+            full = false;
+        }
     }
 
     @SuppressWarnings("unchecked")

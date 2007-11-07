@@ -33,6 +33,7 @@ import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.WriteRequestQueue;
 import org.apache.mina.common.WriteToClosedSessionException;
 
 /**
@@ -168,15 +169,15 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     private class VmPipeIoProcessor implements IoProcessor {
         public void flush(IoSession session) {
             VmPipeSessionImpl s = (VmPipeSessionImpl) session;
-            Queue<WriteRequest> queue = s.getWriteRequestQueue();
-            if (queue.isEmpty()) {
+            WriteRequestQueue queue = s.getWriteRequestQueue();
+            if (queue.isEmpty(s)) {
                 return;
             }
             if (s.isConnected()) {
                 if (s.getLock().tryLock()) {
                     try {
                         WriteRequest req;
-                        while ((req = queue.poll()) != null) {
+                        while ((req = queue.poll(s)) != null) {
                             Object message = req.getMessage();
                             Object messageCopy = message;
                             if (message instanceof IoBuffer) {
@@ -200,7 +201,12 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                     flushPendingDataQueues(s);
                 }
             } else {
-                List<WriteRequest> failedRequests = new ArrayList<WriteRequest>(queue);
+                List<WriteRequest> failedRequests = new ArrayList<WriteRequest>();
+                WriteRequest req;
+                while ((req = queue.poll(s)) != null) {
+                    failedRequests.add(req);
+                }
+                
                 if (!failedRequests.isEmpty()) {
                     WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
                     for (WriteRequest r: failedRequests) {

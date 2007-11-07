@@ -632,7 +632,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 s.increaseScheduledWriteMessages();
             }
 
-            s.getWriteRequestQueue().add(writeRequest);
+            s.getWriteRequestQueue().offer(s, writeRequest);
             if (s.getTrafficMask().isWritable()) {
                 s.getProcessor().flush(s);
             }
@@ -683,10 +683,14 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 session.getHandler().sessionClosed(session);
             } finally {
                 try {
-                    ((AbstractIoSession) session).getAttributeMap().dispose(session);
+                    ((AbstractIoSession) session).getWriteRequestQueue().dispose(session);
                 } finally {
-                    // Remove all filters.
-                    session.getFilterChain().clear();
+                    try {
+                        ((AbstractIoSession) session).getAttributeMap().dispose(session);
+                    } finally {
+                        // Remove all filters.
+                        session.getFilterChain().clear();
+                    }
                 }
             }
         }

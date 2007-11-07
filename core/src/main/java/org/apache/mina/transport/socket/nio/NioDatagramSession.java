@@ -24,7 +24,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
-import java.util.Queue;
 
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
@@ -37,6 +36,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.WriteRequestQueue;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.transport.socket.DatagramSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -153,8 +153,18 @@ class NioDatagramSession extends NioSession implements DatagramSession {
     }
 
     @Override
-    protected Queue<WriteRequest> getWriteRequestQueue() {
+    protected WriteRequestQueue getWriteRequestQueue() {
         return super.getWriteRequestQueue();
+    }
+
+    @Override
+    protected WriteRequest getCurrentWriteRequest() {
+        return super.getCurrentWriteRequest();
+    }
+
+    @Override
+    protected void setCurrentWriteRequest(WriteRequest currentWriteRequest) {
+        super.setCurrentWriteRequest(currentWriteRequest);
     }
 
     @Override

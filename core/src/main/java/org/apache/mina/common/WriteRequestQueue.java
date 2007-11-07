@@ -19,29 +19,23 @@
  */
 package org.apache.mina.common;
 
-import java.util.Comparator;
 
 /**
- * Provides data structures to a newly created session.
+ * Stores {@link WriteRequest}s which are queued to an {@link IoSession}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoSessionDataStructureFactory {
-    /**
-     * Returns an {@link IoSessionAttributeMap} which is going to be associated
-     * with the specified <tt>session</tt>.  Please note that the returned
-     * implementation must be thread-safe.
-     */
-    IoSessionAttributeMap getAttributeMap(IoSession session) throws Exception;
+public interface WriteRequestQueue {
+
+    WriteRequest poll(IoSession session);
+    void offer(IoSession session, WriteRequest writeRequest);
+    boolean isEmpty(IoSession session);
+    void clear(IoSession session);
     
     /**
-     * Returns an {@link WriteRequest} which is going to be associated with
-     * the specified <tt>session</tt>.  Please note that the returned
-     * implementation must be thread-safe and robust enough to deal
-     * with various messages types (even what you didn't expect at all),
-     * especially when you are going to implement a priority queue which
-     * involves {@link Comparator}.
+     * Disposes any releases associated with the specified session.
+     * This method is invoked on disconnection.
      */
-    WriteRequestQueue getWriteRequestQueue(IoSession session) throws Exception;
+    void dispose(IoSession session);
 }

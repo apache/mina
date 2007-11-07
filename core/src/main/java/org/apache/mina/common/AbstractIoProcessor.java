@@ -364,7 +364,8 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             case OPEN:
                 try {
                     boolean flushedAll = flush(session);
-                    if (flushedAll && !session.getWriteRequestQueue().isEmpty() && !session.isScheduledForFlush()) {
+                    if (flushedAll && !session.getWriteRequestQueue().isEmpty(session) &&
+                        !session.isScheduledForFlush()) {
                         scheduleFlush(session);
                     }
                 } catch (Exception e) {
@@ -387,12 +388,12 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     }
 
     private void clearWriteRequestQueue(AbstractIoSession session) {
-        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
+        WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
         
         List<WriteRequest> failedRequests = new ArrayList<WriteRequest>();
 
-        if ((req = writeRequestQueue.poll()) != null) {
+        if ((req = writeRequestQueue.poll(session)) != null) {
             Object m = req.getMessage();
             if (m instanceof IoBuffer) {
                 IoBuffer buf = (IoBuffer) req.getMessage();
@@ -410,7 +411,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             }
 
             // Discard others.
-            while ((req = writeRequestQueue.poll()) != null) {
+            while ((req = writeRequestQueue.poll(session)) != null) {
                 failedRequests.add(req);
             }
         }
@@ -435,7 +436,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         // Clear OP_WRITE
         setOpWrite(session, false);
 
-        Queue<WriteRequest> writeRequestQueue = session.getWriteRequestQueue();
+        WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
 
         // Set limitation for the number of written bytes for read-write
         // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
@@ -446,10 +447,13 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
         do {
             // Check for pending writes.
-            WriteRequest req = writeRequestQueue.peek();
-
+            WriteRequest req = session.getCurrentWriteRequest();
             if (req == null) {
-                break;
+                req = writeRequestQueue.poll(session);
+                if (req == null) {
+                    break;
+                }
+                session.setCurrentWriteRequest(req);
             }
 
             long localWrittenBytes = 0;
@@ -458,8 +462,8 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 FileRegion region = (FileRegion) message;
 
                 if (region.getCount() <= 0) {
-                    // File has been sent, remove from queue
-                    writeRequestQueue.poll();
+                    // File has been sent, clear the current request.
+                    session.setCurrentWriteRequest(null);
                     session.getFilterChain().fireMessageSent(req);
                     continue;
                 }
@@ -469,8 +473,8 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             } else {
                 IoBuffer buf = (IoBuffer) message;
                 if (buf.remaining() == 0) {
-                    // Buffer has been completely sent, remove request form queue
-                    writeRequestQueue.poll();
+                    // Buffer has been sent, clear the current request.
+                    session.setCurrentWriteRequest(null);
                     buf.reset();
                     session.getFilterChain().fireMessageSent(req);
                     continue;
@@ -518,7 +522,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                 try {
                     setOpWrite(
                             session,
-                            !session.getWriteRequestQueue().isEmpty() &&
+                            !session.getWriteRequestQueue().isEmpty(session) &&
                                     (mask & SelectionKey.OP_WRITE) != 0);
                 } catch (Exception e) {
                     session.getFilterChain().fireExceptionCaught(e);

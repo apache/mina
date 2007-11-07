@@ -19,7 +19,6 @@
  */
 package org.apache.mina.transport.vmpipe;
 
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
@@ -34,7 +33,7 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.WriteRequestQueue;
 
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
@@ -153,7 +152,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     }
 
     @Override
-    protected Queue<WriteRequest> getWriteRequestQueue() {
+    protected WriteRequestQueue getWriteRequestQueue() {
         return super.getWriteRequestQueue();
     }
 
