@@ -51,7 +51,9 @@ public class Main {
                 new InetSocketAddress(args[0], Integer.parseInt(args[1])));
 
         // Wait for the connection attempt to be finished.
-        cf.await();
-        cf.getSession();
+        cf.awaitUninterruptibly();
+        cf.getSession().getCloseFuture().awaitUninterruptibly();
+        
+        connector.dispose();
     }
 }

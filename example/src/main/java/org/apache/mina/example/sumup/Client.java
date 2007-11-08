@@ -94,5 +94,7 @@ public class Client {
 
         // wait until the summation is done
         session.getCloseFuture().awaitUninterruptibly();
+        
+        connector.dispose();
     }
 }
