@@ -46,6 +46,22 @@ import org.slf4j.LoggerFactory;
  * <li>A public constructor with one {@link Executor} parameter.</li>
  * <li>A public default constructor</li>
  * </ol>
+ * The following is an example for the NIO socket transport:
+ * <pre><code>
+ * // Create a shared pool.
+ * SimpleIoProcessorPool pool = new SimpleIoProcessorPool(NioProcessor.class, 16);
+ * 
+ * // Create two services that share the same pool.
+ * SocketAcceptor acceptor = new NioSocketAcceptor(pool);
+ * SocketConnector connector = new NioSocketConnector(pool);
+ * 
+ * ...
+ * 
+ * // Release related resorcese.
+ * connector.dispose();
+ * acceptor.dispose();
+ * pool.dispose();
+ * </code></pre>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
