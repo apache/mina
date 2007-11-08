@@ -110,7 +110,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
                         + session.getRemoteAddress());
             }
 
-            getExecutor().execute(new ProcessEventsRunnable(buf));
+            getExecutor().execute(buf);
         }
     }
 
@@ -125,34 +125,25 @@ public class ExecutorFilter extends AbstractExecutorFilter {
         }
     }
 
-    private static class SessionBuffer {
+    private class SessionBuffer implements Runnable {
+        
         private final IoSession session;
-
         private final Queue<IoFilterEvent> eventQueue = new CircularQueue<IoFilterEvent>();
-
         private boolean processingCompleted = true;
 
         private SessionBuffer(IoSession session) {
             this.session = session;
         }
-    }
-
-    private class ProcessEventsRunnable implements Runnable {
-        private final SessionBuffer buffer;
-
-        ProcessEventsRunnable(SessionBuffer buffer) {
-            this.buffer = buffer;
-        }
-
+        
         public void run() {
             while (true) {
                 IoFilterEvent event;
 
-                synchronized (buffer.eventQueue) {
-                    event = buffer.eventQueue.poll();
+                synchronized (eventQueue) {
+                    event = eventQueue.poll();
 
                     if (event == null) {
-                        buffer.processingCompleted = true;
+                        processingCompleted = true;
                         break;
                     }
                 }
@@ -162,7 +153,7 @@ public class ExecutorFilter extends AbstractExecutorFilter {
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Exiting since queue is empty for "
-                        + buffer.session.getRemoteAddress());
+                        + session.getRemoteAddress());
             }
         }
     }
