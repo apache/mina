@@ -32,6 +32,14 @@ package org.apache.mina.common;
  */
 public interface IoProcessor<T extends IoSession> {
     /**
+     * Requests this processor to release any resources allocated by
+     * this processor.  Please note that {@link IoProcessor} implementation
+     * will release all resources eventually, but the resources will not be
+     * released as long as there are any sessions managed by this processor.
+     */
+    void dispose();
+    
+    /**
      * Adds the specified {@code session} to the I/O processor so that
      * the I/O processor starts to perform any I/O operations related
      * with the {@code session}.

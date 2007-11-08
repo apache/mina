@@ -244,5 +244,8 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 flush(session); // The second parameter is unused.
             }
         }
+
+        public void dispose() {
+        }
     }
 }

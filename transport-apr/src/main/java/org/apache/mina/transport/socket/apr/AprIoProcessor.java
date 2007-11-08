@@ -43,19 +43,19 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 
-class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
+public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
 
-    protected static class IoSessionIterator implements Iterator<AprSessionImpl> {
-        private final Iterator<AprSessionImpl> i;
-        private IoSessionIterator(Collection<AprSessionImpl> sessions) {
+    protected static class IoSessionIterator implements Iterator<AprSession> {
+        private final Iterator<AprSession> i;
+        private IoSessionIterator(Collection<AprSession> sessions) {
             i = sessions.iterator();
         }
         public boolean hasNext() {
             return i.hasNext();
         }
 
-        public AprSessionImpl next() {
-            AprSessionImpl sess = i.next();
+        public AprSession next() {
+            AprSession sess = i.next();
             return sess;
         }
 
@@ -64,7 +64,7 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
         }
     }
 
-    protected class PollSetIterator implements Iterator<AprSessionImpl> {
+    protected class PollSetIterator implements Iterator<AprSession> {
         private long[] pollResult;
         
         int index=0;
@@ -76,8 +76,8 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
             return index*2< pollResult.length;
         }
 
-        public AprSessionImpl next() {
-            AprSessionImpl  sess=managedSessions.get(pollResult[index*2+1]);
+        public AprSession next() {
+            AprSession  sess=managedSessions.get(pollResult[index*2+1]);
             index++;
             System.err.println("sess : "+ sess.getAPRSocket());
             return sess;
@@ -94,12 +94,12 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
 
     private long pollset = 0; // socket poller
 
-    private final Map<Long, AprSessionImpl> managedSessions = new HashMap<Long, AprSessionImpl>();
+    private final Map<Long, AprSession> managedSessions = new HashMap<Long, AprSession>();
 
     private long[] pollResult;
 
-    AprIoProcessor(String threadName, Executor executor) {
-        super(threadName,executor);
+    public AprIoProcessor(Executor executor) {
+        super(executor);
             
 
         // initialize a memory pool for APR functions
@@ -118,15 +118,31 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
             logger.error("APR Error : " + e.getDescription(), e);
         }
     }
+    
+    @Override
+    protected void doDispose() {
+        Poll.destroy(pollset);
+
+        // TODO : necessary I think, need to check APR doc
+        logger.debug("finalize, freeing the pool");
+        Pool.clear(pool);
+        
+        Pool.destroy(pool);
+    }
 
     @Override
-    protected Iterator<AprSessionImpl> allSessions() throws Exception {
+    protected void finalize() throws Throwable {
+        super.finalize();
+        dispose();
+    }
+
+    @Override
+    protected Iterator<AprSession> allSessions() throws Exception {
         return new IoSessionIterator(managedSessions.values());
     }
-    
 
     @Override
-    protected void doAdd(AprSessionImpl session) throws Exception {
+    protected void doAdd(AprSession session) throws Exception {
         logger.debug("doAdd");
         int rv;
         rv = Poll.add(pollset, session.getAPRSocket(), Poll.APR_POLLIN);
@@ -139,7 +155,7 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
                  
     @Override
-    protected void doRemove(AprSessionImpl session) throws Exception {
+    protected void doRemove(AprSession session) throws Exception {
         logger.debug("doRemove");
         int ret=Poll.remove(pollset, session.getAPRSocket());
         if(ret!=Status.APR_SUCCESS) {
@@ -152,26 +168,19 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        // TODO : necessary I think, need to check APR doc
-        logger.debug("finalize, freeing the pool");
-        Pool.clear(pool);
-    }
-
-    @Override
-    protected boolean isOpRead(AprSessionImpl session) throws Exception {
+    protected boolean isOpRead(AprSession session) throws Exception {
         logger.debug("isOpRead : "+session.isOpRead());
         return session.isOpRead();
     }
 
     @Override
-    protected boolean isOpWrite(AprSessionImpl session) throws Exception {
+    protected boolean isOpWrite(AprSession session) throws Exception {
         logger.debug("isOpWrite : "+session.isOpWrite());
         return session.isOpWrite();
     }
 
     @Override
-    protected boolean isReadable(AprSessionImpl session) throws Exception {
+    protected boolean isReadable(AprSession session) throws Exception {
         logger.debug("isReadable?");
         long socket= session.getAPRSocket();
         for(int i=0;i<pollResult.length/2;i++) {
@@ -190,7 +199,7 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
 
     @Override
-    protected boolean isWritable(AprSessionImpl session) throws Exception {
+    protected boolean isWritable(AprSession session) throws Exception {
         long socket= session.getAPRSocket();
         for(int i=0;i<pollResult.length/2;i++) {
             if(pollResult[i*2+1]==socket) {
@@ -208,7 +217,7 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
     
     @Override
-    protected int read(AprSessionImpl session, IoBuffer buffer) throws Exception {
+    protected int read(AprSession session, IoBuffer buffer) throws Exception {
         byte[] buf = session.getReadBuffer();
         // FIXME : hardcoded read value for testing
         int bytes = Socket.recv(session.getAPRSocket(), buf, 0, 1024);
@@ -241,12 +250,12 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
 
     @Override
-    protected Iterator<AprSessionImpl> selectedSessions() throws Exception {
+    protected Iterator<AprSession> selectedSessions() throws Exception {
         return new PollSetIterator(pollResult);
     }
 
     @Override
-    protected void setOpRead(AprSessionImpl session, boolean value) throws Exception {
+    protected void setOpRead(AprSession session, boolean value) throws Exception {
         logger.debug("setOpRead : "+value);
         int rv = Poll.remove(pollset, session.getAPRSocket());
         if (rv != Status.APR_SUCCESS) {
@@ -266,7 +275,7 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
 
     @Override
-    protected void setOpWrite(AprSessionImpl session, boolean value)
+    protected void setOpWrite(AprSession session, boolean value)
             throws Exception {
         logger.debug("setOpWrite : "+value);
         int rv = Poll.remove(pollset, session.getAPRSocket());
@@ -287,7 +296,7 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
 
     @Override
-    protected SessionState state(AprSessionImpl session) {
+    protected SessionState state(AprSession session) {
         logger.debug("state?");
         long socket=session.getAPRSocket();
         if(socket>0)
@@ -299,7 +308,7 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
 
     @Override
-    protected long transferFile(AprSessionImpl session, FileRegion region)
+    protected long transferFile(AprSession session, FileRegion region)
             throws Exception {
         throw new UnsupportedOperationException("Not supposed for APR (TODO)");
     }
@@ -312,7 +321,7 @@ class AprIoProcessor extends AbstractIoProcessor<AprSessionImpl> {
     }
     
     @Override
-    protected int write(AprSessionImpl session, IoBuffer buf) throws Exception {
+    protected int write(AprSession session, IoBuffer buf) throws Exception {
         logger.debug("write");
         // be sure APR_SO_NONBLOCK was set, or it will block
         int toWrite = buf.remaining();

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
+import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -32,12 +33,15 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.common.SimpleIoProcessorPool;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
@@ -54,74 +58,63 @@ import org.apache.mina.util.NewThreadExecutor;
  */
 public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAcceptor {
 
-    /**
-     * @noinspection StaticNonFinalField
-     */
-    private static volatile int nextId = 0;
+    private static final AtomicInteger id = new AtomicInteger();
 
     private int backlog = 50;
-
-    private boolean reuseAddress;
+    private boolean reuseAddress = true;
 
     private final Executor executor;
+    private final String threadName;
+    private final IoProcessor<NioSession> processor;
+    private final boolean createdProcessor;
 
     private final Object lock = new Object();
 
-    private final int id = nextId++;
-
-    private final String threadName = "SocketAcceptor-" + id;
-
-    private ServerSocketChannel serverSocketChannel;
-
     private final Queue<ServiceOperationFuture> registerQueue =
         new ConcurrentLinkedQueue<ServiceOperationFuture>();
-
     private final Queue<ServiceOperationFuture> cancelQueue =
         new ConcurrentLinkedQueue<ServiceOperationFuture>();
 
-    private final NioProcessor[] ioProcessors;
-
-    private final int processorCount;
-
+    private ServerSocketChannel serverSocketChannel;
     private final Selector selector;
-
     private Worker worker;
-
-    private int processorDistributor = 0;
 
     /**
      * Create an acceptor with a single processing thread using a NewThreadExecutor
      */
     public NioSocketAcceptor() {
-        this(new NewThreadExecutor());
+        this(null, new SimpleIoProcessorPool<NioSession>(NioProcessor.class), true);
     }
 
-    /**
-     * Creates an acceptor with a processing thread count set to the
-     * number of available processors + 1 and the submitted executor
-     *
-     * @param executor Executor to use for launching threads
-     */
-    public NioSocketAcceptor(Executor executor) {
-        this(Runtime.getRuntime().availableProcessors() + 1, executor);
+    public NioSocketAcceptor(int processorCount) {
+        this(null, new SimpleIoProcessorPool<NioSession>(NioProcessor.class, processorCount), true);
+    }
+    
+    public NioSocketAcceptor(IoProcessor<NioSession> processor) {
+        this(null, processor, false);
     }
 
-    /**
-     * Create an acceptor with the desired number of processing threads
-     *
-     * @param processorCount Number of processing threads
-     * @param executor       Executor to use for launching threads
-     */
-    public NioSocketAcceptor(int processorCount, Executor executor) {
+    public NioSocketAcceptor(Executor executor, IoProcessor<NioSession> processor) {
+        this(executor, processor, false);
+    }
+
+    private NioSocketAcceptor(Executor executor, IoProcessor<NioSession> processor, boolean createdProcessor) {
         super(new DefaultSocketSessionConfig());
-
+        
+        if (executor == null) {
+            executor = new NewThreadExecutor();
+        }
+        if (processor == null) {
+            throw new NullPointerException("processor");
+        }
+        
+        this.executor = executor;
+        this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
+        this.processor = processor;
+        this.createdProcessor = createdProcessor;
+        
         // The default reuseAddress of an accepted socket should be 'true'.
         getSessionConfig().setReuseAddress(true);
-
-        if (processorCount < 1) {
-            throw new IllegalArgumentException(
-                    "Must have at least one processor");
-        }
 
         // Get the default configuration
         ServerSocket s = null;
@@ -144,29 +137,24 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
+            disposeNow();
             throw new RuntimeIoException("Failed to open a selector.", e);
         }
-
-        // Set other properties and initialize
-        this.executor = executor;
-        this.processorCount = processorCount;
-        ioProcessors = new NioProcessor[processorCount];
-
-        // create an array of SocketIoProcessors that will be used for
-        // handling sessions.
-        for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new NioProcessor(
-                    "SocketAcceptorIoProcessor-" + id + "." + i, executor);
-        }
     }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    
+    private void disposeNow() {
         try {
-            selector.close();
-        } catch (IOException e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
+            if (createdProcessor) {
+                processor.dispose();
+            }
+        } finally {
+            if (selector != null) {
+                try {
+                    selector.close();
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
+            }
         }
     }
 
@@ -255,6 +243,11 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
      * will just return.
      */
     private void startupWorker() {
+        if (!selector.isOpen()) {
+            registerQueue.clear();
+            cancelQueue.clear();
+            throw new ClosedSelectorException();
+        }
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
@@ -284,7 +277,7 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
      */
     private class Worker implements Runnable {
         public void run() {
-            for (; ;) {
+            for (;;) {
                 try {
                     // gets the number of keys that are ready to go
                     int nKeys = selector.select();
@@ -320,6 +313,10 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
                         ExceptionMonitor.getInstance().exceptionCaught(e1);
                     }
                 }
+            }
+            
+            if (isDisposed()) {
+                disposeNow();
             }
         }
 
@@ -357,7 +354,7 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
                     // Create a new session object.  This class extends
                     // BaseIoSession and is custom for socket-based sessions.
                     NioSocketSession session = new NioSocketSession(
-                            NioSocketAcceptor.this, nextProcessor(), ch);
+                            NioSocketAcceptor.this, processor, ch);
                     
                     finishSessionInitialization(session, null);
 
@@ -373,14 +370,6 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
                 }
             }
         }
-    }
-
-    private NioProcessor nextProcessor() {
-        if (this.processorDistributor == Integer.MAX_VALUE) {
-            this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
-        }
-
-        return ioProcessors[processorDistributor++ % processorCount];
     }
 
     /**

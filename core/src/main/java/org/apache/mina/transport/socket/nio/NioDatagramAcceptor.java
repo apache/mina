@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -30,6 +31,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.ExceptionMonitor;
@@ -60,10 +62,10 @@ import org.apache.mina.util.NewThreadExecutor;
 public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramAcceptor {
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
 
-    private static volatile int nextId = 0;
+    private static final AtomicInteger id = new AtomicInteger();
 
     private final Executor executor;
-    private final int id = nextId++;
+    private final String threadName;
     private final Selector selector;
     private final IoProcessor<NioSession> processor = new DatagramAcceptorProcessor();
     private final Queue<ServiceOperationFuture> registerQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
@@ -89,6 +91,8 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
     public NioDatagramAcceptor(Executor executor) {
         super(new DefaultDatagramSessionConfig());
 
+        threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
+
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
@@ -98,13 +102,13 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         this.executor = executor;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        try {
-            selector.close();
-        } catch (IOException e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
+    private void disposeNow() {
+        if (selector != null) {
+            try {
+                selector.close();
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
         }
     }
 
@@ -253,14 +257,27 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         }
 
         public void updateTrafficMask(NioSession session) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void dispose() {
+            // TODO Implement me.
         }
     }
 
-    private synchronized void startupWorker() {
-        if (worker == null) {
-            worker = new Worker();
-            executor.execute(
-                    new NamePreservingRunnable(worker, "DatagramAcceptor-" + id));
+    private  void startupWorker() {
+        if (!selector.isOpen()) {
+            registerQueue.clear();
+            cancelQueue.clear();
+            flushingSessions.clear();
+            throw new ClosedSelectorException();
+        }
+        synchronized (this) {
+            if (worker == null) {
+                worker = new Worker();
+                executor.execute(
+                        new NamePreservingRunnable(worker, threadName));
+            }
         }
     }
 
@@ -310,6 +327,10 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
                     } catch (InterruptedException e1) {
                     }
                 }
+            }
+            
+            if (isDisposed()) {
+                disposeNow();
             }
         }
     }

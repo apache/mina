@@ -124,6 +124,10 @@ public class VmPipeConnector extends AbstractIoConnector {
         return future;
     }
 
+    @Override
+    protected void doDispose() throws Exception {
+    }
+
     private static final Set<VmPipeAddress> TAKEN_LOCAL_ADDRESSES = new HashSet<VmPipeAddress>();
 
     private static int nextLocalPort = -1;

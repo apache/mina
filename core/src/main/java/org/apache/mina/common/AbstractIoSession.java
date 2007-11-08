@@ -288,6 +288,10 @@ public abstract class AbstractIoSession implements IoSession {
             throw new NullPointerException("trafficMask");
         }
         
+        if (isClosing() || !isConnected()) {
+            return;
+        }
+        
         getFilterChain().fireFilterSetTrafficMask(trafficMask);
     }
     

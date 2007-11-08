@@ -22,18 +22,18 @@ package org.apache.mina.transport.socket.nio;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
-import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoProcessor;
+import org.apache.mina.common.SimpleIoProcessorPool;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DatagramConnector;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
-import org.apache.mina.util.NewThreadExecutor;
 
 /**
  * {@link IoConnector} for datagram transport (UDP/IP).
@@ -43,61 +43,50 @@ import org.apache.mina.util.NewThreadExecutor;
  */
 public class NioDatagramConnector extends AbstractIoConnector implements DatagramConnector{
 
-    private static volatile int nextId = 0;
-
-    private final int id = nextId++;
-    private final String threadName = "DatagramConnector-" + id;
-    private final int processorCount;
-    private final NioProcessor[] ioProcessors;
-
-    private int processorDistributor = 0;
-
+    private final IoProcessor<NioSession> processor;
+    private final boolean createdProcessor;
+    
     /**
      * Creates a new instance.
      */
     public NioDatagramConnector() {
-        this(new NewThreadExecutor());
+        this(new SimpleIoProcessorPool<NioSession>(NioProcessor.class), true);
     }
 
     /**
      * Creates a new instance.
      */
-    public NioDatagramConnector(Executor executor) {
-        this(Runtime.getRuntime().availableProcessors() + 1, executor);
+    public NioDatagramConnector(int processorCount) {
+        this(new SimpleIoProcessorPool<NioSession>(NioProcessor.class, processorCount), true);
     }
 
     /**
      * Creates a new instance.
      */
-    public NioDatagramConnector(int processorCount, Executor executor) {
+    public NioDatagramConnector(IoProcessor<NioSession> processor) {
+        this(processor, false);
+    }
+
+    private NioDatagramConnector(IoProcessor<NioSession> processor, boolean createdProcessor) {
         super(new DefaultDatagramSessionConfig());
 
-        if (processorCount < 1) {
-            throw new IllegalArgumentException(
-                    "Must have at least one processor");
+        if (processor == null) {
+            throw new NullPointerException("processor");
         }
-
-        this.processorCount = processorCount;
-        ioProcessors = new NioProcessor[processorCount];
-
-        // create an array of SocketIoProcessors that will be used for
-        // handling sessions.
-        for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new NioProcessor(
-                    threadName + '.' + i, executor);
-        }
+        
+        this.processor = processor;
+        this.createdProcessor = createdProcessor;
     }
-
-    private NioProcessor nextProcessor() {
-        if (this.processorDistributor == Integer.MAX_VALUE) {
-            this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
-        }
-
-        return ioProcessors[processorDistributor++ % processorCount];
-    }
-
+    
     public TransportMetadata getTransportMetadata() {
         return NioDatagramSession.METADATA;
+    }
+    
+    @Override
+    protected void doDispose() throws Exception {
+        if (createdProcessor) {
+            processor.dispose();
+        }
     }
 
     @Override
@@ -121,7 +110,6 @@ public class NioDatagramConnector extends AbstractIoConnector implements Datagra
             }
             ch.connect(remoteAddress);
 
-            NioProcessor processor = nextProcessor();
             final NioSession session = new NioDatagramSession(this, ch, processor);
             ConnectFuture future = new DefaultConnectFuture();
             finishSessionInitialization(session, future);

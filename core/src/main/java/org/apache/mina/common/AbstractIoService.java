@@ -50,6 +50,7 @@ public abstract class AbstractIoService implements IoService {
      * Maintains the {@link IoServiceListener}s of this service.
      */
     private final IoServiceListenerSupport listeners;
+    private volatile boolean disposed;
 
     private volatile long activationTime;
     private final AtomicLong readBytes = new AtomicLong();
@@ -111,6 +112,25 @@ public abstract class AbstractIoService implements IoService {
     public boolean isActive() {
         return getListeners().isActive();
     }
+    
+    public boolean isDisposed() {
+        return disposed;
+    }
+    
+    public void dispose() {
+        if (disposed) {
+            return;
+        }
+
+        disposed = true;
+        try {
+            doDispose();
+        } catch (Exception e) {
+            ExceptionMonitor.getInstance().exceptionCaught(e);
+        }
+    }
+    
+    protected abstract void doDispose() throws Exception;
 
     public Set<IoSession> getManagedSessions() {
         return getListeners().getManagedSessions();

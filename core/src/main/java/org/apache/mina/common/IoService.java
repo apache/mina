@@ -45,6 +45,14 @@ public interface IoService {
      * related with this service.
      */
     void removeListener(IoServiceListener listener);
+    
+    /**
+     * Requests this service to release any resources allocated by
+     * this service.  Please note that {@link IoService} implementation
+     * will release all resources eventually, but the resources will not be
+     * released as long as there are any sessions managed by this service.
+     */
+    void dispose();
 
     /**
      * Returns the handler which will handle all connections managed by this service.

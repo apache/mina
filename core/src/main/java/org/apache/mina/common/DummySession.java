@@ -113,6 +113,9 @@ public class DummySession extends AbstractIoSession {
 
             public void updateTrafficMask(IoSession session) {
             }
+
+            public void dispose() {
+            }
         };
 
         try {

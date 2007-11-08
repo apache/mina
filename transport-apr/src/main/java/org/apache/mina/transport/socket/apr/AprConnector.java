@@ -22,15 +22,16 @@ package org.apache.mina.transport.socket.apr;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoServiceListenerSupport;
+import org.apache.mina.common.SimpleIoProcessorPool;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.util.NewThreadExecutor;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
@@ -47,24 +48,12 @@ import org.apache.tomcat.jni.Status;
  */
 public class AprConnector extends AbstractIoConnector {
 
-    /**
-     * @noinspection StaticNonFinalField
-     */
-    private static volatile int nextId = 0;
+    private static final AtomicInteger id = new AtomicInteger();
 
-    private final int id = nextId++;
-
-    private final String threadName = "APRConnector-" + id;
-
-    private final int processorCount;
-
-    private final Executor executor;
-
-    private final AprIoProcessor[] ioProcessors;
-
-    private int processorDistributor = 0;
-
-    private AprProtocol protocol;
+    private final String threadName;
+    private final IoProcessor<AprSession> processor;
+    private final AprProtocol protocol;
+    private final boolean createdProcessor;
 
     /**
      * Create a connector with a single processing thread using a
@@ -73,7 +62,15 @@ public class AprConnector extends AbstractIoConnector {
      *            The needed socket protocol (TCP,UDP,...)
      */
     public AprConnector(AprProtocol protocol) {
-        this(protocol, 1, new NewThreadExecutor());
+        this(protocol, new SimpleIoProcessorPool<AprSession>(AprIoProcessor.class), true);
+    }
+    
+    public AprConnector(AprProtocol protocol, int processorCount) {
+        this(protocol, new SimpleIoProcessorPool<AprSession>(AprIoProcessor.class, processorCount), true);
+    }
+    
+    public AprConnector(AprProtocol protocol, IoProcessor<AprSession> processor) {
+        this(protocol, processor, false);
     }
 
     /**
@@ -86,29 +83,23 @@ public class AprConnector extends AbstractIoConnector {
      * @param executor
      *            Executor to use for launching threads
      */
-    public AprConnector(AprProtocol protocol, int processorCount,
-            Executor executor) {
+    public AprConnector(AprProtocol protocol, IoProcessor<AprSession> processor, boolean createdProcessor) {
         super(new DefaultAprSessionConfig());
 
+        if (protocol == null) {
+            throw new NullPointerException("protocol");
+        }
+        if (processor == null) {
+            throw new NullPointerException("processor");
+        }
+        
+        this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
         this.protocol = protocol;
+        this.processor = processor;
+        this.createdProcessor = createdProcessor;
 
-        // load  the APR library
-
+        // load the APR library
         AprLibrary.initialize();
-
-        if (processorCount < 1) {
-            throw new IllegalArgumentException(
-                    "Must have at least one processor");
-        }
-
-        this.executor = executor;
-        this.processorCount = processorCount;
-        ioProcessors = new AprIoProcessor[processorCount];
-
-        for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new AprIoProcessor(
-                    threadName + "." + i, executor);
-        }
     }
 
     @Override
@@ -142,10 +133,8 @@ public class AprConnector extends AbstractIoConnector {
             }
 
             ConnectFuture future = new DefaultConnectFuture();
-            AprIoProcessor proc=nextProcessor();
-            System.err.println("proc : "+proc);
-            AprSessionImpl session = new AprSessionImpl(this,proc ,
-                    clientSock, sockAddr, (InetSocketAddress) localAddress);
+            AprSession session = new AprSession(
+                    this, processor, clientSock, sockAddr, (InetSocketAddress) localAddress);
             
             finishSessionInitialization(session, future);
 
@@ -159,10 +148,17 @@ public class AprConnector extends AbstractIoConnector {
 
             // Forward the remaining process to the APRIoProcessor.
             // it's will validate the ConnectFuture when the session is in the poll set
-            session.getIoProcessor().add(session);
+            session.getProcessor().add(session);
             return future;
         } catch (Exception e) {
             return DefaultConnectFuture.newFailedFuture(e);
+        }
+    }
+
+    @Override
+    protected void doDispose() throws Exception {
+        if (createdProcessor) {
+            processor.dispose();
         }
     }
 
@@ -171,14 +167,7 @@ public class AprConnector extends AbstractIoConnector {
         return super.getListeners();
     }
 
-    private AprIoProcessor nextProcessor() {
-        if (this.processorDistributor == Integer.MAX_VALUE) {
-            this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
-        }
-        return ioProcessors[processorDistributor++ % processorCount];
-    }
-
     public TransportMetadata getTransportMetadata() {
-        return AprSessionImpl.METADATA;
+        return AprSession.METADATA;
     }
 }

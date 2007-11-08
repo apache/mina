@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoProcessor;
-import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.RuntimeIoException;
@@ -39,28 +38,26 @@ import org.apache.mina.common.RuntimeIoException;
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class NioProcessor extends AbstractIoProcessor<NioSession> {
+public class NioProcessor extends AbstractIoProcessor<NioSession> {
 
-    protected final Selector selector;
-
-    NioProcessor(String threadName, Executor executor) {
-        super(threadName, executor);
-
+    private static Selector newSelector() {
         try {
-            this.selector = Selector.open();
+            return Selector.open();
         } catch (IOException e) {
             throw new RuntimeIoException("Failed to open a selector.", e);
         }
     }
+    
+    private final Selector selector;
+
+    public NioProcessor(Executor executor) {
+        super(executor);
+        this.selector = newSelector();
+    }
 
     @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        try {
-            selector.close();
-        } catch (IOException e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
-        }
+    protected void doDispose() throws Exception {
+        selector.close();
     }
 
     @Override
@@ -186,5 +183,4 @@ class NioProcessor extends AbstractIoProcessor<NioSession> {
             i.remove();
         }
     }
-
 }

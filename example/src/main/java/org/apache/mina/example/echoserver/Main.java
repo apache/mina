@@ -20,7 +20,6 @@
 package org.apache.mina.example.echoserver;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
 
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
@@ -43,7 +42,7 @@ public class Main {
     private static final boolean USE_SSL = false;
 
     public static void main(String[] args) throws Exception {
-        SocketAcceptor acceptor = new NioSocketAcceptor(Executors.newCachedThreadPool());
+        SocketAcceptor acceptor = new NioSocketAcceptor();
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
         
         // Add SSL filter if SSL is enabled.

@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketAddress;
+import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -29,13 +30,16 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.common.SimpleIoProcessorPool;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketConnector;
@@ -51,68 +55,76 @@ import org.apache.mina.util.NewThreadExecutor;
  */
 public class NioSocketConnector extends AbstractIoConnector implements SocketConnector {
 
-    /**
-     * @noinspection StaticNonFinalField
-     */
-    private static volatile int nextId = 0;
+    private static final AtomicInteger id = new AtomicInteger();
 
     private final Object lock = new Object();
-    private final int id = nextId++;
-    private final String threadName = "SocketConnector-" + id;
-    private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
-    private final Queue<ConnectionRequest> cancelQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
-    private final NioProcessor[] ioProcessors;
-    private final int processorCount;
+    private final String threadName;
     private final Executor executor;
     private final Selector selector;
+    private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
+    private final Queue<ConnectionRequest> cancelQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
+    private final IoProcessor<NioSession> processor;
+    private final boolean createdProcessor;
 
     private Worker worker;
-    private int processorDistributor = 0;
-    private int workerTimeout = 60; // 1 min.
 
-    /**
-     * Create a connector with a single processing thread using a NewThreadExecutor
-     */
     public NioSocketConnector() {
-        this(1, new NewThreadExecutor());
+        this(null, new SimpleIoProcessorPool<NioSession>(NioProcessor.class), true);
     }
 
-    /**
-     * Create a connector with the desired number of processing threads
-     *
-     * @param processorCount Number of processing threads
-     * @param executor       Executor to use for launching threads
-     */
-    public NioSocketConnector(int processorCount, Executor executor) {
+    public NioSocketConnector(int processorCount) {
+        this(null, new SimpleIoProcessorPool<NioSession>(NioProcessor.class, processorCount), true);
+    }
+
+    public NioSocketConnector(IoProcessor<NioSession> processor) {
+        this(null, processor, false);
+    }
+
+    public NioSocketConnector(Executor executor, IoProcessor<NioSession> processor) {
+        this(executor, processor, false);
+    }
+
+    private NioSocketConnector(Executor executor, IoProcessor<NioSession> processor, boolean createdProcessor) {
         super(new DefaultSocketSessionConfig());
-        if (processorCount < 1) {
-            throw new IllegalArgumentException(
-                    "Must have at least one processor");
+        
+        if (executor == null) {
+            executor = new NewThreadExecutor();
         }
+        if (processor == null) {
+            throw new NullPointerException("processor");
+        }
+        
+        this.executor = executor;
+        this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
+        this.processor = processor;
+        this.createdProcessor = createdProcessor;
 
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
+            disposeNow();
             throw new RuntimeIoException("Failed to open a selector.", e);
         }
-
-        this.executor = executor;
-        this.processorCount = processorCount;
-        ioProcessors = new NioProcessor[processorCount];
-
-        for (int i = 0; i < processorCount; i++) {
-            ioProcessors[i] = new NioProcessor(
-                    "SocketConnectorIoProcessor-" + id + "." + i, executor);
-        }
+    }
+    
+    @Override
+    protected void doDispose() throws Exception {
+        startupWorker();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    private void disposeNow() {
         try {
-            selector.close();
-        } catch (IOException e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
+            if (createdProcessor) {
+                processor.dispose();
+            }
+        } finally {
+            if (selector != null) {
+                try {
+                    selector.close();
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
+            }
         }
     }
 
@@ -123,37 +135,6 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
-    }
-
-    /**
-     * How many seconds to keep the connection thread alive between connection requests
-     *
-     * @return the number of seconds to keep connection thread alive.
-     *         0 means that the connection thread will terminate immediately
-     *         when there's no connection to make.
-     */
-    public int getWorkerTimeout() {
-        return workerTimeout;
-    }
-
-    /**
-     * Set how many seconds the connection worker thread should remain alive once idle before terminating itself.
-     *
-     * @param workerTimeout the number of seconds to keep thread alive.
-     *                      Must be >=0.  If 0 is specified, the connection
-     *                      worker thread will terminate immediately when
-     *                      there's no connection to make.
-     */
-    public void setWorkerTimeout(int workerTimeout) {
-        if (workerTimeout < 0) {
-            throw new IllegalArgumentException("Must be >= 0");
-        }
-        this.workerTimeout = workerTimeout;
-    }
-
-    public void close(){
-        setWorkerTimeout(0);
-        selector.wakeup();
     }
 
     @Override
@@ -199,6 +180,11 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     }
 
     private void startupWorker() {
+        if (!selector.isOpen()) {
+            connectQueue.clear();
+            cancelQueue.clear();
+            throw new ClosedSelectorException();
+        }
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
@@ -306,8 +292,7 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
     }
 
     private void newSession(SocketChannel ch, ConnectFuture connectFuture) {
-        NioSocketSession session = new NioSocketSession(
-                this, nextProcessor(), ch);
+        NioSocketSession session = new NioSocketSession(this, processor, ch);
 
         finishSessionInitialization(session, connectFuture);
 
@@ -315,19 +300,10 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
         session.getProcessor().add(session);
     }
 
-    private NioProcessor nextProcessor() {
-        if (this.processorDistributor == Integer.MAX_VALUE) {
-            this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
-        }
-
-        return ioProcessors[processorDistributor++ % processorCount];
-    }
-
     private class Worker implements Runnable {
-        private long lastActive = System.currentTimeMillis();
 
         public void run() {
-            for (; ;) {
+            for (;;) {
                 try {
                     int nKeys = selector.select(1000);
 
@@ -342,17 +318,13 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
                     cancelKeys();
 
                     if (selector.keys().isEmpty()) {
-                        if (System.currentTimeMillis() - lastActive > workerTimeout * 1000L) {
-                            synchronized (lock) {
-                                if (selector.keys().isEmpty()
-                                        && connectQueue.isEmpty()) {
-                                    worker = null;
-                                    break;
-                                }
+                        synchronized (lock) {
+                            if (selector.keys().isEmpty()
+                                    && connectQueue.isEmpty()) {
+                                worker = null;
+                                break;
                             }
                         }
-                    } else {
-                        lastActive = System.currentTimeMillis();
                     }
                 } catch (IOException e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
@@ -363,6 +335,10 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
                         ExceptionMonitor.getInstance().exceptionCaught(e1);
                     }
                 }
+            }
+            
+            if (isDisposed()) {
+                disposeNow();
             }
         }
     }

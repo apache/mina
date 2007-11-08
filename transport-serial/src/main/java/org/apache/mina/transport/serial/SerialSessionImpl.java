@@ -276,4 +276,7 @@ class SerialSessionImpl extends AbstractIoSession implements
     public void updateTrafficMask(SerialSessionImpl session) {
         throw new UnsupportedOperationException();
     }
+
+    public void dispose() {
+    }
 }

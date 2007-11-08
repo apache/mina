@@ -60,10 +60,6 @@ public class Client {
 
         NioSocketConnector connector = new NioSocketConnector();
 
-        // Change the worker timeout to 1 second to make the I/O thread quit soon
-        // when there's no connection to manage.
-        connector.setWorkerTimeout(1);
-
         // Configure the service.
         connector.setConnectTimeout(CONNECT_TIMEOUT);
         if (USE_CUSTOM_CODEC) {

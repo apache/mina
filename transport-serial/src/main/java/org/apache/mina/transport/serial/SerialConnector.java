@@ -123,6 +123,10 @@ public class SerialConnector extends AbstractIoConnector {
                 .newFailedFuture(new SerialPortUnavailableException(
                         "Serial port not found"));
     }
+    
+    @Override
+    protected void doDispose() throws Exception {
+    }
 
     public TransportMetadata getTransportMetadata() {
         return SerialSessionImpl.METADATA;

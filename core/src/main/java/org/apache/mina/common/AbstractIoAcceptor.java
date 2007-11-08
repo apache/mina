@@ -131,6 +131,11 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
             return bound;
         }
     }
+    
+    @Override
+    protected void doDispose() throws Exception {
+        unbind();
+    }
 
     /**
      * Implement this method to perform the actual bind operation.

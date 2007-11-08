@@ -24,10 +24,13 @@ import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.mina.util.CopyOnWriteMap;
 import org.apache.mina.util.NamePreservingRunnable;
 
 /**
@@ -38,7 +41,6 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
-    
     /**
      * The maximum loop count for a write operation until
      * {@link #write(IoSession, IoBuffer)} returns non-zero value.
@@ -46,6 +48,9 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
      * It improves memory utilization and write throughput significantly.
      */
     private static final int WRITE_SPIN_COUNT = 256;
+    
+    private static final Map<Class<?>, AtomicInteger> threadIds =
+        new CopyOnWriteMap<Class<?>, AtomicInteger>();
     
     private final Object lock = new Object();
     private final String threadName;
@@ -58,11 +63,42 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
 
     private Worker worker;
     private long lastIdleCheckTime;
-
-    protected AbstractIoProcessor(String threadName, Executor executor) {
-        this.threadName = threadName;
+    private volatile boolean toBeDisposed;
+    
+    protected AbstractIoProcessor(Executor executor) {
+        if (executor == null) {
+            throw new NullPointerException("executor");
+        }
+        
+        this.threadName = nextThreadName();
         this.executor = executor;
     }
+    
+    private String nextThreadName() {
+        Class<?> cls = getClass();
+        AtomicInteger threadId = threadIds.get(cls);
+        int newThreadId;
+        if (threadId == null) {
+            newThreadId = 1;
+            threadIds.put(cls, new AtomicInteger(newThreadId));
+        } else {
+            newThreadId = threadId.incrementAndGet();
+        }
+        
+        return cls.getSimpleName() + '-' + newThreadId;
+    }
+    
+    protected Executor getExecutor() {
+        return executor;
+    }
+    
+
+    public void dispose() {
+        toBeDisposed = true;
+        startupWorker();
+    }
+    
+    protected abstract void doDispose() throws Exception;
 
     /**
      * poll those sessions for the given timeout
@@ -574,6 +610,14 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
                     } catch (InterruptedException e1) {
                         ExceptionMonitor.getInstance().exceptionCaught(e1);
                     }
+                }
+            }
+            
+            if (toBeDisposed) {
+                try {
+                    doDispose();
+                } catch (Throwable t) {
+                    ExceptionMonitor.getInstance().exceptionCaught(t);
                 }
             }
         }
