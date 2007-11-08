@@ -49,7 +49,8 @@ import org.slf4j.LoggerFactory;
  * The following is an example for the NIO socket transport:
  * <pre><code>
  * // Create a shared pool.
- * SimpleIoProcessorPool pool = new SimpleIoProcessorPool(NioProcessor.class, 16);
+ * SimpleIoProcessorPool&lt;NioSession&gt; pool = 
+ *         new SimpleIoProcessorPool&lt;NioSession&gt;(NioProcessor.class, 16);
  * 
  * // Create two services that share the same pool.
  * SocketAcceptor acceptor = new NioSocketAcceptor(pool);
