@@ -27,7 +27,7 @@ package org.apache.mina.common;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoEvent {
+public class IoEvent implements Runnable {
     private final IoEventType type;
 
     private final IoSession session;
@@ -56,6 +56,10 @@ public class IoEvent {
 
     public Object getParameter() {
         return parameter;
+    }
+    
+    public void run() {
+        fire();
     }
 
     public void fire() {
