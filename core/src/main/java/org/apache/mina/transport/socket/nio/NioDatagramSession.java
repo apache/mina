@@ -70,7 +70,7 @@ class NioDatagramSession extends NioSession implements DatagramSession {
 
     private final InetSocketAddress remoteAddress;
 
-    private final IoProcessor processor;
+    private final IoProcessor<NioSession> processor;
 
     private SelectionKey key;
 
@@ -78,7 +78,7 @@ class NioDatagramSession extends NioSession implements DatagramSession {
      * Creates a new acceptor-side session instance.
      */
     NioDatagramSession(IoService service,
-                        DatagramChannel ch, IoProcessor processor,
+                        DatagramChannel ch, IoProcessor<NioSession> processor,
                         SocketAddress remoteAddress) {
         this.service = service;
         this.ch = ch;
@@ -95,7 +95,7 @@ class NioDatagramSession extends NioSession implements DatagramSession {
      * Creates a new connector-side session instance.
      */
     NioDatagramSession(IoService service,
-                        DatagramChannel ch, IoProcessor processor) {
+                        DatagramChannel ch, IoProcessor<NioSession> processor) {
         this(service, ch, processor, ch.socket().getRemoteSocketAddress());
     }
 
@@ -104,7 +104,7 @@ class NioDatagramSession extends NioSession implements DatagramSession {
     }
 
     @Override
-    protected IoProcessor getProcessor() {
+    protected IoProcessor<NioSession> getProcessor() {
         return processor;
     }
 

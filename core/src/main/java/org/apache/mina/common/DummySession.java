@@ -47,7 +47,7 @@ public class DummySession extends AbstractIoSession {
 
     private volatile IoService service;
 
-    private volatile IoProcessor processor;
+    private volatile IoProcessor<IoSession> processor;
 
     private volatile IoSessionConfig config = new AbstractIoSessionConfig() {
         @Override
@@ -99,7 +99,7 @@ public class DummySession extends AbstractIoSession {
 
         this.service = acceptor;
 
-        this.processor = new IoProcessor() {
+        this.processor = new IoProcessor<IoSession>() {
             public void add(IoSession session) {
             }
 
@@ -226,11 +226,11 @@ public class DummySession extends AbstractIoSession {
     }
 
     @Override
-    public IoProcessor getProcessor() {
+    public IoProcessor<IoSession> getProcessor() {
         return processor;
     }
 
-    public void setProcessor(IoProcessor processor) {
+    public void setProcessor(IoProcessor<IoSession> processor) {
         if (processor == null) {
             throw new NullPointerException("processor");
         }

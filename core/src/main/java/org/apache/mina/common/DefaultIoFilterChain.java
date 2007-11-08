@@ -607,6 +607,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             nextFilter.messageSent(session, writeRequest);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void filterWrite(NextFilter nextFilter, IoSession session,
                 WriteRequest writeRequest) throws Exception {
@@ -638,19 +639,20 @@ public class DefaultIoFilterChain implements IoFilterChain {
             }
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void filterClose(NextFilter nextFilter, IoSession session)
                 throws Exception {
-            AbstractIoSession s = (AbstractIoSession) session;
-            s.getProcessor().remove(s);
+            ((AbstractIoSession) session).getProcessor().remove(session);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void filterSetTrafficMask(NextFilter nextFilter,
                 IoSession session, TrafficMask trafficMask) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
             s.setTrafficMaskNow(trafficMask);
-            s.getProcessor().updateTrafficMask(session);
+            s.getProcessor().updateTrafficMask(s);
         }
         
     }

@@ -29,11 +29,9 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoProcessor;
-import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
 
 /**
@@ -41,7 +39,7 @@ import org.apache.mina.common.RuntimeIoException;
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class NioProcessor extends AbstractIoProcessor {
+class NioProcessor extends AbstractIoProcessor<NioSession> {
 
     protected final Selector selector;
 
@@ -76,28 +74,26 @@ class NioProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected Iterator<AbstractIoSession> allSessions() throws Exception {
+    protected Iterator<NioSession> allSessions() throws Exception {
         return new IoSessionIterator(selector.keys());
     }
 
     @Override
-    protected Iterator<AbstractIoSession> selectedSessions() throws Exception {
+    protected Iterator<NioSession> selectedSessions() throws Exception {
         return new IoSessionIterator(selector.selectedKeys());
     }
 
     @Override
-    protected void doAdd(IoSession session) throws Exception {
-        SelectableChannel ch = (SelectableChannel) getChannel(session);
+    protected void doAdd(NioSession session) throws Exception {
+        SelectableChannel ch = (SelectableChannel) session.getChannel();
         ch.configureBlocking(false);
-        setSelectionKey(
-                session,
-                ch.register(selector, SelectionKey.OP_READ, session));
+        session.setSelectionKey(ch.register(selector, SelectionKey.OP_READ, session));
     }
 
     @Override
-    protected void doRemove(IoSession session) throws Exception {
-        ByteChannel ch = getChannel(session);
-        SelectionKey key = getSelectionKey(session);
+    protected void doRemove(NioSession session) throws Exception {
+        ByteChannel ch = session.getChannel();
+        SelectionKey key = session.getSelectionKey();
         if (key != null) {
             key.cancel();
         }
@@ -105,8 +101,8 @@ class NioProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected SessionState state(IoSession session) {
-        SelectionKey key = getSelectionKey(session);
+    protected SessionState state(NioSession session) {
+        SelectionKey key = session.getSelectionKey();
         if (key == null) {
             return SessionState.PREPARING;
         }
@@ -115,30 +111,30 @@ class NioProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected boolean isReadable(IoSession session) throws Exception {
-        SelectionKey key = getSelectionKey(session);
+    protected boolean isReadable(NioSession session) throws Exception {
+        SelectionKey key = session.getSelectionKey();
         return key.isValid() && key.isReadable();
     }
 
     @Override
-    protected boolean isWritable(IoSession session) throws Exception {
-        SelectionKey key = getSelectionKey(session);
+    protected boolean isWritable(NioSession session) throws Exception {
+        SelectionKey key = session.getSelectionKey();
         return key.isValid() && key.isWritable();
     }
 
     @Override
-    protected boolean isOpRead(IoSession session) throws Exception {
-        return (getSelectionKey(session).interestOps() & SelectionKey.OP_READ) != 0;
+    protected boolean isOpRead(NioSession session) throws Exception {
+        return (session.getSelectionKey().interestOps() & SelectionKey.OP_READ) != 0;
     }
 
     @Override
-    protected boolean isOpWrite(IoSession session) throws Exception {
-        return (getSelectionKey(session).interestOps() & SelectionKey.OP_WRITE) != 0;
+    protected boolean isOpWrite(NioSession session) throws Exception {
+        return (session.getSelectionKey().interestOps() & SelectionKey.OP_WRITE) != 0;
     }
 
     @Override
-    protected void setOpRead(IoSession session, boolean value) throws Exception {
-        SelectionKey key = getSelectionKey(session);
+    protected void setOpRead(NioSession session, boolean value) throws Exception {
+        SelectionKey key = session.getSelectionKey();
         if (value) {
             key.interestOps(key.interestOps() | SelectionKey.OP_READ);
         } else {
@@ -147,9 +143,9 @@ class NioProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected void setOpWrite(IoSession session, boolean value)
+    protected void setOpWrite(NioSession session, boolean value)
             throws Exception {
-        SelectionKey key = getSelectionKey(session);
+        SelectionKey key = session.getSelectionKey();
         if (value) {
             key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
         } else {
@@ -158,45 +154,32 @@ class NioProcessor extends AbstractIoProcessor {
     }
 
     @Override
-    protected int read(IoSession session, IoBuffer buf) throws Exception {
-        return getChannel(session).read(buf.buf());
+    protected int read(NioSession session, IoBuffer buf) throws Exception {
+        return session.getChannel().read(buf.buf());
     }
 
     @Override
-    protected int write(IoSession session, IoBuffer buf) throws Exception {
-        return getChannel(session).write(buf.buf());
+    protected int write(NioSession session, IoBuffer buf) throws Exception {
+        return session.getChannel().write(buf.buf());
     }
 
     @Override
-    protected long transferFile(IoSession session, FileRegion region) throws Exception {
-        return region.getFileChannel().transferTo(region.getPosition(), region.getCount(), getChannel(session));
+    protected long transferFile(NioSession session, FileRegion region) throws Exception {
+        return region.getFileChannel().transferTo(region.getPosition(), region.getCount(), session.getChannel());
     }
 
-    private ByteChannel getChannel(IoSession session) {
-        return ((NioSession) session).getChannel();
-    }
-
-    private SelectionKey getSelectionKey(IoSession session) {
-        return ((NioSession) session).getSelectionKey();
-    }
-
-    private void setSelectionKey(IoSession session, SelectionKey key) {
-        ((NioSession) session).setSelectionKey(key);
-    }
-
-
-    protected static class IoSessionIterator implements Iterator<AbstractIoSession> {
+    protected static class IoSessionIterator implements Iterator<NioSession> {
         private final Iterator<SelectionKey> i;
         private IoSessionIterator(Set<SelectionKey> keys) {
-            i = keys.iterator();
+            i = keys.iterator(); 
         }
         public boolean hasNext() {
             return i.hasNext();
         }
 
-        public AbstractIoSession next() {
+        public NioSession next() {
             SelectionKey key = i.next();
-            return (AbstractIoSession) key.attachment();
+            return (NioSession) key.attachment();
         }
 
         public void remove() {

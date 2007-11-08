@@ -29,16 +29,15 @@ import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IdleStatusChecker;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 class SerialSessionImpl extends AbstractIoSession implements
-        SerialSession, SerialPortEventListener, IoProcessor {
+        SerialSession, SerialPortEventListener, IoProcessor<SerialSessionImpl> {
 
     private SerialSessionConfig config = new DefaultSerialSessionConfig();
 
@@ -234,14 +233,14 @@ class SerialSessionImpl extends AbstractIoSession implements
     }
 
     @Override
-    protected IoProcessor getProcessor() {
+    protected IoProcessor<SerialSessionImpl> getProcessor() {
         return this;
     }
 
-    public void add(IoSession session) {
+    public void add(SerialSessionImpl session) {
     }
 
-    public void flush(IoSession session) {
+    public void flush(SerialSessionImpl session) {
         if (writeWorker == null) {
             writeWorker = new WriteWorker();
             writeWorker.start();
@@ -252,7 +251,7 @@ class SerialSessionImpl extends AbstractIoSession implements
         }
     }
 
-    public void remove(IoSession session) {
+    public void remove(SerialSessionImpl session) {
         try {
             inputStream.close();
         } catch (IOException e) {
@@ -274,7 +273,7 @@ class SerialSessionImpl extends AbstractIoSession implements
                 this);
     }
 
-    public void updateTrafficMask(IoSession session) {
+    public void updateTrafficMask(SerialSessionImpl session) {
         throw new UnsupportedOperationException();
     }
 }

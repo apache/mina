@@ -22,9 +22,9 @@ package org.apache.mina.transport.socket.apr;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.DefaultIoFilterChain;
 import org.apache.mina.common.DefaultTransportMetadata;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
@@ -221,7 +221,7 @@ class AprSessionImpl extends AbstractIoSession implements AprSession {
     }
 
     @Override
-    protected IoProcessor getProcessor() {
+    protected IoProcessor<AprSessionImpl> getProcessor() {
         return ioProcessor;
     }
 

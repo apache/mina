@@ -110,7 +110,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     }
 
     @Override
-    protected IoProcessor getProcessor() {
+    protected IoProcessor<VmPipeSessionImpl> getProcessor() {
         return filterChain.getProcessor();
     }
 

@@ -29,7 +29,6 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DatagramConnector;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -123,7 +122,7 @@ public class NioDatagramConnector extends AbstractIoConnector implements Datagra
             ch.connect(remoteAddress);
 
             NioProcessor processor = nextProcessor();
-            final IoSession session = new NioDatagramSession(this, ch, processor);
+            final NioSession session = new NioDatagramSession(this, ch, processor);
             ConnectFuture future = new DefaultConnectFuture();
             finishSessionInitialization(session, future);
             processor.add(session);

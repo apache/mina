@@ -37,7 +37,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractIoProcessor implements IoProcessor {
+public abstract class AbstractIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
     
     /**
      * The maximum loop count for a write operation until
@@ -51,14 +51,10 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     private final String threadName;
     private final Executor executor;
 
-    private final Queue<AbstractIoSession> newSessions =
-        new ConcurrentLinkedQueue<AbstractIoSession>();
-    private final Queue<AbstractIoSession> removingSessions =
-        new ConcurrentLinkedQueue<AbstractIoSession>();
-    private final Queue<AbstractIoSession> flushingSessions =
-        new ConcurrentLinkedQueue<AbstractIoSession>();
-    private final Queue<AbstractIoSession> trafficControllingSessions =
-        new ConcurrentLinkedQueue<AbstractIoSession>();
+    private final Queue<T> newSessions = new ConcurrentLinkedQueue<T>();
+    private final Queue<T> removingSessions = new ConcurrentLinkedQueue<T>();
+    private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
+    private final Queue<T> trafficControllingSessions = new ConcurrentLinkedQueue<T>();
 
     private Worker worker;
     private long lastIdleCheckTime;
@@ -78,11 +74,11 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
     protected abstract void wakeup();
 
-    protected abstract Iterator<AbstractIoSession> allSessions() throws Exception;
+    protected abstract Iterator<T> allSessions() throws Exception;
 
-    protected abstract Iterator<AbstractIoSession> selectedSessions() throws Exception;
+    protected abstract Iterator<T> selectedSessions() throws Exception;
 
-    protected abstract SessionState state(IoSession session);
+    protected abstract SessionState state(T session);
 
 
     /**
@@ -91,7 +87,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
      * @return true is ready, false if not ready
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isWritable(IoSession session) throws Exception;
+    protected abstract boolean isWritable(T session) throws Exception;
 
     /**
      * Is the session ready for reading
@@ -99,14 +95,14 @@ public abstract class AbstractIoProcessor implements IoProcessor {
      * @return true is ready, false if not ready
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isReadable(IoSession session) throws Exception;
+    protected abstract boolean isReadable(T session) throws Exception;
     /**
      * register a session for writing
      * @param session the session registered
      * @param value true for registering, false for removing
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract void setOpWrite(IoSession session,boolean value) throws Exception;
+    protected abstract void setOpWrite(T session, boolean value) throws Exception;
 
     /**
      * register a session for reading
@@ -114,7 +110,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
      * @param value true for registering, false for removing
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract void setOpRead(IoSession session,boolean value) throws Exception;
+    protected abstract void setOpRead(T session, boolean value) throws Exception;
 
     /**
      * is this session registered for reading
@@ -122,7 +118,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
      * @return true is registered for reading
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isOpRead(IoSession session) throws Exception;
+    protected abstract boolean isOpRead(T session) throws Exception;
 
     /**
      * is this session registered for writing
@@ -130,37 +126,37 @@ public abstract class AbstractIoProcessor implements IoProcessor {
      * @return true is registered for writing
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isOpWrite(IoSession session) throws Exception;
+    protected abstract boolean isOpWrite(T session) throws Exception;
 
-    protected abstract void doAdd(IoSession session) throws Exception;
+    protected abstract void doAdd(T session) throws Exception;
 
-    protected abstract void doRemove(IoSession session) throws Exception;
+    protected abstract void doRemove(T session) throws Exception;
 
-    protected abstract int read(IoSession session, IoBuffer buf) throws Exception;
+    protected abstract int read(T session, IoBuffer buf) throws Exception;
 
-    protected abstract int write(IoSession session, IoBuffer buf) throws Exception;
+    protected abstract int write(T session, IoBuffer buf) throws Exception;
 
-    protected abstract long transferFile(IoSession session, FileRegion region) throws Exception;
+    protected abstract long transferFile(T session, FileRegion region) throws Exception;
 
-    public void add(IoSession session) {
-        newSessions.add((AbstractIoSession) session);
+    public void add(T session) {
+        newSessions.add(session);
         startupWorker();
     }
 
-    public void remove(IoSession session) {
-        scheduleRemove((AbstractIoSession) session);
+    public void remove(T session) {
+        scheduleRemove(session);
         startupWorker();
     }
 
-    public void flush(IoSession session) {
+    public void flush(T session) {
         boolean needsWakeup = flushingSessions.isEmpty();
-        if (scheduleFlush((AbstractIoSession) session) && needsWakeup) {
+        if (scheduleFlush(session) && needsWakeup) {
             wakeup();
         }
     }
 
-    public void updateTrafficMask(IoSession session) {
-        scheduleTrafficControl((AbstractIoSession) session);
+    public void updateTrafficMask(T session) {
+        scheduleTrafficControl(session);
         wakeup();
     }
 
@@ -174,11 +170,11 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         wakeup();
     }
 
-    private void scheduleRemove(AbstractIoSession session) {
+    private void scheduleRemove(T session) {
         removingSessions.add(session);
     }
 
-    private boolean scheduleFlush(AbstractIoSession session) {
+    private boolean scheduleFlush(T session) {
         if (session.setScheduledForFlush(true)) {
             flushingSessions.add(session);
             return true;
@@ -186,14 +182,14 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         return false;
     }
 
-    private void scheduleTrafficControl(AbstractIoSession session) {
+    private void scheduleTrafficControl(T session) {
         trafficControllingSessions.add(session);
     }
 
     private int add() {
         int addedSessions = 0;
         for (; ;) {
-            AbstractIoSession session = newSessions.poll();
+            T session = newSessions.poll();
 
             if (session == null) {
                 break;
@@ -236,7 +232,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     private int remove() {
         int removedSessions = 0;
         for (; ;) {
-            AbstractIoSession session = removingSessions.poll();
+            T session = removingSessions.poll();
 
             if (session == null) {
                 break;
@@ -272,13 +268,13 @@ public abstract class AbstractIoProcessor implements IoProcessor {
     }
 
     private void process() throws Exception {
-        for (Iterator<AbstractIoSession> i = selectedSessions(); i.hasNext();) {
+        for (Iterator<T> i = selectedSessions(); i.hasNext();) {
             process(i.next());
             i.remove();
         }
     }
 
-    private void process(AbstractIoSession session) throws Exception {
+    private void process(T session) throws Exception {
 
         if (isReadable(session) && session.getTrafficMask().isReadable()) {
             read(session);
@@ -289,7 +285,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         }
     }
 
-    private void read(AbstractIoSession session) {
+    private void read(T session) {
         IoSessionConfig config = session.getConfig();
         IoBuffer buf = IoBuffer.allocate(config.getReadBufferSize());
 
@@ -344,9 +340,9 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         }
     }
 
-    private void flush() {
+    private void write() {
         for (; ;) {
-            AbstractIoSession session = flushingSessions.poll();
+            T session = flushingSessions.poll();
 
             if (session == null) {
                 break;
@@ -363,7 +359,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
             switch (state) {
             case OPEN:
                 try {
-                    boolean flushedAll = flush(session);
+                    boolean flushedAll = write(session);
                     if (flushedAll && !session.getWriteRequestQueue().isEmpty(session) &&
                         !session.isScheduledForFlush()) {
                         scheduleFlush(session);
@@ -387,7 +383,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         }
     }
 
-    private void clearWriteRequestQueue(AbstractIoSession session) {
+    private void clearWriteRequestQueue(T session) {
         WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
         
@@ -427,7 +423,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
         }
     }
 
-    private boolean flush(AbstractIoSession session) throws Exception {
+    private boolean write(T session) throws Exception {
         if (!session.isConnected()) {
             scheduleRemove(session);
             return false;
@@ -502,7 +498,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
 
     private void updateTrafficMask() {
         for (; ;) {
-            AbstractIoSession session = trafficControllingSessions.poll();
+            T session = trafficControllingSessions.poll();
 
             if (session == null) {
                 break;
@@ -558,7 +554,7 @@ public abstract class AbstractIoProcessor implements IoProcessor {
                         process();
                     }
 
-                    flush();
+                    write();
                     nSessions -= remove();
                     notifyIdleSessions();
 

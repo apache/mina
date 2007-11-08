@@ -65,7 +65,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
     private final Executor executor;
     private final int id = nextId++;
     private final Selector selector;
-    private final IoProcessor processor = new DatagramAcceptorProcessor();
+    private final IoProcessor<NioSession> processor = new DatagramAcceptorProcessor();
     private final Queue<ServiceOperationFuture> registerQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
     private final Queue<ServiceOperationFuture> cancelQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
     private final Queue<NioDatagramSession> flushingSessions = new ConcurrentLinkedQueue<NioDatagramSession>();
@@ -230,16 +230,16 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         return super.getListeners();
     }
 
-    IoProcessor getProcessor() {
+    IoProcessor<NioSession> getProcessor() {
         return processor;
     }
 
-    private class DatagramAcceptorProcessor implements IoProcessor {
+    private class DatagramAcceptorProcessor implements IoProcessor<NioSession> {
 
-        public void add(IoSession session) {
+        public void add(NioSession session) {
         }
 
-        public void flush(IoSession session) {
+        public void flush(NioSession session) {
             if (scheduleFlush((NioDatagramSession) session)) {
                 Selector selector = NioDatagramAcceptor.this.selector;
                 if (selector != null) {
@@ -248,11 +248,11 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
             }
         }
 
-        public void remove(IoSession session) {
+        public void remove(NioSession session) {
             getListeners().fireSessionDestroyed(session);
         }
 
-        public void updateTrafficMask(IoSession session) {
+        public void updateTrafficMask(NioSession session) {
         }
     }
 

@@ -98,6 +98,7 @@ public abstract class AbstractIoSession implements IoSession {
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
 
+    @SuppressWarnings("unchecked")
     protected abstract IoProcessor getProcessor();
 
     public boolean isConnected() {
@@ -146,6 +147,7 @@ public abstract class AbstractIoSession implements IoSession {
         return closeFuture;
     }
 
+    @SuppressWarnings("unchecked")
     public CloseFuture closeOnFlush() {
         getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);

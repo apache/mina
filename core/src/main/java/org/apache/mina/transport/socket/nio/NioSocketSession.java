@@ -59,7 +59,7 @@ class NioSocketSession extends NioSession implements SocketSession {
 
     private final SocketSessionConfig config = new SessionConfigImpl();
 
-    private final IoProcessor processor;
+    private final IoProcessor<NioSession> processor;
 
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
 
@@ -71,7 +71,7 @@ class NioSocketSession extends NioSession implements SocketSession {
 
     private int readBufferSize = 1024;
 
-    NioSocketSession(IoService service, IoProcessor processor, SocketChannel ch) {
+    NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel ch) {
         this.service = service;
         this.processor = processor;
         this.ch = ch;
@@ -88,7 +88,7 @@ class NioSocketSession extends NioSession implements SocketSession {
     }
 
     @Override
-    protected IoProcessor getProcessor() {
+    protected IoProcessor<NioSession> getProcessor() {
         return processor;
     }
 

@@ -27,26 +27,28 @@ package org.apache.mina.common;
  *
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @param <T> the type of the {@link IoSession} this processor can handle
  */
-public interface IoProcessor {
+public interface IoProcessor<T extends IoSession> {
     /**
      * Adds the specified {@code session} to the I/O processor so that
      * the I/O processor starts to perform any I/O operations related
      * with the {@code session}.
      */
-    void add(IoSession session);
+    void add(T session);
 
     /**
      * Flushes the internal write request queue of the specified
      * {@code session}.
      */
-    void flush(IoSession session);
+    void flush(T session);
 
     /**
      * Controls the traffic of the specified {@code session} as specified
      * in {@link IoSession#getTrafficMask()}.
      */
-    void updateTrafficMask(IoSession session);
+    void updateTrafficMask(T session);
 
     /**
      * Removes and closes the specified {@code session} from the I/O
@@ -54,5 +56,5 @@ public interface IoProcessor {
      * associated with the {@code session} and releases any other related
      * resources.
      */
-    void remove(IoSession session);
+    void remove(T session);
 }
