@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -50,11 +50,12 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
 
     /**
      * Creates a new instance with the default thread pool implementation
-     * (<tt>new ThreadPoolExecutor(1, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue() )</tt>).
+     * (<tt>new ThreadPoolExecutor(0, 16, 60, TimeUnit.SECONDS, new SynchronousQueue() )</tt>).
      */
     protected AbstractExecutorFilter(IoEventType... eventTypes) {
-        this(new ThreadPoolExecutor(1, 16, 60, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>()), eventTypes);
+        this(new ThreadPoolExecutor(
+                0, 16, 60, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>()), eventTypes);
     }
 
     /**
