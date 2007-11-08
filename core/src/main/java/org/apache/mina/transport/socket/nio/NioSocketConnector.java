@@ -317,10 +317,11 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
 
                     cancelKeys();
 
-                    if (selector.keys().isEmpty()) {
+                    if (selector.keys().isEmpty() && isDisposed()) {
                         synchronized (lock) {
-                            if (selector.keys().isEmpty()
-                                    && connectQueue.isEmpty()) {
+                            if (selector.keys().isEmpty() &&
+                                connectQueue.isEmpty() &&
+                                isDisposed()) {
                                 worker = null;
                                 break;
                             }
