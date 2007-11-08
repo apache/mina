@@ -16,7 +16,7 @@ import org.apache.mina.common.WriteRequest;
 import org.easymock.MockControl;
 
 /**
- * Tests {@link WrappingFilter}.
+ * Tests {@link CommonEventFilter}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 567208 $, $Date: 2007-08-18 04:27:05 +0200 (za, 18 aug 2007) $
@@ -97,7 +97,7 @@ public class WrappingFilterTest extends TestCase {
     }
 
 
-    private static class MyWrappingFilter extends WrappingFilter {
+    private static class MyWrappingFilter extends CommonEventFilter {
 
         private List<IoEventType> eventsBefore = new ArrayList<IoEventType>();
 

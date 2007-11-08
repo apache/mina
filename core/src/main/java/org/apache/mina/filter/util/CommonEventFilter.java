@@ -30,9 +30,9 @@ import org.apache.mina.common.WriteRequest;
  * Extend this class when you want to create a filter that
  * wraps the same logic around all 9 IoEvents
  */
-public abstract class WrappingFilter extends IoFilterAdapter {
+public abstract class CommonEventFilter extends IoFilterAdapter {
 
-    public WrappingFilter() {
+    public CommonEventFilter() {
     }
 
     protected abstract void filter(IoFilterEvent event) throws Exception;

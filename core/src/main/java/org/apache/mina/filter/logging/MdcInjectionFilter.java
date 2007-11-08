@@ -29,7 +29,7 @@ import java.util.Set;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.util.WrappingFilter;
+import org.apache.mina.filter.util.CommonEventFilter;
 import org.slf4j.MDC;
 
 /**
@@ -67,7 +67,7 @@ import org.slf4j.MDC;
  * @version $Rev: 566952 $, $Date: 2007-08-17 09:25:04 +0200 (vr, 17 aug 2007) $
  */
 
-public class MdcInjectionFilter extends WrappingFilter {
+public class MdcInjectionFilter extends CommonEventFilter {
 
     public enum MdcKey {
         handlerClass, remoteAddress, localAddress, remoteIp, remotePort, localIp, localPort
