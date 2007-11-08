@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * 
  * ...
  * 
- * // Release related resorcese.
+ * // Release related resources.
  * connector.dispose();
  * acceptor.dispose();
  * pool.dispose();
