@@ -394,7 +394,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Enter: " + sessionBufferSize);
+            logger.debug(getMessage(session, "  Entered - "));
         }
         
         if (enforcePolicy) {
@@ -422,7 +422,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         log(session, state);
         session.suspendRead();
         if (logger.isDebugEnabled()) {
-            logger.debug("Suspended: {}", getMessage(session));
+            logger.debug(getMessage(session, "Suspended - "));
         }
     }
     
@@ -465,13 +465,13 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         }
         
         if (logger.isDebugEnabled()) {
-            logger.debug("Exit: {}", state.sessionBufferSize);
+            logger.debug(getMessage(session, "   Exited - "));
         }
         
         if (enforcePolicy) {
             session.resumeRead();
             if (logger.isDebugEnabled()) {
-                logger.debug("Resumed");
+                logger.debug(getMessage(session, "  Resumed - "));
             }
         }
         
@@ -535,7 +535,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
             session.resumeRead();
             Logger logger = IoSessionLogger.getLogger(session, getClass());
             if (logger.isDebugEnabled()) {
-                logger.debug("Resumed");
+                logger.debug(getMessage(session, "  Resumed - "));
             }
         }
     }
@@ -562,14 +562,19 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     private void raiseException(IoSession session) {
         throw new ReadFloodException(getMessage(session));
     }
-
+    
     private String getMessage(IoSession session) {
+        return getMessage(session, "Read buffer flooded - ");
+    }
+    
+    private String getMessage(IoSession session, String prefix) {
         int  sessionLimit = maxSessionBufferSize;
         int  serviceLimit = maxServiceBufferSize;
         int  globalLimit  = maxGlobalBufferSize;
 
         StringBuilder buf = new StringBuilder(512);
-        buf.append("Read buffer flooded - session: ");
+        buf.append(prefix);
+        buf.append("session: ");
         if (sessionLimit != 0) {
             buf.append(getSessionBufferSize(session));
             buf.append(" / ");
