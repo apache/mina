@@ -74,18 +74,6 @@ public class UnorderedExecutorFilter extends AbstractExecutorFilter {
 
     @Override
     protected void fireEvent(IoFilterEvent event) {
-        getExecutor().execute(new ProcessEventRunnable(event));
-    }
-
-    private class ProcessEventRunnable implements Runnable {
-        private final IoFilterEvent event;
-
-        ProcessEventRunnable(IoFilterEvent event) {
-            this.event = event;
-        }
-
-        public void run() {
-            event.fire();
-        }
+        getExecutor().execute(event);
     }
 }
