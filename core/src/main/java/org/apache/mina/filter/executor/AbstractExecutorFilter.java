@@ -44,13 +44,15 @@ import org.apache.mina.common.WriteRequest;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractExecutorFilter extends IoFilterAdapter {
-    private final EnumSet<IoEventType> eventTypes;
 
+    static final ThreadLocal<IoSession> currentSession = new ThreadLocal<IoSession>();
+    
+    private final EnumSet<IoEventType> eventTypes;
     private final Executor executor;
 
     /**
      * Creates a new instance with the default thread pool implementation
-     * (<tt>new ThreadPoolExecutor(0, 16, 60, TimeUnit.SECONDS, new SynchronousQueue() )</tt>).
+     * (<tt>new ThreadPoolExecutor(0, 16, 60, TimeUnit.SECONDS, new SynchronousQueue())</tt>).
      */
     protected AbstractExecutorFilter(IoEventType... eventTypes) {
         this(new ThreadPoolExecutor(
