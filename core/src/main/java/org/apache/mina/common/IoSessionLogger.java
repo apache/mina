@@ -130,7 +130,7 @@ public class IoSessionLogger implements Logger {
         this.logger = logger;
 
         // Set the default prefix if not set already.
-        if (usePrefix && session.containsAttribute(PREFIX)) {
+        if (usePrefix && !session.containsAttribute(PREFIX)) {
             session.setAttributeIfAbsent(PREFIX, "["
                     + session.getRemoteAddress() + "] ");
         }
