@@ -148,11 +148,6 @@ public class Wget {
             message = null;
         }
 
-        /**
-         * TODO isClosed.
-         *
-         * @return
-         */
         public boolean isClosed() {
             return closed;
         }

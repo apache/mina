@@ -20,6 +20,7 @@
 package org.apache.mina.integration.spring;
 
 import org.apache.mina.common.IoFilter;
+import org.apache.mina.common.IoService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -29,24 +30,11 @@ import org.springframework.util.Assert;
  * <p>
  * Use this class when you want to configure the
  * filters added to the filter chain of all sessions created from a particular
- * {@link org.apache.mina.common.IoService} created using one of the
- * {@link org.apache.mina.integration.spring.IoAcceptorFactoryBean}
- * sub-classes but you don't want the names to be generated automatically.
- * </p>
- * <p>
- * This class can also be used when creating {@link Binding} objects. This lets
- * one configure per-port filters. These filters will only be added to the
- * filter chain of sessions for incoming connections on the port specified by
- * the {@link Binding}. Note that {@link Binding} can also be configured to
- * generate filter names automatically. In that case you add the {@link IoFilter}
- * instances directly to the {@link Binding}.
+ * {@link IoService} created, but you don't want the names to be generated automatically.
  * </p>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- *
- * @see org.apache.mina.integration.spring.IoAcceptorFactoryBean
- * @see org.apache.mina.integration.spring.Binding
  */
 public class IoFilterMapping implements InitializingBean {
     private String name = null;

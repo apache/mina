@@ -47,14 +47,12 @@ public interface IoSessionManagerMBean {
     public long getWrittenBytes();
 
     /**
-     * PDU decoded from the beginning. Only revelent if a ProtocolCodecFilter is installed.
-     * @return
+     * PDU decoded from the beginning. Only relevant if a ProtocolCodecFilter is installed.
      */
     public long getReadMessages();
 
     /**
-     * PDU encoded from the beginning. Only revelent if a ProtocolCodecFilter is installed.
-     * @return
+     * PDU encoded from the beginning. Only relevant if a ProtocolCodecFilter is installed.
      */
     public long getWrittenMessages();
 

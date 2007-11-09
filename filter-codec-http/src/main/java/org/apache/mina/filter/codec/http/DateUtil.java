@@ -161,8 +161,6 @@ class DateUtil {
      *
      * @param date The date to format.
      * @return An RFC 1123 formatted date string.
-     *
-     * @see #PATTERN_RFC1123
      */
     public static String formatDate(Date date) {
         return formatDate(date, PATTERN_RFC1123);

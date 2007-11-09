@@ -22,8 +22,6 @@ package org.apache.mina.filter.codec.http;
 /**
  * An exception to indicate an error parsing a date string.
  *
- * @see DateUtil
- *
  * @author Michael Becke
  */
 public class DateParseException extends Exception {

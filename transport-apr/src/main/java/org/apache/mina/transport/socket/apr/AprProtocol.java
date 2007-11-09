@@ -27,7 +27,7 @@ import org.apache.tomcat.jni.Socket;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-enum AprProtocol {
+public enum AprProtocol {
     TCP(Socket.APR_PROTO_TCP,Socket.SOCK_STREAM), 
     UDP(Socket.APR_PROTO_UDP,Socket.SOCK_DGRAM),
     SCTP(Socket.APR_PROTO_SCTP,Socket.SOCK_STREAM);

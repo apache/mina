@@ -34,9 +34,6 @@ public interface StateContextLookup {
      * must create a new {@link StateContext} if a compatible object is in
      * the arguments and the next time that same object is passed to this
      * method the same {@link StateContext} should be returned.
-     * 
-     * @param eventArgs
-     * @return
      */
     StateContext lookup(Object[] eventArgs);
 }

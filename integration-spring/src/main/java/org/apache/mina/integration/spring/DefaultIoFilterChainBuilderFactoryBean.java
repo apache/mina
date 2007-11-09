@@ -35,9 +35,8 @@ import org.springframework.util.Assert;
  * <p>
  * The filters may be set up in two ways. By creating
  * {@link IoFilterMapping} objects which associate a name with an {@link IoFilter}
- * instance and set them using {@link #setFilterMappings(IoFilterMapping[])} or
- * by using {@link #setFilters(IoFilter[])} directly which assigns automatically
- * generated names to each {@link IoFilter}. Use the
+ * instance and set them using {@link #setFilters(List)} directly which assigns
+ * automatically generated names to each {@link IoFilter}. Use the
  * {@link #setFilterNamePrefix(String)} method to set the prefix used for
  * auto generated names.
  * </p>
@@ -71,7 +70,7 @@ public class DefaultIoFilterChainBuilderFactoryBean extends AbstractFactoryBean 
 
     /**
      * Sets the prefix used to create the names for automatically named filters
-     * added using {@link #setFilters(IoFilter[])}. The default prefix is
+     * added using {@link #setFilters(List)}. The default prefix is
      * <tt>filter</tt>.
      *
      * @param prefix the prefix.

@@ -78,10 +78,6 @@ public class AprConnector extends AbstractIoConnector {
      * 
      * @param protocol 
      * 			  The needed socket protocol (TCP,UDP,...)
-     * @param processorCount
-     *            Number of processing threads
-     * @param executor
-     *            Executor to use for launching threads
      */
     public AprConnector(AprProtocol protocol, IoProcessor<AprSession> processor, boolean createdProcessor) {
         super(new DefaultAprSessionConfig());

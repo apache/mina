@@ -421,8 +421,8 @@ public class SslContextFactoryBean extends AbstractFactoryBean {
     /**
      * Sets the SSLSession cache size for the {@link SSLSessionContext} for use in server mode.
      *
-     * @param size the new session cache size limit; zero means there is no limit.
-     * @see SSLSessionContext#setSessionCacheSize(int size)
+     * @param serverSessionCacheSize the new session cache size limit; zero means there is no limit.
+     * @see SSLSessionContext#setSessionCacheSize(int)
      */
     public void setServerSessionCacheSize(int serverSessionCacheSize) {
         this.serverSessionCacheSize = serverSessionCacheSize;
@@ -431,8 +431,8 @@ public class SslContextFactoryBean extends AbstractFactoryBean {
     /**
      * Set the SSLSession timeout limit for the {@link SSLSessionContext} for use in server mode.
      *
-     * @param seconds the new session timeout limit in seconds; zero means there is no limit.
-     * @see SSLSessionContext#setSessionTimeout(int seconds)
+     * @param serverSessionTimeout the new session timeout limit in seconds; zero means there is no limit.
+     * @see SSLSessionContext#setSessionTimeout(int)
      */
     public void setServerSessionTimeout(int serverSessionTimeout) {
         this.serverSessionTimeout = serverSessionTimeout;

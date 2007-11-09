@@ -45,23 +45,14 @@ public class IoSessionManager implements IoSessionManagerMBean {
         this.session = session;
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#isConnected()
-     */
     public boolean isConnected() {
         return session.isConnected();
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getReadBytes()
-     */
     public long getReadBytes() {
         return session.getReadBytes();
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getWrittenBytes()
-     */
     public long getWrittenBytes() {
         return session.getWrittenBytes();
     }
@@ -74,44 +65,26 @@ public class IoSessionManager implements IoSessionManagerMBean {
         return ((AbstractIoSession) session).getWrittenMessages();
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#close()
-     */
     public void close() {
         session.close().awaitUninterruptibly();
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getCreationTime()
-     */
     public Date getCreationTime() {
         return new Date(session.getCreationTime());
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getLastIoTime()
-     */
     public Date getLastIoTime() {
         return new Date(session.getLastIoTime());
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getLastReadTime()
-     */
     public Date getLastReadTime() {
         return new Date(session.getLastReadTime());
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getLastWriteTime()
-     */
     public Date getLastWriteTime() {
         return new Date(session.getLastWriteTime());
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#getInstalledFilters()
-     */
     public String[] getInstalledFilters() {
         List<IoFilterChain.Entry> filters = session.getFilterChain().getAll();
         String[] res = new String[filters.size()];
@@ -121,32 +94,21 @@ public class IoSessionManager implements IoSessionManagerMBean {
         return res;
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#addLastLoggingFilter()
-     */
     public void addLastLoggingFilter() {
         LoggingFilter f = new LoggingFilter();
         session.getFilterChain().addLast("LoggerLast", f);
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#removeLastLoggingFilter()
-     */
     public void removeLastLoggingFilter() {
-
         session.getFilterChain().remove("LoggerLast");
     }
 
-    /**
-     * @see archean.util.mina.IoSessionManagerMBean#addFirstLoggingFilter()
-     */
     public void addFirstLoggingFilter() {
         LoggingFilter f = new LoggingFilter();
         session.getFilterChain().addFirst("LoggerFirst", f);
     }
 
     public void removeFirstLoggingFilter() {
-
         session.getFilterChain().remove("LoggerFirst");
     }
 
