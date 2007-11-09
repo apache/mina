@@ -51,7 +51,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     private static final IoSession EXIT_SIGNAL = new DummySession();
 
     private final AttributeKey BUFFER = new AttributeKey(getClass(), "queue");
-    private final BlockingQueue<IoSession> waitingSessionQueue = new LinkedBlockingQueue<IoSession>();
+    private final BlockingQueue<IoSession> waitingSessions = new LinkedBlockingQueue<IoSession>();
     
     private final Set<Worker> workers = new HashSet<Worker>();
     
@@ -141,7 +141,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             if (workers.size() <= corePoolSize) {
                 return;
             }
-            waitingSessionQueue.offer(EXIT_SIGNAL);
+            waitingSessions.offer(EXIT_SIGNAL);
         }
     }
     
@@ -207,7 +207,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
         synchronized (workers) {
             for (int i = workers.size(); i > 0; i --) {
-                waitingSessionQueue.offer(EXIT_SIGNAL);
+                waitingSessions.offer(EXIT_SIGNAL);
             }
         }
     }
@@ -218,9 +218,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         
         List<Runnable> answer = new ArrayList<Runnable>();
         IoSession session;
-        while ((session = waitingSessionQueue.poll()) != null) {
+        while ((session = waitingSessions.poll()) != null) {
             if (session == EXIT_SIGNAL) {
-                waitingSessionQueue.offer(EXIT_SIGNAL);
+                waitingSessions.offer(EXIT_SIGNAL);
                 Thread.yield(); // Let others take the signal.
                 continue;
             }
@@ -259,7 +259,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
         
         if (offer) {
-            waitingSessionQueue.offer(s);
+            waitingSessions.offer(s);
         }
         
         addWorkerIfNecessary();
@@ -448,7 +448,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                     }
 
                     try {
-                        session = waitingSessionQueue.poll(waitTime, TimeUnit.MILLISECONDS);
+                        session = waitingSessions.poll(waitTime, TimeUnit.MILLISECONDS);
                         break;
                     } finally {
                         if (session == null) {
