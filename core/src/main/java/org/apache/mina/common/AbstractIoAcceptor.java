@@ -123,11 +123,16 @@ public abstract class AbstractIoAcceptor
         synchronized (bindLock) {
             if (bound) {
                 throw new IllegalStateException("Already bound to: "
-                        + getLocalAddress());
+                        + getLocalAddresses());
             }
 
             if (getHandler() == null) {
                 throw new IllegalStateException("handler is not set.");
+            }
+            
+            if (localAddresses.isEmpty()) {
+                throw new IllegalStateException(
+                        "no local addresses were specified.");
             }
 
             try {
@@ -138,7 +143,7 @@ public abstract class AbstractIoAcceptor
                 throw e;
             } catch (Throwable e) {
                 throw new RuntimeIoException(
-                        "Failed to bind to: " + getLocalAddress(), e);
+                        "Failed to bind to: " + getLocalAddresses(), e);
             }
             bound = true;
         }
@@ -157,7 +162,7 @@ public abstract class AbstractIoAcceptor
                 throw e;
             } catch (Throwable e) {
                 throw new RuntimeIoException(
-                        "Failed to unbind from: " + getLocalAddress(), e);
+                        "Failed to unbind from: " + getLocalAddresses(), e);
             }
             bound = false;
         }
