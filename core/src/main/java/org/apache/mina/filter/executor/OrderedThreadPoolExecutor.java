@@ -49,8 +49,15 @@ import org.apache.mina.util.CircularQueue;
 public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private static final IoSession EXIT_SIGNAL = new DummySession();
+    private static final IoEventQueueHandler NOOP_QUEUE_MONITOR = new IoEventQueueHandler() {
+        public boolean accept(OrderedThreadPoolExecutor executor, IoEvent event) {
+            return true;
+        }
+        public void offered(OrderedThreadPoolExecutor executor, IoEvent event) {}
+        public void polled(OrderedThreadPoolExecutor executor, IoEvent event) {}
+    };
 
-    private final AttributeKey BUFFER = new AttributeKey(getClass(), "queue");
+    private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
     private final BlockingQueue<IoSession> waitingSessions = new LinkedBlockingQueue<IoSession>();
     
     private final Set<Worker> workers = new HashSet<Worker>();
@@ -61,8 +68,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     private final AtomicInteger idleWorkers = new AtomicInteger();
     
     private long completedTaskCount;
-    
     private volatile boolean shutdown;
+    
+    private volatile IoEventQueueHandler queueHandler;
     
     public OrderedThreadPoolExecutor(int maximumPoolSize) {
         this(0, maximumPoolSize);
@@ -80,22 +88,22 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     public OrderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
-            RejectedExecutionHandler handler) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), handler);
+            IoEventQueueHandler queueMonitor) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueMonitor);
     }
 
     public OrderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, new AbortPolicy());
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, null);
     }
 
     public OrderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
-            ThreadFactory threadFactory, RejectedExecutionHandler handler) {
-        super(0, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), threadFactory, handler);
+            ThreadFactory threadFactory, IoEventQueueHandler queueMonitor) {
+        super(0, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), threadFactory, new AbortPolicy());
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
         }
@@ -106,8 +114,25 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
+        setQueueHandler(queueMonitor);
     }
     
+    public IoEventQueueHandler getQueueHandler() {
+        return queueHandler;
+    }
+
+    public void setQueueHandler(IoEventQueueHandler queueHandler) {
+        if (queueHandler == null) {
+            queueHandler = NOOP_QUEUE_MONITOR;
+        }
+        this.queueHandler = queueHandler;
+    }
+
+    @Override
+    public void setRejectedExecutionHandler(RejectedExecutionHandler handler) {
+        // Ignore the request.  It must always be AbortPolicy.
+    }
+
     private void addWorker() {
         synchronized (workers) {
             if (workers.size() >= maximumPoolSize) {
@@ -253,10 +278,15 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         Queue<Runnable> queue = buf.queue;
         boolean offer;
         synchronized (queue) {
-            queue.offer(e);
-            if (buf.processingCompleted) {
-                buf.processingCompleted = false;
-                offer = true;
+            if (queueHandler.accept(this, e)) {
+                queue.offer(e);
+                queueHandler.offered(this, e);
+                if (buf.processingCompleted) {
+                    buf.processingCompleted = false;
+                    offer = true;
+                } else {
+                    offer = false;
+                }
             } else {
                 offer = false;
             }
@@ -345,7 +375,12 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
     }
-
+    
+    @Override
+    public BlockingQueue<Runnable> getQueue() {
+        throw new UnsupportedOperationException("Please use getQueue(Runnable) instead.");
+    }
+    
     @Override
     public void purge() {
     }
@@ -482,6 +517,8 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                         break;
                     }
                 }
+
+                queueHandler.polled(OrderedThreadPoolExecutor.this, (IoEvent) task);
 
                 runTask(task);
             }

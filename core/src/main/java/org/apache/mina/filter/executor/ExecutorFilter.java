@@ -26,10 +26,8 @@ import java.util.EnumSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEventType;
@@ -103,6 +101,10 @@ import org.apache.mina.common.WriteRequest;
  * chain.addLast("executor2", new ExecutorFilter(IoEventType.WRITE));
  * </code></pre>
  * 
+ * <h2>Preventing {@link OutOfMemoryError}</h2>
+ * 
+ * Please refer to {@link OrderedThreadPoolExecutor} and {@link IoEventQueueHandler}.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -152,8 +154,8 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
-            RejectedExecutionHandler handler) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), handler, (IoEventType[]) null);
+            IoEventQueueHandler queueHandler) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler, (IoEventType[]) null);
     }
 
     /**
@@ -164,7 +166,7 @@ public class ExecutorFilter extends IoFilterAdapter {
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, new AbortPolicy(), (IoEventType[]) null);
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, null, (IoEventType[]) null);
     }
 
     /**
@@ -174,8 +176,8 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
-            ThreadFactory threadFactory, RejectedExecutionHandler handler) {
-        this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, handler), true, (IoEventType[]) null);
+            ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
+        this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, queueHandler), true, (IoEventType[]) null);
     }
 
     /**
@@ -218,8 +220,8 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
-            RejectedExecutionHandler handler, IoEventType... eventTypes) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), handler, eventTypes);
+            IoEventQueueHandler queueHandler, IoEventType... eventTypes) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler, eventTypes);
     }
 
     /**
@@ -230,7 +232,7 @@ public class ExecutorFilter extends IoFilterAdapter {
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventType... eventTypes) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, new AbortPolicy(), eventTypes);
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, null, eventTypes);
     }
 
     /**
@@ -240,8 +242,8 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
-            ThreadFactory threadFactory, RejectedExecutionHandler handler, IoEventType... eventTypes) {
-        this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, handler), true, eventTypes);
+            ThreadFactory threadFactory, IoEventQueueHandler queueHandler, IoEventType... eventTypes) {
+        this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, queueHandler), true, eventTypes);
     }
     
     /**
