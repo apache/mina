@@ -65,15 +65,21 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     
     @SuppressWarnings("unchecked")
     public void addMessageEncoder(Iterable<Class<?>> messageTypes, Class<? extends MessageEncoder> encoderClass) {
-        this.encoder.addMessageEncoder(messageTypes, encoderClass);
+        for (Class<?> messageType : messageTypes) {
+            addMessageEncoder(messageType, encoderClass);
+        }
     }
     
     public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoder<? super T> encoder) {
-        this.encoder.addMessageEncoder(messageTypes, encoder);
+        for (Class<? extends T> messageType : messageTypes) {
+            addMessageEncoder(messageType, encoder);
+        }
     }
     
     public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoderFactory<? super T> factory) {
-        this.encoder.addMessageEncoder(messageTypes, factory);
+        for (Class<? extends T> messageType : messageTypes) {
+            addMessageEncoder(messageType, factory);
+        }
     }
     
     public void addMessageDecoder(Class<? extends MessageDecoder> decoderClass) {
