@@ -25,7 +25,11 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEventType;
@@ -86,6 +90,27 @@ public class ExecutorFilter extends IoFilterAdapter {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, (IoEventType[]) null);
     }
 
+    public ExecutorFilter(
+            int corePoolSize, int maximumPoolSize, 
+            long keepAliveTime, TimeUnit unit,
+            RejectedExecutionHandler handler) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), handler, (IoEventType[]) null);
+    }
+
+    public ExecutorFilter(
+            int corePoolSize, int maximumPoolSize, 
+            long keepAliveTime, TimeUnit unit,
+            ThreadFactory threadFactory) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, new AbortPolicy(), (IoEventType[]) null);
+    }
+
+    public ExecutorFilter(
+            int corePoolSize, int maximumPoolSize, 
+            long keepAliveTime, TimeUnit unit,
+            ThreadFactory threadFactory, RejectedExecutionHandler handler) {
+        this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, handler), true, (IoEventType[]) null);
+    }
+
     public ExecutorFilter(IoEventType... eventTypes) {
         this(16, eventTypes);
     }
@@ -100,7 +125,28 @@ public class ExecutorFilter extends IoFilterAdapter {
     
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, IoEventType... eventTypes) {
-        this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit), true, eventTypes);
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), eventTypes);
+    }
+    
+    public ExecutorFilter(
+            int corePoolSize, int maximumPoolSize, 
+            long keepAliveTime, TimeUnit unit,
+            RejectedExecutionHandler handler, IoEventType... eventTypes) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), handler, eventTypes);
+    }
+
+    public ExecutorFilter(
+            int corePoolSize, int maximumPoolSize, 
+            long keepAliveTime, TimeUnit unit,
+            ThreadFactory threadFactory, IoEventType... eventTypes) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, new AbortPolicy(), eventTypes);
+    }
+
+    public ExecutorFilter(
+            int corePoolSize, int maximumPoolSize, 
+            long keepAliveTime, TimeUnit unit,
+            ThreadFactory threadFactory, RejectedExecutionHandler handler, IoEventType... eventTypes) {
+        this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, handler), true, eventTypes);
     }
     
     public ExecutorFilter(Executor executor) {
