@@ -19,8 +19,6 @@
  */
 package org.apache.mina.filter.codec.demux;
 
-import java.util.Collection;
-
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
@@ -66,22 +64,16 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     }
     
     @SuppressWarnings("unchecked")
-    public void addMessageEncoder(Collection<Class<?>> messageTypes, Class<? extends MessageEncoder> encoderClass) {
-    	for (Class<?> messageType : messageTypes) {
-    		this.encoder.addMessageEncoder(messageType, encoderClass);
-    	}
+    public void addMessageEncoder(Iterable<Class<?>> messageTypes, Class<? extends MessageEncoder> encoderClass) {
+        this.encoder.addMessageEncoder(messageTypes, encoderClass);
     }
     
-    public <T> void addMessageEncoder(Collection<Class<? extends T>> messageTypes, MessageEncoder<? super T> encoder) {
-    	for (Class<? extends T> messageType : messageTypes) {
-    		this.encoder.addMessageEncoder(messageType, encoder);
-    	}
+    public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoder<? super T> encoder) {
+        this.encoder.addMessageEncoder(messageTypes, encoder);
     }
     
-    public <T> void addMessageEncoder(Collection<Class<? extends T>> messageTypes, MessageEncoderFactory<? super T> factory) {
-    	for (Class<? extends T> messageType : messageTypes) {
-    		this.encoder.addMessageEncoder(messageType, factory);
-    	}
+    public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoderFactory<? super T> factory) {
+        this.encoder.addMessageEncoder(messageTypes, factory);
     }
     
     public void addMessageDecoder(Class<? extends MessageDecoder> decoderClass) {

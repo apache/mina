@@ -107,6 +107,25 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public void addMessageEncoder(Iterable<Class<?>> messageTypes, Class<? extends MessageEncoder> encoderClass) {
+        for (Class<?> messageType : messageTypes) {
+            addMessageEncoder(messageType, encoderClass);
+        }
+    }
+    
+    public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoder<? super T> encoder) {
+        for (Class<? extends T> messageType : messageTypes) {
+            addMessageEncoder(messageType, encoder);
+        }
+    }
+    
+    public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoderFactory<? super T> factory) {
+        for (Class<? extends T> messageType : messageTypes) {
+            addMessageEncoder(messageType, factory);
+        }
+    }
+    
     public void encode(IoSession session, Object message,
             ProtocolEncoderOutput out) throws Exception {
         State state = getState(session);
