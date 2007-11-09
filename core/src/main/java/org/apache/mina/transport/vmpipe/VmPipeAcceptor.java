@@ -81,7 +81,7 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
                 VmPipeAddress localAddress = (VmPipeAddress) a;
                 if (localAddress == null || localAddress.getPort() == 0) {
                     localAddress = null;
-                    for (int i = 1; i < Integer.MAX_VALUE; i++) {
+                    for (int i = 10000; i < Integer.MAX_VALUE; i++) {
                         VmPipeAddress newLocalAddress = new VmPipeAddress(i);
                         if (!boundHandlers.containsKey(newLocalAddress) &&
                             !newLocalAddresses.contains(newLocalAddress)) {
@@ -111,7 +111,7 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
                     for (SocketAddress a2: newLocalAddresses) {
                         boundHandlers.remove(a2);
                     }
-                    break;
+                    throw new IOException("Duplicate local address: " + a);
                 }
             }
         }
