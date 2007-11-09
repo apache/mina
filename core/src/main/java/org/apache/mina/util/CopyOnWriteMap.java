@@ -62,7 +62,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      * initial data being held by this map is contained in
      * the supplied map.
      *
-     * @param internalMap
+     * @param data
      *  A Map containing the initial contents to be placed into
      *  this class.
      */

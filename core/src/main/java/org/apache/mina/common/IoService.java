@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -178,7 +179,7 @@ public interface IoService {
     /**
      * Writes the specified {@code message} to all the {@link IoSession}s
      * managed by this service.  This method is a convenience shortcut for
-     * {@link IoSessions#broadcast(Object, java.util.Collection)}.
+     * {@link IoUtil#broadcast(Object, Collection)}.
      */
     Set<WriteFuture> broadcast(Object message);
     

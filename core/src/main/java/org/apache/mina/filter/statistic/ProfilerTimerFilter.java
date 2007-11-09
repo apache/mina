@@ -93,10 +93,9 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
     }
 
     /**
-     * Sets the {@link ProfilerTimerUnit} being used.
+     * Sets the {@link TimeUnit} being used.
      *
-     * @param timeUnit
-     *  Sets the new {@link ProfilerTimerUnit} to be used.
+     * @param unit the new {@link TimeUnit} to be used.
      */
     public void setTimeUnit(TimeUnit unit) {
         if (unit == TimeUnit.MILLISECONDS) {
@@ -147,7 +146,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      * Set the bitmask in order to tell this filter which
      * methods to print out timing information
      *
-     * @param eventsToProfile
+     * @param methodsToLog
      *  An int representing the new methods that should be logged
      */
     public void setEventsToProfile(EnumSet<IoEventType> methodsToLog) {
@@ -326,7 +325,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      * for each method.
      *
      */
-    class TimerWorker {
+    private class TimerWorker {
 
         private AtomicLong total;
 
@@ -424,7 +423,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         }
     }
 
-    enum ProfilerTimerUnit {
+    private enum ProfilerTimerUnit {
         SECONDS {
             @Override
             public long timeNow() {

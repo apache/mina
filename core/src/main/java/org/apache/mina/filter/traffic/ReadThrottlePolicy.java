@@ -41,7 +41,7 @@ public enum ReadThrottlePolicy {
     /**
      * Block the write operation until the size of write request buffer
      * is full.  You must use this policy in conjunction with the
-     * {@link ReadThrottleFilterChainBuilder} to prevent the
+     * {@link ReadThrottleFilter} to prevent the
      * {@link OutOfMemoryError} on the reader side.
      */
     BLOCK,

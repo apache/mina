@@ -48,8 +48,8 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
 
     /**
      * Creates a new instance with the specified {@link Charset}.  The
-     * encoder uses a UNIX {@link LineDelimeter} and the decoder uses
-     * the AUTO {@link LineDelimeter}.
+     * encoder uses a UNIX {@link LineDelimiter} and the decoder uses
+     * the AUTO {@link LineDelimiter}.
      *
      * @param charset
      *  The charset to use in the encoding and decoding

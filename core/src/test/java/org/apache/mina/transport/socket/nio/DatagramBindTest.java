@@ -26,7 +26,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.transport.AbstractBindTest;
 
 /**
- * Tests {@link NIODatagramAcceptor} resource leakage.
+ * Tests {@link NioDatagramAcceptor} resource leakage.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

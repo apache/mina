@@ -23,11 +23,12 @@ import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * A composite {@link ProtocoDecoder} that demultiplexes incoming {@link IoBuffer}
+ * A composite {@link ProtocolDecoder} that demultiplexes incoming {@link IoBuffer}
  * decoding requests into an appropriate {@link MessageDecoder}.
  * 
  * <h2>Internal mechanism of {@link MessageDecoder} selection</h2>

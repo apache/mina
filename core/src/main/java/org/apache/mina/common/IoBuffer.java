@@ -1918,7 +1918,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *
      * @param <E> The enum type to return
      * @param enumClass  The enum's class object
-     * @return
      */
     public <E extends Enum<E>> E getEnum(Class<E> enumClass) {
         return toEnum(enumClass, get());
@@ -1931,7 +1930,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param <E> The enum type to return
      * @param index  the index from which the byte will be read
      * @param enumClass  The enum's class object
-     * @return
      */
     public <E extends Enum<E>> E getEnum(int index, Class<E> enumClass) {
         return toEnum(enumClass, get(index));
@@ -1943,7 +1941,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *
      * @param <E> The enum type to return
      * @param enumClass  The enum's class object
-     * @return
      */
     public <E extends Enum<E>> E getEnumShort(Class<E> enumClass) {
         return toEnum(enumClass, getShort());
@@ -1956,7 +1953,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param <E> The enum type to return
      * @param index  the index from which the bytes will be read
      * @param enumClass  The enum's class object
-     * @return
      */
     public <E extends Enum<E>> E getEnumShort(int index, Class<E> enumClass) {
         return toEnum(enumClass, getShort(index));
@@ -1968,7 +1964,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *
      * @param <E> The enum type to return
      * @param enumClass  The enum's class object
-     * @return
      */
     public <E extends Enum<E>> E getEnumInt(Class<E> enumClass) {
         return toEnum(enumClass, getInt());
@@ -1981,7 +1976,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param <E> The enum type to return
      * @param index  the index from which the bytes will be read
      * @param enumClass  The enum's class object
-     * @return
      */
     public <E extends Enum<E>> E getEnumInt(int index, Class<E> enumClass) {
         return toEnum(enumClass, getInt(index));

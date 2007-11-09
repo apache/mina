@@ -320,7 +320,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      * {@link #createUnrespondedRequestStore(IoSession)}.  This method is
      * useful if you override {@link #createUnrespondedRequestStore(IoSession)}.
      *
-     * @param requestStore what you returned in {@link #createUnrespondedRequestStore(IoSession)}
+     * @param unrespondedRequestStore what you returned in {@link #createUnrespondedRequestStore(IoSession)}
      */
     protected void destroyUnrespondedRequestStore(
             @SuppressWarnings("unused")

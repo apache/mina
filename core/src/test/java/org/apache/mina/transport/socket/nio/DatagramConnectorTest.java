@@ -24,7 +24,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.transport.AbstractConnectorTest;
 
 /**
- * Tests {@link NIODatagramConnector}.
+ * Tests {@link NioDatagramConnector}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

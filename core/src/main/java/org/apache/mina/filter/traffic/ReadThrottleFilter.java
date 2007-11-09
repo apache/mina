@@ -68,7 +68,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     private static long lastGlobalResumeTime = 0;
     
     /**
-     * Returns the current amount of data in the buffer of the {@link ExecuorFilter}
+     * Returns the current amount of data in the buffer of the {@link ExecutorFilter}
      * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
      * this builder.
      */

@@ -63,7 +63,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     }
 
     /**
-     * Creates a new copy of the specified {@link DefaultFilterChainBuilder}.
+     * Creates a new copy of the specified {@link DefaultIoFilterChainBuilder}.
      */
     public DefaultIoFilterChainBuilder(DefaultIoFilterChainBuilder filterChain) {
         if (filterChain == null) {

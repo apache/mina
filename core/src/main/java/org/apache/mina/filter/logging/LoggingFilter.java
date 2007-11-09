@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoEventType;
+import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
@@ -37,8 +38,9 @@ import org.slf4j.LoggerFactory;
  * are in place that allow the user to use either the get or set method for each event
  * and pass in the {@link IoEventType} and the {@link LogLevel}.
  *
- * By default, all events are logged to the {@link IoEventType.INFO} level except
- * {@link IoFilterAdapter.exceptionCaught()}, which is logged to {@link IoEventType.WARN}.
+ * By default, all events are logged to the {@link #INFO} level except
+ * {@link IoFilterAdapter#exceptionCaught(IoFilter.NextFilter, IoSession, Throwable)},
+ * which is logged to {@link #WARN}.
  *
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$

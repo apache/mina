@@ -37,7 +37,7 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
- * Tests if {@link NIODatagramAcceptor} session is configured properly.
+ * Tests if {@link NioDatagramAcceptor} session is configured properly.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

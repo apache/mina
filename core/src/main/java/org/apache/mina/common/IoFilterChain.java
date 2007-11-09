@@ -325,7 +325,6 @@ public interface IoFilterChain {
         /**
          * Replace the filter of this entry with the specified new filter.
          *
-         * @return the old filter
          * @throws IllegalArgumentException if there's no such filter
          */
         void replace(IoFilter newFilter);
