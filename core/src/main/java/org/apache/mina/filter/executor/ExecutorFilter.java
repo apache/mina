@@ -37,13 +37,32 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 
 /**
- * A base abstract class for generic filters that forward I/O events to
- * {@link Executor} to enforce a certain thread model.
+ * A filter that forwards I/O events to {@link Executor} to enforce a certain
+ * thread model while allowing the events per session to be processed
+ * simultaneously. You can apply various thread model by inserting this filter
+ * to a {@link IoFilterChain}.
+ * <p>
+ * Please note that this filter doesn't manage the life cycle of the underlying
+ * {@link Executor}.  You have to destroy or stop it by yourself.
+ * <p>
+ * This filter does not maintain the order of events per session and thus
+ * more than one event handler methods can be invoked at the same time with
+ * mixed order.  For example, let's assume that messageReceived, messageSent,
+ * and sessionClosed events are fired.
+ * <ul>
+ * <li>All event handler methods can be called simultaneously.
+ *     (e.g. messageReceived and messageSent can be invoked at the same time.)</li>
+ * <li>The event order can be mixed up.
+ *     (e.g. sessionClosed or messageSent can be invoked before messageReceived
+ *           is invoked.)</li>
+ * </ul>
+ * If you need to maintain the order of events per session, please use
+ * {@link OrderedThreadPoolExecutor} as its underlying {@link Executor}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractExecutorFilter extends IoFilterAdapter {
+public class ExecutorFilter extends IoFilterAdapter {
 
     static final ThreadLocal<IoSession> currentSession = new ThreadLocal<IoSession>();
     
@@ -54,7 +73,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
      * Creates a new instance with the default thread pool implementation
      * (<tt>new ThreadPoolExecutor(0, 16, 60, TimeUnit.SECONDS, new SynchronousQueue())</tt>).
      */
-    protected AbstractExecutorFilter(IoEventType... eventTypes) {
+    protected ExecutorFilter(IoEventType... eventTypes) {
         this(new ThreadPoolExecutor(
                 0, 16, 60, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>()), eventTypes);
@@ -63,7 +82,7 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
     /**
      * Creates a new instance with the specified <tt>executor</tt>.
      */
-    protected AbstractExecutorFilter(Executor executor,
+    protected ExecutorFilter(Executor executor,
             IoEventType... eventTypes) {
         if (executor == null) {
             throw new NullPointerException("executor");
@@ -97,7 +116,9 @@ public abstract class AbstractExecutorFilter extends IoFilterAdapter {
         return executor;
     }
 
-    protected abstract void fireEvent(IoFilterEvent event);
+    private void fireEvent(IoFilterEvent event) {
+        getExecutor().execute(event);
+    }
 
     @Override
     public void onPreAdd(IoFilterChain parent, String name,
