@@ -103,10 +103,14 @@ import org.apache.mina.common.WriteRequest;
  * 
  * <h2>Preventing {@link OutOfMemoryError}</h2>
  * 
- * Please refer to {@link OrderedThreadPoolExecutor} and {@link IoEventQueueHandler}.
+ * Please refer to {@link IoEventQueueThrottle}, which is specified as
+ * a parameter of the convenience constructors.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * 
+ * @see OrderedThreadPoolExecutor
+ * @see UnorderedThreadPoolExecutor
  */
 public class ExecutorFilter extends IoFilterAdapter {
 

@@ -27,7 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Throttles incoming events into {@link OrderedThreadPoolExecutor}.
+ * Throttles incoming events into {@link OrderedThreadPoolExecutor} or
+ * {@link UnorderedThreadPoolExecutor}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

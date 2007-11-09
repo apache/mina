@@ -42,7 +42,10 @@ import org.apache.mina.util.CircularQueue;
 
 /**
  * A {@link ThreadPoolExecutor} that maintains the order of {@link IoEvent}s.
- * 
+ * <p>
+ * If you don't need to maintain the order of events per session, please use
+ * {@link UnorderedThreadPoolExecutor}.
+
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */

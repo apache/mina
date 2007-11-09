@@ -25,7 +25,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.mina.common.IoEvent;
 
 /**
- * Listens to all event queue operations occurring in {@link IoThreadPoolExecutor}.
+ * Listenes and filters all event queue operations occurring in
+ * {@link OrderedThreadPoolExecutor} and {@link UnorderedThreadPoolExecutor}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
