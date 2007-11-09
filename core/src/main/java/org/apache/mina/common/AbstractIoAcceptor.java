@@ -58,11 +58,7 @@ public abstract class AbstractIoAcceptor
     }
 
     public void setLocalAddress(SocketAddress localAddress) {
-        if (localAddress == null) {
-            throw new NullPointerException("localAddress");
-        }
-        
-        setLocalAddresses(localAddress);
+        setLocalAddresses(new SocketAddress[] { localAddress });
     }
 
     public List<SocketAddress> getLocalAddresses() {
@@ -76,9 +72,6 @@ public abstract class AbstractIoAcceptor
         
         List<SocketAddress> list = new ArrayList<SocketAddress>();
         for (SocketAddress a: localAddresses) {
-            if (a == null) {
-                continue;
-            }
             list.add(a);
         }
         
@@ -99,10 +92,8 @@ public abstract class AbstractIoAcceptor
             Collection<SocketAddress> newLocalAddresses = 
                 new ArrayList<SocketAddress>();
             for (SocketAddress a: localAddresses) {
-                if (a == null) {
-                    continue;
-                }
-                if (!getTransportMetadata().getAddressType().isAssignableFrom(
+                if (a != null &&
+                    !getTransportMetadata().getAddressType().isAssignableFrom(
                                 a.getClass())) {
                     throw new IllegalArgumentException("localAddress type: "
                             + a.getClass().getSimpleName() + " (expected: "

@@ -79,7 +79,7 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
         synchronized (boundHandlers) {
             for (SocketAddress a: localAddresses) {
                 VmPipeAddress localAddress = (VmPipeAddress) a;
-                if (localAddress.getPort() == 0) {
+                if (localAddress == null || localAddress.getPort() == 0) {
                     localAddress = null;
                     for (int i = 1; i < Integer.MAX_VALUE; i++) {
                         VmPipeAddress newLocalAddress = new VmPipeAddress(i);
