@@ -32,7 +32,6 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.TrafficMask;
 import org.apache.mina.filter.executor.ExecutorFilter;
-import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.util.CopyOnWriteMap;
 import org.slf4j.Logger;
 
@@ -455,8 +454,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
                 state.sessionBufferSize = sessionBufferSize = 0;
                 throw new IllegalStateException("sessionBufferSize < 0");
             }
-            if (state.suspendedRead &&
-                (maxGlobalBufferSize == 0 || globalBufferSize < maxGlobalBufferSize) &&
+            if ((maxGlobalBufferSize == 0 || globalBufferSize < maxGlobalBufferSize) &&
                 (maxServiceBufferSize == 0 || serviceBufferSize < maxServiceBufferSize) &&
                 (maxSessionBufferSize == 0 || sessionBufferSize < maxSessionBufferSize)) {
                 state.suspendedRead = false;
@@ -524,8 +522,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         int maxSessionBufferSize = this.maxSessionBufferSize;
         boolean resume = false;
         synchronized (state) {
-            if (state.suspendedRead &&
-                (maxSessionBufferSize == 0 || state.sessionBufferSize < maxSessionBufferSize)) {
+            if ((maxSessionBufferSize == 0 || state.sessionBufferSize < maxSessionBufferSize)) {
                 state.suspendedRead = false;
                 resume = true;
             }
