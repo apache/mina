@@ -221,7 +221,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             }
     
             first = 0;
-            last = oldLen;
+            last = size;
             items = tmp;
             mask = tmp.length - 1;
         }
