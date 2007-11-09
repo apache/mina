@@ -38,6 +38,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
 
     private static final int DEFAULT_CAPACITY = 4;
 
+    private final int initialCapacity;
     private Object[] items;
     private int mask;
     private int first = 0;
@@ -52,6 +53,13 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
     }
     
     public CircularQueue(int initialCapacity) {
+        int actualCapacity = normalizeCapacity(initialCapacity);
+        items = new Object[actualCapacity];
+        mask = actualCapacity - 1;
+        this.initialCapacity = actualCapacity;
+    }
+
+    private static int normalizeCapacity(int initialCapacity) {
         int actualCapacity = 1;
         while (actualCapacity < initialCapacity) {
             actualCapacity <<= 1;
@@ -60,8 +68,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
                 break;
             }
         }
-        items = new Object[actualCapacity];
-        mask = actualCapacity - 1;
+        return actualCapacity;
     }
 
     /**
@@ -78,6 +85,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             first = 0;
             last = 0;
             full = false;
+            shrinkIfNeeded();
         }
     }
 
@@ -95,6 +103,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             first = last = 0;
         }
 
+        shrinkIfNeeded();
         return (E) ret;
     }
 
@@ -102,7 +111,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         if (item == null) {
             throw new NullPointerException("item");
         }
-        ensureCapacity();
+        expandIfNeeded();
         items[last] = item;
         increaseSize();
         return true;
@@ -168,26 +177,54 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         full = false;
     }
 
-    private void ensureCapacity() {
-        if (!full) {
-            return;
+    private void expandIfNeeded() {
+        if (full) {
+            // expand queue
+            final int oldLen = items.length;
+            Object[] tmp = new Object[oldLen << 1];
+    
+            if (first < last) {
+                System.arraycopy(items, first, tmp, 0, last - first);
+            } else {
+                System.arraycopy(items, first, tmp, 0, oldLen - first);
+                System.arraycopy(items, 0, tmp, oldLen - first, last);
+            }
+    
+            first = 0;
+            last = oldLen;
+            items = tmp;
+            mask = tmp.length - 1;
         }
-
-        // expand queue
-        final int oldLen = items.length;
-        Object[] tmp = new Object[oldLen << 1];
-
-        if (first < last) {
-            System.arraycopy(items, first, tmp, 0, last - first);
-        } else {
-            System.arraycopy(items, first, tmp, 0, oldLen - first);
-            System.arraycopy(items, 0, tmp, oldLen - first, last);
+    }
+    
+    private void shrinkIfNeeded() {
+        int size = size();
+        if (size < (capacity() >>> 1)) {
+            // shrink queue
+            final int oldLen = items.length;
+            int newLen = normalizeCapacity(size);
+            if (newLen < initialCapacity) {
+                if (oldLen == initialCapacity) {
+                    return;
+                } else {
+                    newLen = initialCapacity;
+                }
+            }
+            
+            Object[] tmp = new Object[newLen];
+    
+            if (first < last) {
+                System.arraycopy(items, first, tmp, 0, last - first);
+            } else {
+                System.arraycopy(items, first, tmp, 0, oldLen - first);
+                System.arraycopy(items, 0, tmp, oldLen - first, last);
+            }
+    
+            first = 0;
+            last = oldLen;
+            items = tmp;
+            mask = tmp.length - 1;
         }
-
-        first = 0;
-        last = oldLen;
-        items = tmp;
-        mask = tmp.length - 1;
     }
 
     @Override
@@ -214,7 +251,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         }
 
         checkIndex(idx);
-        ensureCapacity();
+        expandIfNeeded();
 
         int realIdx = getRealIndex(idx);
 
@@ -269,6 +306,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         items[first] = null;
         decreaseSize();
 
+        shrinkIfNeeded();
         return (E) removed;
     }
 
