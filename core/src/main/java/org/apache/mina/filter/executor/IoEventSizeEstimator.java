@@ -19,34 +19,15 @@
  */
 package org.apache.mina.filter.executor;
 
-import java.util.EventListener;
-import java.util.concurrent.ThreadPoolExecutor;
-
 import org.apache.mina.common.IoEvent;
 
 /**
- * Listens to all event queue operations occurring in {@link IoThreadPoolExecutor}.
+ * Estimates the amount of memory that the specified {@link IoEvent} occupies
+ * in the current JVM.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface IoEventQueueHandler extends EventListener {
-    /**
-     * Returns <tt>true</tt> if and only if the specified <tt>event</tt> is
-     * allowed to be offered to the event queue.  The <tt>event</tt> is dropped
-     * if <tt>false</tt> is returned.
-     */
-    boolean accept(ThreadPoolExecutor executor, IoEvent event);
-    
-    /**
-     * Invoked after the specified <tt>event</tt> has been offered to the
-     * event queue.
-     */
-    void offered(ThreadPoolExecutor executor, IoEvent event);
-    
-    /**
-     * Invoked after the specified <tt>event</tt> has been polled from the
-     * event queue.
-     */
-    void polled(ThreadPoolExecutor executor, IoEvent event);
+public interface IoEventSizeEstimator {
+    int estimateSize(IoEvent event);
 }

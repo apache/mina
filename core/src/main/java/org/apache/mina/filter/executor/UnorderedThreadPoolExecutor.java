@@ -22,33 +22,40 @@ package org.apache.mina.filter.executor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.DummySession;
 import org.apache.mina.common.IoEvent;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.util.CircularQueue;
 
 /**
- * A {@link ThreadPoolExecutor} that maintains the order of {@link IoEvent}s.
+ * A {@link ThreadPoolExecutor} that does not maintain the order of {@link IoEvent}s.
+ * This means more than one event handler methods can be invoked at the same
+ * time with mixed order.  For example, let's assume that messageReceived, messageSent,
+ * and sessionClosed events are fired.
+ * <ul>
+ * <li>All event handler methods can be called simultaneously.
+ *     (e.g. messageReceived and messageSent can be invoked at the same time.)</li>
+ * <li>The event order can be mixed up.
+ *     (e.g. sessionClosed or messageSent can be invoked before messageReceived
+ *           is invoked.)</li>
+ * </ul>
+ * If you need to maintain the order of events per session, please use
+ * {@link OrderedThreadPoolExecutor}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
+public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
-    private static final IoSession EXIT_SIGNAL = new DummySession();
+    private static final Runnable EXIT_SIGNAL = new Runnable() {
+        public void run() {}
+    };
     private static final IoEventQueueHandler NOOP_QUEUE_MONITOR = new IoEventQueueHandler() {
         public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
             return true;
@@ -57,9 +64,6 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         public void polled(ThreadPoolExecutor executor, IoEvent event) {}
     };
 
-    private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
-    private final BlockingQueue<IoSession> waitingSessions = new LinkedBlockingQueue<IoSession>();
-    
     private final Set<Worker> workers = new HashSet<Worker>();
     
     private volatile int corePoolSize;
@@ -72,42 +76,42 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     
     private volatile IoEventQueueHandler queueHandler;
     
-    public OrderedThreadPoolExecutor() {
+    public UnorderedThreadPoolExecutor() {
         this(16);
     }
     
-    public OrderedThreadPoolExecutor(int maximumPoolSize) {
+    public UnorderedThreadPoolExecutor(int maximumPoolSize) {
         this(0, maximumPoolSize);
     }
     
-    public OrderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize) {
+    public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize) {
         this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS);
     }
     
-    public OrderedThreadPoolExecutor(
+    public UnorderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory());
     }
     
-    public OrderedThreadPoolExecutor(
+    public UnorderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
             IoEventQueueHandler queueMonitor) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueMonitor);
     }
 
-    public OrderedThreadPoolExecutor(
+    public UnorderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, null);
     }
 
-    public OrderedThreadPoolExecutor(
+    public UnorderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventQueueHandler queueMonitor) {
-        super(0, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), threadFactory, new AbortPolicy());
+        super(0, 1, keepAliveTime, unit, new LinkedBlockingQueue<Runnable>(), threadFactory, new AbortPolicy());
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
         }
@@ -170,7 +174,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             if (workers.size() <= corePoolSize) {
                 return;
             }
-            waitingSessions.offer(EXIT_SIGNAL);
+            getQueue().offer(EXIT_SIGNAL);
         }
     }
     
@@ -240,7 +244,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
         synchronized (workers) {
             for (int i = workers.size(); i > 0; i --) {
-                waitingSessions.offer(EXIT_SIGNAL);
+                getQueue().offer(EXIT_SIGNAL);
             }
         }
     }
@@ -250,19 +254,15 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         shutdown();
         
         List<Runnable> answer = new ArrayList<Runnable>();
-        IoSession session;
-        while ((session = waitingSessions.poll()) != null) {
-            if (session == EXIT_SIGNAL) {
-                waitingSessions.offer(EXIT_SIGNAL);
+        Runnable task;
+        while ((task = getQueue().poll()) != null) {
+            if (task == EXIT_SIGNAL) {
+                getQueue().offer(EXIT_SIGNAL);
                 Thread.yield(); // Let others take the signal.
                 continue;
             }
             
-            SessionBuffer buf = (SessionBuffer) session.getAttribute(BUFFER);
-            synchronized (buf.queue) {
-                answer.addAll(buf.queue);
-                buf.queue.clear();
-            }
+            answer.add(task);
         }
         
         return answer;
@@ -277,28 +277,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         checkTaskType(task);
         
         IoEvent e = (IoEvent) task;
-        IoSession s = e.getSession();
-        SessionBuffer buf = getSessionBuffer(s);
-        Queue<Runnable> queue = buf.queue;
-        boolean offerSession;
-        boolean offeredEvent;
-        synchronized (queue) {
-            offeredEvent = queueHandler.accept(this, e);
-            if (offeredEvent) {
-                queue.offer(e);
-                if (buf.processingCompleted) {
-                    buf.processingCompleted = false;
-                    offerSession = true;
-                } else {
-                    offerSession = false;
-                }
-            } else {
-                offerSession = false;
-            }
-        }
-        
-        if (offerSession) {
-            waitingSessions.offer(s);
+        boolean offeredEvent = queueHandler.accept(this, e);
+        if (offeredEvent) {
+            getQueue().offer(e);
         }
         
         addWorkerIfNecessary();
@@ -386,30 +367,6 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     }
     
     @Override
-    public BlockingQueue<Runnable> getQueue() {
-        throw new UnsupportedOperationException("Please use getQueue(Runnable) instead.");
-    }
-    
-    @Override
-    public void purge() {
-    }
-
-    @Override
-    public boolean remove(Runnable task) {
-        checkTaskType(task);
-        IoEvent e = (IoEvent) task;
-        IoSession s = e.getSession();
-        SessionBuffer buffer = (SessionBuffer) s.getAttribute(BUFFER);
-        if (buffer == null) {
-            return false;
-        }
-        
-        synchronized (buffer.queue) {
-            return buffer.queue.remove(task);
-        }
-    }
-    
-    @Override
     public int getCorePoolSize() {
         return corePoolSize;
     }
@@ -429,23 +386,6 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             this.corePoolSize = corePoolSize;
         }
     }
-
-    private SessionBuffer getSessionBuffer(IoSession session) {
-        SessionBuffer buffer = (SessionBuffer) session.getAttribute(BUFFER);
-        if (buffer == null) {
-            buffer = new SessionBuffer();
-            SessionBuffer oldBuffer = (SessionBuffer) session.setAttributeIfAbsent(BUFFER, buffer);
-            if (oldBuffer != null) {
-                buffer = oldBuffer;
-            }
-        }
-        return buffer;
-    }
-    
-    private static class SessionBuffer {
-        private final Queue<Runnable> queue = new CircularQueue<Runnable>();
-        private boolean processingCompleted = true;
-    }
     
     private class Worker implements Runnable {
         
@@ -456,11 +396,11 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             thread = Thread.currentThread();
             
             for (;;) {
-                IoSession session = fetchSession();
+                Runnable task = fetchTask();
                 
                 idleWorkers.decrementAndGet();
                 
-                if (session == null) {
+                if (task == null) {
                     synchronized (workers) {
                         if (workers.size() > corePoolSize) {
                             // Remove now to prevent duplicate exit.
@@ -470,12 +410,13 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                     }
                 }
                 
-                if (session == EXIT_SIGNAL) {
+                if (task == EXIT_SIGNAL) {
                     break;
                 }
                 
+                queueHandler.polled(UnorderedThreadPoolExecutor.this, (IoEvent) task);
                 try {
-                    runTasks(getSessionBuffer(session));
+                    runTask(task);
                 } finally {
                     idleWorkers.incrementAndGet();
                 }
@@ -483,13 +424,13 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             
             synchronized (workers) {
                 workers.remove(this);
-                OrderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount;
+                UnorderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount;
                 workers.notifyAll();
             }
         }
 
-        private IoSession fetchSession() {
-            IoSession session = null;
+        private Runnable fetchTask() {
+            Runnable task = null;
             long currentTime = System.currentTimeMillis();
             long deadline = currentTime + getKeepAliveTime(TimeUnit.MILLISECONDS);
             for (;;) {
@@ -500,10 +441,10 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                     }
 
                     try {
-                        session = waitingSessions.poll(waitTime, TimeUnit.MILLISECONDS);
+                        task = getQueue().poll(waitTime, TimeUnit.MILLISECONDS);
                         break;
                     } finally {
-                        if (session == null) {
+                        if (task == null) {
                             currentTime = System.currentTimeMillis();
                         }
                     }
@@ -512,25 +453,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                     continue;
                 }
             }
-            return session;
-        }
-
-        private void runTasks(SessionBuffer buf) {
-            for (;;) {
-                Runnable task;
-                synchronized (buf.queue) {
-                    task = buf.queue.poll();
-    
-                    if (task == null) {
-                        buf.processingCompleted = true;
-                        break;
-                    }
-                }
-
-                queueHandler.polled(OrderedThreadPoolExecutor.this, (IoEvent) task);
-
-                runTask(task);
-            }
+            return task;
         }
 
         private void runTask(Runnable task) {
