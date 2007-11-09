@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.executor;
 
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
@@ -40,12 +40,12 @@ public class ExecutorFilterRegressionTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-        filter = new ExecutorFilter();
+        filter = new ExecutorFilter(8);
     }
 
     @Override
     public void tearDown() throws Exception {
-        ((ThreadPoolExecutor) filter.getExecutor()).shutdown();
+        ((ExecutorService) filter.getExecutor()).shutdown();
         filter = null;
     }
 
@@ -57,11 +57,11 @@ public class ExecutorFilterRegressionTest extends TestCase {
                 new EventOrderCounter(), new EventOrderCounter(),
                 new EventOrderCounter(), new EventOrderCounter(),
                 new EventOrderCounter(), new EventOrderCounter(), };
-        final int loop = 1000000;
+        final int loop = 10000000;
         final int end = sessions.length - 1;
         final ExecutorFilter filter = this.filter;
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) filter.getExecutor();
-        executor.setKeepAliveTime(3, TimeUnit.SECONDS);
+        ExecutorService executor = (ExecutorService) filter.getExecutor();
+        //executor.setKeepAliveTime(3, TimeUnit.SECONDS);
 
         for (int i = 0; i < loop; i++) {
             Integer objI = new Integer(i);

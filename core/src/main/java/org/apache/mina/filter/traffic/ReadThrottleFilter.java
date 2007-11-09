@@ -31,7 +31,7 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.TrafficMask;
-import org.apache.mina.filter.executor.AbstractExecutorFilter;
+import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.util.CopyOnWriteMap;
 import org.slf4j.Logger;
@@ -264,7 +264,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     @Override
     public void onPreAdd(
             IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
-        if (!parent.contains(AbstractExecutorFilter.class)) {
+        if (!parent.contains(ExecutorFilter.class)) {
             throw new IllegalStateException(
                     "At least one " + ExecutorFilter.class.getName() + " must exist in the chain.");
         }
@@ -283,7 +283,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         for (IoFilterChain.Entry e: parent.getAll()) {
             IoFilter currentFilter = e.getFilter();
             if (currentFilter == this) {
-                if (lastFilter instanceof AbstractExecutorFilter) {
+                if (lastFilter instanceof ExecutorFilter) {
                     // Good!
                     break;
                 } else {

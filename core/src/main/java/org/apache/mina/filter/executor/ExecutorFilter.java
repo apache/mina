@@ -24,8 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.concurrent.Executor;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.common.IdleStatus;
@@ -68,22 +67,51 @@ public class ExecutorFilter extends IoFilterAdapter {
     
     private final EnumSet<IoEventType> eventTypes;
     private final Executor executor;
+    private final boolean createdExecutor;
 
-    /**
-     * Creates a new instance with the default thread pool implementation
-     * (<tt>new ThreadPoolExecutor(0, 16, 60, TimeUnit.SECONDS, new SynchronousQueue())</tt>).
-     */
-    protected ExecutorFilter(IoEventType... eventTypes) {
-        this(new ThreadPoolExecutor(
-                0, 16, 60, TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>()), eventTypes);
+    public ExecutorFilter() {
+        this(16, (IoEventType[]) null);
+    }
+    
+    public ExecutorFilter(int maximumPoolSize) {
+        this(0, maximumPoolSize, (IoEventType[]) null);
+    }
+    
+    public ExecutorFilter(int corePoolSize, int maximumPoolSize) {
+        this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS, (IoEventType[]) null);
+    }
+    
+    public ExecutorFilter(
+            int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, (IoEventType[]) null);
     }
 
-    /**
-     * Creates a new instance with the specified <tt>executor</tt>.
-     */
-    protected ExecutorFilter(Executor executor,
-            IoEventType... eventTypes) {
+    public ExecutorFilter(IoEventType... eventTypes) {
+        this(16, eventTypes);
+    }
+    
+    public ExecutorFilter(int maximumPoolSize, IoEventType... eventTypes) {
+        this(0, maximumPoolSize, eventTypes);
+    }
+    
+    public ExecutorFilter(int corePoolSize, int maximumPoolSize, IoEventType... eventTypes) {
+        this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS, eventTypes);
+    }
+    
+    public ExecutorFilter(
+            int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, IoEventType... eventTypes) {
+        this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit), true, eventTypes);
+    }
+    
+    public ExecutorFilter(Executor executor) {
+        this(executor, false, (IoEventType[]) null);
+    }
+
+    public ExecutorFilter(Executor executor, IoEventType... eventTypes) {
+        this(executor, false, eventTypes);
+    }
+
+    private ExecutorFilter(Executor executor, boolean createdExecutor, IoEventType... eventTypes) {
         if (executor == null) {
             throw new NullPointerException("executor");
         }
@@ -102,11 +130,19 @@ public class ExecutorFilter extends IoFilterAdapter {
         }
 
         this.executor = executor;
+        this.createdExecutor = createdExecutor;
 
         Collection<IoEventType> eventTypeCollection = new ArrayList<IoEventType>(
                 eventTypes.length);
         Collections.addAll(eventTypeCollection, eventTypes);
         this.eventTypes = EnumSet.copyOf(eventTypeCollection);
+    }
+    
+    @Override
+    public void destroy() {
+        if (createdExecutor) {
+            ((ExecutorService) executor).shutdown();
+        }
     }
 
     /**
