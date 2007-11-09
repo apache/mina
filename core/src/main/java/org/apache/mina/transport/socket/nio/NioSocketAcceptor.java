@@ -446,7 +446,7 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
                             ExceptionMonitor.getInstance().exceptionCaught(e);
                         }
                     }
-
+                    selector.wakeup();
                 }
             }
         }

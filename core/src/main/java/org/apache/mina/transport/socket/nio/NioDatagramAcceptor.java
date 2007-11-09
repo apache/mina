@@ -540,6 +540,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
                             ExceptionMonitor.getInstance().exceptionCaught(e);
                         }
                     }
+                    selector.wakeup();
                 }
             }
         }
