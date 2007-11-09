@@ -52,7 +52,7 @@ import org.apache.mina.util.CircularQueue;
 public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private static final IoSession EXIT_SIGNAL = new DummySession();
-    private static final IoEventQueueHandler NOOP_QUEUE_MONITOR = new IoEventQueueHandler() {
+    private static final IoEventQueueHandler NOOP_QUEUE_HANDLER = new IoEventQueueHandler() {
         public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
             return true;
         }
@@ -73,7 +73,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     private long completedTaskCount;
     private volatile boolean shutdown;
     
-    private volatile IoEventQueueHandler queueHandler;
+    private final IoEventQueueHandler queueHandler;
     
     public OrderedThreadPoolExecutor() {
         this(16);
@@ -95,8 +95,8 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     public OrderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
-            IoEventQueueHandler queueMonitor) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueMonitor);
+            IoEventQueueHandler queueHandler) {
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler);
     }
 
     public OrderedThreadPoolExecutor(
@@ -109,7 +109,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     public OrderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
-            ThreadFactory threadFactory, IoEventQueueHandler queueMonitor) {
+            ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
         super(0, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), threadFactory, new AbortPolicy());
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
@@ -119,20 +119,17 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
         }
         
+        if (queueHandler == null) {
+            queueHandler = NOOP_QUEUE_HANDLER;
+        }
+        
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
-        setQueueHandler(queueMonitor);
+        this.queueHandler = queueHandler;
     }
     
     public IoEventQueueHandler getQueueHandler() {
         return queueHandler;
-    }
-
-    public void setQueueHandler(IoEventQueueHandler queueHandler) {
-        if (queueHandler == null) {
-            queueHandler = NOOP_QUEUE_MONITOR;
-        }
-        this.queueHandler = queueHandler;
     }
 
     @Override
