@@ -293,7 +293,7 @@ public class ExecutorFilter extends IoFilterAdapter {
     
     /**
      * Shuts down the underlying executor if this filter is creates via
-     * a convenience constrcutor.
+     * a convenience constructor.
      */
     @Override
     public void destroy() {
