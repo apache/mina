@@ -24,8 +24,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -37,9 +36,9 @@ import java.util.Set;
 public abstract class AbstractIoAcceptor 
         extends AbstractIoService implements IoAcceptor {
     
-    private final Set<SocketAddress> localAddresses = new HashSet<SocketAddress>();
-    private final Set<SocketAddress> unmodifiableLocalAddresses =
-        Collections.unmodifiableSet(localAddresses);
+    private final List<SocketAddress> localAddresses = new ArrayList<SocketAddress>();
+    private final List<SocketAddress> unmodifiableLocalAddresses =
+        Collections.unmodifiableList(localAddresses);
     private boolean disconnectOnUnbind = true;
     private boolean bound;
 
@@ -66,17 +65,24 @@ public abstract class AbstractIoAcceptor
         setLocalAddresses(localAddress);
     }
 
-    public Set<SocketAddress> getLocalAddresses() {
+    public List<SocketAddress> getLocalAddresses() {
         return unmodifiableLocalAddresses;
     }
 
-    public void setLocalAddresses(Set<SocketAddress> localAddresses) {
+    public void setLocalAddresses(Iterable<SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");
         }
         
-        setLocalAddresses(
-                localAddresses.toArray(new SocketAddress[localAddresses.size()]));
+        List<SocketAddress> list = new ArrayList<SocketAddress>();
+        for (SocketAddress a: localAddresses) {
+            if (a == null) {
+                continue;
+            }
+            list.add(a);
+        }
+        
+        setLocalAddresses(list.toArray(new SocketAddress[list.size()]));
     }
 
     public void setLocalAddresses(SocketAddress... localAddresses) {

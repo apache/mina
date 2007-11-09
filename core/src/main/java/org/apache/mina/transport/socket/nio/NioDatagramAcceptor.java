@@ -26,7 +26,12 @@ import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -71,10 +76,11 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
     private final Queue<ServiceOperationFuture> registerQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
     private final Queue<ServiceOperationFuture> cancelQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
     private final Queue<NioDatagramSession> flushingSessions = new ConcurrentLinkedQueue<NioDatagramSession>();
+    private final Map<SocketAddress, DatagramChannel> serverChannels =
+        Collections.synchronizedMap(new HashMap<SocketAddress, DatagramChannel>());
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
 
-    private DatagramChannel channel;
     private Worker worker;
     private long lastIdleCheckTime;
 
@@ -144,7 +150,11 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
             throw request.getException();
         }
 
-        setLocalAddress(channel.socket().getLocalSocketAddress());
+        Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
+        for (DatagramChannel c: serverChannels.values()) {
+            newLocalAddresses.add(c.socket().getLocalSocketAddress());
+        }
+        setLocalAddresses(newLocalAddresses);
     }
 
     @Override
@@ -162,7 +172,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         }
     }
 
-    public IoSession newSession(SocketAddress remoteAddress) {
+    public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         if (remoteAddress == null) {
             throw new NullPointerException("remoteAddress");
         }
@@ -173,19 +183,23 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
                         "Can't create a session from a unbound service.");
             }
 
-            return newSessionWithoutLock(remoteAddress);
+            return newSessionWithoutLock(remoteAddress, localAddress);
         }
     }
 
-    private IoSession newSessionWithoutLock(SocketAddress remoteAddress) {
+    private IoSession newSessionWithoutLock(
+            SocketAddress remoteAddress, SocketAddress localAddress) {
         Selector selector = this.selector;
-        DatagramChannel ch = this.channel;
+        DatagramChannel ch = serverChannels.get(localAddress);
+        if (ch == null) {
+            throw new IllegalArgumentException("Unknown local address: " + localAddress);
+        }
         SelectionKey key = ch.keyFor(selector);
 
         IoSession session;
         IoSessionRecycler sessionRecycler = getSessionRecycler();
         synchronized (sessionRecycler) {
-            session = sessionRecycler.recycle(getLocalAddress(), remoteAddress);
+            session = sessionRecycler.recycle(localAddress, remoteAddress);
             if (session != null) {
                 return session;
             }
@@ -365,7 +379,8 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
 
         SocketAddress remoteAddress = channel.receive(readBuf.buf());
         if (remoteAddress != null) {
-            NioDatagramSession session = (NioDatagramSession) newSessionWithoutLock(remoteAddress);
+            IoSession session = newSessionWithoutLock(
+                    remoteAddress, channel.socket().getLocalSocketAddress());
 
             readBuf.flip();
 
@@ -469,35 +484,61 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
                 break;
             }
 
-            DatagramChannel ch = null;
+            Map<SocketAddress, DatagramChannel> newServerChannels =
+                new HashMap<SocketAddress, DatagramChannel>();
+            List<SocketAddress> localAddresses = getLocalAddresses();
+
             try {
-                ch = DatagramChannel.open();
-                DatagramSessionConfig cfg = getSessionConfig();
-                ch.socket().setReuseAddress(cfg.isReuseAddress());
-                ch.socket().setBroadcast(cfg.isBroadcast());
-                ch.socket().setReceiveBufferSize(cfg.getReceiveBufferSize());
-                ch.socket().setSendBufferSize(cfg.getSendBufferSize());
-
-                if (ch.socket().getTrafficClass() != cfg.getTrafficClass()) {
-                    ch.socket().setTrafficClass(cfg.getTrafficClass());
+                for (SocketAddress a: localAddresses) {
+                    DatagramChannel c = null;
+                    boolean success = false;
+                    try {
+                        c = DatagramChannel.open();
+                        DatagramSessionConfig cfg = getSessionConfig();
+                        c.socket().setReuseAddress(cfg.isReuseAddress());
+                        c.socket().setBroadcast(cfg.isBroadcast());
+                        c.socket().setReceiveBufferSize(cfg.getReceiveBufferSize());
+                        c.socket().setSendBufferSize(cfg.getSendBufferSize());
+        
+                        if (c.socket().getTrafficClass() != cfg.getTrafficClass()) {
+                            c.socket().setTrafficClass(cfg.getTrafficClass());
+                        }
+        
+                        c.configureBlocking(false);
+                        c.socket().bind(a);
+                        c.register(selector, SelectionKey.OP_READ, req);
+                        success = true;
+                    } finally {
+                        if (c != null && !success) {
+                            try {
+                                c.disconnect();
+                                c.close();
+                            } catch (Throwable e) {
+                                ExceptionMonitor.getInstance().exceptionCaught(e);
+                            }
+                        }
+                    }
+                    
+                    newServerChannels.put(c.socket().getLocalSocketAddress(), c);
                 }
-
-                ch.configureBlocking(false);
-                ch.socket().bind(getLocalAddress());
-                ch.register(selector, SelectionKey.OP_READ, req);
-                this.channel = ch;
-
+                
+                serverChannels.putAll(newServerChannels);
+                
                 getListeners().fireServiceActivated();
                 req.setDone();
             } catch (Exception e) {
                 req.setException(e);
             } finally {
-                if (ch != null && req.getException() != null) {
-                    try {
-                        ch.disconnect();
-                        ch.close();
-                    } catch (Throwable e) {
-                        ExceptionMonitor.getInstance().exceptionCaught(e);
+                // Roll back if failed to bind all addresses.
+                if (req.getException() != null) {
+                    for (DatagramChannel c: newServerChannels.values()) {
+                        c.keyFor(selector).cancel();
+                        try {
+                            c.disconnect();
+                            c.close();
+                        } catch (IOException e) {
+                            ExceptionMonitor.getInstance().exceptionCaught(e);
+                        }
                     }
                 }
             }
@@ -511,22 +552,22 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
                 break;
             }
 
-            DatagramChannel ch = this.channel;
-            this.channel = null;
+            // close the channels
+            for (DatagramChannel c: serverChannels.values()) {
+                try {
+                    SelectionKey key = c.keyFor(selector);
+                    key.cancel();
 
-            // close the channel
-            try {
-                SelectionKey key = ch.keyFor(selector);
-                key.cancel();
-                selector.wakeup(); // wake up again to trigger thread death
-                ch.disconnect();
-                ch.close();
-            } catch (Throwable t) {
-                ExceptionMonitor.getInstance().exceptionCaught(t);
-            } finally {
-                getListeners().fireServiceDeactivated();
-                request.setDone();
+                    selector.wakeup(); // wake up again to trigger thread death
+                    c.disconnect();
+                    c.close();
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
+            
+            serverChannels.clear();
+            request.setDone();
         }
     }
 

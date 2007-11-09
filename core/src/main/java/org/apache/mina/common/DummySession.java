@@ -84,7 +84,7 @@ public class DummySession extends AbstractIoSession {
                 throw new UnsupportedOperationException();
             }
 
-            public IoSession newSession(SocketAddress remoteAddress) {
+            public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
                 throw new UnsupportedOperationException();
             }
 

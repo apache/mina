@@ -28,7 +28,12 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -75,7 +80,8 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
     private final Queue<ServiceOperationFuture> cancelQueue =
         new ConcurrentLinkedQueue<ServiceOperationFuture>();
 
-    private ServerSocketChannel serverSocketChannel;
+    private final Map<SocketAddress, ServerSocketChannel> serverChannels =
+        Collections.synchronizedMap(new HashMap<SocketAddress, ServerSocketChannel>());
     private final Selector selector;
     private Worker worker;
 
@@ -226,11 +232,14 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
             throw request.getException();
         }
 
-        // Update the local address.
-        // setLocalAddress() shouldn't be called from the worker thread
+        // Update the local addresses.
+        // setLocalAddresses() shouldn't be called from the worker thread
         // because of deadlock.
-        setLocalAddress(serverSocketChannel.socket()
-                .getLocalSocketAddress());
+        Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
+        for (ServerSocketChannel c: serverChannels.values()) {
+            newLocalAddresses.add(c.socket().getLocalSocketAddress());
+        }
+        setLocalAddresses(newLocalAddresses);
     }
 
     /**
@@ -382,40 +391,62 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
      * Registers OP_ACCEPT for selector
      */
     private void registerNew() {
-        for (; ;) {
+        for (;;) {
             ServiceOperationFuture future = registerQueue.poll();
             if (future == null) {
                 break;
             }
 
-            ServerSocketChannel ssc = null;
-
+            Map<SocketAddress, ServerSocketChannel> newServerChannels =
+                new HashMap<SocketAddress, ServerSocketChannel>();
+            List<SocketAddress> localAddresses = getLocalAddresses();
+            
             try {
-                ssc = ServerSocketChannel.open();
-                ssc.configureBlocking(false);
-
-                // Configure the server socket,
-                ssc.socket().setReuseAddress(isReuseAddress());
-                ssc.socket().setReceiveBufferSize(
-                        getSessionConfig().getReceiveBufferSize());
-
-                // and bind.
-                ssc.socket().bind(getLocalAddress(), getBacklog());
-                ssc.register(selector, SelectionKey.OP_ACCEPT, future);
-
-                serverSocketChannel = ssc;
+                for (SocketAddress a: localAddresses) {
+                    ServerSocketChannel c = null;
+                    boolean success = false;
+                    try {
+                        c = ServerSocketChannel.open();
+                        c.configureBlocking(false);
+                        // Configure the server socket,
+                        c.socket().setReuseAddress(isReuseAddress());
+                        c.socket().setReceiveBufferSize(
+                                getSessionConfig().getReceiveBufferSize());
+                        // and bind.
+                        c.socket().bind(a, getBacklog());
+                        c.register(selector, SelectionKey.OP_ACCEPT, future);
+                        success = true;
+                    } finally {
+                        if (!success && c != null) {
+                            try {
+                                c.close();
+                            } catch (IOException e) {
+                                ExceptionMonitor.getInstance().exceptionCaught(e);
+                            }
+                        }
+                    }
+                    
+                    newServerChannels.put(c.socket().getLocalSocketAddress(), c);
+                }
+                
+                serverChannels.putAll(newServerChannels);
 
                 // and notify.
                 future.setDone();
             } catch (Exception e) {
                 future.setException(e);
             } finally {
-                if (ssc != null && future.getException() != null) {
-                    try {
-                        ssc.close();
-                    } catch (IOException e) {
-                        ExceptionMonitor.getInstance().exceptionCaught(e);
+                // Roll back if failed to bind all addresses.
+                if (future.getException() != null) {
+                    for (ServerSocketChannel c: newServerChannels.values()) {
+                        c.keyFor(selector).cancel();
+                        try {
+                            c.close();
+                        } catch (IOException e) {
+                            ExceptionMonitor.getInstance().exceptionCaught(e);
+                        }
                     }
+
                 }
             }
         }
@@ -434,27 +465,25 @@ public class NioSocketAcceptor extends AbstractIoAcceptor implements SocketAccep
                 break;
             }
 
-            // close the channel
-            try {
-                SelectionKey key = serverSocketChannel.keyFor(selector);
-                key.cancel();
+            // close the channels
+            for (ServerSocketChannel c: serverChannels.values()) {
+                try {
+                    SelectionKey key = c.keyFor(selector);
+                    key.cancel();
 
-                selector.wakeup(); // wake up again to trigger thread death
-
-                serverSocketChannel.close();
-                serverSocketChannel = null;
-            } catch (IOException e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-            } finally {
-                future.setDone();
+                    selector.wakeup(); // wake up again to trigger thread death
+                    c.close();
+                } catch (IOException e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
+            
+            serverChannels.clear();
+            future.setDone();
         }
     }
 
-    /**
-     * @see org.apache.mina.common.IoAcceptor#newSession(java.net.SocketAddress)
-     */
-    public IoSession newSession(SocketAddress remoteAddress) {
+    public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         throw new UnsupportedOperationException();
     }
 }

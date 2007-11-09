@@ -21,7 +21,9 @@ package org.apache.mina.transport.vmpipe;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.common.AbstractIoAcceptor;
@@ -71,33 +73,50 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
 
     @Override
     protected void doBind() throws IOException {
-        VmPipeAddress localAddress = getLocalAddress();
+        List<SocketAddress> localAddresses = getLocalAddresses();
+        List<SocketAddress> newLocalAddresses = new ArrayList<SocketAddress>();
 
         synchronized (boundHandlers) {
-            if (localAddress == null || localAddress.getPort() == 0) {
-                localAddress = null;
-                for (int i = 1; i < Integer.MAX_VALUE; i++) {
-                    VmPipeAddress newLocalAddress = new VmPipeAddress(i);
-                    if (!boundHandlers.containsKey(newLocalAddress)) {
-                        localAddress = newLocalAddress;
-                        break;
+            for (SocketAddress a: localAddresses) {
+                VmPipeAddress localAddress = (VmPipeAddress) a;
+                if (localAddress.getPort() == 0) {
+                    localAddress = null;
+                    for (int i = 1; i < Integer.MAX_VALUE; i++) {
+                        VmPipeAddress newLocalAddress = new VmPipeAddress(i);
+                        if (!boundHandlers.containsKey(newLocalAddress) &&
+                            !newLocalAddresses.contains(newLocalAddress)) {
+                            localAddress = newLocalAddress;
+                            break;
+                        }
                     }
+    
+                    if (localAddress == null) {
+                        throw new IOException("No port available.");
+                    }
+                } else if (localAddress.getPort() < 0) {
+                    throw new IOException("Bind port number must be 0 or above.");
+                } else if (boundHandlers.containsKey(localAddress)) {
+                    throw new IOException("Address already bound: " + localAddress);
                 }
-
-                if (localAddress == null) {
-                    throw new IOException("No port available.");
-                }
-            } else if (localAddress.getPort() < 0) {
-                throw new IOException("Bind port number must be 0 or above.");
-            } else if (boundHandlers.containsKey(localAddress)) {
-                throw new IOException("Address already bound: " + localAddress);
+                
+                newLocalAddresses.add(localAddress);
             }
 
-            boundHandlers.put(localAddress, new VmPipe(this, localAddress,
-                    getHandler(), getListeners()));
+            for (SocketAddress a: newLocalAddresses) {
+                VmPipeAddress localAddress = (VmPipeAddress) a;
+                if (!boundHandlers.containsKey(localAddress)) {
+                    boundHandlers.put(localAddress, new VmPipe(this, localAddress,
+                            getHandler(), getListeners()));
+                } else {
+                    for (SocketAddress a2: newLocalAddresses) {
+                        boundHandlers.remove(a2);
+                    }
+                    break;
+                }
+            }
         }
 
-        setLocalAddress(localAddress);
+        setLocalAddresses(newLocalAddresses);
     }
 
     @Override
@@ -109,7 +128,7 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
         getListeners().fireServiceDeactivated();
     }
 
-    public IoSession newSession(SocketAddress remoteAddress) {
+    public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         throw new UnsupportedOperationException();
     }
 

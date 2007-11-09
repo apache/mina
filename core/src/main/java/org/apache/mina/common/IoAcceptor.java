@@ -21,7 +21,7 @@ package org.apache.mina.common;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
@@ -50,11 +50,11 @@ public interface IoAcceptor extends IoService {
     SocketAddress getLocalAddress();
     
     /**
-     * Returns a {@link Set} of the local address to bind.
+     * Returns a {@link List} of the local addresses to bind.
      *
      * @throws IllegalStateException if this service is already running.
      */
-    Set<SocketAddress> getLocalAddresses();
+    List<SocketAddress> getLocalAddresses();
 
     /**
      * Sets the local address to bind.
@@ -79,7 +79,7 @@ public interface IoAcceptor extends IoService {
      *
      * @throws IllegalStateException if this service is already running.
      */
-    void setLocalAddresses(Set<SocketAddress> localAddresses);
+    void setLocalAddresses(Iterable<SocketAddress> localAddresses);
 
     /**
      * Returns <tt>true</tt> if and only if all clients are disconnected
@@ -108,9 +108,9 @@ public interface IoAcceptor extends IoService {
     void unbind();
 
     /**
-     * (Optional) Returns an {@link IoSession} that is bound to the current
-     * local address and the specified <tt>remoteAddress</tt> which reuses
-     * the local address that is already bound by this service.
+     * (Optional) Returns an {@link IoSession} that is bound to the specified
+     * <tt>localAddress</tt> and the specified <tt>remoteAddress</tt> which
+     * reuses the local address that is already bound by this service.
      * <p>
      * This operation is optional.  Please throw {@link UnsupportedOperationException}
      * if the transport type doesn't support this operation.  This operation is
@@ -118,6 +118,8 @@ public interface IoAcceptor extends IoService {
      *
      * @throws UnsupportedOperationException if this operation is not supported
      * @throws IllegalStateException if this service is not running.
+     * @throws IllegalArgumentException if this service is not bound to the
+     *                                  specified <tt>localAddress</tt>.
      */
-    IoSession newSession(SocketAddress remoteAddress);
+    IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress);
 }
