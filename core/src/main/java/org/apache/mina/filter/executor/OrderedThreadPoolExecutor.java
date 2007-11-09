@@ -97,11 +97,11 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             ThreadFactory threadFactory, RejectedExecutionHandler handler) {
         super(0, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), threadFactory, handler);
         if (corePoolSize < 0) {
-            throw new IllegalArgumentException("minThreads: " + corePoolSize);
+            throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
         }
         
         if (maximumPoolSize == 0 || maximumPoolSize < corePoolSize) {
-            throw new IllegalArgumentException("maxThreads: " + maximumPoolSize);
+            throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
         }
         
         this.corePoolSize = corePoolSize;
@@ -153,6 +153,10 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     public void setMaximumPoolSize(int maximumPoolSize) {
         synchronized (workers) {
+            if (maximumPoolSize == 0 || maximumPoolSize < corePoolSize) {
+                throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
+            }
+            
             if (this.maximumPoolSize > maximumPoolSize) {
                 for (int i = this.maximumPoolSize - maximumPoolSize; i > 0; i --) {
                     removeWorker();
@@ -368,6 +372,10 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     @Override
     public void setCorePoolSize(int corePoolSize) {
+        if (corePoolSize < 0) {
+            throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
+        }
+        
         synchronized (workers) {
             if (this.corePoolSize > corePoolSize) {
                 for (int i = this.corePoolSize - corePoolSize; i > 0; i --) {
