@@ -44,14 +44,35 @@ import org.apache.mina.common.WriteRequest;
  * thread model while allowing the events per session to be processed
  * simultaneously. You can apply various thread model by inserting this filter
  * to a {@link IoFilterChain}.
- * <p>
- * Please note that this filter doesn't manage the life cycle of the underlying
- * {@link Executor}.  You have to destroy or stop it by yourself.
- * <p>
- * This filter does not maintain the order of events per session and thus
- * more than one event handler methods can be invoked at the same time with
- * mixed order.  For example, let's assume that messageReceived, messageSent,
- * and sessionClosed events are fired.
+ * 
+ * <h2>Life Cycle Management</h2>
+ * 
+ * Please note that this filter doesn't manage the life cycle of the {@link Executor}.
+ * If you created this filter using {@link #ExecutorFilter(Executor)} or similar
+ * constructor that accepts an {@link Executor} that you've instantiated, you have
+ * full control and responsibility of managing its life cycle (e.g. calling
+ * {@link ExecutorService#shutdown()}.
+ * <p> 
+ * If you created this filter using convenience constructors like
+ * {@link #ExecutorFilter(int)}, then you can shut down the executor by calling
+ * {@link #destroy()} explicitly.
+ * 
+ * <h2>Event Ordering</h2>
+ * 
+ * All convenience constructors of this filter creates a new
+ * {@link OrderedThreadPoolExecutor} instance.  Therefore, the order of event is
+ * maintained like the following:
+ * <ul>
+ * <li>All event handler methods are called exclusively.
+ *     (e.g. messageReceived and messageSent can't be invoked at the same time.)</li>
+ * <li>The event order is never mixed up.
+ *     (e.g. messageReceived is always invoked before sessionClosed or messageSent.)</li>
+ * </ul>
+ * However, if you specified other {@link Executor} instance in the constructor,
+ * the order of events are not maintained at all.  This means more than one event
+ * handler methods can be invoked at the same time with mixed order.  For example,
+ * let's assume that messageReceived, messageSent, and sessionClosed events are
+ * fired.
  * <ul>
  * <li>All event handler methods can be called simultaneously.
  *     (e.g. messageReceived and messageSent can be invoked at the same time.)</li>
@@ -59,37 +80,75 @@ import org.apache.mina.common.WriteRequest;
  *     (e.g. sessionClosed or messageSent can be invoked before messageReceived
  *           is invoked.)</li>
  * </ul>
- * If you need to maintain the order of events per session, please use
- * {@link OrderedThreadPoolExecutor} as its underlying {@link Executor}.
- *
+ * If you need to maintain the order of events per session, please specify an
+ * {@link OrderedThreadPoolExecutor} instance or use the convenience constructors.
+ * 
+ * <h2>Selective Filtering</h2>
+ * 
+ * By default, all event types but <tt>sessionCreated</tt>, <tt>filterWrite</tt>,
+ * <tt>filterClose</tt> and <tt>filterSetTrafficMask</tt> are submitted to the
+ * underlying executor, which is most common setting.
+ * <p>
+ * If you want to submit only a certain set of event types, you can specify them
+ * in the constructor.  For example, you could configure a thread pool for
+ * write operation for the maximum performance:
+ * <pre><code>
+ * IoService service = ...;
+ * DefaultIoFilterChainBuilder chain = service.getFilterChain();
+ * 
+ * chain.addLast("codec", new ProtocolCodecFilter(...));
+ * // Use one thread pool for most events.
+ * chain.addLast("executor1", new ExecutorFilter());
+ * // and another dedicated thread pool for 'filterWrite' events.
+ * chain.addLast("executor2", new ExecutorFilter(IoEventType.WRITE));
+ * </code></pre>
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ExecutorFilter extends IoFilterAdapter {
 
-    static final ThreadLocal<IoSession> currentSession = new ThreadLocal<IoSession>();
-    
     private final EnumSet<IoEventType> eventTypes;
     private final Executor executor;
     private final boolean createdExecutor;
 
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter() {
         this(16, (IoEventType[]) null);
     }
     
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(int maximumPoolSize) {
         this(0, maximumPoolSize, (IoEventType[]) null);
     }
     
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(int corePoolSize, int maximumPoolSize) {
         this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS, (IoEventType[]) null);
     }
     
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, (IoEventType[]) null);
     }
 
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
@@ -97,6 +156,10 @@ public class ExecutorFilter extends IoFilterAdapter {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), handler, (IoEventType[]) null);
     }
 
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
@@ -104,6 +167,10 @@ public class ExecutorFilter extends IoFilterAdapter {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, new AbortPolicy(), (IoEventType[]) null);
     }
 
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
@@ -111,23 +178,43 @@ public class ExecutorFilter extends IoFilterAdapter {
         this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, handler), true, (IoEventType[]) null);
     }
 
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(IoEventType... eventTypes) {
         this(16, eventTypes);
     }
     
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(int maximumPoolSize, IoEventType... eventTypes) {
         this(0, maximumPoolSize, eventTypes);
     }
     
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, IoEventType... eventTypes) {
         this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS, eventTypes);
     }
     
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, IoEventType... eventTypes) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), eventTypes);
     }
     
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
@@ -135,6 +222,10 @@ public class ExecutorFilter extends IoFilterAdapter {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), handler, eventTypes);
     }
 
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
@@ -142,6 +233,10 @@ public class ExecutorFilter extends IoFilterAdapter {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, new AbortPolicy(), eventTypes);
     }
 
+    /**
+     * (Convenience constructor) Creates a new instance with a new
+     * {@link OrderedThreadPoolExecutor}.
+     */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
             long keepAliveTime, TimeUnit unit,
@@ -149,10 +244,16 @@ public class ExecutorFilter extends IoFilterAdapter {
         this(new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, handler), true, eventTypes);
     }
     
+    /**
+     * Creates a new instance with the specified {@link Executor}.
+     */
     public ExecutorFilter(Executor executor) {
         this(executor, false, (IoEventType[]) null);
     }
 
+    /**
+     * Creates a new instance with the specified {@link Executor}.
+     */
     public ExecutorFilter(Executor executor, IoEventType... eventTypes) {
         this(executor, false, eventTypes);
     }
@@ -184,6 +285,10 @@ public class ExecutorFilter extends IoFilterAdapter {
         this.eventTypes = EnumSet.copyOf(eventTypeCollection);
     }
     
+    /**
+     * Shuts down the underlying executor if this filter is creates via
+     * a convenience constrcutor.
+     */
     @Override
     public void destroy() {
         if (createdExecutor) {
@@ -198,7 +303,10 @@ public class ExecutorFilter extends IoFilterAdapter {
         return executor;
     }
 
-    private void fireEvent(IoFilterEvent event) {
+    /**
+     * Fires the specified event through the underlying executor.
+     */
+    protected void fireEvent(IoFilterEvent event) {
         getExecutor().execute(event);
     }
 
