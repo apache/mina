@@ -21,6 +21,11 @@ package org.apache.mina.common;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -29,12 +34,13 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractIoAcceptor extends AbstractIoService implements
-        IoAcceptor {
-    private SocketAddress localAddress;
-
+public abstract class AbstractIoAcceptor 
+        extends AbstractIoService implements IoAcceptor {
+    
+    private final Set<SocketAddress> localAddresses = new HashSet<SocketAddress>();
+    private final Set<SocketAddress> unmodifiableLocalAddresses =
+        Collections.unmodifiableSet(localAddresses);
     private boolean disconnectOnUnbind = true;
-
     private boolean bound;
 
     /**
@@ -49,25 +55,62 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements
     }
 
     public SocketAddress getLocalAddress() {
-        return localAddress;
+        return localAddresses.iterator().next();
     }
 
     public void setLocalAddress(SocketAddress localAddress) {
-        if (localAddress != null
-                && !getTransportMetadata().getAddressType().isAssignableFrom(
-                        localAddress.getClass())) {
-            throw new IllegalArgumentException("localAddress type: "
-                    + localAddress.getClass() + " (expected: "
-                    + getTransportMetadata().getAddressType() + ")");
+        if (localAddress == null) {
+            throw new NullPointerException("localAddress");
         }
+        
+        setLocalAddresses(localAddress);
+    }
 
+    public Set<SocketAddress> getLocalAddresses() {
+        return unmodifiableLocalAddresses;
+    }
+
+    public void setLocalAddresses(Set<SocketAddress> localAddresses) {
+        if (localAddresses == null) {
+            throw new NullPointerException("localAddresses");
+        }
+        
+        setLocalAddresses(
+                localAddresses.toArray(new SocketAddress[localAddresses.size()]));
+    }
+
+    public void setLocalAddresses(SocketAddress... localAddresses) {
+        if (localAddresses == null) {
+            throw new NullPointerException("localAddresses");
+        }
+        
         synchronized (bindLock) {
             if (bound) {
                 throw new IllegalStateException(
                         "localAddress can't be set while the acceptor is bound.");
             }
 
-            this.localAddress = localAddress;
+            Collection<SocketAddress> newLocalAddresses = 
+                new ArrayList<SocketAddress>();
+            for (SocketAddress a: localAddresses) {
+                if (a == null) {
+                    continue;
+                }
+                if (!getTransportMetadata().getAddressType().isAssignableFrom(
+                                a.getClass())) {
+                    throw new IllegalArgumentException("localAddress type: "
+                            + a.getClass().getSimpleName() + " (expected: "
+                            + getTransportMetadata().getAddressType().getSimpleName() + ")");
+                }
+                newLocalAddresses.add(a);
+            }
+            
+            if (newLocalAddresses.isEmpty()) {
+                throw new IllegalArgumentException("empty localAddresses");
+            }
+            
+            this.localAddresses.clear();
+            this.localAddresses.addAll(newLocalAddresses);
         }
     }
 

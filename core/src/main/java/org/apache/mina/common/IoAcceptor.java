@@ -21,6 +21,7 @@ package org.apache.mina.common;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.Set;
 
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
@@ -42,9 +43,18 @@ import java.net.SocketAddress;
  */
 public interface IoAcceptor extends IoService {
     /**
-     * Returns the local address to bind.
+     * Returns the local address to bind.  If more than one address are set,
+     * one of them will be returned, but it's not necessarily the firstly
+     * specified address in {@link #setLocalAddresses(SocketAddress...)}.
      */
     SocketAddress getLocalAddress();
+    
+    /**
+     * Returns a {@link Set} of the local address to bind.
+     *
+     * @throws IllegalStateException if this service is already running.
+     */
+    Set<SocketAddress> getLocalAddresses();
 
     /**
      * Sets the local address to bind.
@@ -52,6 +62,24 @@ public interface IoAcceptor extends IoService {
      * @throws IllegalStateException if this service is already running.
      */
     void setLocalAddress(SocketAddress localAddress);
+    
+    /**
+     * Sets the local addresses to bind.  If more than one address is
+     * specified, {@link #bind()} method binds to all the addresses with
+     * the same {@link IoHandler}.
+     *
+     * @throws IllegalStateException if this service is already running.
+     */
+    void setLocalAddresses(SocketAddress... localAddresses);
+    
+    /**
+     * Sets the local addresses to bind.  If more than one address is
+     * specified, {@link #bind()} method binds to all the addresses with
+     * the same {@link IoHandler}.
+     *
+     * @throws IllegalStateException if this service is already running.
+     */
+    void setLocalAddresses(Set<SocketAddress> localAddresses);
 
     /**
      * Returns <tt>true</tt> if and only if all clients are disconnected
