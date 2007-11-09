@@ -44,6 +44,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
     private int first = 0;
     private int last = 0;
     private boolean full;
+    private int shrinkThreshold;
 
     /**
      * Construct a new, empty queue.
@@ -57,6 +58,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         items = new Object[actualCapacity];
         mask = actualCapacity - 1;
         this.initialCapacity = actualCapacity;
+        this.shrinkThreshold = 0;
     }
 
     private static int normalizeCapacity(int initialCapacity) {
@@ -181,7 +183,8 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         if (full) {
             // expand queue
             final int oldLen = items.length;
-            Object[] tmp = new Object[oldLen << 1];
+            final int newLen = oldLen << 1;
+            Object[] tmp = new Object[newLen];
     
             if (first < last) {
                 System.arraycopy(items, first, tmp, 0, last - first);
@@ -194,15 +197,26 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             last = oldLen;
             items = tmp;
             mask = tmp.length - 1;
+            if (newLen >>> 3 > initialCapacity) {
+                shrinkThreshold = newLen >>> 3;
+            }
         }
     }
     
     private void shrinkIfNeeded() {
         int size = size();
-        if (size < (capacity() >>> 1)) {
+        if (size < shrinkThreshold) {
             // shrink queue
             final int oldLen = items.length;
             int newLen = normalizeCapacity(size);
+            if (size == newLen) {
+                newLen <<= 1;
+            }
+            
+            if (newLen >= oldLen) {
+                return;
+            }
+            
             if (newLen < initialCapacity) {
                 if (oldLen == initialCapacity) {
                     return;
@@ -224,6 +238,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             last = size;
             items = tmp;
             mask = tmp.length - 1;
+            shrinkThreshold = 0;
         }
     }
 
