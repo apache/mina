@@ -260,7 +260,10 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             
             SessionBuffer buf = (SessionBuffer) session.getAttribute(BUFFER);
             synchronized (buf.queue) {
-                answer.addAll(buf.queue);
+                for (Runnable task: buf.queue) {
+                    getQueueHandler().polled(this, (IoEvent) task);
+                    answer.add(task);
+                }
                 buf.queue.clear();
             }
         }
@@ -387,7 +390,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     
     @Override
     public BlockingQueue<Runnable> getQueue() {
-        throw new UnsupportedOperationException("Please use getQueue(Runnable) instead.");
+        throw new UnsupportedOperationException();
     }
     
     @Override
@@ -404,9 +407,16 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             return false;
         }
         
+        boolean removed;
         synchronized (buffer.queue) {
-            return buffer.queue.remove(task);
+            removed = buffer.queue.remove(task);
         }
+        
+        if (removed) {
+            getQueueHandler().polled(this, e);
+        }
+        
+        return removed;
     }
     
     @Override

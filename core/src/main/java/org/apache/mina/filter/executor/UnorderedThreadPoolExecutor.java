@@ -259,6 +259,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                 continue;
             }
             
+            getQueueHandler().polled(this, (IoEvent) task);
             answer.add(task);
         }
         
@@ -363,6 +364,19 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
     }
     
+    @Override
+    public void purge() {
+    }
+
+    @Override
+    public boolean remove(Runnable task) {
+        boolean removed = super.remove(task);
+        if (removed) {
+            getQueueHandler().polled(this, (IoEvent) task);
+        }
+        return removed;
+    }
+
     @Override
     public int getCorePoolSize() {
         return corePoolSize;
