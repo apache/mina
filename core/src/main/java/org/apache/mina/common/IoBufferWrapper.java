@@ -646,4 +646,15 @@ public class IoBufferWrapper extends IoBuffer {
     public boolean isDerived() {
         return buf.isDerived();
     }
+
+    @Override
+    public boolean isAutoShrink() {
+        return buf.isAutoShrink();
+    }
+
+    @Override
+    public IoBuffer setAutoShrink(boolean autoShrink) {
+        buf.setAutoShrink(autoShrink);
+        return this;
+    }
 }

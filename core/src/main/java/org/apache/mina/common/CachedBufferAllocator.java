@@ -177,8 +177,12 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         return buf;
     }
     
+    public ByteBuffer allocateNioBuffer(int capacity, boolean direct) {
+        return allocate(capacity, direct).buf();
+    }
+    
     public IoBuffer wrap(ByteBuffer nioBuffer) {
-        return new CachedBuffer(nioBuffer, true);
+        return new CachedBuffer(nioBuffer);
     }
 
     public void dispose() {
@@ -211,11 +215,17 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         private final Thread ownerThread;
         private ByteBuffer buf;
 
-        protected CachedBuffer(ByteBuffer buf, boolean autoExpandAllowed) {
-            super(autoExpandAllowed);
+        protected CachedBuffer(ByteBuffer buf) {
+            super(CachedBufferAllocator.this, buf.capacity());
             this.ownerThread = Thread.currentThread();
             this.buf = buf;
             buf.order(ByteOrder.BIG_ENDIAN);
+        }
+        
+        protected CachedBuffer(CachedBuffer parent, ByteBuffer buf) {
+            super(parent);
+            this.ownerThread = Thread.currentThread();
+            this.buf = buf;
         }
 
         @Override
@@ -225,33 +235,27 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             }
             return buf;
         }
-
+        
         @Override
-        protected void capacity0(int requestedCapacity) {
-            int newCapacity = normalizeCapacity(requestedCapacity);
-
-            ByteBuffer oldBuf = buf();
-            ByteBuffer newBuf = allocate(newCapacity, isDirect()).buf();
-            oldBuf.clear();
-            newBuf.put(oldBuf);
-            this.buf = newBuf;
-            
+        protected void buf(ByteBuffer buf) {
+            ByteBuffer oldBuf = this.buf;
+            this.buf = buf;
             free(oldBuf);
         }
 
         @Override
         protected IoBuffer duplicate0() {
-            return new CachedBuffer(buf().duplicate(), false);
+            return new CachedBuffer(this, buf().duplicate());
         }
 
         @Override
         protected IoBuffer slice0() {
-            return new CachedBuffer(buf().slice(), false);
+            return new CachedBuffer(this, buf().slice());
         }
 
         @Override
         protected IoBuffer asReadOnlyBuffer0() {
-            return new CachedBuffer(buf().asReadOnlyBuffer(), false);
+            return new CachedBuffer(this, buf().asReadOnlyBuffer());
         }
 
         @Override
@@ -296,7 +300,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
 
             // Restrict the size of the pool to prevent OOM.
             if (maxPoolSize == 0 || pool.size() < maxPoolSize) {
-                pool.offer(new CachedBuffer(oldBuf, true));
+                pool.offer(new CachedBuffer(oldBuf));
             }
         }
     }

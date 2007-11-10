@@ -103,6 +103,20 @@ import java.util.Set;
  * increase by two times, and its limit will increase to the last position
  * the string is written.
  * </p>
+ * 
+ * <h2>AutoShrink</h2>
+ * <p>
+ * You might also want to decrease the capacity of the buffer when most
+ * of the allocated memory area is not being used.  MINA {@link IoBuffer}
+ * provides <tt>autoShrink</tt> property to take care of this issue.
+ * If <tt>autoShrink</tt> is turned on, {@link IoBuffer} halves the capacity
+ * of the buffer when {@link #compact()} is invoked and only 1/4 or less of
+ * the current capacity is being used. NIO <tt>ByteBuffer</tt> is reallocated
+ * by MINA {@link IoBuffer} behind the scene, and therefore {@link #buf()}
+ * will return a different {@link ByteBuffer} instance once capacity is
+ * changed.  Please also note {@link #compact()} will not decrease the
+ * capacity if the new capacity is less than the initial capacity of the
+ * buffer. 
  *
  * <h2>Derived Buffers</h2>
  * <p>
@@ -110,9 +124,9 @@ import java.util.Set;
  * {@link #duplicate()}, {@link #slice()}, or {@link #asReadOnlyBuffer()}.
  * They are useful especially when you broadcast the same messages to
  * multiple {@link IoSession}s.  Please note that the buffer derived from and
- * its derived buffers are not both auto-expandable.  Trying to call
- * {@link #setAutoExpand(boolean)} with <tt>true</tt> parameter will
- * raise an {@link IllegalStateException}.
+ * its derived buffers are not both auto-expandable neither auto-shrinkable.
+ * Trying to call {@link #setAutoExpand(boolean)} or {@link #setAutoShrink(boolean)}
+ * with <tt>true</tt> parameter will raise an {@link IllegalStateException}.
  * </p>
  *
  * <h2>Changing Buffer Allocation Policy</h2>
@@ -129,7 +143,7 @@ import java.util.Set;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * @noinspection StaticNonFinalField
+ * 
  * @see IoBufferAllocator
  */
 public abstract class IoBuffer implements Comparable<IoBuffer> {
@@ -247,7 +261,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Returns the underlying NIO buffer instance.
      */
     public abstract ByteBuffer buf();
-
+    
     /**
      * @see ByteBuffer#isDirect()
      */
@@ -270,7 +284,11 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract int capacity();
 
     /**
-     * Changes the capacity of this buffer.
+     * Increases the capacity of this buffer.  If the new capacity is less than
+     * or equal to the current capacity, this method returns silently.  If the
+     * new capacity is greater than the current capacity, the buffer is
+     * reallocated while retaining the position, limit, mark and the content
+     * of the buffer.
      */
     public abstract IoBuffer capacity(int newCapacity);
 
@@ -283,6 +301,16 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Turns on or off <tt>autoExpand</tt>.
      */
     public abstract IoBuffer setAutoExpand(boolean autoExpand);
+    
+    /**
+     * Returns <tt>true</tt> if and only if <tt>autoShrink</tt> is turned on.
+     */
+    public abstract boolean isAutoShrink();
+
+    /**
+     * Turns on or off <tt>autoShrink</tt>.
+     */
+    public abstract IoBuffer setAutoShrink(boolean autoShrink);
 
     /**
      * Changes the capacity and limit of this buffer so this buffer get
@@ -297,11 +325,11 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Changes the capacity and limit of this buffer so this buffer get
      * the specified <tt>expectedRemaining</tt> room from the specified
-     * <tt>pos</tt>.
+     * <tt>position</tt>.
      * This method works even if you didn't set <tt>autoExpand</tt> to
      * <tt>true</tt>.
      */
-    public abstract IoBuffer expand(int pos, int expectedRemaining);
+    public abstract IoBuffer expand(int position, int expectedRemaining);
 
     /**
      * @see java.nio.Buffer#position()

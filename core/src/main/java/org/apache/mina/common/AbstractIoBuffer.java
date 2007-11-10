@@ -37,13 +37,16 @@ import java.nio.ShortBuffer;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * @noinspection StaticNonFinalField
  * @see IoBufferAllocator
  */
 public abstract class AbstractIoBuffer extends IoBuffer {
+    
+    private final IoBufferAllocator allocator;
+    private final int initialCapacity;
     private final boolean derived;
     private boolean autoExpand;
-    private boolean autoExpandAllowed = true;
+    private boolean autoShrink;
+    private boolean recapacityAllowed = true;
 
     /**
      * We don't have any access to Buffer.markValue(), so we need to track it down,
@@ -51,9 +54,25 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     private int mark = -1;
 
-    protected AbstractIoBuffer(boolean autoExpandAllowed) {
-        this.autoExpandAllowed = autoExpandAllowed;
-        this.derived = !autoExpandAllowed;
+    /**
+     * Creates a new parent buffer.
+     */
+    protected AbstractIoBuffer(
+            IoBufferAllocator allocator, int initialCapacity) {
+        this.allocator = allocator;
+        this.recapacityAllowed = true;
+        this.derived = false;
+        this.initialCapacity = initialCapacity;
+    }
+    
+    /**
+     * Creates a new derived buffer.
+     */
+    protected AbstractIoBuffer(AbstractIoBuffer parent) {
+        this.allocator = parent.allocator;
+        this.recapacityAllowed = false;
+        this.derived = true;
+        this.initialCapacity = parent.initialCapacity;
     }
 
     @Override
@@ -66,6 +85,11 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         return buf().isReadOnly();
     }
 
+    /**
+     * Sets the underlying NIO buffer instance.
+     */
+    protected abstract void buf(ByteBuffer newBuf);
+
     @Override
     public int capacity() {
         return buf().capacity();
@@ -73,13 +97,28 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public IoBuffer capacity(int newCapacity) {
+        if (!recapacityAllowed) {
+            throw new IllegalStateException(
+                    "Derived buffers and their parent can't be expanded.");
+        }
+
+        // Allocate a new buffer and transfer all settings to it.
         if (newCapacity > capacity()) {
-            // Allocate a new buffer and transfer all settings to it.
+            // Expand:
+            //// Save the state.
             int pos = position();
             int limit = limit();
             ByteOrder bo = order();
 
-            capacity0(newCapacity);
+            //// Reallocate.
+            ByteBuffer oldBuf = buf();
+            ByteBuffer newBuf = 
+                allocator.allocateNioBuffer(newCapacity, isDirect());
+            oldBuf.clear();
+            newBuf.put(oldBuf);
+            buf(newBuf);
+
+            //// Restore the state.
             buf().limit(limit);
             if (mark >= 0) {
                 buf().position(mark);
@@ -88,19 +127,18 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             buf().position(pos);
             buf().order(bo);
         }
-
+        
         return this;
     }
 
-    /**
-     * Implement this method to increase the capacity of this buffer.
-     * <tt>newCapacity</tt> is always greater than the current capacity.
-     */
-    protected abstract void capacity0(int newCapacity);
-
     @Override
     public boolean isAutoExpand() {
-        return autoExpand && autoExpandAllowed;
+        return autoExpand && recapacityAllowed;
+    }
+    
+    @Override
+    public boolean isAutoShrink() {
+        return autoShrink && recapacityAllowed;
     }
     
     @Override
@@ -110,16 +148,31 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public IoBuffer setAutoExpand(boolean autoExpand) {
-        if (!autoExpandAllowed) {
+        if (!recapacityAllowed) {
             throw new IllegalStateException(
-                    "Derived buffers can't be auto-expandable.");
+                    "Derived buffers and their parent can't be expanded.");
         }
         this.autoExpand = autoExpand;
         return this;
     }
 
     @Override
+    public IoBuffer setAutoShrink(boolean autoShrink) {
+        if (!recapacityAllowed) {
+            throw new IllegalStateException(
+                    "Derived buffers and their parent can't be shrinked.");
+        }
+        this.autoShrink = autoShrink;
+        return this;
+    }
+
+    @Override
     public IoBuffer expand(int pos, int expectedRemaining) {
+        if (!recapacityAllowed) {
+            throw new IllegalStateException(
+                    "Derived buffers and their parent can't be expanded.");
+        }
+
         int end = pos + expectedRemaining;
         if (end > capacity()) {
             // The buffer needs expansion.
@@ -248,7 +301,38 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public IoBuffer compact() {
-        buf().compact();
+        int remaining = remaining();
+        if (isAutoShrink() && remaining <= capacity() >>> 2) {
+            int newCapacity = remaining << 1;
+            if (newCapacity < initialCapacity && initialCapacity == capacity()) {
+                buf().compact();
+            } else {
+                newCapacity = Math.max(initialCapacity, newCapacity);
+
+                // Shrink and compact:
+                //// Save the state.
+                ByteOrder bo = order();
+    
+                //// Sanity check.
+                if (remaining > newCapacity) {
+                    throw new IllegalStateException(
+                            "The amount of the remaining bytes is greater than " +
+                            "the new capacity.");
+                }
+    
+                //// Reallocate.
+                ByteBuffer oldBuf = buf();
+                ByteBuffer newBuf = 
+                    allocator.allocateNioBuffer(newCapacity, isDirect());
+                newBuf.put(oldBuf);
+                buf(newBuf);
+                
+                //// Restore the state.
+                buf().order(bo);
+            }
+        } else {
+            buf().compact();
+        }
         mark = -1;
         return this;
     }
@@ -440,7 +524,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public final IoBuffer asReadOnlyBuffer() {
-        autoExpandAllowed = false;
+        recapacityAllowed = false;
         return asReadOnlyBuffer0();
     }
 
@@ -452,7 +536,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public final IoBuffer duplicate() {
-        autoExpandAllowed = false;
+        recapacityAllowed = false;
         return duplicate0();
     }
 
@@ -464,7 +548,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public final IoBuffer slice() {
-        autoExpandAllowed = false;
+        recapacityAllowed = false;
         return slice0();
     }
 

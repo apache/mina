@@ -116,6 +116,80 @@ public class IoBufferTest extends TestCase {
         buf.reset();
         Assert.assertEquals(3, buf.position());
     }
+    
+    public void testAutoShrink() throws Exception {
+        IoBuffer buf = IoBuffer.allocate(8).setAutoShrink(true);
+        
+        // Make sure the buffer doesn't shrink too much (less than the initial
+        // capacity.)
+        buf.sweep((byte) 1);
+        buf.fill(7); 
+        buf.compact();
+        Assert.assertEquals(8, buf.capacity());
+        Assert.assertEquals(1, buf.position());
+        Assert.assertEquals(8, buf.limit());
+        buf.clear();
+        Assert.assertEquals(1, buf.get());
+
+        // Expand the buffer.
+        buf.capacity(32).clear();
+        Assert.assertEquals(32, buf.capacity());
+        
+        // Make sure the buffer shrinks when only 1/4 is being used.
+        buf.sweep((byte) 1);
+        buf.fill(24);
+        buf.compact();
+        Assert.assertEquals(16, buf.capacity());
+        Assert.assertEquals(8, buf.position());
+        Assert.assertEquals(16, buf.limit());
+        buf.clear();
+        for (int i = 0; i < 8; i ++) {
+            Assert.assertEquals(1, buf.get());
+        }
+
+        // Expand the buffer.
+        buf.capacity(32).clear();
+        Assert.assertEquals(32, buf.capacity());
+        
+        // Make sure the buffer shrinks when only 1/8 is being used.
+        buf.sweep((byte) 1);
+        buf.fill(28);
+        buf.compact();
+        Assert.assertEquals(8, buf.capacity());
+        Assert.assertEquals(4, buf.position());
+        Assert.assertEquals(8, buf.limit());
+        buf.clear();
+        for (int i = 0; i < 4; i ++) {
+            Assert.assertEquals(1, buf.get());
+        }
+
+        // Expand the buffer.
+        buf.capacity(32).clear();
+        Assert.assertEquals(32, buf.capacity());
+        
+        // Make sure the buffer shrinks when 0 byte is being used.
+        buf.fill(32);
+        buf.compact();
+        Assert.assertEquals(8, buf.capacity());
+        Assert.assertEquals(0, buf.position());
+        Assert.assertEquals(8, buf.limit());
+
+        // Expand the buffer.
+        buf.capacity(32).clear();
+        Assert.assertEquals(32, buf.capacity());
+        
+        // Make sure the buffer doesn't shrink when more than 1/4 is being used.
+        buf.sweep((byte) 1);
+        buf.fill(23);
+        buf.compact();
+        Assert.assertEquals(32, buf.capacity());
+        Assert.assertEquals(9, buf.position());
+        Assert.assertEquals(32, buf.limit());
+        buf.clear();
+        for (int i = 0; i < 9; i ++) {
+            Assert.assertEquals(1, buf.get());
+        }
+    }
 
     public void testGetString() throws Exception {
         IoBuffer buf = IoBuffer.allocate(16);
