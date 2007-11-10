@@ -181,17 +181,18 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     
     @Override
     public void setMaximumPoolSize(int maximumPoolSize) {
+        if (maximumPoolSize <= 0 || maximumPoolSize < corePoolSize) {
+            throw new IllegalArgumentException("maximumPoolSize: "
+                    + maximumPoolSize);
+        }
+
         synchronized (workers) {
-            if (maximumPoolSize == 0 || maximumPoolSize < corePoolSize) {
-                throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
-            }
-            
-            if (this.maximumPoolSize > maximumPoolSize) {
-                for (int i = this.maximumPoolSize - maximumPoolSize; i > 0; i --) {
-                    removeWorker();
-                }
-            }
             this.maximumPoolSize = maximumPoolSize;
+            int difference = workers.size() - maximumPoolSize;
+            while (difference > 0) {
+                removeWorker();
+                --difference;
+            }
         }
     }
     
@@ -428,6 +429,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     public void setCorePoolSize(int corePoolSize) {
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
+        }
+        if (corePoolSize > maximumPoolSize) {
+            throw new IllegalArgumentException("corePoolSize exceeds maximumPoolSize");
         }
         
         synchronized (workers) {
