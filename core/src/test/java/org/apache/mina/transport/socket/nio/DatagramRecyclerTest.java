@@ -87,63 +87,124 @@ public class DatagramRecyclerTest extends TestCase {
 
             Thread.sleep(1000);
 
-            Assert.assertEquals("CROPSECL", connectorHandler.result);
-            Assert.assertEquals("CROPRECL", acceptorHandler.result);
+            Assert.assertEquals("CROPSECL", connectorHandler.result.toString());
+            Assert.assertEquals("CROPRECL", acceptorHandler.result.toString());
+        } finally {
+            acceptor.unbind();
+        }
+    }
+    
+    public void testCloseRequest() throws Exception {
+        int port = AvailablePortFinder.getNextAvailable(1024);
+        ExpiringSessionRecycler recycler = new ExpiringSessionRecycler(10, 1);
+
+        MockHandler acceptorHandler = new MockHandler();
+        MockHandler connectorHandler = new MockHandler();
+
+        acceptor.setLocalAddress(new InetSocketAddress(port));
+        acceptor.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, 1);
+        acceptor.setHandler(acceptorHandler);
+        acceptor.setSessionRecycler(recycler);
+        acceptor.bind();
+
+        try {
+            connector.setHandler(connectorHandler);
+            ConnectFuture future = connector.connect(new InetSocketAddress(
+                    "localhost", port));
+            future.awaitUninterruptibly();
+            
+            // Write whatever to trigger the acceptor.
+            future.getSession().write(IoBuffer.allocate(1)).awaitUninterruptibly();
+
+            // Make sure the connection is closed before recycler closes it.
+            while (acceptorHandler.session == null) {
+                Thread.yield();
+            }
+            acceptorHandler.session.close();
+            Assert.assertTrue(
+                    acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
+            
+            IoSession oldSession = acceptorHandler.session;
+
+            // Wait until all events are processed and clear the state.
+            long startTime = System.currentTimeMillis();
+            while (acceptorHandler.result.length() < 8) {
+                Thread.yield();
+                if (System.currentTimeMillis() - startTime > 5000) {
+                    throw new Exception();
+                }
+            }
+            acceptorHandler.result.setLength(0);
+            acceptorHandler.session = null;
+            
+            // Write whatever to trigger the acceptor again.
+            future.getSession().write(IoBuffer.allocate(1))
+                    .awaitUninterruptibly();
+            
+            // Make sure the connection is closed before recycler closes it.
+            while (acceptorHandler.session == null) {
+                Thread.yield();
+            }
+            acceptorHandler.session.close();
+            Assert.assertTrue(
+                    acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
+
+            future.getSession().close().awaitUninterruptibly();
+            
+            Assert.assertNotSame(oldSession, acceptorHandler.session);
         } finally {
             acceptor.unbind();
         }
     }
 
     private class MockHandler extends IoHandlerAdapter {
-        public IoSession session;
-
-        public String result = "";
+        public volatile IoSession session;
+        public final StringBuffer result = new StringBuffer();
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
             this.session = session;
-            result += "CA";
+            result.append("CA");
         }
 
         @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {
             this.session = session;
-            result += "RE";
+            result.append("RE");
         }
 
         @Override
         public void messageSent(IoSession session, Object message)
                 throws Exception {
             this.session = session;
-            result += "SE";
+            result.append("SE");
         }
 
         @Override
         public void sessionClosed(IoSession session) throws Exception {
             this.session = session;
-            result += "CL";
+            result.append("CL");
         }
 
         @Override
         public void sessionCreated(IoSession session) throws Exception {
             this.session = session;
-            result += "CR";
+            result.append("CR");
         }
 
         @Override
         public void sessionIdle(IoSession session, IdleStatus status)
                 throws Exception {
             this.session = session;
-            result += "ID";
+            result.append("ID");
         }
 
         @Override
         public void sessionOpened(IoSession session) throws Exception {
             this.session = session;
-            result += "OP";
+            result.append("OP");
         }
-
     }
 }

@@ -267,6 +267,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         }
 
         public void remove(NioSession session) {
+            getSessionRecycler().remove(session);
             getListeners().fireSessionDestroyed(session);
         }
 
