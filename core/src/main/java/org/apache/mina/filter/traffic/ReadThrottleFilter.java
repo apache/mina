@@ -100,10 +100,6 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         return serviceBufferSize.addAndGet(increment);
     }
     
-    private static void resetServiceBufferSize(IoService service) {
-        serviceBufferSizes.remove(service);
-    }
-    
     private final AttributeKey STATE =
         new AttributeKey(ReadThrottleFilter.class, "state");
 
@@ -313,7 +309,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     @Override
     public void messageReceived(
             NextFilter nextFilter, IoSession session, Object message) throws Exception {
-        exit(session, messageSizeEstimator.estimateSize(message));
+        exit(session, estimateSize(message));
         nextFilter.messageReceived(session, message);
     }
 
@@ -358,9 +354,19 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         @Override
         public void messageReceived(
                 NextFilter nextFilter, IoSession session, Object message) throws Exception {
-            enter(session, messageSizeEstimator.estimateSize(message));
+            enter(session, estimateSize(message));
             nextFilter.messageReceived(session, message);
         }
+    }
+    
+    private int estimateSize(Object message) {
+        int size = messageSizeEstimator.estimateSize(message);
+        if (size < 0) {
+            throw new IllegalStateException(
+                    MessageSizeEstimator.class.getSimpleName() + " returned " +
+                    "a negative value (" + size + "): " + message);
+        }
+        return size;
     }
 
     private void enter(IoSession session, int size) {
@@ -431,12 +437,12 @@ public class ReadThrottleFilter extends IoFilterAdapter {
 
         int globalBufferSize = ReadThrottleFilter.globalBufferSize.addAndGet(-size);
         if (globalBufferSize < 0) {
-            ReadThrottleFilter.globalBufferSize.set(0);
+            throw new IllegalStateException("globalBufferSize: " + globalBufferSize);
         }
         
         int serviceBufferSize = increaseServiceBufferSize(session.getService(), -size);
         if (serviceBufferSize < 0) {
-            resetServiceBufferSize(session.getService());
+            throw new IllegalStateException("serviceBufferSize: " + serviceBufferSize);
         }
 
         int maxGlobalBufferSize = this.maxGlobalBufferSize;
@@ -449,7 +455,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         synchronized (state) {
             sessionBufferSize = (state.sessionBufferSize -= size);
             if (sessionBufferSize < 0) {
-                state.sessionBufferSize = sessionBufferSize = 0;
+                throw new IllegalStateException("sessionBufferSize: " + sessionBufferSize);
             }
             if ((maxGlobalBufferSize == 0 || globalBufferSize < maxGlobalBufferSize) &&
                 (maxServiceBufferSize == 0 || serviceBufferSize < maxServiceBufferSize) &&

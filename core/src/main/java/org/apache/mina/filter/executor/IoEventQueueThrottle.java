@@ -81,7 +81,7 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
     }
     
     public void offered(ThreadPoolExecutor executor, IoEvent event) {
-        int eventSize = getEventSizeEstimator().estimateSize(event);
+        int eventSize = estimateSize(event);
         int currentCounter = counter.addAndGet(eventSize);
         logState();
 
@@ -89,10 +89,14 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
             block();
         }
     }
-    
+
     public void polled(ThreadPoolExecutor executor, IoEvent event) {
-        int eventSize = getEventSizeEstimator().estimateSize(event);
+        int eventSize = estimateSize(event);
         int currentCounter = counter.addAndGet(-eventSize);
+        if (currentCounter < 0) {
+            throw new IllegalStateException("counter: " + currentCounter);
+        }
+        
         logState();
 
         if (currentCounter < threshold) {
@@ -100,6 +104,16 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         }
     }
 
+    private int estimateSize(IoEvent event) {
+        int size = getEventSizeEstimator().estimateSize(event);
+        if (size < 0) {
+            throw new IllegalStateException(
+                    IoEventSizeEstimator.class.getSimpleName() + " returned " +
+                    "a negative value (" + size + "): " + event);
+        }
+        return size;
+    }
+    
     private void logState() {
         if (logger.isDebugEnabled()) {
             logger.debug(Thread.currentThread().getName() + " state: " + counter.get() + " / " + getThreshold());
