@@ -148,7 +148,8 @@ import java.util.Set;
  */
 public abstract class IoBuffer implements Comparable<IoBuffer> {
     private static IoBufferAllocator allocator = new SimpleBufferAllocator();
-
+    private static final IoBuffer EMPTY_DIRECT_BUFFER = allocator.allocate(0, true);
+    private static final IoBuffer EMPTY_HEAP_BUFFER = allocator.allocate(0, false);
     private static boolean useDirectBuffer = false;
 
     /**
@@ -218,6 +219,14 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *                 <tt>false</tt> to get a heap buffer.
      */
     public static IoBuffer allocate(int capacity, boolean direct) {
+        if (capacity == 0) {
+            return direct? EMPTY_DIRECT_BUFFER : EMPTY_HEAP_BUFFER;
+        }
+        
+        if (capacity < 0) {
+            throw new IllegalArgumentException("capacity: " + capacity);
+        }
+
         return allocator.allocate(capacity, direct);
     }
 

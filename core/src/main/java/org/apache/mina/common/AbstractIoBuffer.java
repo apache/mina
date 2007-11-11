@@ -302,8 +302,21 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public IoBuffer compact() {
         int remaining = remaining();
-        if (isAutoShrink() && remaining <= capacity() >>> 2) {
-            int newCapacity = remaining << 1;
+        int capacity = capacity();
+        if (capacity == 0) {
+            return this;
+        }
+
+        if (isAutoShrink() && remaining <= capacity >>> 2) {
+            int newCapacity = capacity;
+            int minCapacity = Math.max(initialCapacity, remaining << 1);
+            for (;;) {
+                if (newCapacity >>> 1 < minCapacity) {
+                    break;
+                }
+                newCapacity >>>= 1;
+            }
+            
             if (newCapacity < initialCapacity && initialCapacity == capacity()) {
                 buf().compact();
             } else {
