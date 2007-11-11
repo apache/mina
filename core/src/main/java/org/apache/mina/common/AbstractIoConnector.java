@@ -58,6 +58,10 @@ public abstract class AbstractIoConnector extends AbstractIoService implements
 
     public final ConnectFuture connect(SocketAddress remoteAddress,
             SocketAddress localAddress) {
+        if (isDisposed()) {
+            throw new IllegalStateException("Already disposed.");
+        }
+
         if (remoteAddress == null) {
             throw new NullPointerException("remoteAddress");
         }
@@ -97,6 +101,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements
      * related with event notifications to the specified {@code session}
      * and {@code future}.
      */
+    @Override
     protected void finishSessionInitialization(
             final IoSession session, IoFuture future) {
         super.finishSessionInitialization(session, future);

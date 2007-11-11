@@ -120,6 +120,10 @@ public abstract class AbstractIoAcceptor
     }
 
     public final void bind() throws IOException {
+        if (isDisposed()) {
+            throw new IllegalStateException("Already disposed.");
+        }
+
         synchronized (bindLock) {
             if (bound) {
                 throw new IllegalStateException("Already bound to: "

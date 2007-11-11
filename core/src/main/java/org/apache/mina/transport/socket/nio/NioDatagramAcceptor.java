@@ -173,6 +173,10 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
     }
 
     public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
+        if (isDisposed()) {
+            throw new IllegalStateException("Already disposed.");
+        }
+
         if (remoteAddress == null) {
             throw new NullPointerException("remoteAddress");
         }

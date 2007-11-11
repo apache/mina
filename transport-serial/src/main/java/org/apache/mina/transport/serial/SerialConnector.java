@@ -60,10 +60,6 @@ public class SerialConnector extends AbstractIoConnector {
     @Override
     protected ConnectFuture doConnect(SocketAddress remoteAddress,
             SocketAddress localAddress) {
-        if (!(remoteAddress instanceof SerialAddress)) {
-            throw new IllegalArgumentException(
-                    "Bad SocketAddress, need a SerialPortAddress");
-        }
 
         CommPortIdentifier portId;
         Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
