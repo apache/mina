@@ -317,7 +317,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         if (previousSessionCount == 0) {
             synchronized (resumeOthersTask) {
                 resumeOthersFuture = executor.scheduleWithFixedDelay(
-                        resumeOthersTask, 1000, 1000, TimeUnit.MILLISECONDS);
+                        resumeOthersTask, 3000, 3000, TimeUnit.MILLISECONDS);
             }
         }
     }
