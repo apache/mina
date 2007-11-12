@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * A key that makes its parent {@link Map} or session attribute to search
- * fast while being debug-friendly by providing the spring representation.
+ * fast while being debug-friendly by providing the string representation.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
