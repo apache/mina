@@ -22,6 +22,7 @@ package org.apache.mina.filter.codec;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.UnderivableBuffer;
 
 /**
  * A {@link ProtocolDecoder} that cumulates the content of received
@@ -189,10 +190,12 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     }
 
     private void storeRemainingInSession(IoBuffer buf, IoSession session) {
-        final IoBuffer remainingBuf = IoBuffer.allocate(buf.capacity());
-        remainingBuf.setAutoExpand(true);
+        final IoBuffer remainingBuf = new UnderivableBuffer(
+                IoBuffer.allocate(buf.capacity()).setAutoExpand(true));
+        
         remainingBuf.order(buf.order());
         remainingBuf.put(buf);
+        
         session.setAttribute(BUFFER, remainingBuf);
     }
 }
