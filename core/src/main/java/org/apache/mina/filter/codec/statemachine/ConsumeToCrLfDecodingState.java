@@ -29,7 +29,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class ConsumeToCRLFDecodingState implements DecodingState {
+public abstract class ConsumeToCrLfDecodingState implements DecodingState {
 
     /**
      * Carriage return character
@@ -48,7 +48,7 @@ public abstract class ConsumeToCRLFDecodingState implements DecodingState {
     /**
      * Creates a new instance.
      */
-    public ConsumeToCRLFDecodingState() {
+    public ConsumeToCrLfDecodingState() {
     }
 
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)

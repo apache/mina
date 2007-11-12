@@ -35,7 +35,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class CRLFDecodingState implements DecodingState {
+public abstract class CrLfDecodingState implements DecodingState {
     /**
      * Carriage return character
      */
