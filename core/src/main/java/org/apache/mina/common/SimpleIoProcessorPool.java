@@ -171,27 +171,19 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
     }
     
     public void add(T session) {
-        IoProcessor<T> p = nextProcessor();
-        session.setAttribute(PROCESSOR, p);
-        p.add(session);
+        getProcessor(session).add(session);
     }
 
-    @SuppressWarnings("unchecked")
     public void flush(T session) {
-        IoProcessor<T> p = (IoProcessor<T>) session.getAttribute(PROCESSOR);
-        p.flush(session);
+        getProcessor(session).flush(session);
     }
 
-    @SuppressWarnings("unchecked")
     public void remove(T session) {
-        IoProcessor<T> p = (IoProcessor<T>) session.removeAttribute(PROCESSOR);
-        p.remove(session);
+        getProcessor(session).remove(session);
     }
 
-    @SuppressWarnings("unchecked")
     public void updateTrafficMask(T session) {
-        IoProcessor<T> p = (IoProcessor<T>) session.getAttribute(PROCESSOR);
-        p.updateTrafficMask(session);
+        getProcessor(session).updateTrafficMask(session);
     }
     
     public void dispose() {
@@ -221,6 +213,21 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
         }
     }
     
+    @SuppressWarnings("unchecked")
+    private IoProcessor<T> getProcessor(T session) {
+        IoProcessor<T> p = (IoProcessor<T>) session.getAttribute(PROCESSOR);
+        if (p == null) {
+            p = nextProcessor();
+            IoProcessor<T> oldp =
+                (IoProcessor<T>) session.setAttributeIfAbsent(PROCESSOR, p);
+            if (oldp != null) {
+                p = oldp;
+            }
+        }
+        
+        return p;
+    }
+
     private IoProcessor<T> nextProcessor() {
         checkDisposal();
         return pool[Math.abs(processorDistributor.getAndIncrement()) % pool.length];
