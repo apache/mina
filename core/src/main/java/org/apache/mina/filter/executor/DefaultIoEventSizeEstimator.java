@@ -21,8 +21,10 @@ package org.apache.mina.filter.executor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoEvent;
@@ -43,19 +45,9 @@ import org.apache.mina.common.IoEvent;
  */
 public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
 
-    private final Map<Class<?>, Integer> class2size = new ConcurrentHashMap<Class<?>, Integer>();
-    private final int averageSizePerField;
+    private final ConcurrentMap<Class<?>, Integer> class2size = new ConcurrentHashMap<Class<?>, Integer>();
     
     public DefaultIoEventSizeEstimator() {
-        this(64);
-    }
-    
-    public DefaultIoEventSizeEstimator(int averageSizePerField) {
-        if (averageSizePerField <= 0) {
-            throw new IllegalArgumentException("averageSizePerField: " + averageSizePerField);
-        }
-        this.averageSizePerField = averageSizePerField;
-        
         class2size.put(boolean.class, 4); // Probably an integer.
         class2size.put(byte.class, 1);
         class2size.put(char.class, 2);
@@ -69,87 +61,62 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         return estimateSize((Object) event) + estimateSize(event.getParameter());
     }
     
-    private int estimateSize(Object message) {
+    public int estimateSize(Object message) {
         if (message == null) {
             return 8;
         }
 
+        int answer = 8 + estimateSize(message.getClass(), null);
+        
         if (message instanceof IoBuffer) {
-            return align(46 + ((IoBuffer) message).remaining());
-        }
-        
-        if (message instanceof CharSequence) {
-            return align(38 + (((CharSequence) message).length() << 1));
-        }
-        
-        if (message instanceof Iterable) {
-            int answer = estimateSize(message.getClass());
+            answer += ((IoBuffer) message).remaining();
+        } else if (message instanceof CharSequence) {
+            answer += ((CharSequence) message).length() << 1;
+        } else if (message instanceof Iterable) {
             for (Object m: (Iterable<?>) message) {
                 answer += estimateSize(m);
             }
-            return answer;
         }
         
-        return estimateSize(message.getClass());
+        return align(answer);
     }
     
-    private int estimateSize(Class<?> clazz) {
+    private int estimateSize(Class<?> clazz, Set<Class<?>> visitedClasses) {
         Integer objectSize = class2size.get(clazz);
         if (objectSize != null) {
             return objectSize;
         }
         
-        int answer = 8; // Basic overhead.
-        synchronized (class2size) {
-            
-            // Get the rough estimation.
-            for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-                Field[] fields = c.getDeclaredFields();
-                for (Field f: fields) {
-                    if ((f.getModifiers() & Modifier.STATIC) != 0) {
-                        // Ignore static fields.
-                        continue;
-                    }
-                    
-                    Integer fieldSize = class2size.get(f.getType());
-                    if (fieldSize == null) {
-                        answer += averageSizePerField;
-                    } else {
-                        answer += fieldSize;
-                    }
-                }
+        if (visitedClasses != null) {
+            if (visitedClasses.contains(clazz)) {
+                return 0;
             }
-            
-            // Put the intermediate answer to prevent infinite recursion.
-            class2size.put(clazz, answer);
-            
-            // Now include field classes, too.
-            for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-                Field[] fields = c.getDeclaredFields();
-                for (Field f: fields) {
-                    if ((f.getModifiers() & Modifier.STATIC) != 0) {
-                        // Ignore static fields.
-                        continue;
-                    }
-                    
-                    if (!class2size.containsKey(f.getType())) {
-                        // Compensate previous rough estimation
-                        answer += estimateSize(f.getType()) - averageSizePerField;
-                    }
-                }
-            }
-            
-            if (answer <= 0) {
-                answer = averageSizePerField;
-            }
-            
-            // Some alignment.
-            answer = align(answer);
-            
-            // Put the final answer.
-            class2size.put(clazz, answer);
+        } else {
+            visitedClasses = new HashSet<Class<?>>();
         }
         
+        visitedClasses.add(clazz);
+        
+        int answer = 8; // Basic overhead.
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            Field[] fields = c.getDeclaredFields();
+            for (Field f: fields) {
+                if ((f.getModifiers() & Modifier.STATIC) != 0) {
+                    // Ignore static fields.
+                    continue;
+                }
+                
+                answer += estimateSize(f.getType(), visitedClasses);
+            }
+        }
+            
+        visitedClasses.remove(clazz);
+        
+        // Some alignment.
+        answer = align(answer);
+        
+        // Put the final answer.
+        class2size.putIfAbsent(clazz, answer);
         return answer;
     }
     

@@ -93,10 +93,7 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
     public void polled(ThreadPoolExecutor executor, IoEvent event) {
         int eventSize = estimateSize(event);
         int currentCounter = counter.addAndGet(-eventSize);
-        if (currentCounter < 0) {
-            throw new IllegalStateException("counter: " + currentCounter);
-        }
-        
+
         logState();
 
         if (currentCounter < threshold) {
