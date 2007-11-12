@@ -20,6 +20,9 @@
 package org.apache.mina.filter.traffic;
 
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.AttributeKey;
@@ -111,36 +114,50 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     private volatile int maxGlobalBufferSize;
     
     private final IoFilter enterFilter = new EnterFilter();
+    
+    private final ScheduledExecutorService executor;
+    private ScheduledFuture<?> resumeOthersFuture;
+    private final AtomicInteger sessionCount = new AtomicInteger();
+    private final Runnable resumeOthersTask = new Runnable() {
+        public void run() {
+            resumeOthers();
+        }
+    };
 
     /**
      * Creates a new instance with 64KB <tt>maxSessionBufferSize</tt>,
      * 128MB <tt>maxGlobalBufferSize</tt> and a new {@link DefaultMessageSizeEstimator}.
      */
-    public ReadThrottleFilter() {
-        this(ReadThrottlePolicy.LOG);
+    public ReadThrottleFilter(ScheduledExecutorService executor) {
+        this(executor, ReadThrottlePolicy.LOG);
     }
     
-    public ReadThrottleFilter(ReadThrottlePolicy policy) {
-        this(policy, null);
+    public ReadThrottleFilter(
+            ScheduledExecutorService executor, ReadThrottlePolicy policy) {
+        this(executor, policy, null);
     }
     
-    public ReadThrottleFilter(ReadThrottlePolicy policy, MessageSizeEstimator messageSizeEstimator) {
+    public ReadThrottleFilter(
+            ScheduledExecutorService executor,
+            ReadThrottlePolicy policy, MessageSizeEstimator messageSizeEstimator) {
         // 64KB, 64MB, 128MB.
-        this(policy, messageSizeEstimator, 65536, 1048576 * 64, 1048576 * 128);
+        this(executor, policy, messageSizeEstimator, 65536, 1048576 * 64, 1048576 * 128);
     }
     
     /**
      * Creates a new instance with the specified <tt>maxSessionBufferSize</tt>,
      * <tt>maxGlobalBufferSize</tt> and a new {@link DefaultMessageSizeEstimator}.
      */
-    public ReadThrottleFilter(int maxSessionBufferSize, int maxServiceBufferSize, int maxGlobalBufferSize) {
-        this(ReadThrottlePolicy.LOG, maxSessionBufferSize, maxServiceBufferSize, maxGlobalBufferSize);
+    public ReadThrottleFilter(
+            ScheduledExecutorService executor,
+            int maxSessionBufferSize, int maxServiceBufferSize, int maxGlobalBufferSize) {
+        this(executor, ReadThrottlePolicy.LOG, maxSessionBufferSize, maxServiceBufferSize, maxGlobalBufferSize);
     }
 
     public ReadThrottleFilter(
-            ReadThrottlePolicy policy,
+            ScheduledExecutorService executor, ReadThrottlePolicy policy,
             int maxSessionBufferSize, int maxServiceBufferSize, int maxGlobalBufferSize) {
-        this(policy, null, maxSessionBufferSize, maxServiceBufferSize, maxGlobalBufferSize);
+        this(executor, policy, null, maxSessionBufferSize, maxServiceBufferSize, maxGlobalBufferSize);
     }
 
     /**
@@ -159,11 +176,13 @@ public class ReadThrottleFilter extends IoFilterAdapter {
      *                             a new {@link DefaultMessageSizeEstimator} is created.
      */
     public ReadThrottleFilter(
+            ScheduledExecutorService executor, 
             ReadThrottlePolicy policy, MessageSizeEstimator messageSizeEstimator,
             int maxSessionBufferSize, int maxServiceBufferSize, int maxGlobalBufferSize) {
         if (messageSizeEstimator == null) {
             messageSizeEstimator = new DefaultMessageSizeEstimator();
         }
+        this.executor = executor;
         this.messageSizeEstimator = messageSizeEstimator;
         setPolicy(policy);
         setMaxSessionBufferSize(maxSessionBufferSize);
@@ -293,6 +312,14 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         
         // Add an entering filter before the ExecutorFilter.
         parent.getEntry(lastFilter).addBefore(name + ".preprocessor", enterFilter);
+        
+        int previousSessionCount = sessionCount.getAndIncrement();
+        if (previousSessionCount == 0) {
+            synchronized (resumeOthersTask) {
+                resumeOthersFuture = executor.scheduleWithFixedDelay(
+                        resumeOthersTask, 1000, 1000, TimeUnit.MILLISECONDS);
+            }
+        }
     }
 
     @Override
@@ -303,6 +330,14 @@ public class ReadThrottleFilter extends IoFilterAdapter {
             parent.remove(enterFilter);
         } catch (Exception e) {
             // Ignore.
+        }
+        
+        int currentSessionCount = sessionCount.decrementAndGet();
+        if (currentSessionCount == 0) {
+            synchronized (resumeOthersTask) {
+                resumeOthersFuture.cancel(false);
+                resumeOthersFuture = null;
+            }
         }
     }
 
@@ -498,11 +533,10 @@ public class ReadThrottleFilter extends IoFilterAdapter {
             if (maxGlobalBufferSize == 0 || globalBufferSize.get() < maxGlobalBufferSize) {
                 for (IoService service: serviceBufferSizes.keySet()) {
                     resumeService(service);
+                    synchronized (globalResumeLock) {
+                        lastGlobalResumeTime = System.currentTimeMillis();
+                    }
                 }
-            }
-            
-            synchronized (globalResumeLock) {
-                lastGlobalResumeTime = System.currentTimeMillis();
             }
         }
     }
