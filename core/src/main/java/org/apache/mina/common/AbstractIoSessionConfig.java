@@ -35,6 +35,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     private int idleTimeForWrite;
     private int idleTimeForBoth;
     private int writeTimeout;
+    private boolean useReadOperation;
 
     protected AbstractIoSessionConfig() {
     }
@@ -51,6 +52,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
         setIdleTime(IdleStatus.READER_IDLE, config.getIdleTime(IdleStatus.READER_IDLE));
         setIdleTime(IdleStatus.WRITER_IDLE, config.getIdleTime(IdleStatus.WRITER_IDLE));
         setWriteTimeout(config.getWriteTimeout());
+        setUseReadOperation(config.isUseReadOperation());
 
         doSetAll(config);
     }
@@ -153,5 +155,13 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
                     + writeTimeout);
         }
         this.writeTimeout = writeTimeout;
+    }
+
+    public boolean isUseReadOperation() {
+        return useReadOperation;
+    }
+
+    public void setUseReadOperation(boolean useReadOperation) {
+        this.useReadOperation = useReadOperation;
     }
 }

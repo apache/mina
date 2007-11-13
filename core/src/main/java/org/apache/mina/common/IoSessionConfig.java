@@ -19,6 +19,8 @@
  */
 package org.apache.mina.common;
 
+import java.util.concurrent.BlockingQueue;
+
 /**
  * The configuration of {@link IoSession}.
  *
@@ -98,6 +100,26 @@ public interface IoSessionConfig {
      * Sets write timeout in seconds.
      */
     void setWriteTimeout(int writeTimeout);
+    
+    /**
+     * Returns <tt>true</tt> if and only if {@link IoSession#read()} operation
+     * is enabled.  If enabled, all received messages are stored in an internal
+     * {@link BlockingQueue} so you can read received messages in more
+     * convenient way for client applications.  Enabling this option is not
+     * useful to server applications and can cause unintended memory leak, and
+     * therefore it's disabled by default.
+     */
+    boolean isUseReadOperation();
+    
+    /**
+     * Enables or disabled {@link IoSession#read()} operation.  If enabled, all
+     * received messages are stored in an internal {@link BlockingQueue} so you
+     * can read received messages in more convenient way for client
+     * applications.  Enabling this option is not useful to server applications
+     * and can cause unintended memory leak, and therefore it's disabled by
+     * default.
+     */
+    void setUseReadOperation(boolean useReadOperation);
 
     /**
      * Sets all configuration properties retrieved from the specified

@@ -78,6 +78,14 @@ public interface IoSession {
      * Returns the {@link TransportMetadata} that this session runs on.
      */
     TransportMetadata getTransportMetadata();
+    
+    /**
+     * 
+     * @throws IllegalStateException if
+     * {@link IoSessionConfig#setUseReadOperation(boolean) useReadOperation}
+     * option has not been enabled.
+     */
+    ReadFuture read();
 
     /**
      * Writes the specified <code>message</code> to remote peer.  This

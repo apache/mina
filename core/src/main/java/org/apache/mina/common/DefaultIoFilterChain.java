@@ -681,17 +681,24 @@ public class DefaultIoFilterChain implements IoFilterChain {
         @Override
         public void sessionClosed(NextFilter nextFilter, IoSession session)
                 throws Exception {
+            AbstractIoSession s = (AbstractIoSession) session;
             try {
-                session.getHandler().sessionClosed(session);
+                s.getHandler().sessionClosed(session);
             } finally {
                 try {
-                    ((AbstractIoSession) session).getWriteRequestQueue().dispose(session);
+                    s.getWriteRequestQueue().dispose(session);
                 } finally {
                     try {
-                        ((AbstractIoSession) session).getAttributeMap().dispose(session);
+                        s.getAttributeMap().dispose(session);
                     } finally {
-                        // Remove all filters.
-                        session.getFilterChain().clear();
+                        try {
+                            // Remove all filters.
+                            session.getFilterChain().clear();
+                        } finally {
+                            if (s.getConfig().isUseReadOperation()) {
+                                s.offerClosedReadFuture();
+                            }
+                        }
                     }
                 }
             }
@@ -706,14 +713,28 @@ public class DefaultIoFilterChain implements IoFilterChain {
         @Override
         public void exceptionCaught(NextFilter nextFilter, IoSession session,
                 Throwable cause) throws Exception {
-            session.getHandler().exceptionCaught(session, cause);
+            AbstractIoSession s = (AbstractIoSession) session;
+            try {
+                s.getHandler().exceptionCaught(s, cause);
+            } finally {
+                if (s.getConfig().isUseReadOperation()) {
+                    s.offerFailedReadFuture(cause);
+                }
+            }
         }
 
         @Override
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) throws Exception {
-            ((AbstractIoSession) session).increaseReadMessages();
-            session.getHandler().messageReceived(session, message);
+            AbstractIoSession s = (AbstractIoSession) session;
+            s.increaseReadMessages();
+            try {
+                session.getHandler().messageReceived(s, message);
+            } finally {
+                if (s.getConfig().isUseReadOperation()) {
+                    s.offerReadFuture(message);
+                }
+            }
         }
 
         @Override

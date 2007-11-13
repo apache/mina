@@ -24,10 +24,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.FileChannel;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.mina.util.CircularQueue;
 
 
 /**
@@ -38,6 +41,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class AbstractIoSession implements IoSession {
 
+    private static final AttributeKey READY_READ_FUTURES =
+        new AttributeKey(AbstractIoSession.class, "readyReadFutures");
+    private static final AttributeKey WAITING_READ_FUTURES =
+        new AttributeKey(AbstractIoSession.class, "waitingReadFutures");
+    
     private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER =
         new IoFutureListener<CloseFuture>() {
             public void operationComplete(CloseFuture future) {
@@ -152,6 +160,85 @@ public abstract class AbstractIoSession implements IoSession {
         getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);
         return closeFuture;
+    }
+
+    public ReadFuture read() {
+        if (!getConfig().isUseReadOperation()) {
+            throw new IllegalStateException("useReadOperation is not enabled.");
+        }
+        
+        Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
+        ReadFuture future;
+        synchronized (readyReadFutures) {
+            future = readyReadFutures.poll();
+            if (future != null) {
+                if (future.isClosed()) {
+                    // Let other readers get notified.
+                    readyReadFutures.offer(future);
+                }
+            } else {
+                future = new DefaultReadFuture(this);
+                getWaitingReadFutures().offer(future);
+            }
+        }
+        
+        return future;
+    }
+    
+    protected void offerReadFuture(Object message) {
+        newReadFuture().setRead(message);
+    }
+
+    protected void offerFailedReadFuture(Throwable exception) {
+        newReadFuture().setException(exception);
+    }
+
+    protected void offerClosedReadFuture() {
+        Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
+        synchronized (readyReadFutures) {
+            newReadFuture().setClosed();
+        }
+    }
+
+    private ReadFuture newReadFuture() {
+        Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
+        Queue<ReadFuture> waitingReadFutures = getWaitingReadFutures();
+        ReadFuture future;
+        synchronized (readyReadFutures) {
+            future = waitingReadFutures.poll();
+            if (future == null) {
+                future = new DefaultReadFuture(this);
+                readyReadFutures.offer(future);
+            }
+        }
+        return future;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Queue<ReadFuture> getReadyReadFutures() {
+        Queue<ReadFuture> readyReadFutures = 
+            (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES);
+        if (readyReadFutures == null) {
+            readyReadFutures = new CircularQueue<ReadFuture>();
+            
+            Queue<ReadFuture> oldReadyReadFutures =
+                (Queue<ReadFuture>) setAttributeIfAbsent(
+                        READY_READ_FUTURES, readyReadFutures);
+            if (oldReadyReadFutures != null) {
+                readyReadFutures = oldReadyReadFutures;
+            }
+            
+            // Initialize waitingReadFutures together.
+            Queue<ReadFuture> waitingReadFutures = 
+                new CircularQueue<ReadFuture>();
+            setAttributeIfAbsent(WAITING_READ_FUTURES, waitingReadFutures);
+        }
+        return readyReadFutures;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Queue<ReadFuture> getWaitingReadFutures() {
+        return (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES);
     }
 
     public WriteFuture write(Object message) {
