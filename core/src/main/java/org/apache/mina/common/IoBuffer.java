@@ -318,6 +318,22 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract boolean isReadOnly();
 
     /**
+     * Returns the minimum capacity of this buffer which is used to determine
+     * the new capacity of the buffer shrunk by {@link #compact()} and
+     * {@link #shrink()} operation.  The default value is the initial capacity
+     * of the buffer.
+     */
+    public abstract int minimumCapacity();
+    
+    /**
+     * Sets the minimum capacity of this buffer which is used to determine
+     * the new capacity of the buffer shrunk by {@link #compact()} and
+     * {@link #shrink()} operation.  The default value is the initial capacity
+     * of the buffer.
+     */
+    public abstract IoBuffer minimumCapacity(int minimumCapacity);
+
+    /**
      * @see ByteBuffer#capacity()
      */
     public abstract int capacity();
@@ -369,7 +385,16 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * <tt>true</tt>.
      */
     public abstract IoBuffer expand(int position, int expectedRemaining);
-
+    
+    /**
+     * Changes the capacity of this buffer so this buffer occupies as less
+     * memory as possible while retaining the position, limit and the
+     * buffer content between the position and limit.  The capacity of the
+     * buffer never becomes less than {@link #minimumCapacity()}.
+     * The mark is discarded once the capacity changes.
+     */
+    public abstract IoBuffer shrink();
+    
     /**
      * @see java.nio.Buffer#position()
      */

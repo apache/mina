@@ -617,6 +617,17 @@ public class IoBufferWrapper extends IoBuffer {
     }
 
     @Override
+    public int minimumCapacity() {
+        return buf.minimumCapacity();
+    }
+
+    @Override
+    public IoBuffer minimumCapacity(int minimumCapacity) {
+        buf.minimumCapacity(minimumCapacity);
+        return this;
+    }
+
+    @Override
     public IoBuffer capacity(int newCapacity) {
         buf.capacity(newCapacity);
         return this;
@@ -655,6 +666,12 @@ public class IoBufferWrapper extends IoBuffer {
     @Override
     public IoBuffer setAutoShrink(boolean autoShrink) {
         buf.setAutoShrink(autoShrink);
+        return this;
+    }
+
+    @Override
+    public IoBuffer shrink() {
+        buf.shrink();
         return this;
     }
 }

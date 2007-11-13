@@ -42,11 +42,11 @@ import java.nio.ShortBuffer;
 public abstract class AbstractIoBuffer extends IoBuffer {
     
     private final IoBufferAllocator allocator;
-    private final int initialCapacity;
     private final boolean derived;
     private boolean autoExpand;
     private boolean autoShrink;
     private boolean recapacityAllowed = true;
+    private int minimumCapacity;
 
     /**
      * We don't have any access to Buffer.markValue(), so we need to track it down,
@@ -62,7 +62,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         this.allocator = allocator;
         this.recapacityAllowed = true;
         this.derived = false;
-        this.initialCapacity = initialCapacity;
+        this.minimumCapacity = initialCapacity;
     }
     
     /**
@@ -72,7 +72,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         this.allocator = parent.allocator;
         this.recapacityAllowed = false;
         this.derived = true;
-        this.initialCapacity = parent.initialCapacity;
+        this.minimumCapacity = parent.minimumCapacity;
     }
 
     @Override
@@ -89,6 +89,21 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * Sets the underlying NIO buffer instance.
      */
     protected abstract void buf(ByteBuffer newBuf);
+
+    @Override
+    public int minimumCapacity() {
+        return minimumCapacity;
+    }
+    
+    @Override
+    public IoBuffer minimumCapacity(int minimumCapacity) {
+        if (minimumCapacity < 0) {
+            throw new IllegalArgumentException(
+                    "minimumCapacity: " + minimumCapacity);
+        }
+        this.minimumCapacity = minimumCapacity;
+        return this;
+    }
 
     @Override
     public int capacity() {
@@ -183,6 +198,58 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             // We call limit() directly to prevent StackOverflowError
             buf().limit(end);
         }
+        return this;
+    }
+    
+    @Override
+    public IoBuffer shrink() {
+
+        if (!recapacityAllowed) {
+            throw new IllegalStateException(
+                    "Derived buffers and their parent can't be expanded.");
+        }
+        
+        int position = position();
+        int capacity = capacity();
+        int limit = limit();
+        if (capacity == limit) {
+            return this;
+        }
+
+        int newCapacity = capacity;
+        int minCapacity = Math.max(minimumCapacity, limit);
+        for (;;) {
+            if (newCapacity >>> 1 < minCapacity) {
+                break;
+            }
+            newCapacity >>>= 1;
+        }
+        
+        newCapacity = Math.max(minCapacity, newCapacity);
+        
+        if (newCapacity == capacity) {
+            return this;
+        }
+
+        // Shrink and compact:
+        //// Save the state.
+        ByteOrder bo = order();
+
+        //// Reallocate.
+        ByteBuffer oldBuf = buf();
+        ByteBuffer newBuf = 
+            allocator.allocateNioBuffer(newCapacity, isDirect());
+        oldBuf.position(0);
+        oldBuf.limit(limit);
+        newBuf.put(oldBuf);
+        buf(newBuf);
+        
+        //// Restore the state.
+        buf().position(position);
+        buf().limit(limit);
+        buf().order(bo);
+        mark = -1;
+        
         return this;
     }
 
@@ -308,9 +375,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             return this;
         }
 
-        if (isAutoShrink() && remaining <= capacity >>> 2 && capacity > initialCapacity) {
+        if (isAutoShrink() && remaining <= capacity >>> 2 && capacity > minimumCapacity) {
             int newCapacity = capacity;
-            int minCapacity = Math.max(initialCapacity, remaining << 1);
+            int minCapacity = Math.max(minimumCapacity, remaining << 1);
             for (;;) {
                 if (newCapacity >>> 1 < minCapacity) {
                     break;
@@ -318,7 +385,11 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 newCapacity >>>= 1;
             }
             
-            newCapacity = Math.max(initialCapacity, newCapacity);
+            newCapacity = Math.max(minCapacity, newCapacity);
+            
+            if (newCapacity == capacity) {
+                return this;
+            }
 
             // Shrink and compact:
             //// Save the state.
