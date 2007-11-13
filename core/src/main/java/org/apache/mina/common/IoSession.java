@@ -80,6 +80,15 @@ public interface IoSession {
     TransportMetadata getTransportMetadata();
     
     /**
+     * Returns a {@link ReadFuture} which is notified when a new message is
+     * received, the connection is closed or an exception is caught.  This
+     * operation is especially useful when you implement a client application.
+     * However, please note that this operation is disabled by default and
+     * throw {@link IllegalStateException} because all received events must be
+     * queued somewhere to support this operation, possibly leading to memory
+     * leak.  This means you have to keep calling {@link #read()} once you
+     * enabled this operation.  To enable this oepration, please call
+     * {@link IoSessionConfig#setUseReadOperation(boolean)} with <tt>true</tt>. 
      * 
      * @throws IllegalStateException if
      * {@link IoSessionConfig#setUseReadOperation(boolean) useReadOperation}
