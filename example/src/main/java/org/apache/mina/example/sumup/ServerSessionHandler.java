@@ -34,13 +34,16 @@ import org.apache.mina.example.sumup.message.ResultMessage;
  * @version $Rev$, $Date$
  */
 public class ServerSessionHandler extends IoHandlerAdapter {
+    
+    private static final String SUM_KEY = "sum";
+    
     @Override
     public void sessionOpened(IoSession session) {
         // set idle time to 60 seconds
         session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 60);
 
         // initial sum is zero
-        session.setAttachment(new Integer(0));
+        session.setAttribute(SUM_KEY, new Integer(0));
     }
 
     @Override
@@ -50,7 +53,7 @@ public class ServerSessionHandler extends IoHandlerAdapter {
         AddMessage am = (AddMessage) message;
 
         // add the value to the current sum.
-        int sum = ((Integer) session.getAttachment()).intValue();
+        int sum = ((Integer) session.getAttribute(SUM_KEY)).intValue();
         int value = am.getValue();
         long expectedSum = (long) sum + value;
         if (expectedSum > Integer.MAX_VALUE || expectedSum < Integer.MIN_VALUE) {
@@ -62,7 +65,7 @@ public class ServerSessionHandler extends IoHandlerAdapter {
         } else {
             // sum up
             sum = (int) expectedSum;
-            session.setAttachment(new Integer(sum));
+            session.setAttribute(SUM_KEY, new Integer(sum));
 
             // return the result message
             ResultMessage rm = new ResultMessage();

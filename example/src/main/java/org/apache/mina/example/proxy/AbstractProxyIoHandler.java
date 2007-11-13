@@ -45,10 +45,10 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
-        if (session.getAttachment() != null) {
-            ((IoSession) session.getAttachment()).setAttachment(null);
-            ((IoSession) session.getAttachment()).closeOnFlush();
-            session.setAttachment(null);
+        if (session.getAttribute( "" ) != null) {
+            ((IoSession) session.getAttribute("")).setAttribute("", null);
+            ((IoSession) session.getAttribute("")).closeOnFlush();
+            session.setAttribute("", null);
         }
     }
 
@@ -60,7 +60,7 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         rb.mark();
         wb.put(rb);
         wb.flip();
-        ((IoSession) session.getAttachment()).write(wb);
+        ((IoSession) session.getAttribute("")).write(wb);
         rb.reset();
         IoSessionLogger.getLogger(session).info(rb.getString(CHARSET.newDecoder()));
     }
