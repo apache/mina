@@ -23,32 +23,25 @@ import org.apache.mina.common.IoSession;
 
 /**
  * A handler interface that {@link DemuxingIoHandler} forwards
- * <code>messageReceived</code> events to.  You have to register your
- * handler with the type of message you want to get notified using
- * {@link DemuxingIoHandler#addMessageHandler(Class, MessageHandler)}.
+ * <code>exceptionCaught</code> events to.  You have to register your
+ * handler with the type of exception you want to get notified using
+ * {@link DemuxingIoHandler#addExceptionHandler(Class, ExceptionHandler)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface MessageHandler<E> {
+public interface ExceptionHandler<E extends Throwable> {
     /**
-     * A {@link MessageHandler} that does nothing.  This is usefule when
+     * A {@link ExceptionHandler} that does nothing.  This is usefule when
      * you want to ignore messages of the specific type silently.
      */
-    static MessageHandler<Object> NOOP = new MessageHandler<Object>() {
-        public void messageReceived(IoSession session, Object message) {}
-        public void messageSent(IoSession session, Object message) {}
+    static ExceptionHandler<Throwable> NOOP = new ExceptionHandler<Throwable>() {
+        public void exceptionCaught(IoSession session, Throwable cause) {}
     };
 
     /**
-     * Invoked when the specific type of message is received from the
+     * Invoked when the specific type of exception is caught from the
      * specified <code>session</code>.
      */
-    void messageReceived(IoSession session, E message) throws Exception;
-    
-    /**
-     * Invoked when the specific type of message is received from the
-     * specified <code>session</code>.
-     */
-    void messageSent(IoSession session, E message) throws Exception;
+    void exceptionCaught(IoSession session, E cause) throws Exception;
 }
