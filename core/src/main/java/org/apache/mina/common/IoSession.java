@@ -87,7 +87,7 @@ public interface IoSession {
      * throw {@link IllegalStateException} because all received events must be
      * queued somewhere to support this operation, possibly leading to memory
      * leak.  This means you have to keep calling {@link #read()} once you
-     * enabled this operation.  To enable this oepration, please call
+     * enabled this operation.  To enable this operation, please call
      * {@link IoSessionConfig#setUseReadOperation(boolean)} with <tt>true</tt>. 
      * 
      * @throws IllegalStateException if
