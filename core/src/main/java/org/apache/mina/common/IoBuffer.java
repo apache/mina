@@ -86,9 +86,9 @@ import java.util.Set;
  * <h2>AutoExpand</h2>
  * <p>
  * Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
- * easy, and it is because its size is fixed.  MINA {@link IoBuffer}
- * introduces <tt>autoExpand</tt> property.  If <tt>autoExpand</tt> property
- * is true, you never get {@link BufferOverflowException} or
+ * easy, and it is because its size is fixed.  {@link IoBuffer} introduces 
+ * <tt>autoExpand</tt> property.  If <tt>autoExpand</tt> property is true, you
+ * never get {@link BufferOverflowException} or
  * {@link IndexOutOfBoundsException} (except when index is negative).
  * It automatically expands its capacity and limit value.  For example:
  * <pre>
@@ -98,25 +98,29 @@ import java.util.Set;
  * buf.setAutoExpand( true );
  * buf.putString( greeting, utf8encoder );
  * </pre>
- * NIO <tt>ByteBuffer</tt> is reallocated by MINA {@link IoBuffer} behind
- * the scene if the encoded data is larger than 16 bytes.  Its capacity will
- * increase by two times, and its limit will increase to the last position
+ * The underlying {@link ByteBuffer} is reallocated by {@link IoBuffer} behind
+ * the scene if the encoded data is larger than 16 bytes in the example above.
+ * Its capacity will double, and its limit will increase to the last position
  * the string is written.
  * </p>
  * 
  * <h2>AutoShrink</h2>
  * <p>
  * You might also want to decrease the capacity of the buffer when most
- * of the allocated memory area is not being used.  MINA {@link IoBuffer}
- * provides <tt>autoShrink</tt> property to take care of this issue.
- * If <tt>autoShrink</tt> is turned on, {@link IoBuffer} halves the capacity
+ * of the allocated memory area is not being used.  {@link IoBuffer} provides
+ * <tt>autoShrink</tt> property to take care of this issue.  If 
+ * <tt>autoShrink</tt> is turned on, {@link IoBuffer} halves the capacity
  * of the buffer when {@link #compact()} is invoked and only 1/4 or less of
- * the current capacity is being used. NIO <tt>ByteBuffer</tt> is reallocated
- * by MINA {@link IoBuffer} behind the scene, and therefore {@link #buf()}
- * will return a different {@link ByteBuffer} instance once capacity is
- * changed.  Please also note {@link #compact()} will not decrease the
- * capacity if the new capacity is less than the initial capacity of the
- * buffer. 
+ * the current capacity is being used.
+ * <p>
+ * You can also {@link #shrink()} method manually to shrink the capacity of
+ * the buffer.
+ * <p> 
+ * The underlying {@link ByteBuffer} is reallocated by {@link IoBuffer} behind
+ * the scene, and therefore {@link #buf()} will return a different
+ * {@link ByteBuffer} instance once capacity changes.  Please also note
+ * {@link #compact()} or {@link #shrink()} will not decrease the capacity if
+ * the new capacity is less than the {@link #minimumCapacity()} of the buffer.
  *
  * <h2>Derived Buffers</h2>
  * <p>
@@ -131,11 +135,11 @@ import java.util.Set;
  *
  * <h2>Changing Buffer Allocation Policy</h2>
  * <p>
- * MINA provides a {@link IoBufferAllocator} interface to let you override
- * the default buffer management behavior.  There's only one allocator
- * provided out-of-the-box:
+ * {@link IoBufferAllocator} interface lets you override the default buffer
+ * management behavior.  There are two allocators provided out-of-the-box:
  * <ul>
- * <li>{@link SimpleBufferAllocator}</li>
+ * <li>{@link SimpleBufferAllocator} (default)</li>
+ * <li>{@link CachedBufferAllocator}</li>
  * </ul>
  * You can implement your own allocator and use it by calling
  * {@link #setAllocator(IoBufferAllocator)}.
@@ -143,8 +147,6 @@ import java.util.Set;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
- * 
- * @see IoBufferAllocator
  */
 public abstract class IoBuffer implements Comparable<IoBuffer> {
     private static IoBufferAllocator allocator = new SimpleBufferAllocator();
