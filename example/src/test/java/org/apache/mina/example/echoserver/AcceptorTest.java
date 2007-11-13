@@ -39,7 +39,7 @@ public class AcceptorTest extends AbstractTest {
     }
 
     public void testTCP() throws Exception {
-        testTCP0(new Socket("localhost", port));
+        testTCP0(new Socket("127.0.0.1", port));
     }
 
     public void testTCPWithSSL() throws Exception {
@@ -96,7 +96,7 @@ public class AcceptorTest extends AbstractTest {
 
     public void testUDP() throws Exception {
         DatagramSocket client = new DatagramSocket();
-        client.connect(new InetSocketAddress(port));
+        client.connect(new InetSocketAddress("127.0.0.1", port));
         client.setSoTimeout(500);
 
         byte[] writeBuf = new byte[16];

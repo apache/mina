@@ -69,7 +69,8 @@ public class DatagramConfigTest extends TestCase {
 
         try {
             connector.setHandler(new IoHandlerAdapter());
-            ConnectFuture future = connector.connect(new InetSocketAddress(port));
+            ConnectFuture future = connector.connect(
+                    new InetSocketAddress("127.0.0.1", port));
             future.awaitUninterruptibly();
 
             WriteFuture writeFuture = future.getSession().write(

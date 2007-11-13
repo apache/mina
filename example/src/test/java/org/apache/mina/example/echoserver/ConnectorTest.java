@@ -101,7 +101,7 @@ public class ConnectorTest extends AbstractTest {
         IoSession session = null;
         if (!useLocalAddress) {
             ConnectFuture future = connector.connect(new InetSocketAddress(
-                    "localhost", port));
+                    "127.0.0.1", port));
             future.awaitUninterruptibly();
             session = future.getSession();
         } else {
@@ -111,7 +111,7 @@ public class ConnectorTest extends AbstractTest {
                         .getNextAvailable(clientPort + 1);
                 try {
                     ConnectFuture future = connector.connect(
-                            new InetSocketAddress("localhost", port),
+                            new InetSocketAddress("127.0.0.1", port),
                             new InetSocketAddress(clientPort));
                     future.awaitUninterruptibly();
                     session = future.getSession();
