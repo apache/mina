@@ -119,8 +119,8 @@ import org.slf4j.Logger;
  */
 public class KeepAliveFilter extends IoFilterAdapter {
     
-    private final AttributeKey WAITING_FOR_PONG = new AttributeKey(
-            getClass(), "waitingForPong");
+    private final AttributeKey WAITING_FOR_RESPONSE = new AttributeKey(
+            getClass(), "waitingForResponse");
 
     private final KeepAliveMessageFactory messageFactory;
     private volatile KeepAlivePolicy policy;
@@ -268,18 +268,24 @@ public class KeepAliveFilter extends IoFilterAdapter {
             NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         try {
             if (status == IdleStatus.READER_IDLE) {
-                if (!session.containsAttribute(WAITING_FOR_PONG)) {
+                if (!session.containsAttribute(WAITING_FOR_RESPONSE)) {
                     Object pingMessage = messageFactory.getRequest(session);
                     if (pingMessage != null) {
                         // The first idleness.
                         nextFilter.filterWrite(
                                 session,
                                 new DefaultWriteRequest(pingMessage));
-                        markStatus(session);
+                        
+                        // If policy is OFF, there's no need to wait for
+                        // the response.
+                        if (getPolicy() != KeepAlivePolicy.OFF) {
+                            markStatus(session);
+                        } else {
+                            resetStatus(session);
+                        }
                     }
                 } else {
                     resetStatus(session);
-                    // DO something based on policy.
                     switch (getPolicy()) {
                     case OFF:
                         break;
@@ -321,14 +327,14 @@ public class KeepAliveFilter extends IoFilterAdapter {
             // Mark only when keepAliveTimeout is enabled.
             session.getConfig().setIdleTime(
                     IdleStatus.READER_IDLE, getKeepAliveRequestTimeout());
-            session.setAttribute(WAITING_FOR_PONG);
+            session.setAttribute(WAITING_FOR_RESPONSE);
         }
     }
 
     private void resetStatus(IoSession session) {
         session.getConfig().setIdleTime(
                 IdleStatus.READER_IDLE, getKeepAliveRequestInterval());
-        session.removeAttribute(WAITING_FOR_PONG);
+        session.removeAttribute(WAITING_FOR_RESPONSE);
     }
     
     private boolean isKeepAliveMessage(IoSession session, Object message) {
