@@ -424,20 +424,20 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             
             newMap.put(filterName, dummyFilter);
             expectedNames.add(filterName);
-        }
-        
-        Iterator<String> i = expectedNames.iterator();
-        for (Object key: newMap.keySet()) {
-            if (!i.next().equals(key)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(
-                            "The specified map didn't pass the insertion " +
-                            "order test.");
+
+            Iterator<String> it = expectedNames.iterator();
+            for (Object key: newMap.keySet()) {
+                if (!it.next().equals(key)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                                "The specified map didn't pass the insertion " +
+                                "order test after " + (i + 1) + " tries.");
+                    }
+                    return false;
                 }
-                return false;
             }
         }
-
+        
         if (logger.isDebugEnabled()) {
             logger.debug(
                     "The specified map passed the insertion order test.");
