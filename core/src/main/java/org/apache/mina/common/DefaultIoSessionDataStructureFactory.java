@@ -173,7 +173,7 @@ public class DefaultIoSessionDataStructureFactory implements
     
     private static class DefaultWriteRequestQueue implements WriteRequestQueue {
 
-        private final Queue<WriteRequest> q = new CircularQueue<WriteRequest>(128);
+        private final Queue<WriteRequest> q = new CircularQueue<WriteRequest>(16);
         
         public void dispose(IoSession session) {
         }
