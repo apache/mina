@@ -112,7 +112,9 @@ import org.slf4j.Logger;
  * <h2>Enforcing a policy</h2>
  * 
  * You can enforce a predefined policy by specifying a {@link KeepAlivePolicy}.
- * The default policy is {@link KeepAlivePolicy#CLOSE}.
+ * The default policy is {@link KeepAlivePolicy#CLOSE}.  Setting the policy
+ * to {@link KeepAlivePolicy#OFF} stops this filter from waiting for response
+ * messages and therefore disables <tt>keepAliveRequestTimeout</tt> property.
  *  
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
