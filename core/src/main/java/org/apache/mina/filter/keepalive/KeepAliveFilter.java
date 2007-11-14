@@ -321,13 +321,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
     }
 
     private void markStatus(IoSession session) {
-        int keepAliveTimeout = getKeepAliveRequestTimeout();
-        if (keepAliveTimeout > 0) {
-            // Mark only when keepAliveTimeout is enabled.
-            session.getConfig().setIdleTime(
-                    IdleStatus.READER_IDLE, getKeepAliveRequestTimeout());
-            session.setAttribute(WAITING_FOR_RESPONSE);
-        }
+        session.getConfig().setIdleTime(
+                IdleStatus.READER_IDLE, getKeepAliveRequestTimeout());
+        session.setAttribute(WAITING_FOR_RESPONSE);
     }
 
     private void resetStatus(IoSession session) {
