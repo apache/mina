@@ -19,6 +19,8 @@
  */
 package org.apache.mina.filter.traffic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -531,8 +533,24 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         if (resumeOthers) {
             int maxGlobalBufferSize = this.maxGlobalBufferSize;
             if (maxGlobalBufferSize == 0 || globalBufferSize.get() < maxGlobalBufferSize) {
+                List<IoService> inactiveServices = null;
                 for (IoService service: serviceBufferSizes.keySet()) {
                     resumeService(service);
+                    
+                    if (!service.isActive()) {
+                        if (inactiveServices == null) {
+                            inactiveServices = new ArrayList<IoService>();
+                        }
+                        inactiveServices.add(service);
+                    }
+                    
+                    // Remove inactive services from the map.
+                    if (inactiveServices != null) {
+                        for (IoService s: inactiveServices) {
+                            serviceBufferSizes.remove(s);
+                        }
+                    }
+
                     synchronized (globalResumeLock) {
                         lastGlobalResumeTime = System.currentTimeMillis();
                     }
