@@ -271,7 +271,6 @@ public class KeepAliveFilter extends IoFilterAdapter {
                 if (!session.containsAttribute(WAITING_FOR_RESPONSE)) {
                     Object pingMessage = messageFactory.getRequest(session);
                     if (pingMessage != null) {
-                        // The first idleness.
                         nextFilter.filterWrite(
                                 session,
                                 new DefaultWriteRequest(pingMessage));
