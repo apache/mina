@@ -33,7 +33,7 @@ import org.apache.mina.common.WriteRequest;
 
 /**
  * An {@link IoFilter} that limits bandwidth (bytes per second) related with
- * read and write operations.
+ * read and write operations on a per-session basis.
  * <p>
  * It is always recommended to add this filter in the first place of the
  * {@link IoFilterChain}.
