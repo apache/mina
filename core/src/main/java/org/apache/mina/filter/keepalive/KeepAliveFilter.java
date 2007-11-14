@@ -58,9 +58,9 @@ import org.slf4j.Logger;
  * <td>Active</td>
  * <td>You want a keep-alive request is sent when the reader is idle.
  * Once the request is sent, the response for the request should be
- * received within <tt>keepAliveTimeout</tt> seconds.  Otherwise, the specified
- * {@link KeepAlivePolicy} should be enforced.  If a keep-alive request
- * is received, its response also should be sent back.</td>
+ * received within <tt>keepAliveRequestTimeout</tt> seconds.  Otherwise,
+ * the specified {@link KeepAlivePolicy} will be enforced.  If a keep-alive
+ * request is received, its response also should be sent back.</td>
  * <td>Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
  * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
  * return a non-<tt>null</tt>.</td>
