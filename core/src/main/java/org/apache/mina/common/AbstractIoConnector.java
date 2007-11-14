@@ -28,9 +28,11 @@ import java.net.SocketAddress;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractIoConnector extends AbstractIoService implements
-        IoConnector {
+public abstract class AbstractIoConnector 
+        extends AbstractIoService implements IoConnector {
+    
     private int connectTimeout = 60; // 1 minute
+    private SocketAddress defaultRemoteAddress;
 
     protected AbstractIoConnector(IoSessionConfig sessionConfig) {
         super(sessionConfig);
@@ -50,6 +52,33 @@ public abstract class AbstractIoConnector extends AbstractIoService implements
                     + connectTimeout);
         }
         this.connectTimeout = connectTimeout;
+    }
+
+    public SocketAddress getDefaultRemoteAddress() {
+        return defaultRemoteAddress;
+    }
+
+    public void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress) {
+        if (defaultRemoteAddress == null) {
+            throw new NullPointerException("defaultRemoteAddress");
+        }
+        
+        if (!getTransportMetadata().getAddressType().isAssignableFrom(
+                defaultRemoteAddress.getClass())) {
+            throw new IllegalArgumentException("defaultRemoteAddress type: "
+                    + defaultRemoteAddress.getClass() + " (expected: "
+                    + getTransportMetadata().getAddressType() + ")");
+        }
+        this.defaultRemoteAddress = defaultRemoteAddress;
+    }
+    
+    public final ConnectFuture connect() {
+        SocketAddress defaultRemoteAddress = getDefaultRemoteAddress();
+        if (defaultRemoteAddress == null) {
+            throw new IllegalStateException("defaultRemoteAddress is not set.");
+        }
+        
+        return connect(defaultRemoteAddress, null);
     }
 
     public final ConnectFuture connect(SocketAddress remoteAddress) {

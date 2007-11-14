@@ -57,6 +57,25 @@ public interface IoConnector extends IoService {
     void setConnectTimeout(int connectTimeout);
 
     /**
+     * Returns the default remote address to connect to when no argument
+     * is specified in {@link #connect()} method.
+     */
+    SocketAddress getDefaultRemoteAddress();
+    
+    /**
+     * Sets the default remote address to connect to when no argument is
+     * specified in {@link #connect()} method.
+     */
+    void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress);
+
+    /**
+     * Connects to the {@link #setDefaultRemoteAddress(SocketAddress) default remote address}.
+     * 
+     * @throws IllegalStateException if no default remoted address is set.
+     */
+    ConnectFuture connect();
+    
+    /**
      * Connects to the specified remote address.
      *
      * @return the {@link ConnectFuture} instance which is completed when the
