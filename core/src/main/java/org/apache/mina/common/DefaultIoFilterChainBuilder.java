@@ -366,6 +366,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             }
             return true;
         }
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(mapType.getName() + " is not a " + LinkedHashMap.class.getSimpleName());
+        }
 
         // Detect Jakarta Commons Collections OrderedMap implementations.
         Class<?> type = mapType;
@@ -382,6 +386,12 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
                 }
             }
             type = type.getSuperclass();
+        }
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                    mapType.getName() +
+                    " doesn't implement OrderedMap interface.");
         }
         
         // Last resort: try to create a new instance and test if it maintains
