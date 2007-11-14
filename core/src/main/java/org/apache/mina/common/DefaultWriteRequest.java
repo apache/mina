@@ -96,9 +96,7 @@ public class DefaultWriteRequest implements WriteRequest {
     };
 
     private final Object message;
-
     private final WriteFuture future;
-
     private final SocketAddress destination;
 
     /**
@@ -140,25 +138,18 @@ public class DefaultWriteRequest implements WriteRequest {
         this.destination = destination;
     }
 
-    /**
-     * Returns {@link WriteFuture} that is associated with this write request.
-     */
     public WriteFuture getFuture() {
         return future;
     }
 
-    /**
-     * Returns a message object to be written.
-     */
     public Object getMessage() {
         return message;
     }
 
-    /**
-     * Returne the destination of this write request.
-     *
-     * @return <tt>null</tt> for the default destination
-     */
+    public WriteRequest getOriginalRequest() {
+        return this;
+    }
+
     public SocketAddress getDestination() {
         return destination;
     }

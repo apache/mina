@@ -29,35 +29,39 @@ import java.net.SocketAddress;
  */
 public class WriteRequestWrapper implements WriteRequest {
 
-    private final WriteRequest writeRequest;
+    private final WriteRequest parentRequest;
 
     /**
      * Creates a new instance that wraps the specified request.
      */
-    public WriteRequestWrapper(WriteRequest writeRequest) {
-        if (writeRequest == null) {
-            throw new NullPointerException("writeRequest");
+    public WriteRequestWrapper(WriteRequest parentRequest) {
+        if (parentRequest == null) {
+            throw new NullPointerException("parentRequest");
         }
-        this.writeRequest = writeRequest;
+        this.parentRequest = parentRequest;
     }
 
     public SocketAddress getDestination() {
-        return writeRequest.getDestination();
+        return parentRequest.getDestination();
     }
 
     public WriteFuture getFuture() {
-        return writeRequest.getFuture();
+        return parentRequest.getFuture();
     }
 
     public Object getMessage() {
-        return writeRequest.getMessage();
+        return parentRequest.getMessage();
+    }
+
+    public WriteRequest getOriginalRequest() {
+        return parentRequest.getOriginalRequest();
     }
 
     /**
      * Returns the wrapped request object.
      */
-    public WriteRequest getWriteRequest() {
-        return writeRequest;
+    public WriteRequest getParentRequest() {
+        return parentRequest;
     }
 
     @Override

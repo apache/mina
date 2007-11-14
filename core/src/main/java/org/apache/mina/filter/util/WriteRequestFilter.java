@@ -61,7 +61,7 @@ public abstract class WriteRequestFilter extends IoFilterAdapter {
         if (writeRequest instanceof FilteredWriteRequest) {
             FilteredWriteRequest req = (FilteredWriteRequest) writeRequest;
             if (req.getParent() == this) {
-                nextFilter.messageSent(session, req.getWriteRequest());
+                nextFilter.messageSent(session, req.getParentRequest());
                 return;
             }
         }

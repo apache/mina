@@ -206,7 +206,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         MessageWriteRequest wrappedRequest = (MessageWriteRequest) writeRequest;
-        nextFilter.messageSent(session, wrappedRequest.getWriteRequest());
+        nextFilter.messageSent(session, wrappedRequest.getParentRequest());
     }
 
     @Override

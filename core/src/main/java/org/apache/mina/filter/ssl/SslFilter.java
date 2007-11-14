@@ -444,7 +444,7 @@ public class SslFilter extends IoFilterAdapter {
             WriteRequest writeRequest) {
         if (writeRequest instanceof EncryptedWriteRequest) {
             EncryptedWriteRequest wrappedRequest = (EncryptedWriteRequest) writeRequest;
-            nextFilter.messageSent(session, wrappedRequest.getWriteRequest());
+            nextFilter.messageSent(session, wrappedRequest.getParentRequest());
         } else {
             // ignore extra buffers used for handshaking
         }

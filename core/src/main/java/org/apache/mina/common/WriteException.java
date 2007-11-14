@@ -23,7 +23,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.mina.util.MapBackedSet;
 
 /**
  * An exception which is thrown when one or more write operations were failed.
@@ -125,11 +129,13 @@ public class WriteException extends IOException {
             throw new IllegalArgumentException("requests is empty.");
         }
 
-        List<WriteRequest> newRequests = new ArrayList<WriteRequest>(requests.size());
+        // Create a list of requests removing duplicates.
+        Set<WriteRequest> newRequests = new MapBackedSet<WriteRequest>(new LinkedHashMap<WriteRequest, Boolean>());
         for (WriteRequest r: requests) {
-            newRequests.add(unwrapRequest(r));
+            newRequests.add(r.getOriginalRequest());
         }
-        return Collections.unmodifiableList(newRequests);
+        
+        return Collections.unmodifiableList(new ArrayList<WriteRequest>(newRequests));
     }
 
     private static List<WriteRequest> asRequestList(WriteRequest request) {
@@ -138,14 +144,7 @@ public class WriteException extends IOException {
         }
         
         List<WriteRequest> requests = new ArrayList<WriteRequest>(1);
-        requests.add(unwrapRequest(request));
+        requests.add(request.getOriginalRequest());
         return Collections.unmodifiableList(requests);
-    }
-
-    private static WriteRequest unwrapRequest(WriteRequest request) {
-        while (request instanceof WriteRequestWrapper) {
-            request = ((WriteRequestWrapper) request).getWriteRequest();
-        }
-        return request;
     }
 }
