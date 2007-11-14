@@ -33,8 +33,8 @@ import org.slf4j.Logger;
 
 /**
  * An {@link IoFilter} that sends a keep-alive request on
- * <tt>sessionIdle</tt> event ({@link IdleStatus#READER_IDLE}) and sends the
- * response for the keep-alive request.
+ * <tt>sessionIdle</tt> event with {@link IdleStatus#READER_IDLE} and sends
+ * back  the response for the keep-alive request.
  * 
  * <h2>Interference with {@link IoSessionConfig#setIdleTime(IdleStatus, int)}</h2>
  * 
