@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.integration.spring.ssl;
+package org.apache.mina.filter.ssl;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
