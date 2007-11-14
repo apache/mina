@@ -285,10 +285,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         SessionBuffer buf = getSessionBuffer(s);
         Queue<Runnable> queue = buf.queue;
         boolean offerSession;
-        boolean offeredEvent;
-        synchronized (queue) {
-            offeredEvent = queueHandler.accept(this, e);
-            if (offeredEvent) {
+        boolean offerEvent = queueHandler.accept(this, e);
+        if (offerEvent) {
+            synchronized (queue) {
                 queue.offer(e);
                 if (buf.processingCompleted) {
                     buf.processingCompleted = false;
@@ -296,9 +295,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                 } else {
                     offerSession = false;
                 }
-            } else {
-                offerSession = false;
-            }
+            }            
+        } else {
+            offerSession = false;
         }
         
         if (offerSession) {
@@ -307,7 +306,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         
         addWorkerIfNecessary();
         
-        if (offeredEvent) {
+        if (offerEvent) {
             queueHandler.offered(this, e);
         }
     }
