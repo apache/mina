@@ -21,14 +21,18 @@ package org.apache.mina.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.common.IoFilterChain.Entry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation of {@link IoFilterChainBuilder} which is useful
@@ -55,6 +59,8 @@ import org.apache.mina.common.IoFilterChain.Entry;
  * @version $Rev$, $Date$
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final List<Entry> entries;
 
     /**
@@ -317,14 +323,22 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     
     /**
      * Clears the current list of filters and adds the specified
-     * filter mapping to this builder.  Please make sure to use a {@link Map}
-     * implementation that iterated the filter mapping in the order of addition
-     * such as {@link LinkedHashMap}.
+     * filter mapping to this builder.  Please note that you must specify
+     * a {@link Map} implementation that iterates the filter mapping in the
+     * order of insertion such as {@link LinkedHashMap}.  Otherwise, it will
+     * throw an {@link IllegalArgumentException}.
      */
-    public synchronized void setFilters(Map<String, ? extends IoFilter> filters) {
+    public void setFilters(Map<String, ? extends IoFilter> filters) {
         if (filters == null) {
             throw new NullPointerException("filters");
         }
+        
+        if (!isOrderedMap(filters)) {
+            throw new IllegalArgumentException(
+                    "filters is not an ordered map. Please try " + 
+                    LinkedHashMap.class.getName() + ".");
+        }
+
         filters = new LinkedHashMap<String, IoFilter>(filters);
         for (Map.Entry<String, ? extends IoFilter> e: filters.entrySet()) {
             if (e.getKey() == null) {
@@ -335,11 +349,90 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             }
         }
         
-        clear();
-
-        for (Map.Entry<String, ? extends IoFilter> e: filters.entrySet()) {
-            addLast(e.getKey(), e.getValue());
+        synchronized (this) {
+            clear();
+            for (Map.Entry<String, ? extends IoFilter> e: filters.entrySet()) {
+                addLast(e.getKey(), e.getValue());
+            }
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private boolean isOrderedMap(Map map) {
+        Class<?> mapType = map.getClass();
+        if (LinkedHashMap.class.isAssignableFrom(mapType)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(mapType.getSimpleName() + " is an ordered map.");
+            }
+            return true;
+        }
+
+        // Detect Jakarta Commons Collections OrderedMap implementations.
+        Class<?> type = mapType;
+        while (type != null) {
+            for (Class<?> i: type.getInterfaces()) {
+                if (i.getName().endsWith("OrderedMap")) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                                mapType.getSimpleName() +
+                                " is an ordered map (guessed from that it " +
+                                " implements OrderedMap interface.)");
+                    }
+                    return true;
+                }
+            }
+            type = type.getSuperclass();
+        }
+        
+        // Last resort: try to create a new instance and test if it maintains
+        // the insertion order.
+        logger.debug(
+                "Last resort; trying to create a new map instance with a " +
+                "default constructor and test if insertion order is " +
+                "maintained.");
+        
+        Map newMap;
+        try {
+            newMap = (Map) mapType.newInstance();
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                        "Failed to create a new map instance of '" + 
+                        mapType.getName() +"'.", e);
+            }
+            return false;
+        }
+        
+        Random rand = new Random();
+        List<String> expectedNames = new ArrayList<String>();
+        IoFilter dummyFilter = new IoFilterAdapter();
+        for (int i = 0; i < 65536; i ++) {
+            String filterName;
+            do {
+                filterName = String.valueOf(rand.nextInt());
+            } while (newMap.containsKey(filterName));
+            
+            newMap.put(filterName, dummyFilter);
+            expectedNames.add(filterName);
+        }
+        
+        Iterator<String> i = expectedNames.iterator();
+        for (Object key: newMap.keySet()) {
+            if (!i.next().equals(key)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                            "The specified map didn't pass the insertion " +
+                            "order test.");
+                }
+                return false;
+            }
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                    "The specified map passed the insertion order test.");
+        }
+        return true;
     }
 
     public void buildFilterChain(IoFilterChain chain) throws Exception {
