@@ -21,8 +21,10 @@ package org.apache.mina.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.mina.common.IoFilter.NextFilter;
@@ -309,8 +311,35 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     /**
      * @see IoFilterChain#clear()
      */
-    public synchronized void clear() throws Exception {
+    public synchronized void clear() {
         entries.clear();
+    }
+    
+    /**
+     * Clears the current list of filters and adds the specified
+     * filter mapping to this builder.  Please make sure to use a {@link Map}
+     * implementation that iterated the filter mapping in the order of addition
+     * such as {@link LinkedHashMap}.
+     */
+    public synchronized void setFilters(Map<String, ? extends IoFilter> filters) {
+        if (filters == null) {
+            throw new NullPointerException("filters");
+        }
+        filters = new LinkedHashMap<String, IoFilter>(filters);
+        for (Map.Entry<String, ? extends IoFilter> e: filters.entrySet()) {
+            if (e.getKey() == null) {
+                throw new NullPointerException("filters contains a null key.");
+            }
+            if (e.getValue() == null) {
+                throw new NullPointerException("filters contains a null value.");
+            }
+        }
+        
+        clear();
+
+        for (Map.Entry<String, ? extends IoFilter> e: filters.entrySet()) {
+            addLast(e.getKey(), e.getValue());
+        }
     }
 
     public void buildFilterChain(IoFilterChain chain) throws Exception {
