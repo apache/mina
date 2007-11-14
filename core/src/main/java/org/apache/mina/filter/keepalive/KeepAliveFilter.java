@@ -52,7 +52,7 @@ import org.slf4j.Logger;
  * 
  * <table>
  * <tr>
- * <th>Case name</th><th>Case description</th><th>Implementation</th>
+ * <th>Name</th><th>Description</th><th>Implementation</th>
  * </tr>
  * <tr>
  * <td>Active</td>
