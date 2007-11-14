@@ -33,24 +33,24 @@ public interface IoServiceManagerMBean {
     /**
      * start collecting throughput statistics for all the managed sessions
      */
-    void startCollectingStats();
+    void start();
 
     /**
      * get the polling interval for collecting statistics
      * @return configurated polling time in milliseconds
      */
-    int getStatsPollingInterval();
+    int getPollingInterval();
 
     /**
      * set the polling interval for collecting statistics
      * @param millisecondsPolling polling time in milliseconds like 5000 for computing throughput every 5 seconds
      */
-    void setStatsPollingInterval(int millisecondsPolling);
+    void setPollingInterval(int millisecondsPolling);
 
     /**
      * stop collecting throughput statistics
      */
-    void stopCollectingStats();
+    void stop();
 
     /**
      * bytes read per seconds sum of all the managed sessions

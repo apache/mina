@@ -123,7 +123,7 @@ public interface IoSessionManagerMBean {
      * works only if a stat collector is inspecting this session,
      * @return written bytes per seconds
      */
-    public float getByteWrittenThroughtput();
+    public float getByteWriteThroughtput();
 
     /**
      * get the read messages per second throughput
@@ -137,6 +137,6 @@ public interface IoSessionManagerMBean {
      * works only if a stat collector is inspecting this session, and only if a ProtocolDecoderFilter is used
      * @return written messages per seconds
      */
-    public float getMessageWrittenThroughtput();
+    public float getMessageWriteThroughtput();
 
 }

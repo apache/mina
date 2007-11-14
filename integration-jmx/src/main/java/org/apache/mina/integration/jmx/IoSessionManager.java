@@ -26,8 +26,8 @@ import org.apache.mina.common.AbstractIoSession;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
-import org.apache.mina.management.IoSessionStat;
-import org.apache.mina.management.StatCollector;
+import org.apache.mina.management.IoStatistics;
+import org.apache.mina.management.IoStatisticsCollector;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -113,8 +113,8 @@ public class IoSessionManager implements IoSessionManagerMBean {
     }
 
     public float getByteReadThroughtput() {
-        IoSessionStat stats = (IoSessionStat) session
-                .getAttribute(StatCollector.KEY);
+        IoStatistics stats = (IoStatistics) session
+                .getAttribute(IoStatisticsCollector.STATISTICS);
         if (stats == null) {
             return Float.NaN;
         } else {
@@ -122,19 +122,19 @@ public class IoSessionManager implements IoSessionManagerMBean {
         }
     }
 
-    public float getByteWrittenThroughtput() {
-        IoSessionStat stats = (IoSessionStat) session
-                .getAttribute(StatCollector.KEY);
+    public float getByteWriteThroughtput() {
+        IoStatistics stats = (IoStatistics) session
+                .getAttribute(IoStatisticsCollector.STATISTICS);
         if (stats == null) {
             return Float.NaN;
         } else {
-            return stats.getByteWrittenThroughput();
+            return stats.getByteWriteThroughput();
         }
     }
 
     public float getMessageReadThroughtput() {
-        IoSessionStat stats = (IoSessionStat) session
-                .getAttribute(StatCollector.KEY);
+        IoStatistics stats = (IoStatistics) session
+                .getAttribute(IoStatisticsCollector.STATISTICS);
         if (stats == null) {
             return Float.NaN;
         } else {
@@ -142,13 +142,13 @@ public class IoSessionManager implements IoSessionManagerMBean {
         }
     }
 
-    public float getMessageWrittenThroughtput() {
-        IoSessionStat stats = (IoSessionStat) session
-                .getAttribute(StatCollector.KEY);
+    public float getMessageWriteThroughtput() {
+        IoStatistics stats = (IoStatistics) session
+                .getAttribute(IoStatisticsCollector.STATISTICS);
         if (stats == null) {
             return Float.NaN;
         } else {
-            return stats.getMessageWrittenThroughput();
+            return stats.getMessageWriteThroughput();
         }
     }
 }

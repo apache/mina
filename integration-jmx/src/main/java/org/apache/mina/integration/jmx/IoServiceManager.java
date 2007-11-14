@@ -25,7 +25,7 @@ import javax.management.ObjectName;
 
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.management.StatCollector;
+import org.apache.mina.management.IoStatisticsCollector;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -33,23 +33,20 @@ import org.apache.mina.management.StatCollector;
  */
 public class IoServiceManager implements IoServiceManagerMBean,
         MBeanRegistration {
-    private IoService service;
+    private final IoService service;
+    private volatile IoStatisticsCollector collector;
+    private volatile int pollingInterval;
+    private final boolean autoStart;
 
-    private StatCollector collector = null;
-
-    private int milliSecondsPolling;
-
-    private boolean autoStartCollecting = false;
-
-    public IoServiceManager(IoService service, int milliSecondsPolling,
-            boolean autoStartCollecting) {
-        this.autoStartCollecting = autoStartCollecting;
+    public IoServiceManager(
+            IoService service, int pollingInterval, boolean autoStart) {
+        this.autoStart = autoStart;
         this.service = service;
-        this.milliSecondsPolling = milliSecondsPolling;
+        this.pollingInterval = pollingInterval;
     }
 
-    public IoServiceManager(IoService service, int milliSecondsPolling) {
-        this(service, milliSecondsPolling, false);
+    public IoServiceManager(IoService service, int pollingInterval) {
+        this(service, pollingInterval, false);
     }
 
     public IoServiceManager(IoService service) {
@@ -60,24 +57,24 @@ public class IoServiceManager implements IoServiceManagerMBean,
         return service.getManagedSessions().size();
     }
 
-    public void startCollectingStats() {
+    public void start() {
         if (collector != null && collector.isRunning()) {
-            throw new RuntimeException("Already collecting stats");
+            throw new IllegalStateException("Already collecting stats");
         }
 
-        collector = new StatCollector(service, milliSecondsPolling);
+        collector = new IoStatisticsCollector(service, pollingInterval);
         collector.start();
     }
 
-    public int getStatsPollingInterval() {
-        return milliSecondsPolling;
+    public int getPollingInterval() {
+        return pollingInterval;
     }
 
-    public void setStatsPollingInterval(int millisecondsPolling) {
-        this.milliSecondsPolling = millisecondsPolling;
+    public void setPollingInterval(int pollingInterval) {
+        this.pollingInterval = pollingInterval;
     }
 
-    public void stopCollectingStats() {
+    public void stop() {
         if (collector != null && collector.isRunning()) {
             collector.stop();
         }
@@ -85,36 +82,36 @@ public class IoServiceManager implements IoServiceManagerMBean,
     }
 
     public float getTotalByteReadThroughput() {
-        return collector.getBytesReadThroughput();
+        return collector.getByteReadThroughput();
     }
 
     public float getTotalByteWrittenThroughput() {
-        return collector.getBytesWrittenThroughput();
+        return collector.getByteWriteThroughput();
     }
 
     public float getTotalMessageReadThroughput() {
-        return collector.getMsgReadThroughput();
+        return collector.getMessageReadThroughput();
     }
 
     public float getTotalMessageWrittenThroughput() {
-        return collector.getMsgWrittenThroughput();
+        return collector.getMessageWriteThroughput();
     }
 
     public float getAverageByteReadThroughput() {
-        return collector.getBytesReadThroughput() / collector.getSessionCount();
+        return collector.getByteReadThroughput() / collector.getSessionCount();
     }
 
     public float getAverageByteWrittenThroughput() {
-        return collector.getBytesWrittenThroughput()
+        return collector.getByteWriteThroughput()
                 / collector.getSessionCount();
     }
 
     public float getAverageMessageReadThroughput() {
-        return collector.getMsgReadThroughput() / collector.getSessionCount();
+        return collector.getMessageReadThroughput() / collector.getSessionCount();
     }
 
     public float getAverageMessageWrittenThroughput() {
-        return collector.getMsgWrittenThroughput()
+        return collector.getMessageWriteThroughput()
                 / collector.getSessionCount();
     }
 
@@ -132,8 +129,8 @@ public class IoServiceManager implements IoServiceManagerMBean,
 
     public void postRegister(Boolean registrationDone) {
         if (registrationDone.booleanValue()) {
-            if (autoStartCollecting) {
-                startCollectingStats();
+            if (autoStart) {
+                start();
             }
 
         }
@@ -141,7 +138,7 @@ public class IoServiceManager implements IoServiceManagerMBean,
 
     public void preDeregister() throws Exception {
         if (collector != null && collector.isRunning()) {
-            stopCollectingStats();
+            stop();
         }
     }
 
