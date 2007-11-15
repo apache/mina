@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.integration.spring;
+package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditorSupport;
 import java.net.InetAddress;
@@ -46,11 +46,15 @@ import org.apache.mina.filter.firewall.BlacklistFilter;
 public class InetAddressEditor extends PropertyEditorSupport {
     @Override
     public void setAsText(String text) throws IllegalArgumentException {
+        if (text == null) {
+            throw new IllegalArgumentException("address is null.");
+        }
         try {
             setValue(InetAddress.getByName(text));
         } catch (UnknownHostException uhe) {
             IllegalArgumentException iae = new IllegalArgumentException();
             iae.initCause(uhe);
+            throw iae;
         }
     }
 }

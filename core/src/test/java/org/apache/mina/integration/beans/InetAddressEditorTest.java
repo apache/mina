@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.integration.spring;
+package org.apache.mina.integration.beans;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -25,7 +25,7 @@ import java.net.UnknownHostException;
 import junit.framework.TestCase;
 
 /**
- * Tests {@link org.apache.mina.integration.spring.InetAddressEditor}.
+ * Tests {@link InetAddressEditor}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

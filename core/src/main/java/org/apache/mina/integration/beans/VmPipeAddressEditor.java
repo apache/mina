@@ -17,13 +17,12 @@
  *  under the License.
  *
  */
-package org.apache.mina.integration.spring;
+package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditorSupport;
 import java.net.SocketAddress;
 
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
-import org.springframework.util.Assert;
 
 /**
  * Java Bean {@link java.beans.PropertyEditor} which converts Strings into
@@ -47,7 +46,9 @@ public class VmPipeAddressEditor extends PropertyEditorSupport {
     }
 
     private SocketAddress parseSocketAddress(String s) {
-        Assert.notNull(s, "null SocketAddress string");
+        if (s == null) {
+            throw new IllegalArgumentException("socketAddress is null.");
+        }
         s = s.trim();
         if (s.startsWith(":")) {
             s = s.substring(1);
@@ -55,7 +56,7 @@ public class VmPipeAddressEditor extends PropertyEditorSupport {
         try {
             return new VmPipeAddress(Integer.parseInt(s.trim()));
         } catch (NumberFormatException nfe) {
-            throw new IllegalArgumentException("Illegal vm pipe address: " + s);
+            throw new IllegalArgumentException("Illegal VmPipeAddress: " + s);
         }
     }
 }

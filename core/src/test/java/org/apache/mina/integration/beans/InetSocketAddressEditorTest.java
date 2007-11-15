@@ -17,33 +17,43 @@
  *  under the License.
  *
  */
-package org.apache.mina.integration.spring;
+package org.apache.mina.integration.beans;
+
+import java.net.InetSocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.transport.vmpipe.VmPipeAddress;
-
 /**
- * Tests {@link VmPipeAddressEditor}.
+ * Tests {@link InetSocketAddressEditor}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAddressEditorTest extends TestCase {
-    VmPipeAddressEditor editor;
+public class InetSocketAddressEditorTest extends TestCase {
+    InetSocketAddressEditor editor;
 
     @Override
     protected void setUp() throws Exception {
-        editor = new VmPipeAddressEditor();
+        editor = new InetSocketAddressEditor();
     }
 
-    public void testSetAsTextWithLegalValues() throws Exception {
+    public void testSetAsTextWithWildcardAddress() throws Exception {
         editor.setAsText("1");
-        assertEquals(new VmPipeAddress(1), editor.getValue());
+        assertEquals(new InetSocketAddress(1), editor.getValue());
         editor.setAsText(":10");
-        assertEquals(new VmPipeAddress(10), editor.getValue());
-        editor.setAsText(":100");
-        assertEquals(new VmPipeAddress(100), editor.getValue());
+        assertEquals(new InetSocketAddress(10), editor.getValue());
+    }
+
+    public void testSetAsTextWithHostName() throws Exception {
+        editor.setAsText("www.google.com:80");
+        assertEquals(new InetSocketAddress("www.google.com", 80), editor
+                .getValue());
+    }
+
+    public void testSetAsTextWithIpAddress() throws Exception {
+        editor.setAsText("192.168.0.1:1000");
+        assertEquals(new InetSocketAddress("192.168.0.1", 1000), editor
+                .getValue());
     }
 
     public void testSetAsTextWithIllegalValues() throws Exception {
@@ -59,6 +69,11 @@ public class VmPipeAddressEditorTest extends TestCase {
         }
         try {
             editor.setAsText(":foo");
+            fail("Illegal port number. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException iae) {
+        }
+        try {
+            editor.setAsText("www.foo.com:yada");
             fail("Illegal port number. IllegalArgumentException expected.");
         } catch (IllegalArgumentException iae) {
         }

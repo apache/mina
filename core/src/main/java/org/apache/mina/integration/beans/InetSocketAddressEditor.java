@@ -17,13 +17,11 @@
  *  under the License.
  *
  */
-package org.apache.mina.integration.spring;
+package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditorSupport;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-
-import org.springframework.util.Assert;
 
 /**
  * Java Bean {@link java.beans.PropertyEditor} which converts Strings into
@@ -49,17 +47,22 @@ public class InetSocketAddressEditor extends PropertyEditorSupport {
     }
 
     private SocketAddress parseSocketAddress(String s) {
-        Assert.notNull(s, "null SocketAddress string");
+        if (s == null) {
+            throw new IllegalArgumentException("socketAddress is null.");
+        }
+        
         s = s.trim();
         int colonIndex = s.indexOf(":");
         if (colonIndex > 0) {
             String host = s.substring(0, colonIndex);
-            int port = parsePort(s.substring(colonIndex + 1));
-            return new InetSocketAddress(host, port);
-        } else {
-            int port = parsePort(s.substring(colonIndex + 1));
-            return new InetSocketAddress(port);
+            if (!"*".equals(host)) {
+                int port = parsePort(s.substring(colonIndex + 1));
+                return new InetSocketAddress(host, port);
+            }
         }
+
+        int port = parsePort(s.substring(colonIndex + 1));
+        return new InetSocketAddress(port);
     }
 
     private int parsePort(String s) {
