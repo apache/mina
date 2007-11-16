@@ -257,21 +257,34 @@ public abstract class AbstractIoService implements IoService {
     }
     
     public double getReadBytesThroughput() {
+        resetThroughput();
         return readBytesThroughput;
     }
 
     public double getWrittenBytesThroughput() {
+        resetThroughput();
         return writtenBytesThroughput;
     }
 
     public double getReadMessagesThroughput() {
+        resetThroughput();
         return readMessagesThroughput;
     }
 
     public double getWrittenMessagesThroughput() {
+        resetThroughput();
         return writtenMessagesThroughput;
     }
     
+    private void resetThroughput() {
+        if (getManagedSessionCount() == 0) {
+            readBytesThroughput = 0;
+            writtenBytesThroughput = 0;
+            readMessagesThroughput = 0;
+            writtenMessagesThroughput = 0;
+        }
+    }
+
     private void updateThroughput(long currentTime) {
         synchronized (throughputCalculationLock) {
             int interval = (int) (currentTime - lastThroughputCalculationTime);

@@ -80,16 +80,14 @@ public interface IoService {
     
     /**
      * Returns the maximum number of sessions which were being managed at the
-     * same time.  This value is reset to <tt>0</tt> when the service is
-     * activated.
+     * same time.
      */
     int getLargestManagedSessionCount();
     
     /**
      * Returns the cumulative number of sessions which were managed (or are
      * being managed) by this service, which means 'currently managed session
-     * count + closed session count'.  This value is reset to <tt>0</tt> when
-     * the service is activated.
+     * count + closed session count'.
      */
     long getCumulativeManagedSessionCount();
 

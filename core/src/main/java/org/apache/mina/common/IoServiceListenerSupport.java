@@ -118,8 +118,6 @@ public class IoServiceListenerSupport {
         }
 
         activationTime = System.currentTimeMillis();
-        largestManagedSessionCount = 0;
-        cumulativeManagedSessionCount = 0;
 
         for (IoServiceListener l : listeners) {
             l.serviceActivated(service);
