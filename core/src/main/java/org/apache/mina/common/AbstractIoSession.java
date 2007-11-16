@@ -52,6 +52,10 @@ public abstract class AbstractIoSession implements IoSession {
                 AbstractIoSession s = (AbstractIoSession) future.getSession();
                 s.scheduledWriteBytes.set(0);
                 s.scheduledWriteMessages.set(0);
+                s.readBytesThroughput = 0;
+                s.readMessagesThroughput = 0;
+                s.writtenBytesThroughput = 0;
+                s.writtenMessagesThroughput = 0;
             }
     };
 
