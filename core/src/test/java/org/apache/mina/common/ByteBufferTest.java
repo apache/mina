@@ -19,9 +19,6 @@
  */
 package org.apache.mina.common;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import java.nio.BufferOverflowException;
 import java.nio.ByteOrder;
 import java.nio.ReadOnlyBufferException;
@@ -32,6 +29,9 @@ import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 /**
  * Tests {@link ByteBuffer}.
@@ -516,6 +516,7 @@ public class ByteBufferTest extends TestCase {
         buf.setAutoExpand(true);
         List o = new ArrayList();
         o.add(new Date());
+        o.add(long.class);
 
         // Test writing an object.
         buf.putObject(o);

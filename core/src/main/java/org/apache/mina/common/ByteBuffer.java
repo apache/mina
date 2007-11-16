@@ -19,12 +19,14 @@
  */
 package org.apache.mina.common;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.OutputStream;
+import java.io.StreamCorruptedException;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteOrder;
@@ -38,6 +40,8 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.mina.common.support.ByteBufferHexDumper;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
@@ -244,6 +248,20 @@ public abstract class ByteBuffer implements Comparable {
      */
     public static ByteBuffer wrap(byte[] byteArray, int offset, int length) {
         return wrap(java.nio.ByteBuffer.wrap(byteArray, offset, length));
+    }
+
+    private static final Set primitiveTypeNames = new HashSet();
+    
+    static {
+        primitiveTypeNames.add("void");
+        primitiveTypeNames.add("boolean");
+        primitiveTypeNames.add("byte");
+        primitiveTypeNames.add("char");
+        primitiveTypeNames.add("short");
+        primitiveTypeNames.add("int");
+        primitiveTypeNames.add("long");
+        primitiveTypeNames.add("float");
+        primitiveTypeNames.add("double");
     }
 
     protected ByteBuffer() {
@@ -1477,9 +1495,22 @@ public abstract class ByteBuffer implements Comparable {
             ObjectInputStream in = new ObjectInputStream(asInputStream()) {
                 protected ObjectStreamClass readClassDescriptor()
                         throws IOException, ClassNotFoundException {
-                    String className = readUTF();
-                    Class clazz = Class.forName(className, true, classLoader);
-                    return ObjectStreamClass.lookup(clazz);
+                    int type = read();
+                    if (type < 0) {
+                        throw new EOFException();
+                    }
+                    switch (type) {
+                    case 0: // Primitive types
+                        return super.readClassDescriptor();
+                    case 1: // Non-primitive types
+                        String className = readUTF();
+                        Class clazz =
+                            Class.forName(className, true, classLoader);
+                        return ObjectStreamClass.lookup(clazz);
+                    default:
+                        throw new StreamCorruptedException(
+                                "Unexpected class descriptor type: " + type);
+                    }
                 }
             };
             return in.readObject();
@@ -1500,7 +1531,14 @@ public abstract class ByteBuffer implements Comparable {
             ObjectOutputStream out = new ObjectOutputStream(asOutputStream()) {
                 protected void writeClassDescriptor(ObjectStreamClass desc)
                         throws IOException {
-                    writeUTF(desc.getName());
+                    String className = desc.getName();
+                    if (primitiveTypeNames.contains(className)) {
+                        write(0);
+                        super.writeClassDescriptor(desc);
+                    } else {
+                        write(1);
+                        writeUTF(desc.getName());
+                    }
                 }
             };
             out.writeObject(o);
