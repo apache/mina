@@ -492,15 +492,17 @@ public abstract class AbstractIoSession implements IoSession {
     }
     
     private void increaseReadBytes(long increment, long currentTime) {
-        if (increment > 0) {
-            readBytes += increment;
-            lastReadTime = currentTime;
-            idleCountForBoth = 0;
-            idleCountForRead = 0;
+        if (increment <= 0) {
+            return;
+        }
+        
+        readBytes += increment;
+        lastReadTime = currentTime;
+        idleCountForBoth = 0;
+        idleCountForRead = 0;
 
-            if (getService() instanceof AbstractIoService) {
-                ((AbstractIoService) getService()).increaseReadBytes(increment, currentTime);
-            }
+        if (getService() instanceof AbstractIoService) {
+            ((AbstractIoService) getService()).increaseReadBytes(increment, currentTime);
         }
     }
     
