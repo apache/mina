@@ -19,12 +19,14 @@
  */
 package org.apache.mina.common;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.OutputStream;
+import java.io.StreamCorruptedException;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteOrder;
@@ -38,6 +40,8 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.mina.common.support.ByteBufferHexDumper;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
@@ -244,6 +248,20 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      */
     public static ByteBuffer wrap(byte[] byteArray, int offset, int length) {
         return wrap(java.nio.ByteBuffer.wrap(byteArray, offset, length));
+    }
+
+    private static final Set<String> primitiveTypeNames = new HashSet<String>();
+    
+    static {
+        primitiveTypeNames.add("void");
+        primitiveTypeNames.add("boolean");
+        primitiveTypeNames.add("byte");
+        primitiveTypeNames.add("char");
+        primitiveTypeNames.add("short");
+        primitiveTypeNames.add("int");
+        primitiveTypeNames.add("long");
+        primitiveTypeNames.add("float");
+        primitiveTypeNames.add("double");
     }
 
     protected ByteBuffer() {
@@ -527,6 +545,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      */
     public abstract ByteBuffer compact();
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         if (isDirect()) {
@@ -546,6 +565,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         return buf.toString();
     }
 
+    @Override
     public int hashCode() {
         int h = 1;
         int p = position();
@@ -555,6 +575,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         return h;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof ByteBuffer)) {
             return false;
@@ -788,18 +809,22 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      */
     public InputStream asInputStream() {
         return new InputStream() {
+            @Override
             public int available() {
                 return ByteBuffer.this.remaining();
             }
 
+            @Override
             public synchronized void mark(int readlimit) {
                 ByteBuffer.this.mark();
             }
 
+            @Override
             public boolean markSupported() {
                 return true;
             }
 
+            @Override
             public int read() {
                 if (ByteBuffer.this.hasRemaining()) {
                     return ByteBuffer.this.get() & 0xff;
@@ -808,6 +833,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
                 }
             }
 
+            @Override
             public int read(byte[] b, int off, int len) {
                 int remaining = ByteBuffer.this.remaining();
                 if (remaining > 0) {
@@ -819,10 +845,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
                 }
             }
 
+            @Override
             public synchronized void reset() {
                 ByteBuffer.this.reset();
             }
 
+            @Override
             public long skip(long n) {
                 int bytes;
                 if (n > Integer.MAX_VALUE) {
@@ -846,10 +874,12 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
      */
     public OutputStream asOutputStream() {
         return new OutputStream() {
+            @Override
             public void write(byte[] b, int off, int len) {
                 ByteBuffer.this.put(b, off, len);
             }
 
+            @Override
             public void write(int b) {
                 ByteBuffer.this.put((byte) b);
             }
@@ -1474,12 +1504,25 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         limit(position() + length);
         try {
             ObjectInputStream in = new ObjectInputStream(asInputStream()) {
+                @Override
                 protected ObjectStreamClass readClassDescriptor()
                         throws IOException, ClassNotFoundException {
-                    String className = readUTF();
-                    Class<?> clazz = Class
-                            .forName(className, true, classLoader);
-                    return ObjectStreamClass.lookup(clazz);
+                    int type = read();
+                    if (type < 0) {
+                        throw new EOFException();
+                    }
+                    switch (type) {
+                    case 0: // Primitive types
+                        return super.readClassDescriptor();
+                    case 1: // Non-primitive types
+                        String className = readUTF();
+                        Class<?> clazz =
+                            Class.forName(className, true, classLoader);
+                        return ObjectStreamClass.lookup(clazz);
+                    default:
+                        throw new StreamCorruptedException(
+                                "Unexpected class descriptor type: " + type);
+                    }
                 }
             };
             return in.readObject();
@@ -1498,9 +1541,17 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         skip(4); // Make a room for the length field.
         try {
             ObjectOutputStream out = new ObjectOutputStream(asOutputStream()) {
+                @Override
                 protected void writeClassDescriptor(ObjectStreamClass desc)
                         throws IOException {
-                    writeUTF(desc.getName());
+                    String className = desc.getName();
+                    if (primitiveTypeNames.contains(className)) {
+                        write(0);
+                        super.writeClassDescriptor(desc);
+                    } else {
+                        write(1);
+                        writeUTF(desc.getName());
+                    }
                 }
             };
             out.writeObject(o);
