@@ -34,8 +34,9 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     private int idleTimeForRead;
     private int idleTimeForWrite;
     private int idleTimeForBoth;
-    private int writeTimeout;
+    private int writeTimeout = 60;
     private boolean useReadOperation;
+    private int throughputCalculationInterval = 3;
 
     protected AbstractIoSessionConfig() {
     }
@@ -53,6 +54,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
         setIdleTime(IdleStatus.WRITER_IDLE, config.getIdleTime(IdleStatus.WRITER_IDLE));
         setWriteTimeout(config.getWriteTimeout());
         setUseReadOperation(config.isUseReadOperation());
+        setThroughputCalculationInterval(config.getThroughputCalculationInterval());
 
         doSetAll(config);
     }
@@ -163,5 +165,22 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
 
     public void setUseReadOperation(boolean useReadOperation) {
         this.useReadOperation = useReadOperation;
+    }
+
+    public int getThroughputCalculationInterval() {
+        return throughputCalculationInterval;
+    }
+
+    public void setThroughputCalculationInterval(int throughputCalculationInterval) {
+        if (throughputCalculationInterval < 0) {
+            throw new IllegalArgumentException(
+                    "throughputCalculationInterval: " + throughputCalculationInterval);
+        }
+
+        this.throughputCalculationInterval = throughputCalculationInterval;
+    }
+    
+    public long getThroughputCalculationIntervalInMillis() {
+        return throughputCalculationInterval * 1000L;
     }
 }

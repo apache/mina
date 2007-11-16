@@ -88,6 +88,16 @@ public abstract class AbstractIoSession implements IoSession {
     private long writtenMessages;
     private long lastReadTime;
     private long lastWriteTime;
+    
+    private long lastThroughputCalculationTime;
+    private long lastReadBytes;
+    private long lastWrittenBytes;
+    private long lastReadMessages;
+    private long lastWrittenMessages;
+    private double readBytesThroughput;
+    private double writtenBytesThroughput;
+    private double readMessagesThroughput;
+    private double writtenMessagesThroughput;
 
     private int idleCountForBoth;
     private int idleCountForRead;
@@ -100,9 +110,10 @@ public abstract class AbstractIoSession implements IoSession {
     private boolean deferDecreaseReadBuffer = true;
 
     protected AbstractIoSession() {
-        creationTime = lastReadTime = lastWriteTime =
+        creationTime = lastThroughputCalculationTime = 
+            lastReadTime = lastWriteTime =
             lastIdleTimeForBoth = lastIdleTimeForRead =
-                lastIdleTimeForWrite = System.currentTimeMillis();
+            lastIdleTimeForWrite = System.currentTimeMillis();
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
 
@@ -418,6 +429,42 @@ public abstract class AbstractIoSession implements IoSession {
         return writtenMessages;
     }
 
+    public double getReadBytesThroughput() {
+        return readBytesThroughput;
+    }
+
+    public double getWrittenBytesThroughput() {
+        return writtenBytesThroughput;
+    }
+
+    public double getReadMessagesThroughput() {
+        return readMessagesThroughput;
+    }
+
+    public double getWrittenMessagesThroughput() {
+        return writtenMessagesThroughput;
+    }
+    
+    protected void updateThroughput(long currentTime) {
+        int interval = (int) (currentTime - lastThroughputCalculationTime);
+        long minInterval = getConfig().getThroughputCalculationIntervalInMillis();
+        if (minInterval == 0 || interval < minInterval) {
+            return;
+        }
+        
+        readBytesThroughput = (readBytes - lastReadBytes) * 1000.0 / interval;
+        writtenBytesThroughput = (writtenBytes - lastWrittenBytes) * 1000.0 / interval;
+        readMessagesThroughput = (readMessages - lastReadMessages) * 1000.0 / interval;
+        writtenMessagesThroughput = (writtenMessages - lastWrittenMessages) * 1000.0 / interval;
+        
+        lastReadBytes = readBytes;
+        lastWrittenBytes = writtenBytes;
+        lastReadMessages = readMessages;
+        lastWrittenMessages = writtenMessages;
+        
+        lastThroughputCalculationTime = currentTime;
+    }
+
     public long getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
@@ -426,61 +473,81 @@ public abstract class AbstractIoSession implements IoSession {
         return scheduledWriteMessages.get();
     }
 
-    protected void increaseReadBytes(long increment) {
+    protected void increaseReadBytesAndMessages(
+            Object message, long currentTime) {
+        if (message instanceof IoBuffer) {
+            IoBuffer b = (IoBuffer) message;
+            if (b.hasRemaining()) {
+                increaseReadBytes(((IoBuffer) message).remaining(), currentTime);
+            } else {
+                increaseReadMessages(currentTime);
+            }
+        } else {
+            increaseReadMessages(currentTime);
+        }
+    }
+    
+    private void increaseReadBytes(long increment, long currentTime) {
         if (increment > 0) {
             readBytes += increment;
-            lastReadTime = System.currentTimeMillis();
+            lastReadTime = currentTime;
             idleCountForBoth = 0;
             idleCountForRead = 0;
 
             if (getService() instanceof AbstractIoService) {
-                ((AbstractIoService) getService()).increaseReadBytes(increment);
+                ((AbstractIoService) getService()).increaseReadBytes(increment, currentTime);
             }
         }
     }
     
-    protected void increaseReadMessages() {
+    private void increaseReadMessages(long currentTime) {
         readMessages++;
-        lastWriteTime = System.currentTimeMillis();
+        lastWriteTime = currentTime;
+        idleCountForBoth = 0;
+        idleCountForRead = 0;
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseReadMessages();
+            ((AbstractIoService) getService()).increaseReadMessages(currentTime);
         }
     }
 
-    protected void increaseWrittenBytesAndMessages(WriteRequest request) {
+    protected void increaseWrittenBytesAndMessages(
+            WriteRequest request, long currentTime) {
+        
         Object message = request.getMessage();
         if (message instanceof IoBuffer) {
             IoBuffer b = (IoBuffer) message;
             if (b.hasRemaining()) {
-                increaseWrittenBytes(((IoBuffer) message).remaining());
+                increaseWrittenBytes(((IoBuffer) message).remaining(), currentTime);
             } else {
-                increaseWrittenMessages();
+                increaseWrittenMessages(currentTime);
             }
         } else {
-            increaseWrittenMessages();
+            increaseWrittenMessages(currentTime);
         }
     }
     
-    protected void increaseWrittenBytes(long increment) {
-        if (increment > 0) {
-            writtenBytes += increment;
-            lastWriteTime = System.currentTimeMillis();
-            idleCountForBoth = 0;
-            idleCountForWrite = 0;
-
-            if (getService() instanceof AbstractIoService) {
-                ((AbstractIoService) getService()).increaseWrittenBytes(increment);
-            }
-
-            increaseScheduledWriteBytes(-increment);
+    private void increaseWrittenBytes(long increment, long currentTime) {
+        if (increment <= 0) {
+            return;
         }
+
+        writtenBytes += increment;
+        lastWriteTime = currentTime;
+        idleCountForBoth = 0;
+        idleCountForWrite = 0;
+
+        if (getService() instanceof AbstractIoService) {
+            ((AbstractIoService) getService()).increaseWrittenBytes(increment, currentTime);
+        }
+
+        increaseScheduledWriteBytes(-increment);
     }
 
-    protected void increaseWrittenMessages() {
+    private void increaseWrittenMessages(long currentTime) {
         writtenMessages++;
-        lastWriteTime = System.currentTimeMillis();
+        lastWriteTime = currentTime;
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseWrittenMessages();
+            ((AbstractIoService) getService()).increaseWrittenMessages(currentTime);
         }
 
         decreaseScheduledWriteMessages();
@@ -500,7 +567,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    protected void decreaseScheduledWriteMessages() {
+    private void decreaseScheduledWriteMessages() {
         scheduledWriteMessages.decrementAndGet();
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).decreaseScheduledWriteMessages();
@@ -621,16 +688,16 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    protected void increaseIdleCount(IdleStatus status) {
+    protected void increaseIdleCount(IdleStatus status, long currentTime) {
         if (status == IdleStatus.BOTH_IDLE) {
             idleCountForBoth++;
-            lastIdleTimeForBoth = System.currentTimeMillis();
+            lastIdleTimeForBoth = currentTime;
         } else if (status == IdleStatus.READER_IDLE) {
             idleCountForRead++;
-            lastIdleTimeForRead = System.currentTimeMillis();
+            lastIdleTimeForRead = currentTime;
         } else if (status == IdleStatus.WRITER_IDLE) {
             idleCountForWrite++;
-            lastIdleTimeForWrite = System.currentTimeMillis();
+            lastIdleTimeForWrite = currentTime;
         } else {
             throw new IllegalArgumentException("Unknown idle status: " + status);
         }

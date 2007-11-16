@@ -70,6 +70,24 @@ public interface IoSessionConfig {
      * read buffer size to the greater value than this property value.
      */
     void setMaxReadBufferSize(int maxReadBufferSize);
+    
+    /**
+     * Returns the interval (seconds) between each throughput calculation.
+     * The default value is <tt>3</tt> seconds.
+     */
+    int getThroughputCalculationInterval();
+    
+    /**
+     * Returns the interval (milliseconds) between each throughput calculation.
+     * The default value is <tt>3</tt> seconds.
+     */
+    long getThroughputCalculationIntervalInMillis();
+    
+    /**
+     * Sets the interval (seconds) between each throughput calculation.  The
+     * default value is <tt>3</tt> seconds.
+     */
+    void setThroughputCalculationInterval(int throughputCalculationInterval);
 
     /**
      * Returns idle time for the specified type of idleness in seconds.

@@ -67,14 +67,31 @@ public interface IoService {
 
     /**
      * Returns all sessions which are currently managed by this service.
-     * {@link IoAcceptor} will assume the specified <tt>address</tt> is a local
-     * address, and {@link IoConnector} will assume it's a remote address.
      *
      * @return the sessions. An empty collection if there's no session.
-     * @throws UnsupportedOperationException if this operation isn't supported
-     *         for the particular transport type implemented by this {@link IoService}.
      */
     Set<IoSession> getManagedSessions();
+    
+    /**
+     * Returns the number of all sessions which are currently managed by this
+     * service.
+     */
+    int getManagedSessionCount();
+    
+    /**
+     * Returns the maximum number of sessions which were being managed at the
+     * same time.  This value is reset to <tt>0</tt> when the service is
+     * activated.
+     */
+    int getLargestManagedSessionCount();
+    
+    /**
+     * Returns the cumulative number of sessions which were managed (or are
+     * being managed) by this service, which means 'currently managed session
+     * count + closed session count'.  This value is reset to <tt>0</tt> when
+     * the service is activated.
+     */
+    long getCumulativeManagedSessionCount();
 
     /**
      * Returns the default configuration of the new {@link IoSession}s
@@ -120,13 +137,67 @@ public interface IoService {
     boolean isActive();
 
     /**
-     * Returns the time when this service was activated.  Should return
-     * zero if the service has not been activated.
+     * Returns the time when this service was activated.  It returns the last
+     * time when this service was activated if the service is not active now.
      *
      * @return
-     * 	The time by using <code>System.currentTimeMillis()</code>
+     * 	The time by using {@link System#currentTimeMillis()}
      */
     long getActivationTime();
+
+    /**
+     * Returns the time in millis when I/O occurred lastly.
+     */
+    long getLastIoTime();
+
+    /**
+     * Returns the time in millis when read operation occurred lastly.
+     */
+    long getLastReadTime();
+
+    /**
+     * Returns the time in millis when write operation occurred lastly.
+     */
+    long getLastWriteTime();
+    
+    /**
+     * Returns <code>true</code> if this service is idle for the specified
+     * {@link IdleStatus}.
+     */
+    boolean isIdle(IdleStatus status);
+
+    /**
+     * Returns the number of the fired continuous <tt>serviceIdle</tt> events
+     * for the specified {@link IdleStatus}.
+     * <p/>
+     * If <tt>serviceIdle</tt> event is fired first after some time after I/O,
+     * <tt>idleCount</tt> becomes <tt>1</tt>.  <tt>idleCount</tt> resets to
+     * <tt>0</tt> if any I/O occurs again, otherwise it increases to
+     * <tt>2</tt> and so on if <tt>serviceIdle</tt> event is fired again without
+     * any I/O between two (or more) <tt>serviceIdle</tt> events.
+     */
+    int getIdleCount(IdleStatus status);
+
+    /**
+     * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
+     * is fired for the specified {@link IdleStatus}.
+     */
+    long getLastIdleTime(IdleStatus status);
+
+    /**
+     * Returns idle time for the specified type of idleness in seconds.
+     */
+    int getIdleTime(IdleStatus status);
+
+    /**
+     * Returns idle time for the specified type of idleness in milliseconds.
+     */
+    long getIdleTimeInMillis(IdleStatus status);
+
+    /**
+     * Sets idle time for the specified type of idleness in seconds.
+     */
+    void setIdleTime(IdleStatus status, int idleTime);
 
     /**
      * Returns the number of bytes read by this service
@@ -159,6 +230,44 @@ public interface IoService {
      * 	The number of messages this service has written
      */
     long getWrittenMessages();
+    
+    /**
+     * Returns the number of read bytes per second.
+     */
+    double getReadBytesThroughput();
+
+    /**
+     * Returns the number of written bytes per second.
+     */
+    double getWrittenBytesThroughput();
+    
+    /**
+     * Returns the number of read messages per second.
+     */
+    double getReadMessagesThroughput();
+    
+    /**
+     * Returns the number of written messages per second.
+     */
+    double getWrittenMessagesThroughput();
+    
+    /**
+     * Returns the interval (seconds) between each throughput calculation.
+     * The default value is <tt>3</tt> seconds.
+     */
+    int getThroughputCalculationInterval();
+    
+    /**
+     * Returns the interval (milliseconds) between each throughput calculation.
+     * The default value is <tt>3</tt> seconds.
+     */
+    long getThroughputCalculationIntervalInMillis();
+    
+    /**
+     * Sets the interval (seconds) between each throughput calculation.  The
+     * default value is <tt>3</tt> seconds.
+     */
+    void setThroughputCalculationInterval(int throughputCalculationInterval);
 
     /**
      * Returns the number of bytes scheduled to be written

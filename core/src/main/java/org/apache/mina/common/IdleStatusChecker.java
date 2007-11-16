@@ -87,10 +87,31 @@ public class IdleStatusChecker {
      *
      * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
-    public static void notifyIdleSessions(Iterator<? extends IoSession> sessions, long currentTime) {
+    public static void notifyIdleness(Iterator<? extends IoSession> sessions, long currentTime) {
+        IoSession s = null;
         while (sessions.hasNext()) {
-            IoSession s = sessions.next();
+            s = sessions.next();
             notifyIdleSession(s, currentTime);
+        }
+        
+        if (s != null) {
+            notifyIdleness(s.getService(), currentTime, false);
+        }
+    }
+
+    public static void notifyIdleness(IoService service, long currentTime) {
+        notifyIdleness(service, currentTime, true);
+    }
+    
+    private static void notifyIdleness(IoService service, long currentTime, boolean includeSessions) {
+        if (!(service instanceof AbstractIoService)) {
+            return;
+        }
+        
+        ((AbstractIoService) service).notifyIdleness(currentTime);
+        
+        if (includeSessions) {
+            notifyIdleness(service.getManagedSessions().iterator(), currentTime);
         }
     }
 
@@ -101,51 +122,95 @@ public class IdleStatusChecker {
      * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleSession(IoSession session, long currentTime) {
-        notifyIdleSession0(session, currentTime, session
-                .getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
-                IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session
-                        .getLastIdleTime(IdleStatus.BOTH_IDLE)));
-        notifyIdleSession0(session, currentTime, session
-                .getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
-                IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(),
-                        session.getLastIdleTime(IdleStatus.READER_IDLE)));
-        notifyIdleSession0(session, currentTime, session
-                .getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
-                IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(),
-                        session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
-        notifyWriteTimeout(session, currentTime, session
-                .getConfig().getWriteTimeoutInMillis(), session.getLastWriteTime());
+        if (session instanceof AbstractIoSession) {
+            AbstractIoSession s = (AbstractIoSession) session;
+            notifyIdleSession1(
+                    s, currentTime,
+                    s.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                    IdleStatus.BOTH_IDLE, Math.max(
+                            s.getLastIoTime(),
+                            s.getLastIdleTime(IdleStatus.BOTH_IDLE)));
+            
+            notifyIdleSession1(
+                    s, currentTime,
+                    s.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                    IdleStatus.READER_IDLE, Math.max(
+                            s.getLastReadTime(),
+                            s.getLastIdleTime(IdleStatus.READER_IDLE)));
+            
+            notifyIdleSession1(
+                    s, currentTime,
+                    s.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                    IdleStatus.WRITER_IDLE, Math.max(
+                            s.getLastWriteTime(),
+                            s.getLastIdleTime(IdleStatus.WRITER_IDLE)));
+    
+            notifyWriteTimeout(s, currentTime);
+            updateThroughput(s, currentTime);
+        } else {
+            notifyIdleSession0(
+                    session, currentTime,
+                    session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                    IdleStatus.BOTH_IDLE, Math.max(
+                            session.getLastIoTime(),
+                            session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
+            
+            notifyIdleSession0(
+                    session, currentTime,
+                    session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                    IdleStatus.READER_IDLE, Math.max(
+                            session.getLastReadTime(),
+                            session.getLastIdleTime(IdleStatus.READER_IDLE)));
+            
+            notifyIdleSession0(
+                    session, currentTime,
+                    session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                    IdleStatus.WRITER_IDLE, Math.max(
+                            session.getLastWriteTime(),
+                            session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
+        }
     }
 
-    private static void notifyIdleSession0(IoSession session, long currentTime,
+    private static void notifyIdleSession0(
+            IoSession session, long currentTime,
             long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
                 && currentTime - lastIoTime >= idleTime) {
-            if (session instanceof AbstractIoSession) {
-                ((AbstractIoSession) session).increaseIdleCount(status);
-            }
             session.getFilterChain().fireSessionIdle(status);
         }
     }
 
-    private static void notifyWriteTimeout(IoSession session,
-            long currentTime, long writeTimeout, long lastIoTime) {
-        if (!(session instanceof AbstractIoSession)) {
-            return;
+    private static void notifyIdleSession1(
+            AbstractIoSession session, long currentTime,
+            long idleTime, IdleStatus status, long lastIoTime) {
+        if (idleTime > 0 && lastIoTime != 0
+                && currentTime - lastIoTime >= idleTime) {
+            session.increaseIdleCount(status, currentTime);
+            session.getFilterChain().fireSessionIdle(status);
         }
+    }
 
-        AbstractIoSession s = (AbstractIoSession) session;
-        if (writeTimeout > 0 && currentTime - lastIoTime >= writeTimeout &&
-                !s.getWriteRequestQueue().isEmpty(session)) {
-            WriteRequest request = s.getCurrentWriteRequest();
+    private static void notifyWriteTimeout(
+            AbstractIoSession session, long currentTime) {
+
+        long writeTimeout = session.getConfig().getWriteTimeoutInMillis();
+        if (writeTimeout > 0 &&
+                currentTime - session.getLastWriteTime() >= writeTimeout &&
+                !session.getWriteRequestQueue().isEmpty(session)) {
+            WriteRequest request = session.getCurrentWriteRequest();
             if (request != null) {
-                s.setCurrentWriteRequest(null);
+                session.setCurrentWriteRequest(null);
                 WriteTimeoutException cause = new WriteTimeoutException(request);
                 request.getFuture().setException(cause);
-                s.getFilterChain().fireExceptionCaught(cause);
+                session.getFilterChain().fireExceptionCaught(cause);
                 // WriteException is an IOException, so we close the session.
-                s.close();
+                session.close();
             }
         }
+    }
+
+    private static void updateThroughput(
+            AbstractIoSession session, long currentTime) {
+        session.updateThroughput(currentTime);
     }
 }

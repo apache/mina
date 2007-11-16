@@ -54,8 +54,11 @@ public class IoServiceListenerSupport {
      * Read only version of {@link #managedSessions}.
      */
     private final Set<IoSession> readOnlyManagedSessions = Collections.unmodifiableSet(managedSessions);
-
+    
     private final AtomicBoolean activated = new AtomicBoolean();
+    private volatile long activationTime;
+    private volatile int largestManagedSessionCount;
+    private volatile long cumulativeManagedSessionCount;
 
     /**
      * Creates a new instance.
@@ -80,9 +83,25 @@ public class IoServiceListenerSupport {
     public void remove(IoServiceListener listener) {
         listeners.remove(listener);
     }
+    
+    public long getActivationTime() {
+        return activationTime;
+    }
 
     public Set<IoSession> getManagedSessions() {
         return readOnlyManagedSessions;
+    }
+    
+    public int getManagedSessionCount() {
+        return managedSessions.size();
+    }
+    
+    public int getLargestManagedSessionCount() {
+        return largestManagedSessionCount;
+    }
+    
+    public long getCumulativeManagedSessionCount() {
+        return cumulativeManagedSessionCount;
     }
 
     public boolean isActive() {
@@ -98,14 +117,29 @@ public class IoServiceListenerSupport {
             return;
         }
 
-        if (service instanceof AbstractIoService) {
-            ((AbstractIoService) service).setActivationTime(System.currentTimeMillis());
-        }
+        activationTime = System.currentTimeMillis();
+        largestManagedSessionCount = 0;
+        cumulativeManagedSessionCount = 0;
 
         for (IoServiceListener l : listeners) {
             l.serviceActivated(service);
         }
     }
+    
+    /**
+     * Calls {@link IoServiceListener#serviceIdle(IoService, IdleStatus)}
+     * for all registered listeners.
+     */
+    public void fireServiceIdle(IdleStatus status) {
+        if (!activated.get()) {
+            return;
+        }
+
+        for (IoServiceListener l : listeners) {
+            l.serviceIdle(service, status);
+        }
+    }
+
 
     /**
      * Calls {@link IoServiceListener#serviceDeactivated(IoService)}
@@ -122,9 +156,6 @@ public class IoServiceListenerSupport {
             }
         } finally {
             disconnectSessions();
-            if (service instanceof AbstractIoService) {
-                ((AbstractIoService) service).setActivationTime(0);
-            }
         }
     }
 
@@ -143,7 +174,7 @@ public class IoServiceListenerSupport {
         if (!managedSessions.add(session)) {
             return;
         }
-
+        
         // If the first connector session, fire a virtual service activation event.
         if (firstSession) {
             fireServiceActivated();
@@ -152,6 +183,12 @@ public class IoServiceListenerSupport {
         // Fire session events.
         session.getFilterChain().fireSessionCreated();
         session.getFilterChain().fireSessionOpened();
+
+        int managedSessionCount = managedSessions.size();
+        if (managedSessionCount > largestManagedSessionCount) {
+            largestManagedSessionCount = managedSessionCount;
+        }
+        cumulativeManagedSessionCount ++;
 
         // Fire listener events.
         for (IoServiceListener l : listeners) {

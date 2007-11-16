@@ -52,14 +52,42 @@ public abstract class AbstractIoService implements IoService {
     private final IoServiceListenerSupport listeners;
     private volatile boolean disposed;
 
-    private volatile long activationTime;
     private final AtomicLong readBytes = new AtomicLong();
     private final AtomicLong writtenBytes = new AtomicLong();
     private final AtomicLong readMessages = new AtomicLong();
     private final AtomicLong writtenMessages = new AtomicLong();
+    private long lastReadTime;
+    private long lastWriteTime;
+    
     private final AtomicLong scheduledWriteBytes = new AtomicLong();
     private final AtomicLong scheduledWriteMessages = new AtomicLong();
 
+    private final Object throughputCalculationLock = new Object();
+    private int throughputCalculationInterval = 3;
+
+    private long lastThroughputCalculationTime;
+    private long lastReadBytes;
+    private long lastWrittenBytes;
+    private long lastReadMessages;
+    private long lastWrittenMessages;
+    private double readBytesThroughput;
+    private double writtenBytesThroughput;
+    private double readMessagesThroughput;
+    private double writtenMessagesThroughput;
+
+    private final Object idlenessCheckLock = new Object();
+    private int idleTimeForRead;
+    private int idleTimeForWrite;
+    private int idleTimeForBoth;
+
+    private int idleCountForBoth;
+    private int idleCountForRead;
+    private int idleCountForWrite;
+
+    private long lastIdleTimeForBoth;
+    private long lastIdleTimeForRead;
+    private long lastIdleTimeForWrite;
+    
     /**
      * The default {@link IoSessionConfig} which will be used to configure new sessions.
      */
@@ -136,6 +164,18 @@ public abstract class AbstractIoService implements IoService {
         return getListeners().getManagedSessions();
     }
 
+    public long getCumulativeManagedSessionCount() {
+        return getListeners().getCumulativeManagedSessionCount();
+    }
+
+    public int getLargestManagedSessionCount() {
+        return getListeners().getLargestManagedSessionCount();
+    }
+
+    public int getManagedSessionCount() {
+        return getListeners().getManagedSessionCount();
+    }
+
     public IoHandler getHandler() {
         return handler;
     }
@@ -181,18 +221,84 @@ public abstract class AbstractIoService implements IoService {
         return readBytes.get();
     }
 
-    protected void increaseReadBytes(long increment) {
+    protected void increaseReadBytes(long increment, long currentTime) {
         readBytes.addAndGet(increment);
+        lastReadTime = currentTime;
+        idleCountForBoth = 0;
+        idleCountForRead = 0;
     }
 
     public long getReadMessages() {
         return readMessages.get();
     }
 
-    protected void increaseReadMessages() {
+    protected void increaseReadMessages(long currentTime) {
         readMessages.incrementAndGet();
+        lastReadTime = currentTime;
+        idleCountForBoth = 0;
+        idleCountForRead = 0;
     }
 
+    public int getThroughputCalculationInterval() {
+        return throughputCalculationInterval;
+    }
+
+    public void setThroughputCalculationInterval(int throughputCalculationInterval) {
+        if (throughputCalculationInterval < 0) {
+            throw new IllegalArgumentException(
+                    "throughputCalculationInterval: " + throughputCalculationInterval);
+        }
+
+        this.throughputCalculationInterval = throughputCalculationInterval;
+    }
+    
+    public long getThroughputCalculationIntervalInMillis() {
+        return throughputCalculationInterval * 1000L;
+    }
+    
+    public double getReadBytesThroughput() {
+        return readBytesThroughput;
+    }
+
+    public double getWrittenBytesThroughput() {
+        return writtenBytesThroughput;
+    }
+
+    public double getReadMessagesThroughput() {
+        return readMessagesThroughput;
+    }
+
+    public double getWrittenMessagesThroughput() {
+        return writtenMessagesThroughput;
+    }
+    
+    private void updateThroughput(long currentTime) {
+        synchronized (throughputCalculationLock) {
+            int interval = (int) (currentTime - lastThroughputCalculationTime);
+            long minInterval = getThroughputCalculationIntervalInMillis();
+            if (minInterval == 0 || interval < minInterval) {
+                return;
+            }
+            
+            long readBytes = this.readBytes.get();
+            long writtenBytes = this.writtenBytes.get();
+            long readMessages = this.readMessages.get();
+            long writtenMessages = this.writtenMessages.get();
+            
+            readBytesThroughput = (readBytes - lastReadBytes) * 1000.0 / interval;
+            writtenBytesThroughput = (writtenBytes - lastWrittenBytes) * 1000.0 / interval;
+            readMessagesThroughput = (readMessages - lastReadMessages) * 1000.0 / interval;
+            writtenMessagesThroughput = (writtenMessages - lastWrittenMessages) * 1000.0 / interval;
+            
+            lastReadBytes = readBytes;
+            lastWrittenBytes = writtenBytes;
+            lastReadMessages = readMessages;
+            lastWrittenMessages = writtenMessages;
+            
+            lastThroughputCalculationTime = currentTime;
+        }
+    }
+    
     public long getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
@@ -214,29 +320,179 @@ public abstract class AbstractIoService implements IoService {
     }
 
     public long getActivationTime() {
-        return activationTime;
+        return getListeners().getActivationTime();
     }
 
-    protected void setActivationTime(long activationTime) {
-        this.activationTime = activationTime;
+    public long getLastIoTime() {
+        return Math.max(lastReadTime, lastWriteTime);
+    }
+
+    public long getLastReadTime() {
+        return lastReadTime;
+    }
+
+    public long getLastWriteTime() {
+        return lastWriteTime;
     }
 
     public long getWrittenBytes() {
         return writtenBytes.get();
     }
 
-    protected void increaseWrittenBytes(long increment) {
+    protected void increaseWrittenBytes(long increment, long currentTime) {
         writtenBytes.addAndGet(increment);
+        lastWriteTime = currentTime;
+        idleCountForBoth = 0;
+        idleCountForWrite = 0;
     }
 
     public long getWrittenMessages() {
         return writtenMessages.get();
     }
 
-    protected void increaseWrittenMessages() {
+    protected void increaseWrittenMessages(long currentTime) {
         writtenMessages.incrementAndGet();
+        lastWriteTime = currentTime;
+        idleCountForBoth = 0;
+        idleCountForWrite = 0;
     }
 
+    public int getIdleTime(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE) {
+            return idleTimeForBoth;
+        }
+
+        if (status == IdleStatus.READER_IDLE) {
+            return idleTimeForRead;
+        }
+
+        if (status == IdleStatus.WRITER_IDLE) {
+            return idleTimeForWrite;
+        }
+
+        throw new IllegalArgumentException("Unknown idle status: " + status);
+    }
+
+    public long getIdleTimeInMillis(IdleStatus status) {
+        return getIdleTime(status) * 1000L;
+    }
+
+    public void setIdleTime(IdleStatus status, int idleTime) {
+        if (idleTime < 0) {
+            throw new IllegalArgumentException("Illegal idle time: " + idleTime);
+        }
+
+        if (status == IdleStatus.BOTH_IDLE) {
+            idleTimeForBoth = idleTime;
+        } else if (status == IdleStatus.READER_IDLE) {
+            idleTimeForRead = idleTime;
+        } else if (status == IdleStatus.WRITER_IDLE) {
+            idleTimeForWrite = idleTime;
+        } else {
+            throw new IllegalArgumentException("Unknown idle status: " + status);
+        }
+    }
+
+    public boolean isIdle(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE) {
+            return idleCountForBoth > 0;
+        }
+
+        if (status == IdleStatus.READER_IDLE) {
+            return idleCountForRead > 0;
+        }
+
+        if (status == IdleStatus.WRITER_IDLE) {
+            return idleCountForWrite > 0;
+        }
+
+        throw new IllegalArgumentException("Unknown idle status: " + status);
+    }
+
+    public int getIdleCount(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE) {
+            return idleCountForBoth;
+        }
+
+        if (status == IdleStatus.READER_IDLE) {
+            return idleCountForRead;
+        }
+
+        if (status == IdleStatus.WRITER_IDLE) {
+            return idleCountForWrite;
+        }
+
+        throw new IllegalArgumentException("Unknown idle status: " + status);
+    }
+
+    public long getLastIdleTime(IdleStatus status) {
+        if (status == IdleStatus.BOTH_IDLE) {
+            return lastIdleTimeForBoth;
+        }
+
+        if (status == IdleStatus.READER_IDLE) {
+            return lastIdleTimeForRead;
+        }
+
+        if (status == IdleStatus.WRITER_IDLE) {
+            return lastIdleTimeForWrite;
+        }
+
+        throw new IllegalArgumentException("Unknown idle status: " + status);
+    }
+
+    private void increaseIdleCount(IdleStatus status, long currentTime) {
+        if (status == IdleStatus.BOTH_IDLE) {
+            idleCountForBoth++;
+            lastIdleTimeForBoth = currentTime;
+        } else if (status == IdleStatus.READER_IDLE) {
+            idleCountForRead++;
+            lastIdleTimeForRead = currentTime;
+        } else if (status == IdleStatus.WRITER_IDLE) {
+            idleCountForWrite++;
+            lastIdleTimeForWrite = currentTime;
+        } else {
+            throw new IllegalArgumentException("Unknown idle status: " + status);
+        }
+    }
+    
+    protected void notifyIdleness(long currentTime) {
+        updateThroughput(currentTime);
+        
+        synchronized (idlenessCheckLock) {
+            notifyIdleness(
+                    currentTime,
+                    getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                    IdleStatus.BOTH_IDLE, Math.max(
+                            getLastIoTime(),
+                            getLastIdleTime(IdleStatus.BOTH_IDLE)));
+            
+            notifyIdleness(
+                    currentTime,
+                    getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                    IdleStatus.READER_IDLE, Math.max(
+                            getLastReadTime(),
+                            getLastIdleTime(IdleStatus.READER_IDLE)));
+            
+            notifyIdleness(
+                    currentTime,
+                    getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                    IdleStatus.WRITER_IDLE, Math.max(
+                            getLastWriteTime(),
+                            getLastIdleTime(IdleStatus.WRITER_IDLE)));
+        }
+    }
+    
+    private void notifyIdleness(
+            long currentTime, long idleTime, IdleStatus status, long lastIoTime) {
+        if (idleTime > 0 && lastIoTime != 0
+                && currentTime - lastIoTime >= idleTime) {
+            increaseIdleCount(status, currentTime);
+            getListeners().fireServiceIdle(status);
+        }
+    }
+
+    
     public Set<WriteFuture> broadcast(Object message) {
         // Convert to Set.  We do not return a List here because only the 
         // direct caller of MessageBroadcaster knows the order of write

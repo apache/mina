@@ -372,7 +372,7 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
-            IdleStatusChecker.notifyIdleSessions(allSessions(), currentTime);
+            IdleStatusChecker.notifyIdleness(allSessions(), currentTime);
         }
     }
 

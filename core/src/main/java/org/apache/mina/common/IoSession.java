@@ -373,6 +373,26 @@ public interface IoSession {
     long getWrittenMessages();
 
     /**
+     * Returns the number of read bytes per second.
+     */
+    double getReadBytesThroughput();
+
+    /**
+     * Returns the number of written bytes per second.
+     */
+    double getWrittenBytesThroughput();
+    
+    /**
+     * Returns the number of read messages per second.
+     */
+    double getReadMessagesThroughput();
+    
+    /**
+     * Returns the number of written messages per second.
+     */
+    double getWrittenMessagesThroughput();
+    
+    /**
      * Returns the number of messages which are scheduled to be written to this session.
      */
     int getScheduledWriteMessages();

@@ -35,6 +35,11 @@ public interface IoServiceListener extends EventListener {
      * @param service the {@link IoService}
      */
     void serviceActivated(IoService service);
+    
+    /**
+     * Invoked when a service is idle.
+     */
+    void serviceIdle(IoService service, IdleStatus idleStatus);
 
     /**
      * Invoked when a service is deactivated by an {@link IoService}.

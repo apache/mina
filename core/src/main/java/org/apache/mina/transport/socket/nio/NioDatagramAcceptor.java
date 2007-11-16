@@ -582,7 +582,7 @@ public class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramA
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
-            IdleStatusChecker.notifyIdleSessions(
+            IdleStatusChecker.notifyIdleness(
                     getListeners().getManagedSessions().iterator(),
                     currentTime);
         }
