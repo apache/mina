@@ -410,37 +410,39 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         public void run() {
             thread = Thread.currentThread();
             
-            for (;;) {
-                Runnable task = fetchTask();
-                
-                idleWorkers.decrementAndGet();
-                
-                if (task == null) {
-                    synchronized (workers) {
-                        if (workers.size() > corePoolSize) {
-                            // Remove now to prevent duplicate exit.
-                            workers.remove(this);
-                            break;
+            try {
+                for (;;) {
+                    Runnable task = fetchTask();
+                    
+                    idleWorkers.decrementAndGet();
+                    
+                    if (task == null) {
+                        synchronized (workers) {
+                            if (workers.size() > corePoolSize) {
+                                // Remove now to prevent duplicate exit.
+                                workers.remove(this);
+                                break;
+                            }
                         }
                     }
+                    
+                    if (task == EXIT_SIGNAL) {
+                        break;
+                    }
+                    
+                    queueHandler.polled(UnorderedThreadPoolExecutor.this, (IoEvent) task);
+                    try {
+                        runTask(task);
+                    } finally {
+                        idleWorkers.incrementAndGet();
+                    }
                 }
-                
-                if (task == EXIT_SIGNAL) {
-                    break;
+            } finally {
+                synchronized (workers) {
+                    workers.remove(this);
+                    UnorderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount;
+                    workers.notifyAll();
                 }
-                
-                queueHandler.polled(UnorderedThreadPoolExecutor.this, (IoEvent) task);
-                try {
-                    runTask(task);
-                } finally {
-                    idleWorkers.incrementAndGet();
-                }
-            }
-            
-            synchronized (workers) {
-                workers.remove(this);
-                UnorderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount;
-                workers.notifyAll();
             }
         }
 

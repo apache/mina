@@ -467,37 +467,39 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         
         public void run() {
             thread = Thread.currentThread();
-            
-            for (;;) {
-                IoSession session = fetchSession();
-                
-                idleWorkers.decrementAndGet();
-                
-                if (session == null) {
-                    synchronized (workers) {
-                        if (workers.size() > corePoolSize) {
-                            // Remove now to prevent duplicate exit.
-                            workers.remove(this);
-                            break;
+
+            try {
+                for (;;) {
+                    IoSession session = fetchSession();
+                    
+                    idleWorkers.decrementAndGet();
+                    
+                    if (session == null) {
+                        synchronized (workers) {
+                            if (workers.size() > corePoolSize) {
+                                // Remove now to prevent duplicate exit.
+                                workers.remove(this);
+                                break;
+                            }
                         }
                     }
+                    
+                    if (session == EXIT_SIGNAL) {
+                        break;
+                    }
+                    
+                    try {
+                        runTasks(getSessionBuffer(session));
+                    } finally {
+                        idleWorkers.incrementAndGet();
+                    }
                 }
-                
-                if (session == EXIT_SIGNAL) {
-                    break;
+            } finally {
+                synchronized (workers) {
+                    workers.remove(this);
+                    OrderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount;
+                    workers.notifyAll();
                 }
-                
-                try {
-                    runTasks(getSessionBuffer(session));
-                } finally {
-                    idleWorkers.incrementAndGet();
-                }
-            }
-            
-            synchronized (workers) {
-                workers.remove(this);
-                OrderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount;
-                workers.notifyAll();
             }
         }
 
