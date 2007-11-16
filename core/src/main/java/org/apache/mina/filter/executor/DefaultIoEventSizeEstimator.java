@@ -56,6 +56,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         class2size.put(long.class, 8);
         class2size.put(float.class, 4);
         class2size.put(double.class, 8);
+        class2size.put(void.class, 0);
     }
     
     public int estimateSize(IoEvent event) {

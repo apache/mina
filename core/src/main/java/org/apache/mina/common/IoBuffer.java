@@ -19,12 +19,14 @@
  */
 package org.apache.mina.common;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.OutputStream;
+import java.io.StreamCorruptedException;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -41,8 +43,8 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
-
 
 /**
  * A byte buffer used by MINA applications.
@@ -150,8 +152,13 @@ import java.util.Set;
  */
 public abstract class IoBuffer implements Comparable<IoBuffer> {
     private static IoBufferAllocator allocator = new SimpleBufferAllocator();
-    private static final IoBuffer EMPTY_DIRECT_BUFFER = allocator.allocate(0, true);
-    private static final IoBuffer EMPTY_HEAP_BUFFER = allocator.allocate(0, false);
+
+    private static final IoBuffer EMPTY_DIRECT_BUFFER = allocator.allocate(0,
+            true);
+
+    private static final IoBuffer EMPTY_HEAP_BUFFER = allocator.allocate(0,
+            false);
+
     private static boolean useDirectBuffer = false;
 
     /**
@@ -222,13 +229,13 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      */
     public static IoBuffer allocate(int capacity, boolean direct) {
         if (capacity == 0) {
-            return direct? EMPTY_DIRECT_BUFFER : EMPTY_HEAP_BUFFER;
+            return direct ? EMPTY_DIRECT_BUFFER : EMPTY_HEAP_BUFFER;
         }
-        
+
         if (capacity < 0) {
             throw new IllegalArgumentException("capacity: " + capacity);
         }
-        
+
         return allocator.allocate(capacity, direct);
     }
 
@@ -252,7 +259,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public static IoBuffer wrap(byte[] byteArray, int offset, int length) {
         return wrap(ByteBuffer.wrap(byteArray, offset, length));
     }
-    
+
     /**
      * Normalizes the specified capacity of the buffer to power of 2,
      * which is often helpful for optimal memory usage and performance. 
@@ -262,16 +269,40 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     protected static int normalizeCapacity(int requestedCapacity) {
         switch (requestedCapacity) {
         case 0:
-        case 1 <<  0: case 1 <<  1: case 1 <<  2: case 1 <<  3: case 1 <<  4:
-        case 1 <<  5: case 1 <<  6: case 1 <<  7: case 1 <<  8: case 1 <<  9:
-        case 1 << 10: case 1 << 11: case 1 << 12: case 1 << 13: case 1 << 14:
-        case 1 << 15: case 1 << 16: case 1 << 17: case 1 << 18: case 1 << 19:
-        case 1 << 21: case 1 << 22: case 1 << 23: case 1 << 24: case 1 << 25:
-        case 1 << 26: case 1 << 27: case 1 << 28: case 1 << 29: case 1 << 30:
+        case 1 << 0:
+        case 1 << 1:
+        case 1 << 2:
+        case 1 << 3:
+        case 1 << 4:
+        case 1 << 5:
+        case 1 << 6:
+        case 1 << 7:
+        case 1 << 8:
+        case 1 << 9:
+        case 1 << 10:
+        case 1 << 11:
+        case 1 << 12:
+        case 1 << 13:
+        case 1 << 14:
+        case 1 << 15:
+        case 1 << 16:
+        case 1 << 17:
+        case 1 << 18:
+        case 1 << 19:
+        case 1 << 21:
+        case 1 << 22:
+        case 1 << 23:
+        case 1 << 24:
+        case 1 << 25:
+        case 1 << 26:
+        case 1 << 27:
+        case 1 << 28:
+        case 1 << 29:
+        case 1 << 30:
         case Integer.MAX_VALUE:
             return requestedCapacity;
         }
-        
+
         int newCapacity = 1;
         while (newCapacity < requestedCapacity) {
             newCapacity <<= 1;
@@ -281,15 +312,27 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
         }
         return newCapacity;
     }
-
+    
+    private static final Set<String> primitiveTypeNames = new HashSet<String>();
+    
+    static {
+        primitiveTypeNames.add("void");
+        primitiveTypeNames.add("boolean");
+        primitiveTypeNames.add("byte");
+        primitiveTypeNames.add("char");
+        primitiveTypeNames.add("short");
+        primitiveTypeNames.add("int");
+        primitiveTypeNames.add("long");
+        primitiveTypeNames.add("float");
+        primitiveTypeNames.add("double");
+    }
 
     /**
      * Creates a new instance.  This is an empty constructor.
-     *
      */
     protected IoBuffer() {
     }
-    
+
     /**
      * Declares this buffer and all its derived buffers are not used anymore
      * so that it can be reused by some {@link IoBufferAllocator} implementations.
@@ -302,12 +345,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Returns the underlying NIO buffer instance.
      */
     public abstract ByteBuffer buf();
-    
+
     /**
      * @see ByteBuffer#isDirect()
      */
     public abstract boolean isDirect();
-    
+
     /**
      * returns <tt>true</tt> if and only if this buffer is derived from other buffer
      * via {@link #duplicate()}, {@link #slice()} or {@link #asReadOnlyBuffer()}.
@@ -326,7 +369,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * of the buffer.
      */
     public abstract int minimumCapacity();
-    
+
     /**
      * Sets the minimum capacity of this buffer which is used to determine
      * the new capacity of the buffer shrunk by {@link #compact()} and
@@ -358,7 +401,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Turns on or off <tt>autoExpand</tt>.
      */
     public abstract IoBuffer setAutoExpand(boolean autoExpand);
-    
+
     /**
      * Returns <tt>true</tt> if and only if <tt>autoShrink</tt> is turned on.
      */
@@ -387,7 +430,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * <tt>true</tt>.
      */
     public abstract IoBuffer expand(int position, int expectedRemaining);
-    
+
     /**
      * Changes the capacity of this buffer so this buffer occupies as less
      * memory as possible while retaining the position, limit and the
@@ -396,7 +439,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * The mark is discarded once the capacity changes.
      */
     public abstract IoBuffer shrink();
-    
+
     /**
      * @see java.nio.Buffer#position()
      */
@@ -1746,10 +1789,22 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
                 @Override
                 protected ObjectStreamClass readClassDescriptor()
                         throws IOException, ClassNotFoundException {
-                    String className = readUTF();
-                    Class<?> clazz = Class
-                            .forName(className, true, classLoader);
-                    return ObjectStreamClass.lookup(clazz);
+                    int type = read();
+                    if (type < 0) {
+                        throw new EOFException();
+                    }
+                    switch (type) {
+                    case 0: // Primitive types
+                        return super.readClassDescriptor();
+                    case 1: // Non-primitive types
+                        String className = readUTF();
+                        Class<?> clazz =
+                            Class.forName(className, true, classLoader);
+                        return ObjectStreamClass.lookup(clazz);
+                    default:
+                        throw new StreamCorruptedException(
+                                "Unexpected class descriptor type: " + type);
+                    }
                 }
             };
             return in.readObject();
@@ -1771,7 +1826,14 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
                 @Override
                 protected void writeClassDescriptor(ObjectStreamClass desc)
                         throws IOException {
-                    writeUTF(desc.getName());
+                    String className = desc.getName();
+                    if (primitiveTypeNames.contains(className)) {
+                        write(0);
+                        super.writeClassDescriptor(desc);
+                    } else {
+                        write(1);
+                        writeUTF(desc.getName());
+                    }
                 }
             };
             out.writeObject(o);

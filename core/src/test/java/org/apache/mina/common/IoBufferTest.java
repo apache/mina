@@ -544,6 +544,7 @@ public class IoBufferTest extends TestCase {
         buf.setAutoExpand(true);
         List<Object> o = new ArrayList<Object>();
         o.add(new Date());
+        o.add(long.class);
 
         // Test writing an object.
         buf.putObject(o);
