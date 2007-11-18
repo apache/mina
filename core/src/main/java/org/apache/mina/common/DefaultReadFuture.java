@@ -46,7 +46,8 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
                 return null;
             }
             
-            if (v instanceof Throwable) {
+            if (v instanceof ExceptionHolder) {
+                v = ((ExceptionHolder) v).exception;
                 if (v instanceof RuntimeException) {
                     throw (RuntimeException) v;
                 }
@@ -73,7 +74,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     public boolean isRead() {
         if (isReady()) {
             Object v = getValue();
-            return (v != CLOSED && !(v instanceof Throwable));
+            return (v != CLOSED && !(v instanceof ExceptionHolder));
         }
         return false;
     }
@@ -88,8 +89,8 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     public Throwable getException() {
         if (isReady()) {
             Object v = getValue();
-            if (v instanceof Throwable) {
-                return (Throwable) v;
+            if (v instanceof ExceptionHolder) {
+                return ((ExceptionHolder) v).exception;
             }
         }
         return null;
@@ -104,7 +105,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     }
 
     public void setException(Throwable cause) {
-        setValue(cause);
+        setValue(new ExceptionHolder(cause));
     }
 
     @Override
@@ -125,5 +126,13 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     @Override
     public ReadFuture removeListener(IoFutureListener<?> listener) {
         return (ReadFuture) super.removeListener(listener);
+    }
+    
+    private static class ExceptionHolder {
+        private final Throwable exception;
+        
+        private ExceptionHolder(Throwable exception) {
+            this.exception = exception;
+        }
     }
 }
