@@ -39,9 +39,9 @@ public interface ConnectFuture extends IoFuture {
      * Returns {@link IoSession} which is the result of connect operation.
      *
      * @return <tt>null</tt> if the connect operation is not finished yet
-     * @throws RuntimeIoException if connection attempt failed by an exception
+     * @throws RuntimeException if connection attempt failed by an exception
      */
-    IoSession getSession() throws RuntimeIoException;
+    IoSession getSession();
 
     /**
      * Returns the cause of the connection failure.
