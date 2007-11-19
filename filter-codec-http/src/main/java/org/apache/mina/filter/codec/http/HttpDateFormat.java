@@ -30,7 +30,7 @@ import java.util.TimeZone;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class HttpDateFormat {
+class HttpDateFormat {
 
     /**
      * By default, we update the format if it is more than a second old

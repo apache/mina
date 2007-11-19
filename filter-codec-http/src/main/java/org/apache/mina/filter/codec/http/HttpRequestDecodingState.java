@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class HttpRequestDecodingState extends DecodingStateMachine {
+abstract class HttpRequestDecodingState extends DecodingStateMachine {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(HttpRequestDecodingState.class);
@@ -82,9 +82,6 @@ public abstract class HttpRequestDecodingState extends DecodingStateMachine {
     private MutableHttpRequest request;
 
     private boolean parseCookies = true;
-
-    public HttpRequestDecodingState() {
-    }
 
     public boolean isParseCookies() {
         return parseCookies;

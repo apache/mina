@@ -78,9 +78,6 @@ abstract class ChunkedBodyDecodingState extends DecodingStateMachine {
 
     private boolean chunkHasExtension;
 
-    ChunkedBodyDecodingState() {
-    }
-
     @Override
     protected void destroy() throws Exception {
     }

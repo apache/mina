@@ -26,10 +26,10 @@ import java.util.Comparator;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class HttpHeaderNameComparator implements Comparator<String>, Serializable {
+class HttpHeaderNameComparator implements Comparator<String>, Serializable {
     private static final long serialVersionUID = -3781572057321507963L;
 
-    public static final HttpHeaderNameComparator INSTANCE = new HttpHeaderNameComparator();
+    static final HttpHeaderNameComparator INSTANCE = new HttpHeaderNameComparator();
 
     public int compare(String o1, String o2) {
         return o1.compareToIgnoreCase(o2);
