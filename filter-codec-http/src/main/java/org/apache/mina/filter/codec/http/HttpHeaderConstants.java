@@ -83,6 +83,16 @@ public class HttpHeaderConstants {
      * The "date" header
      */
     public static final String KEY_DATE = "Date";
+    
+    /**
+     * The "set-cookie" header.
+     */
+    public static final String KEY_SET_COOKIE = "Set-Cookie";
+
+    /**
+     * The "host" header.
+     */
+    public static final String KEY_HOST = "Host";
 
     private HttpHeaderConstants() {
     }

@@ -20,7 +20,6 @@
 package org.apache.mina.filter.codec.http;
 
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.common.IoBuffer;
@@ -43,13 +42,10 @@ import org.apache.mina.filter.codec.statemachine.LinearWhitespaceSkippingState;
  */
 abstract class HttpRequestLineDecodingState extends DecodingStateMachine {
 
-    private static final Charset US_ASCII = Charset.forName("US-ASCII");
-
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
-
-    private final CharsetDecoder asciiDecoder = US_ASCII.newDecoder();
-
-    private final CharsetDecoder utf8Decoder = UTF_8.newDecoder();
+    private final CharsetDecoder asciiDecoder = 
+        HttpCodecUtils.US_ASCII_CHARSET.newDecoder();
+    private final CharsetDecoder defaultDecoder = 
+        HttpCodecUtils.DEFAULT_CHARSET.newDecoder();
 
     @Override
     protected DecodingState init() throws Exception {
@@ -89,7 +85,7 @@ abstract class HttpRequestLineDecodingState extends DecodingStateMachine {
         @Override
         protected DecodingState finishDecode(IoBuffer product,
                 ProtocolDecoderOutput out) throws Exception {
-            out.write(new URI(product.getString(utf8Decoder)));
+            out.write(new URI(product.getString(defaultDecoder)));
             return AFTER_READ_REQUEST_URI;
         }
     };

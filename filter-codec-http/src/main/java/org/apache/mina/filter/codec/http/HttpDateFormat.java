@@ -67,7 +67,8 @@ class HttpDateFormat {
 
     private HttpDateFormat() {
         // HTTP date format specifies GMT
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone(
+                HttpCodecUtils.DEFAULT_TIME_ZONE_NAME));
     }
 
     /**

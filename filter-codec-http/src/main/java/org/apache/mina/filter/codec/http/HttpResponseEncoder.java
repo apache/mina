@@ -20,7 +20,6 @@
 package org.apache.mina.filter.codec.http;
 
 import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 import org.apache.mina.common.IoBuffer;
@@ -35,8 +34,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  */
 public class HttpResponseEncoder implements ProtocolEncoder {
 
-    private static final Charset US_ASCII = Charset.forName("US-ASCII");
-    private final CharsetEncoder asciiEncoder = US_ASCII.newEncoder();
+    private final CharsetEncoder asciiEncoder = HttpCodecUtils.US_ASCII_CHARSET.newEncoder();
 
     public void encode(IoSession session, Object message,
             ProtocolEncoderOutput out) throws Exception {

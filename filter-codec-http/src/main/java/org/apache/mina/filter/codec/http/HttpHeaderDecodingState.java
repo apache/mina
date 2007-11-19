@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filter.codec.http;
 
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,13 +43,11 @@ import org.apache.mina.filter.codec.statemachine.LinearWhitespaceSkippingState;
  * @version $Rev$, $Date$
  */
 abstract class HttpHeaderDecodingState extends DecodingStateMachine {
-    private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
-
-    private final CharsetDecoder asciiDecoder = US_ASCII.newDecoder();
-
-    private final CharsetDecoder utf8Decoder = UTF_8.newDecoder();
+    private final CharsetDecoder asciiDecoder =
+        HttpCodecUtils.US_ASCII_CHARSET.newDecoder();
+    private final CharsetDecoder defaultDecoder =
+        HttpCodecUtils.DEFAULT_CHARSET.newDecoder();
 
     private Map<String, List<String>> headers = new HashMap<String, List<String>>();
 
@@ -108,7 +105,7 @@ abstract class HttpHeaderDecodingState extends DecodingStateMachine {
         @Override
         protected DecodingState finishDecode(IoBuffer product,
                 ProtocolDecoderOutput out) throws Exception {
-            String value = product.getString(utf8Decoder);
+            String value = product.getString(defaultDecoder);
             if (lastHeaderValue.length() == 0) {
                 lastHeaderValue.append(value);
             } else {

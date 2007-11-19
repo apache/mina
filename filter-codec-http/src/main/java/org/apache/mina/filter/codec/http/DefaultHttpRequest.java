@@ -278,7 +278,8 @@ public class DefaultHttpRequest extends DefaultHttpMessage implements
         protected DateFormat initialValue() {
             SimpleDateFormat format = new SimpleDateFormat(
                     "EEE, dd-MMM-yyyy HH:mm:ss z", Locale.US);
-            format.setTimeZone(TimeZone.getTimeZone("GMT"));
+            format.setTimeZone(TimeZone.getTimeZone(
+                    HttpCodecUtils.DEFAULT_TIME_ZONE_NAME));
             return format;
         }
 
@@ -354,7 +355,7 @@ public class DefaultHttpRequest extends DefaultHttpMessage implements
         Set<Cookie> cookies = getCookies();
         if (!cookies.isEmpty()) {
             // Clear previous values.
-            removeHeader("Set-Cookie");
+            removeHeader(HttpHeaderConstants.KEY_SET_COOKIE);
             
             // And encode.
             for (Cookie c: cookies) {
@@ -392,12 +393,12 @@ public class DefaultHttpRequest extends DefaultHttpMessage implements
                 
                 buf.append(';');
                 
-                addHeader("Set-Cookie", buf.toString());
+                addHeader(HttpHeaderConstants.KEY_SET_COOKIE, buf.toString());
             }
         }
         
         // Add the Host header.
-        if (!containsHeader("Host")) {
+        if (!containsHeader(HttpHeaderConstants.KEY_HOST)) {
             URI uri = getRequestUri();
             String host = uri.getHost();
             if (host != null) {
@@ -405,9 +406,9 @@ public class DefaultHttpRequest extends DefaultHttpMessage implements
                      uri.getPort() != 80 && uri.getPort() > 0) ||
                     (uri.getScheme().equalsIgnoreCase("https") &&
                      uri.getPort() != 443 && uri.getPort() > 0)) {
-                    setHeader("Host", host + ':' + uri.getPort());
+                    setHeader(HttpHeaderConstants.KEY_HOST, host + ':' + uri.getPort());
                 } else {
-                    setHeader("Host", host);
+                    setHeader(HttpHeaderConstants.KEY_HOST, host);
                 }
             }
         }

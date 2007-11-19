@@ -129,11 +129,11 @@ public class DefaultHttpMessage implements MutableHttpMessage {
     }
 
     public String getContentType() {
-        return getHeader("Content-Type");
+        return getHeader(HttpHeaderConstants.KEY_CONTENT_TYPE);
     }
 
     public void setContentType(String type) {
-        setHeader("Content-Type", type);
+        setHeader(HttpHeaderConstants.KEY_CONTENT_TYPE, type);
     }
 
     public boolean isKeepAlive() {

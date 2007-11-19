@@ -21,6 +21,7 @@ package org.apache.mina.filter.codec.http;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +38,13 @@ import org.slf4j.LoggerFactory;
  */
 class HttpCodecUtils {
 
-    /**
-     * The default charset we employ
-     */
-    public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
-
+    public static final String DEFAULT_CHARSET_NAME = "UTF-8";
+    public static final Charset DEFAULT_CHARSET =
+        Charset.forName(DEFAULT_CHARSET_NAME);
     public static final String US_ASCII_CHARSET_NAME = "US-ASCII";
+    public static final Charset US_ASCII_CHARSET =
+        Charset.forName(US_ASCII_CHARSET_NAME);
+    public static final String DEFAULT_TIME_ZONE_NAME = "GMT";
 
     /**
      * Ampersand character
@@ -322,7 +324,9 @@ class HttpCodecUtils {
         try {
             for (Map.Entry<String, List<String>> header : message.getHeaders()
                     .entrySet()) {
-                byte[] key = header.getKey().getBytes("US-ASCII");
+                byte[] key = header.getKey().getBytes(
+                        HttpCodecUtils.US_ASCII_CHARSET_NAME);
+
                 for (String value : header.getValue()) {
                     buffer.put(key);
                     buffer.put((byte) ':');
@@ -332,7 +336,9 @@ class HttpCodecUtils {
                 }
             }
         } catch (UnsupportedEncodingException e) {
-            throw new InternalError("US-ASCII should be available.");
+            throw new InternalError(
+                    HttpCodecUtils.US_ASCII_CHARSET_NAME + 
+                    " should be available.");
         }
 
         HttpCodecUtils.appendCRLF(buffer);

@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filter.codec.http;
 
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.common.IoBuffer;
@@ -35,8 +34,7 @@ import org.apache.mina.filter.codec.statemachine.DecodingState;
  */
 abstract class HttpVersionDecodingState implements DecodingState {
 
-    private static final Charset US_ASCII = Charset.forName("US-ASCII");
-    private final CharsetDecoder asciiDecoder = US_ASCII.newDecoder();
+    private final CharsetDecoder asciiDecoder = HttpCodecUtils.US_ASCII_CHARSET.newDecoder();
     
     private final DecodingState READ_PROTOCOL_VERSION = new ConsumeToDynamicTerminatorDecodingState() {
         @Override
