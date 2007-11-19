@@ -31,7 +31,7 @@ import org.apache.mina.filter.codec.statemachine.StateMachineProtocolDecoder;
  */
 public class HttpRequestDecoder extends StateMachineProtocolDecoder {
     public HttpRequestDecoder() {
-        super(new HttpResponseDecodingState() {
+        super(new HttpRequestDecodingState() {
             @Override
             protected DecodingState finishDecode(List<Object> childProducts,
                     ProtocolDecoderOutput out) throws Exception {
