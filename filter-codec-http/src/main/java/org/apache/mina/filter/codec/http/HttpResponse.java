@@ -19,39 +19,23 @@
  */
 package org.apache.mina.filter.codec.http;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import org.apache.mina.common.IoBuffer;
 
 /**
- * Base message type of {@link HttpRequest} and {@link HttpResponse}.
+ * Represents a response to an <code>HttpRequest</code>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface HttpMessage extends Serializable {
-
-    /**
-     * Returns the version of the protocol associated with this request.
-     */
-    HttpVersion getProtocolVersion();
-
-    /**
-     * Gets the <tt>Content-Type</tt> header of the request.
-     * @return The content type.
-     */
-    String getContentType();
-
-    /**
-     * Returns <tt>true</tt> if this message enables keep-alive connection.
-     */
-    boolean isKeepAlive();
+public interface HttpResponse extends HttpMessage {
 
     /**
      * Returns the value of the HTTP header with the specified name.
      * If more than one header with the given name is associated with
-     * this request, one is selected and returned.
+     * this response, one is selected and returned.
      *
      * @param name  The name of the desired header
      * @return      The header value - or null if no header is found
@@ -60,24 +44,33 @@ public interface HttpMessage extends Serializable {
     String getHeader(String name);
 
     /**
-     * Returns <tt>true</tt> if the HTTP header with the specified name exists in this request.
+     * Returns <tt>true</tt> if the HTTP header with the specified name exists in this response.
      */
     boolean containsHeader(String name);
 
     /**
-     * Returns a read-only {@link Map} of HTTP headers whose key is a {@link String} and whose value
+     * Returns the {@link Map} of HTTP headers whose key is a {@link String} and whose value
      * is a {@link List} of {@link String}s.
      */
     Map<String, List<String>> getHeaders();
 
     /**
-     * Returns a read-only {@link Map} of cookies whose key is a {@link String} and whose value is
-     * a {@link Cookie}.
+     * Returns the Content-Type header of the response.
      */
-    Set<Cookie> getCookies();
+    String getContentType();
 
     /**
-     * Returns the content of the request body.
+     * Returns the status of this response
      */
-    Object getContent();
+    HttpResponseStatus getStatus();
+
+    /**
+     * Returns the reason phrase which is associated with the current status of this response.
+     */
+    String getStatusReasonPhrase();
+
+    /**
+     * Returns the content of the response body.
+     */
+    IoBuffer getContent();
 }

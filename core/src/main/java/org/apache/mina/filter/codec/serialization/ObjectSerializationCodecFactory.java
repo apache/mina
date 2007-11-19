@@ -20,6 +20,7 @@
 package org.apache.mina.filter.codec.serialization;
 
 import org.apache.mina.common.BufferDataException;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
@@ -53,11 +54,11 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory {
         decoder = new ObjectSerializationDecoder(classLoader);
     }
 
-    public ProtocolEncoder getEncoder() {
+    public ProtocolEncoder getEncoder(IoSession session) {
         return encoder;
     }
 
-    public ProtocolDecoder getDecoder() {
+    public ProtocolDecoder getDecoder(IoSession session) {
         return decoder;
     }
 

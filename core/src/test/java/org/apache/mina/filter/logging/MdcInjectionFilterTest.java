@@ -332,7 +332,7 @@ public class MdcInjectionFilterTest extends TestCase {
 
     private static class DummyProtocolCodecFactory implements ProtocolCodecFactory {
 
-        public ProtocolEncoder getEncoder() throws Exception {
+        public ProtocolEncoder getEncoder(IoSession session) throws Exception {
             return new ProtocolEncoderAdapter() {
                 public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
                     logger.info("encode");
@@ -342,7 +342,7 @@ public class MdcInjectionFilterTest extends TestCase {
             };
         }
 
-        public ProtocolDecoder getDecoder() throws Exception {
+        public ProtocolDecoder getDecoder(IoSession session) throws Exception {
             return new ProtocolDecoderAdapter() {
                 public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
                     if (in.remaining() >= 4) {

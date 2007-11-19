@@ -21,9 +21,7 @@ package org.apache.mina.protocol.http.client;
 
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.http.HttpResponseDecoder;
-import org.apache.mina.filter.codec.http.HttpResponseMessage;
+import org.apache.mina.filter.codec.http.HttpResponse;
 
 public class HttpIoHandler extends IoHandlerAdapter {
     private AsyncHttpClientCallback callback;
@@ -40,26 +38,18 @@ public class HttpIoHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession ioSession, Object object)
             throws Exception {
-        HttpResponseMessage message = (HttpResponseMessage) object;
+        HttpResponse message = (HttpResponse) object;
         callback.onResponse(message);
     }
 
     @Override
     public void exceptionCaught(IoSession ioSession, Throwable throwable)
             throws Exception {
-        cleanup(ioSession);
         callback.onException(throwable);
     }
 
     @Override
     public void sessionClosed(IoSession ioSession) throws Exception {
-        cleanup(ioSession);
         callback.onClosed();
-    }
-
-    private void cleanup(IoSession ioSession) throws Exception {
-        // Clean up if any in-proccess decoding was occurring
-        ProtocolCodecFilter codecFilter = (ProtocolCodecFilter) ioSession.getFilterChain().get("protocolFilter");
-        ((HttpResponseDecoder) codecFilter.getDecoder(ioSession)).finishDecode(ioSession, null);
     }
 }

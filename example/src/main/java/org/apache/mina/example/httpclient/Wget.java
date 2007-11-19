@@ -20,10 +20,12 @@
 
 package org.apache.mina.example.httpclient;
 
+import java.net.URI;
 import java.net.URL;
 
-import org.apache.mina.filter.codec.http.HttpRequestMessage;
-import org.apache.mina.filter.codec.http.HttpResponseMessage;
+import org.apache.mina.filter.codec.http.DefaultHttpRequest;
+import org.apache.mina.filter.codec.http.HttpResponse;
+import org.apache.mina.filter.codec.http.MutableHttpRequest;
 import org.apache.mina.protocol.http.client.AsyncHttpClient;
 import org.apache.mina.protocol.http.client.AsyncHttpClientCallback;
 
@@ -59,7 +61,8 @@ public class Wget {
             path = url.getPath();
         }
 
-        HttpRequestMessage request = new HttpRequestMessage(path);
+        MutableHttpRequest request = new DefaultHttpRequest();
+        request.setRequestUri(new URI(path));
         AsyncHttpClient ahc = new AsyncHttpClient(url, callback);
         ahc.connect();
         ahc.sendRequest(request);
@@ -72,8 +75,8 @@ public class Wget {
             throw new Exception(callback.getThrowable());
         }
 
-        HttpResponseMessage msg = callback.getMessage();
-        System.out.println(msg.getStringContent());
+        HttpResponse msg = callback.getMessage();
+        System.out.println(msg.getContent());
     }
 
     class WgetCallback implements AsyncHttpClientCallback {
@@ -84,7 +87,7 @@ public class Wget {
 
         private Throwable throwable = null;
 
-        private HttpResponseMessage message = null;
+        private HttpResponse message = null;
 
         public WgetCallback() {
             clear();
@@ -93,9 +96,9 @@ public class Wget {
         /**
          * What to do when a response has come from the server
          *
-         * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onResponse(org.apache.mina.filter.codec.http.HttpResponseMessage)
+         * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onResponse(HttpResponse)
          */
-        public void onResponse(HttpResponseMessage message) {
+        public void onResponse(HttpResponse message) {
             this.message = message;
             synchronized (semaphore) {
                 semaphore.notify();
@@ -105,7 +108,7 @@ public class Wget {
         /**
          * What to do when an exception has been thrown
          *
-         * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onException(java.lang.Throwable)
+         * @see org.apache.mina.protocol.http.client.AsyncHttpClientCallback#onException(Throwable)
          */
         public void onException(Throwable cause) {
             throwable = cause;
@@ -164,11 +167,11 @@ public class Wget {
             this.exception = exception;
         }
 
-        public HttpResponseMessage getMessage() {
+        public HttpResponse getMessage() {
             return message;
         }
 
-        public void setMessage(HttpResponseMessage message) {
+        public void setMessage(HttpResponse message) {
             this.message = message;
         }
     }

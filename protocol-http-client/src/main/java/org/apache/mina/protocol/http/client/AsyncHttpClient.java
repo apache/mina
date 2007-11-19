@@ -29,8 +29,9 @@ import javax.net.ssl.SSLContext;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.http.HttpProtocolCodecFactory;
-import org.apache.mina.filter.codec.http.HttpRequestMessage;
+import org.apache.mina.filter.codec.http.HttpCodecFactory;
+import org.apache.mina.filter.codec.http.HttpRequest;
+import org.apache.mina.filter.codec.http.MutableHttpRequest;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
@@ -77,7 +78,7 @@ public class AsyncHttpClient {
         }
 
         connector.getFilterChain().addLast("protocolFilter",
-                new ProtocolCodecFilter(new HttpProtocolCodecFactory(url)));
+                new ProtocolCodecFilter(new HttpCodecFactory()));
         connector.setHandler(new HttpIoHandler(callback));
         ConnectFuture future = connector.connect(new InetSocketAddress(url
                 .getHost(), port));
@@ -95,7 +96,10 @@ public class AsyncHttpClient {
         session = null;
     }
 
-    public void sendRequest(HttpRequestMessage message) {
+    public void sendRequest(HttpRequest message) {
+        if (message instanceof MutableHttpRequest) {
+            ((MutableHttpRequest) message).normalize();
+        }
         session.write(message);
     }
 

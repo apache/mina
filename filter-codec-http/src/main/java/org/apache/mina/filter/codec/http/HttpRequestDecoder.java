@@ -29,8 +29,8 @@ import org.apache.mina.filter.codec.statemachine.StateMachineProtocolDecoder;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$, $Date$
  */
-public class HttpResponseDecoder extends StateMachineProtocolDecoder {
-    public HttpResponseDecoder() {
+public class HttpRequestDecoder extends StateMachineProtocolDecoder {
+    public HttpRequestDecoder() {
         super(new HttpResponseDecodingState() {
             @Override
             protected DecodingState finishDecode(List<Object> childProducts,

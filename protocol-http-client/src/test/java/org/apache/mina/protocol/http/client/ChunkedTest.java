@@ -19,14 +19,12 @@
  */
 package org.apache.mina.protocol.http.client;
 
-import java.util.Arrays;
-
 import junit.framework.TestCase;
 
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
+import org.apache.mina.filter.codec.http.HttpResponse;
 import org.apache.mina.filter.codec.http.HttpResponseDecoder;
-import org.apache.mina.filter.codec.http.HttpResponseMessage;
 
 public class ChunkedTest extends TestCase {
 
@@ -51,10 +49,11 @@ public class ChunkedTest extends TestCase {
         HttpResponseDecoder decoder = new HttpResponseDecoder();
         decoder.decode(session, buffer, session.getDecoderOutput());
 
-        HttpResponseMessage response = (HttpResponseMessage) session
+        HttpResponse response = (HttpResponse) session
                 .getDecoderOutputQueue().poll();
-        assertTrue(Arrays.equals(response.getContent(),
-                "abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes()));
+        assertEquals(
+                IoBuffer.wrap("abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes()),
+                response.getContent());
     }
 
     public void testChunkingContinue() throws Exception {
@@ -66,10 +65,10 @@ public class ChunkedTest extends TestCase {
         HttpResponseDecoder decoder = new HttpResponseDecoder();
         decoder.decode(session, buffer, session.getDecoderOutput());
 
-        HttpResponseMessage response = (HttpResponseMessage) session
+        HttpResponse response = (HttpResponse) session
                 .getDecoderOutputQueue().poll();
-        assertTrue(Arrays.equals(response.getContent(),
-                "abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes()));
+        assertEquals(
+                IoBuffer.wrap("abcdefghijklmnopqrstuvwxyz1234567890abcdef".getBytes()),
+                response.getContent());
     }
-
 }

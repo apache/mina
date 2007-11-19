@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filter.codec.demux;
 
+import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
@@ -42,11 +43,11 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     public DemuxingProtocolCodecFactory() {
     }
 
-    public ProtocolEncoder getEncoder() throws Exception {
+    public ProtocolEncoder getEncoder(IoSession session) throws Exception {
         return encoder;
     }
 
-    public ProtocolDecoder getDecoder() throws Exception {
+    public ProtocolDecoder getDecoder(IoSession session) throws Exception {
         return decoder;
     }
     

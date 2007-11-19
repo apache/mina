@@ -21,11 +21,16 @@ package org.apache.mina.protocol.http.client;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
+import java.nio.charset.Charset;
 
-import org.apache.mina.filter.codec.http.HttpRequestMessage;
-import org.apache.mina.filter.codec.http.HttpResponseMessage;
+import org.apache.mina.common.IoBuffer;
+import org.apache.mina.filter.codec.http.DefaultHttpRequest;
+import org.apache.mina.filter.codec.http.HttpMethod;
+import org.apache.mina.filter.codec.http.HttpRequest;
+import org.apache.mina.filter.codec.http.HttpResponse;
+import org.apache.mina.filter.codec.http.MutableHttpRequest;
 
 public class AsyncHttpClientTest extends AbstractTest {
 
@@ -33,18 +38,18 @@ public class AsyncHttpClientTest extends AbstractTest {
 
     public void testHtmlConnection() throws Exception {
         TestCallback callback = new TestCallback();
-        doGetConnection(callback, "http://localhost:8282", "/", false);
+        doGetConnection(callback, "http://localhost:8282/", false);
 
-        HttpResponseMessage msg = callback.getMessage();
-        assertEquals("\nHello World!", msg.getStringContent());
+        HttpResponse msg = callback.getMessage();
+        assertEquals("\nHello World!", msg.getContent().getString(Charset.forName("UTF-8").newDecoder()));
     }
 
     public void testSSLHtmlConnection() throws Exception {
         TestCallback callback = new TestCallback();
-        doGetConnection(callback, "https://localhost:8383", "/", false);
+        doGetConnection(callback, "https://localhost:8383/", false);
 
-        HttpResponseMessage msg = callback.getMessage();
-        assertEquals("\nHello World!", msg.getStringContent());
+        HttpResponse msg = callback.getMessage();
+        assertEquals("\nHello World!", msg.getContent().getString(Charset.forName("UTF-8").newDecoder()));
     }
 
     public void testBinaryRequest() throws Exception {
@@ -56,12 +61,12 @@ public class AsyncHttpClientTest extends AbstractTest {
         fis.read(realFile);
 
         TestCallback callback = new TestCallback();
-        doGetConnection(callback, "http://localhost:8282", "/pwrd_apache.gif",
+        doGetConnection(callback, "http://localhost:8282/pwrd_apache.gif",
                 false);
 
-        HttpResponseMessage msg = callback.getMessage();
+        HttpResponse msg = callback.getMessage();
 
-        assertTrue(Arrays.equals(realFile, msg.getContent()));
+        assertEquals(IoBuffer.wrap(realFile), msg.getContent());
     }
 
     public void testSSLBinaryRequest() throws Exception {
@@ -73,50 +78,52 @@ public class AsyncHttpClientTest extends AbstractTest {
         fis.read(realFile);
 
         TestCallback callback = new TestCallback();
-        doGetConnection(callback, "https://localhost:8383", "/pwrd_apache.gif",
+        doGetConnection(callback, "https://localhost:8383/pwrd_apache.gif",
                 false);
 
-        HttpResponseMessage msg = callback.getMessage();
+        HttpResponse msg = callback.getMessage();
 
-        assertTrue(Arrays.equals(realFile, msg.getContent()));
+        assertEquals(IoBuffer.wrap(realFile), msg.getContent());
     }
 
     public void testGetParameters() throws Exception {
         TestCallback callback = new TestCallback();
-        doGetConnection(callback, "http://localhost:8282", "/params.jsp", false);
+        doGetConnection(callback, "http://localhost:8282/params.jsp", false);
 
-        HttpResponseMessage msg = callback.getMessage();
-        assertEquals("Test One Test Two", msg.getStringContent());
+        HttpResponse msg = callback.getMessage();
+        assertEquals("Test One Test Two", msg.getContent().getString(Charset.forName("UTF-8").newDecoder()));
     }
 
     public void testPostParameters() throws Exception {
         TestCallback callback = new TestCallback();
-        doPostConnection(callback, "http://localhost:8282", "/params.jsp",
+        doPostConnection(callback, "http://localhost:8282/params.jsp",
                 false);
 
-        HttpResponseMessage msg = callback.getMessage();
-        assertEquals("Test One Test Two", msg.getStringContent());
+        HttpResponse msg = callback.getMessage();
+        assertEquals("Test One Test Two", msg.getContent().getString(Charset.forName("UTF-8").newDecoder()));
     }
 
-    private void doGetConnection(TestCallback callback, String url, String uri,
+    private void doGetConnection(TestCallback callback, String url,
             boolean testForException) throws Exception {
-        HttpRequestMessage request = new HttpRequestMessage(uri);
+        MutableHttpRequest request = new DefaultHttpRequest();
+        request.setRequestUri(new URI(url));
         request.setParameter("TEST1", "Test One");
         request.setParameter("TEST2", "Test Two");
         doConnection(callback, url, request, testForException);
     }
 
     private void doPostConnection(TestCallback callback, String url,
-            String uri, boolean testForException) throws Exception {
-        HttpRequestMessage request = new HttpRequestMessage(uri);
+            boolean testForException) throws Exception {
+        MutableHttpRequest request = new DefaultHttpRequest();
+        request.setRequestUri(new URI(url));
         request.setParameter("TEST1", "Test One");
         request.setParameter("TEST2", "Test Two");
-        request.setRequestMethod(HttpRequestMessage.REQUEST_POST);
+        request.setMethod(HttpMethod.POST);
         doConnection(callback, url, request, testForException);
     }
 
     private void doConnection(TestCallback callback, String url,
-            HttpRequestMessage request, boolean testForException)
+            HttpRequest request, boolean testForException)
             throws Exception {
         URL url_connect = new URL(url);
 
@@ -148,13 +155,13 @@ public class AsyncHttpClientTest extends AbstractTest {
 
         private Throwable throwable = null;
 
-        private HttpResponseMessage message = null;
+        private HttpResponse message = null;
 
         public TestCallback() {
             clear();
         }
 
-        public void onResponse(HttpResponseMessage message) {
+        public void onResponse(HttpResponse message) {
             this.message = message;
             synchronized (semaphore) {
                 semaphore.notify();
@@ -202,11 +209,11 @@ public class AsyncHttpClientTest extends AbstractTest {
             this.exception = exception;
         }
 
-        public HttpResponseMessage getMessage() {
+        public HttpResponse getMessage() {
             return message;
         }
 
-        public void setMessage(HttpResponseMessage message) {
+        public void setMessage(HttpResponse message) {
             this.message = message;
         }
     }

@@ -1,116 +1,84 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
  *
  */
 package org.apache.mina.filter.codec.http;
 
-import java.util.Date;
+import java.io.Serializable;
 
 /**
- * TODO Cookie.
+ * An HTTP cookie.
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
- * @version $Rev$, $Date$
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev: 592337 $, $Date: 2007-11-06 17:59:36 +0900 (화, 06 11월 2007) $
  */
-public class Cookie {
+public interface Cookie extends Serializable, Comparable<Cookie> {
 
-    private String comment;
+    /**
+     * Returns the cookie version number. The default (if not specified) is 0
+     *
+     * @return  The version number
+     */
+    int getVersion();
 
-    private String domain;
+    /**
+     * Returns the name of this cookie
+     *
+     * @return  The cookie name
+     */
+    String getName();
 
-    private String name;
+    /**
+     * Returns the value of this cookie
+     *
+     * @return  The cookie value - or <code>null</code> if this cookie does not have
+     *          a value
+     */
+    String getValue();
 
-    private String value;
+    /**
+     * Returns the domain of this cookie.
+     */
+    String getDomain();
 
-    private String path;
+    /**
+     * Returns the path on the server to which the client returns this cookie.
+     *
+     * @return  The path
+     */
+    String getPath();
 
-    private boolean secure;
+    /**
+     * Returns if this cookie is marked as "secure".
+     * Secure cookies should be sent back by a client over a transport as least as
+     * secure as that upon which they were received
+     */
+    boolean isSecure();
 
-    private int version = 0;
+    /**
+     * Returns the maximum age of this cookie in seconds.
+     */
+    int getMaxAge();
 
-    private Date expires;
-
-    public Cookie(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public boolean isSecure() {
-        return secure;
-    }
-
-    public void setSecure(boolean secure) {
-        this.secure = secure;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
-    public Date getExpires() {
-        return expires;
-    }
-
-    public void setExpires(Date expires) {
-        this.expires = expires;
-    }
+    /**
+     * Returns the comment of this cookie.  Comments are not supported by version 0 cookies.
+     *
+     * @return <tt>null</tt> if no comment is specified
+     */
+    String getComment();
 }

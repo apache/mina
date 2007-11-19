@@ -19,34 +19,19 @@
  */
 package org.apache.mina.filter.codec.http;
 
-import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.filter.codec.ProtocolDecoder;
+import java.io.Serializable;
+import java.util.Comparator;
 
-import java.net.URL;
+public class HttpHeaderNameComparator implements Comparator<String>, Serializable {
+    private static final long serialVersionUID = -3781572057321507963L;
 
-/**
- * TODO HttpProtocolCodecFactory.
- *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
- * @version $Rev$, $Date$
- */
-public class HttpProtocolCodecFactory implements ProtocolCodecFactory {
+    public static final HttpHeaderNameComparator INSTANCE = new HttpHeaderNameComparator();
 
-    private final ProtocolEncoder encoder;
-
-    private final ProtocolDecoder decoder;
-
-    public HttpProtocolCodecFactory(URL url) {
-        encoder = new HttpRequestEncoder(url);
-        decoder = new HttpResponseDecoder();
+    public int compare(String o1, String o2) {
+        return o1.compareToIgnoreCase(o2);
     }
 
-    public ProtocolEncoder getEncoder() throws Exception {
-        return encoder;
-    }
-
-    public ProtocolDecoder getDecoder() throws Exception {
-        return decoder;
+    private Object readResolve() {
+        return INSTANCE;
     }
 }

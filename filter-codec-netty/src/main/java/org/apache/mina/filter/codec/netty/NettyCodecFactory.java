@@ -22,6 +22,7 @@ package org.apache.mina.filter.codec.netty;
 import net.gleamynode.netty2.Message;
 import net.gleamynode.netty2.MessageRecognizer;
 
+import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 
 /**
@@ -44,11 +45,11 @@ public class NettyCodecFactory implements ProtocolCodecFactory {
         this.recognizer = recognizer;
     }
 
-    public org.apache.mina.filter.codec.ProtocolEncoder getEncoder() {
+    public org.apache.mina.filter.codec.ProtocolEncoder getEncoder(IoSession session) {
         return ENCODER;
     }
 
-    public org.apache.mina.filter.codec.ProtocolDecoder getDecoder() {
+    public org.apache.mina.filter.codec.ProtocolDecoder getDecoder(IoSession session) {
         return new NettyDecoder(recognizer);
     }
 }

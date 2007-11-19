@@ -71,11 +71,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         this.factory = new ProtocolCodecFactory() {
-            public ProtocolEncoder getEncoder() {
+            public ProtocolEncoder getEncoder(IoSession session) {
                 return encoder;
             }
 
-            public ProtocolDecoder getDecoder() {
+            public ProtocolDecoder getDecoder(IoSession session) {
                 return decoder;
             }
         };
@@ -112,11 +112,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         this.factory = new ProtocolCodecFactory() {
-            public ProtocolEncoder getEncoder() throws Exception {
+            public ProtocolEncoder getEncoder(IoSession session) throws Exception {
                 return encoderClass.newInstance();
             }
 
-            public ProtocolDecoder getDecoder() throws Exception {
+            public ProtocolDecoder getDecoder(IoSession session) throws Exception {
                 return decoderClass.newInstance();
             }
         };
@@ -269,7 +269,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         ProtocolEncoder encoder = (ProtocolEncoder) session
                 .getAttribute(ENCODER);
         if (encoder == null) {
-            encoder = factory.getEncoder();
+            encoder = factory.getEncoder(session);
             session.setAttribute(ENCODER, encoder);
         }
         return encoder;
@@ -284,7 +284,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         ProtocolDecoder decoder = (ProtocolDecoder) session
                 .getAttribute(DECODER);
         if (decoder == null) {
-            decoder = factory.getDecoder();
+            decoder = factory.getDecoder(session);
             session.setAttribute(DECODER, decoder);
         }
         return decoder;

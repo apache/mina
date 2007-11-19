@@ -50,14 +50,17 @@ public class Main {
             addSSLSupport(chain);
         }
 
-        addLogger(chain);
-        
         // Bind
         acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new EchoProtocolHandler());
         acceptor.bind();
 
         System.out.println("Listening on port " + PORT);
+        
+        for (;;) {
+            System.out.println("R: " + acceptor.getReadBytesThroughput() + ", W: " + acceptor.getWrittenBytesThroughput());
+            Thread.sleep(3000);
+        }
     }
 
     private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
