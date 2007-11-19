@@ -28,6 +28,11 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
+/**
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class HttpResponseEncoder implements ProtocolEncoder {
 
     private static final Charset US_ASCII = Charset.forName("US-ASCII");

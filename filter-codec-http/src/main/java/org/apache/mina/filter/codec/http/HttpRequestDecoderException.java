@@ -27,8 +27,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
  * This exception enables decoders which are capable of determining the type of
  * failure to specify the response which is ultimately returned to the client.
  *
- * @author irvingd
- * @author trustin
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpRequestDecoderException extends ProtocolDecoderException {

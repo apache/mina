@@ -28,7 +28,7 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
 /**
  * TODO HttpProtocolCodecFactory.
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpCodecFactory implements ProtocolCodecFactory {

@@ -26,7 +26,7 @@ import org.apache.mina.filter.codec.statemachine.DecodingState;
 import org.apache.mina.filter.codec.statemachine.StateMachineProtocolDecoder;
 
 /**
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpResponseDecoder extends StateMachineProtocolDecoder {

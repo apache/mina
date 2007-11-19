@@ -26,8 +26,8 @@ import java.io.Serializable;
 /**
  * Type safe enumeration representing HTTP protocol version
  *
- * @author irvingd
- *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 public class HttpVersion implements Serializable {
 

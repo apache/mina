@@ -21,13 +21,9 @@ package org.apache.mina.filter.codec.http;
 
 /**
  * Default cookie implementation.
- * Content built using <code>Bytes</code> is cached as a <code>LazyDecodedString</code>
- * until the content item is needed.
- * <code>DefaultCookie</code> tracks changes to content items - allowing changed cookies
- * to be written automatically when a response is written back to the client
  *
- * @author irvingd
- *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 public class DefaultCookie implements MutableCookie {
 

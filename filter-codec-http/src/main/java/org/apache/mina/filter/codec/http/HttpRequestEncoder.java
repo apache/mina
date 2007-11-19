@@ -31,7 +31,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 /**
  * TODO HttpRequestEncoder.
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpRequestEncoder extends ProtocolEncoderAdapter {

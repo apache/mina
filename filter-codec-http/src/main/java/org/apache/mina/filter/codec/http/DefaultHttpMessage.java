@@ -33,7 +33,7 @@ import org.apache.mina.common.IoBuffer;
 /**
  * A default implementation of {@link MutableHttpMessage}.
  *
- * @author trustin
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultHttpMessage implements MutableHttpMessage {

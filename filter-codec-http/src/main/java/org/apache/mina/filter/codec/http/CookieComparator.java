@@ -22,6 +22,11 @@ package org.apache.mina.filter.codec.http;
 import java.io.Serializable;
 import java.util.Comparator;
 
+/**
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class CookieComparator implements Serializable, Comparator<Cookie> {
 
     private static final long serialVersionUID = -222644341851192813L;

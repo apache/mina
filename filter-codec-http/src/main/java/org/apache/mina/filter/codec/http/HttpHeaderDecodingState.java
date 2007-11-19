@@ -40,8 +40,7 @@ import org.apache.mina.filter.codec.statemachine.LinearWhitespaceSkippingState;
  * <code>HttpHeaderDecoder</code> employs several sub-decoders - each taking
  * the responsibility of decoding a specific part of the header.<br/>
  *
- * @author irvingd
- * @author trustin
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 abstract class HttpHeaderDecodingState extends DecodingStateMachine {

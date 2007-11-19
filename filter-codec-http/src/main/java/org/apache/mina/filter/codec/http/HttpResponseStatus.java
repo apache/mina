@@ -21,6 +21,11 @@ package org.apache.mina.filter.codec.http;
 
 import java.io.Serializable;
 
+/**
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class HttpResponseStatus implements Serializable {
 
     private static final long serialVersionUID = -5885201751942967031L;

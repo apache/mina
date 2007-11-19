@@ -27,7 +27,8 @@ import org.apache.mina.common.IoBuffer;
 
 /**
  * A mutable {@link HttpMessage}.
- * @author trustin
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface MutableHttpMessage extends HttpMessage {

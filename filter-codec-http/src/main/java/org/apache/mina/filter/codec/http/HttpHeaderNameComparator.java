@@ -22,6 +22,10 @@ package org.apache.mina.filter.codec.http;
 import java.io.Serializable;
 import java.util.Comparator;
 
+/**
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class HttpHeaderNameComparator implements Comparator<String>, Serializable {
     private static final long serialVersionUID = -3781572057321507963L;
 

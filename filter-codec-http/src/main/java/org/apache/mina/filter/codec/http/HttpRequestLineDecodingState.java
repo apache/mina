@@ -38,8 +38,8 @@ import org.apache.mina.filter.codec.statemachine.LinearWhitespaceSkippingState;
  * Request-Line = Method SP Request-URI SP HTTP-Version CRLF
  * </pre>
  *
- * @author irvingd
- *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 abstract class HttpRequestLineDecodingState extends DecodingStateMachine {
 

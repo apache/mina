@@ -31,6 +31,10 @@ import org.apache.mina.filter.codec.http.HttpResponseStatus.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 class HttpCodecUtils {
 
     /**

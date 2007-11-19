@@ -22,8 +22,8 @@ package org.apache.mina.filter.codec.http;
 /**
  * Type-safe enumeration of standard HTTP Methods
  *
- * @author irvingd
- *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 public enum HttpMethod {
 

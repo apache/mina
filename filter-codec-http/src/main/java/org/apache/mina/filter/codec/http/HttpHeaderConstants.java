@@ -22,8 +22,7 @@ package org.apache.mina.filter.codec.http;
 /**
  * HTTP Header Constants.
  *
- * @author irvingd
- * @author trustin
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class HttpHeaderConstants {

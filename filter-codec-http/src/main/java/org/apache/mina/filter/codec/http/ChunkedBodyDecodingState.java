@@ -65,7 +65,8 @@ import org.apache.mina.filter.codec.statemachine.SkippingState;
  * <code>Bytes</code>. This enables all chunks to be read without requiring
  * copying.
  *
- * @author irvingd
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 abstract class ChunkedBodyDecodingState extends DecodingStateMachine {
 

@@ -45,8 +45,7 @@ import org.slf4j.LoggerFactory;
  * Note, however, that a parser <i>must</i> be <code>prepare</code>d before
  * each new parse.
  *
- * @author irvingd
- * @author trustin
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class HttpResponseDecodingState extends DecodingStateMachine {

@@ -27,8 +27,8 @@ import java.util.TimeZone;
 /**
  * Utility for generating date strings in the format required by HTTP.
  *
- * @author irvingd
- *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 public class HttpDateFormat {
 
