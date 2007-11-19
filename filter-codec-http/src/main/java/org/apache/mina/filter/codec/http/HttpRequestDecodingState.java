@@ -54,42 +54,10 @@ abstract class HttpRequestDecodingState extends DecodingStateMachine {
     private static final Logger LOG = LoggerFactory
             .getLogger(HttpRequestDecodingState.class);
 
-    private static final String HEADER_COOKIE = "Cookie";
-
-    /**
-     * The header which provides a requests transfer coding
-     */
-    private static final String TRANSFER_CODING = "transfer-encoding";
-
-    /**
-     * The chunked coding
-     */
-    private static final String CHUNKED = "chunked";
-
-    /**
-     * The header which provides a requests content length
-     */
-    private static final String CONTENT_LENGTH = "content-length";
-
-    /**
-     * Indicates the start of a coding extension
-     */
-    private static final char EXTENSION_CHAR = ';';
-
     /**
      * The request we are building
      */
     private MutableHttpRequest request;
-
-    private boolean parseCookies = true;
-
-    public boolean isParseCookies() {
-        return parseCookies;
-    }
-
-    public void setParseCookies(boolean parseCookies) {
-        this.parseCookies = parseCookies;
-    }
 
     @Override
     protected DecodingState init() throws Exception {
@@ -132,20 +100,23 @@ abstract class HttpRequestDecodingState extends DecodingStateMachine {
         @SuppressWarnings("unchecked")
         protected DecodingState finishDecode(List<Object> childProducts,
                 ProtocolDecoderOutput out) throws Exception {
-            Map<String, List<String>> headers = (Map<String, List<String>>) childProducts
-                    .get(0);
-            if (parseCookies) {
-                List<String> cookies = headers.remove(HEADER_COOKIE);
-                if (cookies != null && !cookies.isEmpty()) {
-                    if (cookies.size() > 1) {
-                        if (LOG.isWarnEnabled()) {
-                            LOG.warn("Ignoring extra cookie headers: "
-                                    + cookies.subList(1, cookies.size()));
-                        }
+            Map<String, List<String>> headers =
+                (Map<String, List<String>>) childProducts.get(0);
+            
+            // Set cookies.
+            List<String> cookies = headers.get(
+                    HttpHeaderConstants.KEY_COOKIE);
+            if (cookies != null && !cookies.isEmpty()) {
+                if (cookies.size() > 1) {
+                    if (LOG.isWarnEnabled()) {
+                        LOG.warn("Ignoring extra cookie headers: "
+                                + cookies.subList(1, cookies.size()));
                     }
-                    request.setCookies(cookies.get(0));
                 }
+                request.setCookies(cookies.get(0));
             }
+
+            // Set headers.
             request.setHeaders(headers);
 
             if (LOG.isDebugEnabled()) {
@@ -226,7 +197,8 @@ abstract class HttpRequestDecodingState extends DecodingStateMachine {
         private int getContentLength(HttpRequest request)
                 throws ProtocolDecoderException {
             int length = 0;
-            String lengthValue = request.getHeader(CONTENT_LENGTH);
+            String lengthValue = request.getHeader(
+                    HttpHeaderConstants.KEY_CONTENT_LENGTH);
             if (lengthValue != null) {
                 try {
                     length = Integer.parseInt(lengthValue);
@@ -252,13 +224,20 @@ abstract class HttpRequestDecodingState extends DecodingStateMachine {
         private boolean isChunked(HttpRequest request)
                 throws ProtocolDecoderException {
             boolean isChunked = false;
-            String coding = request.getHeader(TRANSFER_CODING);
+            String coding = request.getHeader(
+                    HttpHeaderConstants.KEY_TRANSFER_ENCODING);
+            if (coding == null) {
+                coding = request.getHeader(
+                        HttpHeaderConstants.KEY_TRANSFER_CODING);
+            }
+
             if (coding != null) {
-                int extensionIndex = coding.indexOf(EXTENSION_CHAR);
+                int extensionIndex = coding.indexOf(
+                        HttpHeaderConstants.EXTENSION_CHAR);
                 if (extensionIndex != -1) {
                     coding = coding.substring(0, extensionIndex);
                 }
-                if (CHUNKED.equalsIgnoreCase(coding)) {
+                if (HttpHeaderConstants.VALUE_CHUNKED.equalsIgnoreCase(coding)) {
                     isChunked = true;
                 } else {
                     // As we only support chunked encoding, any other encoding

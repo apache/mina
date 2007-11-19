@@ -70,6 +70,16 @@ public class HttpHeaderConstants {
     public static final String KEY_TRANSFER_CODING = "Transfer-Coding";
 
     /**
+     * The "transfer-encoding" header name
+     */
+    public static final String KEY_TRANSFER_ENCODING = "Transfer-Encoding";
+    
+    /**
+     * The chunked coding.
+     */
+    public static final String VALUE_CHUNKED = "chunked";
+
+    /**
      * The "expect" header name
      */
     public static final String KEY_EXPECT = "Expect";
@@ -85,6 +95,11 @@ public class HttpHeaderConstants {
     public static final String KEY_DATE = "Date";
     
     /**
+     * The "cookie" header.
+     */
+    public static final String KEY_COOKIE = "Cookie";
+
+    /**
      * The "set-cookie" header.
      */
     public static final String KEY_SET_COOKIE = "Set-Cookie";
@@ -93,6 +108,13 @@ public class HttpHeaderConstants {
      * The "host" header.
      */
     public static final String KEY_HOST = "Host";
+
+    /**
+     * An extension character that splits header values (e.g.
+     * transfer-encoding and cookie).
+     */
+    public static final char EXTENSION_CHAR = ';';
+
 
     private HttpHeaderConstants() {
     }

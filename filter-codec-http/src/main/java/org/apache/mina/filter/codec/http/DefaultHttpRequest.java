@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.CharacterCodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -210,9 +211,11 @@ public class DefaultHttpRequest extends DefaultHttpMessage implements
 
     public void setParameters(String queryString) {
         try {
-            this.setParameters(queryString, "UTF-8");
+            this.setParameters(queryString, HttpCodecUtils.DEFAULT_CHARSET_NAME);
         } catch (UnsupportedEncodingException e) {
-            throw new InternalError("UTF-8 decoder must be provided by JDK.");
+            throw new InternalError(
+                    HttpCodecUtils.DEFAULT_CHARSET_NAME +
+                    " decoder must be provided by JDK.");
         }
     }
 
@@ -268,6 +271,28 @@ public class DefaultHttpRequest extends DefaultHttpMessage implements
 
     public Map<String, List<String>> getParameters() {
         return Collections.unmodifiableMap(parameters);
+    }
+
+    @Override
+    public void setContent(IoBuffer content) {
+        if (content == null) {
+            throw new NullPointerException("content");
+        }
+        
+        if (HttpHeaderConstants.VALUE_URLENCODED_FORM.equalsIgnoreCase(
+                getContentType())) {
+            content.mark();
+            try {
+                setParameters(content.getString(
+                        HttpCodecUtils.DEFAULT_CHARSET.newDecoder()));
+            } catch (CharacterCodingException e) {
+                throw new IllegalArgumentException(
+                        "Failed to decode the url-encoded content.", e);
+            } finally {
+                content.reset();
+            }
+        }
+        super.setContent(content);
     }
 
     /**
