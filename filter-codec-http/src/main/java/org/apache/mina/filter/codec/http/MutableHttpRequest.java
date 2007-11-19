@@ -40,7 +40,10 @@ public interface MutableHttpRequest extends MutableHttpMessage, HttpRequest {
     /**
      * Adds a query parameter to this request.
      * Adding a query parameter does not cause any existing parameters with the
-     * same name to be overwritten
+     * same name to be overwritten.  Please also note that calling this method
+     * doesn't update {@link #setRequestUri(URI) the request URI} immediately
+     * due to performance overhead.  You have to call {@link #normalize()} by
+     * yourself to update the request URI.
      *
      * @param name   The header name
      * @param value  The header value
@@ -49,36 +52,60 @@ public interface MutableHttpRequest extends MutableHttpMessage, HttpRequest {
 
     /**
      * Removes all query parameters with the specified name.
+     * Please note that calling this method doesn't update
+     * {@link #setRequestUri(URI) the request URI} immediately due to
+     * performance overhead.  You have to call {@link #normalize()} by yourself
+     * to update the request URI.
      */
     boolean removeParameter(String name);
 
     /**
      * Sets the value of a query parameter.
      * Any existing query parameters with the specified name are removed.
+     * Please also note that calling this method doesn't update
+     * {@link #setRequestUri(URI) the request URI} immediately due to
+     * performance overhead.  You have to call {@link #normalize()} by yourself
+     * to update the request URI.
      */
     void setParameter(String name, String value);
 
     /**
-     * Sets query parameters with the specified {@link Map} whose key is a {@link String} and
-     * whose value is a {@link List} of {@link String}s.
+     * Sets query parameters with the specified {@link Map} whose key is a
+     * {@link String} and whose value is a {@link List} of {@link String}s.
+     * Please note that calling this method doesn't update
+     * {@link #setRequestUri(URI) the request URI} immediately due to
+     * performance overhead.  You have to call {@link #normalize()} by yourself
+     * to update the request URI.
      */
     void setParameters(Map<String, List<String>> parameters);
 
     /**
-     * Sets query parameters from the specified <tt>queryString</tt> which is encoded with UTF-8
-     * encoding.
+     * Sets query parameters from the specified <tt>queryString</tt> which is
+     * encoded with UTF-8 encoding.
+     * Please note that calling this method doesn't update
+     * {@link #setRequestUri(URI) the request URI} immediately due to
+     * performance overhead.  You have to call {@link #normalize()} by yourself
+     * to update the request URI.
      */
     void setParameters(String queryString);
 
     /**
-     * Sets query parameters from the specified <tt>queryString</tt> which is encoded with the
-     * specified charset <tt>encoding</tt>.
+     * Sets query parameters from the specified <tt>queryString</tt> which is
+     * encoded with the specified charset <tt>encoding</tt>.
+     * Please note that calling this method doesn't update
+     * {@link #setRequestUri(URI) the request URI} immediately due to
+     * performance overhead.  You have to call {@link #normalize()} by yourself
+     * to update the request URI.
      */
     void setParameters(String queryString, String encoding)
             throws UnsupportedEncodingException;
 
     /**
      * Removes all query parameters from this request.
+     * Please note that calling this method doesn't update
+     * {@link #setRequestUri(URI) the request URI} immediately due to
+     * performance overhead.  You have to call {@link #normalize()} by yourself
+     * to update the request URI.
      */
     void clearParameters();
 
