@@ -25,7 +25,7 @@ package org.apache.mina.filter.codec.http;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class HttpHeaderConstants {
+public class HttpHeaderConstants {
 
     /**
      * The name of the "connection" header
