@@ -109,13 +109,6 @@ public class HttpHeaderConstants {
      */
     public static final String KEY_HOST = "Host";
 
-    /**
-     * An extension character that splits header values (e.g.
-     * transfer-encoding and cookie).
-     */
-    public static final char EXTENSION_CHAR = ';';
-
-
     private HttpHeaderConstants() {
     }
 }

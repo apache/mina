@@ -38,88 +38,18 @@ import org.slf4j.LoggerFactory;
  */
 class HttpCodecUtils {
 
-    public static final String DEFAULT_CHARSET_NAME = "UTF-8";
-    public static final Charset DEFAULT_CHARSET =
+    static final String DEFAULT_CHARSET_NAME = "UTF-8";
+    static final Charset DEFAULT_CHARSET =
         Charset.forName(DEFAULT_CHARSET_NAME);
-    public static final String US_ASCII_CHARSET_NAME = "US-ASCII";
-    public static final Charset US_ASCII_CHARSET =
+    static final String US_ASCII_CHARSET_NAME = "US-ASCII";
+    static final Charset US_ASCII_CHARSET =
         Charset.forName(US_ASCII_CHARSET_NAME);
-    public static final String DEFAULT_TIME_ZONE_NAME = "GMT";
-
-    /**
-     * Ampersand character
-     */
-    public static final byte AMP = 38;
-
-    /**
-     * Colon character
-     */
-    public static final byte COLON = 58;
-
-    /**
-     * Carriage return character
-     */
-    public static final byte CR = 13;
-
-    /**
-     * Equals character
-     */
-    public static final byte EQUALS = 61;
-
-    /**
-     * Line feed character
-     */
-    public static final byte LF = 10;
-
-    /**
-     * Space character
-     */
-    public static final byte SP = 32;
-
-    /**
-     * Plus character
-     */
-    public static final byte PLUS = 43;
-
-    /**
-     * Question mark character
-     */
-    public static final byte QS = 63;
-
-    /**
-     * Horizontal tab character
-     */
-    public static final byte HT = 9;
-
-    /**
-     * Percent character
-     */
-    public static final byte PERCENT = 37;
-
-    /**
-     * Foward-slash character
-     */
-    public static final byte FOWARD_SLASH = 47;
-
-    /**
-     * Back-slash character
-     */
-    public static final byte BACK_SLASH = 92;
-
-    /**
-     * Quote character
-     */
-    public static final byte QUOTE = 34;
-
-    /**
-     * Semi-colon
-     */
-    public static final byte SEMI_COLON = 59;
+    static final String DEFAULT_TIME_ZONE_NAME = "GMT";
 
     /**
      * Bytes making up a <code>CR LF</code>
      */
-    private static final byte[] CRLF_BYTES = new byte[] { CR, LF };
+    private static final byte[] CRLF_BYTES = new byte[] { '\r', '\n' };
 
     /**
      * A lookup table for HTPP separator characters
@@ -167,7 +97,7 @@ class HttpCodecUtils {
      * @return  <code>true</code> iff the character is a valid hex
      *          character
      */
-    public static boolean isHex(byte b) {
+    static boolean isHex(byte b) {
         return HEX_DEC[b] != -1;
     }
 
@@ -179,7 +109,7 @@ class HttpCodecUtils {
      * @return   <code>true</code> iff the character is an HTTP field
      *           separator
      */
-    public static boolean isHttpSeparator(byte b) {
+    static boolean isHttpSeparator(byte b) {
         return HTTP_SEPARATORS[b];
     }
 
@@ -191,56 +121,8 @@ class HttpCodecUtils {
      * @return   <code>true</code> iff the character is an HTTP control
      *           character
      */
-    public static boolean isHttpControl(byte b) {
+    static boolean isHttpControl(byte b) {
         return HTTP_CONTROLS[b];
-    }
-
-    /**
-     * Determines whether a specified (US-ASCII) character is an HTTP
-     * whitespace character (Space or Horizontal tab)
-     *
-     * @param b  the US-ASCII character to check
-     * @return  <code>true</code> iff the character is an HTTP whitespace
-     *          character
-     */
-    public static boolean isWhiteSpace(byte b) {
-        return b == SP || b == HT;
-    }
-
-    /**
-     * "Pushes back" a byte on to the specified buffer, by rewinding the
-     * position by 1 byte
-     *
-     * @param buffer  The buffer to "push back" to
-     */
-    public static void pushBack(IoBuffer buffer) {
-        buffer.position(buffer.position() - 1);
-    }
-
-    /**
-     * Obtains the decimal value for a hex value encoded in ASCII
-     *
-     * @param b  The ASCII encoded byte
-     * @return   The decimal value - or <code>-1</code> if the specified byte
-     *           is not a valid ASCII hex character
-     */
-    public static int hexASCIIToDecimal(byte b) {
-        return HEX_DEC[b];
-    }
-
-    /**
-     * Returns the ASCII bytes for a specified string.
-     *
-     * @param str  The string
-     * @return        The ASCII bytes making up the string
-     */
-    public static byte[] getASCIIBytes(String str) {
-        try {
-            return str.getBytes(US_ASCII_CHARSET_NAME);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Required charset: "
-                    + US_ASCII_CHARSET_NAME);
-        }
     }
 
     /**
@@ -249,7 +131,7 @@ class HttpCodecUtils {
      *
      * @param cause  The cause
      */
-    public static void throwDecoderException(String cause)
+    static void throwDecoderException(String cause)
             throws ProtocolDecoderException {
         throwDecoderException(cause, HttpResponseStatus.BAD_REQUEST);
     }
@@ -261,7 +143,7 @@ class HttpCodecUtils {
      * @param message   The cause
      * @param status  The response status
      */
-    public static void throwDecoderException(String message,
+    static void throwDecoderException(String message,
             HttpResponseStatus status) throws ProtocolDecoderException {
         if (!(status.getCategory() == Category.CLIENT_ERROR || status
                 .getCategory() == Category.SERVER_ERROR)) {
@@ -286,7 +168,7 @@ class HttpCodecUtils {
      * @param buffer  The buffer to append to
      * @param string  The string to append
      */
-    public static void appendString(IoBuffer buffer, String string) {
+    static void appendString(IoBuffer buffer, String string) {
         if (string == null) {
             return;
         }
@@ -294,8 +176,8 @@ class HttpCodecUtils {
 
         for (int i = 0; i < len; i++) {
             byte b = (byte) string.charAt(i);
-            if (isHttpControl(b) && b != HT) {
-                b = SP;
+            if (isHttpControl(b) && b != '\t') {
+                b = ' ';
             }
             buffer.put(b);
         }
@@ -306,7 +188,7 @@ class HttpCodecUtils {
      *
      * @param buffer  The buffer
      */
-    public static void appendCRLF(IoBuffer buffer) {
+    static void appendCRLF(IoBuffer buffer) {
         buffer.put(CRLF_BYTES);
     }
     
@@ -318,7 +200,7 @@ class HttpCodecUtils {
      * @param message  The response whose headers are to be encoded
      * @param buffer   The buffer
      */
-    public static void encodeHeaders(
+    static void encodeHeaders(
             HttpMessage message, IoBuffer buffer, CharsetEncoder encoder) throws CharacterCodingException {
         
         try {
@@ -350,7 +232,7 @@ class HttpCodecUtils {
      * @param message  The response
      * @param buffer   The buffer to write to
      */
-    public static void encodeBody(HttpMessage message, IoBuffer buffer) {
+    static void encodeBody(HttpMessage message, IoBuffer buffer) {
         IoBuffer content = (IoBuffer) message.getContent();
         buffer.put(content);
     }
@@ -374,7 +256,6 @@ class HttpCodecUtils {
         HTTP_SEPARATORS[92] = true; // \
         HTTP_SEPARATORS[123] = true; // {
         HTTP_SEPARATORS[125] = true; // }
-        // TODO: SP, HT
 
         // HTTP Control characters
         for (int i = 0; i <= 31; ++i) {
@@ -383,5 +264,4 @@ class HttpCodecUtils {
         HTTP_CONTROLS[127] = true; // DEL
 
     }
-
 }

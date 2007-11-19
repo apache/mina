@@ -337,9 +337,11 @@ public class DefaultHttpRequest extends DefaultHttpMessage implements
                             buf.append('&');
                         }
                         
-                        buf.append(URLEncoder.encode(e.getKey(), "UTF-8"));
+                        buf.append(URLEncoder.encode(
+                                e.getKey(), HttpCodecUtils.DEFAULT_CHARSET_NAME));
                         buf.append('=');
-                        buf.append(URLEncoder.encode(v, "UTF-8"));
+                        buf.append(URLEncoder.encode(
+                                v, HttpCodecUtils.DEFAULT_CHARSET_NAME));
                         first = false;
                     }
                 }

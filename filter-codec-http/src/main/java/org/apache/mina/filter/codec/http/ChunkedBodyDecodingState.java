@@ -100,15 +100,15 @@ abstract class ChunkedBodyDecodingState extends DecodingStateMachine {
                 return SKIP_CHUNK_EXTENSION;
             }
             return AFTER_SKIP_CHUNK_EXTENSION.decode(IoBuffer
-                    .wrap(new byte[] { HttpCodecUtils.CR }), out);
+                    .wrap(new byte[] { '\r' }), out);
         }
 
         @Override
         protected boolean isTerminator(byte b) {
             if (!(b >= '0' && b <= '9' || b >= 'a' && b <= 'f' || b >= 'A'
                     && b <= 'F')) {
-                if (b == HttpCodecUtils.CR || b == HttpCodecUtils.SEMI_COLON) {
-                    chunkHasExtension = b == HttpCodecUtils.SEMI_COLON;
+                if (b == '\r' || b == ';') {
+                    chunkHasExtension = b == ';';
                     return true;
                 }
                 throw new IllegalArgumentException();
@@ -125,7 +125,7 @@ abstract class ChunkedBodyDecodingState extends DecodingStateMachine {
 
         @Override
         protected boolean canSkip(byte b) {
-            return b != HttpCodecUtils.CR;
+            return b != '\r';
         }
     };
 
@@ -187,7 +187,7 @@ abstract class ChunkedBodyDecodingState extends DecodingStateMachine {
 
         @Override
         protected boolean canSkip(byte b) {
-            return b != HttpCodecUtils.CR;
+            return b != '\r';
         }
 
         @Override

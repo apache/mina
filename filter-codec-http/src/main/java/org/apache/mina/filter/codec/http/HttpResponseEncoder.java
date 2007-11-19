@@ -71,13 +71,13 @@ public class HttpResponseEncoder implements ProtocolEncoder {
         // Write protocol version.
         buffer.putString(
                 response.getProtocolVersion().toString(), asciiEncoder);
-        buffer.put(HttpCodecUtils.SP);
+        buffer.put((byte) ' ');
 
         // Write status code.
         HttpResponseStatus status = response.getStatus();
         // TODO: Cached buffers for response codes / descriptions?
         HttpCodecUtils.appendString(buffer, String.valueOf(status.getCode()));
-        buffer.put(HttpCodecUtils.SP);
+        buffer.put((byte) ' ');
 
         // Write reason phrase.
         HttpCodecUtils.appendString(buffer, response.getStatusReasonPhrase());

@@ -232,8 +232,7 @@ abstract class HttpRequestDecodingState extends DecodingStateMachine {
             }
 
             if (coding != null) {
-                int extensionIndex = coding.indexOf(
-                        HttpHeaderConstants.EXTENSION_CHAR);
+                int extensionIndex = coding.indexOf(';');
                 if (extensionIndex != -1) {
                     coding = coding.substring(0, extensionIndex);
                 }
