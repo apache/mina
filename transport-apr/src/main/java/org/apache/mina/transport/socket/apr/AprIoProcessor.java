@@ -45,8 +45,10 @@ import org.apache.tomcat.jni.Status;
  */
 
 public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
+    private static final int INITIAL_CAPACITY = 32;
     
-    private final Map<Long, AprSession> managedSessions = new HashMap<Long, AprSession>();
+    private final Map<Long, AprSession> allSessions =
+        new HashMap<Long, AprSession>(INITIAL_CAPACITY);
     
     private final Object wakeupLock = new Object();
     private long wakeupSocket;
@@ -54,8 +56,9 @@ public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
 
     private final long bufferPool; // memory pool
     private final long pollset; // socket poller
-    private long[] polledSockets = new long[64];
-    private final List<AprSession> polledSessions = new CircularQueue<AprSession>();
+    private long[] polledSockets = new long[INITIAL_CAPACITY << 1];
+    private final List<AprSession> polledSessions =
+        new CircularQueue<AprSession>(INITIAL_CAPACITY);
 
     public AprIoProcessor(Executor executor) {
         super(executor);
@@ -80,7 +83,7 @@ public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
             // TODO : optimize/parameterize those values
             pollset = Poll
                     .create(
-                            2,
+                            INITIAL_CAPACITY,
                             AprLibrary.getInstance().getRootPool(),
                             Poll.APR_POLLSET_THREADSAFE,
                             10000000);
@@ -113,7 +116,7 @@ public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
 
     @Override
     protected Iterator<AprSession> allSessions() throws Exception {
-        return managedSessions.values().iterator();
+        return allSessions.values().iterator();
     }
 
     @Override
@@ -128,10 +131,10 @@ public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
         }
         
         session.setInterestedInRead(true);
-        if (managedSessions.size() >= polledSockets.length >>> 2) {
+        if (allSessions.size() > polledSockets.length >>> 2) {
             this.polledSockets = new long[polledSockets.length << 1];
         }
-        managedSessions.put(s, session);
+        allSessions.put(s, session);
     }
 
     private void throwException(int code) throws IOException {
@@ -142,7 +145,12 @@ public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
 
     @Override
     protected void destroy(AprSession session) throws Exception {
-        managedSessions.remove(session.getAprSocket());
+        allSessions.remove(session.getAprSocket());
+        if (polledSockets.length >= (INITIAL_CAPACITY << 2) &&
+            allSessions.size() <= polledSockets.length >>> 3) {
+            this.polledSockets = new long[polledSockets.length >>> 1];
+        }
+
         int ret = Poll.remove(pollset, session.getAprSocket());
         if (ret != Status.APR_SUCCESS) {
             try {
@@ -224,7 +232,7 @@ public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
                     }
                     continue;
                 }
-                AprSession session = managedSessions.get(socket);
+                AprSession session = allSessions.get(socket);
                 if (session == null) {
                     continue;
                 }
@@ -291,7 +299,7 @@ public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
         long socket = session.getAprSocket();
         if (socket > 0) {
             return SessionState.OPEN;
-        } else if (managedSessions.get(socket) != null) {
+        } else if (allSessions.get(socket) != null) {
             return SessionState.PREPARING; // will occur ?
         } else {
             return SessionState.CLOSED;
