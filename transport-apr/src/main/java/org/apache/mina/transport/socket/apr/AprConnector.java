@@ -27,9 +27,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoServiceListenerSupport;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.SimpleIoProcessorPool;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.tomcat.jni.Address;
@@ -79,7 +82,7 @@ public class AprConnector extends AbstractIoConnector {
      * @param protocol 
      * 			  The needed socket protocol (TCP,UDP,...)
      */
-    public AprConnector(AprProtocol protocol, IoProcessor<AprSession> processor, boolean createdProcessor) {
+    private AprConnector(AprProtocol protocol, IoProcessor<AprSession> processor, boolean createdProcessor) {
         super(new DefaultAprSessionConfig());
 
         if (protocol == null) {
@@ -107,11 +110,11 @@ public class AprConnector extends AbstractIoConnector {
             //pool = Pool.create(pool);
             long inetAddr = 0;
             inetAddr = Address.info(sockAddr.getHostName(), Socket.APR_INET,
-                    sockAddr.getPort(), 0, AprLibrary.getLibrary().getPool());
+                    sockAddr.getPort(), 0, AprLibrary.getInstance().getRootPool());
 
             long clientSock = Socket.create(Socket.APR_INET,
                     protocol.socketType, protocol.codeProto, AprLibrary
-                            .getLibrary().getPool());
+                            .getInstance().getRootPool());
 
             
             // FIXME : error checking
@@ -165,5 +168,30 @@ public class AprConnector extends AbstractIoConnector {
 
     public TransportMetadata getTransportMetadata() {
         return AprSession.METADATA;
+    }
+    
+    public static void main(String[] args) throws Exception {
+        IoConnector c = new AprConnector(AprProtocol.TCP);
+//        IoConnector c = new NioSocketConnector();
+        c.setHandler(new IoHandlerAdapter() {
+            @Override
+            public void messageReceived(IoSession session, Object message)
+                    throws Exception {
+                session.write(((IoBuffer) message).duplicate());
+            }
+
+            @Override
+            public void exceptionCaught(IoSession session, Throwable cause)
+                    throws Exception {
+                cause.printStackTrace();
+            }
+        });
+        
+        for (int i = 0; i < 4; i ++) {
+            ConnectFuture f = c.connect(new InetSocketAddress("127.0.0.1", 8080));
+            f.awaitUninterruptibly();
+            IoSession session = f.getSession();
+            session.write(IoBuffer.allocate(1048576));
+        }
     }
 }

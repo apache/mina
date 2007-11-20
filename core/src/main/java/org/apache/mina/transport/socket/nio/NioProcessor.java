@@ -62,7 +62,7 @@ public class NioProcessor extends AbstractIoProcessor<NioSession> {
 
     @Override
     protected boolean select(int timeout) throws Exception {
-        return selector.select(1000)>0;
+        return selector.select(1000) > 0;
     }
 
     @Override
@@ -81,14 +81,14 @@ public class NioProcessor extends AbstractIoProcessor<NioSession> {
     }
 
     @Override
-    protected void doAdd(NioSession session) throws Exception {
+    protected void init(NioSession session) throws Exception {
         SelectableChannel ch = (SelectableChannel) session.getChannel();
         ch.configureBlocking(false);
         session.setSelectionKey(ch.register(selector, SelectionKey.OP_READ, session));
     }
 
     @Override
-    protected void doRemove(NioSession session) throws Exception {
+    protected void destroy(NioSession session) throws Exception {
         ByteChannel ch = session.getChannel();
         SelectionKey key = session.getSelectionKey();
         if (key != null) {
@@ -120,17 +120,17 @@ public class NioProcessor extends AbstractIoProcessor<NioSession> {
     }
 
     @Override
-    protected boolean isOpRead(NioSession session) throws Exception {
+    protected boolean isInterestedInRead(NioSession session) throws Exception {
         return (session.getSelectionKey().interestOps() & SelectionKey.OP_READ) != 0;
     }
 
     @Override
-    protected boolean isOpWrite(NioSession session) throws Exception {
+    protected boolean isInterestedInWrite(NioSession session) throws Exception {
         return (session.getSelectionKey().interestOps() & SelectionKey.OP_WRITE) != 0;
     }
 
     @Override
-    protected void setOpRead(NioSession session, boolean value) throws Exception {
+    protected void setInterestedInRead(NioSession session, boolean value) throws Exception {
         SelectionKey key = session.getSelectionKey();
         if (value) {
             key.interestOps(key.interestOps() | SelectionKey.OP_READ);
@@ -140,7 +140,7 @@ public class NioProcessor extends AbstractIoProcessor<NioSession> {
     }
 
     @Override
-    protected void setOpWrite(NioSession session, boolean value)
+    protected void setInterestedInWrite(NioSession session, boolean value)
             throws Exception {
         SelectionKey key = session.getSelectionKey();
         if (value) {

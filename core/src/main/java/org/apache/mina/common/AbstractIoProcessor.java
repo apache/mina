@@ -107,7 +107,7 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean select(int timeout) throws Exception;
-
+    
     protected abstract void wakeup();
 
     protected abstract Iterator<T> allSessions() throws Exception;
@@ -132,21 +132,24 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean isReadable(T session) throws Exception;
+
     /**
      * register a session for writing
      * @param session the session registered
-     * @param value true for registering, false for removing
+     * @param interested true for registering, false for removing
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract void setOpWrite(T session, boolean value) throws Exception;
+    protected abstract void setInterestedInWrite(
+            T session, boolean interested) throws Exception;
 
     /**
      * register a session for reading
      * @param session the session registered
-     * @param value true for registering, false for removing
+     * @param interested true for registering, false for removing
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract void setOpRead(T session, boolean value) throws Exception;
+    protected abstract void setInterestedInRead(
+            T session, boolean interested) throws Exception;
 
     /**
      * is this session registered for reading
@@ -154,7 +157,7 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
      * @return true is registered for reading
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isOpRead(T session) throws Exception;
+    protected abstract boolean isInterestedInRead(T session) throws Exception;
 
     /**
      * is this session registered for writing
@@ -162,11 +165,11 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
      * @return true is registered for writing
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isOpWrite(T session) throws Exception;
+    protected abstract boolean isInterestedInWrite(T session) throws Exception;
 
-    protected abstract void doAdd(T session) throws Exception;
+    protected abstract void init(T session) throws Exception;
 
-    protected abstract void doRemove(T session) throws Exception;
+    protected abstract void destroy(T session) throws Exception;
 
     protected abstract int read(T session, IoBuffer buf) throws Exception;
 
@@ -184,6 +187,10 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
         startupWorker();
     }
 
+    private void scheduleRemove(T session) {
+        removingSessions.add(session);
+    }
+
     public void flush(T session) {
         boolean needsWakeup = flushingSessions.isEmpty();
         if (scheduleFlush(session) && needsWakeup) {
@@ -191,9 +198,21 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
         }
     }
 
+    private boolean scheduleFlush(T session) {
+        if (session.setScheduledForFlush(true)) {
+            flushingSessions.add(session);
+            return true;
+        }
+        return false;
+    }
+
     public void updateTrafficMask(T session) {
         scheduleTrafficControl(session);
         wakeup();
+    }
+
+    private void scheduleTrafficControl(T session) {
+        trafficControllingSessions.add(session);
     }
 
     private void startupWorker() {
@@ -206,22 +225,6 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
         wakeup();
     }
 
-    private void scheduleRemove(T session) {
-        removingSessions.add(session);
-    }
-
-    private boolean scheduleFlush(T session) {
-        if (session.setScheduledForFlush(true)) {
-            flushingSessions.add(session);
-            return true;
-        }
-        return false;
-    }
-
-    private void scheduleTrafficControl(T session) {
-        trafficControllingSessions.add(session);
-    }
-
     private int add() {
         int addedSessions = 0;
         for (; ;) {
@@ -231,38 +234,48 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
                 break;
             }
 
-            boolean notified = false;
-            try {
-                doAdd(session);
+            
+            if (addNow(session)) {
                 addedSessions ++;
-
-                // Build the filter chain of this session.
-                session.getService().getFilterChainBuilder().buildFilterChain(
-                        session.getFilterChain());
-
-                // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
-                // in AbstractIoFilterChain.fireSessionOpened().
-                ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
-                notified = true;
-            } catch (Exception e) {
-                if (notified) {
-                    // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
-                    // and call ConnectFuture.setException().
-                    session.getFilterChain().fireExceptionCaught(e);
-                    scheduleRemove(session);
-                    wakeup();
-                } else {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                    try {
-                        doRemove(session);
-                    } catch (Exception e1) {
-                        ExceptionMonitor.getInstance().exceptionCaught(e1);
-                    }
-                }
             }
         }
 
         return addedSessions;
+    }
+
+    private boolean addNow(T session) {
+
+        boolean registered = false;
+        boolean notified = false;
+        try {
+            init(session);
+            registered = true;
+
+            // Build the filter chain of this session.
+            session.getService().getFilterChainBuilder().buildFilterChain(
+                    session.getFilterChain());
+
+            // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
+            // in AbstractIoFilterChain.fireSessionOpened().
+            ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
+            notified = true;
+        } catch (Exception e) {
+            if (notified) {
+                // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
+                // and call ConnectFuture.setException().
+                scheduleRemove(session);
+                session.getFilterChain().fireExceptionCaught(e);
+                wakeup();
+            } else {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+                try {
+                    destroy(session);
+                } catch (Exception e1) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e1);
+                }
+            }
+        }
+        return registered;
     }
 
     private int remove() {
@@ -277,14 +290,8 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
             SessionState state = state(session);
             switch (state) {
             case OPEN:
-                try {
-                    doRemove(session);
+                if (removeNow(session)) {
                     removedSessions ++;
-                } catch (Exception e) {
-                    session.getFilterChain().fireExceptionCaught(e);
-                } finally {
-                    clearWriteRequestQueue(session);
-                    ((AbstractIoService) session.getService()).getListeners().fireSessionDestroyed(session);
                 }
                 break;
             case CLOSED:
@@ -301,6 +308,61 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
         }
 
         return removedSessions;
+    }
+
+    private boolean removeNow(T session) {
+        clearWriteRequestQueue(session);
+
+        try {
+            destroy(session);
+            return true;
+        } catch (Exception e) {
+            session.getFilterChain().fireExceptionCaught(e);
+        } finally {
+            clearWriteRequestQueue(session);
+            ((AbstractIoService) session.getService()).getListeners().fireSessionDestroyed(session);
+        }
+        return false;
+    }
+
+    private void clearWriteRequestQueue(T session) {
+        WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+        WriteRequest req;
+        
+        List<WriteRequest> failedRequests = new ArrayList<WriteRequest>();
+    
+        if ((req = writeRequestQueue.poll(session)) != null) {
+            Object m = req.getMessage();
+            if (m instanceof IoBuffer) {
+                IoBuffer buf = (IoBuffer) req.getMessage();
+    
+                // The first unwritten empty buffer must be
+                // forwarded to the filter chain.
+                if (buf.hasRemaining()) {
+                    buf.reset();
+                    failedRequests.add(req);
+                } else {
+                    session.getFilterChain().fireMessageSent(req);
+                }
+            } else {
+                failedRequests.add(req);
+            }
+    
+            // Discard others.
+            while ((req = writeRequestQueue.poll(session)) != null) {
+                failedRequests.add(req);
+            }
+        }
+        
+        // Create an exception and notify.
+        if (!failedRequests.isEmpty()) {
+            WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
+            for (WriteRequest r: failedRequests) {
+                session.decreaseScheduledBytesAndMessages(r);
+                r.getFuture().setException(cause);
+            }
+            session.getFilterChain().fireExceptionCaught(cause);
+        }
     }
 
     private void process() throws Exception {
@@ -333,6 +395,9 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
                 if (session.getTransportMetadata().hasFragmentation()) {
                     while ((ret = read(session, buf)) > 0) {
                         readBytes += ret;
+                        if (!buf.hasRemaining()) {
+                            break;
+                        }
                     }
                 } else {
                     ret = read(session, buf);
@@ -360,9 +425,11 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
                 scheduleRemove(session);
             }
         } catch (IOException e) {
-            scheduleRemove(session);
             session.getFilterChain().fireExceptionCaught(e);
         } catch (Throwable e) {
+            if (e instanceof IOException) {
+                scheduleRemove(session);
+            }
             session.getFilterChain().fireExceptionCaught(e);
         }
     }
@@ -376,7 +443,7 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
         }
     }
 
-    private void write() {
+    private void flush() {
         for (; ;) {
             T session = flushingSessions.poll();
 
@@ -385,17 +452,11 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
             }
 
             session.setScheduledForFlush(false);
-
-            if (!session.isConnected()) {
-                clearWriteRequestQueue(session);
-                continue;
-            }
-
             SessionState state = state(session);
             switch (state) {
             case OPEN:
                 try {
-                    boolean flushedAll = write(session);
+                    boolean flushedAll = flushNow(session);
                     if (flushedAll && !session.getWriteRequestQueue().isEmpty(session) &&
                         !session.isScheduledForFlush()) {
                         scheduleFlush(session);
@@ -419,115 +480,80 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
         }
     }
 
-    private void clearWriteRequestQueue(T session) {
-        WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
-        WriteRequest req;
-        
-        List<WriteRequest> failedRequests = new ArrayList<WriteRequest>();
-
-        if ((req = writeRequestQueue.poll(session)) != null) {
-            Object m = req.getMessage();
-            if (m instanceof IoBuffer) {
-                IoBuffer buf = (IoBuffer) req.getMessage();
-
-                // The first unwritten empty buffer must be
-                // forwarded to the filter chain.
-                if (buf.hasRemaining()) {
-                    buf.reset();
-                    failedRequests.add(req);
-                } else {
-                    session.getFilterChain().fireMessageSent(req);
-                }
-            } else {
-                failedRequests.add(req);
-            }
-
-            // Discard others.
-            while ((req = writeRequestQueue.poll(session)) != null) {
-                failedRequests.add(req);
-            }
-        }
-        
-        // Create an exception and notify.
-        if (!failedRequests.isEmpty()) {
-            WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
-            for (WriteRequest r: failedRequests) {
-                session.decreaseScheduledBytesAndMessages(r);
-                r.getFuture().setException(cause);
-            }
-            session.getFilterChain().fireExceptionCaught(cause);
-        }
-    }
-
-    private boolean write(T session) throws Exception {
+    private boolean flushNow(T session) {
         if (!session.isConnected()) {
             scheduleRemove(session);
             return false;
         }
 
-        // Clear OP_WRITE
-        setOpWrite(session, false);
-
-        WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
-
-        // Set limitation for the number of written bytes for read-write
-        // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
-        // performance in my experience while not breaking fairness much.
-        int maxWrittenBytes = session.getConfig().getMaxReadBufferSize() +
-                              (session.getConfig().getMaxReadBufferSize() >>> 1);
-        int writtenBytes = 0;
-
-        do {
-            // Check for pending writes.
-            WriteRequest req = session.getCurrentWriteRequest();
-            if (req == null) {
-                req = writeRequestQueue.poll(session);
+        try {
+            // Clear OP_WRITE
+            setInterestedInWrite(session, false);
+    
+            WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+    
+            // Set limitation for the number of written bytes for read-write
+            // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
+            // performance in my experience while not breaking fairness much.
+            int maxWrittenBytes = session.getConfig().getMaxReadBufferSize() +
+                                  (session.getConfig().getMaxReadBufferSize() >>> 1);
+            int writtenBytes = 0;
+    
+            do {
+                // Check for pending writes.
+                WriteRequest req = session.getCurrentWriteRequest();
                 if (req == null) {
-                    break;
-                }
-                session.setCurrentWriteRequest(req);
-            }
-
-            long localWrittenBytes = 0;
-            Object message = req.getMessage();
-            if (message instanceof FileRegion) {
-                FileRegion region = (FileRegion) message;
-
-                if (region.getCount() <= 0) {
-                    // File has been sent, clear the current request.
-                    session.setCurrentWriteRequest(null);
-                    session.getFilterChain().fireMessageSent(req);
-                    continue;
-                }
-
-                localWrittenBytes = transferFile(session, region);
-                region.setPosition(region.getPosition() + localWrittenBytes);
-            } else {
-                IoBuffer buf = (IoBuffer) message;
-                if (buf.remaining() == 0) {
-                    // Buffer has been sent, clear the current request.
-                    session.setCurrentWriteRequest(null);
-                    buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
-                    continue;
-                }
-
-                for (int i = WRITE_SPIN_COUNT; i > 0; i --) {
-                    localWrittenBytes = write(session, buf);
-                    if (localWrittenBytes != 0 || !buf.hasRemaining()) {
+                    req = writeRequestQueue.poll(session);
+                    if (req == null) {
                         break;
                     }
+                    session.setCurrentWriteRequest(req);
                 }
-            }
-            
-            writtenBytes += localWrittenBytes;
-
-            if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
-                // Kernel buffer is full or wrote too much.
-                setOpWrite(session, true);
-                return false;
-            }
-        } while (writtenBytes < maxWrittenBytes);
+    
+                long localWrittenBytes = 0;
+                Object message = req.getMessage();
+                if (message instanceof FileRegion) {
+                    FileRegion region = (FileRegion) message;
+    
+                    if (region.getCount() <= 0) {
+                        // File has been sent, clear the current request.
+                        session.setCurrentWriteRequest(null);
+                        session.getFilterChain().fireMessageSent(req);
+                        continue;
+                    }
+    
+                    localWrittenBytes = transferFile(session, region);
+                    region.setPosition(region.getPosition() + localWrittenBytes);
+                } else {
+                    IoBuffer buf = (IoBuffer) message;
+                    if (buf.remaining() == 0) {
+                        // Buffer has been sent, clear the current request.
+                        session.setCurrentWriteRequest(null);
+                        buf.reset();
+                        session.getFilterChain().fireMessageSent(req);
+                        continue;
+                    }
+    
+                    for (int i = WRITE_SPIN_COUNT; i > 0; i --) {
+                        localWrittenBytes = write(session, buf);
+                        if (localWrittenBytes != 0 || !buf.hasRemaining()) {
+                            break;
+                        }
+                    }
+                }
+                
+                writtenBytes += localWrittenBytes;
+    
+                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
+                    // Kernel buffer is full or wrote too much.
+                    setInterestedInWrite(session, true);
+                    return false;
+                }
+            } while (writtenBytes < maxWrittenBytes);
+        } catch (Exception e) {
+            session.getFilterChain().fireExceptionCaught(e);
+            return false;
+        }
 
         return true;
     }
@@ -543,22 +569,7 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
             SessionState state = state(session);
             switch (state) {
             case OPEN:
-                // The normal is OP_READ and, if there are write requests in the
-                // session's write queue, set OP_WRITE to trigger flushing.
-                int mask = session.getTrafficMask().getInterestOps();
-                try {
-                    setOpRead(session, (mask & SelectionKey.OP_READ) != 0);
-                } catch (Exception e) {
-                    session.getFilterChain().fireExceptionCaught(e);
-                }
-                try {
-                    setOpWrite(
-                            session,
-                            !session.getWriteRequestQueue().isEmpty(session) &&
-                                    (mask & SelectionKey.OP_WRITE) != 0);
-                } catch (Exception e) {
-                    session.getFilterChain().fireExceptionCaught(e);
-                }
+                updateTrafficMaskNow(session);
                 break;
             case CLOSED:
                 break;
@@ -571,6 +582,25 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
             default:
                 throw new IllegalStateException(String.valueOf(state));
             }
+        }
+    }
+
+    private void updateTrafficMaskNow(T session) {
+        // The normal is OP_READ and, if there are write requests in the
+        // session's write queue, set OP_WRITE to trigger flushing.
+        int mask = session.getTrafficMask().getInterestOps();
+        try {
+            setInterestedInRead(session, (mask & SelectionKey.OP_READ) != 0);
+        } catch (Exception e) {
+            session.getFilterChain().fireExceptionCaught(e);
+        }
+        try {
+            setInterestedInWrite(
+                    session,
+                    !session.getWriteRequestQueue().isEmpty(session) &&
+                            (mask & SelectionKey.OP_WRITE) != 0);
+        } catch (Exception e) {
+            session.getFilterChain().fireExceptionCaught(e);
         }
     }
 
@@ -590,7 +620,7 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
                         process();
                     }
 
-                    write();
+                    flush();
                     nSessions -= remove();
                     notifyIdleSessions();
 

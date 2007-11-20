@@ -19,22 +19,23 @@
  */
 package org.apache.mina.transport.socket.apr;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoProcessor;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoBuffer;
-import org.apache.tomcat.jni.Error;
+import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.util.CircularQueue;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The class in charge of processing socket level IO events for the {@link AprConnector}
@@ -44,300 +45,301 @@ import org.slf4j.LoggerFactory;
  */
 
 public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
-
-    protected static class IoSessionIterator implements Iterator<AprSession> {
-        private final Iterator<AprSession> i;
-        private IoSessionIterator(Collection<AprSession> sessions) {
-            i = sessions.iterator();
-        }
-        public boolean hasNext() {
-            return i.hasNext();
-        }
-
-        public AprSession next() {
-            AprSession sess = i.next();
-            return sess;
-        }
-
-        public void remove() {
-            i.remove();
-        }
-    }
-
-    protected class PollSetIterator implements Iterator<AprSession> {
-        private long[] pollResult;
-        
-        int index=0;
-        public PollSetIterator(long[] pollResult) {
-            this.pollResult=pollResult;
-        }
-
-        public boolean hasNext() {
-            return index*2< pollResult.length;
-        }
-
-        public AprSession next() {
-            AprSession  sess=managedSessions.get(pollResult[index*2+1]);
-            index++;
-            System.err.println("sess : "+ sess.getAPRSocket());
-            return sess;
-        }
-
-        public void remove() {
-            //throw new UnsupportedOperationException("remove");            
-        }
-    }
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private long pool = 0; // memory pool
-
-    private long pollset = 0; // socket poller
-
+    
     private final Map<Long, AprSession> managedSessions = new HashMap<Long, AprSession>();
+    
+    private final Object wakeupLock = new Object();
+    private long wakeupSocket;
+    private volatile boolean toBeWakenUp;
 
-    private long[] pollResult;
+    private final long bufferPool; // memory pool
+    private final long pollset; // socket poller
+    private long[] polledSockets = new long[64];
+    private final List<AprSession> polledSessions = new CircularQueue<AprSession>();
 
     public AprIoProcessor(Executor executor) {
         super(executor);
-            
+        
+        try {
+            wakeupSocket = Socket.create(
+                    Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
+                    .getInstance().getRootPool());
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Error e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeIoException("Failed to create a wakeup socket.", e);
+        }
 
         // initialize a memory pool for APR functions
-        pool = Pool.create(AprLibrary.getLibrary().getPool());
+        bufferPool = Pool.create(AprLibrary.getInstance().getRootPool());
+        
+        boolean success = false;
         try {
-
             // TODO : optimize/parameterize those values
             pollset = Poll
                     .create(
-                            32,
-                            pool,
-                            Poll.APR_POLLSET_THREADSAFE /* enable poll thread safeness */,
+                            2,
+                            AprLibrary.getInstance().getRootPool(),
+                            Poll.APR_POLLSET_THREADSAFE,
                             10000000);
-
+            if (pollset < 0) {
+                if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
+                    throw new RuntimeIoException(
+                            "Thread-safe pollset is not supported in this platform.");
+                }
+            }
+            success = true;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Error e) {
-            logger.error("APR Error : " + e.getDescription(), e);
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeIoException("Failed to create a pollset.", e);
+        } finally {
+            if (!success) {
+                dispose();
+            }
         }
     }
-    
+
     @Override
     protected void doDispose() {
         Poll.destroy(pollset);
-
-        // TODO : necessary I think, need to check APR doc
-        logger.debug("finalize, freeing the pool");
-        Pool.clear(pool);
-        
-        Pool.destroy(pool);
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        dispose();
+        Pool.destroy(bufferPool);
+        Socket.close(wakeupSocket);
     }
 
     @Override
     protected Iterator<AprSession> allSessions() throws Exception {
-        return new IoSessionIterator(managedSessions.values());
+        return managedSessions.values().iterator();
     }
 
     @Override
-    protected void doAdd(AprSession session) throws Exception {
-        logger.debug("doAdd");
-        int rv;
-        rv = Poll.add(pollset, session.getAPRSocket(), Poll.APR_POLLIN);
-        if (rv == Status.APR_SUCCESS) {
-            logger.debug("sesion added to pollset");
-            session.setOpRead(true);
-            managedSessions.put(session.getAPRSocket(), session);
-        } else
-            throw new RuntimeException("APR error while Poll.add(..) : "+Error.strerror(-1*rv)+" ( code : "+rv+")");
-    }
-                 
-    @Override
-    protected void doRemove(AprSession session) throws Exception {
-        logger.debug("doRemove");
-        int ret=Poll.remove(pollset, session.getAPRSocket());
-        if(ret!=Status.APR_SUCCESS) {
-            logger.error("removing of pollset error");
+    protected void init(AprSession session) throws Exception {
+        long s = session.getAprSocket();
+        Socket.optSet(s, Socket.APR_SO_NONBLOCK, 1);
+        Socket.timeoutSet(s, 0);
+        
+        int rv = Poll.add(pollset, s, Poll.APR_POLLIN);
+        if (rv != Status.APR_SUCCESS) {
+            throwException(rv);
         }
-        ret=Socket.close(session.getAPRSocket());
-        if(ret!=Status.APR_SUCCESS) {
-            logger.error("closing socket error");
+        
+        session.setInterestedInRead(true);
+        if (managedSessions.size() >= polledSockets.length >>> 2) {
+            this.polledSockets = new long[polledSockets.length << 1];
+        }
+        managedSessions.put(s, session);
+    }
+
+    private void throwException(int code) throws IOException {
+        throw new IOException(
+                org.apache.tomcat.jni.Error.strerror(-code) +
+                " (code: " + code + ")");
+    }
+
+    @Override
+    protected void destroy(AprSession session) throws Exception {
+        managedSessions.remove(session.getAprSocket());
+        int ret = Poll.remove(pollset, session.getAprSocket());
+        if (ret != Status.APR_SUCCESS) {
+            try {
+                throwException(ret);
+            } finally {
+                System.out.println("CLOSE");
+                ret = Socket.close(session.getAprSocket());
+                if (ret != Status.APR_SUCCESS) {
+                    throwException(ret);
+                }
+            }
         }
     }
 
     @Override
-    protected boolean isOpRead(AprSession session) throws Exception {
-        logger.debug("isOpRead : "+session.isOpRead());
-        return session.isOpRead();
+    protected boolean isInterestedInRead(AprSession session) throws Exception {
+        return session.isInterestedInRead();
     }
 
     @Override
-    protected boolean isOpWrite(AprSession session) throws Exception {
-        logger.debug("isOpWrite : "+session.isOpWrite());
-        return session.isOpWrite();
+    protected boolean isInterestedInWrite(AprSession session) throws Exception {
+        return session.isInterestedInWrite();
     }
 
     @Override
     protected boolean isReadable(AprSession session) throws Exception {
-        logger.debug("isReadable?");
-        long socket= session.getAPRSocket();
-        for(int i=0;i<pollResult.length/2;i++) {
-            if(pollResult[i*2+1]==socket) {
-                if( (pollResult[i*2]&Poll.APR_POLLIN) >0 ) {
-                    logger.debug("isReadable : true");
-                    return true;
-                } else {
-                    logger.debug("isReadable : false");
-                    return false;
-                }
-            }
-        }
-        logger.debug("isReadable : false (socket not found)");
-        return false;
+        return session.isReadable();
     }
 
     @Override
     protected boolean isWritable(AprSession session) throws Exception {
-        long socket= session.getAPRSocket();
-        for(int i=0;i<pollResult.length/2;i++) {
-            if(pollResult[i*2+1]==socket) {
-                if( (pollResult[i*2]&Poll.APR_POLLOUT) >0 ) {
-                    logger.debug("isWritable : true");
-                    return true;
-                } else {
-                    logger.debug("isWritable : false");   
-                    return false;
-                }
-            }
-        }
-        logger.debug("isWritable : false (socket not found)");
-        return false;
+        return session.isWritable();
     }
-    
+
     @Override
     protected int read(AprSession session, IoBuffer buffer) throws Exception {
-        byte[] buf = session.getReadBuffer();
-        // FIXME : hardcoded read value for testing
-        int bytes = Socket.recv(session.getAPRSocket(), buf, 0, 1024);
-        logger.debug("read bytes : "+bytes);
-        if (bytes > 0) {
-            buffer.put(buf);
+        int bytes;
+        // Using Socket.recv() directly causes memory leak. :-(
+        ByteBuffer b = Pool.alloc(bufferPool, buffer.remaining());
+        try {
+            bytes = Socket.recvb(
+                    session.getAprSocket(), b, 0, b.remaining());
+            b.flip();
+            buffer.put(b);
+            if (bytes > 0) {
+                buffer.skip(bytes);
+            }
+            
+            if (bytes < 0) {
+                if (Status.APR_STATUS_IS_EOF(-bytes)) {
+                    bytes = -1;
+                } else if (Status.APR_STATUS_IS_EAGAIN(-bytes)) {
+                    bytes = 0;
+                } else {
+                    throwException(bytes);
+                }
+            }
+        } finally {
+            Pool.clear(bufferPool);
         }
         return bytes;
     }
 
     @Override
     protected boolean select(int timeout) throws Exception {
-        logger.debug("select?");
-        // poll the socket descriptors
-        /* is it OK ? : Two times size of the created pollset */
-        pollResult = new long[managedSessions.size() * 2];
-
-        int rv = Poll.poll(pollset, 1000 * timeout, pollResult, false);
+        int rv = Poll.poll(pollset, 1000 * timeout, polledSockets, false);
         if (rv > 0) {
-            logger.debug("select : true");    
-            return true;
-        } else if(rv<0) {
-            if(rv!=-120001) { // timeout ( FIXME : can't find the good constant in APR)
-                System.err.println("APR Poll error : "+Error.strerror(-1*rv)+" "+rv);
-                throw new RuntimeException("APR polling error : "+Error.strerror(-1*rv)+" ( code : "+rv+")");
+            rv <<= 1;
+            if (!polledSessions.isEmpty()) {
+                polledSessions.clear();
             }
+            for (int i = 0; i < rv; i ++) {
+                long flag = polledSockets[i];
+                long socket = polledSockets[++i];
+                if (socket == wakeupSocket) {
+                    synchronized (wakeupLock) {
+                        Poll.remove(pollset, wakeupSocket);
+                        toBeWakenUp = false;
+                    }
+                    continue;
+                }
+                AprSession session = managedSessions.get(socket);
+                if (session == null) {
+                    continue;
+                }
+                
+                session.setReadable((flag & Poll.APR_POLLIN) != 0);
+                session.setWritable((flag & Poll.APR_POLLOUT) != 0);
+                
+                polledSessions.add(session);
+            }
+            
+            return !polledSessions.isEmpty();
+        } else if (rv < 0 && rv != -120001) {
+            throwException(rv);
         }
-        logger.debug("select : false");
+
         return false;
     }
 
     @Override
     protected Iterator<AprSession> selectedSessions() throws Exception {
-        return new PollSetIterator(pollResult);
+        return polledSessions.iterator();
     }
 
     @Override
-    protected void setOpRead(AprSession session, boolean value) throws Exception {
-        logger.debug("setOpRead : "+value);
-        int rv = Poll.remove(pollset, session.getAPRSocket());
-        if (rv != Status.APR_SUCCESS) {
-            System.err.println("poll.remove Error : " + Error.strerror(rv));
-        }
-        
-        int flags=(value?Poll.APR_POLLIN:0) | (session.isOpWrite()?Poll.APR_POLLOUT:0);
-        
-        rv = Poll.add(pollset, session.getAPRSocket(), flags);
-        
-        if (rv == Status.APR_SUCCESS) {
-            // ok
-            session.setOpRead(value);
-        } else {
-            logger.error("poll.add Error : " + Error.strerror(rv));
-        }
-    }
-
-    @Override
-    protected void setOpWrite(AprSession session, boolean value)
+    protected void setInterestedInRead(AprSession session, boolean value)
             throws Exception {
-        logger.debug("setOpWrite : "+value);
-        int rv = Poll.remove(pollset, session.getAPRSocket());
+        int rv = Poll.remove(pollset, session.getAprSocket());
         if (rv != Status.APR_SUCCESS) {
-            System.err.println("poll.remove Error : " + Error.strerror(rv));
+            throwException(rv);
         }
-        
-        int flags=(session.isOpRead()?Poll.APR_POLLIN:0) | (value?Poll.APR_POLLOUT:0);
-        
-        rv = Poll.add(pollset, session.getAPRSocket(), flags);
-        
+
+        int flags = (value ? Poll.APR_POLLIN : 0)
+                | (session.isInterestedInWrite() ? Poll.APR_POLLOUT : 0);
+
+        rv = Poll.add(pollset, session.getAprSocket(), flags);
         if (rv == Status.APR_SUCCESS) {
-            // ok
-            session.setOpWrite(value);
+            session.setInterestedInRead(value);
         } else {
-            logger.error("poll.add Error : " + Error.strerror(rv));
+            throwException(rv);
+        }
+    }
+
+    @Override
+    protected void setInterestedInWrite(AprSession session, boolean value)
+            throws Exception {
+        int rv = Poll.remove(pollset, session.getAprSocket());
+        if (rv != Status.APR_SUCCESS) {
+            throwException(rv);
+        }
+
+        int flags = (session.isInterestedInRead() ? Poll.APR_POLLIN : 0)
+                | (value ? Poll.APR_POLLOUT : 0);
+
+        rv = Poll.add(pollset, session.getAprSocket(), flags);
+        if (rv == Status.APR_SUCCESS) {
+            session.setInterestedInWrite(value);
+        } else {
+            throwException(rv);
         }
     }
 
     @Override
     protected SessionState state(AprSession session) {
-        logger.debug("state?");
-        long socket=session.getAPRSocket();
-        if(socket>0)
+        long socket = session.getAprSocket();
+        if (socket > 0) {
             return SessionState.OPEN;
-        else if(managedSessions.get(socket)!=null)
+        } else if (managedSessions.get(socket) != null) {
             return SessionState.PREPARING; // will occur ?
-        else
+        } else {
             return SessionState.CLOSED;
+        }
     }
 
     @Override
     protected long transferFile(AprSession session, FileRegion region)
             throws Exception {
-        throw new UnsupportedOperationException("Not supposed for APR (TODO)");
+        throw new UnsupportedOperationException();
     }
 
     @Override
     protected void wakeup() {
-        logger.debug("wakeup");
-        // FIXME : is it possible to interrupt a Poll.poll ?
+        if (toBeWakenUp) {
+            return;
+        }
         
+        // Add a dummy socket to the pollset.
+        synchronized (wakeupLock) {
+            toBeWakenUp = true;
+            Poll.add(pollset, wakeupSocket, Poll.APR_POLLOUT);
+        }
     }
-    
+
     @Override
     protected int write(AprSession session, IoBuffer buf) throws Exception {
-        logger.debug("write");
-        // be sure APR_SO_NONBLOCK was set, or it will block
-        int toWrite = buf.remaining();
-
         int writtenBytes;
-        // APR accept ByteBuffer, only if they are Direct ones, due to native code
         if (buf.isDirect()) {
-            writtenBytes = Socket.sendb( session.getAPRSocket(), buf.buf(),
-                    0, toWrite);
+            writtenBytes = Socket.sendb(session.getAprSocket(), buf.buf(), buf
+                    .position(), buf.remaining());
         } else {
-            writtenBytes = Socket.send( session.getAPRSocket(), buf.array(),
-                    0, toWrite);
-            // FIXME : kludgy ?
-            buf.position(buf.position() + writtenBytes);
+            writtenBytes = Socket.send(session.getAprSocket(), buf.array(), buf
+                    .position(), buf.remaining());
+            if (writtenBytes > 0) {
+                buf.skip(writtenBytes);
+            }
         }
-        logger.debug("write : "+writtenBytes);
+        
+        if (writtenBytes < 0) {
+            if (Status.APR_STATUS_IS_EAGAIN(-writtenBytes)) {
+                writtenBytes = 0;
+            } else if (Status.APR_STATUS_IS_EOF(-writtenBytes)) {
+                writtenBytes = 0;
+            } else {
+                throwException(writtenBytes);
+            }
+        }
         return writtenBytes;
     }
 }

@@ -34,7 +34,7 @@ class AprLibrary {
     // is APR library was initialized (load of native libraries)
     private static AprLibrary library = null;
 
-    static synchronized AprLibrary getLibrary() {
+    static synchronized AprLibrary getInstance() {
         if (!isInitialized())
             initialize();
         return library;
@@ -57,17 +57,18 @@ class AprLibrary {
             Library.initialize(null);
         } catch (Exception e) {
             throw new RuntimeException(
-                    "Error loading Apache Portable Runtime (APR)", e);
+                    "Error loading Apache Portable Runtime (APR).", e);
         }
         pool = Pool.create(0);
     }
 
+    @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        Pool.clear(pool);
+        Pool.destroy(pool);
     }
 
-    public long getPool() {
+    long getRootPool() {
         return pool;
     }
 }

@@ -49,8 +49,6 @@ public class AprSession extends AbstractIoSession {
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
     private final IoHandler handler;
 
-    private byte[] readBuffer = new byte[1024]; //FIXME : fixed rcvd buffer, need to change that to a config value
-
     private final InetSocketAddress remoteAddress;
     private final InetSocketAddress localAddress;
 
@@ -58,8 +56,10 @@ public class AprSession extends AbstractIoSession {
             "Apache Portable Runtime socket", false, true,
             InetSocketAddress.class, AprSessionConfig.class, IoBuffer.class);
 
-    private boolean isOpRead=false;
-    private boolean isOpWrite=false;
+    private boolean readable = true;
+    private boolean writable = true;
+    private boolean interestedInRead;
+    private boolean interestedInWrite;
     
     /**
      * Creates a new instance.
@@ -74,7 +74,7 @@ public class AprSession extends AbstractIoSession {
         this.socket = socket;
     }
 
-    long getAPRSocket() {
+    long getAprSocket() {
         return socket;
     }
 
@@ -91,10 +91,6 @@ public class AprSession extends AbstractIoSession {
         return localAddress;
     }
 
-    byte[] getReadBuffer() {
-        return readBuffer;
-    }
-
     public InetSocketAddress getRemoteAddress() {
         return remoteAddress;
     }
@@ -107,7 +103,6 @@ public class AprSession extends AbstractIoSession {
     public IoHandler getHandler() {
         return handler;
     }
-
     
     public IoService getService() {
         return service;
@@ -122,20 +117,36 @@ public class AprSession extends AbstractIoSession {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
-    boolean isOpRead() {
-        return isOpRead;
+    boolean isReadable() {
+        return readable;
     }
 
-    void setOpRead(boolean isOpRead) {
-        this.isOpRead = isOpRead;
+    void setReadable(boolean readable) {
+        this.readable = readable;
     }
 
-    boolean isOpWrite() {
-        return isOpWrite;
+    boolean isWritable() {
+        return writable;
     }
 
-    void setOpWrite(boolean isOpWrite) {
-        this.isOpWrite = isOpWrite;
+    void setWritable(boolean writable) {
+        this.writable = writable;
+    }
+
+    boolean isInterestedInRead() {
+        return interestedInRead;
+    }
+
+    void setInterestedInRead(boolean isOpRead) {
+        this.interestedInRead = isOpRead;
+    }
+
+    boolean isInterestedInWrite() {
+        return interestedInWrite;
+    }
+
+    void setInterestedInWrite(boolean isOpWrite) {
+        this.interestedInWrite = isOpWrite;
     }
 
     private class APRSessionConfigImpl extends AbstractAprSessionConfig
@@ -143,18 +154,18 @@ public class AprSession extends AbstractIoSession {
 
         public boolean isKeepAlive() {
             try {
-                return Socket.optGet(getAPRSocket(), Socket.APR_SO_KEEPALIVE) == 1;
+                return Socket.optGet(getAprSocket(), Socket.APR_SO_KEEPALIVE) == 1;
             } catch (Exception e) {
                 throw new RuntimeException("APR Exception", e);
             }
         }
 
         public void setKeepAlive(boolean on) {
-            Socket.optSet(getAPRSocket(), Socket.APR_SO_KEEPALIVE, on ? 1 : 0);
+            Socket.optSet(getAprSocket(), Socket.APR_SO_KEEPALIVE, on ? 1 : 0);
         }
 
         public boolean isOobInline() {
-            return Socket.atmark(getAPRSocket());
+            return Socket.atmark(getAprSocket());
         }
 
         public void setOobInline(boolean on) {
@@ -164,19 +175,19 @@ public class AprSession extends AbstractIoSession {
 
         public boolean isReuseAddress() {
             try {
-                return Socket.optGet(getAPRSocket(), Socket.APR_SO_REUSEADDR) == 1;
+                return Socket.optGet(getAprSocket(), Socket.APR_SO_REUSEADDR) == 1;
             } catch (Exception e) {
                 throw new RuntimeException("APR Exception", e);
             }
         }
 
         public void setReuseAddress(boolean on) {
-            Socket.optSet(getAPRSocket(), Socket.APR_SO_REUSEADDR, on ? 1 : 0);
+            Socket.optSet(getAprSocket(), Socket.APR_SO_REUSEADDR, on ? 1 : 0);
         }
 
         public int getSoLinger() {
             try {
-                return Socket.optGet(getAPRSocket(), Socket.APR_SO_LINGER);
+                return Socket.optGet(getAprSocket(), Socket.APR_SO_LINGER);
             } catch (Exception e) {
                 throw new RuntimeException("APR Exception", e);
             }
@@ -184,19 +195,19 @@ public class AprSession extends AbstractIoSession {
 
         public void setSoLinger(int linger) {
             // TODO : it's me or APR isn't able to disable linger ?
-            Socket.optSet(getAPRSocket(), Socket.APR_SO_LINGER, linger);
+            Socket.optSet(getAprSocket(), Socket.APR_SO_LINGER, linger);
         }
 
         public boolean isTcpNoDelay() {
             try {
-                return Socket.optGet(getAPRSocket(), Socket.APR_TCP_NODELAY) == 1;
+                return Socket.optGet(getAprSocket(), Socket.APR_TCP_NODELAY) == 1;
             } catch (Exception e) {
                 throw new RuntimeException("APR Exception", e);
             }
         }
 
         public void setTcpNoDelay(boolean on) {
-            Socket.optSet(getAPRSocket(), Socket.APR_TCP_NODELAY, on ? 1 : 0);
+            Socket.optSet(getAprSocket(), Socket.APR_TCP_NODELAY, on ? 1 : 0);
         }
 
         public int getTrafficClass() {
@@ -210,27 +221,26 @@ public class AprSession extends AbstractIoSession {
 
         public int getSendBufferSize() {
             try {
-                return Socket.optGet(getAPRSocket(), Socket.APR_SO_SNDBUF);
+                return Socket.optGet(getAprSocket(), Socket.APR_SO_SNDBUF);
             } catch (Exception e) {
                 throw new RuntimeException("APR Exception", e);
             }
         }
 
         public void setSendBufferSize(int size) {
-            Socket.optSet(getAPRSocket(), Socket.APR_SO_SNDBUF, size);
+            Socket.optSet(getAprSocket(), Socket.APR_SO_SNDBUF, size);
         }
 
         public int getReceiveBufferSize() {
             try {
-                return Socket.optGet(getAPRSocket(), Socket.APR_SO_RCVBUF);
+                return Socket.optGet(getAprSocket(), Socket.APR_SO_RCVBUF);
             } catch (Exception e) {
                 throw new RuntimeException("APR Exception", e);
             }
         }
 
         public void setReceiveBufferSize(int size) {
-            Socket.optSet(getAPRSocket(), Socket.APR_SO_RCVBUF, size);
+            Socket.optSet(getAprSocket(), Socket.APR_SO_RCVBUF, size);
         }
-
     }
 }
