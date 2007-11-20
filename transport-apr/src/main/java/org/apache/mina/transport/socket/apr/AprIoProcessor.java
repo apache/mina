@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.AbstractIoProcessor;
+import org.apache.mina.common.AbstractPollingIoProcessor;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.RuntimeIoException;
@@ -44,7 +44,7 @@ import org.apache.tomcat.jni.Status;
  * @version $Rev$, $Date$
  */
 
-public class AprIoProcessor extends AbstractIoProcessor<AprSession> {
+public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     private static final int INITIAL_CAPACITY = 32;
     
     private final Map<Long, AprSession> allSessions =

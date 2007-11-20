@@ -40,7 +40,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
+public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
     /**
      * The maximum loop count for a write operation until
      * {@link #write(IoSession, IoBuffer)} returns non-zero value.
@@ -65,7 +65,7 @@ public abstract class AbstractIoProcessor<T extends AbstractIoSession> implement
     private long lastIdleCheckTime;
     private volatile boolean toBeDisposed;
     
-    protected AbstractIoProcessor(Executor executor) {
+    protected AbstractPollingIoProcessor(Executor executor) {
         if (executor == null) {
             throw new NullPointerException("executor");
         }

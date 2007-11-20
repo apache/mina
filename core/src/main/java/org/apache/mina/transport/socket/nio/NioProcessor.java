@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.AbstractIoProcessor;
+import org.apache.mina.common.AbstractPollingIoProcessor;
 import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.RuntimeIoException;
@@ -38,7 +38,7 @@ import org.apache.mina.common.RuntimeIoException;
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class NioProcessor extends AbstractIoProcessor<NioSession> {
+public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
     private static Selector newSelector() {
         try {

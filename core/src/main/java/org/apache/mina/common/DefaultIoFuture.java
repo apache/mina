@@ -171,7 +171,7 @@ public class DefaultIoFuture implements IoFuture {
 
         // Simple and quick check.
         for (StackTraceElement s: stackTrace) {
-            if (AbstractIoProcessor.class.getName().equals(s.getClassName())) {
+            if (AbstractPollingIoProcessor.class.getName().equals(s.getClassName())) {
                 throw e;
             }
         }
