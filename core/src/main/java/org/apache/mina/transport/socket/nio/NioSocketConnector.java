@@ -20,32 +20,23 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.SocketAddress;
-import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.DefaultConnectFuture;
+import org.apache.mina.common.AbstractPollingIoConnector;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.RuntimeIoException;
-import org.apache.mina.common.SimpleIoProcessorPool;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.SocketSessionConfig;
-import org.apache.mina.util.NamePreservingRunnable;
-import org.apache.mina.util.NewThreadExecutor;
 
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
@@ -53,77 +44,44 @@ import org.apache.mina.util.NewThreadExecutor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
-public class NioSocketConnector extends AbstractIoConnector implements SocketConnector {
+public class NioSocketConnector
+        extends AbstractPollingIoConnector<NioSession, SocketChannel>
+        implements SocketConnector {
 
-    private static final AtomicInteger id = new AtomicInteger();
-
-    private final Object lock = new Object();
-    private final String threadName;
-    private final Executor executor;
-    private final Selector selector;
-    private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
-    private final Queue<ConnectionRequest> cancelQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
-    private final IoProcessor<NioSession> processor;
-    private final boolean createdProcessor;
-
-    private Worker worker;
+    private volatile Selector selector;
 
     public NioSocketConnector() {
-        this(null, new SimpleIoProcessorPool<NioSession>(NioProcessor.class), true);
+        super(new DefaultSocketSessionConfig(), NioProcessor.class);
     }
 
     public NioSocketConnector(int processorCount) {
-        this(null, new SimpleIoProcessorPool<NioSession>(NioProcessor.class, processorCount), true);
+        super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
     }
 
     public NioSocketConnector(IoProcessor<NioSession> processor) {
-        this(null, processor, false);
+        super(new DefaultSocketSessionConfig(), processor);
     }
 
     public NioSocketConnector(Executor executor, IoProcessor<NioSession> processor) {
-        this(executor, processor, false);
+        super(new DefaultSocketSessionConfig(), executor, processor);
     }
-
-    private NioSocketConnector(Executor executor, IoProcessor<NioSession> processor, boolean createdProcessor) {
-        super(new DefaultSocketSessionConfig());
-        
-        if (executor == null) {
-            executor = new NewThreadExecutor();
-        }
-        if (processor == null) {
-            throw new NullPointerException("processor");
-        }
-        
-        this.executor = executor;
-        this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
-        this.processor = processor;
-        this.createdProcessor = createdProcessor;
-
+    
+    @Override
+    protected void doInit() {
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
-            disposeNow();
             throw new RuntimeIoException("Failed to open a selector.", e);
         }
     }
     
     @Override
-    protected void doDispose() throws Exception {
-        startupWorker();
-    }
-
-    private void disposeNow() {
-        try {
-            if (createdProcessor) {
-                processor.dispose();
-            }
-        } finally {
-            if (selector != null) {
-                try {
-                    selector.close();
-                } catch (IOException e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
+    protected void doDispose0() {
+        if (selector != null) {
+            try {
+                selector.close();
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
             }
         }
     }
@@ -137,229 +95,110 @@ public class NioSocketConnector extends AbstractIoConnector implements SocketCon
         return (SocketSessionConfig) super.getSessionConfig();
     }
 
+    
     @Override
-    protected ConnectFuture doConnect(SocketAddress remoteAddress,
-                                      SocketAddress localAddress) {
-        SocketChannel ch = null;
-        boolean success = false;
-        try {
-            ch = SocketChannel.open();
-            ch.socket().setReuseAddress(true);
-            if (localAddress != null) {
-                ch.socket().bind(localAddress);
-            }
-
-            ch.configureBlocking(false);
-
-            if (ch.connect(remoteAddress)) {
-                ConnectFuture future = new DefaultConnectFuture();
-                newSession(ch, future);
-                success = true;
-                return future;
-            }
-
-            success = true;
-        } catch (IOException e) {
-            return DefaultConnectFuture.newFailedFuture(e);
-        } finally {
-            if (!success && ch != null) {
-                try {
-                    ch.close();
-                } catch (IOException e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
-            }
-        }
-
-        ConnectionRequest request = new ConnectionRequest(ch);
-        connectQueue.add(request);
-        startupWorker();
-        selector.wakeup();
-
-        return request;
+    protected Iterator<SocketChannel> allHandles() {
+        return new SocketChannelIterator(selector.keys());
     }
 
-    private void startupWorker() {
-        if (!selector.isOpen()) {
-            connectQueue.clear();
-            cancelQueue.clear();
-            throw new ClosedSelectorException();
-        }
-        synchronized (lock) {
-            if (worker == null) {
-                worker = new Worker();
-                executor.execute(new NamePreservingRunnable(worker, threadName));
-            }
-        }
+    @Override
+    protected boolean connect(SocketChannel handle, SocketAddress remoteAddress)
+            throws Exception {
+        return handle.connect(remoteAddress);
     }
 
-    private void registerNew() {
-        for (; ;) {
-            ConnectionRequest req = connectQueue.poll();
-            if (req == null) {
-                break;
-            }
-
-            SocketChannel ch = req.channel;
-            try {
-                ch.register(selector, SelectionKey.OP_CONNECT, req);
-            } catch (IOException e) {
-                req.setException(e);
-                try {
-                    ch.close();
-                } catch (IOException e2) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e2);
-                }
-            }
+    @Override
+    protected ConnectionRequest connectionRequest(SocketChannel handle) {
+        SelectionKey key = handle.keyFor(selector);
+        if (key == null) {
+            return null;
         }
+        
+        return (ConnectionRequest) key.attachment();
     }
 
-    private void cancelKeys() {
-        for (; ;) {
-            ConnectionRequest req = cancelQueue.poll();
-            if (req == null) {
-                break;
-            }
-
-            SocketChannel ch = req.channel;
-            SelectionKey key = ch.keyFor(selector);
-            if (key == null) {
-                continue;
-            }
-
+    @Override
+    protected void destroy(SocketChannel handle) throws Exception {
+        SelectionKey key = handle.keyFor(selector);
+        if (key != null) {
             key.cancel();
-
-            try {
-                ch.close();
-            } catch (IOException e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-            }
         }
+        handle.close();
     }
 
-    private void processSessions(Set<SelectionKey> keys) {
-        for (SelectionKey key : keys) {
-            if (!key.isConnectable()) {
-                continue;
-            }
-
-            SocketChannel ch = (SocketChannel) key.channel();
-            ConnectionRequest entry = (ConnectionRequest) key.attachment();
-
-            boolean success = false;
-            try {
-                ch.finishConnect();
-                newSession(ch, entry);
-                success = true;
-            } catch (Throwable e) {
-                entry.setException(e);
-            } finally {
-                key.cancel();
-                if (!success) {
-                    try {
-                        ch.close();
-                    } catch (IOException e) {
-                        ExceptionMonitor.getInstance().exceptionCaught(e);
-                    }
-                }
-            }
+    @Override
+    protected void finishConnect(SocketChannel handle) throws Exception {
+        SelectionKey key = handle.keyFor(selector);
+        if (key != null) {
+            key.cancel();
         }
-
-        keys.clear();
+        
+        handle.finishConnect();
     }
 
-    private void processTimedOutSessions(Set<SelectionKey> keys) {
-        long currentTime = System.currentTimeMillis();
-
-        for (SelectionKey key : keys) {
-            if (!key.isValid()) {
-                continue;
-            }
-
-            ConnectionRequest entry = (ConnectionRequest) key.attachment();
-
-            if (currentTime >= entry.deadline) {
-                entry.setException(new ConnectException());
-                try {
-                    key.channel().close();
-                } catch (IOException e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                } finally {
-                    key.cancel();
-                }
-            }
+    @Override
+    protected SocketChannel newHandle(SocketAddress localAddress)
+            throws Exception {
+        SocketChannel ch = SocketChannel.open();
+        ch.socket().setReuseAddress(true);
+        if (localAddress != null) {
+            ch.socket().bind(localAddress);
         }
+        ch.configureBlocking(false);
+        return ch;
     }
 
-    private void newSession(SocketChannel ch, ConnectFuture connectFuture) {
-        NioSocketSession session = new NioSocketSession(this, processor, ch);
-
-        finishSessionInitialization(session, connectFuture);
-
-        // Forward the remaining process to the SocketIoProcessor.
-        session.getProcessor().add(session);
+    @Override
+    protected NioSession newSession(IoProcessor<NioSession> processor, SocketChannel handle)
+            throws Exception {
+        return new NioSocketSession(this, processor, handle);
     }
 
-    private class Worker implements Runnable {
-
-        public void run() {
-            for (;;) {
-                try {
-                    int nKeys = selector.select(1000);
-
-                    registerNew();
-
-                    if (nKeys > 0) {
-                        processSessions(selector.selectedKeys());
-                    }
-
-                    processTimedOutSessions(selector.keys());
-
-                    cancelKeys();
-
-                    if (selector.keys().isEmpty() && isDisposed()) {
-                        synchronized (lock) {
-                            if (selector.keys().isEmpty() &&
-                                connectQueue.isEmpty() &&
-                                isDisposed()) {
-                                worker = null;
-                                break;
-                            }
-                        }
-                    }
-                } catch (IOException e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        ExceptionMonitor.getInstance().exceptionCaught(e1);
-                    }
-                }
-            }
-            
-            if (isDisposed()) {
-                disposeNow();
-            }
-        }
+    @Override
+    protected void register(SocketChannel handle, ConnectionRequest request)
+            throws Exception {
+        handle.register(selector, SelectionKey.OP_CONNECT, request);
     }
 
-    private class ConnectionRequest extends DefaultConnectFuture {
-        private final SocketChannel channel;
-        private final long deadline;
+    @Override
+    protected boolean select(int timeout) throws Exception {
+        return selector.select(timeout) > 0;
+    }
 
-        private ConnectionRequest(SocketChannel channel) {
-            this.channel = channel;
-            this.deadline = System.currentTimeMillis()
-                    + getConnectTimeoutMillis();
+    @Override
+    protected boolean selectable() {
+        return selector.isOpen();
+    }
+
+    @Override
+    protected Iterator<SocketChannel> selectedHandles() {
+        return new SocketChannelIterator(selector.selectedKeys());
+    }
+
+    @Override
+    protected void wakeup() {
+        selector.wakeup();
+    }
+    
+    private static class SocketChannelIterator implements Iterator<SocketChannel> {
+        
+        private final Iterator<SelectionKey> i;
+        
+        private SocketChannelIterator(Collection<SelectionKey> selectedKeys) {
+            this.i = selectedKeys.iterator();
         }
 
-        @Override
-        public void cancel() {
-            super.cancel();
-            cancelQueue.add(this);
-            startupWorker();
-            selector.wakeup();
+        public boolean hasNext() {
+            return i.hasNext();
+        }
+
+        public SocketChannel next() {
+            SelectionKey key = i.next();
+            return (SocketChannel) key.channel();
+        }
+
+        public void remove() {
+            i.remove();
         }
     }
 }
