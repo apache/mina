@@ -170,7 +170,7 @@ public class NioSocketAcceptor
     
     @Override
     protected NioSession accept(IoProcessor<NioSession> processor,
-            ServerSocketChannel handle) throws Exception {
+            ServerSocketChannel handle) {
 
         SelectionKey key = handle.keyFor(selector);
         if (!key.isAcceptable()) {
@@ -178,7 +178,14 @@ public class NioSocketAcceptor
         }
 
         // accept the connection from the client
-        SocketChannel ch = handle.accept();
+        SocketChannel ch;
+        try {
+            ch = handle.accept();
+        } catch (IOException e) {
+            ExceptionMonitor.getInstance().exceptionCaught(e);
+            return null;
+        }
+
         if (ch == null) {
             return null;
         }
@@ -190,14 +197,22 @@ public class NioSocketAcceptor
     protected ServerSocketChannel bind(SocketAddress localAddress)
             throws Exception {
         ServerSocketChannel c = ServerSocketChannel.open();
-        c.configureBlocking(false);
-        // Configure the server socket,
-        c.socket().setReuseAddress(isReuseAddress());
-        c.socket().setReceiveBufferSize(
-                getSessionConfig().getReceiveBufferSize());
-        // and bind.
-        c.socket().bind(localAddress, getBacklog());
-        c.register(selector, SelectionKey.OP_ACCEPT);
+        boolean success = false;
+        try {
+            c.configureBlocking(false);
+            // Configure the server socket,
+            c.socket().setReuseAddress(isReuseAddress());
+            c.socket().setReceiveBufferSize(
+                    getSessionConfig().getReceiveBufferSize());
+            // and bind.
+            c.socket().bind(localAddress, getBacklog());
+            c.register(selector, SelectionKey.OP_ACCEPT);
+            success = true;
+        } finally {
+            if (!success) {
+                unbind(c);
+            }
+        }
         return c;
     }
 

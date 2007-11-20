@@ -106,7 +106,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected abstract Iterator<H> selectedHandles();
     protected abstract H bind(SocketAddress localAddress) throws Exception;
     protected abstract SocketAddress localAddress(H handle) throws Exception;
-    protected abstract T accept(IoProcessor<T> processor, H handle) throws Exception;
+    protected abstract T accept(IoProcessor<T> processor, H handle);
     protected abstract void unbind(H handle) throws Exception;
 
     @Override
@@ -246,29 +246,15 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 H handle = handles.next();
                 handles.remove();
 
-                boolean success = false;
-                try {
-                    T session = accept(processor, handle);
-                    if (session == null) {
-                        break;
-                    }
-                    
-                    finishSessionInitialization(session, null);
-
-                    // add the session to the SocketIoProcessor
-                    session.getProcessor().add(session);
-                    success = true;
-                } catch (Throwable t) {
-                    ExceptionMonitor.getInstance().exceptionCaught(t);
-                } finally {
-                    if (!success) {
-                        try {
-                            unbind(handle);
-                        } catch (Throwable t) {
-                            ExceptionMonitor.getInstance().exceptionCaught(t);
-                        }
-                    }
+                T session = accept(processor, handle);
+                if (session == null) {
+                    break;
                 }
+                
+                finishSessionInitialization(session, null);
+
+                // add the session to the SocketIoProcessor
+                session.getProcessor().add(session);
             }
         }
     }
@@ -295,12 +281,10 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             try {
                 for (SocketAddress a: localAddresses) {
                     H handle = null;
-                    boolean success = false;
                     try {
                         handle = bind(a);
-                        success = true;
                     } finally {
-                        if (!success && handle != null) {
+                        if (handle != null) {
                             try {
                                 unbind(handle);
                             } catch (Exception e) {

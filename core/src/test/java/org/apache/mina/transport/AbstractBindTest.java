@@ -81,6 +81,7 @@ public abstract class AbstractBindTest extends TestCase {
                 socketBound = true;
                 break;
             } catch (IOException e) {
+                //System.out.println(e.getMessage());
             }
         }
 
