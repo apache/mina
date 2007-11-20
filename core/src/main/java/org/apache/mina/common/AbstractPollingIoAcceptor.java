@@ -280,19 +280,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             
             try {
                 for (SocketAddress a: localAddresses) {
-                    H handle = null;
-                    try {
-                        handle = bind(a);
-                    } finally {
-                        if (handle != null) {
-                            try {
-                                unbind(handle);
-                            } catch (Exception e) {
-                                ExceptionMonitor.getInstance().exceptionCaught(e);
-                            }
-                        }
-                    }
-                    
+                    H handle = bind(a);
                     newHandles.put(localAddress(handle), handle);
                 }
                 
