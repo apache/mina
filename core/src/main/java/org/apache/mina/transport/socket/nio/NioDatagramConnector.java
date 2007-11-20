@@ -19,17 +19,13 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
+import java.util.Iterator;
 
-import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.DefaultConnectFuture;
-import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.AbstractPollingIoConnector;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.SimpleIoProcessorPool;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DatagramConnector;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -41,41 +37,29 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class NioDatagramConnector extends AbstractIoConnector implements DatagramConnector{
+public class NioDatagramConnector
+        extends AbstractPollingIoConnector<NioSession, DatagramChannel>
+        implements DatagramConnector {
 
-    private final IoProcessor<NioSession> processor;
-    private final boolean createdProcessor;
-    
     /**
      * Creates a new instance.
      */
     public NioDatagramConnector() {
-        this(new SimpleIoProcessorPool<NioSession>(NioProcessor.class), true);
+        super(new DefaultDatagramSessionConfig(), NioProcessor.class);
     }
 
     /**
      * Creates a new instance.
      */
     public NioDatagramConnector(int processorCount) {
-        this(new SimpleIoProcessorPool<NioSession>(NioProcessor.class, processorCount), true);
+        super(new DefaultDatagramSessionConfig(), NioProcessor.class, processorCount);
     }
 
     /**
      * Creates a new instance.
      */
     public NioDatagramConnector(IoProcessor<NioSession> processor) {
-        this(processor, false);
-    }
-
-    private NioDatagramConnector(IoProcessor<NioSession> processor, boolean createdProcessor) {
-        super(new DefaultDatagramSessionConfig());
-
-        if (processor == null) {
-            throw new NullPointerException("processor");
-        }
-        
-        this.processor = processor;
-        this.createdProcessor = createdProcessor;
+        super(new DefaultDatagramSessionConfig(), processor);
     }
     
     public TransportMetadata getTransportMetadata() {
@@ -83,50 +67,92 @@ public class NioDatagramConnector extends AbstractIoConnector implements Datagra
     }
     
     @Override
-    protected void doDispose() throws Exception {
-        if (createdProcessor) {
-            processor.dispose();
-        }
-    }
-
-    @Override
     public DatagramSessionConfig getSessionConfig() {
         return (DatagramSessionConfig) super.getSessionConfig();
     }
 
     @Override
-    protected ConnectFuture doConnect(SocketAddress remoteAddress,
-                                      SocketAddress localAddress) {
-        DatagramChannel ch = null;
-        boolean initialized = false;
-        try {
-            ch = DatagramChannel.open();
-            ch.socket().setReuseAddress(getSessionConfig().isReuseAddress());
-            ch.socket().setReuseAddress(true);
-            ch.socket().setBroadcast(getSessionConfig().isBroadcast());
+    protected void doInit() {
+    }
 
-            if (localAddress != null) {
-                ch.socket().bind(localAddress);
-            }
-            ch.connect(remoteAddress);
+    @Override
+    protected DatagramChannel newHandle(SocketAddress localAddress)
+            throws Exception {
+        DatagramChannel ch = DatagramChannel.open();
+        ch.socket().setReuseAddress(getSessionConfig().isReuseAddress());
+        ch.socket().setReuseAddress(true);
+        ch.socket().setBroadcast(getSessionConfig().isBroadcast());
 
-            final NioSession session = new NioDatagramSession(this, ch, processor);
-            ConnectFuture future = new DefaultConnectFuture();
-            finishSessionInitialization(session, future);
-            processor.add(session);
-            initialized = true;
-            return future;
-        } catch (Exception e) {
-            return DefaultConnectFuture.newFailedFuture(e);
-        } finally {
-            if (!initialized && ch != null) {
-                try {
-                    ch.disconnect();
-                    ch.close();
-                } catch (IOException e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
-            }
+        if (localAddress != null) {
+            ch.socket().bind(localAddress);
         }
+        
+        return ch;
+    }
+
+    @Override
+    protected boolean connect(DatagramChannel handle,
+            SocketAddress remoteAddress) throws Exception {
+        handle.connect(remoteAddress);
+        return true;
+    }
+
+    @Override
+    protected NioSession newSession(IoProcessor<NioSession> processor,
+            DatagramChannel handle) throws Exception {
+        return new NioDatagramSession(this, handle, processor);
+    }
+
+    @Override
+    protected void destroy(DatagramChannel handle) throws Exception {
+        handle.disconnect();
+        handle.close();
+    }
+    
+    // Unused extension points.
+    @Override
+    protected Iterator<DatagramChannel> allHandles() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected ConnectionRequest connectionRequest(DatagramChannel handle) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void doDispose0() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void finishConnect(DatagramChannel handle) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void register(DatagramChannel handle, ConnectionRequest request)
+            throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected boolean select(int timeout) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected boolean selectable() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected Iterator<DatagramChannel> selectedHandles() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void wakeup() {
+        throw new UnsupportedOperationException();
     }
 }
