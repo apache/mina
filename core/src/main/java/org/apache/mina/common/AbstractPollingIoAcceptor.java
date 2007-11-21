@@ -288,6 +288,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
                 // and notify.
                 future.setDone();
+                return boundHandles.size();
             } catch (Exception e) {
                 future.setException(e);
             } finally {
@@ -305,7 +306,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             }
         }
         
-        return boundHandles.size();
+        return 0;
     }
 
     /**

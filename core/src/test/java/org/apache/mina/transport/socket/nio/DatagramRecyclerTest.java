@@ -30,6 +30,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -138,8 +139,9 @@ public class DatagramRecyclerTest extends TestCase {
             acceptorHandler.session = null;
             
             // Write whatever to trigger the acceptor again.
-            future.getSession().write(IoBuffer.allocate(1))
-                    .awaitUninterruptibly();
+            WriteFuture wf = future.getSession().write(
+                    IoBuffer.allocate(1)).awaitUninterruptibly();
+            Assert.assertTrue(wf.isWritten());
             
             // Make sure the connection is closed before recycler closes it.
             while (acceptorHandler.session == null) {

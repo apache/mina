@@ -149,8 +149,7 @@ public class NioSocketConnector
     }
 
     @Override
-    protected NioSession newSession(IoProcessor<NioSession> processor, SocketChannel handle)
-            throws Exception {
+    protected NioSession newSession(IoProcessor<NioSession> processor, SocketChannel handle) {
         return new NioSocketSession(this, processor, handle);
     }
 

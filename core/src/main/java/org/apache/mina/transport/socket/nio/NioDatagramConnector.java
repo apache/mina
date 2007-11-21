@@ -99,7 +99,7 @@ public class NioDatagramConnector
 
     @Override
     protected NioSession newSession(IoProcessor<NioSession> processor,
-            DatagramChannel handle) throws Exception {
+            DatagramChannel handle) {
         return new NioDatagramSession(this, handle, processor);
     }
 

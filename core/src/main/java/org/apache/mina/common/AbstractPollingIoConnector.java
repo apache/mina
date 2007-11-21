@@ -89,7 +89,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected abstract H newHandle(SocketAddress localAddress) throws Exception;
     protected abstract boolean connect(H handle, SocketAddress remoteAddress) throws Exception;
     protected abstract void finishConnect(H handle) throws Exception;
-    protected abstract T newSession(IoProcessor<T> processor, H handle) throws Exception;
+    protected abstract T newSession(IoProcessor<T> processor, H handle);
     protected abstract void destroy(H handle) throws Exception;
     protected abstract void wakeup();
     protected abstract boolean selectable();
