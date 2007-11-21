@@ -41,21 +41,21 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
     private final List<Long> polledHandles =
         new CircularQueue<Long>(POLLSET_SIZE);
     
+    public AprSocketAcceptor() {
+        super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
+    }
+
     public AprSocketAcceptor(int processorCount) {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class, processorCount);
     }
 
-    public AprSocketAcceptor() {
-        super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
+    public AprSocketAcceptor(IoProcessor<AprSession> processor) {
+        super(new DefaultSocketSessionConfig(), processor);
     }
 
     public AprSocketAcceptor(Executor executor,
             IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), executor, processor);
-    }
-
-    public AprSocketAcceptor(IoProcessor<AprSession> processor) {
-        super(new DefaultSocketSessionConfig(), processor);
     }
 
     @Override
