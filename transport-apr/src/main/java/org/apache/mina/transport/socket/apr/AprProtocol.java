@@ -22,21 +22,21 @@ package org.apache.mina.transport.socket.apr;
 import org.apache.tomcat.jni.Socket;
 
 /**
- * Protocol usable with the {@link AprConnector}.
+ * Protocol usable with the {@link AprSocketConnector}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public enum AprProtocol {
+enum AprProtocol {
     TCP(Socket.APR_PROTO_TCP,Socket.SOCK_STREAM), 
     UDP(Socket.APR_PROTO_UDP,Socket.SOCK_DGRAM),
     SCTP(Socket.APR_PROTO_SCTP,Socket.SOCK_STREAM);
 
-    int socketType;
-    int codeProto;
+    int type;
+    int protocol;
 
-    private AprProtocol(int codeProto,int socketType) {
-        this.codeProto = codeProto;
-        this.socketType = socketType;
+    private AprProtocol(int protocol, int type) {
+        this.protocol = protocol;
+        this.type = type;
     }
 }

@@ -38,7 +38,7 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 
 /**
- * The class in charge of processing socket level IO events for the {@link AprConnector}
+ * The class in charge of processing socket level IO events for the {@link AprSocketConnector}
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -176,7 +176,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
 
     @Override
     protected void init(AprSession session) throws Exception {
-        long s = session.getAprSocket();
+        long s = session.getDescriptor();
         Socket.optSet(s, Socket.APR_SO_NONBLOCK, 1);
         Socket.timeoutSet(s, 0);
         
@@ -194,19 +194,19 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
 
     @Override
     protected void destroy(AprSession session) throws Exception {
-        allSessions.remove(session.getAprSocket());
+        allSessions.remove(session.getDescriptor());
         if (polledSockets.length >= (INITIAL_CAPACITY << 2) &&
             allSessions.size() <= polledSockets.length >>> 3) {
             this.polledSockets = new long[polledSockets.length >>> 1];
         }
     
-        int ret = Poll.remove(pollset, session.getAprSocket());
+        int ret = Poll.remove(pollset, session.getDescriptor());
         if (ret != Status.APR_SUCCESS) {
             try {
                 throwException(ret);
             } finally {
                 System.out.println("CLOSE");
-                ret = Socket.close(session.getAprSocket());
+                ret = Socket.close(session.getDescriptor());
                 if (ret != Status.APR_SUCCESS) {
                     throwException(ret);
                 }
@@ -216,7 +216,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
 
     @Override
     protected SessionState state(AprSession session) {
-        long socket = session.getAprSocket();
+        long socket = session.getDescriptor();
         if (socket > 0) {
             return SessionState.OPEN;
         } else if (allSessions.get(socket) != null) {
@@ -249,7 +249,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     @Override
     protected void setInterestedInRead(AprSession session, boolean value)
             throws Exception {
-        int rv = Poll.remove(pollset, session.getAprSocket());
+        int rv = Poll.remove(pollset, session.getDescriptor());
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
         }
@@ -257,7 +257,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
         int flags = (value ? Poll.APR_POLLIN : 0)
                 | (session.isInterestedInWrite() ? Poll.APR_POLLOUT : 0);
 
-        rv = Poll.add(pollset, session.getAprSocket(), flags);
+        rv = Poll.add(pollset, session.getDescriptor(), flags);
         if (rv == Status.APR_SUCCESS) {
             session.setInterestedInRead(value);
         } else {
@@ -268,7 +268,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     @Override
     protected void setInterestedInWrite(AprSession session, boolean value)
             throws Exception {
-        int rv = Poll.remove(pollset, session.getAprSocket());
+        int rv = Poll.remove(pollset, session.getDescriptor());
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
         }
@@ -276,7 +276,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
         int flags = (session.isInterestedInRead() ? Poll.APR_POLLIN : 0)
                 | (value ? Poll.APR_POLLOUT : 0);
 
-        rv = Poll.add(pollset, session.getAprSocket(), flags);
+        rv = Poll.add(pollset, session.getDescriptor(), flags);
         if (rv == Status.APR_SUCCESS) {
             session.setInterestedInWrite(value);
         } else {
@@ -291,14 +291,12 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
         ByteBuffer b = Pool.alloc(bufferPool, buffer.remaining());
         try {
             bytes = Socket.recvb(
-                    session.getAprSocket(), b, 0, b.remaining());
-            b.flip();
-            buffer.put(b);
+                    session.getDescriptor(), b, 0, b.remaining());
             if (bytes > 0) {
-                buffer.skip(bytes);
-            }
-            
-            if (bytes < 0) {
+                b.position(0);
+                b.limit(bytes);
+                buffer.put(b);
+            } else if (bytes < 0) {
                 if (Status.APR_STATUS_IS_EOF(-bytes)) {
                     bytes = -1;
                 } else if (Status.APR_STATUS_IS_EAGAIN(-bytes)) {
@@ -317,10 +315,10 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     protected int write(AprSession session, IoBuffer buf) throws Exception {
         int writtenBytes;
         if (buf.isDirect()) {
-            writtenBytes = Socket.sendb(session.getAprSocket(), buf.buf(), buf
+            writtenBytes = Socket.sendb(session.getDescriptor(), buf.buf(), buf
                     .position(), buf.remaining());
         } else {
-            writtenBytes = Socket.send(session.getAprSocket(), buf.array(), buf
+            writtenBytes = Socket.send(session.getDescriptor(), buf.array(), buf
                     .position(), buf.remaining());
             if (writtenBytes > 0) {
                 buf.skip(writtenBytes);
