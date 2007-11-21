@@ -69,8 +69,6 @@ class NioSocketSession extends NioSession implements SocketSession {
 
     private SelectionKey key;
 
-    private int readBufferSize = 1024;
-
     NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel ch) {
         this.service = service;
         this.processor = processor;
@@ -130,14 +128,6 @@ class NioSocketSession extends NioSession implements SocketSession {
     @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();
-    }
-
-    int getReadBufferSize() {
-        return readBufferSize;
-    }
-
-    void setReadBufferSize(int readBufferSize) {
-        this.readBufferSize = readBufferSize;
     }
 
     private class SessionConfigImpl extends AbstractSocketSessionConfig implements SocketSessionConfig {
