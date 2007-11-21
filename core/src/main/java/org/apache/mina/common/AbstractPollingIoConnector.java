@@ -221,11 +221,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                 entry.setException(e);
             } finally {
                 if (!success) {
-                    try {
-                        destroy(handle);
-                    } catch (Exception e) {
-                        ExceptionMonitor.getInstance().exceptionCaught(e);
-                    }
+                    cancelQueue.offer(entry);
                 }
             }
         }
@@ -240,11 +236,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
             if (currentTime >= entry.deadline) {
                 entry.setException(new ConnectException());
-                try {
-                    destroy(handle);
-                } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
+                cancelQueue.offer(entry);
             }
         }
     }
