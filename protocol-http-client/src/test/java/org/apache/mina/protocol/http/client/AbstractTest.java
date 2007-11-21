@@ -20,6 +20,9 @@
 package org.apache.mina.protocol.http.client;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.net.InetAddress;
+import java.security.Permission;
 
 import junit.framework.TestCase;
 
@@ -39,6 +42,7 @@ public abstract class AbstractTest extends TestCase {
     protected final File WORK = new File(BASEDIR, "target/work");
 
     protected final File KEYSTORE = new File(CATALINAHOME, "conf/keystore");
+    protected final File CERT = new File(CATALINAHOME, "conf/ca_bundle.crt");
 
     protected final File WEBAPPS = new File(CATALINAHOME, "webapps");
 
@@ -54,6 +58,8 @@ public abstract class AbstractTest extends TestCase {
 
         Engine engine = server.createEngine();
         engine.setDefaultHost("localhost");
+        
+        System.setSecurityManager(new AprDisablingSecurityManager());
 
         Host host = server.createHost("localhost", WEBAPPS.getAbsolutePath());
         ((StandardHost) host).setWorkDir(WORK.getAbsolutePath());
@@ -73,6 +79,7 @@ public abstract class AbstractTest extends TestCase {
         //Https
         Connector https = server.createConnector("localhost", 8383, true);
         https.setAttribute("keystoreFile", KEYSTORE.getAbsolutePath());
+        https.setAttribute("SSLCertificateFile", CERT.getAbsolutePath());
         server.addConnector(https);
         server.start();
     }
@@ -104,5 +111,110 @@ public abstract class AbstractTest extends TestCase {
         }
 
         return dir;
+    }
+    
+    private static class AprDisablingSecurityManager extends SecurityManager {
+        @Override
+        public void checkLink(String lib) {
+            if (lib != null && lib.indexOf("tcnative") >= 0) {
+                throw new SecurityException("APR has been disabled.");
+            }
+        }
+
+        @Override
+        public void checkAccept(String host, int port) {
+        }
+
+        @Override
+        public void checkAccess(Thread t) {
+        }
+
+        @Override
+        public void checkAccess(ThreadGroup g) {
+        }
+
+        @Override
+        public void checkConnect(String host, int port, Object context) {
+        }
+
+        @Override
+        public void checkConnect(String host, int port) {
+        }
+
+        @Override
+        public void checkCreateClassLoader() {
+        }
+
+        @Override
+        public void checkDelete(String file) {
+        }
+
+        @Override
+        public void checkExec(String cmd) {
+        }
+
+        @Override
+        public void checkListen(int port) {
+        }
+
+        @Override
+        public void checkMemberAccess(Class<?> clazz, int which) {
+        }
+
+        @Override
+        public void checkMulticast(InetAddress maddr) {
+        }
+
+        @Override
+        public void checkPackageAccess(String pkg) {
+        }
+
+        @Override
+        public void checkPackageDefinition(String pkg) {
+        }
+
+        @Override
+        public void checkPermission(Permission perm, Object context) {
+        }
+
+        @Override
+        public void checkPermission(Permission perm) {
+        }
+
+        @Override
+        public void checkPropertiesAccess() {
+        }
+
+        @Override
+        public void checkPropertyAccess(String key) {
+        }
+
+        @Override
+        public void checkRead(FileDescriptor fd) {
+        }
+
+        @Override
+        public void checkRead(String file, Object context) {
+        }
+
+        @Override
+        public void checkRead(String file) {
+        }
+
+        @Override
+        public void checkSecurityAccess(String target) {
+        }
+
+        @Override
+        public void checkSetFactory() {
+        }
+
+        @Override
+        public void checkWrite(FileDescriptor fd) {
+        }
+
+        @Override
+        public void checkWrite(String file) {
+        }
     }
 }
