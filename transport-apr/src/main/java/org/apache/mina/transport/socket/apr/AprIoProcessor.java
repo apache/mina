@@ -45,7 +45,7 @@ import org.apache.tomcat.jni.Status;
  */
 
 public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
-    private static final int INITIAL_CAPACITY = 32;
+    private static final int INITIAL_CAPACITY = 1024;
     
     private final Map<Long, AprSession> allSessions =
         new HashMap<Long, AprSession>(INITIAL_CAPACITY);
@@ -79,14 +79,23 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
         bufferPool = Pool.create(AprLibrary.getInstance().getRootPool());
         
         boolean success = false;
+        long newPollset;
         try {
-            // TODO : optimize/parameterize those values
-            pollset = Poll
-                    .create(
-                            INITIAL_CAPACITY,
-                            AprLibrary.getInstance().getRootPool(),
-                            Poll.APR_POLLSET_THREADSAFE,
-                            10000000);
+            newPollset = Poll.create(
+                    INITIAL_CAPACITY,
+                    AprLibrary.getInstance().getRootPool(),
+                    Poll.APR_POLLSET_THREADSAFE,
+                    Long.MAX_VALUE);
+
+            if (newPollset == 0) {
+                newPollset = Poll.create(
+                        62,
+                        AprLibrary.getInstance().getRootPool(),
+                        Poll.APR_POLLSET_THREADSAFE,
+                        Long.MAX_VALUE);
+            }
+            
+            pollset = newPollset;
             if (pollset < 0) {
                 if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
                     throw new RuntimeIoException(

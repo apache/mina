@@ -25,7 +25,7 @@ import org.apache.tomcat.jni.Status;
 
 public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Long> implements SocketAcceptor {
 
-    private static final int INITIAL_CAPACITY = 32;
+    private static final int INITIAL_CAPACITY = 1024;
 
     private final Object wakeupLock = new Object();
     private long wakeupSocket;
@@ -151,13 +151,20 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
         
         boolean success = false;
         try {
-            // TODO : optimize/parameterize those values
-            pollset = Poll
-                    .create(
+            pollset = Poll.create(
                             INITIAL_CAPACITY,
                             pool,
                             Poll.APR_POLLSET_THREADSAFE,
-                            10000000);
+                            Long.MAX_VALUE);
+            
+            if (pollset == 0) {
+                pollset = Poll.create(
+                        62,
+                        pool,
+                        Poll.APR_POLLSET_THREADSAFE,
+                        Long.MAX_VALUE);
+            }
+
             if (pollset < 0) {
                 if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
                     throw new RuntimeIoException(
