@@ -232,10 +232,7 @@ public class AprSocketConnector extends AbstractPollingIoConnector<AprSession, L
             inetAddr = Address.info(sockAddr.getHostName(), Socket.APR_INET,
                     sockAddr.getPort(), 0, AprLibrary.getInstance().getRootPool());
 
-            long clientSock = Socket.create(Socket.APR_INET,
-                    AprProtocol.TCP.type, AprProtocol.TCP.protocol,
-                    AprLibrary.getInstance().getRootPool());
-
+            long clientSock = 0;
             
             // FIXME : error checking
             int ret = Socket.connect(clientSock, inetAddr);

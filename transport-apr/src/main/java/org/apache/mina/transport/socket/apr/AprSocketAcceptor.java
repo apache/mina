@@ -80,8 +80,7 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
     protected Long bind(SocketAddress localAddress) throws Exception {
         InetSocketAddress la = (InetSocketAddress) localAddress;
         long handle = Socket.create(
-                Socket.APR_INET, AprProtocol.TCP.type, AprProtocol.TCP.protocol,
-                pool);
+                Socket.APR_INET, Socket.SOCK_STREAM, Socket.APR_PROTO_TCP, pool);
 
         boolean success = false;
         try {
