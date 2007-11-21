@@ -45,7 +45,7 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
-                    "vmpipe", false, false,
+                    "mina", "vmpipe", false, false,
                     VmPipeAddress.class,
                     VmPipeSessionConfig.class,
                     Object.class);

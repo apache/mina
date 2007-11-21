@@ -746,7 +746,7 @@ public abstract class AbstractIoSession implements IoSession {
         if (tm == null) {
             return "null";
         } else {
-            return tm.getName();
+            return tm.getProviderName() + ' ' + tm.getName();
         }
     }
     

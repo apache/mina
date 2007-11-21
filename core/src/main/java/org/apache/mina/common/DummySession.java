@@ -33,7 +33,7 @@ public class DummySession extends AbstractIoSession {
 
     private static final TransportMetadata TRANSPORT_METADATA =
             new DefaultTransportMetadata(
-                    "dummy", false, false,
+                    "mina", "dummy", false, false,
                     SocketAddress.class, IoSessionConfig.class, Object.class);
 
     private static final SocketAddress ANONYMOUS_ADDRESS = new SocketAddress() {

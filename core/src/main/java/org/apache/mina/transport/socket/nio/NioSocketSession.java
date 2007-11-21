@@ -50,7 +50,7 @@ class NioSocketSession extends NioSession implements SocketSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
-                    "socket", false, true,
+                    "nio", "socket", false, true,
                     InetSocketAddress.class,
                     SocketSessionConfig.class,
                     IoBuffer.class, FileRegion.class);

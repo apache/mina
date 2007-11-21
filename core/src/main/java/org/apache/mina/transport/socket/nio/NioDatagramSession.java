@@ -52,7 +52,7 @@ class NioDatagramSession extends NioSession implements DatagramSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
-                    "datagram", true, false,
+                    "nio", "datagram", true, false,
                     InetSocketAddress.class,
                     DatagramSessionConfig.class, IoBuffer.class);
 

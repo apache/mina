@@ -53,7 +53,7 @@ public class AprSession extends AbstractIoSession {
     private final InetSocketAddress localAddress;
 
     static final TransportMetadata METADATA = new DefaultTransportMetadata(
-            "Apache Portable Runtime socket", false, true,
+            "apr", "socket", false, true,
             InetSocketAddress.class, AprSessionConfig.class, IoBuffer.class);
 
     private boolean readable = true;

@@ -29,6 +29,11 @@ import java.util.Set;
  * @version $Rev$, $Date$
  */
 public interface TransportMetadata {
+    
+    /**
+     * Returns the name of the service provider (e.g. "nio", "apr" and "rxtx").
+     */
+    String getProviderName();
 
     /**
      * Returns the name of the service.

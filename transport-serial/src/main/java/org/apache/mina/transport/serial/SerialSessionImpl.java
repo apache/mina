@@ -72,7 +72,7 @@ class SerialSessionImpl extends AbstractIoSession implements
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
-                    "serial", false, true, SerialAddress.class,
+                    "rxtx", "serial", false, true, SerialAddress.class,
                     SerialSessionConfig.class, IoBuffer.class);
 
     SerialSessionImpl(IoService service, SerialAddress address, SerialPort port) {
