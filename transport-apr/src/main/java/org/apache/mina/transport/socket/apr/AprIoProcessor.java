@@ -333,14 +333,14 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     }
 
     @Override
-    protected int write(AprSession session, IoBuffer buf) throws Exception {
+    protected int write(AprSession session, IoBuffer buf, int length) throws Exception {
         int writtenBytes;
         if (buf.isDirect()) {
-            writtenBytes = Socket.sendb(session.getDescriptor(), buf.buf(), buf
-                    .position(), buf.remaining());
+            writtenBytes = Socket.sendb(
+                    session.getDescriptor(), buf.buf(), buf.position(), length);
         } else {
-            writtenBytes = Socket.send(session.getDescriptor(), buf.array(), buf
-                    .position(), buf.remaining());
+            writtenBytes = Socket.send(
+                    session.getDescriptor(), buf.array(), buf.position(), length);
             if (writtenBytes > 0) {
                 buf.skip(writtenBytes);
             }
@@ -359,7 +359,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     }
 
     @Override
-    protected long transferFile(AprSession session, FileRegion region)
+    protected long transferFile(AprSession session, FileRegion region, int length)
             throws Exception {
         throw new UnsupportedOperationException();
     }

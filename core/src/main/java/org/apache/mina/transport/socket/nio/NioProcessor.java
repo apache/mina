@@ -156,12 +156,22 @@ public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected int write(NioSession session, IoBuffer buf) throws Exception {
-        return session.getChannel().write(buf.buf());
+    protected int write(NioSession session, IoBuffer buf, int length) throws Exception {
+        if (buf.remaining() <= length) {
+            return session.getChannel().write(buf.buf());
+        } else {
+            int oldLimit = buf.limit();
+            buf.limit(buf.position() + length);
+            try {
+                return session.getChannel().write(buf.buf());
+            } finally {
+                buf.limit(oldLimit);
+            }
+        }
     }
 
     @Override
-    protected long transferFile(NioSession session, FileRegion region) throws Exception {
+    protected long transferFile(NioSession session, FileRegion region, int length) throws Exception {
         return region.getFileChannel().transferTo(region.getPosition(), region.getCount(), session.getChannel());
     }
 

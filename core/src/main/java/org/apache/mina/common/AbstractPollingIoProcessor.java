@@ -43,7 +43,7 @@ import org.apache.mina.util.NamePreservingRunnable;
 public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
     /**
      * The maximum loop count for a write operation until
-     * {@link #write(IoSession, IoBuffer)} returns non-zero value.
+     * {@link #write(IoSession, IoBuffer, int)} returns non-zero value.
      * It is similar to what a spin lock is for in concurrency programming.
      * It improves memory utilization and write throughput significantly.
      */
@@ -173,9 +173,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     protected abstract int read(T session, IoBuffer buf) throws Exception;
 
-    protected abstract int write(T session, IoBuffer buf) throws Exception;
+    protected abstract int write(T session, IoBuffer buf, int length) throws Exception;
 
-    protected abstract long transferFile(T session, FileRegion region) throws Exception;
+    protected abstract long transferFile(T session, FileRegion region, int length) throws Exception;
 
     public void add(T session) {
         newSessions.add(session);
@@ -522,7 +522,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                         continue;
                     }
     
-                    localWrittenBytes = transferFile(session, region);
+                    localWrittenBytes = transferFile(
+                            session, region, (int) Math.min(
+                                    region.getCount(), 
+                                    maxWrittenBytes - writtenBytes));
                     region.setPosition(region.getPosition() + localWrittenBytes);
                 } else {
                     IoBuffer buf = (IoBuffer) message;
@@ -535,7 +538,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     }
     
                     for (int i = WRITE_SPIN_COUNT; i > 0; i --) {
-                        localWrittenBytes = write(session, buf);
+                        localWrittenBytes = write(
+                                session, buf, Math.min(
+                                        buf.remaining(),
+                                        maxWrittenBytes - writtenBytes));
                         if (localWrittenBytes != 0 || !buf.hasRemaining()) {
                             break;
                         }
