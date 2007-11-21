@@ -117,7 +117,31 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     @Override
     protected boolean select(int timeout) throws Exception {
         int rv = Poll.poll(pollset, 1000 * timeout, polledSockets, false);
-        if (rv > 0) {
+        if (rv <= 0) {
+            if (rv != -120001) {
+                throwException(rv);
+            }
+            
+            rv = Poll.maintain(pollset, polledSockets, true);
+            if (rv > 0) {
+                for (int i = 0; i < rv; i ++) {
+                    long socket = polledSockets[i];
+                    AprSession session = allSessions.get(socket);
+                    if (session == null) {
+                        continue;
+                    }
+                    
+                    int flag = (session.isInterestedInRead()? Poll.APR_POLLIN : 0) |
+                               (session.isInterestedInWrite()? Poll.APR_POLLOUT : 0);
+
+                    Poll.add(pollset, socket, flag);
+                }
+            } else if (rv < 0) {
+                throwException(rv);
+            }
+
+            return false;
+        } else {
             rv <<= 1;
             if (!polledSessions.isEmpty()) {
                 polledSessions.clear();
@@ -144,11 +168,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
             }
             
             return !polledSessions.isEmpty();
-        } else if (rv < 0 && rv != -120001) {
-            throwException(rv);
         }
-
-        return false;
     }
 
     @Override

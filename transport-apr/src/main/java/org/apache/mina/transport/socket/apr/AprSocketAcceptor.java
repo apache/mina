@@ -20,7 +20,6 @@ import org.apache.mina.util.CircularQueue;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
-import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 
@@ -116,7 +115,6 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
             if (result != Status.APR_SUCCESS) {
                 throwException(result);
             }
-            System.out.println("BOUND");
             success = true;
         } finally {
             if (!success) {
@@ -182,8 +180,8 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
 
     @Override
     protected SocketAddress localAddress(Long handle) throws Exception {
-        Sockaddr la = Address.getInfo(Address.get(Socket.APR_LOCAL, handle));
-        return new InetSocketAddress(la.hostname, la.port);
+        long la = Address.get(Socket.APR_LOCAL, handle);
+        return new InetSocketAddress(Address.getip(la), Address.getInfo(la).port);
     }
 
     @Override
@@ -194,10 +192,21 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
 
         int rv = Poll.poll(pollset, Integer.MAX_VALUE, polledSockets, false);
         if (rv <= 0) {
-            System.out.println(org.apache.tomcat.jni.Error.strerror(-rv));
-            Thread.sleep(1000);
-        }
-        if (rv > 0) {
+            if (rv != -120001) {
+                throwException(rv);
+            }
+            
+            rv = Poll.maintain(pollset, polledSockets, true);
+            if (rv > 0) {
+                for (int i = 0; i < rv; i ++) {
+                    Poll.add(pollset, polledSockets[i], Poll.APR_POLLIN);
+                }
+            } else if (rv < 0) {
+                throwException(rv);
+            }
+            
+            return false;
+        } else {
             rv <<= 1;
             if (!polledHandles.isEmpty()) {
                 polledHandles.clear();
@@ -214,18 +223,13 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
                     continue;
                 }
                 
-                System.out.println("Polled: " + socket + ", " + flag);
-
                 if ((flag & Poll.APR_POLLIN) != 0) {
+                    Poll.add(pollset, socket, Poll.APR_POLLIN);
                     polledHandles.add(socket);
                 }
             }
             return !polledHandles.isEmpty();
-        } else if (rv < 0 && rv != -120001) {
-            throwException(rv);
         }
-
-        return false;
     }
 
     @Override
@@ -245,7 +249,6 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
         if (result != Status.APR_SUCCESS) {
             throwException(result);
         }
-        System.out.println("UNBOUND");
     }
 
     @Override
