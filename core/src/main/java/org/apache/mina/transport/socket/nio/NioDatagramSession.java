@@ -35,8 +35,6 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.WriteRequestQueue;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.transport.socket.DatagramSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -150,31 +148,6 @@ class NioDatagramSession extends NioSession implements DatagramSession {
     @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();
-    }
-
-    @Override
-    protected WriteRequestQueue getWriteRequestQueue() {
-        return super.getWriteRequestQueue();
-    }
-
-    @Override
-    protected WriteRequest getCurrentWriteRequest() {
-        return super.getCurrentWriteRequest();
-    }
-
-    @Override
-    protected void setCurrentWriteRequest(WriteRequest currentWriteRequest) {
-        super.setCurrentWriteRequest(currentWriteRequest);
-    }
-
-    @Override
-    protected boolean isScheduledForFlush() {
-        return super.isScheduledForFlush();
-    }
-
-    @Override
-    protected boolean setScheduledForFlush(boolean flag) {
-        return super.setScheduledForFlush(flag);
     }
 
     private class SessionConfigImpl extends AbstractDatagramSessionConfig {
