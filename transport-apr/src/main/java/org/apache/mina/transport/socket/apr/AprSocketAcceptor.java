@@ -96,7 +96,7 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
                 if (la.getAddress() == null) {
                     sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, la.getPort(), 0, pool);
                 } else {
-                    sa = Address.info(la.getAddress().getHostAddress(), Socket.APR_UNSPEC, la.getPort(), Socket.APR_IPV4_ADDR_OK, pool);
+                    sa = Address.info(la.getAddress().getHostAddress(), Socket.APR_INET, la.getPort(), 0, pool);
                 }
             } else {
                 sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, 0, 0, pool);
@@ -125,14 +125,6 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
     }
 
     @Override
-    protected void doDispose0() {
-        selectable = false;
-        Poll.destroy(pollset);
-        Pool.destroy(pool);
-        Socket.close(wakeupSocket);
-    }
-
-    @Override
     protected void doInit() {
         try {
             wakeupSocket = Socket.create(
@@ -145,7 +137,7 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
         } catch (Exception e) {
             throw new RuntimeIoException("Failed to create a wakeup socket.", e);
         }
-
+    
         // initialize a memory pool for APR functions
         pool = Pool.create(AprLibrary.getInstance().getRootPool());
         
@@ -164,7 +156,7 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
                         Poll.APR_POLLSET_THREADSAFE,
                         Long.MAX_VALUE);
             }
-
+    
             if (pollset < 0) {
                 if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
                     throw new RuntimeIoException(
@@ -183,6 +175,14 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
                 dispose();
             }
         }
+    }
+
+    @Override
+    protected void doDispose0() {
+        selectable = false;
+        Socket.close(wakeupSocket);
+        Poll.destroy(pollset);
+        Pool.destroy(pool);
     }
 
     @Override
@@ -231,7 +231,6 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
                 }
                 
                 if ((flag & Poll.APR_POLLIN) != 0) {
-                    Poll.add(pollset, socket, Poll.APR_POLLIN);
                     polledHandles.add(socket);
                 }
             }
