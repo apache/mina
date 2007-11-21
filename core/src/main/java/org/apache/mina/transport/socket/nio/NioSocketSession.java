@@ -130,7 +130,7 @@ class NioSocketSession extends NioSession implements SocketSession {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
-    private class SessionConfigImpl extends AbstractSocketSessionConfig implements SocketSessionConfig {
+    private class SessionConfigImpl extends AbstractSocketSessionConfig {
         public boolean isKeepAlive() {
             try {
                 return ch.socket().getKeepAlive();
