@@ -50,7 +50,7 @@ class AprLibrary {
     }
 
     // APR memory pool (package wide mother pool)	
-    private long pool = -1;
+    private final long pool;
 
     private AprLibrary() {
         try {
