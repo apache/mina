@@ -45,10 +45,10 @@ import org.apache.tomcat.jni.Status;
  */
 
 public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
-    private static final int INITIAL_CAPACITY = 1024;
+    private static final int POLLSET_SIZE = 1024;
     
     private final Map<Long, AprSession> allSessions =
-        new HashMap<Long, AprSession>(INITIAL_CAPACITY);
+        new HashMap<Long, AprSession>(POLLSET_SIZE);
     
     private final Object wakeupLock = new Object();
     private long wakeupSocket;
@@ -56,9 +56,9 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
 
     private final long bufferPool; // memory pool
     private final long pollset; // socket poller
-    private long[] polledSockets = new long[INITIAL_CAPACITY << 1];
+    private final long[] polledSockets = new long[POLLSET_SIZE << 1];
     private final List<AprSession> polledSessions =
-        new CircularQueue<AprSession>(INITIAL_CAPACITY);
+        new CircularQueue<AprSession>(POLLSET_SIZE);
 
     public AprIoProcessor(Executor executor) {
         super(executor);
@@ -82,7 +82,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
         long newPollset;
         try {
             newPollset = Poll.create(
-                    INITIAL_CAPACITY,
+                    POLLSET_SIZE,
                     AprLibrary.getInstance().getRootPool(),
                     Poll.APR_POLLSET_THREADSAFE,
                     Long.MAX_VALUE);
@@ -215,20 +215,12 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
         }
         
         session.setInterestedInRead(true);
-        if (allSessions.size() > polledSockets.length >>> 2) {
-            this.polledSockets = new long[polledSockets.length << 1];
-        }
         allSessions.put(s, session);
     }
 
     @Override
     protected void destroy(AprSession session) throws Exception {
         allSessions.remove(session.getDescriptor());
-        if (polledSockets.length >= (INITIAL_CAPACITY << 2) &&
-            allSessions.size() <= polledSockets.length >>> 3) {
-            this.polledSockets = new long[polledSockets.length >>> 1];
-        }
-    
         int ret = Poll.remove(pollset, session.getDescriptor());
         if (ret != Status.APR_SUCCESS) {
             try {
