@@ -97,7 +97,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected abstract boolean isWritable(H handle);
     protected abstract SocketAddress receive(H handle, IoBuffer buffer) throws Exception;
     protected abstract int send(T session, IoBuffer buffer, SocketAddress remoteAddress) throws Exception;
-    protected abstract T newSession(H handle, SocketAddress remoteAddress);
+    protected abstract T newSession(H handle, SocketAddress remoteAddress) throws Exception;
     protected abstract void setInterestedInWrite(T session, boolean interested) throws Exception;
 
 
@@ -166,12 +166,20 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                         "Can't create a session from a unbound service.");
             }
 
-            return newSessionWithoutLock(remoteAddress, localAddress);
+            try {
+                return newSessionWithoutLock(remoteAddress, localAddress);
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Error e) {
+                throw e;
+            } catch (Exception e) {
+                throw new RuntimeIoException("Failed to create a session.", e);
+            }
         }
     }
 
     private IoSession newSessionWithoutLock(
-            SocketAddress remoteAddress, SocketAddress localAddress) {
+            SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
         H handle = boundHandles.get(localAddress);
         if (handle == null) {
             throw new IllegalArgumentException("Unknown local address: " + localAddress);

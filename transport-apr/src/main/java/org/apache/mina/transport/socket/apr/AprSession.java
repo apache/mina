@@ -71,6 +71,20 @@ abstract class AprSession extends AbstractIoSession {
         this.localAddress = new InetSocketAddress(Address.getip(la), Address.getInfo(la).port);
     }
 
+    AprSession(
+            IoService service, IoProcessor<AprSession> processor,
+            long descriptor, InetSocketAddress remoteAddress) throws Exception {
+        this.service = service;
+        this.processor = processor;
+        this.handler = service.getHandler();
+        this.descriptor = descriptor;
+        
+        long la = Address.get(Socket.APR_LOCAL, descriptor);
+
+        this.remoteAddress = remoteAddress;
+        this.localAddress = new InetSocketAddress(Address.getip(la), Address.getInfo(la).port);
+    }
+
     long getDescriptor() {
         return descriptor;
     }

@@ -24,8 +24,9 @@ class AprDatagramSession extends AprSession implements DatagramSession {
     private final DatagramSessionConfig config = new SessionConfigImpl();
     
     AprDatagramSession(
-            IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
-        super(service, processor, descriptor);
+            IoService service, IoProcessor<AprSession> processor,
+            long descriptor, InetSocketAddress remoteAddress) throws Exception {
+        super(service, processor, descriptor, remoteAddress);
         this.config.setAll(service.getSessionConfig());
     }
 

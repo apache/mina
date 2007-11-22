@@ -106,7 +106,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected abstract Iterator<H> selectedHandles();
     protected abstract H bind(SocketAddress localAddress) throws Exception;
     protected abstract SocketAddress localAddress(H handle) throws Exception;
-    protected abstract T accept(IoProcessor<T> processor, H handle);
+    protected abstract T accept(IoProcessor<T> processor, H handle) throws Exception;
     protected abstract void unbind(H handle) throws Exception;
 
     @Override
@@ -241,7 +241,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
          * and passing the session object to the SocketIoProcessor class.
          */
         @SuppressWarnings("unchecked")
-        private void processHandles(Iterator<H> handles) {
+        private void processHandles(Iterator<H> handles) throws Exception {
             while (handles.hasNext()) {
                 H handle = handles.next();
                 handles.remove();
