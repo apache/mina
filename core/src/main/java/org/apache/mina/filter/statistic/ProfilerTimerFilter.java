@@ -19,8 +19,11 @@
  */
 package org.apache.mina.filter.statistic;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,19 +42,19 @@ import org.apache.mina.common.WriteRequest;
  * the filter is:
  *
  * <pre>
- *  ProfilerTimerFilter profiler = new ProfilerTimerFilter( ProfilerTimerFilter.MSG_RCV, ProfilerTimerUnit.MILLISECOND );
- *  chain.addFirst( "Profiler", profiler);
+ * ProfilerTimerFilter profiler = new ProfilerTimerFilter(
+ *         EnumSet.of(IoEventType.MESSAGE_RECEIVED), TimeUnit.MILLISECOND);
+ * chain.addFirst("Profiler", profiler);
  * </pre>
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ProfilerTimerFilter extends IoFilterAdapter {
-    private EnumSet<IoEventType> eventsToProfile;
-
-    private ProfilerTimerUnit timeUnit;
-
-    private HashMap<IoEventType, TimerWorker> timerManager;
+    
+    private volatile EnumSet<IoEventType> eventsToProfile;
+    private volatile ProfilerTimerUnit timeUnit;
+    private final Map<IoEventType, TimerWorker> timerManager;
 
     /**
      * Creates a new instance of ProfilerFilter.  This is the
@@ -61,32 +64,60 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      */
     public ProfilerTimerFilter() {
         this(
-                EnumSet.of(IoEventType.MESSAGE_RECEIVED,
-                        IoEventType.MESSAGE_SENT), TimeUnit.MILLISECONDS);
+                TimeUnit.MILLISECONDS, EnumSet.of(IoEventType.MESSAGE_RECEIVED,
+                                IoEventType.MESSAGE_SENT));
     }
+    
+    /**
+     * Creates a new instance of ProfilerFilter.  This is the
+     * default constructor and will print out timings for
+     * messageReceived and messageSent and the time increment
+     * will be in milliseconds.
+     */
+    public ProfilerTimerFilter(TimeUnit unit) {
+        this(
+                unit, 
+                IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT);
+    }
+    
+    /**
+     * Creates a new instance of ProfilerFilter.  An example
+     * of this call would be:
+     *
+     * <pre>
+     * new ProfilerTimerFilter(
+     *         TimeUnit.MILLISECONDS,
+     *         IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT);
+     * </pre>
+     * @param unit
+     *  Used to determine the level of precision you need in your timing.
+     * @param firstEventType an event type to profile
+     * @param otherEventTypes event types to profile
+     */
+    public ProfilerTimerFilter(TimeUnit unit, IoEventType firstEventType, IoEventType... otherEventTypes) {
+        this(unit, EnumSet.of(firstEventType, otherEventTypes));
+    }
+
 
     /**
      * Creates a new instance of ProfilerFilter.  An example
      * of this call would be:
      *
-     * <code>
-     * new ProfilerTimerFilter( EnumSet.of( IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT ),
-     *  TimeUnit.MILLISECONDS );
-     * </code>
-     *
-     * @param eventsToProfile
-     *  A set of {@link IoEventType} representation of the methods to profile
+     * <pre>
+     * new ProfilerTimerFilter(
+     *         TimeUnit.MILLISECONDS,
+     *         EnumSet.of(IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT));
+     * </pre>
      * @param unit
      *  Used to determine the level of precision you need in your timing.
+     * @param eventTypes
+     *  A set of {@link IoEventType} representation of the methods to profile
      */
-    public ProfilerTimerFilter(EnumSet<IoEventType> eventsToProfile,
-            TimeUnit unit) {
-        this.eventsToProfile = eventsToProfile;
-
+    public ProfilerTimerFilter(TimeUnit unit, EnumSet<IoEventType> eventTypes) {
         setTimeUnit(unit);
+        setEventsToProfile(eventTypes);
 
         timerManager = new HashMap<IoEventType, TimerWorker>();
-
         for (IoEventType type : eventsToProfile) {
             timerManager.put(type, new TimerWorker());
         }
@@ -105,7 +136,11 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         } else if (unit == TimeUnit.SECONDS) {
             this.timeUnit = ProfilerTimerUnit.SECONDS;
         } else {
-            throw new IllegalArgumentException("Invalid Time specified");
+            throw new IllegalArgumentException(
+                    "Invalid Time specified: " + unit + " (expected: " +
+                    TimeUnit.MILLISECONDS + ", " +
+                    TimeUnit.NANOSECONDS + " or " +
+                    TimeUnit.SECONDS + ')');
         }
     }
 
@@ -138,19 +173,39 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      * @return
      *  An int representing the methods that will be logged
      */
-    public EnumSet<IoEventType> getEventsToProfile() {
-        return eventsToProfile;
+    public Set<IoEventType> getEventsToProfile() {
+        return Collections.unmodifiableSet(eventsToProfile);
+    }
+
+    /**
+     * Set the bitmask in order to tell this filter which
+     * methods to print out timing information
+     */
+    public void setEventsToProfile(IoEventType firstEventType, IoEventType... otherEventTypes) {
+        this.setEventsToProfile(EnumSet.of(firstEventType, otherEventTypes));
     }
 
     /**
      * Set the bitmask in order to tell this filter which
      * methods to print out timing information
      *
-     * @param methodsToLog
+     * @param eventTypes
      *  An int representing the new methods that should be logged
      */
-    public void setEventsToProfile(EnumSet<IoEventType> methodsToLog) {
-        this.eventsToProfile = methodsToLog;
+    public void setEventsToProfile(Set<IoEventType> eventTypes) {
+        if (eventTypes == null) {
+            throw new NullPointerException("eventTypes");
+        }
+        if (eventTypes.isEmpty()) {
+            throw new IllegalArgumentException("eventTypes is empty.");
+        }
+
+        EnumSet<IoEventType> newEventsToProfile = EnumSet.noneOf(IoEventType.class);
+        for (IoEventType e: eventTypes) {
+            newEventsToProfile.add(e);
+        }
+        
+        this.eventsToProfile = newEventsToProfile;
     }
 
     @Override
@@ -299,7 +354,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                     "You are not monitoring this event.  Please add this event first.");
         }
 
-        return timerManager.get(type).getMin();
+        return timerManager.get(type).getMinimum();
     }
 
     /**
@@ -317,7 +372,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                     "You are not monitoring this event.  Please add this event first.");
         }
 
-        return timerManager.get(type).getMax();
+        return timerManager.get(type).getMaximum();
     }
 
     /**
@@ -327,15 +382,11 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      */
     private class TimerWorker {
 
-        private AtomicLong total;
-
-        private AtomicLong calls;
-
-        private AtomicLong min;
-
-        private AtomicLong max;
-
-        private Object lock = new Object();
+        private final AtomicLong total;
+        private final AtomicLong calls;
+        private final AtomicLong minimum;
+        private final AtomicLong maximum;
+        private final Object lock = new Object();
 
         /**
          * Creates a new instance of TimerWorker.
@@ -344,8 +395,8 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         public TimerWorker() {
             total = new AtomicLong();
             calls = new AtomicLong();
-            min = new AtomicLong();
-            max = new AtomicLong();
+            minimum = new AtomicLong();
+            maximum = new AtomicLong();
         }
 
         /**
@@ -361,13 +412,13 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
 
             synchronized (lock) {
                 // this is not entirely thread-safe, must lock
-                if (newReading < min.longValue()) {
-                    min.set(newReading);
+                if (newReading < minimum.longValue()) {
+                    minimum.set(newReading);
                 }
 
                 // this is not entirely thread-safe, must lock
-                if (newReading > max.longValue()) {
-                    max.set(newReading);
+                if (newReading > maximum.longValue()) {
+                    maximum.set(newReading);
                 }
             }
         }
@@ -408,8 +459,8 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
          * @return
          *  the minimum value
          */
-        public long getMin() {
-            return min.longValue();
+        public long getMinimum() {
+            return minimum.longValue();
         }
 
         /**
@@ -418,8 +469,8 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
          * @return
          *  the maximum value
          */
-        public long getMax() {
-            return max.longValue();
+        public long getMaximum() {
+            return maximum.longValue();
         }
     }
 
