@@ -348,7 +348,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      * @return
      *  The minimum time this method has executed represented by the {@link IoEventType}
      */
-    public long getMinValue(IoEventType type) {
+    public long getMinimumTime(IoEventType type) {
         if (!timerManager.containsKey(type)) {
             throw new IllegalArgumentException(
                     "You are not monitoring this event.  Please add this event first.");
@@ -366,7 +366,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      * @return
      *  The maximum time this method has executed represented by the {@link IoEventType}
      */
-    public long getMaxValue(IoEventType type) {
+    public long getMaximumTime(IoEventType type) {
         if (!timerManager.containsKey(type)) {
             throw new IllegalArgumentException(
                     "You are not monitoring this event.  Please add this event first.");
