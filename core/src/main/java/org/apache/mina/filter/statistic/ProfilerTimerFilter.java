@@ -43,7 +43,7 @@ import org.apache.mina.common.WriteRequest;
  *
  * <pre>
  * ProfilerTimerFilter profiler = new ProfilerTimerFilter(
- *         EnumSet.of(IoEventType.MESSAGE_RECEIVED), TimeUnit.MILLISECOND);
+ *         TimeUnit.MILLISECOND, IoEventType.MESSAGE_RECEIVED);
  * chain.addFirst("Profiler", profiler);
  * </pre>
  *
