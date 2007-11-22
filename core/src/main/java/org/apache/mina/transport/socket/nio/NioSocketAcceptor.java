@@ -35,7 +35,6 @@ import org.apache.mina.common.AbstractPollingIoAcceptor;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
@@ -49,7 +48,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
-public class NioSocketAcceptor
+public final class NioSocketAcceptor
         extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel> 
         implements SocketAcceptor {
 
@@ -78,7 +77,7 @@ public class NioSocketAcceptor
     }
 
     @Override
-    protected void doInit() {
+    protected void init() {
         // The default reuseAddress of an accepted socket should be 'true'.
         getSessionConfig().setReuseAddress(true);
 
@@ -103,13 +102,13 @@ public class NioSocketAcceptor
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
-            doDispose0();
+            destroy();
             throw new RuntimeIoException("Failed to open a selector.", e);
         }
     }
     
     @Override
-    protected void doDispose0() {
+    protected void destroy() {
         if (selector != null) {
             try {
                 selector.close();
@@ -228,11 +227,6 @@ public class NioSocketAcceptor
     }
 
     @Override
-    protected boolean selectable() {
-        return selector.isOpen();
-    }
-
-    @Override
     protected Iterator<ServerSocketChannel> selectedHandles() {
         return new ServerSocketChannelIterator(selector.selectedKeys());
     }
@@ -251,11 +245,6 @@ public class NioSocketAcceptor
         selector.wakeup();
     }
 
-    @Override
-    public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
-        throw new UnsupportedOperationException();
-    }
-    
     private static class ServerSocketChannelIterator implements Iterator<ServerSocketChannel> {
         
         private final Iterator<SelectionKey> i;

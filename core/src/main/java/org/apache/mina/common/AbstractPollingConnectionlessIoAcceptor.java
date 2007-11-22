@@ -19,7 +19,6 @@
  */
 package org.apache.mina.common;
 
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.ClosedSelectorException;
 import java.util.Collections;
@@ -34,7 +33,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.util.NamePreservingRunnable;
 import org.apache.mina.util.NewThreadExecutor;
 
@@ -62,6 +60,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
 
+    private volatile boolean selectable;
     private Worker worker;
     private long lastIdleCheckTime;
 
@@ -81,12 +80,12 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
         this.executor = executor;
         
-        doInit();
+        init();
+        selectable = true;
     }
 
-    protected abstract void doInit();
-    protected abstract void doDispose0();
-    protected abstract boolean selectable();
+    protected abstract void init();
+    protected abstract void destroy();
     protected abstract boolean select(int timeout) throws Exception;
     protected abstract void wakeup();
     protected abstract Iterator<H> selectedHandles();
@@ -97,26 +96,11 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected abstract boolean isWritable(H handle);
     protected abstract SocketAddress receive(H handle, IoBuffer buffer) throws Exception;
     protected abstract int send(T session, IoBuffer buffer, SocketAddress remoteAddress) throws Exception;
-    protected abstract T newSession(H handle, SocketAddress remoteAddress) throws Exception;
+    protected abstract T newSession(IoProcessor<T> processor, H handle, SocketAddress remoteAddress) throws Exception;
     protected abstract void setInterestedInWrite(T session, boolean interested) throws Exception;
 
-
     @Override
-    public DatagramSessionConfig getSessionConfig() {
-        return (DatagramSessionConfig) super.getSessionConfig();
-    }
-
-    @Override
-    public InetSocketAddress getLocalAddress() {
-        return (InetSocketAddress) super.getLocalAddress();
-    }
-
-    public void setLocalAddress(InetSocketAddress localAddress) {
-        setLocalAddress((SocketAddress) localAddress);
-    }
-
-    @Override
-    protected void doBind() throws Exception {
+    protected final void bind0() throws Exception {
         ServiceOperationFuture request = new ServiceOperationFuture();
 
         registerQueue.add(request);
@@ -137,7 +121,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     }
 
     @Override
-    protected void doUnbind() throws Exception {
+    protected final void unbind0() throws Exception {
         ServiceOperationFuture request = new ServiceOperationFuture();
 
         cancelQueue.add(request);
@@ -151,7 +135,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
+    public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         if (isDisposed()) {
             throw new IllegalStateException("Already disposed.");
         }
@@ -194,7 +178,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             }
 
             // If a new session needs to be created.
-            T newSession = newSession(handle, remoteAddress);
+            T newSession = newSession(processor, handle, remoteAddress);
             getSessionRecycler().put(newSession);
             session = newSession;
         }
@@ -211,11 +195,11 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         return session;
     }
 
-    public IoSessionRecycler getSessionRecycler() {
+    public final IoSessionRecycler getSessionRecycler() {
         return sessionRecycler;
     }
 
-    public void setSessionRecycler(IoSessionRecycler sessionRecycler) {
+    public final void setSessionRecycler(IoSessionRecycler sessionRecycler) {
         synchronized (bindLock) {
             if (isActive()) {
                 throw new IllegalStateException(
@@ -227,15 +211,6 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             }
             this.sessionRecycler = sessionRecycler;
         }
-    }
-
-    @Override
-    protected IoServiceListenerSupport getListeners() {
-        return super.getListeners();
-    }
-
-    protected IoProcessor<T> getProcessor() {
-        return processor;
     }
 
     private class ConnectionlessAcceptorProcessor implements IoProcessor<T> {
@@ -262,8 +237,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    private  void startupWorker() {
-        if (!selectable()) {
+    private void startupWorker() {
+        if (!selectable) {
             registerQueue.clear();
             cancelQueue.clear();
             flushingSessions.clear();
@@ -326,7 +301,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             }
             
             if (isDisposed()) {
-                doDispose0();
+                selectable = false;
+                destroy();
             }
         }
     }
@@ -353,8 +329,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     }
 
     private void readHandle(H handle) throws Exception {
-        IoBuffer readBuf = IoBuffer.allocate(getSessionConfig()
-                .getReceiveBufferSize());
+        IoBuffer readBuf = IoBuffer.allocate(
+                getSessionConfig().getReadBufferSize());
 
         SocketAddress remoteAddress = receive(handle, readBuf);
         if (remoteAddress != null) {

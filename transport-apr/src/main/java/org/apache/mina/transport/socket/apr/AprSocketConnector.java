@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedSelectorException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,7 +50,7 @@ import org.apache.tomcat.jni.Status;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class AprSocketConnector extends AbstractPollingIoConnector<AprSession, Long> implements SocketConnector {
+public final class AprSocketConnector extends AbstractPollingIoConnector<AprSession, Long> implements SocketConnector {
 
     private static final int POLLSET_SIZE = 1024;
 
@@ -64,7 +63,6 @@ public class AprSocketConnector extends AbstractPollingIoConnector<AprSession, L
 
     private volatile long pool;
     private volatile long pollset; // socket poller
-    private volatile boolean selectable = true;
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
     private final List<Long> polledHandles = new CircularQueue<Long>(POLLSET_SIZE);
     private final Set<Long> failedHandles = new HashSet<Long>(POLLSET_SIZE);
@@ -87,7 +85,7 @@ public class AprSocketConnector extends AbstractPollingIoConnector<AprSession, L
     }
     
     @Override
-    protected void doInit() {
+    protected void init() {
         try {
             wakeupSocket = Socket.create(
                     Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
@@ -141,8 +139,7 @@ public class AprSocketConnector extends AbstractPollingIoConnector<AprSession, L
     }
 
     @Override
-    protected void doDispose0() {
-        selectable = false;
+    protected void destroy() {
         Socket.close(wakeupSocket);
         Poll.destroy(pollset);
         Pool.destroy(pool);
@@ -187,7 +184,7 @@ public class AprSocketConnector extends AbstractPollingIoConnector<AprSession, L
     }
 
     @Override
-    protected void destroy(Long handle) throws Exception {
+    protected void close(Long handle) throws Exception {
         finishConnect(handle);
         int rv = Socket.close(handle);
         if (rv != Status.APR_SUCCESS) {
@@ -269,10 +266,6 @@ public class AprSocketConnector extends AbstractPollingIoConnector<AprSession, L
 
     @Override
     protected boolean select(int timeout) throws Exception {
-        if (!selectable()) {
-            throw new ClosedSelectorException();
-        }
-
         int rv = Poll.poll(pollset, timeout * 1000, polledSockets, false);
         if (rv <= 0) {
             if (rv != -120001) {
@@ -312,11 +305,6 @@ public class AprSocketConnector extends AbstractPollingIoConnector<AprSession, L
             }
             return !polledHandles.isEmpty();
         }
-    }
-
-    @Override
-    protected boolean selectable() {
-        return selectable;
     }
 
     @Override

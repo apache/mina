@@ -109,18 +109,18 @@ public abstract class AbstractIoService implements IoService {
         this.sessionConfig = sessionConfig;
     }
 
-    public IoFilterChainBuilder getFilterChainBuilder() {
+    public final IoFilterChainBuilder getFilterChainBuilder() {
         return filterChainBuilder;
     }
 
-    public void setFilterChainBuilder(IoFilterChainBuilder builder) {
+    public final void setFilterChainBuilder(IoFilterChainBuilder builder) {
         if (builder == null) {
             builder = new DefaultIoFilterChainBuilder();
         }
         filterChainBuilder = builder;
     }
 
-    public DefaultIoFilterChainBuilder getFilterChain() {
+    public final DefaultIoFilterChainBuilder getFilterChain() {
         if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
             return (DefaultIoFilterChainBuilder) filterChainBuilder;
         } else {
@@ -129,58 +129,62 @@ public abstract class AbstractIoService implements IoService {
         }
     }
 
-    public void addListener(IoServiceListener listener) {
-        getListeners().add(listener);
+    public final void addListener(IoServiceListener listener) {
+        listeners.add(listener);
     }
 
-    public void removeListener(IoServiceListener listener) {
-        getListeners().remove(listener);
+    public final void removeListener(IoServiceListener listener) {
+        listeners.remove(listener);
     }
 
-    public boolean isActive() {
-        return getListeners().isActive();
+    public final boolean isActive() {
+        return listeners.isActive();
     }
     
-    public boolean isDisposed() {
+    public final boolean isDisposed() {
         return disposed;
     }
     
-    public void dispose() {
+    public final void dispose() {
         if (disposed) {
             return;
         }
 
         disposed = true;
         try {
-            doDispose();
+            dispose0();
         } catch (Exception e) {
             ExceptionMonitor.getInstance().exceptionCaught(e);
         }
     }
     
-    protected abstract void doDispose() throws Exception;
+    /**
+     * Implement this method to release any acquired resources.  This method
+     * is invoked only once by {@link #dispose()}.
+     */
+    protected abstract void dispose0() throws Exception;
 
-    public Set<IoSession> getManagedSessions() {
-        return getListeners().getManagedSessions();
+    public final Set<IoSession> getManagedSessions() {
+        return listeners.getManagedSessions();
     }
 
-    public long getCumulativeManagedSessionCount() {
-        return getListeners().getCumulativeManagedSessionCount();
+    public final long getCumulativeManagedSessionCount() {
+        return listeners.getCumulativeManagedSessionCount();
     }
 
-    public int getLargestManagedSessionCount() {
-        return getListeners().getLargestManagedSessionCount();
+    public final int getLargestManagedSessionCount() {
+        return listeners.getLargestManagedSessionCount();
     }
 
-    public int getManagedSessionCount() {
-        return getListeners().getManagedSessionCount();
+    public final int getManagedSessionCount() {
+        return listeners.getManagedSessionCount();
     }
 
-    public IoHandler getHandler() {
+    public final IoHandler getHandler() {
         return handler;
     }
 
-    public void setHandler(IoHandler handler) {
+    public final void setHandler(IoHandler handler) {
         if (handler == null) {
             throw new NullPointerException("handler");
         }
@@ -192,19 +196,15 @@ public abstract class AbstractIoService implements IoService {
         this.handler = handler;
     }
 
-    protected IoServiceListenerSupport getListeners() {
-        return listeners;
-    }
-
     public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }
 
-    public IoSessionDataStructureFactory getSessionDataStructureFactory() {
+    public final IoSessionDataStructureFactory getSessionDataStructureFactory() {
         return sessionDataStructureFactory;
     }
 
-    public void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory) {
+    public final void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory) {
         if (sessionDataStructureFactory == null) {
             throw new NullPointerException("sessionDataStructureFactory");
         }
@@ -217,33 +217,33 @@ public abstract class AbstractIoService implements IoService {
         this.sessionDataStructureFactory = sessionDataStructureFactory;
     }
 
-    public long getReadBytes() {
+    public final long getReadBytes() {
         return readBytes.get();
     }
 
-    protected void increaseReadBytes(long increment, long currentTime) {
+    final void increaseReadBytes(long increment, long currentTime) {
         readBytes.addAndGet(increment);
         lastReadTime = currentTime;
         idleCountForBoth = 0;
         idleCountForRead = 0;
     }
 
-    public long getReadMessages() {
+    public final long getReadMessages() {
         return readMessages.get();
     }
 
-    protected void increaseReadMessages(long currentTime) {
+    final void increaseReadMessages(long currentTime) {
         readMessages.incrementAndGet();
         lastReadTime = currentTime;
         idleCountForBoth = 0;
         idleCountForRead = 0;
     }
 
-    public int getThroughputCalculationInterval() {
+    public final int getThroughputCalculationInterval() {
         return throughputCalculationInterval;
     }
 
-    public void setThroughputCalculationInterval(int throughputCalculationInterval) {
+    public final void setThroughputCalculationInterval(int throughputCalculationInterval) {
         if (throughputCalculationInterval < 0) {
             throw new IllegalArgumentException(
                     "throughputCalculationInterval: " + throughputCalculationInterval);
@@ -252,26 +252,26 @@ public abstract class AbstractIoService implements IoService {
         this.throughputCalculationInterval = throughputCalculationInterval;
     }
     
-    public long getThroughputCalculationIntervalInMillis() {
+    public final long getThroughputCalculationIntervalInMillis() {
         return throughputCalculationInterval * 1000L;
     }
     
-    public double getReadBytesThroughput() {
+    public final double getReadBytesThroughput() {
         resetThroughput();
         return readBytesThroughput;
     }
 
-    public double getWrittenBytesThroughput() {
+    public final double getWrittenBytesThroughput() {
         resetThroughput();
         return writtenBytesThroughput;
     }
 
-    public double getReadMessagesThroughput() {
+    public final double getReadMessagesThroughput() {
         resetThroughput();
         return readMessagesThroughput;
     }
 
-    public double getWrittenMessagesThroughput() {
+    public final double getWrittenMessagesThroughput() {
         resetThroughput();
         return writtenMessagesThroughput;
     }
@@ -312,65 +312,65 @@ public abstract class AbstractIoService implements IoService {
         }
     }
     
-    public long getScheduledWriteBytes() {
+    public final long getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
 
-    protected void increaseScheduledWriteBytes(long increment) {
+    final void increaseScheduledWriteBytes(long increment) {
         scheduledWriteBytes.addAndGet(increment);
     }
 
-    public long getScheduledWriteMessages() {
+    public final long getScheduledWriteMessages() {
         return scheduledWriteMessages.get();
     }
 
-    protected void increaseScheduledWriteMessages() {
+    final void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
     }
 
-    protected void decreaseScheduledWriteMessages() {
+    final void decreaseScheduledWriteMessages() {
         scheduledWriteMessages.decrementAndGet();
     }
 
-    public long getActivationTime() {
-        return getListeners().getActivationTime();
+    public final long getActivationTime() {
+        return listeners.getActivationTime();
     }
 
-    public long getLastIoTime() {
+    public final long getLastIoTime() {
         return Math.max(lastReadTime, lastWriteTime);
     }
 
-    public long getLastReadTime() {
+    public final long getLastReadTime() {
         return lastReadTime;
     }
 
-    public long getLastWriteTime() {
+    public final long getLastWriteTime() {
         return lastWriteTime;
     }
 
-    public long getWrittenBytes() {
+    public final long getWrittenBytes() {
         return writtenBytes.get();
     }
 
-    protected void increaseWrittenBytes(long increment, long currentTime) {
+    final void increaseWrittenBytes(long increment, long currentTime) {
         writtenBytes.addAndGet(increment);
         lastWriteTime = currentTime;
         idleCountForBoth = 0;
         idleCountForWrite = 0;
     }
 
-    public long getWrittenMessages() {
+    public final long getWrittenMessages() {
         return writtenMessages.get();
     }
 
-    protected void increaseWrittenMessages(long currentTime) {
+    final void increaseWrittenMessages(long currentTime) {
         writtenMessages.incrementAndGet();
         lastWriteTime = currentTime;
         idleCountForBoth = 0;
         idleCountForWrite = 0;
     }
 
-    public int getIdleTime(IdleStatus status) {
+    public final int getIdleTime(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleTimeForBoth;
         }
@@ -386,11 +386,11 @@ public abstract class AbstractIoService implements IoService {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public long getIdleTimeInMillis(IdleStatus status) {
+    public final long getIdleTimeInMillis(IdleStatus status) {
         return getIdleTime(status) * 1000L;
     }
 
-    public void setIdleTime(IdleStatus status, int idleTime) {
+    public final void setIdleTime(IdleStatus status, int idleTime) {
         if (idleTime < 0) {
             throw new IllegalArgumentException("Illegal idle time: " + idleTime);
         }
@@ -406,7 +406,7 @@ public abstract class AbstractIoService implements IoService {
         }
     }
 
-    public boolean isIdle(IdleStatus status) {
+    public final boolean isIdle(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth > 0;
         }
@@ -422,7 +422,7 @@ public abstract class AbstractIoService implements IoService {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public int getIdleCount(IdleStatus status) {
+    public final int getIdleCount(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth;
         }
@@ -438,7 +438,7 @@ public abstract class AbstractIoService implements IoService {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public long getLastIdleTime(IdleStatus status) {
+    public final long getLastIdleTime(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return lastIdleTimeForBoth;
         }
@@ -501,12 +501,12 @@ public abstract class AbstractIoService implements IoService {
         if (idleTime > 0 && lastIoTime != 0
                 && currentTime - lastIoTime >= idleTime) {
             increaseIdleCount(status, currentTime);
-            getListeners().fireServiceIdle(status);
+            listeners.fireServiceIdle(status);
         }
     }
 
     
-    public Set<WriteFuture> broadcast(Object message) {
+    public final Set<WriteFuture> broadcast(Object message) {
         // Convert to Set.  We do not return a List here because only the 
         // direct caller of MessageBroadcaster knows the order of write
         // operations.
@@ -525,7 +525,11 @@ public abstract class AbstractIoService implements IoService {
         };
     }
     
-    protected void finishSessionInitialization(IoSession session, IoFuture future) {
+    protected final IoServiceListenerSupport getListeners() {
+        return listeners;
+    }
+    
+    protected final void finishSessionInitialization(IoSession session, IoFuture future) {
         // Every property but attributeMap should be set now.
         // Now initialize the attributeMap.  The reason why we initialize
         // the attributeMap at last is to make sure all session properties
@@ -554,9 +558,20 @@ public abstract class AbstractIoService implements IoService {
             // DefaultIoFilterChain will notify the future. (We support ConnectFuture only for now).
             session.setAttribute(DefaultIoFilterChain.SESSION_OPENED_FUTURE, future);
         }
+        
+        finishSessionInitialization0(session, future);
     }
+    
+    /**
+     * Implement this method to perform additional tasks required for session
+     * initialization. Do not call this method directly;
+     * {@link #finishSessionInitialization(IoSession, IoFuture)} will call
+     * this method instead.
+     */
+    @SuppressWarnings("unused")
+    protected void finishSessionInitialization0(IoSession session, IoFuture future) {}
 
-    protected static class ServiceOperationFuture extends DefaultIoFuture {
+    protected static final class ServiceOperationFuture extends DefaultIoFuture {
         public ServiceOperationFuture() {
             super(null);
         }

@@ -33,7 +33,6 @@ import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.TransportMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,17 +43,12 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 529576 $, $Date: 2007-04-17 14:25:07 +0200 (mar., 17 avr. 2007) $
  */
-public class SerialConnector extends AbstractIoConnector {
+public final class SerialConnector extends AbstractIoConnector {
     private Logger log;
 
     public SerialConnector() {
         super(new DefaultSerialSessionConfig());
         log = LoggerFactory.getLogger(SerialConnector.class);
-    }
-
-    @Override
-    protected IoServiceListenerSupport getListeners() {
-        return super.getListeners();
     }
 
     @Override
@@ -86,7 +80,7 @@ public class SerialConnector extends AbstractIoConnector {
 
                         ConnectFuture future = new DefaultConnectFuture();
                         SerialSessionImpl session = new SerialSessionImpl(
-                                this, portAddress, serialPort);
+                                this, getListeners(), portAddress, serialPort);
                         finishSessionInitialization(session, future);
                         session.start();
                         return future;
@@ -121,7 +115,7 @@ public class SerialConnector extends AbstractIoConnector {
     }
     
     @Override
-    protected void doDispose() throws Exception {
+    protected void dispose0() throws Exception {
     }
 
     public TransportMetadata getTransportMetadata() {

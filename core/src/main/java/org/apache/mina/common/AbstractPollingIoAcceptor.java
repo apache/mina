@@ -59,6 +59,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     private final Map<SocketAddress, H> boundHandles =
         Collections.synchronizedMap(new HashMap<SocketAddress, H>());
+    
+    private volatile boolean selectable;
     private Worker worker;
 
     /**
@@ -95,12 +97,12 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         this.processor = processor;
         this.createdProcessor = createdProcessor;
         
-        doInit();
+        init();
+        selectable = true;
     }
 
-    protected abstract void doInit();
-    protected abstract void doDispose0();
-    protected abstract boolean selectable();
+    protected abstract void init();
+    protected abstract void destroy();
     protected abstract boolean select() throws Exception;
     protected abstract void wakeup();
     protected abstract Iterator<H> selectedHandles();
@@ -110,7 +112,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected abstract void unbind(H handle) throws Exception;
 
     @Override
-    protected void doBind() throws Exception {
+    protected final void bind0() throws Exception {
         ServiceOperationFuture request = new ServiceOperationFuture();
 
         // adds the Registration request to the queue for the Workers
@@ -147,7 +149,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      * will just return.
      */
     private void startupWorker() {
-        if (!selectable()) {
+        if (!selectable) {
             registerQueue.clear();
             cancelQueue.clear();
             throw new ClosedSelectorException();
@@ -162,7 +164,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     }
 
     @Override
-    protected void doUnbind() throws Exception {
+    protected final void unbind0() throws Exception {
         ServiceOperationFuture future = new ServiceOperationFuture();
 
         cancelQueue.add(future);
@@ -226,7 +228,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                         processor.dispose();
                     }
                 } finally {
-                    doDispose0();
+                    selectable = false;
+                    destroy();
                 }
             }
         }
@@ -342,7 +345,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         return cancelledHandles;
     }
 
-    public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
+    public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         throw new UnsupportedOperationException();
     }
 }

@@ -37,7 +37,7 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class NioDatagramConnector
+public final class NioDatagramConnector
         extends AbstractPollingIoConnector<NioSession, DatagramChannel>
         implements DatagramConnector {
 
@@ -72,7 +72,7 @@ public class NioDatagramConnector
     }
 
     @Override
-    protected void doInit() {
+    protected void init() {
     }
 
     @Override
@@ -104,7 +104,7 @@ public class NioDatagramConnector
     }
 
     @Override
-    protected void destroy(DatagramChannel handle) throws Exception {
+    protected void close(DatagramChannel handle) throws Exception {
         handle.disconnect();
         handle.close();
     }
@@ -121,7 +121,7 @@ public class NioDatagramConnector
     }
 
     @Override
-    protected void doDispose0() {
+    protected void destroy() {
         throw new UnsupportedOperationException();
     }
 
@@ -138,11 +138,6 @@ public class NioDatagramConnector
 
     @Override
     protected boolean select(int timeout) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected boolean selectable() {
         throw new UnsupportedOperationException();
     }
 

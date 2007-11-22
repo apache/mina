@@ -38,7 +38,7 @@ import org.apache.mina.common.RuntimeIoException;
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
+public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
     private static Selector newSelector() {
         try {
@@ -56,7 +56,7 @@ public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected void doDispose() throws Exception {
+    protected void dispose0() throws Exception {
         selector.close();
     }
 
@@ -71,12 +71,12 @@ public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected Iterator<NioSession> allSessions() throws Exception {
+    protected Iterator<NioSession> allSessions() {
         return new IoSessionIterator(selector.keys());
     }
 
     @Override
-    protected Iterator<NioSession> selectedSessions() throws Exception {
+    protected Iterator<NioSession> selectedSessions() {
         return new IoSessionIterator(selector.selectedKeys());
     }
 
@@ -108,25 +108,27 @@ public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected boolean isReadable(NioSession session) throws Exception {
+    protected boolean isReadable(NioSession session) {
         SelectionKey key = session.getSelectionKey();
         return key.isValid() && key.isReadable();
     }
 
     @Override
-    protected boolean isWritable(NioSession session) throws Exception {
+    protected boolean isWritable(NioSession session) {
         SelectionKey key = session.getSelectionKey();
         return key.isValid() && key.isWritable();
     }
 
     @Override
-    protected boolean isInterestedInRead(NioSession session) throws Exception {
-        return (session.getSelectionKey().interestOps() & SelectionKey.OP_READ) != 0;
+    protected boolean isInterestedInRead(NioSession session) {
+        SelectionKey key = session.getSelectionKey();
+        return key.isValid() && (key.interestOps() & SelectionKey.OP_READ) != 0;
     }
 
     @Override
-    protected boolean isInterestedInWrite(NioSession session) throws Exception {
-        return (session.getSelectionKey().interestOps() & SelectionKey.OP_WRITE) != 0;
+    protected boolean isInterestedInWrite(NioSession session) {
+        SelectionKey key = session.getSelectionKey();
+        return key.isValid() && (key.interestOps() & SelectionKey.OP_WRITE) != 0;
     }
 
     @Override
@@ -140,8 +142,7 @@ public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected void setInterestedInWrite(NioSession session, boolean value)
-            throws Exception {
+    protected void setInterestedInWrite(NioSession session, boolean value) throws Exception {
         SelectionKey key = session.getSelectionKey();
         if (value) {
             key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);

@@ -33,6 +33,7 @@ import org.apache.mina.common.AbstractPollingConnectionlessIoAcceptor;
 import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DatagramAcceptor;
@@ -45,7 +46,7 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class NioDatagramAcceptor
+public final class NioDatagramAcceptor
         extends AbstractPollingConnectionlessIoAcceptor<NioSession, DatagramChannel>
         implements DatagramAcceptor {
 
@@ -66,7 +67,7 @@ public class NioDatagramAcceptor
     }
     
     @Override
-    protected void doInit() {
+    protected void init() {
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
@@ -75,7 +76,7 @@ public class NioDatagramAcceptor
     }
 
     @Override
-    protected void doDispose0() {
+    protected void destroy() {
         if (selector != null) {
             try {
                 selector.close();
@@ -91,15 +92,14 @@ public class NioDatagramAcceptor
 
     @Override
     public DatagramSessionConfig getSessionConfig() {
-        return super.getSessionConfig();
+        return (DatagramSessionConfig) super.getSessionConfig();
     }
 
     @Override
     public InetSocketAddress getLocalAddress() {
-        return super.getLocalAddress();
+        return (InetSocketAddress) super.getLocalAddress();
     }
 
-    @Override
     public void setLocalAddress(InetSocketAddress localAddress) {
         setLocalAddress((SocketAddress) localAddress);
     }
@@ -163,14 +163,15 @@ public class NioDatagramAcceptor
     }
 
     @Override
-    protected NioSession newSession(DatagramChannel handle,
+    protected NioSession newSession(
+            IoProcessor<NioSession> processor, DatagramChannel handle,
             SocketAddress remoteAddress) {
         SelectionKey key = handle.keyFor(selector);
         if (key == null) {
             return null;
         }
         NioDatagramSession newSession = new NioDatagramSession(
-                this, handle, getProcessor(), remoteAddress);
+                this, handle, processor, remoteAddress);
         newSession.setSelectionKey(key);
         
         return newSession;
@@ -185,11 +186,6 @@ public class NioDatagramAcceptor
     @Override
     protected boolean select(int timeout) throws Exception {
         return selector.select(timeout) > 0;
-    }
-
-    @Override
-    protected boolean selectable() {
-        return selector.isOpen();
     }
 
     @Override

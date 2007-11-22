@@ -88,17 +88,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         return cls.getSimpleName() + '-' + newThreadId;
     }
     
-    protected Executor getExecutor() {
-        return executor;
-    }
-    
-
-    public void dispose() {
+    public final void dispose() {
         toBeDisposed = true;
         startupWorker();
     }
     
-    protected abstract void doDispose() throws Exception;
+    protected abstract void dispose0() throws Exception;
 
     /**
      * poll those sessions for the given timeout
@@ -107,13 +102,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean select(int timeout) throws Exception;
-    
     protected abstract void wakeup();
-
-    protected abstract Iterator<T> allSessions() throws Exception;
-
-    protected abstract Iterator<T> selectedSessions() throws Exception;
-
+    protected abstract Iterator<T> allSessions();
+    protected abstract Iterator<T> selectedSessions();
     protected abstract SessionState state(T session);
 
 
@@ -121,51 +112,45 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * Is the session ready for writing
      * @param session the session queried
      * @return true is ready, false if not ready
-     * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isWritable(T session) throws Exception;
+    protected abstract boolean isWritable(T session);
 
     /**
      * Is the session ready for reading
      * @param session the session queried
      * @return true is ready, false if not ready
-     * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isReadable(T session) throws Exception;
+    protected abstract boolean isReadable(T session);
 
     /**
      * register a session for writing
      * @param session the session registered
      * @param interested true for registering, false for removing
-     * @throws Exception if some low level IO error occurs
      */
-    protected abstract void setInterestedInWrite(
-            T session, boolean interested) throws Exception;
+    protected abstract void setInterestedInWrite(T session, boolean interested)
+            throws Exception;
 
     /**
      * register a session for reading
      * @param session the session registered
      * @param interested true for registering, false for removing
-     * @throws Exception if some low level IO error occurs
      */
-    protected abstract void setInterestedInRead(
-            T session, boolean interested) throws Exception;
+    protected abstract void setInterestedInRead(T session, boolean interested)
+            throws Exception;
 
     /**
      * is this session registered for reading
      * @param session the session queried
      * @return true is registered for reading
-     * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isInterestedInRead(T session) throws Exception;
+    protected abstract boolean isInterestedInRead(T session);
 
     /**
      * is this session registered for writing
      * @param session the session queried
      * @return true is registered for writing
-     * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean isInterestedInWrite(T session) throws Exception;
+    protected abstract boolean isInterestedInWrite(T session);
 
     protected abstract void init(T session) throws Exception;
 
@@ -177,12 +162,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     protected abstract long transferFile(T session, FileRegion region, int length) throws Exception;
 
-    public void add(T session) {
+    public final void add(T session) {
         newSessions.add(session);
         startupWorker();
     }
 
-    public void remove(T session) {
+    public final void remove(T session) {
         scheduleRemove(session);
         startupWorker();
     }
@@ -191,7 +176,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         removingSessions.add(session);
     }
 
-    public void flush(T session) {
+    public final void flush(T session) {
         boolean needsWakeup = flushingSessions.isEmpty();
         if (scheduleFlush(session) && needsWakeup) {
             wakeup();
@@ -206,7 +191,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         return false;
     }
 
-    public void updateTrafficMask(T session) {
+    public final void updateTrafficMask(T session) {
         scheduleTrafficControl(session);
         wakeup();
     }
@@ -372,7 +357,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         }
     }
 
-    private void process(T session) throws Exception {
+    private void process(T session) {
 
         if (isReadable(session) && session.getTrafficMask().isReadable()) {
             read(session);
@@ -651,7 +636,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             
             if (toBeDisposed) {
                 try {
-                    doDispose();
+                    dispose0();
                 } catch (Throwable t) {
                     ExceptionMonitor.getInstance().exceptionCaught(t);
                 }

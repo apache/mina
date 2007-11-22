@@ -75,12 +75,12 @@ public class DummySession extends AbstractIoSession {
                 }) {
 
             @Override
-            protected void doBind() throws IOException {
+            protected void bind0() throws IOException {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            protected void doUnbind() {
+            protected void unbind0() {
                 throw new UnsupportedOperationException();
             }
 

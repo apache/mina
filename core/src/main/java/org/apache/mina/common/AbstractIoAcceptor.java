@@ -57,15 +57,15 @@ public abstract class AbstractIoAcceptor
         return localAddresses.iterator().next();
     }
 
-    public void setLocalAddress(SocketAddress localAddress) {
+    public final void setLocalAddress(SocketAddress localAddress) {
         setLocalAddresses(new SocketAddress[] { localAddress });
     }
 
-    public List<SocketAddress> getLocalAddresses() {
+    public final List<SocketAddress> getLocalAddresses() {
         return unmodifiableLocalAddresses;
     }
 
-    public void setLocalAddresses(Iterable<SocketAddress> localAddresses) {
+    public final void setLocalAddresses(Iterable<SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");
         }
@@ -78,7 +78,7 @@ public abstract class AbstractIoAcceptor
         setLocalAddresses(list.toArray(new SocketAddress[list.size()]));
     }
 
-    public void setLocalAddresses(SocketAddress... localAddresses) {
+    public final void setLocalAddresses(SocketAddress... localAddresses) {
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");
         }
@@ -111,11 +111,11 @@ public abstract class AbstractIoAcceptor
         }
     }
 
-    public boolean isDisconnectOnUnbind() {
+    public final boolean isDisconnectOnUnbind() {
         return disconnectOnUnbind;
     }
 
-    public void setDisconnectOnUnbind(boolean disconnectClientsOnUnbind) {
+    public final void setDisconnectOnUnbind(boolean disconnectClientsOnUnbind) {
         this.disconnectOnUnbind = disconnectClientsOnUnbind;
     }
 
@@ -140,7 +140,7 @@ public abstract class AbstractIoAcceptor
             }
 
             try {
-                doBind();
+                bind0();
             } catch (IOException e) {
                 throw e;
             } catch (RuntimeException e) {
@@ -161,7 +161,7 @@ public abstract class AbstractIoAcceptor
             }
 
             try {
-                doUnbind();
+                unbind0();
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable e) {
@@ -175,24 +175,17 @@ public abstract class AbstractIoAcceptor
     }
 
     @Override
-    public boolean isActive() {
-        synchronized (bindLock) {
-            return bound;
-        }
-    }
-    
-    @Override
-    protected void doDispose() throws Exception {
+    protected final void dispose0() throws Exception {
         unbind();
     }
 
     /**
      * Implement this method to perform the actual bind operation.
      */
-    protected abstract void doBind() throws Exception;
+    protected abstract void bind0() throws Exception;
 
     /**
      * Implement this method to perform the actual unbind operation.
      */
-    protected abstract void doUnbind() throws Exception;
+    protected abstract void unbind0() throws Exception;
 }

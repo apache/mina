@@ -38,15 +38,15 @@ public abstract class AbstractIoConnector
         super(sessionConfig);
     }
 
-    public int getConnectTimeout() {
+    public final int getConnectTimeout() {
         return connectTimeout;
     }
 
-    public long getConnectTimeoutMillis() {
+    public final long getConnectTimeoutMillis() {
         return connectTimeout * 1000L;
     }
 
-    public void setConnectTimeout(int connectTimeout) {
+    public final void setConnectTimeout(int connectTimeout) {
         if (connectTimeout <= 0) {
             throw new IllegalArgumentException("connectTimeout: "
                     + connectTimeout);
@@ -58,7 +58,7 @@ public abstract class AbstractIoConnector
         return defaultRemoteAddress;
     }
 
-    public void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress) {
+    public final void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress) {
         if (defaultRemoteAddress == null) {
             throw new NullPointerException("defaultRemoteAddress");
         }
@@ -160,13 +160,13 @@ public abstract class AbstractIoConnector
     /**
      * Adds required internal attributes and {@link IoFutureListener}s
      * related with event notifications to the specified {@code session}
-     * and {@code future}.
+     * and {@code future}.  Do not call this method directly;
+     * {@link #finishSessionInitialization(IoSession, IoFuture)} will call
+     * this method instead.
      */
     @Override
-    protected void finishSessionInitialization(
+    protected final void finishSessionInitialization0(
             final IoSession session, IoFuture future) {
-        super.finishSessionInitialization(session, future);
-
         // In case that ConnectFuture.cancel() is invoked before
         // setSession() is invoked, add a listener that closes the
         // connection immediately on cancellation.

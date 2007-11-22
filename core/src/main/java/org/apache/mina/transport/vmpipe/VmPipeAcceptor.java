@@ -39,7 +39,7 @@ import org.apache.mina.common.TransportMetadata;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeAcceptor extends AbstractIoAcceptor {
+public final class VmPipeAcceptor extends AbstractIoAcceptor {
     static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
 
     /**
@@ -66,13 +66,12 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
     // This method is overriden to work around a problem with
     // bean property access mechanism.
 
-    @Override
-    public void setLocalAddress(SocketAddress localAddress) {
+    public void setLocalAddress(VmPipeAddress localAddress) {
         super.setLocalAddress(localAddress);
     }
 
     @Override
-    protected void doBind() throws IOException {
+    protected void bind0() throws IOException {
         List<SocketAddress> localAddresses = getLocalAddresses();
         List<SocketAddress> newLocalAddresses = new ArrayList<SocketAddress>();
 
@@ -120,7 +119,7 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
     }
 
     @Override
-    protected void doUnbind() {
+    protected void unbind0() {
         synchronized (boundHandlers) {
             boundHandlers.remove(getLocalAddress());
         }
@@ -132,9 +131,7 @@ public class VmPipeAcceptor extends AbstractIoAcceptor {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    protected void finishSessionInitialization(IoSession session,
-            IoFuture future) {
-        super.finishSessionInitialization(session, future);
+    void doFinishSessionInitialization(IoSession session, IoFuture future) {
+        finishSessionInitialization(session, future);
     }
 }

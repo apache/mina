@@ -170,23 +170,23 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
         }
     }
     
-    public void add(T session) {
+    public final void add(T session) {
         getProcessor(session).add(session);
     }
 
-    public void flush(T session) {
+    public final void flush(T session) {
         getProcessor(session).flush(session);
     }
 
-    public void remove(T session) {
+    public final void remove(T session) {
         getProcessor(session).remove(session);
     }
 
-    public void updateTrafficMask(T session) {
+    public final void updateTrafficMask(T session) {
         getProcessor(session).updateTrafficMask(session);
     }
     
-    public void dispose() {
+    public final void dispose() {
         if (disposed) {
             return;
         }

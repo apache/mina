@@ -38,6 +38,7 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.WriteRequest;
 import org.slf4j.Logger;
@@ -57,8 +58,10 @@ class SerialSessionImpl extends AbstractIoSession implements
     private final IoHandler ioHandler;
 
     private final IoFilterChain filterChain;
-
+    
     private final IoService service;
+    
+    private final IoServiceListenerSupport serviceListeners;
 
     private final SerialAddress address;
 
@@ -75,8 +78,11 @@ class SerialSessionImpl extends AbstractIoSession implements
                     "rxtx", "serial", false, true, SerialAddress.class,
                     SerialSessionConfig.class, IoBuffer.class);
 
-    SerialSessionImpl(IoService service, SerialAddress address, SerialPort port) {
+    SerialSessionImpl(
+            IoService service, IoServiceListenerSupport serviceListeners,
+            SerialAddress address, SerialPort port) {
         this.service = service;
+        this.serviceListeners = serviceListeners;
         this.ioHandler = service.getHandler();
         this.filterChain = new DefaultIoFilterChain(this);
         this.port = port;
@@ -131,8 +137,7 @@ class SerialSessionImpl extends AbstractIoSession implements
         w.start();
         port.addEventListener(this);
         IdleStatusChecker.getInstance().addSession(this);
-        ((SerialConnector) getService()).getListeners()
-                .fireSessionCreated(this);
+        serviceListeners.fireSessionCreated(this);
     }
 
     private Object writeMonitor = new Object();
@@ -269,8 +274,7 @@ class SerialSessionImpl extends AbstractIoSession implements
             readReadyMonitor.notifyAll();
         }
 
-        ((SerialConnector) getService()).getListeners().fireSessionDestroyed(
-                this);
+        serviceListeners.fireSessionDestroyed(this);
     }
 
     public void updateTrafficMask(SerialSessionImpl session) {

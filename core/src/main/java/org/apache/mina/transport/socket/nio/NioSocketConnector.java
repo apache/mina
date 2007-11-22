@@ -44,7 +44,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
-public class NioSocketConnector
+public final class NioSocketConnector
         extends AbstractPollingIoConnector<NioSession, SocketChannel>
         implements SocketConnector {
 
@@ -67,7 +67,7 @@ public class NioSocketConnector
     }
     
     @Override
-    protected void doInit() {
+    protected void init() {
         try {
             this.selector = Selector.open();
         } catch (IOException e) {
@@ -76,7 +76,7 @@ public class NioSocketConnector
     }
     
     @Override
-    protected void doDispose0() {
+    protected void destroy() {
         if (selector != null) {
             try {
                 selector.close();
@@ -118,7 +118,7 @@ public class NioSocketConnector
     }
 
     @Override
-    protected void destroy(SocketChannel handle) throws Exception {
+    protected void close(SocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
         if (key != null) {
             key.cancel();
@@ -162,11 +162,6 @@ public class NioSocketConnector
     @Override
     protected boolean select(int timeout) throws Exception {
         return selector.select(timeout) > 0;
-    }
-
-    @Override
-    protected boolean selectable() {
-        return selector.isOpen();
     }
 
     @Override

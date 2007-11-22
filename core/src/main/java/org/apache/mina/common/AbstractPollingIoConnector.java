@@ -48,6 +48,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     private final IoProcessor<T> processor;
     private final boolean createdProcessor;
 
+    private volatile boolean selectable;
     private Worker worker;
 
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<T>> processorClass) {
@@ -81,18 +82,18 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         this.processor = processor;
         this.createdProcessor = createdProcessor;
 
-        doInit();
+        init();
+        selectable = true;
     }
 
-    protected abstract void doInit();
-    protected abstract void doDispose0();
+    protected abstract void init();
+    protected abstract void destroy();
     protected abstract H newHandle(SocketAddress localAddress) throws Exception;
     protected abstract boolean connect(H handle, SocketAddress remoteAddress) throws Exception;
     protected abstract void finishConnect(H handle) throws Exception;
     protected abstract T newSession(IoProcessor<T> processor, H handle) throws Exception;
-    protected abstract void destroy(H handle) throws Exception;
+    protected abstract void close(H handle) throws Exception;
     protected abstract void wakeup();
-    protected abstract boolean selectable();
     protected abstract boolean select(int timeout) throws Exception;
     protected abstract Iterator<H> selectedHandles();
     protected abstract Iterator<H> allHandles();
@@ -100,13 +101,13 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected abstract ConnectionRequest connectionRequest(H handle);
 
     @Override
-    protected void doDispose() throws Exception {
+    protected final void dispose0() throws Exception {
         startupWorker();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected ConnectFuture doConnect(SocketAddress remoteAddress,
+    protected final ConnectFuture doConnect(SocketAddress remoteAddress,
                                       SocketAddress localAddress) {
         H handle = null;
         boolean success = false;
@@ -128,7 +129,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         } finally {
             if (!success && handle != null) {
                 try {
-                    destroy(handle);
+                    close(handle);
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
@@ -144,7 +145,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     }
 
     private void startupWorker() {
-        if (!selectable()) {
+        if (!selectable) {
             connectQueue.clear();
             cancelQueue.clear();
             throw new ClosedSelectorException();
@@ -172,7 +173,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             } catch (Exception e) {
                 req.setException(e);
                 try {
-                    destroy(handle);
+                    close(handle);
                 } catch (Exception e2) {
                     ExceptionMonitor.getInstance().exceptionCaught(e2);
                 }
@@ -192,7 +193,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             H handle = req.handle;
 
             try {
-                destroy(handle);
+                close(handle);
             } catch (Exception e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
             }
@@ -285,13 +286,14 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                         processor.dispose();
                     }
                 } finally {
-                    doDispose0();
+                    selectable = false;
+                    destroy();
                 }
             }
         }
     }
 
-    protected class ConnectionRequest extends DefaultConnectFuture {
+    protected final class ConnectionRequest extends DefaultConnectFuture {
         private final H handle;
         private final long deadline;
 

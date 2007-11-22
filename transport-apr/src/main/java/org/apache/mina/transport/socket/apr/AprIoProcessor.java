@@ -44,7 +44,7 @@ import org.apache.tomcat.jni.Status;
  * @version $Rev$, $Date$
  */
 
-public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
+public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     private static final int POLLSET_SIZE = 1024;
     
     private final Map<Long, AprSession> allSessions =
@@ -117,7 +117,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     }
 
     @Override
-    protected void doDispose() {
+    protected void dispose0() {
         Poll.destroy(pollset);
         Pool.destroy(bufferPool);
         Socket.close(wakeupSocket);
@@ -194,12 +194,12 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     }
 
     @Override
-    protected Iterator<AprSession> allSessions() throws Exception {
+    protected Iterator<AprSession> allSessions() {
         return allSessions.values().iterator();
     }
 
     @Override
-    protected Iterator<AprSession> selectedSessions() throws Exception {
+    protected Iterator<AprSession> selectedSessions() {
         return polledSessions.iterator();
     }
 
@@ -248,28 +248,27 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     }
 
     @Override
-    protected boolean isReadable(AprSession session) throws Exception {
+    protected boolean isReadable(AprSession session) {
         return session.isReadable();
     }
 
     @Override
-    protected boolean isWritable(AprSession session) throws Exception {
+    protected boolean isWritable(AprSession session) {
         return session.isWritable();
     }
 
     @Override
-    protected boolean isInterestedInRead(AprSession session) throws Exception {
+    protected boolean isInterestedInRead(AprSession session) {
         return session.isInterestedInRead();
     }
 
     @Override
-    protected boolean isInterestedInWrite(AprSession session) throws Exception {
+    protected boolean isInterestedInWrite(AprSession session) {
         return session.isInterestedInWrite();
     }
 
     @Override
-    protected void setInterestedInRead(AprSession session, boolean value)
-            throws Exception {
+    protected void setInterestedInRead(AprSession session, boolean value) throws Exception {
         int rv = Poll.remove(pollset, session.getDescriptor());
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
@@ -287,8 +286,7 @@ public class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     }
 
     @Override
-    protected void setInterestedInWrite(AprSession session, boolean value)
-            throws Exception {
+    protected void setInterestedInWrite(AprSession session, boolean value) throws Exception {
         int rv = Poll.remove(pollset, session.getDescriptor());
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);

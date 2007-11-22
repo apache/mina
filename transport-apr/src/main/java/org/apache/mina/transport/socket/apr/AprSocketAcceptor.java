@@ -3,7 +3,6 @@ package org.apache.mina.transport.socket.apr;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.channels.ClosedSelectorException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -23,7 +22,7 @@ import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 
-public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Long> implements SocketAcceptor {
+public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Long> implements SocketAcceptor {
 
     private static final int POLLSET_SIZE = 1024;
 
@@ -36,7 +35,6 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
 
     private volatile long pool;
     private volatile long pollset; // socket poller
-    private volatile boolean selectable = true;
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
     private final List<Long> polledHandles =
         new CircularQueue<Long>(POLLSET_SIZE);
@@ -125,7 +123,7 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
     }
 
     @Override
-    protected void doInit() {
+    protected void init() {
         try {
             wakeupSocket = Socket.create(
                     Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
@@ -178,8 +176,7 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
     }
 
     @Override
-    protected void doDispose0() {
-        selectable = false;
+    protected void destroy() {
         Socket.close(wakeupSocket);
         Poll.destroy(pollset);
         Pool.destroy(pool);
@@ -193,10 +190,6 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
 
     @Override
     protected boolean select() throws Exception {
-        if (!selectable()) {
-            throw new ClosedSelectorException();
-        }
-
         int rv = Poll.poll(pollset, Integer.MAX_VALUE, polledSockets, false);
         if (rv <= 0) {
             if (rv != -120001) {
@@ -236,11 +229,6 @@ public class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Lon
             }
             return !polledHandles.isEmpty();
         }
-    }
-
-    @Override
-    protected boolean selectable() {
-        return selectable;
     }
 
     @Override

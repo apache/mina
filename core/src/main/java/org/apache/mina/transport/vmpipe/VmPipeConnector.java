@@ -42,7 +42,7 @@ import org.apache.mina.common.TransportMetadata;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class VmPipeConnector extends AbstractIoConnector {
+public final class VmPipeConnector extends AbstractIoConnector {
 
     /**
      * Creates a new instance.
@@ -102,7 +102,7 @@ public class VmPipeConnector extends AbstractIoConnector {
 
         // initialize acceptor session
         VmPipeSessionImpl remoteSession = localSession.getRemoteSession();
-        ((VmPipeAcceptor) remoteSession.getService()).finishSessionInitialization(remoteSession, null);
+        ((VmPipeAcceptor) remoteSession.getService()).doFinishSessionInitialization(remoteSession, null);
         try {
             IoFilterChain filterChain = remoteSession.getFilterChain();
             entry.getAcceptor().getFilterChainBuilder().buildFilterChain(
@@ -125,7 +125,7 @@ public class VmPipeConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected void doDispose() throws Exception {
+    protected void dispose0() throws Exception {
     }
 
     private static final Set<VmPipeAddress> TAKEN_LOCAL_ADDRESSES = new HashSet<VmPipeAddress>();
