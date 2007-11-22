@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.util.Iterator;
@@ -69,6 +70,15 @@ public final class NioDatagramConnector
     @Override
     public DatagramSessionConfig getSessionConfig() {
         return (DatagramSessionConfig) super.getSessionConfig();
+    }
+    
+    @Override
+    public InetSocketAddress getDefaultRemoteAddress() {
+        return (InetSocketAddress) super.getDefaultRemoteAddress();
+    }
+    
+    public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
+        super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
 
     @Override

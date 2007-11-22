@@ -333,6 +333,15 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
+    
+    @Override
+    public InetSocketAddress getDefaultRemoteAddress() {
+        return (InetSocketAddress) super.getDefaultRemoteAddress();
+    }
+    
+    public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
+        super.setDefaultRemoteAddress(defaultRemoteAddress);
+    }
 
     private void throwException(int code) throws IOException {
         throw new IOException(

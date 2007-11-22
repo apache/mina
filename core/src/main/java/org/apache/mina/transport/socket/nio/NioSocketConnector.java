@@ -20,6 +20,7 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -95,7 +96,15 @@ public final class NioSocketConnector
         return (SocketSessionConfig) super.getSessionConfig();
     }
 
+    @Override
+    public InetSocketAddress getDefaultRemoteAddress() {
+        return (InetSocketAddress) super.getDefaultRemoteAddress();
+    }
     
+    public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
+        super.setDefaultRemoteAddress(defaultRemoteAddress);
+    }
+
     @Override
     protected Iterator<SocketChannel> allHandles() {
         return new SocketChannelIterator(selector.keys());
