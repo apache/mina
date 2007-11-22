@@ -47,7 +47,7 @@ public interface MessageHandler<E> {
     void messageReceived(IoSession session, E message) throws Exception;
     
     /**
-     * Invoked when the specific type of message is received from the
+     * Invoked when the specific type of message is sent out to the
      * specified <code>session</code>.
      */
     void messageSent(IoSession session, E message) throws Exception;
