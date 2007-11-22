@@ -45,8 +45,12 @@ public class HttpRequestEncoder extends ProtocolEncoderAdapter {
             IoSession session, Object message,
             ProtocolEncoderOutput out) throws Exception {
         
-        asciiEncoder.reset();
         HttpRequest req = (HttpRequest) message;
+        if (req instanceof MutableHttpRequest) {
+            ((MutableHttpRequest) req).normalize();
+        }
+
+        asciiEncoder.reset();
         IoBuffer buf = IoBuffer.allocate(256).setAutoExpand(true);
 
         // Write request line.
