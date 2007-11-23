@@ -49,7 +49,7 @@ public final class NioSocketAcceptor
         implements SocketAcceptor {
 
     private int backlog = 50;
-    private boolean reuseAddress;
+    private boolean reuseAddress = true;
 
     private volatile Selector selector;
 
