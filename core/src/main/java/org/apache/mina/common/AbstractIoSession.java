@@ -72,7 +72,7 @@ public abstract class AbstractIoSession implements IoSession {
     private WriteRequestQueue writeRequestQueue;
     private WriteRequest currentWriteRequest;
     private final long creationTime;
-
+    
     /**
      * A future that will be set 'closed' when the connection is closed.
      */
@@ -120,27 +120,31 @@ public abstract class AbstractIoSession implements IoSession {
             lastIdleTimeForWrite = System.currentTimeMillis();
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
+    
+    public final long getId() {
+        return hashCode() & 0xFFFFFFFFL;
+    }
 
     @SuppressWarnings("unchecked")
     protected abstract IoProcessor getProcessor();
 
-    public boolean isConnected() {
+    public final boolean isConnected() {
         return !closeFuture.isClosed();
     }
 
-    public boolean isClosing() {
+    public final boolean isClosing() {
         return closing || closeFuture.isClosed();
     }
 
-    public CloseFuture getCloseFuture() {
+    public final CloseFuture getCloseFuture() {
         return closeFuture;
     }
 
-    protected boolean isScheduledForFlush() {
+    protected final boolean isScheduledForFlush() {
         return scheduledForFlush.get();
     }
 
-    protected boolean setScheduledForFlush(boolean flag) {
+    protected final boolean setScheduledForFlush(boolean flag) {
         if (flag) {
             return scheduledForFlush.compareAndSet(false, true);
         } else {
@@ -149,7 +153,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    public CloseFuture close(boolean rightNow) {
+    public final CloseFuture close(boolean rightNow) {
         if (rightNow) {
             return close();
         } else {
@@ -157,7 +161,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    public CloseFuture close() {
+    public final CloseFuture close() {
         synchronized (lock) {
             if (isClosing()) {
                 return closeFuture;
@@ -171,13 +175,13 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     @SuppressWarnings("unchecked")
-    public CloseFuture closeOnFlush() {
+    public final CloseFuture closeOnFlush() {
         getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);
         return closeFuture;
     }
 
-    public ReadFuture read() {
+    public final ReadFuture read() {
         if (!getConfig().isUseReadOperation()) {
             throw new IllegalStateException("useReadOperation is not enabled.");
         }
@@ -200,15 +204,15 @@ public abstract class AbstractIoSession implements IoSession {
         return future;
     }
     
-    protected void offerReadFuture(Object message) {
+    protected final void offerReadFuture(Object message) {
         newReadFuture().setRead(message);
     }
 
-    protected void offerFailedReadFuture(Throwable exception) {
+    protected final void offerFailedReadFuture(Throwable exception) {
         newReadFuture().setException(exception);
     }
 
-    protected void offerClosedReadFuture() {
+    protected final void offerClosedReadFuture() {
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
         synchronized (readyReadFutures) {
             newReadFuture().setClosed();
@@ -256,11 +260,11 @@ public abstract class AbstractIoSession implements IoSession {
         return (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES);
     }
 
-    public WriteFuture write(Object message) {
+    public final WriteFuture write(Object message) {
         return write(message, null);
     }
 
-    public WriteFuture write(Object message, SocketAddress remoteAddress) {
+    public final WriteFuture write(Object message, SocketAddress remoteAddress) {
         if (message == null) {
             throw new NullPointerException("message");
         }
@@ -320,72 +324,72 @@ public abstract class AbstractIoSession implements IoSession {
         return future;
     }
 
-    public Object getAttachment() {
+    public final Object getAttachment() {
         return getAttribute("");
     }
 
-    public Object setAttachment(Object attachment) {
+    public final Object setAttachment(Object attachment) {
         return setAttribute("", attachment);
     }
 
-    public Object getAttribute(Object key) {
+    public final Object getAttribute(Object key) {
         return attributes.getAttribute(this, key);
     }
 
-    public Object getAttribute(Object key, Object defaultValue) {
+    public final Object getAttribute(Object key, Object defaultValue) {
         return attributes.getAttribute(this, key, defaultValue);
     }
 
-    public Object setAttribute(Object key, Object value) {
+    public final Object setAttribute(Object key, Object value) {
         return attributes.setAttribute(this, key, value);
     }
 
-    public Object setAttribute(Object key) {
+    public final Object setAttribute(Object key) {
         return attributes.setAttribute(this, key);
     }
 
-    public Object setAttributeIfAbsent(Object key, Object value) {
+    public final Object setAttributeIfAbsent(Object key, Object value) {
         return attributes.setAttributeIfAbsent(this, key, value);
     }
 
-    public Object removeAttribute(Object key) {
+    public final Object removeAttribute(Object key) {
         return attributes.removeAttribute(this, key);
     }
 
-    public boolean removeAttribute(Object key, Object value) {
+    public final boolean removeAttribute(Object key, Object value) {
         return attributes.removeAttribute(this, key, value);
     }
 
-    public boolean replaceAttribute(Object key, Object oldValue, Object newValue) {
+    public final boolean replaceAttribute(Object key, Object oldValue, Object newValue) {
         return attributes.replaceAttribute(this, key, oldValue, newValue);
     }
 
-    public boolean containsAttribute(Object key) {
+    public final boolean containsAttribute(Object key) {
         return attributes.containsAttribute(this, key);
     }
 
-    public Set<Object> getAttributeKeys() {
+    public final Set<Object> getAttributeKeys() {
         return attributes.getAttributeKeys(this);
     }
     
-    protected IoSessionAttributeMap getAttributeMap() {
+    protected final IoSessionAttributeMap getAttributeMap() {
         return attributes;
     }
 
-    protected void setAttributeMap(IoSessionAttributeMap attributes) {
+    protected final void setAttributeMap(IoSessionAttributeMap attributes) {
         this.attributes = attributes;
     }
     
-    protected void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
+    protected final void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
         this.writeRequestQueue =
             new CloseRequestAwareWriteRequestQueue(writeRequestQueue);
     }
 
-    public TrafficMask getTrafficMask() {
+    public final TrafficMask getTrafficMask() {
         return trafficMask;
     }
 
-    public void setTrafficMask(TrafficMask trafficMask) {
+    public final void setTrafficMask(TrafficMask trafficMask) {
         if (trafficMask == null) {
             throw new NullPointerException("trafficMask");
         }
@@ -397,59 +401,59 @@ public abstract class AbstractIoSession implements IoSession {
         getFilterChain().fireFilterSetTrafficMask(trafficMask);
     }
     
-    protected void setTrafficMaskNow(TrafficMask trafficMask) {
+    protected final void setTrafficMaskNow(TrafficMask trafficMask) {
         this.trafficMask = trafficMask;
     }
 
-    public void suspendRead() {
+    public final void suspendRead() {
         setTrafficMask(getTrafficMask().and(TrafficMask.READ.not()));
     }
 
-    public void suspendWrite() {
+    public final void suspendWrite() {
         setTrafficMask(getTrafficMask().and(TrafficMask.WRITE.not()));
     }
 
-    public void resumeRead() {
+    public final void resumeRead() {
         setTrafficMask(getTrafficMask().or(TrafficMask.READ));
     }
 
-    public void resumeWrite() {
+    public final void resumeWrite() {
         setTrafficMask(getTrafficMask().or(TrafficMask.WRITE));
     }
 
-    public long getReadBytes() {
+    public final long getReadBytes() {
         return readBytes;
     }
 
-    public long getWrittenBytes() {
+    public final long getWrittenBytes() {
         return writtenBytes;
     }
 
-    public long getReadMessages() {
+    public final long getReadMessages() {
         return readMessages;
     }
 
-    public long getWrittenMessages() {
+    public final long getWrittenMessages() {
         return writtenMessages;
     }
 
-    public double getReadBytesThroughput() {
+    public final double getReadBytesThroughput() {
         return readBytesThroughput;
     }
 
-    public double getWrittenBytesThroughput() {
+    public final double getWrittenBytesThroughput() {
         return writtenBytesThroughput;
     }
 
-    public double getReadMessagesThroughput() {
+    public final double getReadMessagesThroughput() {
         return readMessagesThroughput;
     }
 
-    public double getWrittenMessagesThroughput() {
+    public final double getWrittenMessagesThroughput() {
         return writtenMessagesThroughput;
     }
     
-    protected void updateThroughput(long currentTime) {
+    protected final void updateThroughput(long currentTime) {
         int interval = (int) (currentTime - lastThroughputCalculationTime);
         long minInterval = getConfig().getThroughputCalculationIntervalInMillis();
         if (minInterval == 0 || interval < minInterval) {
@@ -469,15 +473,15 @@ public abstract class AbstractIoSession implements IoSession {
         lastThroughputCalculationTime = currentTime;
     }
 
-    public long getScheduledWriteBytes() {
+    public final long getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
 
-    public int getScheduledWriteMessages() {
+    public final int getScheduledWriteMessages() {
         return scheduledWriteMessages.get();
     }
 
-    protected void increaseReadBytesAndMessages(
+    protected final void increaseReadBytesAndMessages(
             Object message, long currentTime) {
         if (message instanceof IoBuffer) {
             IoBuffer b = (IoBuffer) message;
@@ -516,7 +520,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    protected void increaseWrittenBytesAndMessages(
+    protected final void increaseWrittenBytesAndMessages(
             WriteRequest request, long currentTime) {
         
         Object message = request.getMessage();
@@ -559,14 +563,14 @@ public abstract class AbstractIoSession implements IoSession {
         decreaseScheduledWriteMessages();
     }
 
-    protected void increaseScheduledWriteBytes(long increment) {
+    protected final void increaseScheduledWriteBytes(long increment) {
         scheduledWriteBytes.addAndGet(increment);
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).increaseScheduledWriteBytes(increment);
         }
     }
 
-    protected void increaseScheduledWriteMessages() {
+    protected final void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).increaseScheduledWriteMessages();
@@ -580,7 +584,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    protected void decreaseScheduledBytesAndMessages(WriteRequest request) {
+    protected final void decreaseScheduledBytesAndMessages(WriteRequest request) {
         Object message = request.getMessage();
         if (message instanceof IoBuffer) {
             IoBuffer b = (IoBuffer) message;
@@ -594,19 +598,22 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    protected WriteRequestQueue getWriteRequestQueue() {
+    protected final WriteRequestQueue getWriteRequestQueue() {
+        if (writeRequestQueue == null) {
+            throw new IllegalStateException();
+        }
         return writeRequestQueue;
     }
     
-    protected WriteRequest getCurrentWriteRequest() {
+    protected final WriteRequest getCurrentWriteRequest() {
         return currentWriteRequest;
     }
     
-    protected void setCurrentWriteRequest(WriteRequest currentWriteRequest) {
+    protected final void setCurrentWriteRequest(WriteRequest currentWriteRequest) {
         this.currentWriteRequest = currentWriteRequest;
     }
 
-    protected void increaseReadBufferSize() {
+    protected final void increaseReadBufferSize() {
         int newReadBufferSize = getConfig().getReadBufferSize() << 1;
         if (newReadBufferSize <= getConfig().getMaxReadBufferSize()) {
             getConfig().setReadBufferSize(newReadBufferSize);
@@ -617,7 +624,7 @@ public abstract class AbstractIoSession implements IoSession {
         deferDecreaseReadBuffer = true;
     }
 
-    protected void decreaseReadBufferSize() {
+    protected final void decreaseReadBufferSize() {
         if (deferDecreaseReadBuffer) {
             deferDecreaseReadBuffer = false;
             return;
@@ -630,23 +637,23 @@ public abstract class AbstractIoSession implements IoSession {
         deferDecreaseReadBuffer = true;
     }
 
-    public long getCreationTime() {
+    public final long getCreationTime() {
         return creationTime;
     }
 
-    public long getLastIoTime() {
+    public final long getLastIoTime() {
         return Math.max(lastReadTime, lastWriteTime);
     }
 
-    public long getLastReadTime() {
+    public final long getLastReadTime() {
         return lastReadTime;
     }
 
-    public long getLastWriteTime() {
+    public final long getLastWriteTime() {
         return lastWriteTime;
     }
 
-    public boolean isIdle(IdleStatus status) {
+    public final boolean isIdle(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth > 0;
         }
@@ -662,7 +669,7 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public int getIdleCount(IdleStatus status) {
+    public final int getIdleCount(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth;
         }
@@ -678,7 +685,7 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    public long getLastIdleTime(IdleStatus status) {
+    public final long getLastIdleTime(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return lastIdleTimeForBoth;
         }
@@ -694,7 +701,7 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
-    protected void increaseIdleCount(IdleStatus status, long currentTime) {
+    protected final void increaseIdleCount(IdleStatus status, long currentTime) {
         if (status == IdleStatus.BOTH_IDLE) {
             idleCountForBoth++;
             lastIdleTimeForBoth = currentTime;
@@ -720,24 +727,22 @@ public abstract class AbstractIoSession implements IoSession {
 
     @Override
     public final int hashCode() {
-        return System.identityHashCode(this);
+        return super.hashCode();
     }
 
     @Override
     public final boolean equals(Object o) {
-        return this == o;
+        return super.equals(o);
     }
 
     @Override
     public String toString() {
         if (getService() instanceof IoAcceptor) {
-            return "(" + getServiceName() + ", server, " +
-                    getRemoteAddress() + " => " +
-                    getLocalAddress() + ')';
+            return "(" + getId() + ": " + getServiceName() + ", server, " +
+                    getRemoteAddress() + " => " + getLocalAddress() + ')';
         } else {
-            return "(" + getServiceName() + ", client, " +
-                    getLocalAddress() + " => " +
-                    getRemoteAddress() + ')';
+            return "(" + getId() + ": " + getServiceName() + ", client, " +
+                    getLocalAddress() + " => " + getRemoteAddress() + ')';
         }
     }
 

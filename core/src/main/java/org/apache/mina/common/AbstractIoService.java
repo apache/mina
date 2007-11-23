@@ -221,7 +221,7 @@ public abstract class AbstractIoService implements IoService {
         return readBytes.get();
     }
 
-    final void increaseReadBytes(long increment, long currentTime) {
+    protected final void increaseReadBytes(long increment, long currentTime) {
         readBytes.addAndGet(increment);
         lastReadTime = currentTime;
         idleCountForBoth = 0;
@@ -232,7 +232,7 @@ public abstract class AbstractIoService implements IoService {
         return readMessages.get();
     }
 
-    final void increaseReadMessages(long currentTime) {
+    protected final void increaseReadMessages(long currentTime) {
         readMessages.incrementAndGet();
         lastReadTime = currentTime;
         idleCountForBoth = 0;
@@ -316,7 +316,7 @@ public abstract class AbstractIoService implements IoService {
         return scheduledWriteBytes.get();
     }
 
-    final void increaseScheduledWriteBytes(long increment) {
+    protected final void increaseScheduledWriteBytes(long increment) {
         scheduledWriteBytes.addAndGet(increment);
     }
 
@@ -324,11 +324,11 @@ public abstract class AbstractIoService implements IoService {
         return scheduledWriteMessages.get();
     }
 
-    final void increaseScheduledWriteMessages() {
+    protected final void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
     }
 
-    final void decreaseScheduledWriteMessages() {
+    protected final void decreaseScheduledWriteMessages() {
         scheduledWriteMessages.decrementAndGet();
     }
 
@@ -352,7 +352,7 @@ public abstract class AbstractIoService implements IoService {
         return writtenBytes.get();
     }
 
-    final void increaseWrittenBytes(long increment, long currentTime) {
+    protected final void increaseWrittenBytes(long increment, long currentTime) {
         writtenBytes.addAndGet(increment);
         lastWriteTime = currentTime;
         idleCountForBoth = 0;
@@ -363,7 +363,7 @@ public abstract class AbstractIoService implements IoService {
         return writtenMessages.get();
     }
 
-    final void increaseWrittenMessages(long currentTime) {
+    protected final void increaseWrittenMessages(long currentTime) {
         writtenMessages.incrementAndGet();
         lastWriteTime = currentTime;
         idleCountForBoth = 0;
@@ -469,7 +469,7 @@ public abstract class AbstractIoService implements IoService {
         }
     }
     
-    protected void notifyIdleness(long currentTime) {
+    protected final void notifyIdleness(long currentTime) {
         updateThroughput(currentTime);
         
         synchronized (idlenessCheckLock) {

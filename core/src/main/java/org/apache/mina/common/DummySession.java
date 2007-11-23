@@ -203,16 +203,6 @@ public class DummySession extends AbstractIoSession {
         this.remoteAddress = remoteAddress;
     }
 
-    @Override
-    public long getScheduledWriteBytes() {
-        return 0;
-    }
-
-    @Override
-    public int getScheduledWriteMessages() {
-        return 0;
-    }
-
     public IoService getService() {
         return service;
     }

@@ -55,6 +55,12 @@ import java.util.Set;
 public interface IoSession {
 
     /**
+     * Returns a unique identifier of this session.  Every session has its own
+     * ID which is different from each other.
+     */
+    long getId();
+    
+    /**
      * Returns the {@link IoService} which provides I/O service to this session.
      */
     IoService getService();

@@ -168,7 +168,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
 
     private class VmPipeIoProcessor implements IoProcessor<VmPipeSessionImpl> {
         public void flush(VmPipeSessionImpl session) {
-            WriteRequestQueue queue = session.getWriteRequestQueue();
+            WriteRequestQueue queue = session.getWriteRequestQueue0();
             if (queue.isEmpty(session)) {
                 return;
             }
