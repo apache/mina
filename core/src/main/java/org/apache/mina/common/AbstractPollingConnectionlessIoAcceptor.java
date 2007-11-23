@@ -31,10 +31,13 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.util.NamePreservingRunnable;
-import org.apache.mina.util.NewThreadExecutor;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
@@ -50,6 +53,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     private static final AtomicInteger id = new AtomicInteger();
 
     private final Executor executor;
+    private final boolean createdExecutor;
     private final String threadName;
     private final IoProcessor<T> processor = new ConnectionlessAcceptorProcessor();
     private final Queue<ServiceOperationFuture> registerQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
@@ -68,7 +72,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
      * Creates a new instance.
      */
     protected AbstractPollingConnectionlessIoAcceptor(IoSessionConfig sessionConfig) {
-        this(sessionConfig, new NewThreadExecutor());
+        this(sessionConfig, null);
     }
 
     /**
@@ -78,7 +82,16 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         super(sessionConfig);
 
         threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
-        this.executor = executor;
+        
+        if (executor == null) {
+            this.executor = new ThreadPoolExecutor(
+                    0, 1, 1L, TimeUnit.SECONDS,
+                    new LinkedBlockingQueue<Runnable>());
+            this.createdExecutor = true;
+        } else {
+            this.executor = executor;
+            this.createdExecutor = false;
+        }
         
         try {
             init();
@@ -316,11 +329,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             
             if (isDisposed()) {
                 selectable = false;
-                // We don't shut down the executor here because:
-                // 1) The default executor (i.e. NewThreadExecutor) doesn't
-                //    need to be shut down.
-                // 2) Other executors specified by users are supposed to be
-                //    shut down by the caller.
+                if (createdExecutor) {
+                    ((ExecutorService) executor).shutdown();
+                }
                 try {
                     destroy();
                 } catch (Exception e) {
