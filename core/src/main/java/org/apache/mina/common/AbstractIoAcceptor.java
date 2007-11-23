@@ -54,6 +54,9 @@ public abstract class AbstractIoAcceptor
     }
 
     public SocketAddress getLocalAddress() {
+        if (localAddresses.isEmpty()) {
+            return null;
+        }
         return localAddresses.iterator().next();
     }
 
