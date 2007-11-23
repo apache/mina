@@ -97,12 +97,26 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         this.processor = processor;
         this.createdProcessor = createdProcessor;
         
-        init();
-        selectable = true;
+        try {
+            init();
+            selectable = true;
+        } catch (RuntimeException e){
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeIoException("Failed to initialize.", e);
+        } finally {
+            if (!selectable) {
+                try {
+                    destroy();
+                } catch (Exception e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
+            }
+        }
     }
 
-    protected abstract void init();
-    protected abstract void destroy();
+    protected abstract void init() throws Exception;
+    protected abstract void destroy() throws Exception;
     protected abstract boolean select() throws Exception;
     protected abstract void wakeup();
     protected abstract Iterator<H> selectedHandles();
@@ -223,13 +237,22 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             }
             
             if (isDisposed()) {
+                // We don't shut down the executor here because:
+                // 1) The default executor (i.e. NewThreadExecutor) doesn't
+                //    need to be shut down.
+                // 2) Other executors specified by users are supposed to be
+                //    shut down by the caller.
                 try {
                     if (createdProcessor) {
                         processor.dispose();
                     }
                 } finally {
                     selectable = false;
-                    destroy();
+                    try {
+                        destroy();
+                    } catch (Exception e) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e);
+                    }
                 }
             }
         }

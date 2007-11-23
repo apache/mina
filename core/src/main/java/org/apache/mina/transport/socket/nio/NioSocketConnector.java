@@ -19,7 +19,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
@@ -30,10 +29,8 @@ import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractPollingIoConnector;
-import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketConnector;
@@ -68,22 +65,14 @@ public final class NioSocketConnector
     }
     
     @Override
-    protected void init() {
-        try {
-            this.selector = Selector.open();
-        } catch (IOException e) {
-            throw new RuntimeIoException("Failed to open a selector.", e);
-        }
+    protected void init() throws Exception {
+        this.selector = Selector.open();
     }
     
     @Override
-    protected void destroy() {
+    protected void destroy() throws Exception {
         if (selector != null) {
-            try {
-                selector.close();
-            } catch (IOException e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-            }
+            selector.close();
         }
     }
 

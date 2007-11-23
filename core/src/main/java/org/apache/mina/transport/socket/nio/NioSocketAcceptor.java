@@ -19,9 +19,7 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -32,10 +30,8 @@ import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractPollingIoAcceptor;
-import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
@@ -53,7 +49,7 @@ public final class NioSocketAcceptor
         implements SocketAcceptor {
 
     private int backlog = 50;
-    private boolean reuseAddress = true;
+    private boolean reuseAddress;
 
     private volatile Selector selector;
 
@@ -77,44 +73,16 @@ public final class NioSocketAcceptor
     }
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         // The default reuseAddress of an accepted socket should be 'true'.
         getSessionConfig().setReuseAddress(true);
-
-        // Get the default configuration
-        ServerSocket s = null;
-        try {
-            s = new ServerSocket();
-            reuseAddress = s.getReuseAddress();
-        } catch (IOException e) {
-            throw new RuntimeIoException(
-                    "Failed to get the default configuration.", e);
-        } finally {
-            if (s != null) {
-                try {
-                    s.close();
-                } catch (IOException e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
-            }
-        }
-
-        try {
-            this.selector = Selector.open();
-        } catch (IOException e) {
-            destroy();
-            throw new RuntimeIoException("Failed to open a selector.", e);
-        }
+        this.selector = Selector.open();
     }
     
     @Override
-    protected void destroy() {
+    protected void destroy() throws Exception {
         if (selector != null) {
-            try {
-                selector.close();
-            } catch (IOException e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-            }
+            selector.close();
         }
     }
 
@@ -169,7 +137,7 @@ public final class NioSocketAcceptor
     
     @Override
     protected NioSession accept(IoProcessor<NioSession> processor,
-            ServerSocketChannel handle) {
+            ServerSocketChannel handle) throws Exception {
 
         SelectionKey key = handle.keyFor(selector);
         if (!key.isAcceptable()) {
@@ -177,14 +145,7 @@ public final class NioSocketAcceptor
         }
 
         // accept the connection from the client
-        SocketChannel ch;
-        try {
-            ch = handle.accept();
-        } catch (IOException e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
-            return null;
-        }
-
+        SocketChannel ch = handle.accept();
         if (ch == null) {
             return null;
         }

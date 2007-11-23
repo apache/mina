@@ -82,7 +82,7 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
     }
 
     @Override
@@ -131,7 +131,7 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected void destroy() {
+    protected void destroy() throws Exception {
         throw new UnsupportedOperationException();
     }
 

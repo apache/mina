@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractPollingIoAcceptor;
-import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
@@ -31,7 +30,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     private volatile boolean toBeWakenUp;
 
     private int backlog = 50;
-    private boolean reuseAddress = true;
+    private boolean reuseAddress;
 
     private volatile long pool;
     private volatile long pollset; // socket poller
@@ -57,20 +56,18 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     }
 
     @Override
-    protected AprSession accept(IoProcessor<AprSession> processor, Long handle) {
+    protected AprSession accept(IoProcessor<AprSession> processor, Long handle) throws Exception {
+        long s = Socket.accept(handle);
+        boolean success = false;
         try {
-            long s = Socket.accept(handle);
-            try {
-                return new AprSocketSession(this, processor, s);
-            } catch (Exception e) {
+            AprSession result = new AprSocketSession(this, processor, s);
+            success = true;
+            return result;
+        } finally {
+            if (!success) {
                 Socket.close(s);
-                ExceptionMonitor.getInstance().exceptionCaught(e);
             }
-        } catch (Exception e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
         }
-        
-        return null;
     }
 
     @Override
@@ -123,63 +120,47 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     }
 
     @Override
-    protected void init() {
-        try {
-            wakeupSocket = Socket.create(
-                    Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
-                    .getInstance().getRootPool());
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Error e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeIoException("Failed to create a wakeup socket.", e);
-        }
+    protected void init() throws Exception {
+        wakeupSocket = Socket.create(
+                Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
+                .getInstance().getRootPool());
     
         // initialize a memory pool for APR functions
         pool = Pool.create(AprLibrary.getInstance().getRootPool());
         
-        boolean success = false;
-        try {
-            pollset = Poll.create(
-                            POLLSET_SIZE,
-                            pool,
-                            Poll.APR_POLLSET_THREADSAFE,
-                            Long.MAX_VALUE);
-            
-            if (pollset == 0) {
-                pollset = Poll.create(
-                        62,
+        pollset = Poll.create(
+                        POLLSET_SIZE,
                         pool,
                         Poll.APR_POLLSET_THREADSAFE,
                         Long.MAX_VALUE);
-            }
-    
-            if (pollset < 0) {
-                if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
-                    throw new RuntimeIoException(
-                            "Thread-safe pollset is not supported in this platform.");
-                }
-            }
-            success = true;
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Error e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeIoException("Failed to create a pollset.", e);
-        } finally {
-            if (!success) {
-                dispose();
+        
+        if (pollset <= 0) {
+            pollset = Poll.create(
+                    62,
+                    pool,
+                    Poll.APR_POLLSET_THREADSAFE,
+                    Long.MAX_VALUE);
+        }
+
+        if (pollset <= 0) {
+            if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
+                throw new RuntimeIoException(
+                        "Thread-safe pollset is not supported in this platform.");
             }
         }
     }
 
     @Override
-    protected void destroy() {
-        Socket.close(wakeupSocket);
-        Poll.destroy(pollset);
-        Pool.destroy(pool);
+    protected void destroy() throws Exception {
+        if (wakeupSocket > 0) {
+            Socket.close(wakeupSocket);
+        }
+        if (pollset > 0) {
+            Poll.destroy(pollset);
+        }
+        if (pool > 0) {
+            Pool.destroy(pool);
+        }
     }
 
     @Override
