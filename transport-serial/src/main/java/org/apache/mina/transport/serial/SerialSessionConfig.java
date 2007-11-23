@@ -48,7 +48,7 @@ public interface SerialSessionConfig extends IoSessionConfig {
      * Is the low latency mode is enabled.
      * @return low latency on
      */
-    boolean isLowLantecy();
+    boolean isLowLatency();
 
     /**
      * Set the low latency mode, be carefull it's not supported by all the OS/hardware.

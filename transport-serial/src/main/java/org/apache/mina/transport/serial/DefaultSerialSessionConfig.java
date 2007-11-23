@@ -53,7 +53,7 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements Seri
         return inputBufferSize;
     }
 
-    public boolean isLowLantecy() {
+    public boolean isLowLatency() {
         return lowLatency;
     }
 

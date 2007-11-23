@@ -144,7 +144,7 @@ public final class SerialConnector extends AbstractIoConnector {
 
         serialPort.notifyOnDataAvailable(true);
 
-        if (config.isLowLantecy()) {
+        if (config.isLowLatency()) {
             serialPort.setLowLatency();
         }
 
