@@ -17,6 +17,9 @@
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-modeler</groupId>
+      <artifactId>commons-modeler</artifactId>
+    </dependency>
   </dependencies>
 </project>
-
