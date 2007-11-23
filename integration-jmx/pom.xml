@@ -18,8 +18,8 @@
       <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-modeler</groupId>
-      <artifactId>commons-modeler</artifactId>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
     </dependency>
   </dependencies>
 </project>
