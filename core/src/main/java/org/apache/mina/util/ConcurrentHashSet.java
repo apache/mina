@@ -31,6 +31,9 @@ import java.util.concurrent.ConcurrentMap;
  * @version $Rev$, $Date$
  */
 public class ConcurrentHashSet<E> extends MapBackedSet<E> {
+
+    private static final long serialVersionUID = 8518578988740277828L;
+
     public ConcurrentHashSet() {
         super(new ConcurrentHashMap<E, Boolean>());
     }

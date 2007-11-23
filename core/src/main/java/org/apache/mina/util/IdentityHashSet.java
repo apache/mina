@@ -30,6 +30,9 @@ import java.util.Set;
  * @version $Rev$, $Date$
  */
 public class IdentityHashSet<E> extends MapBackedSet<E> {
+
+    private static final long serialVersionUID = 6948202189467167147L;
+
     public IdentityHashSet() {
         super(new IdentityHashMap<E, Boolean>());
     }

@@ -19,6 +19,7 @@
  */
 package org.apache.mina.util;
 
+import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,7 +32,10 @@ import java.util.Set;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class MapBackedSet<E> extends AbstractSet<E> {
+public class MapBackedSet<E> extends AbstractSet<E> implements Serializable {
+
+    private static final long serialVersionUID = -8347878570391674042L;
+    
     protected final Map<E, Boolean> map;
 
     public MapBackedSet(Map<E, Boolean> map) {
