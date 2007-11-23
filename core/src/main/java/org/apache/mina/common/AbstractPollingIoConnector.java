@@ -228,7 +228,8 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     }
 
     @SuppressWarnings("unchecked")
-    private void processSessions(Iterator<H> handlers) {
+    private int processSessions(Iterator<H> handlers) {
+        int nHandles = 0;
         while (handlers.hasNext()) {
             H handle = handlers.next();
             handlers.remove();
@@ -241,6 +242,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                 finishSessionInitialization(session, entry);
                 // Forward the remaining process to the IoProcessor.
                 session.getProcessor().add(session);
+                nHandles ++;
                 success = true;
             } catch (Throwable e) {
                 entry.setException(e);
@@ -250,6 +252,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                 }
             }
         }
+        return nHandles;
     }
 
     private void processTimedOutSessions(Iterator<H> handles) {
@@ -277,7 +280,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     nHandles += registerNew();
 
                     if (selected) {
-                        processSessions(selectedHandles());
+                        nHandles -= processSessions(selectedHandles());
                     }
 
                     processTimedOutSessions(allHandles());
