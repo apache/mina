@@ -19,9 +19,7 @@
  */
 package org.apache.mina.integration.beans;
 
-import java.beans.PropertyEditorSupport;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 /**
  * Java Bean {@link java.beans.PropertyEditor} which converts Strings into
@@ -40,28 +38,39 @@ import java.net.SocketAddress;
  *
  * @see java.net.InetSocketAddress
  */
-public class InetSocketAddressEditor extends PropertyEditorSupport {
-    @Override
-    public void setAsText(String text) throws IllegalArgumentException {
-        setValue(parseSocketAddress(text));
-    }
+public class InetSocketAddressEditor extends AbstractPropertyEditor {
 
-    private SocketAddress parseSocketAddress(String s) {
-        if (s == null) {
-            throw new IllegalArgumentException("socketAddress is null.");
+    @Override
+    protected String toText(Object value) {
+        InetSocketAddress addr = ((InetSocketAddress) value);
+        String hostname;
+        if (addr.getAddress() != null) {
+            hostname = addr.getAddress().getHostAddress();
+        } else {
+            hostname = addr.getHostName();
         }
         
-        s = s.trim();
-        int colonIndex = s.indexOf(":");
+        if (hostname.equals("0:0:0:0:0:0:0:0") || hostname.equals("0.0.0.0") ||
+            hostname.equals("00:00:00:00:00:00:00:00")) {
+            hostname = "*";
+        }
+        
+        return hostname + ':' + addr.getPort();
+    }
+
+    @Override
+    protected Object toValue(String text) throws IllegalArgumentException {
+        text = text.trim();
+        int colonIndex = text.lastIndexOf(":");
         if (colonIndex > 0) {
-            String host = s.substring(0, colonIndex);
+            String host = text.substring(0, colonIndex);
             if (!"*".equals(host)) {
-                int port = parsePort(s.substring(colonIndex + 1));
+                int port = parsePort(text.substring(colonIndex + 1));
                 return new InetSocketAddress(host, port);
             }
         }
 
-        int port = parsePort(s.substring(colonIndex + 1));
+        int port = parsePort(text.substring(colonIndex + 1));
         return new InetSocketAddress(port);
     }
 

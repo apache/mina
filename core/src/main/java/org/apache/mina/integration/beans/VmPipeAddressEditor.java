@@ -19,9 +19,6 @@
  */
 package org.apache.mina.integration.beans;
 
-import java.beans.PropertyEditorSupport;
-import java.net.SocketAddress;
-
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
 
 /**
@@ -39,24 +36,21 @@ import org.apache.mina.transport.vmpipe.VmPipeAddress;
  *
  * @see org.apache.mina.transport.vmpipe.VmPipeAddress
  */
-public class VmPipeAddressEditor extends PropertyEditorSupport {
+public class VmPipeAddressEditor extends AbstractPropertyEditor {
     @Override
-    public void setAsText(String text) throws IllegalArgumentException {
-        setValue(parseSocketAddress(text));
+    protected String toText(Object value) {
+        return ":" + ((VmPipeAddress) value).getPort();
     }
 
-    private SocketAddress parseSocketAddress(String s) {
-        if (s == null) {
-            throw new IllegalArgumentException("socketAddress is null.");
-        }
-        s = s.trim();
-        if (s.startsWith(":")) {
-            s = s.substring(1);
+    @Override
+    protected Object toValue(String text) throws IllegalArgumentException {
+        if (text.startsWith(":")) {
+            text = text.substring(1);
         }
         try {
-            return new VmPipeAddress(Integer.parseInt(s.trim()));
+            return new VmPipeAddress(Integer.parseInt(text.trim()));
         } catch (NumberFormatException nfe) {
-            throw new IllegalArgumentException("Illegal VmPipeAddress: " + s);
+            throw new IllegalArgumentException("Illegal VmPipeAddress: " + text);
         }
     }
 }

@@ -19,7 +19,6 @@
  */
 package org.apache.mina.integration.beans;
 
-import java.beans.PropertyEditorSupport;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -43,14 +42,16 @@ import org.apache.mina.filter.firewall.BlacklistFilter;
  *
  * @see java.net.InetAddress
  */
-public class InetAddressEditor extends PropertyEditorSupport {
+public class InetAddressEditor extends AbstractPropertyEditor {
     @Override
-    public void setAsText(String text) throws IllegalArgumentException {
-        if (text == null) {
-            throw new IllegalArgumentException("address is null.");
-        }
+    protected String toText(Object value) {
+        return ((InetAddress) value).getHostAddress();
+    }
+
+    @Override
+    protected Object toValue(String text) throws IllegalArgumentException {
         try {
-            setValue(InetAddress.getByName(text));
+            return InetAddress.getByName(text);
         } catch (UnknownHostException uhe) {
             IllegalArgumentException iae = new IllegalArgumentException();
             iae.initCause(uhe);
