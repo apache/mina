@@ -287,6 +287,7 @@
     <!--
     <module>protocol-http-server</module>
     -->
+    <module>integration-beans</module>
     <module>integration-jmx</module>
     <module>integration-spring</module>
     <module>example</module>
