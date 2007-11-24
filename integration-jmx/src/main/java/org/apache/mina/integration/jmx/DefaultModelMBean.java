@@ -18,6 +18,7 @@ package org.apache.mina.integration.jmx;
 
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.SocketAddress;
@@ -40,6 +41,7 @@ import javax.management.ListenerNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.MBeanNotificationInfo;
+import javax.management.MBeanParameterInfo;
 import javax.management.Notification;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
@@ -61,6 +63,7 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterChainBuilder;
+import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
@@ -139,7 +142,8 @@ class DefaultModelMBean implements ModelMBean {
             for (int i = 0; i < paramTypes.length; i ++) {
                 paramTypes[i] = getAttributeClass(signature[i]);
             }
-            return MethodUtils.invokeMethod(source, name, params, paramTypes);
+            return convertReturnValue(
+                    "", MethodUtils.invokeMethod(source, name, params, paramTypes));
         } catch (ClassNotFoundException e) {
             throw new ReflectionException(e);
         } catch (NoSuchMethodException e) {
@@ -438,7 +442,19 @@ class DefaultModelMBean implements ModelMBean {
                 continue;
             }
             
-            operations.add(new ModelMBeanOperationInfo(m.getName(), m));
+            List<MBeanParameterInfo> signature = new ArrayList<MBeanParameterInfo>();
+            int i = 1;
+            for (Class<?> ptype: m.getParameterTypes()) {
+                String pname = "p" + (i ++);
+                signature.add(new MBeanParameterInfo(
+                        pname, convertReturnType("", ptype).getName(), pname));
+            }
+
+            operations.add(new ModelMBeanOperationInfo(
+                    m.getName(), m.getName(),
+                    signature.toArray(new MBeanParameterInfo[signature.size()]),
+                    convertReturnType("", m.getReturnType()).getName(),
+                    ModelMBeanOperationInfo.ACTION));
         }
     }
     
@@ -508,7 +524,7 @@ class DefaultModelMBean implements ModelMBean {
         if (Class.class.isAssignableFrom(type)) {
             return String.class;
         }
-
+        
         if (SocketAddress.class.isAssignableFrom(type)) {
             return String.class;
         }
@@ -556,6 +572,14 @@ class DefaultModelMBean implements ModelMBean {
             return String.class;
         }
         
+        if (IoFuture.class.isAssignableFrom(type)) {
+            return void.class;
+        }
+        
+        if (!Serializable.class.isAssignableFrom(type) && !type.isPrimitive()) {
+            return void.class;
+        }
+        
         return type;
     }
     
@@ -563,7 +587,7 @@ class DefaultModelMBean implements ModelMBean {
         if (v == null) {
             return null;
         }
-
+        
         if (v instanceof Class) {
             return ((Class<?>) v).getName();
         }
@@ -651,12 +675,20 @@ class DefaultModelMBean implements ModelMBean {
             return "none";
         }
         
+        if (v instanceof IoFuture) {
+            return null;
+        }
+        
         if (v instanceof SocketAddress) {
             PropertyEditor editor = getPropertyEditor(v.getClass());
             if (editor != null) {
                 editor.setValue(v);
                 return editor.getAsText();
             }
+        }
+
+        if (!(v instanceof Serializable)) {
+            return null;
         }
 
         return v;
