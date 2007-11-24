@@ -58,6 +58,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
@@ -462,16 +463,48 @@ class DefaultModelMBean implements ModelMBean {
     }
 
     private Class<?> convertReturnType(String name, Class<?> type) {
+        if (Class.class.isAssignableFrom(type)) {
+            return String.class;
+        }
+
         if (SocketAddress.class.isAssignableFrom(type)) {
             return String.class;
         }
         
-        if (type == Long.class && name.endsWith("Time") &&
+        if ((type == Long.class || type == long.class) && name.endsWith("Time") &&
                 !propertyDescriptors.containsKey(name + "InMillis")) {
             return Date.class;
         }
+        
+        if (type == AttributeKey.class) {
+            return String.class;
+        }
 
         if (type == TrafficMask.class) {
+            return String.class;
+        }
+        
+        if (IoHandler.class.isAssignableFrom(type)) {
+            return String.class;
+        }
+        
+        if (IoSession.class.isAssignableFrom(type)) {
+            return String.class;
+        }
+        
+        if (IoService.class.isAssignableFrom(type)) {
+            return String.class;
+        }
+        
+        if (IoFilterChain.class.isAssignableFrom(type)) {
+            return List.class;
+        }
+        
+        if (IoFilterChainBuilder.class.isAssignableFrom(type)) {
+            return List.class;
+        }
+        
+        if (IoSessionDataStructureFactory.class.isAssignableFrom(type)) {
             return String.class;
         }
         
@@ -525,10 +558,14 @@ class DefaultModelMBean implements ModelMBean {
             return v.getClass().getName();
         }
         
-        if (v instanceof DefaultIoFilterChainBuilder) {
+        if (v instanceof IoFilterChainBuilder) {
             List<String> filterNames = new ArrayList<String>();
-            for (IoFilterChain.Entry e: ((DefaultIoFilterChainBuilder) v).getAll()) {
-                filterNames.add(e.getName());
+            if (v instanceof DefaultIoFilterChainBuilder) {
+                for (IoFilterChain.Entry e: ((DefaultIoFilterChainBuilder) v).getAll()) {
+                    filterNames.add(e.getName());
+                }
+            } else {
+                filterNames.add("Unknown builder: " + v.getClass().getName());
             }
             return filterNames;
         }
@@ -539,6 +576,10 @@ class DefaultModelMBean implements ModelMBean {
                 filterNames.add(e.getName());
             }
             return filterNames;
+        }
+        
+        if (v instanceof IoFilterChainBuilder) {
+            return v.getClass().getName();
         }
         
         if (v instanceof TrafficMask) {
