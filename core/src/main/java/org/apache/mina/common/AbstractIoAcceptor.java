@@ -191,4 +191,14 @@ public abstract class AbstractIoAcceptor
      * Implement this method to perform the actual unbind operation.
      */
     protected abstract void unbind0() throws Exception;
+    
+    @Override
+    public String toString() {
+        TransportMetadata m = getTransportMetadata();
+        return '(' + m.getProviderName() + ' ' + m.getName() + " acceptor: " + 
+               (isActive()?
+                       "localAddress: " + getLocalAddresses() +
+                       ", managedSessionCount: " + getManagedSessionCount() :
+                           "not bound") + ')'; 
+    }
 }

@@ -178,4 +178,11 @@ public abstract class AbstractIoConnector
             }
         });
     }
+    
+    @Override
+    public String toString() {
+        TransportMetadata m = getTransportMetadata();
+        return '(' + m.getProviderName() + ' ' + m.getName() + " connector: " + 
+               "managedSessionCount: " + getManagedSessionCount() + ')'; 
+    }
 }
