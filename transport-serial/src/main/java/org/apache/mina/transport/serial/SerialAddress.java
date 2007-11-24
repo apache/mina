@@ -51,17 +51,12 @@ public class SerialAddress extends SocketAddress {
         NONE, RTSCTS_IN, RTSCTS_OUT, XONXOFF_IN, XONXOFF_OUT
     }
 
-    private String name;
-
-    private int bauds;
-
-    private int dataBits;
-
-    private StopBits stopBits;
-
-    private Parity parity;
-
-    private FlowControl flowControl;
+    private final String name;
+    private final int bauds;
+    private final DataBits dataBits;
+    private final StopBits stopBits;
+    private final Parity parity;
+    private final FlowControl flowControl;
 
     /**
      * Create an address for a serial communication, associating a serial interface and
@@ -73,9 +68,27 @@ public class SerialAddress extends SocketAddress {
      * @param parity parity used
      * @param flowControl flow control used
      */
-    public SerialAddress(String name, int bauds, int dataBits,
+    public SerialAddress(String name, int bauds, DataBits dataBits,
             StopBits stopBits, Parity parity, FlowControl flowControl) {
-        super();
+        if (name == null) {
+            throw new NullPointerException("name");
+        }
+        if (bauds <= 0) {
+            throw new IllegalArgumentException("bauds: " + bauds);
+        }
+        if (dataBits == null) {
+            throw new NullPointerException("dataBits");
+        }
+        if (stopBits == null) {
+            throw new NullPointerException("stopBits");
+        }
+        if (parity == null) {
+            throw new NullPointerException("parity");
+        }
+        if (flowControl == null) {
+            throw new NullPointerException("flowControl");
+        }
+        
         this.name = name;
         this.bauds = bauds;
         this.dataBits = dataBits;
@@ -96,7 +109,7 @@ public class SerialAddress extends SocketAddress {
      * Number of data bits for each communicated bytes.
      * @return the data bits
      */
-    public int getDataBits() {
+    public DataBits getDataBits() {
         return dataBits;
     }
 
@@ -137,20 +150,20 @@ public class SerialAddress extends SocketAddress {
      */
     @Override
     public String toString() {
-        return "serial(" + name + ",bauds:" + bauds + ",databits:" + dataBits
-                + ",stopbits:" + stopBits + ",parity:" + parity
-                + ",flowcontrol:" + flowControl + ")";
+        return name + " (bauds: " + bauds + ", dataBits: " + dataBits
+                + ", stopBits: " + stopBits + ", parity: " + parity
+                + ", flowControl: " + flowControl + ")";
     }
 
     int getDataBitsForRXTX() {
         switch (dataBits) {
-        case 5:
+        case DATABITS_5:
             return SerialPort.DATABITS_5;
-        case 6:
+        case DATABITS_6:
             return SerialPort.DATABITS_6;
-        case 7:
+        case DATABITS_7:
             return SerialPort.DATABITS_7;
-        case 8:
+        case DATABITS_8:
             return SerialPort.DATABITS_8;
         }
         throw new InvalidParameterException("broken databits");
