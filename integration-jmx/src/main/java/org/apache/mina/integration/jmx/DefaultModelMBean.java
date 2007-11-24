@@ -510,8 +510,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             operations.add(new ModelMBeanOperationInfo(
                     m.getName(), m.getName(),
                     signature.toArray(new MBeanParameterInfo[signature.size()]),
-                    convertOperationReturnType(
-                            m.getName(), m.getReturnType()).getName(),
+                    convertOperationReturnType(m.getReturnType()).getName(),
                     ModelMBeanOperationInfo.ACTION));
         }
         
@@ -563,12 +562,14 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         }
     }
     
-    private Class<?> convertOperationReturnType(
-            String opName, Class<?> opReturnType) {
-
+    private Class<?> convertOperationReturnType(Class<?> opReturnType) {
         if (IoFuture.class.isAssignableFrom(opReturnType)) {
             return void.class;
         }
+        if (opReturnType == void.class || opReturnType == Void.class) {
+            return void.class;
+        }
+
         return convertAttributeType("", opReturnType);
     }
 
