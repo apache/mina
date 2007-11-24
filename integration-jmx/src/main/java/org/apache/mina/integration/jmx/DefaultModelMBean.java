@@ -63,7 +63,6 @@ import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterChainBuilder;
-import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
@@ -572,10 +571,6 @@ class DefaultModelMBean implements ModelMBean {
             return String.class;
         }
         
-        if (IoFuture.class.isAssignableFrom(type)) {
-            return void.class;
-        }
-        
         if (!Serializable.class.isAssignableFrom(type) && !type.isPrimitive()) {
             return void.class;
         }
@@ -673,10 +668,6 @@ class DefaultModelMBean implements ModelMBean {
                 return "write";
             }
             return "none";
-        }
-        
-        if (v instanceof IoFuture) {
-            return null;
         }
         
         if (v instanceof SocketAddress) {
