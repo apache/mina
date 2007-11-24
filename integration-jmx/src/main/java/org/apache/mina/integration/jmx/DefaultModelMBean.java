@@ -17,13 +17,17 @@
 package org.apache.mina.integration.jmx;
 
 import java.beans.PropertyDescriptor;
+import java.beans.PropertyEditor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.Attribute;
@@ -31,7 +35,6 @@ import javax.management.AttributeChangeNotification;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
@@ -60,6 +63,7 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionDataStructureFactory;
 import org.apache.mina.common.TrafficMask;
+import org.apache.mina.common.TransportMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +71,10 @@ class DefaultModelMBean implements ModelMBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Object source;
-    private final ModelMBeanInfo info;
+    private final TransportMetadata transportMetadata;
+    private final MBeanInfo info;
+    private final Map<String, PropertyDescriptor> propertyDescriptors =
+        new HashMap<String, PropertyDescriptor>();
 
     public DefaultModelMBean(Object source) {
         if (source == null) {
@@ -75,13 +82,22 @@ class DefaultModelMBean implements ModelMBean {
         }
         
         this.source = source;
+        
+        if (source instanceof IoService) {
+            transportMetadata = ((IoService) source).getTransportMetadata();
+        } else if (source instanceof IoSession) {
+            transportMetadata = ((IoSession) source).getTransportMetadata();
+        } else {
+            transportMetadata = null;
+        }
+        
         this.info = createModelMBeanInfo(source);
     }
     
     public Object getAttribute(String name) throws AttributeNotFoundException,
             MBeanException, ReflectionException {
         try {
-            return convert(
+            return convertReturnValue(
                     name, PropertyUtils.getNestedProperty(source, name));
         } catch (IllegalAccessException e) {
             throw new ReflectionException(e);
@@ -110,7 +126,7 @@ class DefaultModelMBean implements ModelMBean {
     }
 
     public MBeanInfo getMBeanInfo() {
-        return (MBeanInfo) info.clone();
+        return info;
     }
 
     public Object invoke(String name, Object params[], String signature[])
@@ -178,9 +194,13 @@ class DefaultModelMBean implements ModelMBean {
     public void setAttribute(Attribute attribute)
             throws AttributeNotFoundException, MBeanException,
             ReflectionException {
+        String aname = attribute.getName();
+        Object avalue = attribute.getValue();
+        
         try {
             PropertyUtils.setNestedProperty(
-                    source, attribute.getName(), attribute.getValue());
+                    source, aname, convert(
+                            avalue, propertyDescriptors.get(aname).getPropertyType()));
         } catch (IllegalAccessException e) {
             throw new ReflectionException(e);
         } catch (InvocationTargetException e) {
@@ -281,7 +301,7 @@ class DefaultModelMBean implements ModelMBean {
         return source.toString();
     }
     
-    private ModelMBeanInfo createModelMBeanInfo(Object source) {
+    private MBeanInfo createModelMBeanInfo(Object source) {
         String className = source.getClass().getName();
         String description = "";
         
@@ -342,13 +362,15 @@ class DefaultModelMBean implements ModelMBean {
             }
     
             // Ordinary property.
-            try {
-                attributes.add(new ModelMBeanAttributeInfo(
-                        prefix + pname, p.getShortDescription(),
-                        p.getReadMethod(), p.getWriteMethod()));
-            } catch (IntrospectionException e) {
-                logger.debug("Unexpected exception.", e);
-            }
+            String fqpn = prefix + pname;
+            boolean writable = p.getWriteMethod() != null | isWritable(type, pname);
+            attributes.add(new ModelMBeanAttributeInfo(
+                    fqpn, convertReturnType(fqpn, p.getPropertyType()).getName(),
+                    p.getShortDescription(),
+                    true, writable,
+                    p.getReadMethod().getName().startsWith("is")));
+            
+            propertyDescriptors.put(fqpn, p);
         }
     }
 
@@ -376,8 +398,91 @@ class DefaultModelMBean implements ModelMBean {
         }
         return false;
     }
+    
+    private boolean isWritable(Class<?> type, String pname) {
+        if (IoService.class.isAssignableFrom(type) && pname.equals("localAddresses")) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private Object convert(Object v, Class<?> type) throws ReflectionException {
+        if (v == null) {
+            return null;
+        }
+        
+        if (type.isAssignableFrom(v.getClass())) {
+            return v;
+        }
+        
+        if (v instanceof String) {
+            String s = (String) v;
+            if (type == TrafficMask.class) {
+                if ("all".equalsIgnoreCase(s)) {
+                    return TrafficMask.ALL;
+                }
+                if ("read".equalsIgnoreCase(s)) {
+                    return TrafficMask.READ;
+                }
+                if ("write".equalsIgnoreCase(s)) {
+                    return TrafficMask.WRITE;
+                }
+                if ("none".equalsIgnoreCase(s)) {
+                    return TrafficMask.NONE;
+                }
+                throw new IllegalArgumentException(
+                        s + " (expected: all, read, write or none)");
+            }
 
-    private Object convert(String name, Object v) {
+            PropertyEditor editor = getPropertyEditor(type);
+            if (editor == null) {
+                throw new ReflectionException(new ClassNotFoundException(
+                        "Failed to find a PropertyEditor for " + type.getSimpleName()));
+            }
+            editor.setAsText(s);
+            return editor.getValue();
+        }
+
+        return v;
+    }
+
+    private PropertyEditor getPropertyEditor(Class<?> type) {
+        if (transportMetadata != null && type == SocketAddress.class) {
+            type = transportMetadata.getAddressType();
+        }
+
+        try {
+            return (PropertyEditor) IoSession.class.getClassLoader().loadClass(
+                "org.apache.mina.integration.beans." +
+                type.getSimpleName() + "Editor").newInstance();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Class<?> convertReturnType(String name, Class<?> type) {
+        if (SocketAddress.class.isAssignableFrom(type)) {
+            return String.class;
+        }
+        
+        if (type == Long.class && name.endsWith("Time") &&
+                !propertyDescriptors.containsKey(name + "InMillis")) {
+            return Date.class;
+        }
+
+        if (type == TrafficMask.class) {
+            return String.class;
+        }
+        
+//        if (List.class.isAssignableFrom(type) && name.equals("localAddresses")) {
+//            return SocketAddress[].class;
+//        }
+        
+        return type;
+    }
+    
+    private Object convertReturnValue(String name, Object v) {
         if (v == null) {
             return null;
         }
@@ -386,7 +491,8 @@ class DefaultModelMBean implements ModelMBean {
             return ((Class<?>) v).getName();
         }
         
-        if (v instanceof Long && name.endsWith("Time")) {
+        if (v instanceof Long && name.endsWith("Time") &&
+                !propertyDescriptors.containsKey(name + "InMillis")) {
             long time = (Long) v;
             if (time <= 0) {
                 return null;
@@ -403,16 +509,15 @@ class DefaultModelMBean implements ModelMBean {
         }
         
         if (v instanceof AttributeKey) {
-            return String.valueOf(v);
+            return v.toString();
         }
         
         if (v instanceof IoSession) {
-            return ((IoSession) v).getId();
+            return v.toString();
         }
         
         if (v instanceof IoService) {
-            // FIXME getId()
-            return String.valueOf(v);
+            return v.toString();
         }
         
         if (v instanceof IoSessionDataStructureFactory ||
@@ -438,7 +543,24 @@ class DefaultModelMBean implements ModelMBean {
         
         if (v instanceof TrafficMask) {
             TrafficMask m = (TrafficMask) v;
-            return (m.isReadable()? "r" : "") + (m.isWritable()? "w" : ""); 
+            if (m.isReadable() && m.isWritable()) {
+                return "all";
+            }
+            if (m.isReadable()) {
+                return "read";
+            }
+            if (m.isWritable()) {
+                return "write";
+            }
+            return "none";
+        }
+        
+        if (v instanceof SocketAddress) {
+            PropertyEditor editor = getPropertyEditor(v.getClass());
+            if (editor != null) {
+                editor.setValue(v);
+                return editor.getAsText();
+            }
         }
 
         return v;
@@ -447,7 +569,7 @@ class DefaultModelMBean implements ModelMBean {
     private Object convertCollection(Object src, Collection<Object> dst) {
         Collection<?> srcCol = (Collection<?>) src;
         for (Object e: srcCol) {
-            dst.add(convert("element", e));
+            dst.add(convertReturnValue("element", e));
         }
         return dst;
     }

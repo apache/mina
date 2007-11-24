@@ -30,10 +30,12 @@ public class Foo {
             }
         });
         service.setLocalAddress(new InetSocketAddress(8080));
-        service.bind();
+        //service.bind();
         
         server.registerMBean(
                 new DefaultModelMBean(service),
                 new ObjectName("org.apache.mina:type=service,name=myService"));
+        
+        Thread.sleep(1000000);
     }
 }
