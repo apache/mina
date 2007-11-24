@@ -61,6 +61,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterChainBuilder;
@@ -107,13 +108,73 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             MBeanException, ReflectionException {
         
         // Handle synthetic attributes first.
-        if (source instanceof IoSession && name.equals("attributes")) {
-            Map<Object, Object> result = new HashMap<Object, Object>();
-            IoSession session = (IoSession) source;
-            for (Object key: session.getAttributeKeys()) {
-                result.put(key, session.getAttribute(key));
+        if (source instanceof IoSession) {
+            IoSession s = (IoSession) source;
+            if (name.equals("attributes")) {
+                Map<Object, Object> result = new HashMap<Object, Object>();
+                for (Object key: s.getAttributeKeys()) {
+                    result.put(key, s.getAttribute(key));
+                }
+                return convertAttributeValue("attributes", result);
             }
-            return convertAttributeValue("attributes", result);
+            if (name.equals("readerIdleCount")) {
+                return s.getIdleCount(IdleStatus.READER_IDLE);
+            }
+            if (name.equals("writerIdleCount")) {
+                return s.getIdleCount(IdleStatus.WRITER_IDLE);
+            }
+            if (name.equals("bothIdleCount")) {
+                return s.getIdleCount(IdleStatus.BOTH_IDLE);
+            }
+            if (name.startsWith("config.readerIdleTime")) {
+                return s.getConfig().getIdleTime(IdleStatus.READER_IDLE) *
+                       (name.endsWith("InMillis")? 1000L : 1L);
+            }
+            if (name.startsWith("config.writerIdleTime")) {
+                return s.getConfig().getIdleTime(IdleStatus.WRITER_IDLE) *
+                (name.endsWith("InMillis")? 1000L : 1L);
+            }
+            if (name.startsWith("config.bothIdleTime")) {
+                return s.getConfig().getIdleTime(IdleStatus.BOTH_IDLE) *
+                (name.endsWith("InMillis")? 1000L : 1L);
+            }
+        }
+        
+        if (source instanceof IoService) {
+            IoService s = (IoService) source;
+            if (name.equals("readerIdleCount")) {
+                return s.getIdleCount(IdleStatus.READER_IDLE);
+            }
+            if (name.equals("writerIdleCount")) {
+                return s.getIdleCount(IdleStatus.WRITER_IDLE);
+            }
+            if (name.equals("bothIdleCount")) {
+                return s.getIdleCount(IdleStatus.BOTH_IDLE);
+            }
+            if (name.startsWith("readerIdleTime")) {
+                return s.getIdleTime(IdleStatus.READER_IDLE) *
+                       (name.endsWith("InMillis")? 1000 : 1);
+            }
+            if (name.startsWith("writerIdleTime")) {
+                return s.getIdleTime(IdleStatus.WRITER_IDLE) *
+                (name.endsWith("InMillis")? 1000 : 1);
+            }
+            if (name.startsWith("bothIdleTime")) {
+                return s.getIdleTime(IdleStatus.BOTH_IDLE) *
+                (name.endsWith("InMillis")? 1000 : 1);
+            }
+            if (name.startsWith("sessionConfig.readerIdleTime")) {
+                return s.getSessionConfig().getIdleTime(IdleStatus.READER_IDLE) *
+                       (name.endsWith("InMillis")? 1000L : 1L);
+            }
+            if (name.startsWith("sessionConfig.writerIdleTime")) {
+                return s.getSessionConfig().getIdleTime(IdleStatus.WRITER_IDLE) *
+                (name.endsWith("InMillis")? 1000L : 1L);
+            }
+            if (name.startsWith("sessionConfig.bothIdleTime")) {
+                return s.getSessionConfig().getIdleTime(IdleStatus.BOTH_IDLE) *
+                (name.endsWith("InMillis")? 1000L : 1L);
+            }
         }
         
         // And then try reflection.
@@ -133,7 +194,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             throw new AttributeNotFoundException(name);
         }
     }
-
+    
     public AttributeList getAttributes(String names[]) {
         AttributeList answer = new AttributeList();
         for (int i = 0; i < names.length; i++) {
@@ -231,6 +292,70 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         String aname = attribute.getName();
         Object avalue = attribute.getValue();
         
+        // Handle synthetic attributes first.
+        if (source instanceof IoSession) {
+            IoSession s = (IoSession) source;
+            if (aname.equals("config.readerIdleTime")) {
+                s.getConfig().setIdleTime(
+                        IdleStatus.READER_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+            if (aname.equals("config.writerIdleTime")) {
+                s.getConfig().setIdleTime(
+                        IdleStatus.WRITER_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+            if (aname.equals("config.bothIdleTime")) {
+                s.getConfig().setIdleTime(
+                        IdleStatus.BOTH_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+        }
+        
+        if (source instanceof IoService) {
+            IoService s = (IoService) source;
+            if (aname.equals("readerIdleTime")) {
+                s.setIdleTime(
+                        IdleStatus.READER_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+            if (aname.equals("writerIdleTime")) {
+                s.setIdleTime(
+                        IdleStatus.WRITER_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+            if (aname.equals("bothIdleTime")) {
+                s.setIdleTime(
+                        IdleStatus.BOTH_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+            if (aname.equals("sessionConfig.readerIdleTime")) {
+                s.getSessionConfig().setIdleTime(
+                        IdleStatus.READER_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+            if (aname.equals("sessionConfig.writerIdleTime")) {
+                s.getSessionConfig().setIdleTime(
+                        IdleStatus.WRITER_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+            if (aname.equals("sessionConfig.bothIdleTime")) {
+                s.getSessionConfig().setIdleTime(
+                        IdleStatus.BOTH_IDLE,
+                        (Integer) convert(avalue, Integer.class));
+                return;
+            }
+        }
+        
+        // And then try reflection.
         try {
             PropertyUtils.setNestedProperty(
                     source, aname, convert(
@@ -353,7 +478,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         return source.toString();
     }
 
-    private MBeanInfo createModelMBeanInfo(Object source) {
+    protected MBeanInfo createModelMBeanInfo(Object source) {
         String className = source.getClass().getName();
         String description = "";
         
@@ -363,7 +488,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         List<ModelMBeanAttributeInfo> attributes = new ArrayList<ModelMBeanAttributeInfo>();
         List<ModelMBeanOperationInfo> operations = new ArrayList<ModelMBeanOperationInfo>();
         
-        addAttributes(attributes, source, source.getClass(), "");
+        addAttributes(attributes, source);
         addOperations(operations, source);
         
         return new ModelMBeanInfoSupport(
@@ -372,6 +497,12 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
                 constructors,
                 operations.toArray(new ModelMBeanOperationInfo[operations.size()]),
                 notifications);
+    }
+    
+    protected void addAttributes(
+            List<ModelMBeanAttributeInfo> attributes, Object object) {
+        
+        addAttributes(attributes, object, object.getClass(), "");
     }
 
     private void addAttributes(
@@ -432,6 +563,81 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         if (object instanceof IoSession) {
             attributes.add(new ModelMBeanAttributeInfo(
                     "attributes", Map.class.getName(), "attributes",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "readerIdleCount", Integer.class.getName(), "readerIdleCount",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "writerIdleCount", Integer.class.getName(), "writerIdleCount",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "bothIdleCount", Integer.class.getName(), "bothIdleCount",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "config.readerIdleTime", Long.class.getName(), "config.readerIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "config.writerIdleTime", Long.class.getName(), "config.writerIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "config.bothIdleTime", Long.class.getName(), "config.bothIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "config.readerIdleTimeInMillis", Long.class.getName(), "config.readerIdleTimeInMillis",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "config.writerIdleTimeInMillis", Long.class.getName(), "config.writerIdleTimeInMillis",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "config.bothIdleTimeInMillis", Long.class.getName(), "config.bothIdleTimeInMillis",
+                    true, false, false));
+        }
+        
+        if (object instanceof IoService) {
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "readerIdleCount", Integer.class.getName(), "readerIdleCount",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "writerIdleCount", Integer.class.getName(), "writerIdleCount",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "bothIdleCount", Integer.class.getName(), "bothIdleCount",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "readerIdleTime", Long.class.getName(), "readerIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "writerIdleTime", Long.class.getName(), "writerIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "bothIdleTime", Long.class.getName(), "bothIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "readerIdleTimeInMillis", Long.class.getName(), "readerIdleTimeInMillis",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "writerIdleTimeInMillis", Long.class.getName(), "writerIdleTimeInMillis",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "bothIdleTimeInMillis", Long.class.getName(), "bothIdleTimeInMillis",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "sessionConfig.readerIdleTime", Long.class.getName(), "sessionConfig.readerIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "sessionConfig.writerIdleTime", Long.class.getName(), "sessionConfig.writerIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "sessionConfig.bothIdleTime", Long.class.getName(), "sessionConfig.bothIdleTime",
+                    true, true, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "sessionConfig.readerIdleTimeInMillis", Long.class.getName(), "sessionConfig.readerIdleTimeInMillis",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "sessionConfig.writerIdleTimeInMillis", Long.class.getName(), "sessionConfig.writerIdleTimeInMillis",
+                    true, false, false));
+            attributes.add(new ModelMBeanAttributeInfo(
+                    "sessionConfig.bothIdleTimeInMillis", Long.class.getName(), "sessionConfig.bothIdleTimeInMillis",
                     true, false, false));
         }
     }
@@ -520,12 +726,12 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
                 ModelMBeanOperationInfo.ACTION));
     }
     
-    private boolean isWritable(Class<?> type, String pname) {
+    protected boolean isWritable(Class<?> type, String pname) {
         return IoService.class.isAssignableFrom(type) && 
                pname.equals("localAddresses");
     }
     
-    private Object convert(Object v, Class<?> dstType) throws ReflectionException {
+    protected Object convert(Object v, Class<?> dstType) throws ReflectionException {
         if (v == null) {
             return null;
         }
@@ -544,11 +750,32 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             editor.setAsText((String) v);
             return editor.getValue();
         }
+        
+        if (v instanceof Number) {
+            Number n = (Number) v;
+            if (Number.class.isAssignableFrom(dstType)) {
+                if (dstType == Byte.class) {
+                    return n.byteValue();
+                }
+                if (dstType == Double.class) {
+                    return n.doubleValue();
+                }
+                if (dstType == Float.class) {
+                    return n.floatValue();
+                }
+                if (dstType == Integer.class) {
+                    return n.intValue();
+                }
+                if (dstType == Short.class) {
+                    return n.shortValue();
+                }
+            }
+        }
 
         return v;
     }
 
-    private PropertyEditor getPropertyEditor(Class<?> propType) {
+    protected PropertyEditor getPropertyEditor(Class<?> propType) {
         if (transportMetadata != null && propType == SocketAddress.class) {
             propType = transportMetadata.getAddressType();
         }
@@ -562,7 +789,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         }
     }
     
-    private Class<?> convertOperationReturnType(Class<?> opReturnType) {
+    protected Class<?> convertOperationReturnType(Class<?> opReturnType) {
         if (IoFuture.class.isAssignableFrom(opReturnType)) {
             return void.class;
         }
@@ -573,7 +800,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         return convertAttributeType("", opReturnType);
     }
 
-    private Class<?> convertAttributeType(
+    protected Class<?> convertAttributeType(
             String attrName, Class<?> attrType) {
 
         if ((attrType == Long.class || attrType == long.class)) {
@@ -632,7 +859,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         return String.class;
     }
     
-    private Object convertAttributeValue(String attrName, Object v) {
+    protected Object convertAttributeValue(String attrName, Object v) {
         if (v == null) {
             return null;
         }
