@@ -412,28 +412,29 @@ class DefaultModelMBean implements ModelMBean {
             }
             
             // Ignore Object methods.
-            if (mname.matches("(wait|notify|notifyAll|toString|equals|compareTo|hashCode)")) {
+            if (mname.matches(
+                    "(wait|notify|notifyAll|toString|equals|compareTo|hashCode)")) {
                 continue;
             }
             
             // Ignore some IoServide methods.
-            if (object instanceof IoService &&
-                mname.matches("(newSession|broadcast|(add|remove)Listener)")) {
+            if (object instanceof IoService && mname.matches(
+                    "(newSession|broadcast|(add|remove)Listener)")) {
                 continue;
             }
 
             // Ignore some IoSession methods.
-            if (object instanceof IoSession &&
-                mname.matches("(write|read|(remove|replace|contains)Attribute)")) {
+            if (object instanceof IoSession && mname.matches(
+                    "(write|read|(remove|replace|contains)Attribute)")) {
                 continue;
             }
             
             // Ignore some IoFilter methods.
-            if (object instanceof IoFilter &&
-                    mname.matches("(init|destroy|on(Pre|Post)(Add|Remove)|" +
-                    		"session(Created|Opened|Idle|Closed)|" +
-                    		"exceptionCaught|message(Received|Sent)|" +
-                    		"filter(Close|Write|SetTrafficMask))")) {
+            if (object instanceof IoFilter && mname.matches(
+                    "(init|destroy|on(Pre|Post)(Add|Remove)|" +
+                    "session(Created|Opened|Idle|Closed)|" +
+                    "exceptionCaught|message(Received|Sent)|" +
+                    "filter(Close|Write|SetTrafficMask))")) {
                 continue;
             }
             
@@ -512,9 +513,15 @@ class DefaultModelMBean implements ModelMBean {
             return String.class;
         }
         
-        if ((type == Long.class || type == long.class) && name.endsWith("Time") &&
+        if ((type == Long.class || type == long.class)) {
+            if (name.endsWith("Time") &&
                 !propertyDescriptors.containsKey(name + "InMillis")) {
-            return Date.class;
+                return Date.class;
+            }
+            
+            if (name.equals("id")) {
+                return String.class;
+            }
         }
         
         if (type == AttributeKey.class) {
@@ -549,10 +556,6 @@ class DefaultModelMBean implements ModelMBean {
             return String.class;
         }
         
-//        if (List.class.isAssignableFrom(type) && name.equals("localAddresses")) {
-//            return SocketAddress[].class;
-//        }
-        
         return type;
     }
     
@@ -565,13 +568,24 @@ class DefaultModelMBean implements ModelMBean {
             return ((Class<?>) v).getName();
         }
         
-        if (v instanceof Long && name.endsWith("Time") &&
+        if (v instanceof Long) {
+            long l = (Long) v;
+            if (name.endsWith("Time") &&
                 !propertyDescriptors.containsKey(name + "InMillis")) {
-            long time = (Long) v;
-            if (time <= 0) {
-                return null;
+                if (l <= 0) {
+                    return null;
+                }
+                return new Date(l);
             }
-            return new Date(time);
+            
+            if (name.equals("id")) {
+                // ID in MINA is a unsigned 32-bit integer.
+                String id = Long.toHexString(l).toUpperCase();
+                while (id.length() < 8) {
+                    id = '0' + id; // padding
+                }
+                return id;
+            }
         }
         
         if (v instanceof Set) {
