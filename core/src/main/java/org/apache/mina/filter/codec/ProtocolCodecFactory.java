@@ -36,14 +36,12 @@ public interface ProtocolCodecFactory {
     /**
      * Returns a new (or reusable) instance of {@link ProtocolEncoder} which
      * encodes message objects into binary or protocol-specific data.
-     * @param session TODO
      */
     ProtocolEncoder getEncoder(IoSession session) throws Exception;
 
     /**
      * Returns a new (or reusable) instance of {@link ProtocolDecoder} which
      * decodes binary or protocol-specific data into message objects.
-     * @param session TODO
      */
     ProtocolDecoder getDecoder(IoSession session) throws Exception;
 }
