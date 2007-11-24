@@ -73,6 +73,10 @@ public class SerialAddress extends SocketAddress {
         if (name == null) {
             throw new NullPointerException("name");
         }
+        name = name.trim();
+        if (name.length() == 0) {
+            throw new IllegalArgumentException("Empty name.");
+        }
         if (bauds <= 0) {
             throw new IllegalArgumentException("bauds: " + bauds);
         }
