@@ -738,12 +738,24 @@ public abstract class AbstractIoSession implements IoSession {
     @Override
     public String toString() {
         if (getService() instanceof IoAcceptor) {
-            return "(" + getId() + ": " + getServiceName() + ", server, " +
+            return "(" + getIdAsString() + ": " + getServiceName() + ", server, " +
                     getRemoteAddress() + " => " + getLocalAddress() + ')';
         } else {
-            return "(" + getId() + ": " + getServiceName() + ", client, " +
+            return "(" + getIdAsString() + ": " + getServiceName() + ", client, " +
                     getLocalAddress() + " => " + getRemoteAddress() + ')';
         }
+    }
+    
+    private String getIdAsString() {
+        String id = Long.toHexString(getId()).toUpperCase();
+
+        // Somewhat inefficient, but it won't happen that often
+        // because an ID is often a big integer.
+        while (id.length() < 8) {
+            id = '0' + id; // padding
+        }
+
+        return id;
     }
 
     private String getServiceName() {
