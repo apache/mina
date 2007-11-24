@@ -19,6 +19,7 @@ package org.apache.mina.integration.jmx;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +58,7 @@ import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFilterChainBuilder;
 import org.apache.mina.common.IoHandler;
@@ -313,6 +315,7 @@ class DefaultModelMBean implements ModelMBean {
         List<ModelMBeanOperationInfo> operations = new ArrayList<ModelMBeanOperationInfo>();
         
         addAttributes(attributes, source, source.getClass(), "");
+        addOperations(operations, source);
         
         return new ModelMBeanInfoSupport(
                 className, description,
@@ -398,6 +401,44 @@ class DefaultModelMBean implements ModelMBean {
             }
         }
         return false;
+    }
+    
+    private void addOperations(List<ModelMBeanOperationInfo> operations, Object object) {
+        for (Method m: object.getClass().getMethods()) {
+            String mname = m.getName();
+            // Ignore getters and setters.
+            if (mname.startsWith("is") || mname.startsWith("get") || mname.startsWith("set")) {
+                continue;
+            }
+            
+            // Ignore Object methods.
+            if (mname.matches("(wait|notify|notifyAll|toString|equals|compareTo|hashCode)")) {
+                continue;
+            }
+            
+            // Ignore some IoServide methods.
+            if (object instanceof IoService &&
+                mname.matches("(newSession|broadcast|(add|remove)Listener)")) {
+                continue;
+            }
+
+            // Ignore some IoSession methods.
+            if (object instanceof IoSession &&
+                mname.matches("(write|read|(remove|replace|contains)Attribute)")) {
+                continue;
+            }
+            
+            // Ignore some IoFilter methods.
+            if (object instanceof IoFilter &&
+                    mname.matches("(init|destroy|on(Pre|Post)(Add|Remove)|" +
+                    		"session(Created|Opened|Idle|Closed)|" +
+                    		"exceptionCaught|message(Received|Sent)|" +
+                    		"filter(Close|Write|SetTrafficMask))")) {
+                continue;
+            }
+            
+            operations.add(new ModelMBeanOperationInfo(m.getName(), m));
+        }
     }
     
     private boolean isWritable(Class<?> type, String pname) {
