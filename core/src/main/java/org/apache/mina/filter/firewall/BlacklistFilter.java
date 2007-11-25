@@ -22,8 +22,8 @@ package org.apache.mina.filter.firewall;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
@@ -40,7 +40,7 @@ import org.apache.mina.common.WriteRequest;
  * @version $Rev$, $Date$
  */
 public class BlacklistFilter extends IoFilterAdapter {
-    private final Set<InetAddress> blacklist = new HashSet<InetAddress>();
+    private final List<InetAddress> blacklist = new CopyOnWriteArrayList<InetAddress>();
 
     /**
      * Sets the addresses to be blacklisted.
@@ -85,7 +85,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     /**
      * Blocks the specified endpoint.
      */
-    public synchronized void block(InetAddress address, String error_string) {
+    public void block(InetAddress address, String error_string) {
         if (address == null) {
             throw new NullPointerException(error_string);
         }
@@ -95,14 +95,14 @@ public class BlacklistFilter extends IoFilterAdapter {
     /**
      * Blocks the specified endpoint.
      */
-    public synchronized void block(InetAddress address) {
+    public void block(InetAddress address) {
         block(address, "address");
     }
 
     /**
      * Unblocks the specified endpoint.
      */
-    public synchronized void unblock(InetAddress address) {
+    public void unblock(InetAddress address) {
         if (address == null) {
             throw new NullPointerException("address");
         }
