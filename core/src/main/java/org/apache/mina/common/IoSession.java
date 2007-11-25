@@ -448,8 +448,51 @@ public interface IoSession {
     int getIdleCount(IdleStatus status);
 
     /**
+     * Returns the number of the fired continuous <tt>sessionIdle</tt> events
+     * for {@link IdleStatus#READER_IDLE}.
+     * @see #getIdleCount(IdleStatus)
+     */
+    int getReaderIdleCount();
+
+    /**
+     * Returns the number of the fired continuous <tt>sessionIdle</tt> events
+     * for {@link IdleStatus#WRITER_IDLE}.
+     * @see #getIdleCount(IdleStatus)
+     */
+    int getWriterIdleCount();
+    
+    /**
+     * Returns the number of the fired continuous <tt>sessionIdle</tt> events
+     * for {@link IdleStatus#BOTH_IDLE}.
+     * @see #getIdleCount(IdleStatus)
+     */
+    int getBothIdleCount();
+    
+    /**
      * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for the specified {@link IdleStatus}.
      */
     long getLastIdleTime(IdleStatus status);
+    
+
+    /**
+     * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
+     * is fired for {@link IdleStatus#READER_IDLE}.
+     * @see #getLastIdleTime(IdleStatus)
+     */
+    long getLastReaderIdleTime();
+    
+    /**
+     * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
+     * is fired for {@link IdleStatus#WRITER_IDLE}.
+     * @see #getLastIdleTime(IdleStatus)
+     */
+    long getLastWriterIdleTime();
+    
+    /**
+     * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
+     * is fired for {@link IdleStatus#BOTH_IDLE}.
+     * @see #getLastIdleTime(IdleStatus)
+     */
+    long getLastBothIdleTime();
 }

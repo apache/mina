@@ -105,6 +105,51 @@ public interface IoSessionConfig {
     void setIdleTime(IdleStatus status, int idleTime);
 
     /**
+     * Returns idle time for {@link IdleStatus#READER_IDLE} in seconds.
+     */
+    int getReaderIdleTime();
+    
+    /**
+     * Returns idle time for {@link IdleStatus#READER_IDLE} in milliseconds.
+     */
+    long getReaderIdleTimeInMillis();
+    
+    /**
+     * Sets idle time for {@link IdleStatus#READER_IDLE} in seconds.
+     */
+    void setReaderIdleTime(int idleTime);
+    
+    /**
+     * Returns idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
+     */
+    int getWriterIdleTime();
+    
+    /**
+     * Returns idle time for {@link IdleStatus#WRITER_IDLE} in milliseconds.
+     */
+    long getWriterIdleTimeInMillis();
+    
+    /**
+     * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
+     */
+    void setWriterIdleTime(int idleTime);
+    
+    /**
+     * Returns idle time for {@link IdleStatus#BOTH_IDLE} in seconds.
+     */
+    int getBothIdleTime();
+    
+    /**
+     * Returns idle time for {@link IdleStatus#BOTH_IDLE} in milliseconds.
+     */
+    long getBothIdleTimeInMillis();
+    
+    /**
+     * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
+     */
+    void setBothIdleTime(int idleTime);
+    
+    /**
      * Returns write timeout in seconds.
      */
     int getWriteTimeout();

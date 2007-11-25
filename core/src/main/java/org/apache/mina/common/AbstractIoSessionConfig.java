@@ -142,6 +142,42 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
             throw new IllegalArgumentException("Unknown idle status: " + status);
         }
     }
+    
+    public final int getBothIdleTime() {
+        return getIdleTime(IdleStatus.BOTH_IDLE);
+    }
+
+    public final long getBothIdleTimeInMillis() {
+        return getIdleTimeInMillis(IdleStatus.BOTH_IDLE);
+    }
+
+    public final int getReaderIdleTime() {
+        return getIdleTime(IdleStatus.READER_IDLE);
+    }
+
+    public final long getReaderIdleTimeInMillis() {
+        return getIdleTimeInMillis(IdleStatus.READER_IDLE);
+    }
+
+    public final int getWriterIdleTime() {
+        return getIdleTime(IdleStatus.WRITER_IDLE);
+    }
+
+    public final long getWriterIdleTimeInMillis() {
+        return getIdleTimeInMillis(IdleStatus.WRITER_IDLE);
+    }
+    
+    public void setBothIdleTime(int idleTime) {
+        setIdleTime(IdleStatus.BOTH_IDLE, idleTime);
+    }
+
+    public void setReaderIdleTime(int idleTime) {
+        setIdleTime(IdleStatus.READER_IDLE, idleTime);
+    }
+
+    public void setWriterIdleTime(int idleTime) {
+        setIdleTime(IdleStatus.WRITER_IDLE, idleTime);
+    }
 
     public int getWriteTimeout() {
         return writeTimeout;

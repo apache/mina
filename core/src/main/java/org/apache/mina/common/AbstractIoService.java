@@ -505,7 +505,78 @@ public abstract class AbstractIoService implements IoService {
         }
     }
 
+    public final int getBothIdleCount() {
+        return getIdleCount(IdleStatus.BOTH_IDLE);
+    }
+
+    public final long getLastBothIdleTime() {
+        return getLastIdleTime(IdleStatus.BOTH_IDLE);
+    }
+
+    public final long getLastReaderIdleTime() {
+        return getLastIdleTime(IdleStatus.READER_IDLE);
+    }
+
+    public final long getLastWriterIdleTime() {
+        return getLastIdleTime(IdleStatus.WRITER_IDLE);
+    }
+
+    public final int getReaderIdleCount() {
+        return getIdleCount(IdleStatus.READER_IDLE);
+    }
+
+    public final int getWriterIdleCount() {
+        return getIdleCount(IdleStatus.WRITER_IDLE);
+    }
     
+    public final int getBothIdleTime() {
+        return getIdleTime(IdleStatus.BOTH_IDLE);
+    }
+
+    public final long getBothIdleTimeInMillis() {
+        return getIdleTimeInMillis(IdleStatus.BOTH_IDLE);
+    }
+
+    public final int getReaderIdleTime() {
+        return getIdleTime(IdleStatus.READER_IDLE);
+    }
+
+    public final long getReaderIdleTimeInMillis() {
+        return getIdleTimeInMillis(IdleStatus.READER_IDLE);
+    }
+
+    public final int getWriterIdleTime() {
+        return getIdleTime(IdleStatus.WRITER_IDLE);
+    }
+
+    public final long getWriterIdleTimeInMillis() {
+        return getIdleTimeInMillis(IdleStatus.WRITER_IDLE);
+    }
+
+    public final boolean isBothIdle() {
+        return isIdle(IdleStatus.BOTH_IDLE);
+    }
+
+    public final boolean isReaderIdle() {
+        return isIdle(IdleStatus.READER_IDLE);
+    }
+
+    public final boolean isWriterIdle() {
+        return isIdle(IdleStatus.WRITER_IDLE);
+    }
+
+    public final void setBothIdleTime(int idleTime) {
+        setIdleTime(IdleStatus.BOTH_IDLE, idleTime);
+    }
+
+    public final void setReaderIdleTime(int idleTime) {
+        setIdleTime(IdleStatus.READER_IDLE, idleTime);
+    }
+
+    public final void setWriterIdleTime(int idleTime) {
+        setIdleTime(IdleStatus.WRITER_IDLE, idleTime);
+    }
+
     public final Set<WriteFuture> broadcast(Object message) {
         // Convert to Set.  We do not return a List here because only the 
         // direct caller of MessageBroadcaster knows the order of write

@@ -669,6 +669,18 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
+    public final boolean isBothIdle() {
+        return isIdle(IdleStatus.BOTH_IDLE);
+    }
+
+    public final boolean isReaderIdle() {
+        return isIdle(IdleStatus.READER_IDLE);
+    }
+
+    public final boolean isWriterIdle() {
+        return isIdle(IdleStatus.WRITER_IDLE);
+    }
+    
     public final int getIdleCount(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth;
@@ -714,6 +726,30 @@ public abstract class AbstractIoSession implements IoSession {
         } else {
             throw new IllegalArgumentException("Unknown idle status: " + status);
         }
+    }
+
+    public final int getBothIdleCount() {
+        return getIdleCount(IdleStatus.BOTH_IDLE);
+    }
+
+    public final long getLastBothIdleTime() {
+        return getLastIdleTime(IdleStatus.BOTH_IDLE);
+    }
+
+    public final long getLastReaderIdleTime() {
+        return getLastIdleTime(IdleStatus.READER_IDLE);
+    }
+
+    public final long getLastWriterIdleTime() {
+        return getLastIdleTime(IdleStatus.WRITER_IDLE);
+    }
+
+    public final int getReaderIdleCount() {
+        return getIdleCount(IdleStatus.READER_IDLE);
+    }
+
+    public final int getWriterIdleCount() {
+        return getIdleCount(IdleStatus.WRITER_IDLE);
     }
 
     public SocketAddress getServiceAddress() {
