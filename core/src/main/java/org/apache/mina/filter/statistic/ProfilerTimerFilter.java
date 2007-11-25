@@ -21,7 +21,6 @@ package org.apache.mina.filter.statistic;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +31,7 @@ import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
+import org.apache.mina.util.CopyOnWriteMap;
 
 /**
  * This class will measure, the time it takes for a
@@ -117,7 +117,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         setTimeUnit(unit);
         setEventsToProfile(eventTypes);
 
-        timerManager = new HashMap<IoEventType, TimerWorker>();
+        timerManager = new CopyOnWriteMap<IoEventType, TimerWorker>();
         for (IoEventType type : eventsToProfile) {
             timerManager.put(type, new TimerWorker());
         }
