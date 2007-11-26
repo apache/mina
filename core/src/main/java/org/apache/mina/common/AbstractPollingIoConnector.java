@@ -80,7 +80,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         
         if (executor == null) {
             this.executor = new ThreadPoolExecutor(
-                    0, 1, 1L, TimeUnit.SECONDS,
+                    1, 1, 1L, TimeUnit.SECONDS,
                     new LinkedBlockingQueue<Runnable>());
             this.createdExecutor = true;
         } else {
