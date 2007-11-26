@@ -783,14 +783,15 @@ public abstract class AbstractIoSession implements IoSession {
     }
     
     private String getIdAsString() {
-        String id = "0x" + Long.toHexString(getId()).toUpperCase();
+        String id = Long.toHexString(getId()).toUpperCase();
 
         // Somewhat inefficient, but it won't happen that often
         // because an ID is often a big integer.
         while (id.length() < 8) {
             id = '0' + id; // padding
         }
-
+        id = "0x" + id;
+        
         return id;
     }
 
