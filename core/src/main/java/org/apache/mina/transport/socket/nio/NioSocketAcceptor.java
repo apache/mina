@@ -112,7 +112,7 @@ public final class NioSocketAcceptor
         synchronized (bindLock) {
             if (isActive()) {
                 throw new IllegalStateException(
-                        "backlog can't be set while the acceptor is bound.");
+                        "reuseAddress can't be set while the acceptor is bound.");
             }
 
             this.reuseAddress = reuseAddress;
