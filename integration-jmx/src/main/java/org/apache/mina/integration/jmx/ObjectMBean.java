@@ -628,6 +628,11 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
         if ((attrType == Long.class || attrType == long.class)) {
             if (attrName.endsWith("Time") &&
+                attrName.indexOf("Total") < 0 &&
+                attrName.indexOf("Min") < 0 &&
+                attrName.indexOf("Max") < 0 &&
+                attrName.indexOf("Avg") < 0 &&
+                attrName.indexOf("Average") < 0 &&
                 !propertyDescriptors.containsKey(attrName + "InMillis")) {
                 return Date.class;
             }
@@ -690,6 +695,11 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (v instanceof Long) {
             long l = (Long) v;
             if (attrName.endsWith("Time") &&
+                attrName.indexOf("Total") < 0 &&
+                attrName.indexOf("Min") < 0 &&
+                attrName.indexOf("Max") < 0 &&
+                attrName.indexOf("Avg") < 0 &&
+                attrName.indexOf("Average") < 0 &&
                 !propertyDescriptors.containsKey(attrName + "InMillis")) {
                 if (l <= 0) {
                     return null;
