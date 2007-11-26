@@ -100,11 +100,6 @@
       </dependency>
       <dependency>
         <groupId>${groupId}</groupId>
-        <artifactId>mina-protocol-http-server</artifactId>
-        <version>${pom.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${groupId}</groupId>
         <artifactId>mina-integration-beans</artifactId>
         <version>${pom.version}</version>
       </dependency>
@@ -309,9 +304,6 @@
     <module>filter-codec-http</module>
     <module>statemachine</module>
     <module>protocol-http-client</module>
-    <!--
-    <module>protocol-http-server</module>
-    -->
     <module>integration-beans</module>
     <module>integration-ognl</module>
     <module>integration-jmx</module>
