@@ -155,7 +155,7 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
-    public void _testUnbindDisconnectsClients() throws Exception {
+    public void testUnbindDisconnectsClients() throws Exception {
         bind(true);
         IoConnector connector = newConnector();
         IoSession[] sessions = new IoSession[5];
@@ -185,7 +185,7 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
-    public void testRegressively() throws IOException {
+    public void _testRegressively() throws IOException {
         setReuseAddress(true);
 
         SocketAddress addr = createSocketAddress(port);
