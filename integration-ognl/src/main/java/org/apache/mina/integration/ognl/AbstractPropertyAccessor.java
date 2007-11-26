@@ -16,6 +16,7 @@
  */
 package org.apache.mina.integration.ognl;
 
+import java.beans.PropertyEditor;
 import java.util.Map;
 
 import ognl.ObjectPropertyAccessor;
@@ -23,6 +24,8 @@ import ognl.OgnlContext;
 import ognl.OgnlException;
 import ognl.OgnlRuntime;
 import ognl.PropertyAccessor;
+
+import org.apache.mina.integration.beans.PropertyEditorFactory;
 
 /**
  * An abstract OGNL {@link PropertyAccessor} for MINA constructs.
@@ -67,6 +70,12 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
         Object answer = getProperty0((OgnlContext) context, target, name);
         if (answer == OgnlRuntime.NotFound) {
             answer = super.getPossibleProperty(context, target, name);
+            
+            PropertyEditor pe = PropertyEditorFactory.getInstance(answer);
+            if (pe != null) {
+                pe.setValue(answer);
+                answer = pe.getAsText();
+            }
         }
         return answer;
     }
