@@ -532,6 +532,10 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             return false;
         }
         
+        if (ThreadPoolExecutor.class.isAssignableFrom(type) && attrName.equals("queue")) {
+            return false;
+        }
+
         return true;
     }
     

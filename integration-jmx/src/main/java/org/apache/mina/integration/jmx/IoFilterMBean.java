@@ -18,7 +18,6 @@ package org.apache.mina.integration.jmx;
 
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
  * A JMX MBean wrapper for an {@link IoSession}.
@@ -32,15 +31,6 @@ public class IoFilterMBean extends ObjectMBean<IoFilter> {
         super(source);
     }
     
-    @Override
-    protected boolean isReadable(Class<?> type, String attrName) {
-        if (ExecutorFilter.class.isAssignableFrom(type) &&
-            attrName.equals("executor.queue")) {
-            return false;
-        }
-        return super.isReadable(type, attrName);
-    }
-
     @Override
     protected boolean isOperation(String methodName) {
         // Ignore some IoFilter methods.
