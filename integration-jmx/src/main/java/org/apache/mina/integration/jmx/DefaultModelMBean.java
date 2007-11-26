@@ -668,6 +668,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
                 while (id.length() < 8) {
                     id = '0' + id; // padding
                 }
+                id = "0x" + id;
                 return id;
             }
         }
