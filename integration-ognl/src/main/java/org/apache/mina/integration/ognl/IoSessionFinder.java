@@ -32,8 +32,14 @@ import org.apache.mina.common.IoSession;
  * @version $Rev$, $Date$
  */
 public class IoSessionFinder {
+    
+    private final String query;
     private final Object expression;
     
+    /**
+     * Creates a new instance with the specified OGNL expression that returns
+     * a boolean value (e.g. <tt>"id == 0x12345678"</tt>).
+     */
     public IoSessionFinder(String query) {
         if (query == null) {
             throw new NullPointerException("query");
@@ -44,6 +50,7 @@ public class IoSessionFinder {
             throw new IllegalArgumentException("query is empty.");
         }
         
+        this.query = query;
         try {
             expression = Ognl.parseExpression(query);
         } catch (OgnlException e) {
@@ -51,6 +58,11 @@ public class IoSessionFinder {
         }
     }
     
+    /**
+     * Finds a {@link Set} of {@link IoSession}s that matches the query
+     * from the specified sessions and returns the matches.
+     * @throws OgnlException if failed to evaluate the OGNL expression
+     */
     public Set<IoSession> find(Iterable<IoSession> sessions) throws OgnlException {
         if (sessions == null) {
             throw new NullPointerException("sessions");
@@ -59,10 +71,14 @@ public class IoSessionFinder {
         Set<IoSession> answer = new LinkedHashSet<IoSession>();
         for (IoSession s: sessions) {
             OgnlContext context = (OgnlContext) Ognl.createDefaultContext(s);
-            Boolean found = (Boolean) Ognl.getValue(
-                    expression, context, s, Boolean.class);
-            if (found != null && found) {
-                answer.add(s);
+            Object result = Ognl.getValue(expression, context, s);
+            if (result instanceof Boolean) {
+                if (((Boolean) result).booleanValue()) {
+                    answer.add(s);
+                }
+            } else {
+                throw new OgnlException(
+                        "Query didn't return a boolean value: " + query);
             }
         }
         
