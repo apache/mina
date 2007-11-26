@@ -48,11 +48,6 @@ public class VmPipeAddressEditorTest extends TestCase {
 
     public void testSetAsTextWithIllegalValues() throws Exception {
         try {
-            editor.setAsText(null);
-            fail("null string. IllegalArgumentException expected.");
-        } catch (IllegalArgumentException iae) {
-        }
-        try {
             editor.setAsText("bar");
             fail("Illegal port number. IllegalArgumentException expected.");
         } catch (IllegalArgumentException iae) {
