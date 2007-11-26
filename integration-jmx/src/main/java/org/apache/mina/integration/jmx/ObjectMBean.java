@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.management.Attribute;
 import javax.management.AttributeChangeNotification;
@@ -76,6 +77,7 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionDataStructureFactory;
 import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.integration.beans.PropertyEditorFactory;
 import org.apache.mina.integration.ognl.IoFilterPropertyAccessor;
 import org.apache.mina.integration.ognl.IoServicePropertyAccessor;
@@ -442,7 +444,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             
             // Expand if possible.
             if (isExpandable(type, pname)) {
-                expandAttribute(attributes, object, pname);
+                expandAttribute(attributes, object, prefix, pname);
                 continue;
             }
     
@@ -461,7 +463,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     private void expandAttribute(
             List<ModelMBeanAttributeInfo> attributes,
-            Object object, String propName) {
+            Object object, String prefix, String propName) {
         Object property;
         try {
             property = PropertyUtils.getProperty(
@@ -474,7 +476,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         addAttributes(
                 attributes,
                 property, property.getClass(),
-                propName + '.');
+                prefix + propName + '.');
     }
     
     private void addOperations(
@@ -552,6 +554,16 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             return true;
         }
 
+        if (ExecutorFilter.class.isAssignableFrom(type)) {
+            if (attrName.equals("executor")) {
+                return true;
+            }
+        }
+        if (ThreadPoolExecutor.class.isAssignableFrom(type)) {
+            if (attrName.equals("queueHandler")) {
+                return true;
+            }
+        }
         return false;
     }
     
