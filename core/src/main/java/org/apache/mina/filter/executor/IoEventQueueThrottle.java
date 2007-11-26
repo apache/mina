@@ -68,6 +68,10 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
     public int getThreshold() {
         return threshold;
     }
+    
+    public int getCounter() {
+        return counter.get();
+    }
 
     public void setThreshold(int threshold) {
         if (threshold <= 0) {
