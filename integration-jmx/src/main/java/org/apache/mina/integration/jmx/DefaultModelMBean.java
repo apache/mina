@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +77,7 @@ import org.apache.mina.common.IoSessionDataStructureFactory;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.integration.beans.PropertyEditorFactory;
 import org.apache.mina.integration.ognl.IoServicePropertyAccessor;
+import org.apache.mina.integration.ognl.IoSessionFinder;
 import org.apache.mina.integration.ognl.IoSessionPropertyAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +96,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
 
     public DefaultModelMBean(Object source) {
         OgnlRuntime.setPropertyAccessor(IoSession.class, new IoSessionPropertyAccessor());
-        OgnlRuntime.setPropertyAccessor(IoSession.class, new IoServicePropertyAccessor());
+        OgnlRuntime.setPropertyAccessor(IoService.class, new IoServicePropertyAccessor());
         
         if (source == null) {
             throw new NullPointerException("source");
@@ -145,11 +147,16 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
 
     private void throwMBeanException(OgnlException e) throws MBeanException {
         Throwable reason = e.getReason();
+        if (reason == null) {
+            throw new MBeanException(new IllegalArgumentException(e.getClass().getName() + ": " + e.getMessage()));
+        }
+        if (reason instanceof OgnlException) {
+            throw new MBeanException(new IllegalArgumentException(reason.getClass().getName() + ": " + reason.getMessage()));
+        }
         if (reason instanceof Exception) {
             throw new MBeanException((Exception) reason);
-        } else {
-            throw new MBeanException(new Exception("Unexpected exception.", reason));
         }
+        throw new MBeanException(new IllegalArgumentException(reason.getClass().getName() + ": " + reason.getMessage()));
     }
 
     public AttributeList getAttributes(String names[]) {
@@ -186,6 +193,45 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             throws MBeanException, ReflectionException {
 
         // Handle synthetic operations first.
+        if (source instanceof IoService) {
+            if (name.equals("findSessions")) {
+                try {
+                    IoSessionFinder finder = new IoSessionFinder((String) params[0]);
+                    return convertReturnValue(finder.find(
+                            ((IoService) source).getManagedSessions()));
+                } catch (OgnlException e) {
+                    throwMBeanException(e);
+                    throw new InternalError();
+                }
+            }
+            
+            if (name.equals("findAndRegisterSessions")) {
+                try {
+                    IoSessionFinder finder = new IoSessionFinder((String) params[0]);
+                    Set<IoSession> registeredSessions = new LinkedHashSet<IoSession>();
+                    for (IoSession s: finder.find(
+                            ((IoService) source).getManagedSessions())) {
+                        try {
+                            server.registerMBean(
+                                    new DefaultModelMBean(s),
+                                    new ObjectName(
+                                            this.name.getDomain() + 
+                                            ":type=session,name=" + 
+                                            getIdAsString(s.getId())));
+                            registeredSessions.add(s);
+                        } catch (Exception e) {
+                            logger.warn("Failed to register a session as a MBean: " + s, e);
+                        }
+                    }
+                    
+                    return convertReturnValue(registeredSessions);
+                } catch (OgnlException e) {
+                    throwMBeanException(e);
+                    throw new InternalError();
+                }
+            }
+        }
+        
         if (name.equals("unregisterMBean")) {
             try {
                 server.unregisterMBean(this.name);
@@ -201,8 +247,8 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             for (int i = 0; i < paramTypes.length; i ++) {
                 paramTypes[i] = getAttributeClass(signature[i]);
             }
-            return convertAttributeValue(
-                    "", MethodUtils.invokeMethod(source, name, params, paramTypes));
+            return convertReturnValue(
+                    MethodUtils.invokeMethod(source, name, params, paramTypes));
         } catch (ClassNotFoundException e) {
             throw new ReflectionException(e);
         } catch (NoSuchMethodException e) {
@@ -500,14 +546,29 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             for (Class<?> ptype: m.getParameterTypes()) {
                 String pname = "p" + (i ++);
                 signature.add(new MBeanParameterInfo(
-                        pname, convertAttributeType("", ptype).getName(), pname));
+                        pname, convertAttributeType(pname, ptype).getName(), pname));
             }
 
             operations.add(new ModelMBeanOperationInfo(
                     m.getName(), m.getName(),
                     signature.toArray(new MBeanParameterInfo[signature.size()]),
-                    convertOperationReturnType(m.getReturnType()).getName(),
+                    convertReturnType(m.getReturnType()).getName(),
                     ModelMBeanOperationInfo.ACTION));
+        }
+        
+        if (object instanceof IoService) {
+            operations.add(new ModelMBeanOperationInfo(
+                    "findSessions", "findSessions",
+                    new MBeanParameterInfo[] {
+                            new MBeanParameterInfo(
+                                    "ognlQuery", String.class.getName(), "a boolean OGNL expression")
+                    }, Set.class.getName(), ModelMBeanOperationInfo.INFO));
+            operations.add(new ModelMBeanOperationInfo(
+                    "findAndRegisterSessions", "findAndRegisterSessions",
+                    new MBeanParameterInfo[] {
+                            new MBeanParameterInfo(
+                                    "ognlQuery", String.class.getName(), "a boolean OGNL expression")
+                    }, Set.class.getName(), ModelMBeanOperationInfo.INFO));
         }
         
         operations.add(new ModelMBeanOperationInfo(
@@ -573,17 +634,6 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         return PropertyEditorFactory.getInstance(propType);
     }
     
-    protected Class<?> convertOperationReturnType(Class<?> opReturnType) {
-        if (IoFuture.class.isAssignableFrom(opReturnType)) {
-            return void.class;
-        }
-        if (opReturnType == void.class || opReturnType == Void.class) {
-            return void.class;
-        }
-
-        return convertAttributeType("", opReturnType);
-    }
-
     protected Class<?> convertAttributeType(
             String attrName, Class<?> attrType) {
 
@@ -661,16 +711,10 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
                 }
                 return new Date(l);
             }
-            
             if (attrName.equals("id")) {
-                // ID in MINA is a unsigned 32-bit integer.
-                String id = Long.toHexString(l).toUpperCase();
-                while (id.length() < 8) {
-                    id = '0' + id; // padding
-                }
-                id = "0x" + id;
-                return id;
+                return getIdAsString(l);
             }
+
         }
         
         if (v instanceof Set) {
@@ -729,6 +773,31 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         }
         
         return v.toString();
+    }
+    
+    protected Class<?> convertReturnType(Class<?> opReturnType) {
+        if (IoFuture.class.isAssignableFrom(opReturnType)) {
+            return void.class;
+        }
+        if (opReturnType == void.class || opReturnType == Void.class) {
+            return void.class;
+        }
+    
+        return convertAttributeType("", opReturnType);
+    }
+
+    protected Object convertReturnValue(Object value) {
+        return convertAttributeValue("", value);
+    }
+
+    private String getIdAsString(long l) {
+        // ID in MINA is a unsigned 32-bit integer.
+        String id = Long.toHexString(l).toUpperCase();
+        while (id.length() < 8) {
+            id = '0' + id; // padding
+        }
+        id = "0x" + id;
+        return id;
     }
     
     private Object convertCollection(Object src, Collection<Object> dst) {
