@@ -6,11 +6,11 @@
     <artifactId>build</artifactId>
     <version>2.0.0-M1-SNAPSHOT</version>
   </parent>
-  <artifactId>mina-integration-jmx</artifactId>
-  <name>Apache MINA JMX Integration</name>
+  <artifactId>mina-integration-ognl</artifactId>
+  <name>Apache MINA OGNL Integration</name>
   <packaging>bundle</packaging>  
   <properties>
-    <exportedPackage>${groupId}.integration.jmx</exportedPackage>
+    <exportedPackage>${groupId}.integration.ognl</exportedPackage>
   </properties>
   <dependencies>
     <dependency>
@@ -18,16 +18,12 @@
       <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>ognl</groupId>
+      <artifactId>ognl</artifactId>
+    </dependency>
+    <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-integration-beans</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${groupId}</groupId>
-      <artifactId>mina-integration-ognl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
     </dependency>
   </dependencies>
 </project>

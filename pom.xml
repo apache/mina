@@ -110,6 +110,11 @@
       </dependency>
       <dependency>
         <groupId>${groupId}</groupId>
+        <artifactId>mina-integration-ognl</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${groupId}</groupId>
         <artifactId>mina-integration-jmx</artifactId>
         <version>${pom.version}</version>
       </dependency>
@@ -176,9 +181,24 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>ognl</groupId>
+        <artifactId>ognl</artifactId>
+        <version>2.6.9</version>
+      </dependency> 
+      <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>1.7.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency> 
 
       <!-- State Machine -->
@@ -293,6 +313,7 @@
     <module>protocol-http-server</module>
     -->
     <module>integration-beans</module>
+    <module>integration-ognl</module>
     <module>integration-jmx</module>
     <module>integration-spring</module>
     <module>example</module>

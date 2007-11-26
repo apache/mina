@@ -58,6 +58,10 @@ import javax.management.modelmbean.ModelMBeanInfoSupport;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
+import ognl.Ognl;
+import ognl.OgnlException;
+import ognl.OgnlRuntime;
+
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
@@ -70,6 +74,9 @@ import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionDataStructureFactory;
 import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.integration.beans.PropertyEditorFactory;
+import org.apache.mina.integration.ognl.IoServicePropertyAccessor;
+import org.apache.mina.integration.ognl.IoSessionPropertyAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +93,9 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
     private volatile ObjectName name;
 
     public DefaultModelMBean(Object source) {
+        OgnlRuntime.setPropertyAccessor(IoSession.class, new IoSessionPropertyAccessor());
+        OgnlRuntime.setPropertyAccessor(IoSession.class, new IoServicePropertyAccessor());
+        
         if (source == null) {
             throw new NullPointerException("source");
         }
@@ -103,39 +113,45 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         this.info = createModelMBeanInfo(source);
     }
     
+    public MBeanInfo getMBeanInfo() {
+        return info;
+    }
+
     public Object getAttribute(String name) throws AttributeNotFoundException,
             MBeanException, ReflectionException {
-        
-        // Handle synthetic attributes first.
-        if (source instanceof IoSession) {
-            IoSession s = (IoSession) source;
-            if (name.equals("attributes")) {
-                Map<Object, Object> result = new HashMap<Object, Object>();
-                for (Object key: s.getAttributeKeys()) {
-                    result.put(key, s.getAttribute(key));
-                }
-                return convertAttributeValue("attributes", result);
-            }
-        }
-        
-        // And then try reflection.
         try {
             return convertAttributeValue(
-                    name, PropertyUtils.getNestedProperty(source, name));
-        } catch (IllegalAccessException e) {
-            throw new ReflectionException(e);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof Exception) {
-                throw new MBeanException((Exception) cause);
-            } else {
-                throw new MBeanException(new Exception(cause));
-            }
-        } catch (NoSuchMethodException e) {
-            throw new AttributeNotFoundException(name);
+                    name, Ognl.getValue(name, source));
+        } catch (OgnlException e) {
+            throwMBeanException(e);
+            throw new InternalError();
         }
     }
     
+    public void setAttribute(Attribute attribute)
+            throws AttributeNotFoundException, MBeanException,
+            ReflectionException {
+        String aname = attribute.getName();
+        Object avalue = attribute.getValue();
+        
+        try {
+            Ognl.setValue(aname, source, convert(
+                    avalue, propertyDescriptors.get(aname).getPropertyType()));
+        } catch (OgnlException e) {
+            throwMBeanException(e);
+            throw new InternalError();
+        }
+    }
+
+    private void throwMBeanException(OgnlException e) throws MBeanException {
+        Throwable reason = e.getReason();
+        if (reason instanceof Exception) {
+            throw new MBeanException((Exception) reason);
+        } else {
+            throw new MBeanException(new Exception("Unexpected exception.", reason));
+        }
+    }
+
     public AttributeList getAttributes(String names[]) {
         AttributeList answer = new AttributeList();
         for (int i = 0; i < names.length; i++) {
@@ -148,8 +164,22 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         return answer;
     }
 
-    public MBeanInfo getMBeanInfo() {
-        return info;
+    public AttributeList setAttributes(AttributeList attributes) {
+        // Prepare and return our response, eating all exceptions
+        String names[] = new String[attributes.size()];
+        int n = 0;
+        Iterator<Object> items = attributes.iterator();
+        while (items.hasNext()) {
+            Attribute item = (Attribute) items.next();
+            names[n++] = item.getName();
+            try {
+                setAttribute(item);
+            } catch (Exception e) {
+                ; // Ignore all exceptions
+            }
+        }
+    
+        return getAttributes(names);
     }
 
     public Object invoke(String name, Object params[], String signature[])
@@ -225,52 +255,6 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         }
         
         return Class.forName(signature);
-    }
-
-    public void setAttribute(Attribute attribute)
-            throws AttributeNotFoundException, MBeanException,
-            ReflectionException {
-        String aname = attribute.getName();
-        Object avalue = attribute.getValue();
-        
-        // Handle synthetic attributes first.
-        // ...
-        
-        // And then try reflection.
-        try {
-            PropertyUtils.setNestedProperty(
-                    source, aname, convert(
-                            avalue, propertyDescriptors.get(aname).getPropertyType()));
-        } catch (IllegalAccessException e) {
-            throw new ReflectionException(e);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof Exception) {
-                throw new MBeanException((Exception) cause);
-            } else {
-                throw new MBeanException(new Exception(cause));
-            }
-        } catch (NoSuchMethodException e) {
-            throw new AttributeNotFoundException(attribute.getName());
-        }
-    }
-
-    public AttributeList setAttributes(AttributeList attributes) {
-        // Prepare and return our response, eating all exceptions
-        String names[] = new String[attributes.size()];
-        int n = 0;
-        Iterator<Object> items = attributes.iterator();
-        while (items.hasNext()) {
-            Attribute item = (Attribute) items.next();
-            names[n++] = item.getName();
-            try {
-                setAttribute(item);
-            } catch (Exception e) {
-                ; // Ignore all exceptions
-            }
-        }
-
-        return getAttributes(names);
     }
 
     public void setManagedResource(Object resource, String type)
@@ -586,13 +570,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             propType = transportMetadata.getAddressType();
         }
 
-        try {
-            return (PropertyEditor) getClass().getClassLoader().loadClass(
-                "org.apache.mina.integration.beans." +
-                propType.getSimpleName() + "Editor").newInstance();
-        } catch (Exception e) {
-            return null;
-        }
+        return PropertyEditorFactory.getInstance(propType);
     }
     
     protected Class<?> convertOperationReturnType(Class<?> opReturnType) {
