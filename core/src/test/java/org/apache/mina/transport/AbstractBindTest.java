@@ -155,7 +155,7 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
-    public void testUnbindDisconnectsClients() throws Exception {
+    public void _testUnbindDisconnectsClients() throws Exception {
         bind(true);
         IoConnector connector = newConnector();
         IoSession[] sessions = new IoSession[5];
@@ -185,7 +185,7 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
-    public void _testRegressively() throws IOException {
+    public void testRegressively() throws IOException {
         setReuseAddress(true);
 
         SocketAddress addr = createSocketAddress(port);
@@ -194,8 +194,7 @@ public abstract class AbstractBindTest extends TestCase {
         acceptor.setHandler(handler);
         for (int i = 0; i < 1048576; i++) {
             acceptor.bind();
-            testDuplicateBind();
-            testDuplicateUnbind();
+            acceptor.unbind();
             if (i % 100 == 0) {
                 System.out.println(i + " (" + new Date() + ")");
             }

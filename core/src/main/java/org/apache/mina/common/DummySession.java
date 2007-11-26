@@ -91,6 +91,10 @@ public class DummySession extends AbstractIoSession {
             public TransportMetadata getTransportMetadata() {
                 return TRANSPORT_METADATA;
             }
+
+            @Override
+            protected void dispose0() throws Exception {
+            }
         };
 
         // Set meaningless default values.

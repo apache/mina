@@ -136,6 +136,13 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected abstract void unbind(H handle) throws Exception;
 
     @Override
+    protected void dispose0() throws Exception {
+        unbind();
+        startupWorker();
+        wakeup();
+    }
+
+    @Override
     protected final void bind0() throws Exception {
         ServiceOperationFuture request = new ServiceOperationFuture();
 
@@ -209,7 +216,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         public void run() {
             int nHandles = 0;
             
-            for (;;) {
+            while (selectable) {
                 try {
                     // gets the number of keys that are ready to go
                     boolean selected = select();

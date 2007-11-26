@@ -127,6 +127,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     @Override
     protected final void dispose0() throws Exception {
         startupWorker();
+        wakeup();
     }
 
     @Override
@@ -273,7 +274,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
         public void run() {
             int nHandles = 0;
-            for (;;) {
+            while (selectable) {
                 try {
                     boolean selected = select(1000);
 

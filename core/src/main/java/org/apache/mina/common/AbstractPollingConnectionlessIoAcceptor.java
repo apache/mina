@@ -127,6 +127,13 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected abstract void setInterestedInWrite(T session, boolean interested) throws Exception;
 
     @Override
+    protected void dispose0() throws Exception {
+        unbind();
+        startupWorker();
+        wakeup();
+    }
+
+    @Override
     protected final void bind0() throws Exception {
         ServiceOperationFuture request = new ServiceOperationFuture();
 
@@ -294,7 +301,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             int nHandles = 0;
             lastIdleCheckTime = System.currentTimeMillis();
 
-            for (; ;) {
+            while (selectable) {
                 try {
                     boolean selected = select(1000);
 

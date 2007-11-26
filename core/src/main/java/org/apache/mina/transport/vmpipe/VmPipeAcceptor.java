@@ -71,6 +71,11 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     }
 
     @Override
+    protected void dispose0() throws Exception {
+        unbind();
+    }
+
+    @Override
     protected void bind0() throws IOException {
         List<SocketAddress> localAddresses = getLocalAddresses();
         List<SocketAddress> newLocalAddresses = new ArrayList<SocketAddress>();

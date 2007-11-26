@@ -89,6 +89,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
     
     public final void dispose() {
+        if (toBeDisposed) {
+            return;
+        }
+        
         toBeDisposed = true;
         startupWorker();
     }

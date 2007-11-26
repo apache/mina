@@ -177,11 +177,6 @@ public abstract class AbstractIoAcceptor
         getListeners().fireServiceDeactivated();
     }
 
-    @Override
-    protected final void dispose0() throws Exception {
-        unbind();
-    }
-
     /**
      * Implement this method to perform the actual bind operation.
      */
