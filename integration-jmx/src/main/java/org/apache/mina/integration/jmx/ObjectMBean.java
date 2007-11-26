@@ -488,7 +488,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             for (Class<?> ptype: m.getParameterTypes()) {
                 String pname = "p" + (i ++);
                 signature.add(new MBeanParameterInfo(
-                        pname, convertAttributeType(pname, ptype).getName(), pname));
+                        pname, convertParameterType(ptype).getName(), pname));
             }
 
             operations.add(new ModelMBeanOperationInfo(
@@ -739,6 +739,14 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         return v.toString();
     }
     
+    protected Class<?> convertParameterType(Class<?> paramType) {
+        if (paramType.isPrimitive()) {
+            return paramType;
+        }
+        
+        return convertAttributeType("parameter", paramType);
+    }
+
     protected Class<?> convertReturnType(Class<?> opReturnType) {
         if (IoFuture.class.isAssignableFrom(opReturnType)) {
             return void.class;
