@@ -19,7 +19,7 @@ public class Foo {
         service.bind();
         
         server.registerMBean(
-                new DefaultModelMBean(service),
+                new IoServiceMBean(service),
                 new ObjectName("org.apache.mina:type=service,name=myService"));
     }
 }

@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,16 +75,45 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionDataStructureFactory;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.integration.beans.PropertyEditorFactory;
+import org.apache.mina.integration.ognl.IoFilterPropertyAccessor;
 import org.apache.mina.integration.ognl.IoServicePropertyAccessor;
-import org.apache.mina.integration.ognl.IoSessionFinder;
 import org.apache.mina.integration.ognl.IoSessionPropertyAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class DefaultModelMBean implements ModelMBean, MBeanRegistration {
+/**
+ * A {@link ModelMBean} wrapper implementation for a POJO.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * 
+ * @param <T> the type of the managed object
+ */
+public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final Object source;
+    static {
+        OgnlRuntime.setPropertyAccessor(IoService.class, new IoServicePropertyAccessor());
+        OgnlRuntime.setPropertyAccessor(IoSession.class, new IoSessionPropertyAccessor());
+        OgnlRuntime.setPropertyAccessor(IoFilter.class, new IoFilterPropertyAccessor());
+    }
+    
+    protected static final void throwMBeanException(OgnlException e) throws MBeanException {
+        Throwable reason = e.getReason();
+        if (reason == null) {
+            throw new MBeanException(new IllegalArgumentException(e.getClass().getName() + ": " + e.getMessage()));
+        }
+        if (reason instanceof OgnlException) {
+            throw new MBeanException(new IllegalArgumentException(reason.getClass().getName() + ": " + reason.getMessage()));
+        }
+        if (reason instanceof Exception) {
+            throw new MBeanException((Exception) reason);
+        }
+        throw new MBeanException(new IllegalArgumentException(reason.getClass().getName() + ": " + reason.getMessage()));
+    }
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final T source;
     private final TransportMetadata transportMetadata;
     private final MBeanInfo info;
     private final Map<String, PropertyDescriptor> propertyDescriptors =
@@ -94,10 +122,10 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
     private volatile MBeanServer server;
     private volatile ObjectName name;
 
-    public DefaultModelMBean(Object source) {
-        OgnlRuntime.setPropertyAccessor(IoSession.class, new IoSessionPropertyAccessor());
-        OgnlRuntime.setPropertyAccessor(IoService.class, new IoServicePropertyAccessor());
-        
+    /**
+     * Creates a new instance with the specified POJO.
+     */
+    public ObjectMBean(T source) {
         if (source == null) {
             throw new NullPointerException("source");
         }
@@ -115,10 +143,6 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         this.info = createModelMBeanInfo(source);
     }
     
-    public MBeanInfo getMBeanInfo() {
-        return info;
-    }
-
     public Object getAttribute(String name) throws AttributeNotFoundException,
             MBeanException, ReflectionException {
         try {
@@ -141,97 +165,13 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
                     avalue, propertyDescriptors.get(aname).getPropertyType()));
         } catch (OgnlException e) {
             throwMBeanException(e);
-            throw new InternalError();
         }
-    }
-
-    private void throwMBeanException(OgnlException e) throws MBeanException {
-        Throwable reason = e.getReason();
-        if (reason == null) {
-            throw new MBeanException(new IllegalArgumentException(e.getClass().getName() + ": " + e.getMessage()));
-        }
-        if (reason instanceof OgnlException) {
-            throw new MBeanException(new IllegalArgumentException(reason.getClass().getName() + ": " + reason.getMessage()));
-        }
-        if (reason instanceof Exception) {
-            throw new MBeanException((Exception) reason);
-        }
-        throw new MBeanException(new IllegalArgumentException(reason.getClass().getName() + ": " + reason.getMessage()));
-    }
-
-    public AttributeList getAttributes(String names[]) {
-        AttributeList answer = new AttributeList();
-        for (int i = 0; i < names.length; i++) {
-            try {
-                answer.add(new Attribute(names[i], getAttribute(names[i])));
-            } catch (Exception e) {
-                // Ignore.
-            }
-        }
-        return answer;
-    }
-
-    public AttributeList setAttributes(AttributeList attributes) {
-        // Prepare and return our response, eating all exceptions
-        String names[] = new String[attributes.size()];
-        int n = 0;
-        Iterator<Object> items = attributes.iterator();
-        while (items.hasNext()) {
-            Attribute item = (Attribute) items.next();
-            names[n++] = item.getName();
-            try {
-                setAttribute(item);
-            } catch (Exception e) {
-                ; // Ignore all exceptions
-            }
-        }
-    
-        return getAttributes(names);
     }
 
     public Object invoke(String name, Object params[], String signature[])
             throws MBeanException, ReflectionException {
-
+    
         // Handle synthetic operations first.
-        if (source instanceof IoService) {
-            if (name.equals("findSessions")) {
-                try {
-                    IoSessionFinder finder = new IoSessionFinder((String) params[0]);
-                    return convertReturnValue(finder.find(
-                            ((IoService) source).getManagedSessions()));
-                } catch (OgnlException e) {
-                    throwMBeanException(e);
-                    throw new InternalError();
-                }
-            }
-            
-            if (name.equals("findAndRegisterSessions")) {
-                try {
-                    IoSessionFinder finder = new IoSessionFinder((String) params[0]);
-                    Set<IoSession> registeredSessions = new LinkedHashSet<IoSession>();
-                    for (IoSession s: finder.find(
-                            ((IoService) source).getManagedSessions())) {
-                        try {
-                            server.registerMBean(
-                                    new DefaultModelMBean(s),
-                                    new ObjectName(
-                                            this.name.getDomain() + 
-                                            ":type=session,name=" + 
-                                            getIdAsString(s.getId())));
-                            registeredSessions.add(s);
-                        } catch (Exception e) {
-                            logger.warn("Failed to register a session as a MBean: " + s, e);
-                        }
-                    }
-                    
-                    return convertReturnValue(registeredSessions);
-                } catch (OgnlException e) {
-                    throwMBeanException(e);
-                    throw new InternalError();
-                }
-            }
-        }
-        
         if (name.equals("unregisterMBean")) {
             try {
                 server.unregisterMBean(this.name);
@@ -291,7 +231,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         if (signature.equals(Short.TYPE.getName())) {
             return Short.TYPE;
         }
-
+    
         try {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if (cl != null) {
@@ -303,15 +243,66 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         return Class.forName(signature);
     }
 
-    public void setManagedResource(Object resource, String type)
+    public final T getSource() {
+        return source;
+    }
+    
+    public final MBeanServer getServer() {
+        return server;
+    }
+    
+    public final ObjectName getName() {
+        return name;
+    }
+
+    public final MBeanInfo getMBeanInfo() {
+        return info;
+    }
+
+    public final AttributeList getAttributes(String names[]) {
+        AttributeList answer = new AttributeList();
+        for (int i = 0; i < names.length; i++) {
+            try {
+                answer.add(new Attribute(names[i], getAttribute(names[i])));
+            } catch (Exception e) {
+                // Ignore.
+            }
+        }
+        return answer;
+    }
+
+    public final AttributeList setAttributes(AttributeList attributes) {
+        // Prepare and return our response, eating all exceptions
+        String names[] = new String[attributes.size()];
+        int n = 0;
+        Iterator<Object> items = attributes.iterator();
+        while (items.hasNext()) {
+            Attribute item = (Attribute) items.next();
+            names[n++] = item.getName();
+            try {
+                setAttribute(item);
+            } catch (Exception e) {
+                ; // Ignore all exceptions
+            }
+        }
+    
+        return getAttributes(names);
+    }
+
+    public final void setManagedResource(Object resource, String type)
             throws InstanceNotFoundException, InvalidTargetObjectTypeException,
             MBeanException {
         throw new RuntimeOperationsException(new UnsupportedOperationException());
 
     }
 
-    public void setModelMBeanInfo(ModelMBeanInfo info) throws MBeanException {
+    public final void setModelMBeanInfo(ModelMBeanInfo info) throws MBeanException {
         throw new RuntimeOperationsException(new UnsupportedOperationException());
+    }
+
+    @Override
+    public final String toString() {
+        return source.toString();
     }
 
     public void addAttributeChangeNotificationListener(
@@ -384,12 +375,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         this.name = null;
     }
 
-    @Override
-    public String toString() {
-        return source.toString();
-    }
-
-    protected MBeanInfo createModelMBeanInfo(Object source) {
+    private MBeanInfo createModelMBeanInfo(T source) {
         String className = source.getClass().getName();
         String description = "";
         
@@ -400,7 +386,10 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         List<ModelMBeanOperationInfo> operations = new ArrayList<ModelMBeanOperationInfo>();
         
         addAttributes(attributes, source);
+        addExtraAttributes(attributes);
+        
         addOperations(operations, source);
+        addExtraOperations(operations);
         
         return new ModelMBeanInfoSupport(
                 className, description,
@@ -410,9 +399,8 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
                 notifications);
     }
     
-    protected void addAttributes(
+    private void addAttributes(
             List<ModelMBeanAttributeInfo> attributes, Object object) {
-        
         addAttributes(attributes, object, object.getClass(), "");
     }
 
@@ -431,31 +419,13 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             if (pname.equals("class")) {
                 continue;
             }
-            if (IoService.class.isAssignableFrom(type) && pname.equals("filterChain")) {
-                continue;
-            }
-            if (IoSession.class.isAssignableFrom(type) && pname.equals("attachment")) {
-                continue;
-            }
-            if (IoSession.class.isAssignableFrom(type) && pname.equals("attributeKeys")) {
-                continue;
-            }
-            if (IoSession.class.isAssignableFrom(type) && pname.equals("closeFuture")) {
+            if (!isReadable(type, pname)) {
                 continue;
             }
             
-            // Expandable property.
-            boolean expanded = false;
-            expanded |= expandAttribute(
-                    attributes, IoService.class, "sessionConfig", object, type, p);
-            expanded |= expandAttribute(
-                    attributes, IoService.class, "transportMetadata", object, type, p);
-            expanded |= expandAttribute(
-                    attributes, IoSession.class, "config", object, type, p);
-            expanded |= expandAttribute(
-                    attributes, IoSession.class, "transportMetadata", object, type, p);
-    
-            if (expanded) {
+            // Expand if possible.
+            if (isExpandable(type, pname)) {
+                expandAttribute(attributes, object, pname);
                 continue;
             }
     
@@ -470,37 +440,24 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             
             propertyDescriptors.put(fqpn, p);
         }
-        
-        if (object instanceof IoSession) {
-            attributes.add(new ModelMBeanAttributeInfo(
-                    "attributes", Map.class.getName(), "attributes",
-                    true, false, false));
-        }
     }
 
-    private boolean expandAttribute(
+    private void expandAttribute(
             List<ModelMBeanAttributeInfo> attributes,
-            Class<?> expectedType, String expectedPropertyName,
-            Object object, Class<?> type, PropertyDescriptor descriptor) {
-        if (expectedType.isAssignableFrom(type)) {
-            if (descriptor.getName().equals(expectedPropertyName)) {
-                Object property;
-                try {
-                    property = PropertyUtils.getProperty(
-                            object, expectedPropertyName);
-                } catch (Exception e) {
-                    logger.debug("Unexpected exception.", e);
-                    return false;
-                }
-                
-                addAttributes(
-                        attributes,
-                        property, property.getClass(),
-                        expectedPropertyName + '.');
-                return true;
-            }
+            Object object, String propName) {
+        Object property;
+        try {
+            property = PropertyUtils.getProperty(
+                    object, propName);
+        } catch (Exception e) {
+            logger.debug("Unexpected exception.", e);
+            return;
         }
-        return false;
+        
+        addAttributes(
+                attributes,
+                property, property.getClass(),
+                propName + '.');
     }
     
     private void addOperations(
@@ -508,6 +465,7 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
 
         for (Method m: object.getClass().getMethods()) {
             String mname = m.getName();
+            
             // Ignore getters and setters.
             if (mname.startsWith("is") || mname.startsWith("get") ||
                 mname.startsWith("set")) {
@@ -516,28 +474,12 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             
             // Ignore Object methods.
             if (mname.matches(
-                    "(wait|notify|notifyAll|toString|equals|compareTo|hashCode)")) {
+                    "(wait|notify|notifyAll|toString|equals|compareTo|hashCode|clone)")) {
                 continue;
             }
             
-            // Ignore some IoServide methods.
-            if (object instanceof IoService && mname.matches(
-                    "(newSession|broadcast|(add|remove)Listener)")) {
-                continue;
-            }
-
-            // Ignore some IoSession methods.
-            if (object instanceof IoSession && mname.matches(
-                    "(write|read|(remove|replace|contains)Attribute)")) {
-                continue;
-            }
-            
-            // Ignore some IoFilter methods.
-            if (object instanceof IoFilter && mname.matches(
-                    "(init|destroy|on(Pre|Post)(Add|Remove)|" +
-                    "session(Created|Opened|Idle|Closed)|" +
-                    "exceptionCaught|message(Received|Sent)|" +
-                    "filter(Close|Write|SetTrafficMask))")) {
+            // Ignore other user-defined non-operations.
+            if (!isOperation(mname)) {
                 continue;
             }
             
@@ -556,32 +498,62 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
                     ModelMBeanOperationInfo.ACTION));
         }
         
-        if (object instanceof IoService) {
-            operations.add(new ModelMBeanOperationInfo(
-                    "findSessions", "findSessions",
-                    new MBeanParameterInfo[] {
-                            new MBeanParameterInfo(
-                                    "ognlQuery", String.class.getName(), "a boolean OGNL expression")
-                    }, Set.class.getName(), ModelMBeanOperationInfo.INFO));
-            operations.add(new ModelMBeanOperationInfo(
-                    "findAndRegisterSessions", "findAndRegisterSessions",
-                    new MBeanParameterInfo[] {
-                            new MBeanParameterInfo(
-                                    "ognlQuery", String.class.getName(), "a boolean OGNL expression")
-                    }, Set.class.getName(), ModelMBeanOperationInfo.INFO));
-        }
-        
         operations.add(new ModelMBeanOperationInfo(
                 "unregisterMBean", "unregisterMBean",
                 new MBeanParameterInfo[0], void.class.getName(), 
                 ModelMBeanOperationInfo.ACTION));
     }
     
-    protected boolean isWritable(Class<?> type, String pname) {
-        return IoService.class.isAssignableFrom(type) && 
-               pname.equals("localAddresses");
+    protected boolean isReadable(Class<?> type, String attrName) {
+        if (IoService.class.isAssignableFrom(type) && attrName.equals("filterChain")) {
+            return false;
+        }
+        if (IoSession.class.isAssignableFrom(type) && attrName.equals("attachment")) {
+            return false;
+        }
+        if (IoSession.class.isAssignableFrom(type) && attrName.equals("attributeKeys")) {
+            return false;
+        }
+        if (IoSession.class.isAssignableFrom(type) && attrName.equals("closeFuture")) {
+            return false;
+        }
+        
+        return true;
     }
     
+    protected boolean isWritable(Class<?> type, String attrName) {
+        return IoService.class.isAssignableFrom(type) && 
+               attrName.equals("localAddresses");
+    }
+    
+    protected boolean isExpandable(Class<?> type, String attrName) {
+        if (IoService.class.isAssignableFrom(type) && attrName.equals("sessionConfig")) {
+            return true;
+        }
+        if (IoService.class.isAssignableFrom(type) && attrName.equals("transportMetadata")) {
+            return true;
+        }
+        if (IoSession.class.isAssignableFrom(type) && attrName.equals("config")) {
+            return true;
+        }
+        if (IoSession.class.isAssignableFrom(type) && attrName.equals("transportMetadata")) {
+            return true;
+        }
+
+        return false;
+    }
+    
+    @SuppressWarnings("unused")
+    protected boolean isOperation(String methodName) {
+        return true;
+    }
+    
+    @SuppressWarnings("unused")
+    protected void addExtraAttributes(List<ModelMBeanAttributeInfo> attributes) {}
+    
+    @SuppressWarnings("unused")
+    protected void addExtraOperations(List<ModelMBeanOperationInfo> operations) {}
+
     protected Object convert(Object v, Class<?> dstType) throws ReflectionException {
         if (v == null) {
             return null;
@@ -641,10 +613,6 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
             if (attrName.endsWith("Time") &&
                 !propertyDescriptors.containsKey(attrName + "InMillis")) {
                 return Date.class;
-            }
-            
-            if (attrName.equals("id")) {
-                return String.class;
             }
         }
         
@@ -711,10 +679,6 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
                 }
                 return new Date(l);
             }
-            if (attrName.equals("id")) {
-                return getIdAsString(l);
-            }
-
         }
         
         if (v instanceof Set) {
@@ -790,16 +754,6 @@ class DefaultModelMBean implements ModelMBean, MBeanRegistration {
         return convertAttributeValue("", value);
     }
 
-    private String getIdAsString(long l) {
-        // ID in MINA is a unsigned 32-bit integer.
-        String id = Long.toHexString(l).toUpperCase();
-        while (id.length() < 8) {
-            id = '0' + id; // padding
-        }
-        id = "0x" + id;
-        return id;
-    }
-    
     private Object convertCollection(Object src, Collection<Object> dst) {
         Collection<?> srcCol = (Collection<?>) src;
         for (Object e: srcCol) {
