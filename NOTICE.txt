@@ -31,3 +31,9 @@ from
 
    http://www.rxtx.org/
 
+OGNL is provided by the OGNL library package, which is open source
+software, written by Drew Davidson and Luke Blanshard.  The original
+software is available from
+
+   http://www.ognl.org/
+
