@@ -27,9 +27,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.Attribute;
 import javax.management.AttributeChangeNotification;
@@ -91,6 +93,13 @@ import org.slf4j.LoggerFactory;
  */
 public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
+    private static final Map<ObjectName, Object> sources =
+        new ConcurrentHashMap<ObjectName, Object>();
+    
+    public static Object getSource(ObjectName oname) {
+        return sources.get(oname);
+    }
+    
     static {
         OgnlRuntime.setPropertyAccessor(IoService.class, new IoServicePropertyAccessor());
         OgnlRuntime.setPropertyAccessor(IoSession.class, new IoSessionPropertyAccessor());
@@ -357,20 +366,24 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         throw new RuntimeOperationsException(new UnsupportedOperationException());
     }
 
-    public ObjectName preRegister(MBeanServer server, ObjectName name)
+    public final ObjectName preRegister(MBeanServer server, ObjectName name)
             throws Exception {
         this.server = server;
         this.name = name;
         return name;
     }
 
-    public void postRegister(Boolean registrationDone) {
+    public final void postRegister(Boolean registrationDone) {
+        if (registrationDone) {
+            sources.put(name, source);
+        }
     }
 
-    public void preDeregister() throws Exception {
+    public final void preDeregister() throws Exception {
     }
 
-    public void postDeregister() {
+    public final void postDeregister() {
+        sources.remove(name);
         this.server = null;
         this.name = null;
     }
@@ -390,7 +403,11 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         
         addOperations(operations, source);
         addExtraOperations(operations);
-        
+        operations.add(new ModelMBeanOperationInfo(
+                "unregisterMBean", "unregisterMBean",
+                new MBeanParameterInfo[0], void.class.getName(), 
+                ModelMBeanOperationInfo.ACTION));
+
         return new ModelMBeanInfoSupport(
                 className, description,
                 attributes.toArray(new ModelMBeanAttributeInfo[attributes.size()]),
@@ -497,11 +514,6 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                     convertReturnType(m.getReturnType()).getName(),
                     ModelMBeanOperationInfo.ACTION));
         }
-        
-        operations.add(new ModelMBeanOperationInfo(
-                "unregisterMBean", "unregisterMBean",
-                new MBeanParameterInfo[0], void.class.getName(), 
-                ModelMBeanOperationInfo.ACTION));
     }
     
     protected boolean isReadable(Class<?> type, String attrName) {
@@ -617,11 +629,11 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
         
         if (IoFilterChain.class.isAssignableFrom(attrType)) {
-            return List.class;
+            return Map.class;
         }
         
         if (IoFilterChainBuilder.class.isAssignableFrom(attrType)) {
-            return List.class;
+            return Map.class;
         }
         
         if (attrType.isPrimitive()) {
@@ -699,27 +711,23 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
         
         if (v instanceof IoFilterChainBuilder) {
-            List<String> filterNames = new ArrayList<String>();
+            Map<String, String> filterMapping = new LinkedHashMap<String, String>();
             if (v instanceof DefaultIoFilterChainBuilder) {
                 for (IoFilterChain.Entry e: ((DefaultIoFilterChainBuilder) v).getAll()) {
-                    filterNames.add(e.getName());
+                    filterMapping.put(e.getName(), e.getClass().getName());
                 }
             } else {
-                filterNames.add("Unknown builder: " + v.getClass().getName());
+                filterMapping.put("Unknown builder type", v.getClass().getName());
             }
-            return filterNames;
+            return filterMapping;
         }
 
         if (v instanceof IoFilterChain) {
-            List<String> filterNames = new ArrayList<String>();
+            Map<String, String> filterMapping = new LinkedHashMap<String, String>();
             for (IoFilterChain.Entry e: ((IoFilterChain) v).getAll()) {
-                filterNames.add(e.getName());
+                filterMapping.put(e.getName(), e.getFilter().getClass().getName());
             }
-            return filterNames;
-        }
-        
-        if (v instanceof IoFilterChainBuilder) {
-            return v.getClass().getName();
+            return filterMapping;
         }
         
         if (v.getClass().isPrimitive() ||

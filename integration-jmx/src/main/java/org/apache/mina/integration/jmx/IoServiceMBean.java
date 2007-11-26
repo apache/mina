@@ -108,7 +108,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
                 new MBeanParameterInfo[] {
                         new MBeanParameterInfo(
                                 "ognlQuery", String.class.getName(), "a boolean OGNL expression")
-                }, Set.class.getName(), ModelMBeanOperationInfo.INFO));
+                }, Set.class.getName(), ModelMBeanOperationInfo.ACTION_INFO));
     }
 
     @Override
