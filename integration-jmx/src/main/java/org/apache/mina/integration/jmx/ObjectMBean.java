@@ -566,6 +566,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     @SuppressWarnings("unused")
     protected void addExtraOperations(List<ModelMBeanOperationInfo> operations) {}
 
+    @SuppressWarnings("unchecked")
     protected Object convert(Object v, Class<?> dstType) throws ReflectionException {
         if (v == null) {
             return null;
@@ -576,6 +577,10 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
         
         if (v instanceof String) {
+            if (dstType.isEnum()) {
+                return Enum.valueOf(dstType.asSubclass(Enum.class), (String) v);
+            }
+            
             PropertyEditor editor = getPropertyEditor(dstType);
             if (editor == null) {
                 throw new ReflectionException(new ClassNotFoundException(
@@ -606,7 +611,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 }
             }
         }
-
+        
         return v;
     }
 
