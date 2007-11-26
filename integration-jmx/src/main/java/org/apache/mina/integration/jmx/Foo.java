@@ -1,9 +1,9 @@
 package org.apache.mina.integration.jmx;
 
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 
 import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import org.apache.mina.common.IoAcceptor;
@@ -14,7 +14,8 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 public class Foo {
     public static void main(String[] args) throws Exception {
-        final MBeanServer server = MBeanServerFactory.findMBeanServer(null).get(0);
+        final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+
         IoAcceptor service = new NioSocketAcceptor();
         service.setHandler(new IoHandlerAdapter());
         service.setLocalAddress(new InetSocketAddress(8080));
@@ -28,6 +29,6 @@ public class Foo {
         
         server.registerMBean(
                 new IoFilterMBean(loggingFilter),
-                new ObjectName("org.apache.mina:type=filter,name=loggingFilter"));
+                new ObjectName("org.apache.mina:type=filter,name=logger"));
     }
 }
