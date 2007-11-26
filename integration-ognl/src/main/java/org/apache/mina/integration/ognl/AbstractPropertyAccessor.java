@@ -70,12 +70,12 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
         Object answer = getProperty0((OgnlContext) context, target, name);
         if (answer == OgnlRuntime.NotFound) {
             answer = super.getPossibleProperty(context, target, name);
-            
-            PropertyEditor pe = PropertyEditorFactory.getInstance(answer);
-            if (pe != null) {
-                pe.setValue(answer);
-                answer = pe.getAsText();
-            }
+        }
+
+        PropertyEditor pe = PropertyEditorFactory.getInstance(answer);
+        if (pe != null) {
+            pe.setValue(answer);
+            answer = pe.getAsText();
         }
         return answer;
     }
