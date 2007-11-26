@@ -36,6 +36,8 @@ import org.apache.mina.integration.beans.PropertyEditorFactory;
 @SuppressWarnings("unchecked")
 public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
 
+    static final Object READ_ONLY_MODE = new Object();
+    
     @Override
     public final boolean hasGetProperty(OgnlContext context, Object target,
             Object oname) throws OgnlException {
@@ -53,6 +55,11 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
     @Override
     public final boolean hasSetProperty(OgnlContext context, Object target,
             Object oname) throws OgnlException {
+        if (context.containsKey(READ_ONLY_MODE)) {
+            // Return true to trigger setPossibleProperty to throw an exception.
+            return true;
+        }
+        
         if (oname == null) {
             return false;
         }
@@ -83,6 +90,10 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
     @Override
     public final Object setPossibleProperty(Map context, Object target, String name,
             Object value) throws OgnlException {
+        if (context.containsKey(READ_ONLY_MODE)) {
+            throw new OgnlException("Expression must be read-only.");
+        }
+        
         Object answer = setProperty0((OgnlContext) context, target, name, value);
         if (answer == OgnlRuntime.NotFound) {
             answer = super.setPossibleProperty(context, target, name, value);

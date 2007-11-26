@@ -71,6 +71,8 @@ public class IoSessionFinder {
         Set<IoSession> answer = new LinkedHashSet<IoSession>();
         for (IoSession s: sessions) {
             OgnlContext context = (OgnlContext) Ognl.createDefaultContext(s);
+            context.put(AbstractPropertyAccessor.READ_ONLY_MODE, true);
+
             Object result = Ognl.getValue(expression, context, s);
             if (result instanceof Boolean) {
                 if (((Boolean) result).booleanValue()) {
