@@ -34,12 +34,21 @@ import org.apache.mina.common.IoSession;
 public class IoSessionFinder {
     private final Object expression;
     
-    public IoSessionFinder(String query) throws OgnlException {
+    public IoSessionFinder(String query) {
         if (query == null) {
             throw new NullPointerException("query");
         }
         
-        expression = Ognl.parseExpression(query);
+        query = query.trim();
+        if (query.length() == 0) {
+            throw new IllegalArgumentException("query is empty.");
+        }
+        
+        try {
+            expression = Ognl.parseExpression(query);
+        } catch (OgnlException e) {
+            throw new IllegalArgumentException("query: " + query);
+        }
     }
     
     public Set<IoSession> find(Iterable<IoSession> sessions) throws OgnlException {
