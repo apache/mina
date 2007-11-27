@@ -63,8 +63,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private Worker worker;
     private long lastIdleCheckTime;
-    private volatile boolean toBeDisposed;
-    
+
+    private final Object disposalLock = new Object();
+    private volatile boolean disposing;
+    private volatile boolean disposed;
+    private final DefaultIoFuture disposalFuture = new DefaultIoFuture(null);
+
     protected AbstractPollingIoProcessor(Executor executor) {
         if (executor == null) {
             throw new NullPointerException("executor");
@@ -88,13 +92,28 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         return cls.getSimpleName() + '-' + newThreadId;
     }
     
+    public final boolean isDisposing() {
+        return disposing;
+    }
+    
+    public final boolean isDisposed() {
+        return disposed;
+    }
+    
     public final void dispose() {
-        if (toBeDisposed) {
+        if (disposed) {
             return;
         }
+
+        synchronized (disposalLock) {
+            if (!disposing) {
+                disposing = true;
+                startupWorker();
+            }
+        }
         
-        toBeDisposed = true;
-        startupWorker();
+        disposalFuture.awaitUninterruptibly();
+        disposed = true;
     }
     
     protected abstract void dispose0() throws Exception;
@@ -167,6 +186,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     protected abstract long transferFile(T session, FileRegion region, int length) throws Exception;
 
     public final void add(T session) {
+        if (isDisposing()) {
+            throw new IllegalStateException("Already disposed.");
+        }
+
         newSessions.add(session);
         startupWorker();
     }
@@ -627,6 +650,15 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                             }
                         }
                     }
+                    
+                    // Disconnect all sessions immediately if disposal has been
+                    // requested so that we exit this loop eventually.
+                    if (isDisposing()) {
+                        for (Iterator<T> i = allSessions(); i.hasNext(); ) {
+                            scheduleRemove(i.next());
+                        }
+                        wakeup();
+                    }
                 } catch (Throwable t) {
                     ExceptionMonitor.getInstance().exceptionCaught(t);
 
@@ -638,11 +670,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 }
             }
             
-            if (toBeDisposed) {
+            if (isDisposing()) {
                 try {
                     dispose0();
                 } catch (Throwable t) {
                     ExceptionMonitor.getInstance().exceptionCaught(t);
+                } finally {
+                    disposalFuture.setValue(true);
                 }
             }
         }

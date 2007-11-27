@@ -18,12 +18,17 @@
       <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>mina-integration-beans</artifactId>
+    </dependency>
+    <dependency>
       <groupId>ognl</groupId>
       <artifactId>ognl</artifactId>
     </dependency>
     <dependency>
-      <groupId>${groupId}</groupId>
-      <artifactId>mina-integration-beans</artifactId>
+      <groupId>jboss</groupId>
+      <artifactId>javassist</artifactId>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>
