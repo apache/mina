@@ -322,13 +322,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public void fireSessionCreated() {
-        IoService service = session.getService();
-        if (service instanceof AbstractIoService) {
-            AbstractIoService s = (AbstractIoService) service;
-            s.setLastReadTime(session.getCreationTime());
-            s.setLastWriteTime(session.getCreationTime());
-        }
-
         Entry head = this.head;
         callNextSessionCreated(head, session);
     }

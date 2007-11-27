@@ -682,6 +682,20 @@ public abstract class AbstractIoSession implements IoSession {
     }
     
     public final int getIdleCount(IdleStatus status) {
+        if (getConfig().getIdleTime(status) == 0) {
+            if (status == IdleStatus.BOTH_IDLE) {
+                idleCountForBoth = 0;
+            }
+
+            if (status == IdleStatus.READER_IDLE) {
+                idleCountForRead = 0;
+            }
+
+            if (status == IdleStatus.WRITER_IDLE) {
+                idleCountForWrite = 0;
+            }
+        }
+
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth;
         }

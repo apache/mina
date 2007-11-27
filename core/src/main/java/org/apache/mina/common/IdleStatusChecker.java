@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Dectects idle sessions and fires <tt>sessionIdle</tt> events to them.
+ * Detects idle sessions and fires <tt>sessionIdle</tt> events to them.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 525369 $, $Date: 2007-04-04 05:05:11 +0200 (mer., 04 avr. 2007) $
@@ -37,6 +37,7 @@ public class IdleStatusChecker {
     }
 
     private final Set<AbstractIoSession> sessions = new HashSet<AbstractIoSession>();
+    private final Set<AbstractIoService> services = new HashSet<AbstractIoService>();
 
     private final Worker worker = new Worker();
 
@@ -47,6 +48,12 @@ public class IdleStatusChecker {
     public void addSession(AbstractIoSession session) {
         synchronized (sessions) {
             sessions.add(session);
+        }
+    }
+    
+    public void addService(AbstractIoService service) {
+        synchronized (services) {
+            services.add(service);
         }
     }
 
@@ -77,6 +84,19 @@ public class IdleStatusChecker {
                         }
                     }
                 }
+                
+                synchronized (services) {
+                    Iterator<AbstractIoService> it = services.iterator();
+                    while (it.hasNext()) {
+                        AbstractIoService service = it.next();
+                        if (!service.isActive()) {
+                            it.remove();
+                            System.out.println("DROPPED");
+                        } else {
+                            notifyIdleness(service, currentTime, false);
+                        }
+                    }
+                }
             }
         }
     }
@@ -92,10 +112,6 @@ public class IdleStatusChecker {
         while (sessions.hasNext()) {
             s = sessions.next();
             notifyIdleSession(s, currentTime);
-        }
-        
-        if (s != null) {
-            notifyIdleness(s.getService(), currentTime, false);
         }
     }
 

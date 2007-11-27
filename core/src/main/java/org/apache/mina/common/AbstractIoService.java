@@ -33,6 +33,28 @@ import java.util.concurrent.atomic.AtomicLong;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoService implements IoService {
+    private static final IoServiceListener SERVICE_ACTIVATION_LISTENER =
+        new IoServiceListener() {
+            public void serviceActivated(IoService service) {
+                // Update lastIoTime.
+                AbstractIoService s = (AbstractIoService) service;
+                if (s.getLastReadTime() == 0) {
+                    s.setLastReadTime(s.getActivationTime());
+                }
+                if (s.getLastWriteTime() == 0) {
+                    s.setLastWriteTime(s.getActivationTime());
+                }
+                
+                // Start idleness notification.
+                IdleStatusChecker.getInstance().addService(s);
+            }
+
+            public void serviceDeactivated(IoService service) {}
+            public void serviceIdle(IoService service, IdleStatus idleStatus) {}
+            public void sessionCreated(IoSession session) {}
+            public void sessionDestroyed(IoSession session) {}
+    };
+    
     /**
      * Current filter chain builder.
      */
@@ -110,6 +132,7 @@ public abstract class AbstractIoService implements IoService {
         }
 
         this.listeners = new IoServiceListenerSupport(this);
+        this.listeners.add(SERVICE_ACTIVATION_LISTENER);
         this.sessionConfig = sessionConfig;
     }
 
@@ -426,7 +449,7 @@ public abstract class AbstractIoService implements IoService {
         if (idleTime < 0) {
             throw new IllegalArgumentException("Illegal idle time: " + idleTime);
         }
-
+        
         if (status == IdleStatus.BOTH_IDLE) {
             idleTimeForBoth = idleTime;
         } else if (status == IdleStatus.READER_IDLE) {
@@ -435,6 +458,16 @@ public abstract class AbstractIoService implements IoService {
             idleTimeForWrite = idleTime;
         } else {
             throw new IllegalArgumentException("Unknown idle status: " + status);
+        }
+        
+        if (idleTime == 0) {
+            if (status == IdleStatus.BOTH_IDLE) {
+                idleCountForBoth = 0;
+            } else if (status == IdleStatus.READER_IDLE) {
+                idleCountForRead = 0;
+            } else if (status == IdleStatus.WRITER_IDLE) {
+                idleCountForWrite = 0;
+            }
         }
     }
 
@@ -633,6 +666,14 @@ public abstract class AbstractIoService implements IoService {
     }
     
     protected final void finishSessionInitialization(IoSession session, IoFuture future) {
+        // Update lastIoTime if needed.
+        if (getLastReadTime() == 0) {
+            setLastReadTime(getActivationTime());
+        }
+        if (getLastWriteTime() == 0) {
+            setLastWriteTime(getActivationTime());
+        }
+
         // Every property but attributeMap should be set now.
         // Now initialize the attributeMap.  The reason why we initialize
         // the attributeMap at last is to make sure all session properties
