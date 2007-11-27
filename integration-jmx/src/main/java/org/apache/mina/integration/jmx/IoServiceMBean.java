@@ -26,6 +26,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
+import ognl.Ognl;
 import ognl.OgnlException;
 
 import org.apache.mina.common.IoService;
@@ -92,6 +93,26 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
             }
         }
         
+        if (name.equals("findAndProcessSessions")) {
+            try {
+                IoSessionFinder finder = new IoSessionFinder((String) params[0]);
+                String command = (String) params[1];
+                Object expr = Ognl.parseExpression(command);
+                Set<IoSession> matches = finder.find(getSource().getManagedSessions());
+                
+                for (IoSession s: matches) {
+                    try {
+                        Ognl.getValue(expr, s);
+                    } catch (Exception e) {
+                        logger.warn("Failed to execute '" + command + "' for: " + s, e);
+                    }
+                }
+                return convertReturnValue(matches);
+            } catch (OgnlException e) {
+                throwMBeanException(e);
+            }
+        }
+        
         return super.invoke(name, params, signature);
     }
 
@@ -108,6 +129,14 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
                 new MBeanParameterInfo[] {
                         new MBeanParameterInfo(
                                 "ognlQuery", String.class.getName(), "a boolean OGNL expression")
+                }, Set.class.getName(), ModelMBeanOperationInfo.ACTION_INFO));
+        operations.add(new ModelMBeanOperationInfo(
+                "findAndProcessSessions", "findAndProcessSessions",
+                new MBeanParameterInfo[] {
+                        new MBeanParameterInfo(
+                                "ognlQuery", String.class.getName(), "a boolean OGNL expression"),
+                        new MBeanParameterInfo(
+                                "ognlCommand", String.class.getName(), "an OGNL expression that modifies the state of the sessions in the match result")
                 }, Set.class.getName(), ModelMBeanOperationInfo.ACTION_INFO));
     }
 
