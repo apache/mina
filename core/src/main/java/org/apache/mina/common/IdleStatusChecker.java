@@ -91,7 +91,6 @@ public class IdleStatusChecker {
                         AbstractIoService service = it.next();
                         if (!service.isActive()) {
                             it.remove();
-                            System.out.println("DROPPED");
                         } else {
                             notifyIdleness(service, currentTime, false);
                         }
