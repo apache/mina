@@ -48,6 +48,19 @@ public interface IoService {
     void removeListener(IoServiceListener listener);
     
     /**
+     * Returns <tt>true</tt> if and if only {@link #dispose()} method has
+     * been called.  Please note that this method will return <tt>true</tt>
+     * even after all the related resources are released.
+     */
+    boolean isDisposing();
+    
+    /**
+     * Returns <tt>true</tt> if and if only all resources of this processor
+     * have been disposed.
+     */
+    boolean isDisposed();
+    
+    /**
      * Releases any resources allocated by this service.  Please note that 
      * this method might block as long as there are any sessions managed by
      * this service.

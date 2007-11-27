@@ -31,11 +31,25 @@ package org.apache.mina.common;
  * @param <T> the type of the {@link IoSession} this processor can handle
  */
 public interface IoProcessor<T extends IoSession> {
+
     /**
-     * Requests this processor to release any resources allocated by
-     * this processor.  Please note that {@link IoProcessor} implementation
-     * will release all resources eventually, but the resources will not be
-     * released as long as there are any sessions managed by this processor.
+     * Returns <tt>true</tt> if and if only {@link #dispose()} method has
+     * been called.  Please note that this method will return <tt>true</tt>
+     * even after all the related resources are released.
+     */
+    boolean isDisposing();
+    
+    /**
+     * Returns <tt>true</tt> if and if only all resources of this processor
+     * have been disposed.
+     */
+    boolean isDisposed();
+    
+    /**
+     * Releases any resources allocated by this processor.  Please note that 
+     * the resources might not be released as long as there are any sessions
+     * managed by this processor.  Most implementations will close all sessions
+     * immediately and release the related resources.
      */
     void dispose();
     

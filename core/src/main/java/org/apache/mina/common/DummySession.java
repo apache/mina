@@ -121,6 +121,14 @@ public class DummySession extends AbstractIoSession {
 
             public void dispose() {
             }
+
+            public boolean isDisposed() {
+                return false;
+            }
+
+            public boolean isDisposing() {
+                return false;
+            }
         };
 
         try {

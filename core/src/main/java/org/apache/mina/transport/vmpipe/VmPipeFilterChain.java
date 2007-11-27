@@ -247,5 +247,13 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
 
         public void dispose() {
         }
+
+        public boolean isDisposed() {
+            return false;
+        }
+
+        public boolean isDisposing() {
+            return false;
+        }
     }
 }

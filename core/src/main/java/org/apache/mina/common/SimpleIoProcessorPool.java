@@ -81,6 +81,9 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
     private final AtomicInteger processorDistributor = new AtomicInteger();
     private final Executor executor;
     private final boolean createdExecutor;
+    
+    private final Object disposalLock = new Object();
+    private volatile boolean disposing;
     private volatile boolean disposed;
     
     public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType) {
@@ -186,31 +189,46 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
         getProcessor(session).updateTrafficMask(session);
     }
     
+    public boolean isDisposed() {
+        return disposed;
+    }
+
+    public boolean isDisposing() {
+        return disposing;
+    }
+
     public final void dispose() {
         if (disposed) {
             return;
         }
 
-        disposed = true;
-        for (int i = pool.length - 1; i >= 0; i --) {
-            if (pool[i] == null) {
-                continue;
-            }
+        synchronized (disposalLock) {
+            if (!disposing) {
+                disposing = true;
+                for (int i = pool.length - 1; i >= 0; i --) {
+                    if (pool[i] == null) {
+                        continue;
+                    }
 
-            try {
-                pool[i].dispose();
-            } catch (Exception e) {
-                logger.warn(
-                        "Failed to dispose a " + pool[i].getClass().getSimpleName() +
-                        " at index " + i + ".", e);
-            } finally {
-                pool[i] = null;
+                    try {
+                        pool[i].dispose();
+                    } catch (Exception e) {
+                        logger.warn(
+                                "Failed to dispose a " +
+                                pool[i].getClass().getSimpleName() +
+                                " at index " + i + ".", e);
+                    } finally {
+                        pool[i] = null;
+                    }
+                }
+                
+                if (createdExecutor) {
+                    ((ExecutorService) executor).shutdown();
+                }
             }
         }
-        
-        if (createdExecutor) {
-            ((ExecutorService) executor).shutdown();
-        }
+
+        disposed = true;
     }
     
     @SuppressWarnings("unchecked")

@@ -51,32 +51,25 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 class SerialSessionImpl extends AbstractIoSession implements
-        SerialSession, SerialPortEventListener, IoProcessor<SerialSessionImpl> {
-
-    private SerialSessionConfig config = new DefaultSerialSessionConfig();
-
-    private final IoHandler ioHandler;
-
-    private final IoFilterChain filterChain;
-    
-    private final IoService service;
-    
-    private final IoServiceListenerSupport serviceListeners;
-
-    private final SerialAddress address;
-
-    private InputStream inputStream;
-
-    private OutputStream outputStream;
-
-    private final SerialPort port;
-
-    private final Logger log;
+        SerialSession, SerialPortEventListener {
 
     static final TransportMetadata METADATA =
-            new DefaultTransportMetadata(
-                    "rxtx", "serial", false, true, SerialAddress.class,
-                    SerialSessionConfig.class, IoBuffer.class);
+        new DefaultTransportMetadata(
+                "rxtx", "serial", false, true, SerialAddress.class,
+                SerialSessionConfig.class, IoBuffer.class);
+
+    private final SerialSessionConfig config = new DefaultSerialSessionConfig();
+    private final IoProcessor<SerialSessionImpl> processor = new SerialIoProcessor();
+    private final IoHandler ioHandler;
+    private final IoFilterChain filterChain;
+    private final IoService service;
+    private final IoServiceListenerSupport serviceListeners;
+    private final SerialAddress address;
+    private final SerialPort port;
+    private final Logger log;
+
+    private InputStream inputStream;
+    private OutputStream outputStream;
 
     SerialSessionImpl(
             IoService service, IoServiceListenerSupport serviceListeners,
@@ -141,7 +134,6 @@ class SerialSessionImpl extends AbstractIoSession implements
     }
 
     private Object writeMonitor = new Object();
-
     private WriteWorker writeWorker;
 
     private class WriteWorker extends Thread {
@@ -239,48 +231,58 @@ class SerialSessionImpl extends AbstractIoSession implements
 
     @Override
     protected IoProcessor<SerialSessionImpl> getProcessor() {
-        return this;
+        return processor;
     }
+    
+    private class SerialIoProcessor implements IoProcessor<SerialSessionImpl> {
+        public void add(SerialSessionImpl session) {
+        }
 
-    public void add(SerialSessionImpl session) {
-    }
-
-    public void flush(SerialSessionImpl session) {
-        if (writeWorker == null) {
-            writeWorker = new WriteWorker();
-            writeWorker.start();
-        } else {
-            synchronized (writeMonitor) {
-                writeMonitor.notifyAll();
+        public void flush(SerialSessionImpl session) {
+            if (writeWorker == null) {
+                writeWorker = new WriteWorker();
+                writeWorker.start();
+            } else {
+                synchronized (writeMonitor) {
+                    writeMonitor.notifyAll();
+                }
             }
         }
-    }
 
-    public void remove(SerialSessionImpl session) {
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
+        public void remove(SerialSessionImpl session) {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
+
+            port.close();
+            flush(session);
+            synchronized (readReadyMonitor) {
+                readReadyMonitor.notifyAll();
+            }
+
+            serviceListeners.fireSessionDestroyed(SerialSessionImpl.this);
         }
-        try {
-            outputStream.close();
-        } catch (IOException e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
+        
+        public void updateTrafficMask(SerialSessionImpl session) {
+            throw new UnsupportedOperationException();
         }
 
-        port.close();
-        flush(session);
-        synchronized (readReadyMonitor) {
-            readReadyMonitor.notifyAll();
+        public void dispose() {
         }
 
-        serviceListeners.fireSessionDestroyed(this);
-    }
+        public boolean isDisposed() {
+            return false;
+        }
 
-    public void updateTrafficMask(SerialSessionImpl session) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void dispose() {
+        public boolean isDisposing() {
+            return false;
+        }
     }
 }

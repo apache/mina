@@ -273,6 +273,14 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
         public void dispose() {
         }
+
+        public boolean isDisposed() {
+            return false;
+        }
+
+        public boolean isDisposing() {
+            return false;
+        }
     }
 
     private void startupWorker() {
