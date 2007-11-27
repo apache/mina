@@ -19,9 +19,14 @@
  */
 package org.apache.mina.common;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.mina.util.ConcurrentHashSet;
+import org.apache.mina.util.NamePreservingRunnable;
 
 /**
  * Detects idle sessions and fires <tt>sessionIdle</tt> events to them.
@@ -36,67 +41,130 @@ public class IdleStatusChecker {
         return INSTANCE;
     }
 
-    private final Set<AbstractIoSession> sessions = new HashSet<AbstractIoSession>();
-    private final Set<AbstractIoService> services = new HashSet<AbstractIoService>();
+    private final Set<AbstractIoSession> sessions =
+        new ConcurrentHashSet<AbstractIoSession>();
+    private final Set<AbstractIoService> services =
+        new ConcurrentHashSet<AbstractIoService>();
 
-    private final Worker worker = new Worker();
+    private final Object lock = new Object();
+    private final Runnable notifyingTask = new NamePreservingRunnable(
+            new NotifyingTask(), "IdleStatusChecker");
+    private final IoServiceListener serviceDeactivationListener = 
+        new ServiceDeactivationListener();
+    private final IoFutureListener<IoFuture> sessionCloseListener =
+        new SessionCloseListener();
+    private volatile ScheduledExecutorService executor;
 
-    private IdleStatusChecker() {
-        worker.start();
-    }
+    private IdleStatusChecker() {}
 
     public void addSession(AbstractIoSession session) {
-        synchronized (sessions) {
-            sessions.add(session);
+        synchronized (lock) {
+            boolean start = false;
+            if (sessions.isEmpty() && services.isEmpty()) {
+                start = true;
+            }
+            if (!sessions.add(session)) {
+                return;
+            }
+            if (start) {
+                start();
+            }
         }
+        
+        session.getCloseFuture().addListener(sessionCloseListener);
     }
     
     public void addService(AbstractIoService service) {
-        synchronized (services) {
-            services.add(service);
+        synchronized (lock) {
+            boolean start = false;
+            if (sessions.isEmpty() && services.isEmpty()) {
+                start = true;
+            }
+            if (!services.add(service)) {
+                return;
+            }
+            if (start) {
+                start();
+            }
+        }
+        
+        service.addListener(serviceDeactivationListener);
+    }
+
+    public void removeSession(AbstractIoSession session) {
+        synchronized (lock) {
+            sessions.remove(session);
+            if (sessions.isEmpty() && services.isEmpty()) {
+                stop();
+            }
+        }
+    }
+    
+    public void removeService(AbstractIoService service) {
+        synchronized (lock) {
+            services.remove(service);
+            if (sessions.isEmpty() && services.isEmpty()) {
+                stop();
+            }
         }
     }
 
-    private class Worker extends Thread {
-        private Worker() {
-            super("IdleStatusChecker");
-            setDaemon(true);
+    private void start() {
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        this.executor = executor;
+        executor.scheduleWithFixedDelay(
+                notifyingTask, 1000, 1000, TimeUnit.SECONDS);
+    }
+    
+    private void stop() {
+        ScheduledExecutorService executor = this.executor;
+        if (executor == null) {
+            return;
         }
+        executor.shutdownNow();
+        this.executor = null;
+    }
 
-        @Override
+    private class NotifyingTask implements Runnable {
         public void run() {
-            for (;;) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                }
+            long currentTime = System.currentTimeMillis();
 
-                long currentTime = System.currentTimeMillis();
-
-                synchronized (sessions) {
-                    Iterator<AbstractIoSession> it = sessions.iterator();
-                    while (it.hasNext()) {
-                        AbstractIoSession session = it.next();
-                        if (!session.isConnected()) {
-                            it.remove();
-                        } else {
-                            notifyIdleSession(session, currentTime);
-                        }
-                    }
-                }
-                
-                synchronized (services) {
-                    Iterator<AbstractIoService> it = services.iterator();
-                    while (it.hasNext()) {
-                        AbstractIoService service = it.next();
-                        if (!service.isActive()) {
-                            it.remove();
-                        } else {
-                            notifyIdleness(service, currentTime, false);
-                        }
+            synchronized (sessions) {
+                Iterator<AbstractIoSession> it = sessions.iterator();
+                while (it.hasNext()) {
+                    AbstractIoSession session = it.next();
+                    if (session.isConnected()) {
+                        notifyIdleSession(session, currentTime);
                     }
                 }
             }
+            
+            synchronized (services) {
+                Iterator<AbstractIoService> it = services.iterator();
+                while (it.hasNext()) {
+                    AbstractIoService service = it.next();
+                    if (service.isActive()) {
+                        notifyIdleness(service, currentTime, false);
+                    }
+                }
+            }
+        }
+    }
+    
+    private class ServiceDeactivationListener implements IoServiceListener {
+        public void serviceDeactivated(IoService service) {
+            removeService((AbstractIoService) service);
+        }
+
+        public void serviceActivated(IoService service) {}
+        public void serviceIdle(IoService service, IdleStatus idleStatus) {}
+        public void sessionCreated(IoSession session) {}
+        public void sessionDestroyed(IoSession session) {}
+    }
+    
+    private class SessionCloseListener implements IoFutureListener<IoFuture> {
+        public void operationComplete(IoFuture future) {
+            removeSession((AbstractIoSession) future.getSession());
         }
     }
 
