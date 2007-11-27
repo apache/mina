@@ -52,6 +52,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     private static final AtomicInteger id = new AtomicInteger();
 
+    private final Object lock = new Object();
     private final Executor executor;
     private final boolean createdExecutor;
     private final String threadName;
@@ -278,7 +279,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             flushingSessions.clear();
             throw new ClosedSelectorException();
         }
-        synchronized (this) {
+        synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
                 executor.execute(
@@ -317,7 +318,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     notifyIdleSessions();
 
                     if (nHandles == 0) {
-                        synchronized (AbstractPollingConnectionlessIoAcceptor.this) {
+                        synchronized (lock) {
                             if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
                                 worker = null;
                                 break;
