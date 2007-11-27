@@ -38,12 +38,8 @@ public abstract class AbstractIoService implements IoService {
             public void serviceActivated(IoService service) {
                 // Update lastIoTime.
                 AbstractIoService s = (AbstractIoService) service;
-                if (s.getLastReadTime() == 0) {
-                    s.setLastReadTime(s.getActivationTime());
-                }
-                if (s.getLastWriteTime() == 0) {
-                    s.setLastWriteTime(s.getActivationTime());
-                }
+                s.setLastReadTime(s.getActivationTime());
+                s.setLastWriteTime(s.getActivationTime());
                 
                 // Start idleness notification.
                 IdleStatusChecker.getInstance().addService(s);
