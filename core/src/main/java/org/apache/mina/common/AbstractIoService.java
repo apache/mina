@@ -368,8 +368,16 @@ public abstract class AbstractIoService implements IoService {
         return lastReadTime;
     }
 
+    protected final void setLastReadTime(long lastReadTime) {
+        this.lastReadTime = lastReadTime;
+    }
+
     public final long getLastWriteTime() {
         return lastWriteTime;
+    }
+    
+    protected final void setLastWriteTime(long lastWriteTime) {
+        this.lastWriteTime = lastWriteTime;
     }
 
     public final long getWrittenBytes() {
