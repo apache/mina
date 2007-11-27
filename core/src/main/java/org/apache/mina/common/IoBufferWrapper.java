@@ -51,7 +51,7 @@ public class IoBufferWrapper extends IoBuffer {
     /**
      * The buffer proxied by this proxy.
      */
-    protected IoBuffer buf;
+    private final IoBuffer buf;
 
     /**
      * Create a new instance.
@@ -62,6 +62,13 @@ public class IoBufferWrapper extends IoBuffer {
             throw new NullPointerException("buf");
         }
         this.buf = buf;
+    }
+    
+    /**
+     * Returns the parent buffer that this buffer wrapped.
+     */
+    public IoBuffer getParentBuffer() {
+        return buf;
     }
 
     @Override
