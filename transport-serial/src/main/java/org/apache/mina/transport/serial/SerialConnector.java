@@ -33,6 +33,7 @@ import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.TransportMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +116,8 @@ public final class SerialConnector extends AbstractIoConnector {
     }
     
     @Override
-    protected void dispose0() throws Exception {
+    protected IoFuture dispose0() throws Exception {
+        return null;
     }
 
     public TransportMetadata getTransportMetadata() {

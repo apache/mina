@@ -65,6 +65,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
 
+    private final ServiceOperationFuture disposalFuture =
+        new ServiceOperationFuture();
     private volatile boolean selectable;
     private Worker worker;
     private long lastIdleCheckTime;
@@ -128,10 +130,11 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected abstract void setInterestedInWrite(T session, boolean interested) throws Exception;
 
     @Override
-    protected void dispose0() throws Exception {
+    protected IoFuture dispose0() throws Exception {
         unbind();
         startupWorker();
         wakeup();
+        return disposalFuture;
     }
 
     @Override
@@ -171,7 +174,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     }
 
     public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
-        if (isDisposed()) {
+        if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
         }
 
@@ -335,7 +338,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                 }
             }
             
-            if (isDisposed()) {
+            if (isDisposing()) {
                 selectable = false;
                 if (createdExecutor) {
                     ((ExecutorService) executor).shutdown();
@@ -345,6 +348,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
+                disposalFuture.setValue(true);
             }
         }
     }

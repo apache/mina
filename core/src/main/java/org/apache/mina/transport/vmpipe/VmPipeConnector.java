@@ -125,7 +125,8 @@ public final class VmPipeConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected void dispose0() throws Exception {
+    protected IoFuture dispose0() throws Exception {
+        return null;
     }
 
     private static final Set<VmPipeAddress> TAKEN_LOCAL_ADDRESSES = new HashSet<VmPipeAddress>();

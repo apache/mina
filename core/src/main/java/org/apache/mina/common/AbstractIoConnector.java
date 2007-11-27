@@ -87,7 +87,7 @@ public abstract class AbstractIoConnector
 
     public final ConnectFuture connect(SocketAddress remoteAddress,
             SocketAddress localAddress) {
-        if (isDisposed()) {
+        if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
         }
 

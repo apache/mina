@@ -123,7 +123,7 @@ public abstract class AbstractIoAcceptor
     }
 
     public final void bind() throws IOException {
-        if (isDisposed()) {
+        if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
         }
 

@@ -71,8 +71,9 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     }
 
     @Override
-    protected void dispose0() throws Exception {
+    protected IoFuture dispose0() throws Exception {
         unbind();
+        return null;
     }
 
     @Override

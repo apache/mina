@@ -93,7 +93,8 @@ public class DummySession extends AbstractIoSession {
             }
 
             @Override
-            protected void dispose0() throws Exception {
+            protected IoFuture dispose0() throws Exception {
+                return null;
             }
         };
 

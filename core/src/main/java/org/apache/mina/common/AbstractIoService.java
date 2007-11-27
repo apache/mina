@@ -50,7 +50,11 @@ public abstract class AbstractIoService implements IoService {
      * Maintains the {@link IoServiceListener}s of this service.
      */
     private final IoServiceListenerSupport listeners;
+    
+    private final Object disposalLock = new Object();
+    private volatile boolean disposing;
     private volatile boolean disposed;
+    private IoFuture disposalFuture;
 
     private final AtomicLong readBytes = new AtomicLong();
     private final AtomicLong writtenBytes = new AtomicLong();
@@ -141,6 +145,10 @@ public abstract class AbstractIoService implements IoService {
         return listeners.isActive();
     }
     
+    public final boolean isDisposing() {
+        return disposing;
+    }
+    
     public final boolean isDisposed() {
         return disposed;
     }
@@ -150,19 +158,35 @@ public abstract class AbstractIoService implements IoService {
             return;
         }
 
-        disposed = true;
-        try {
-            dispose0();
-        } catch (Exception e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
+        IoFuture disposalFuture;
+        synchronized (disposalLock) {
+            disposalFuture = this.disposalFuture;
+            if (!disposing) {
+                disposing = true;
+                try {
+                    this.disposalFuture = disposalFuture = dispose0();
+                } catch (Exception e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                } finally {
+                    if (disposalFuture == null) {
+                        disposed = true;
+                    }
+                }
+            }
         }
+        
+        if (disposalFuture != null) {
+            disposalFuture.awaitUninterruptibly();
+        }
+
+        disposed = true;
     }
     
     /**
      * Implement this method to release any acquired resources.  This method
      * is invoked only once by {@link #dispose()}.
      */
-    protected abstract void dispose0() throws Exception;
+    protected abstract IoFuture dispose0() throws Exception;
 
     public final Set<IoSession> getManagedSessions() {
         return listeners.getManagedSessions();

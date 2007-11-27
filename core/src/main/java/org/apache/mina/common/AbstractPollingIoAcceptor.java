@@ -64,6 +64,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     private final Map<SocketAddress, H> boundHandles =
         Collections.synchronizedMap(new HashMap<SocketAddress, H>());
     
+    private final ServiceOperationFuture disposalFuture =
+        new ServiceOperationFuture();
     private volatile boolean selectable;
     private Worker worker;
 
@@ -136,10 +138,11 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected abstract void unbind(H handle) throws Exception;
 
     @Override
-    protected void dispose0() throws Exception {
+    protected IoFuture dispose0() throws Exception {
         unbind();
         startupWorker();
         wakeup();
+        return disposalFuture;
     }
 
     @Override
@@ -253,7 +256,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 }
             }
             
-            if (isDisposed()) {
+            if (isDisposing()) {
                 try {
                     if (createdProcessor) {
                         processor.dispose();
@@ -269,6 +272,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                         ExceptionMonitor.getInstance().exceptionCaught(e);
                     }
                 }
+                disposalFuture.setDone();
             }
         }
 

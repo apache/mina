@@ -52,6 +52,8 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     private final IoProcessor<T> processor;
     private final boolean createdProcessor;
 
+    private final ServiceOperationFuture disposalFuture =
+        new ServiceOperationFuture();
     private volatile boolean selectable;
     private Worker worker;
 
@@ -125,9 +127,10 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected abstract ConnectionRequest connectionRequest(H handle);
 
     @Override
-    protected final void dispose0() throws Exception {
+    protected final IoFuture dispose0() throws Exception {
         startupWorker();
         wakeup();
+        return disposalFuture;
     }
 
     @Override
@@ -307,7 +310,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                 }
             }
             
-            if (isDisposed()) {
+            if (isDisposing()) {
                 try {
                     if (createdProcessor) {
                         processor.dispose();
@@ -322,6 +325,8 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     } catch (Exception e) {
                         ExceptionMonitor.getInstance().exceptionCaught(e);
                     }
+                    
+                    disposalFuture.setDone();
                 }
             }
         }
