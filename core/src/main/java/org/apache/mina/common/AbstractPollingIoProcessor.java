@@ -524,55 +524,14 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     
                 int localWrittenBytes = 0;
                 Object message = req.getMessage();
-                if (message instanceof FileRegion) {
-                    FileRegion region = (FileRegion) message;
-                    if (region.getCount() > 0) {
-                        int length;
-                        if (hasFragmentation) {
-                            length = (int) Math.min(
-                                    region.getCount(), 
-                                    maxWrittenBytes - writtenBytes);
-                        } else {
-                            length = (int) Math.min(
-                                    Integer.MAX_VALUE, region.getCount());
-                        }
-                        localWrittenBytes = transferFile(session, region, length);
-                        region.setPosition(region.getPosition() + localWrittenBytes);
-                    }
-
-                    if (region.getCount() <= 0 ||
-                            (!hasFragmentation && localWrittenBytes != 0)) {
-                        // File has been sent, clear the current request.
-                        session.setCurrentWriteRequest(null);
-                        session.getFilterChain().fireMessageSent(req);
-                    }
+                if (message instanceof IoBuffer) {
+                    localWrittenBytes = writeBuffer(
+                            session, req, hasFragmentation,
+                            maxWrittenBytes - writtenBytes);
                 } else {
-                    IoBuffer buf = (IoBuffer) message;
-                    if (buf.hasRemaining()) {
-                        for (int i = WRITE_SPIN_COUNT; i > 0; i --) {
-                            int length;
-                            if (hasFragmentation) {
-                                length = Math.min(
-                                        buf.remaining(), 
-                                        maxWrittenBytes - writtenBytes);
-                            } else {
-                                length = buf.remaining();
-                            }
-    
-                            localWrittenBytes = write(session, buf, length);
-                            if (localWrittenBytes != 0 || !buf.hasRemaining()) {
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!buf.hasRemaining() ||
-                            (!hasFragmentation && localWrittenBytes != 0)) {
-                        // Buffer has been sent, clear the current request.
-                        session.setCurrentWriteRequest(null);
-                        buf.reset();
-                        session.getFilterChain().fireMessageSent(req);
-                    }
+                    localWrittenBytes = writeFile(
+                            session, req, hasFragmentation,
+                            maxWrittenBytes - writtenBytes);
                 }
                 
                 writtenBytes += localWrittenBytes;
@@ -589,6 +548,63 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         }
 
         return true;
+    }
+
+    private int writeBuffer(T session, WriteRequest req,
+            boolean hasFragmentation, int maxLength) throws Exception {
+        IoBuffer buf = (IoBuffer) req.getMessage();
+        int localWrittenBytes = 0;
+        if (buf.hasRemaining()) {
+            int length;
+            if (hasFragmentation) {
+                length = Math.min(buf.remaining(), maxLength);
+            } else {
+                length = buf.remaining();
+            }
+            for (int i = WRITE_SPIN_COUNT; i > 0; i --) {
+                localWrittenBytes = write(session, buf, length);
+                if (localWrittenBytes != 0 || !buf.hasRemaining()) {
+                    break;
+                }
+            }
+        }
+
+        if (!buf.hasRemaining() ||
+                (!hasFragmentation && localWrittenBytes != 0)) {
+            // Buffer has been sent, clear the current request.
+            buf.reset();
+            fireMessageSent(session, req);
+        }
+        return localWrittenBytes;
+    }
+
+    private int writeFile(T session, WriteRequest req,
+            boolean hasFragmentation, int maxLength) throws Exception {
+        int localWrittenBytes;
+        FileRegion region = (FileRegion) req.getMessage();
+        if (region.getCount() > 0) {
+            int length;
+            if (hasFragmentation) {
+                length = (int) Math.min(region.getCount(), maxLength);
+            } else {
+                length = (int) Math.min(Integer.MAX_VALUE, region.getCount());
+            }
+            localWrittenBytes = transferFile(session, region, length);
+            region.setPosition(region.getPosition() + localWrittenBytes);
+        } else {
+            localWrittenBytes = 0;
+        }
+
+        if (region.getCount() <= 0 ||
+                (!hasFragmentation && localWrittenBytes != 0)) {
+            fireMessageSent(session, req);
+        }
+        return localWrittenBytes;
+    }
+
+    private void fireMessageSent(T session, WriteRequest req) {
+        session.setCurrentWriteRequest(null);
+        session.getFilterChain().fireMessageSent(req);
     }
 
     private void updateTrafficMask() {
