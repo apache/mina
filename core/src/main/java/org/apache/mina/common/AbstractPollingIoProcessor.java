@@ -563,7 +563,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
             for (int i = WRITE_SPIN_COUNT; i > 0; i --) {
                 localWrittenBytes = write(session, buf, length);
-                if (localWrittenBytes != 0 || !buf.hasRemaining()) {
+                if (localWrittenBytes != 0) {
                     break;
                 }
             }
