@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
+import java.util.Collections;
 import java.util.Iterator;
 
 import org.apache.mina.common.AbstractPollingIoConnector;
@@ -121,8 +122,9 @@ public final class NioDatagramConnector
     
     // Unused extension points.
     @Override
+    @SuppressWarnings("unchecked")
     protected Iterator<DatagramChannel> allHandles() {
-        throw new UnsupportedOperationException();
+        return Collections.EMPTY_LIST.iterator();
     }
 
     @Override
@@ -132,7 +134,6 @@ public final class NioDatagramConnector
 
     @Override
     protected void destroy() throws Exception {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -148,16 +149,16 @@ public final class NioDatagramConnector
 
     @Override
     protected boolean select(int timeout) throws Exception {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected Iterator<DatagramChannel> selectedHandles() {
-        throw new UnsupportedOperationException();
+        return Collections.EMPTY_LIST.iterator();
     }
 
     @Override
     protected void wakeup() {
-        throw new UnsupportedOperationException();
     }
 }

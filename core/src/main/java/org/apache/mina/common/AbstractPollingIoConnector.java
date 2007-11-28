@@ -21,7 +21,6 @@ package org.apache.mina.common;
 
 import java.net.ConnectException;
 import java.net.SocketAddress;
-import java.nio.channels.ClosedSelectorException;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -128,8 +127,10 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
     @Override
     protected final IoFuture dispose0() throws Exception {
-        startupWorker();
-        wakeup();
+        if (!disposalFuture.isDone()) {
+            startupWorker();
+            wakeup();
+        }
         return disposalFuture;
     }
 
@@ -176,8 +177,8 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         if (!selectable) {
             connectQueue.clear();
             cancelQueue.clear();
-            throw new ClosedSelectorException();
         }
+
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
@@ -310,13 +311,13 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                 }
             }
             
-            if (isDisposing()) {
+            if (selectable && isDisposing()) {
+                selectable = false;
                 try {
                     if (createdProcessor) {
                         processor.dispose();
                     }
                 } finally {
-                    selectable = false;
                     if (createdExecutor) {
                         ((ExecutorService) executor).shutdown();
                     }
@@ -324,9 +325,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                         destroy();
                     } catch (Exception e) {
                         ExceptionMonitor.getInstance().exceptionCaught(e);
+                    } finally {
+                        disposalFuture.setDone();
                     }
-                    
-                    disposalFuture.setDone();
                 }
             }
         }

@@ -54,13 +54,8 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
                 if (v instanceof Error) {
                     throw (Error) v;
                 }
-                if (v instanceof IOException) {
-                    throw new RuntimeIoException(
-                            "Failed to read.", (IOException) v);
-                }
-                if (v instanceof Exception) {
-                    throw new RuntimeException(
-                            "Failed to read.", (Exception) v);
+                if (v instanceof IOException || v instanceof Exception) {
+                    throw new RuntimeIoException((Exception) v);
                 }
             }
             

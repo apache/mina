@@ -20,7 +20,6 @@
 package org.apache.mina.common;
 
 import java.net.SocketAddress;
-import java.nio.channels.ClosedSelectorException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -132,8 +131,10 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     @Override
     protected IoFuture dispose0() throws Exception {
         unbind();
-        startupWorker();
-        wakeup();
+        if (!disposalFuture.isDone()) {
+            startupWorker();
+            wakeup();
+        }
         return disposalFuture;
     }
 
@@ -288,8 +289,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             registerQueue.clear();
             cancelQueue.clear();
             flushingSessions.clear();
-            throw new ClosedSelectorException();
         }
+        
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
@@ -346,7 +347,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                 }
             }
             
-            if (isDisposing()) {
+            if (selectable && isDisposing()) {
                 selectable = false;
                 if (createdExecutor) {
                     ((ExecutorService) executor).shutdown();
@@ -355,8 +356,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     destroy();
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
+                } finally {
+                    disposalFuture.setValue(true);
                 }
-                disposalFuture.setValue(true);
             }
         }
     }
