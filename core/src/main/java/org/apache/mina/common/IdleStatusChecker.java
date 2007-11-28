@@ -49,8 +49,6 @@ public class IdleStatusChecker {
     private final Object lock = new Object();
     private final Runnable notifyingTask = new NamePreservingRunnable(
             new NotifyingTask(), "IdleStatusChecker");
-    private final IoServiceListener serviceDeactivationListener = 
-        new ServiceDeactivationListener();
     private final IoFutureListener<IoFuture> sessionCloseListener =
         new SessionCloseListener();
     private volatile ScheduledExecutorService executor;
@@ -87,8 +85,6 @@ public class IdleStatusChecker {
                 start();
             }
         }
-        
-        service.addListener(serviceDeactivationListener);
     }
 
     public void removeSession(AbstractIoSession session) {
@@ -113,7 +109,7 @@ public class IdleStatusChecker {
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         this.executor = executor;
         executor.scheduleWithFixedDelay(
-                notifyingTask, 1000, 1000, TimeUnit.SECONDS);
+                notifyingTask, 1000, 1000, TimeUnit.MILLISECONDS);
     }
     
     private void stop() {
@@ -128,38 +124,29 @@ public class IdleStatusChecker {
     private class NotifyingTask implements Runnable {
         public void run() {
             long currentTime = System.currentTimeMillis();
+            notifyServices(currentTime);
+            notifySessions(currentTime);
+        }
 
-            synchronized (sessions) {
-                Iterator<AbstractIoSession> it = sessions.iterator();
-                while (it.hasNext()) {
-                    AbstractIoSession session = it.next();
-                    if (session.isConnected()) {
-                        notifyIdleSession(session, currentTime);
-                    }
-                }
-            }
-            
-            synchronized (services) {
-                Iterator<AbstractIoService> it = services.iterator();
-                while (it.hasNext()) {
-                    AbstractIoService service = it.next();
-                    if (service.isActive()) {
-                        notifyIdleness(service, currentTime, false);
-                    }
+        private void notifyServices(long currentTime) {
+            Iterator<AbstractIoService> it = services.iterator();
+            while (it.hasNext()) {
+                AbstractIoService service = it.next();
+                if (service.isActive()) {
+                    notifyIdleness(service, currentTime, false);
                 }
             }
         }
-    }
-    
-    private class ServiceDeactivationListener implements IoServiceListener {
-        public void serviceDeactivated(IoService service) {
-            removeService((AbstractIoService) service);
-        }
 
-        public void serviceActivated(IoService service) {}
-        public void serviceIdle(IoService service, IdleStatus idleStatus) {}
-        public void sessionCreated(IoSession session) {}
-        public void sessionDestroyed(IoSession session) {}
+        private void notifySessions(long currentTime) {
+            Iterator<AbstractIoSession> it = sessions.iterator();
+            while (it.hasNext()) {
+                AbstractIoSession session = it.next();
+                if (session.isConnected()) {
+                    notifyIdleSession(session, currentTime);
+                }
+            }
+        }
     }
     
     private class SessionCloseListener implements IoFutureListener<IoFuture> {

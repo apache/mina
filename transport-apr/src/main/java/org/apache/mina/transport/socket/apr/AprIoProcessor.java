@@ -357,7 +357,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     }
 
     @Override
-    protected long transferFile(AprSession session, FileRegion region, int length)
+    protected int transferFile(AprSession session, FileRegion region, int length)
             throws Exception {
         throw new UnsupportedOperationException();
     }
