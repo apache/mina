@@ -115,11 +115,6 @@
       </dependency>
       <dependency>
         <groupId>${groupId}</groupId>
-        <artifactId>mina-integration-spring</artifactId>
-        <version>${pom.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${groupId}</groupId>
         <artifactId>mina-statemachine</artifactId>
         <version>${pom.version}</version>
       </dependency>
@@ -159,7 +154,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring</artifactId>
-        <version>2.0.6</version>
+        <version>2.5</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -312,7 +307,6 @@
     <module>integration-beans</module>
     <module>integration-ognl</module>
     <module>integration-jmx</module>
-    <module>integration-spring</module>
     <module>example</module>
   </modules>
   

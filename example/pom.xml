@@ -16,7 +16,7 @@
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>mina-integration-spring</artifactId>
+      <artifactId>mina-integration-jmx</artifactId>
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
