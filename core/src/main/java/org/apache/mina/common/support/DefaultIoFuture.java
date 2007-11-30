@@ -35,21 +35,18 @@ import org.apache.mina.common.IoSession;
  * @version $Rev$, $Date$
  */
 public class DefaultIoFuture implements IoFuture {
+
     private final IoSession session;
-
     private final Object lock;
-
     private IoFutureListener firstListener;
-
     private List otherListeners;
-
     private Object result;
-
     private boolean ready;
+    private int waiters;
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param session an {@link IoSession} which is associated with this future
      */
     public DefaultIoFuture(IoSession session) {
@@ -58,12 +55,11 @@ public class DefaultIoFuture implements IoFuture {
     }
 
     /**
-     * Creates a new instance which uses the specified object as a lock.
+     * Creates a new instance.
+     *
+     * @param session an {@link IoSession} which is associated with this future
      */
     public DefaultIoFuture(IoSession session, Object lock) {
-        if (lock == null) {
-            throw new NullPointerException("lock");
-        }
         this.session = session;
         this.lock = lock;
     }
@@ -71,26 +67,46 @@ public class DefaultIoFuture implements IoFuture {
     public IoSession getSession() {
         return session;
     }
-
+    
     public Object getLock() {
         return lock;
     }
 
     public void join() {
+        awaitUninterruptibly();
+    }
+
+    public boolean join(long timeoutMillis) {
+        return awaitUninterruptibly(timeoutMillis);
+    }
+
+    private IoFuture awaitUninterruptibly() {
         synchronized (lock) {
             while (!ready) {
+                waiters++;
                 try {
                     lock.wait();
                 } catch (InterruptedException e) {
+                } finally {
+                    waiters--;
                 }
             }
         }
+
+        return this;
     }
 
-    public boolean join(long timeoutInMillis) {
-        long startTime = (timeoutInMillis <= 0) ? 0 : System
-                .currentTimeMillis();
-        long waitTime = timeoutInMillis;
+    private boolean awaitUninterruptibly(long timeoutMillis) {
+        try {
+            return await0(timeoutMillis, false);
+        } catch (InterruptedException e) {
+            throw new InternalError();
+        }
+    }
+
+    private boolean await0(long timeoutMillis, boolean interruptable) throws InterruptedException {
+        long startTime = timeoutMillis <= 0 ? 0 : System.currentTimeMillis();
+        long waitTime = timeoutMillis;
 
         synchronized (lock) {
             if (ready) {
@@ -99,21 +115,29 @@ public class DefaultIoFuture implements IoFuture {
                 return ready;
             }
 
-            for (;;) {
-                try {
-                    lock.wait(waitTime);
-                } catch (InterruptedException e) {
-                }
+            waiters++;
+            try {
+                for (;;) {
+                    try {
+                        lock.wait(waitTime);
+                    } catch (InterruptedException e) {
+                        if (interruptable) {
+                            throw e;
+                        }
+                    }
 
-                if (ready)
-                    return true;
-                else {
-                    waitTime = timeoutInMillis
-                            - (System.currentTimeMillis() - startTime);
-                    if (waitTime <= 0) {
-                        return ready;
+                    if (ready) {
+                        return true;
+                    } else {
+                        waitTime = timeoutMillis
+                                - (System.currentTimeMillis() - startTime);
+                        if (waitTime <= 0) {
+                            return ready;
+                        }
                     }
                 }
+            } finally {
+                waiters--;
             }
         }
     }
@@ -136,10 +160,12 @@ public class DefaultIoFuture implements IoFuture {
 
             result = newValue;
             ready = true;
-            lock.notifyAll();
-
-            notifyListeners();
+            if (waiters > 0) {
+                lock.notifyAll();
+            }
         }
+
+        notifyListeners();
     }
 
     /**
@@ -156,8 +182,11 @@ public class DefaultIoFuture implements IoFuture {
             throw new NullPointerException("listener");
         }
 
+        boolean notifyNow = false;
         synchronized (lock) {
-            if (!ready) {
+            if (ready) {
+                notifyNow = true;
+            } else {
                 if (firstListener == null) {
                     firstListener = listener;
                 } else {
@@ -166,9 +195,11 @@ public class DefaultIoFuture implements IoFuture {
                     }
                     otherListeners.add(listener);
                 }
-            } else {
-                notifyListener(listener);
             }
+        }
+
+        if (notifyNow) {
+            notifyListener(listener);
         }
     }
 
@@ -178,27 +209,33 @@ public class DefaultIoFuture implements IoFuture {
         }
 
         synchronized (lock) {
-            if (listener == firstListener) {
-                if (otherListeners != null && !otherListeners.isEmpty()) {
-                    firstListener = (IoFutureListener) otherListeners.remove(0);
-                } else {
-                    firstListener = null;
+            if (!ready) {
+                if (listener == firstListener) {
+                    if (otherListeners != null && !otherListeners.isEmpty()) {
+                        firstListener = (IoFutureListener) otherListeners.remove(0);
+                    } else {
+                        firstListener = null;
+                    }
+                } else if (otherListeners != null) {
+                    otherListeners.remove(listener);
                 }
-            } else if (otherListeners != null) {
-                otherListeners.remove(listener);
             }
         }
     }
 
     private void notifyListeners() {
-        synchronized (lock) {
-            if (firstListener != null) {
-                notifyListener(firstListener);
-                if (otherListeners != null) {
-                    for (Iterator i = otherListeners.iterator(); i.hasNext();) {
-                        notifyListener((IoFutureListener) i.next());
-                    }
+        // There won't be any visibility problem or concurrent modification
+        // because 'ready' flag will be checked against both addListener and
+        // removeListener calls.
+        if (firstListener != null) {
+            notifyListener(firstListener);
+            firstListener = null;
+
+            if (otherListeners != null) {
+                for (Iterator i = otherListeners.iterator(); i.hasNext(); ) {
+                    notifyListener((IoFutureListener) i.next());
                 }
+                otherListeners = null;
             }
         }
     }
