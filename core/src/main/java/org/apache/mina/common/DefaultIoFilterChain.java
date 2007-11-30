@@ -432,6 +432,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         } else {
             // Please note that this place is not the only place that
             // calls ConnectFuture.setException().
+            session.close();
             future.setException(cause);
         }
     }
