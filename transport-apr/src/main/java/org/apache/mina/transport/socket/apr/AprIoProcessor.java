@@ -222,15 +222,14 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     protected void destroy(AprSession session) throws Exception {
         allSessions.remove(session.getDescriptor());
         int ret = Poll.remove(pollset, session.getDescriptor());
-        if (ret != Status.APR_SUCCESS) {
-            try {
+        try {
+            if (ret != Status.APR_SUCCESS) {
                 throwException(ret);
-            } finally {
-                System.out.println("CLOSE");
-                ret = Socket.close(session.getDescriptor());
-                if (ret != Status.APR_SUCCESS) {
-                    throwException(ret);
-                }
+            }
+        } finally {
+            ret = Socket.close(session.getDescriptor());
+            if (ret != Status.APR_SUCCESS) {
+                throwException(ret);
             }
         }
     }
