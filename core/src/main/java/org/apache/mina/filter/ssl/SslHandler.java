@@ -385,7 +385,6 @@ class SslHandler {
             if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
                 outNetBuffer.capacity(outNetBuffer.capacity() << 1);
                 outNetBuffer.limit(outNetBuffer.capacity());
-                System.out.println("new capacity: " + outNetBuffer.limit());
             } else {
                 break;
             }
