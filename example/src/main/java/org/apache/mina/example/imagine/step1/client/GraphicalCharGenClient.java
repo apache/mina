@@ -1,23 +1,68 @@
+/*
+ *   Licensed to the Apache Software Foundation (ASF) under one
+ *   or more contributor license agreements.  See the NOTICE file
+ *   distributed with this work for additional information
+ *   regarding copyright ownership.  The ASF licenses this file
+ *   to you under the Apache License, Version 2.0 (the
+ *   "License"); you may not use this file except in compliance
+ *   with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing,
+ *   software distributed under the License is distributed on an
+ *   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *   KIND, either express or implied.  See the License for the
+ *   specific language governing permissions and limitations
+ *   under the License.
+ *
+ */
+
 package org.apache.mina.example.imagine.step1.client;
 
 import org.apache.mina.example.imagine.step1.ImageRequest;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.Checkbox;
 
 /**
- * @author Maarten Bosteels
+ * Swing application that acts as a client of the ImageServer
+ *
+ * @author Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-public class GraphicalCharGenClient extends javax.swing.JFrame implements ImageListener {
+public class GraphicalCharGenClient extends JFrame implements ImageListener {
+
     public static final int PORT = 33789;
     public static final String HOST = "localhost";
 
     public GraphicalCharGenClient() {
         initComponents();
+        jSpinnerHeight.setModel(spinnerHeightModel);
+        jSpinnerWidth.setModel(spinnerWidthModel);
+        jSpinnerChars.setModel(spinnerCharsModel);
+        jTextFieldHost.setText(HOST);
+        jTextFieldPort.setText(String.valueOf(PORT));
+        setTitle("");
     }
 
     private void jButtonConnectActionPerformed() {
@@ -42,7 +87,7 @@ public class GraphicalCharGenClient extends javax.swing.JFrame implements ImageL
     }
 
     public void onImages(BufferedImage image1, BufferedImage image2) {
-        if (checkboxContinous.getState()) {
+        if (checkBoxContinuous.isSelected()) {
             // already request next image
             sendRequest();
         }
@@ -55,10 +100,11 @@ public class GraphicalCharGenClient extends javax.swing.JFrame implements ImageL
             cause = cause.getCause();
         }
         JOptionPane.showMessageDialog(
-            this,
-            cause.getMessage(),
-            throwable.getMessage(),
-            JOptionPane.ERROR_MESSAGE);
+                this,
+                cause.getMessage(),
+                throwable.getMessage(),
+                JOptionPane.ERROR_MESSAGE);
+        setTitle("");
     }
 
     public void sessionOpened() {
@@ -79,162 +125,145 @@ public class GraphicalCharGenClient extends javax.swing.JFrame implements ImageL
         super.setTitle("MINA - Chargen client - " + title);
     }
 
+
     private void initComponents() {
-        setTitle("");
-        jPanel1 = new javax.swing.JPanel();
-        jTextFieldHost = new javax.swing.JTextField();
-        jTextFieldPort = new javax.swing.JTextField();
-        jButtonConnect = new javax.swing.JButton();
-        jButtonDisconnect = new javax.swing.JButton();
-        jSpinnerWidth = new javax.swing.JSpinner();
-        jSpinnerHeight = new javax.swing.JSpinner();
-        jButtonSendRequest = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jSpinnerChars = new javax.swing.JSpinner();
-        jLabel5 = new javax.swing.JLabel();
-        checkboxContinous = new java.awt.Checkbox();
+        jLabel1 = new JLabel();
+        jTextFieldHost = new JTextField();
+        jButtonConnect = new JButton();
+        jLabel3 = new JLabel();
+        jSpinnerWidth = new JSpinner();
+        label5 = new JLabel();
+        jSpinnerChars = new JSpinner();
+        checkBoxContinuous = new JCheckBox();
+        jLabel2 = new JLabel();
+        jTextFieldPort = new JTextField();
+        jButtonDisconnect = new JButton();
+        jLabel4 = new JLabel();
+        jSpinnerHeight = new JSpinner();
+        jButtonSendRequest = new JButton();
         imagePanel1 = new ImagePanel();
 
-        jSpinnerHeight.setModel(spinnerHeightModel);
-        jSpinnerWidth.setModel(spinnerWidthModel);
-        jSpinnerChars.setModel(spinnerCharsModel);
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(700, 300));
+        setPreferredSize(new Dimension(720, 600));
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new GridBagLayout());
+        ((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{36, 167, 99, 41, 66, 75, 57, 96, 0, 0};
+        ((GridBagLayout) contentPane.getLayout()).rowHeights = new int[]{10, 31, 31, 256, 0};
+        ((GridBagLayout) contentPane.getLayout()).columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+        ((GridBagLayout) contentPane.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 1.0E-4};
 
+        //---- jLabel1 ----
+        jLabel1.setText("Host");
+        contentPane.add(jLabel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 5), 0, 0));
+        contentPane.add(jTextFieldHost, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 10), 0, 0));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        jTextFieldHost.setText("localhost");
-
-        jTextFieldPort.setText("33789");
-
-        checkboxContinous.setLabel("continuous");
+        //---- jButtonConnect ----
         jButtonConnect.setText("Connect");
-        jButtonConnect.setName("connectButton");
-        jButtonConnect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButtonConnect.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 jButtonConnectActionPerformed();
             }
         });
+        contentPane.add(jButtonConnect, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 10), 0, 0));
 
+        //---- jLabel3 ----
+        jLabel3.setText("Width");
+        contentPane.add(jLabel3, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 5, 5), 0, 0));
+        contentPane.add(jSpinnerWidth, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 10), 0, 0));
+
+        //---- label5 ----
+        label5.setText("characters");
+        contentPane.add(label5, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 5, 5), 0, 0));
+        contentPane.add(jSpinnerChars, new GridBagConstraints(6, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 5, 10), 0, 0));
+
+        //---- checkBoxContinuous ----
+        checkBoxContinuous.setText("continuous");
+        contentPane.add(checkBoxContinuous, new GridBagConstraints(7, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 10), 0, 0));
+
+        //---- jLabel2 ----
+        jLabel2.setText("Port");
+        contentPane.add(jLabel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 5), 0, 0));
+        contentPane.add(jTextFieldPort, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 10), 0, 0));
+
+        //---- jButtonDisconnect ----
         jButtonDisconnect.setText("Disconnect");
-        jButtonDisconnect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButtonDisconnect.setEnabled(false);
+        jButtonDisconnect.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 jButtonDisconnectActionPerformed();
             }
         });
+        contentPane.add(jButtonDisconnect, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 10), 0, 0));
 
+        //---- jLabel4 ----
+        jLabel4.setText("Height");
+        contentPane.add(jLabel4, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 5, 5), 0, 0));
+        contentPane.add(jSpinnerHeight, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 10), 0, 0));
+
+        //---- jButtonSendRequest ----
         jButtonSendRequest.setText("Send Request");
-        jButtonSendRequest.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButtonSendRequest.setEnabled(false);
+        jButtonSendRequest.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 jButtonSendRequestActionPerformed();
             }
         });
+        contentPane.add(jButtonSendRequest, new GridBagConstraints(5, 2, 2, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 10), 0, 0));
 
-        jLabel1.setText("Host");
-        jLabel2.setText("Port");
-        jLabel3.setText("Width");
-        jLabel4.setText("Height");
-        jLabel5.setText("characters");
-        jButtonDisconnect.setEnabled(false);
-        jButtonSendRequest.setEnabled(false);
+        //======== imagePanel1 ========
+        {
+            imagePanel1.setBackground(new Color(51, 153, 255));
+            imagePanel1.setPreferredSize(new Dimension(500, 500));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jTextFieldPort, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextFieldHost, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButtonConnect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButtonDisconnect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(39, 39, 39)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jSpinnerHeight)
-                    .addComponent(jSpinnerWidth, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(14, 14, 14)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSpinnerChars))
-                    .addComponent(jButtonSendRequest))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
-                .addComponent(checkboxContinous, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextFieldHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButtonConnect)
-                        .addComponent(jLabel1))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextFieldPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonDisconnect)
-                    .addComponent(jLabel2)))
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                    .addGap(12, 12, 12)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jSpinnerWidth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel3)
-                        .addComponent(jLabel5)
-                        .addComponent(jSpinnerChars, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jSpinnerHeight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(jButtonSendRequest)))
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(checkboxContinous, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(35, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout imagePanel1Layout = new javax.swing.GroupLayout(imagePanel1);
-        imagePanel1.setLayout(imagePanel1Layout);
-        imagePanel1Layout.setHorizontalGroup(
-            imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGap(0, 544, Short.MAX_VALUE)
-        );
-        imagePanel1Layout.setVerticalGroup(
-            imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGap(0, 308, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addComponent(imagePanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(imagePanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+            { // compute preferred size
+                Dimension preferredSize = new Dimension();
+                for (int i = 0; i < imagePanel1.getComponentCount(); i++) {
+                    Rectangle bounds = imagePanel1.getComponent(i).getBounds();
+                    preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
+                    preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+                }
+                Insets insets = imagePanel1.getInsets();
+                preferredSize.width += insets.right;
+                preferredSize.height += insets.bottom;
+                imagePanel1.setMinimumSize(preferredSize);
+                imagePanel1.setPreferredSize(preferredSize);
+            }
+        }
+        contentPane.add(imagePanel1, new GridBagConstraints(0, 3, 9, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(8, 5, 8, 5), 0, 0));
         pack();
+        setLocationRelativeTo(getOwner());
     }
 
     /**
@@ -253,26 +282,25 @@ public class GraphicalCharGenClient extends javax.swing.JFrame implements ImageL
         });
     }
 
+    private JLabel jLabel1;
+    private JTextField jTextFieldHost;
+    private JButton jButtonConnect;
+    private JLabel jLabel3;
+    private JSpinner jSpinnerWidth;
+    private JLabel label5;
+    private JSpinner jSpinnerChars;
+    private JCheckBox checkBoxContinuous;
+    private JLabel jLabel2;
+    private JTextField jTextFieldPort;
+    private JButton jButtonDisconnect;
+    private JLabel jLabel4;
+    private JSpinner jSpinnerHeight;
+    private JButton jButtonSendRequest;
     private ImagePanel imagePanel1;
-    private javax.swing.JButton jButtonConnect;
-    private javax.swing.JButton jButtonDisconnect;
-    private javax.swing.JButton jButtonSendRequest;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JSpinner jSpinnerChars;
-    private javax.swing.JSpinner jSpinnerHeight;
-    private javax.swing.JSpinner jSpinnerWidth;
-    private javax.swing.JTextField jTextFieldHost;
-    private javax.swing.JTextField jTextFieldPort;
+
     private SpinnerNumberModel spinnerHeightModel = new SpinnerNumberModel(100, 50, 600, 25);
-    private SpinnerNumberModel spinnerWidthModel = new SpinnerNumberModel(175, 50, 1000, 25);
+    private SpinnerNumberModel spinnerWidthModel = new SpinnerNumberModel(200, 50, 1000, 25);
     private SpinnerNumberModel spinnerCharsModel = new SpinnerNumberModel(10, 1, 60, 1);
-    private Checkbox checkboxContinous;
+
     private ImageClient imageClient = new ImageClient(HOST, PORT, this);
-
 }
-
