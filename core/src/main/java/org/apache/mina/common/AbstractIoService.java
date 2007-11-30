@@ -135,6 +135,10 @@ public abstract class AbstractIoService implements IoService {
         this.listeners = new IoServiceListenerSupport(this);
         this.listeners.add(SERVICE_ACTIVATION_LISTENER);
         this.sessionConfig = sessionConfig;
+        
+        // Make JVM load the exception monitor before some transports
+        // change the thread context class loader.
+        ExceptionMonitor.getInstance();
     }
 
     public final IoFilterChainBuilder getFilterChainBuilder() {
