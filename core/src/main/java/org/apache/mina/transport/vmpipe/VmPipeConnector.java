@@ -61,7 +61,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected ConnectFuture doConnect(SocketAddress remoteAddress,
+    protected ConnectFuture connect0(SocketAddress remoteAddress,
                                       SocketAddress localAddress) {
         VmPipe entry = VmPipeAcceptor.boundHandlers.get(remoteAddress);
         if (entry == null) {

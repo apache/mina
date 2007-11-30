@@ -146,7 +146,7 @@ public abstract class AbstractIoConnector
             }
         }
 
-        return doConnect(remoteAddress, localAddress);
+        return connect0(remoteAddress, localAddress);
     }
 
     /**
@@ -154,7 +154,7 @@ public abstract class AbstractIoConnector
      *
      * @param localAddress <tt>null</tt> if no local address is specified
      */
-    protected abstract ConnectFuture doConnect(SocketAddress remoteAddress,
+    protected abstract ConnectFuture connect0(SocketAddress remoteAddress,
             SocketAddress localAddress);
 
     /**

@@ -136,7 +136,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
     @Override
     @SuppressWarnings("unchecked")
-    protected final ConnectFuture doConnect(SocketAddress remoteAddress,
+    protected final ConnectFuture connect0(SocketAddress remoteAddress,
                                       SocketAddress localAddress) {
         H handle = null;
         boolean success = false;
@@ -220,14 +220,13 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             }
 
             H handle = req.handle;
-
             try {
                 close(handle);
             } catch (Exception e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
+            } finally {
+                nHandles ++;
             }
-            
-            nHandles ++;
         }
         return nHandles;
     }
