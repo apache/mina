@@ -53,7 +53,7 @@ public final class SerialConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected ConnectFuture doConnect(SocketAddress remoteAddress,
+    protected ConnectFuture connect0(SocketAddress remoteAddress,
             SocketAddress localAddress) {
 
         CommPortIdentifier portId;
