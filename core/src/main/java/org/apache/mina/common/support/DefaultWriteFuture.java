@@ -54,6 +54,13 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
         super(session);
     }
 
+    /**
+     * Creates a new instance which uses the specified object as a lock.
+     */
+    public DefaultWriteFuture(IoSession session, Object lock) {
+        super(session, lock);
+    }
+
     public boolean isWritten() {
         if (isReady()) {
             return (Boolean) getValue();

@@ -291,6 +291,10 @@ public interface IoFilter {
                 throw new IllegalStateException(
                         "You can't add a listener to a dummy future.");
             }
+
+            public Object getLock() {
+                return this;
+            }
         };
 
         private final Object message;
@@ -361,6 +365,7 @@ public interface IoFilter {
             return destination;
         }
 
+        @Override
         public String toString() {
             return message.toString();
         }

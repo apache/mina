@@ -36,6 +36,13 @@ public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture {
         super(session);
     }
 
+    /**
+     * Creates a new instance which uses the specified object as a lock.
+     */
+    public DefaultCloseFuture(IoSession session, Object lock) {
+        super(session, lock);
+    }
+
     public boolean isClosed() {
         if (isReady()) {
             return (Boolean) getValue();

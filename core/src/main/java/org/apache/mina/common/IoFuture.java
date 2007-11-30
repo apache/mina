@@ -32,6 +32,11 @@ public interface IoFuture {
     IoSession getSession();
 
     /**
+     * Returns the lock object this future acquires.
+     */
+    Object getLock();
+
+    /**
      * Wait for the asynchronous operation to end.
      */
     void join();

@@ -47,6 +47,13 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
         super(null);
     }
 
+    /**
+     * Creates a new instance which uses the specified object as a lock.
+     */
+    public DefaultConnectFuture(Object lock) {
+        super(null, lock);
+    }
+
     @Override
     public IoSession getSession() throws RuntimeIOException {
         Object v = getValue();
