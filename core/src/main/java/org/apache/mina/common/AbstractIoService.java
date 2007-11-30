@@ -737,8 +737,11 @@ public abstract class AbstractIoService implements IoService {
             }
         }
 
-        public void setException(Exception cause) {
-            setValue(cause);
+        public void setException(Exception exception) {
+            if (exception == null) {
+                throw new NullPointerException("exception");
+            }
+            setValue(exception);
         }
     }
 }

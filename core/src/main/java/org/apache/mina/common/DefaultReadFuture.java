@@ -96,11 +96,18 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     }
 
     public void setRead(Object message) {
+        if (message == null) {
+            throw new NullPointerException("message");
+        }
         setValue(message);
     }
 
-    public void setException(Throwable cause) {
-        setValue(new ExceptionHolder(cause));
+    public void setException(Throwable exception) {
+        if (exception == null) {
+            throw new NullPointerException("exception");
+        }
+        
+        setValue(new ExceptionHolder(exception));
     }
 
     @Override

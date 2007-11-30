@@ -76,8 +76,12 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
         setValue(Boolean.TRUE);
     }
     
-    public void setException(Throwable cause) {
-        setValue(cause);
+    public void setException(Throwable exception) {
+        if (exception == null) {
+            throw new NullPointerException("exception");
+        }
+        
+        setValue(exception);
     }
 
     @Override
