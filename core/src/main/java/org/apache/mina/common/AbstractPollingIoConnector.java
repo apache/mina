@@ -268,7 +268,8 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             ConnectionRequest entry = connectionRequest(handle);
 
             if (currentTime >= entry.deadline) {
-                entry.setException(new ConnectException());
+                entry.setException(
+                        new ConnectException("Connection timed out."));
                 cancelQueue.offer(entry);
             }
         }
@@ -339,8 +340,12 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
         public ConnectionRequest(H handle) {
             this.handle = handle;
-            this.deadline = System.currentTimeMillis()
-                    + getConnectTimeoutMillis();
+            long timeout = getConnectTimeoutMillis();
+            if (timeout <= 0L) {
+                this.deadline = Long.MAX_VALUE;
+            } else {
+                this.deadline = System.currentTimeMillis() + timeout;
+            }
         }
 
         public H getHandle() {
