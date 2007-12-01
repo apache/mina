@@ -48,22 +48,26 @@ public class StateMachineProxyFactory {
     private StateMachineProxyFactory() {
     }
 
-    public static Object create(Class<?> iface, StateMachine sm) {
-        return create(new Class[] { iface }, sm);
+    @SuppressWarnings("unchecked")
+    public static <T> T create(Class<T> iface, StateMachine sm) {
+        return (T) create(new Class[] { iface }, sm);
     }
     
-    public static Object create(Class<?> iface, StateMachine sm, StateContextLookup contextLookup) {
-        return create(new Class[] { iface }, sm, contextLookup);
+    @SuppressWarnings("unchecked")
+    public static <T> T create(Class<T> iface, StateMachine sm, StateContextLookup contextLookup) {
+        return (T) create(new Class[] { iface }, sm, contextLookup);
     }
     
-    public static Object create(Class<?> iface, StateMachine sm, StateContextLookup contextLookup,
+    @SuppressWarnings("unchecked")
+    public static <T> T create(Class<T> iface, StateMachine sm, StateContextLookup contextLookup,
             EventArgumentsInterceptor interceptor) {
-        return create(new Class[] { iface }, sm, contextLookup, interceptor, new DefaultEventFactory());
+        return (T) create(new Class[] { iface }, sm, contextLookup, interceptor, new DefaultEventFactory());
     }
 
-    public static Object create(Class<?> iface, StateMachine sm, StateContextLookup contextLookup,
+    @SuppressWarnings("unchecked")
+    public static <T> T create(Class<T> iface, StateMachine sm, StateContextLookup contextLookup,
             EventArgumentsInterceptor interceptor, EventFactory eventFactory) {
-        return create(new Class[] { iface }, sm, contextLookup, interceptor, eventFactory);
+        return (T) create(new Class[] { iface }, sm, contextLookup, interceptor, eventFactory);
     }
     
     public static Object create(Class<?>[] ifaces, StateMachine sm) {
@@ -71,7 +75,6 @@ public class StateMachineProxyFactory {
     }
     
     public static Object create(Class<?>[] ifaces, StateMachine sm, StateContextLookup contextLookup) {
-
         return create(ifaces, sm, contextLookup, null, new DefaultEventFactory());
     }
     

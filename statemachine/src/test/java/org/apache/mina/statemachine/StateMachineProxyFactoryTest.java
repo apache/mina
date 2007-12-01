@@ -23,10 +23,6 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.statemachine.State;
-import org.apache.mina.statemachine.StateMachine;
-import org.apache.mina.statemachine.StateMachineFactory;
-import org.apache.mina.statemachine.StateMachineProxyFactory;
 import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.event.Event;
@@ -52,7 +48,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
         s3.addTransition(new MethodTransition("call3", handler));
 
         StateMachine sm = new StateMachine(new State[] { s1, s2, s3 }, "s1");
-        Reentrant reentrant = (Reentrant) StateMachineProxyFactory.create(Reentrant.class, sm);
+        Reentrant reentrant = StateMachineProxyFactory.create(Reentrant.class, sm);
         reentrant.call1(reentrant);
         assertTrue(handler.finished);
     }
@@ -76,7 +72,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
         s5.addTransition(new MethodTransition("pause", s3, "playing", handler));
 
         StateMachine sm = new StateMachine(new State[] { s1, s2, s3, s4, s5 }, "s1");
-        TapeDeck player = (TapeDeck) StateMachineProxyFactory.create(TapeDeck.class, sm);
+        TapeDeck player = StateMachineProxyFactory.create(TapeDeck.class, sm);
         player.insert("Kings of convenience - Riot on an empty street");
         player.start();
         player.pause();
@@ -101,7 +97,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
 
         StateMachine sm = StateMachineFactory.getInstance(Transition.class).create(TapeDeckStateMachineHandler.S1, handler);
 
-        TapeDeck player = (TapeDeck) StateMachineProxyFactory.create(TapeDeck.class, sm);
+        TapeDeck player = StateMachineProxyFactory.create(TapeDeck.class, sm);
         player.insert("Kings of convenience - Riot on an empty street");
         player.start();
         player.pause();

@@ -49,7 +49,7 @@ public class Main {
         StateMachine sm = StateMachineFactory.getInstance(IoHandlerTransition.class)
                                 .create(TapeDeckServer.EMPTY, new TapeDeckServer());
         
-        return (IoHandler) StateMachineProxyFactory.create(IoHandler.class, sm, 
+        return StateMachineProxyFactory.create(IoHandler.class, sm, 
                 new IoSessionStateContextLookup(new StateContextFactory() {
                     public StateContext create() {
                         return new TapeDeckServer.TapeDeckContext();
