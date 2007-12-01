@@ -21,6 +21,7 @@
 package org.apache.mina.example.imagine.step1.client;
 
 import org.apache.mina.example.imagine.step1.ImageRequest;
+import org.apache.mina.example.imagine.step1.server.ImageServer;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -44,7 +45,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 /**
- * Swing application that acts as a client of the ImageServer
+ * Swing application that acts as a client of the {@link ImageServer}
  *
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -66,8 +67,21 @@ public class GraphicalCharGenClient extends JFrame implements ImageListener {
     }
 
     private void jButtonConnectActionPerformed() {
-        setTitle("connecting...");
-        imageClient.connect();
+        try {
+            setTitle("connecting...");
+            String host = jTextFieldHost.getText();
+            int port = Integer.valueOf(jTextFieldPort.getText());
+            if (imageClient != null) {
+                imageClient.disconnect();
+            }
+            imageClient = new ImageClient(host, port, this);
+            imageClient.connect();
+            jButtonConnect.setEnabled(!imageClient.isConnected());
+        } catch (NumberFormatException e) {
+            onException(e);
+        } catch (IllegalArgumentException e) {
+            onException(e);
+        }
     }
 
     private void jButtonDisconnectActionPerformed() {
@@ -105,6 +119,8 @@ public class GraphicalCharGenClient extends JFrame implements ImageListener {
                 throwable.getMessage(),
                 JOptionPane.ERROR_MESSAGE);
         setTitle("");
+        jButtonConnect.setEnabled(!imageClient.isConnected());
+        jButtonDisconnect.setEnabled(imageClient.isConnected());
     }
 
     public void sessionOpened() {
@@ -146,7 +162,7 @@ public class GraphicalCharGenClient extends JFrame implements ImageListener {
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(700, 300));
-        setPreferredSize(new Dimension(720, 600));
+        setPreferredSize(new Dimension(740, 600));
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridBagLayout());
         ((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{36, 167, 99, 41, 66, 75, 57, 96, 0, 0};
