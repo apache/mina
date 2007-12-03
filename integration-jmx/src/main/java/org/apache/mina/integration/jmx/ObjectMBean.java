@@ -450,7 +450,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     
             // Ordinary property.
             String fqpn = prefix + pname;
-            boolean writable = p.getWriteMethod() != null | isWritable(type, pname);
+            boolean writable = p.getWriteMethod() != null;
             attributes.add(new ModelMBeanAttributeInfo(
                     fqpn, convertAttributeType(fqpn, p.getPropertyType()).getName(),
                     p.getShortDescription(),
@@ -537,11 +537,6 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
 
         return true;
-    }
-    
-    protected boolean isWritable(Class<?> type, String attrName) {
-        return IoService.class.isAssignableFrom(type) && 
-               attrName.equals("localAddresses");
     }
     
     protected boolean isExpandable(Class<?> type, String attrName) {
