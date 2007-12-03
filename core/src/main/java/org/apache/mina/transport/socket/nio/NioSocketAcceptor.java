@@ -170,9 +170,7 @@ public final class NioSocketAcceptor
             c.socket().setReceiveBufferSize(
                     getSessionConfig().getReceiveBufferSize());
             // and bind.
-            synchronized (c) {
-                c.socket().bind(localAddress, getBacklog());
-            }
+            c.socket().bind(localAddress, getBacklog());
             c.register(selector, SelectionKey.OP_ACCEPT);
             success = true;
         } finally {
@@ -186,9 +184,7 @@ public final class NioSocketAcceptor
     @Override
     protected SocketAddress localAddress(ServerSocketChannel handle)
             throws Exception {
-        synchronized (handle) {
-            return handle.socket().getLocalSocketAddress();
-        }
+        return handle.socket().getLocalSocketAddress();
     }
 
     @Override
