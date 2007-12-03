@@ -32,7 +32,7 @@ public class IoFilterMBean extends ObjectMBean<IoFilter> {
     }
     
     @Override
-    protected boolean isOperation(String methodName) {
+    protected boolean isOperation(String methodName, Class<?>[] paramTypes) {
         // Ignore some IoFilter methods.
         if (methodName.matches(
                 "(init|destroy|on(Pre|Post)(Add|Remove)|" +
@@ -42,6 +42,6 @@ public class IoFilterMBean extends ObjectMBean<IoFilter> {
             return false;
         }
         
-        return super.isOperation(methodName);
+        return super.isOperation(methodName, paramTypes);
     }
 }

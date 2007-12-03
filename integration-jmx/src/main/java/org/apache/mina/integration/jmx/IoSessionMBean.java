@@ -154,14 +154,14 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
     }
 
     @Override
-    protected boolean isOperation(String methodName) {
+    protected boolean isOperation(String methodName, Class<?>[] paramTypes) {
         // Ignore some IoSession methods.
         if (methodName.matches(
                 "(write|read|(remove|replace|contains)Attribute)")) {
             return false;
         }
         
-        return super.isOperation(methodName);
+        return super.isOperation(methodName, paramTypes);
     }
 
     @Override

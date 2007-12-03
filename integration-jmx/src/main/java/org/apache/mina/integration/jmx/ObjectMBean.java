@@ -450,7 +450,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     
             // Ordinary property.
             String fqpn = prefix + pname;
-            boolean writable = p.getWriteMethod() != null;
+            boolean writable = p.getWriteMethod() != null || isWritable(type, pname);
             attributes.add(new ModelMBeanAttributeInfo(
                     fqpn, convertAttributeType(fqpn, p.getPropertyType()).getName(),
                     p.getShortDescription(),
@@ -498,7 +498,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             }
             
             // Ignore other user-defined non-operations.
-            if (!isOperation(mname)) {
+            if (!isOperation(mname, m.getParameterTypes())) {
                 continue;
             }
             
@@ -539,6 +539,13 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         return true;
     }
     
+    protected boolean isWritable(Class<?> type, String attrName) {
+        if (IoService.class.isAssignableFrom(type) && attrName.startsWith("defaultLocalAddress")) {
+            return true;
+        }
+        return false;
+    }
+    
     protected boolean isExpandable(Class<?> type, String attrName) {
         if (IoService.class.isAssignableFrom(type) && attrName.equals("sessionConfig")) {
             return true;
@@ -567,7 +574,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     }
     
     @SuppressWarnings("unused")
-    protected boolean isOperation(String methodName) {
+    protected boolean isOperation(String methodName, Class<?>[] paramTypes) {
         return true;
     }
     

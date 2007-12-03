@@ -16,6 +16,7 @@
  */
 package org.apache.mina.integration.jmx;
 
+import java.net.SocketAddress;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -141,13 +142,20 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
     }
 
     @Override
-    protected boolean isOperation(String methodName) {
+    protected boolean isOperation(String methodName, Class<?>[] paramTypes) {
         // Ignore some IoServide methods.
         if (methodName.matches(
                 "(newSession|broadcast|(add|remove)Listener)")) {
             return false;
         }
+        
+        if ((methodName.equals("bind") || methodName.equals("unbind")) &&
+                (paramTypes.length > 1 ||
+                        (paramTypes.length == 1 && !SocketAddress.class.isAssignableFrom(paramTypes[0])))) {
+            return false;
+        }
+                
 
-        return super.isOperation(methodName);
+        return super.isOperation(methodName, paramTypes);
     }
 }
