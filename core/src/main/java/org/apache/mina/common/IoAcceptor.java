@@ -138,11 +138,11 @@ public interface IoAcceptor extends IoService {
     void bind(Iterable<? extends SocketAddress> localAddresses) throws IOException;
     
     /**
-     * Unbinds from the default local address(es) and stop to accept incoming
-     * connections.  All managed connections will be closed if
-     * {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property is
-     * <tt>true</tt>.  This method returns silently if the default local
-     * address(es) are not bound yet.
+     * Unbinds from all local addresses that this service is bound to and stops
+     * to accept incoming connections.  All managed connections will be closed
+     * if {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property
+     * is <tt>true</tt>.  This method returns silently if no local address is
+     * bound yet.
      */
     void unbind();
     
@@ -173,15 +173,6 @@ public interface IoAcceptor extends IoService {
      */
     void unbind(Iterable<? extends SocketAddress> localAddresses);
     
-    /**
-     * Unbinds from all local addresses that this service is bound to and stops
-     * to accept incoming connections.  All managed connections will be closed
-     * if {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property
-     * is <tt>true</tt>.  This method returns silently if no local address is
-     * bound yet.
-     */
-    void unbindAll();
-
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified
      * <tt>localAddress</tt> and the specified <tt>remoteAddress</tt> which

@@ -214,11 +214,7 @@ public abstract class AbstractIoAcceptor
     }
 
     public final void unbind() {
-        if (getDefaultLocalAddress() == null) {
-            throw new IllegalStateException(
-                    "defaultLocalAddress is null (i.e. any).");
-        }
-        unbind(getDefaultLocalAddresses());
+        unbind(getLocalAddresses());
     }
 
     public final void unbind(SocketAddress localAddress) {
@@ -244,10 +240,6 @@ public abstract class AbstractIoAcceptor
         localAddresses.add(firstLocalAddress);
         Collections.addAll(localAddresses, otherLocalAddresses);
         unbind(localAddresses);
-    }
-
-    public final void unbindAll() {
-        unbind(getLocalAddresses());
     }
 
     public final void unbind(Iterable<? extends SocketAddress> localAddresses) {

@@ -103,7 +103,7 @@ public class DatagramRecyclerTest extends TestCase {
             Assert.assertEquals("CROPSECL", connectorHandler.result.toString());
             Assert.assertEquals("CROPRECL", acceptorHandler.result.toString());
         } finally {
-            acceptor.unbindAll();
+            acceptor.unbind();
         }
     }
     
@@ -166,7 +166,7 @@ public class DatagramRecyclerTest extends TestCase {
             
             Assert.assertNotSame(oldSession, acceptorHandler.session);
         } finally {
-            acceptor.unbindAll();
+            acceptor.unbind();
         }
     }
 

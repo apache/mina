@@ -63,6 +63,6 @@ public class Main {
         // Wait until the match ends.
         session.getCloseFuture().awaitUninterruptibly();
 
-        acceptor.unbindAll();
+        acceptor.unbind();
     }
 }

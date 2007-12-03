@@ -132,7 +132,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     @Override
     protected IoFuture dispose0() throws Exception {
-        unbindAll();
+        unbind();
         if (!disposalFuture.isDone()) {
             startupWorker();
             wakeup();

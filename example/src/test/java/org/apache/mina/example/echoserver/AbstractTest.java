@@ -155,10 +155,10 @@ public abstract class AbstractTest extends TestCase {
             } catch (IOException e) {
             } finally {
                 if (socketBound && !datagramBound) {
-                    socketAcceptor.unbindAll();
+                    socketAcceptor.unbind();
                 }
                 if (datagramBound && !socketBound) {
-                    datagramAcceptor.unbindAll();
+                    datagramAcceptor.unbind();
                 }
             }
         }

@@ -138,7 +138,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     @Override
     protected IoFuture dispose0() throws Exception {
-        unbindAll();
+        unbind();
         if (!disposalFuture.isDone()) {
             startupWorker();
             wakeup();

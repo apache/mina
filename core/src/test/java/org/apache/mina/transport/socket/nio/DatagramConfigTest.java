@@ -94,7 +94,7 @@ public class DatagramConfigTest extends TestCase {
 
             Assert.assertEquals("FH", result);
         } finally {
-            acceptor.unbindAll();
+            acceptor.unbind();
         }
     }
 
