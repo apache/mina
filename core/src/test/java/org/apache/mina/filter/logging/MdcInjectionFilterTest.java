@@ -82,7 +82,7 @@ public class MdcInjectionFilterTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        acceptor.unbind();
+        acceptor.dispose();
         super.tearDown();
     }
 
@@ -158,8 +158,7 @@ public class MdcInjectionFilterTest extends TestCase {
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         SimpleIoHandler simpleIoHandler = new SimpleIoHandler();
         acceptor.setHandler(simpleIoHandler);
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
         acceptor.setFilterChainBuilder(chain);
         // create some clients
         NioSocketConnector connector = new NioSocketConnector();
@@ -192,8 +191,7 @@ public class MdcInjectionFilterTest extends TestCase {
         // configure the server
         SimpleIoHandler simpleIoHandler = new SimpleIoHandler();
         acceptor.setHandler(simpleIoHandler);
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
         acceptor.setFilterChainBuilder(chain);
         // create some clients
         NioSocketConnector connector = new NioSocketConnector();

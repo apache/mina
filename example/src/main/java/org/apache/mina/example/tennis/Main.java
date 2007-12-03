@@ -47,9 +47,8 @@ public class Main {
         VmPipeAddress address = new VmPipeAddress(8080);
 
         // Set up server
-        acceptor.setLocalAddress(address);
         acceptor.setHandler(new TennisPlayer());
-        acceptor.bind();
+        acceptor.bind(address);
 
         // Connect to the server.
         VmPipeConnector connector = new VmPipeConnector();
@@ -64,6 +63,6 @@ public class Main {
         // Wait until the match ends.
         session.getCloseFuture().awaitUninterruptibly();
 
-        acceptor.unbind();
+        acceptor.unbindAll();
     }
 }

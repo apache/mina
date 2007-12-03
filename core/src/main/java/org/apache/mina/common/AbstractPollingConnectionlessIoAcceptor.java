@@ -56,8 +56,10 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     private final boolean createdExecutor;
     private final String threadName;
     private final IoProcessor<T> processor = new ConnectionlessAcceptorProcessor();
-    private final Queue<ServiceOperationFuture> registerQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
-    private final Queue<ServiceOperationFuture> cancelQueue = new ConcurrentLinkedQueue<ServiceOperationFuture>();
+    private final Queue<AcceptorOperationFuture> registerQueue = 
+        new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> cancelQueue = 
+        new ConcurrentLinkedQueue<AcceptorOperationFuture>();
     private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
     private final Map<SocketAddress, H> boundHandles =
         Collections.synchronizedMap(new HashMap<SocketAddress, H>());
@@ -118,8 +120,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected abstract boolean select(int timeout) throws Exception;
     protected abstract void wakeup();
     protected abstract Iterator<H> selectedHandles();
-    protected abstract H bind(SocketAddress localAddress) throws Exception;
-    protected abstract void unbind(H handle) throws Exception;
+    protected abstract H open(SocketAddress localAddress) throws Exception;
+    protected abstract void close(H handle) throws Exception;
     protected abstract SocketAddress localAddress(H handle) throws Exception;
     protected abstract boolean isReadable(H handle);
     protected abstract boolean isWritable(H handle);
@@ -130,7 +132,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     @Override
     protected IoFuture dispose0() throws Exception {
-        unbind();
+        unbindAll();
         if (!disposalFuture.isDone()) {
             startupWorker();
             wakeup();
@@ -139,8 +141,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     }
 
     @Override
-    protected final void bind0() throws Exception {
-        ServiceOperationFuture request = new ServiceOperationFuture();
+    protected final Set<SocketAddress> bind0(
+            List<? extends SocketAddress> localAddresses) throws Exception {
+        AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
 
         registerQueue.add(request);
         startupWorker();
@@ -156,12 +159,13 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         for (H handle: boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
         }
-        setLocalAddresses(newLocalAddresses);
+        return newLocalAddresses;
     }
 
     @Override
-    protected final void unbind0() throws Exception {
-        ServiceOperationFuture request = new ServiceOperationFuture();
+    protected final void unbind0(
+            List<? extends SocketAddress> localAddresses) throws Exception {
+        AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
 
         cancelQueue.add(request);
         startupWorker();
@@ -479,29 +483,24 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     }
 
     private int registerHandles() {
-        if (registerQueue.isEmpty()) {
-            return 0;
-        }
-
-        for (; ;) {
-            ServiceOperationFuture req = registerQueue.poll();
+        for (;;) {
+            AcceptorOperationFuture req = registerQueue.poll();
             if (req == null) {
                 break;
             }
 
             Map<SocketAddress, H> newHandles = new HashMap<SocketAddress, H>();
-            List<SocketAddress> localAddresses = getLocalAddresses();
+            List<SocketAddress> localAddresses = req.getLocalAddresses();
             try {
                 for (SocketAddress a: localAddresses) {
-                    H handle = bind(a);
+                    H handle = open(a);
                     newHandles.put(localAddress(handle), handle);
                 }
-                
                 boundHandles.putAll(newHandles);
                 
                 getListeners().fireServiceActivated();
                 req.setDone();
-                return boundHandles.size();
+                return newHandles.size();
             } catch (Exception e) {
                 req.setException(e);
             } finally {
@@ -509,7 +508,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                 if (req.getException() != null) {
                     for (H handle: newHandles.values()) {
                         try {
-                            unbind(handle);
+                            close(handle);
                         } catch (Exception e) {
                             ExceptionMonitor.getInstance().exceptionCaught(e);
                         }
@@ -524,24 +523,29 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     private int unregisterHandles() {
         int nHandles = 0;
-        for (; ;) {
-            ServiceOperationFuture request = cancelQueue.poll();
+        for (;;) {
+            AcceptorOperationFuture request = cancelQueue.poll();
             if (request == null) {
                 break;
             }
 
             // close the channels
-            for (H handle: boundHandles.values()) {
-                try {
-                    unbind(handle);
-                    wakeup(); // wake up again to trigger thread death
-                } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
+            for (SocketAddress a: request.getLocalAddresses()) {
+                H handle = boundHandles.remove(a);
+                if (handle == null) {
+                    continue;
                 }
-                nHandles ++;
+
+                try {
+                    close(handle);
+                    wakeup(); // wake up again to trigger thread death
+                } catch (Throwable e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                } finally {
+                    nHandles ++;
+                }
             }
             
-            boundHandles.clear();
             request.setDone();
         }
         

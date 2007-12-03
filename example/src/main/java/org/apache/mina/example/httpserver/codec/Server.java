@@ -57,10 +57,8 @@ public class Server {
                     new ProtocolCodecFilter(
                             new HttpServerProtocolCodecFactory()));
             acceptor.getFilterChain().addLast("logger", new LoggingFilter());
-
-            acceptor.setLocalAddress(new InetSocketAddress(port));
             acceptor.setHandler(new ServerHandler());
-            acceptor.bind();
+            acceptor.bind(new InetSocketAddress(port));
 
             System.out.println("Server now listening on port " + port);
         } catch (Exception ex) {

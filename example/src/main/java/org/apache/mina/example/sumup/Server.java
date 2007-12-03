@@ -57,9 +57,8 @@ public class Server {
         }
         acceptor.getFilterChain().addLast("logger", new LoggingFilter());
 
-        acceptor.setLocalAddress(new InetSocketAddress(SERVER_PORT));
         acceptor.setHandler(new ServerSessionHandler());
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(SERVER_PORT));
 
         System.out.println("Listening on port " + SERVER_PORT);
     }

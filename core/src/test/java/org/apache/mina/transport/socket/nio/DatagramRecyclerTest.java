@@ -40,11 +40,24 @@ import org.apache.mina.util.AvailablePortFinder;
  * @version $Rev$, $Date$
  */
 public class DatagramRecyclerTest extends TestCase {
-    private final NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
-
-    private final NioDatagramConnector connector = new NioDatagramConnector();
+    private NioDatagramAcceptor acceptor;
+    private NioDatagramConnector connector;
 
     public DatagramRecyclerTest() {
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        acceptor = new NioDatagramAcceptor();
+        connector = new NioDatagramConnector();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        acceptor.dispose();
+        connector.dispose();
     }
 
     public void testDatagramRecycler() throws Exception {
@@ -54,10 +67,9 @@ public class DatagramRecyclerTest extends TestCase {
         MockHandler acceptorHandler = new MockHandler();
         MockHandler connectorHandler = new MockHandler();
 
-        acceptor.setLocalAddress(new InetSocketAddress(port));
         acceptor.setHandler(acceptorHandler);
         acceptor.setSessionRecycler(recycler);
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(port));
 
         try {
             connector.setHandler(connectorHandler);
@@ -91,7 +103,7 @@ public class DatagramRecyclerTest extends TestCase {
             Assert.assertEquals("CROPSECL", connectorHandler.result.toString());
             Assert.assertEquals("CROPRECL", acceptorHandler.result.toString());
         } finally {
-            acceptor.unbind();
+            acceptor.unbindAll();
         }
     }
     
@@ -102,11 +114,10 @@ public class DatagramRecyclerTest extends TestCase {
         MockHandler acceptorHandler = new MockHandler();
         MockHandler connectorHandler = new MockHandler();
 
-        acceptor.setLocalAddress(new InetSocketAddress(port));
         acceptor.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, 1);
         acceptor.setHandler(acceptorHandler);
         acceptor.setSessionRecycler(recycler);
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(port));
 
         try {
             connector.setHandler(connectorHandler);
@@ -155,7 +166,7 @@ public class DatagramRecyclerTest extends TestCase {
             
             Assert.assertNotSame(oldSession, acceptorHandler.session);
         } finally {
-            acceptor.unbind();
+            acceptor.unbindAll();
         }
     }
 

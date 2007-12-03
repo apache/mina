@@ -19,8 +19,9 @@
  */
 package org.apache.mina.common;
 
-import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A dummy {@link IoSession} for unit-testing or non-network-use of
@@ -75,12 +76,12 @@ public class DummySession extends AbstractIoSession {
                 }) {
 
             @Override
-            protected void bind0() throws IOException {
+            protected Set<SocketAddress> bind0(List<? extends SocketAddress> localAddresses) throws Exception {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            protected void unbind0() {
+            protected void unbind0(List<? extends SocketAddress> localAddresses) throws Exception {
                 throw new UnsupportedOperationException();
             }
 
@@ -100,7 +101,6 @@ public class DummySession extends AbstractIoSession {
 
         // Set meaningless default values.
         acceptor.setHandler(new IoHandlerAdapter());
-        acceptor.setLocalAddress(ANONYMOUS_ADDRESS);
 
         this.service = acceptor;
 

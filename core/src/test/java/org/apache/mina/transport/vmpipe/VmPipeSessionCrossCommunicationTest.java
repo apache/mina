@@ -62,8 +62,7 @@ public class VmPipeSessionCrossCommunicationTest extends TestCase {
                 }
             }
         });
-        acceptor.setLocalAddress(address);
-        acceptor.bind();
+        acceptor.bind(address);
 
         connector.setHandler(new IoHandlerAdapter() {
             @Override
@@ -143,6 +142,6 @@ public class VmPipeSessionCrossCommunicationTest extends TestCase {
         }
 
         acceptor.setDisconnectOnUnbind(false);
-        acceptor.unbind();
+        acceptor.dispose();
     }
 }

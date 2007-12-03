@@ -351,18 +351,15 @@ public class StreamWriteFilterTest extends TestCase {
         SenderHandler sender = new SenderHandler(stream);
         ReceiverHandler receiver = new ReceiverHandler(stream.size);
 
-        acceptor.setLocalAddress(address);
         acceptor.setHandler(sender);
-
         connector.setHandler(receiver);
-
-        acceptor.bind();
-
+        
+        acceptor.bind(address);
         connector.connect(address);
         sender.latch.await();
         receiver.latch.await();
 
-        acceptor.unbind();
+        acceptor.dispose();
 
         assertEquals(stream.bytesRead, receiver.bytesRead);
         assertEquals(stream.size, receiver.bytesRead);

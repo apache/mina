@@ -99,9 +99,14 @@ public final class NioSocketAcceptor
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
+    
+    @Override
+    public InetSocketAddress getDefaultLocalAddress() {
+        return (InetSocketAddress) super.getDefaultLocalAddress();
+    }
 
-    public void setLocalAddress(InetSocketAddress localAddress) {
-        setLocalAddress((SocketAddress) localAddress);
+    public void setDefaultLocalAddress(InetSocketAddress localAddress) {
+        setDefaultLocalAddress((SocketAddress) localAddress);
     }
 
     public boolean isReuseAddress() {
@@ -154,7 +159,7 @@ public final class NioSocketAcceptor
     }
 
     @Override
-    protected ServerSocketChannel bind(SocketAddress localAddress)
+    protected ServerSocketChannel open(SocketAddress localAddress)
             throws Exception {
         ServerSocketChannel c = ServerSocketChannel.open();
         boolean success = false;
@@ -165,12 +170,14 @@ public final class NioSocketAcceptor
             c.socket().setReceiveBufferSize(
                     getSessionConfig().getReceiveBufferSize());
             // and bind.
-            c.socket().bind(localAddress, getBacklog());
+            synchronized (c) {
+                c.socket().bind(localAddress, getBacklog());
+            }
             c.register(selector, SelectionKey.OP_ACCEPT);
             success = true;
         } finally {
             if (!success) {
-                unbind(c);
+                close(c);
             }
         }
         return c;
@@ -179,7 +186,9 @@ public final class NioSocketAcceptor
     @Override
     protected SocketAddress localAddress(ServerSocketChannel handle)
             throws Exception {
-        return handle.socket().getLocalSocketAddress();
+        synchronized (handle) {
+            return handle.socket().getLocalSocketAddress();
+        }
     }
 
     @Override
@@ -193,7 +202,7 @@ public final class NioSocketAcceptor
     }
 
     @Override
-    protected void unbind(ServerSocketChannel handle) throws Exception {
+    protected void close(ServerSocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
         if (key != null) {
             key.cancel();

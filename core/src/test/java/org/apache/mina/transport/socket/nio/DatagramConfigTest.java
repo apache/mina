@@ -43,10 +43,8 @@ import org.apache.mina.util.AvailablePortFinder;
  * @version $Rev$, $Date$
  */
 public class DatagramConfigTest extends TestCase {
-    private final IoAcceptor acceptor = new NioDatagramAcceptor();
-
-    private final IoConnector connector = new NioDatagramConnector();
-
+    private IoAcceptor acceptor;
+    private IoConnector connector;
     private String result;
 
     public DatagramConfigTest() {
@@ -55,6 +53,14 @@ public class DatagramConfigTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         result = "";
+        acceptor = new NioDatagramAcceptor();
+        connector = new NioDatagramConnector();
+    }
+    
+    @Override
+    protected void tearDown() throws Exception {
+        acceptor.dispose();
+        connector.dispose();
     }
 
     public void testAcceptorFilterChain() throws Exception {
@@ -63,9 +69,8 @@ public class DatagramConfigTest extends TestCase {
         IoHandler mockHandler = new MockHandler();
 
         acceptor.getFilterChain().addLast("mock", mockFilter);
-        acceptor.setLocalAddress(new InetSocketAddress(port));
         acceptor.setHandler(mockHandler);
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(port));
 
         try {
             connector.setHandler(new IoHandlerAdapter());
@@ -89,7 +94,7 @@ public class DatagramConfigTest extends TestCase {
 
             Assert.assertEquals("FH", result);
         } finally {
-            acceptor.unbind();
+            acceptor.unbindAll();
         }
     }
 

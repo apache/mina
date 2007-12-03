@@ -60,7 +60,6 @@ public class MemoryMonitor {
     public MemoryMonitor() throws IOException {
 
         NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new MemoryMonitorHandler(this));
 
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
@@ -78,7 +77,7 @@ public class MemoryMonitor {
         frame.setLocation(300, 300);
         frame.setVisible(true);
 
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
         System.out.println("UDPServer listening on port " + PORT);
     }
 

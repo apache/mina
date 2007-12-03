@@ -21,10 +21,11 @@ package org.apache.mina.transport.vmpipe;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.IoFuture;
@@ -63,23 +64,27 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
         return (VmPipeAddress) super.getLocalAddress();
     }
 
+    @Override
+    public VmPipeAddress getDefaultLocalAddress() {
+        return (VmPipeAddress) super.getDefaultLocalAddress();
+    }
+
     // This method is overriden to work around a problem with
     // bean property access mechanism.
 
-    public void setLocalAddress(VmPipeAddress localAddress) {
-        super.setLocalAddress(localAddress);
+    public void setDefaultLocalAddress(VmPipeAddress localAddress) {
+        super.setDefaultLocalAddress(localAddress);
     }
 
     @Override
     protected IoFuture dispose0() throws Exception {
-        unbind();
+        unbindAll();
         return null;
     }
 
     @Override
-    protected void bind0() throws IOException {
-        List<SocketAddress> localAddresses = getLocalAddresses();
-        List<SocketAddress> newLocalAddresses = new ArrayList<SocketAddress>();
+    protected Set<SocketAddress> bind0(List<? extends SocketAddress> localAddresses) throws IOException {
+        Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
 
         synchronized (boundHandlers) {
             for (SocketAddress a: localAddresses) {
@@ -121,16 +126,16 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
             }
         }
 
-        setLocalAddresses(newLocalAddresses);
+        return newLocalAddresses;
     }
 
     @Override
-    protected void unbind0() {
+    protected void unbind0(List<? extends SocketAddress> localAddresses) {
         synchronized (boundHandlers) {
-            boundHandlers.remove(getLocalAddress());
+            for (SocketAddress a: localAddresses) {
+                boundHandlers.remove(a);
+            }
         }
-
-        getListeners().fireServiceDeactivated();
     }
 
     public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {

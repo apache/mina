@@ -55,16 +55,15 @@ public abstract class AbstractTrafficControlTest extends TestCase {
         super.setUp();
 
         port = AvailablePortFinder.getNextAvailable();
-        acceptor.setLocalAddress(createServerSocketAddress(port));
         acceptor.setHandler(new ServerIoHandler());
-        acceptor.bind();
+        acceptor.bind(createServerSocketAddress(port));
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
 
-        acceptor.unbind();
+        acceptor.dispose();
     }
 
     protected abstract ConnectFuture connect(int port, IoHandler handler)

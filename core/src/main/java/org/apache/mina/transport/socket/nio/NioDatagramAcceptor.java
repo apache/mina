@@ -88,13 +88,18 @@ public final class NioDatagramAcceptor
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
+    
+    @Override
+    public InetSocketAddress getDefaultLocalAddress() {
+        return (InetSocketAddress) super.getDefaultLocalAddress();
+    }
 
-    public void setLocalAddress(InetSocketAddress localAddress) {
-        setLocalAddress((SocketAddress) localAddress);
+    public void setDefaultLocalAddress(InetSocketAddress localAddress) {
+        setDefaultLocalAddress((SocketAddress) localAddress);
     }
 
     @Override
-    protected DatagramChannel bind(SocketAddress localAddress) throws Exception {
+    protected DatagramChannel open(SocketAddress localAddress) throws Exception {
         DatagramChannel c = DatagramChannel.open();
         boolean success = false;
         try {
@@ -114,7 +119,7 @@ public final class NioDatagramAcceptor
             success = true;
         } finally {
             if (!success) {
-                unbind(c);
+                close(c);
             }
         }
 
@@ -205,7 +210,7 @@ public final class NioDatagramAcceptor
     }
 
     @Override
-    protected void unbind(DatagramChannel handle) throws Exception {
+    protected void close(DatagramChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
         if (key != null) {
             key.cancel();

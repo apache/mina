@@ -25,8 +25,8 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
@@ -108,7 +108,6 @@ public abstract class AbstractTest extends TestCase {
             address = new InetSocketAddress(port);
 
             try {
-                socketAcceptor.setLocalAddress(address);
                 socketAcceptor.setHandler(new EchoProtocolHandler() {
                     @Override
                     public void sessionCreated(IoSession session) {
@@ -145,22 +144,21 @@ public abstract class AbstractTest extends TestCase {
                         }
                     }
                 });
-                socketAcceptor.bind();
+                socketAcceptor.bind(address);
                 socketBound = true;
 
-                datagramAcceptor.setLocalAddress(address);
                 datagramAcceptor.setHandler(new EchoProtocolHandler());
-                datagramAcceptor.bind();
+                datagramAcceptor.bind(address);
                 datagramBound = true;
 
                 break;
             } catch (IOException e) {
             } finally {
                 if (socketBound && !datagramBound) {
-                    socketAcceptor.unbind();
+                    socketAcceptor.unbindAll();
                 }
                 if (datagramBound && !socketBound) {
-                    datagramAcceptor.unbind();
+                    datagramAcceptor.unbindAll();
                 }
             }
         }
@@ -177,8 +175,8 @@ public abstract class AbstractTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         if (boundAddress != null) {
-            socketAcceptor.unbind();
-            datagramAcceptor.unbind();
+            socketAcceptor.dispose();
+            datagramAcceptor.dispose();
         }
     }
 }

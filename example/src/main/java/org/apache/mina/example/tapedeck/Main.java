@@ -64,7 +64,6 @@ public class Main {
                 new TextLineEncoder(), new CommandDecoder());
         acceptor.getFilterChain().addLast("codec", pcf);
         acceptor.setHandler(createIoHandler());
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
     }
 }

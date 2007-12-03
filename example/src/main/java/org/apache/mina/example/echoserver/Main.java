@@ -51,9 +51,8 @@ public class Main {
         }
 
         // Bind
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new EchoProtocolHandler());
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
 
         System.out.println("Listening on port " + PORT);
         

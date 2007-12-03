@@ -720,20 +720,20 @@ public abstract class AbstractIoService implements IoService {
     @SuppressWarnings("unused")
     protected void finishSessionInitialization0(IoSession session, IoFuture future) {}
 
-    protected static final class ServiceOperationFuture extends DefaultIoFuture {
+    protected static class ServiceOperationFuture extends DefaultIoFuture {
         public ServiceOperationFuture() {
             super(null);
         }
 
-        public boolean isDone() {
+        public final boolean isDone() {
             return getValue() == Boolean.TRUE;
         }
 
-        public void setDone() {
+        public final void setDone() {
             setValue(Boolean.TRUE);
         }
 
-        public Exception getException() {
+        public final Exception getException() {
             if (getValue() instanceof Exception) {
                 return (Exception) getValue();
             } else {
@@ -741,7 +741,7 @@ public abstract class AbstractIoService implements IoService {
             }
         }
 
-        public void setException(Exception exception) {
+        public final void setException(Exception exception) {
             if (exception == null) {
                 throw new NullPointerException("exception");
             }

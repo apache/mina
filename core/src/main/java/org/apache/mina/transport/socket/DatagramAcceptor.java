@@ -32,7 +32,8 @@ import org.apache.mina.common.IoSessionRecycler;
  */
 public interface DatagramAcceptor extends DatagramService, IoAcceptor {
     InetSocketAddress getLocalAddress();
-    void setLocalAddress(InetSocketAddress localAddress);
+    InetSocketAddress getDefaultLocalAddress();
+    void setDefaultLocalAddress(InetSocketAddress localAddress);
 
     /**
      * Returns the {@link IoSessionRecycler} for this service.

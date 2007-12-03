@@ -22,6 +22,7 @@ package org.apache.mina.common;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Accepts incoming connection, communicates with clients, and fires events to
@@ -43,43 +44,54 @@ import java.util.List;
  */
 public interface IoAcceptor extends IoService {
     /**
-     * Returns the local address to bind.  If more than one address are set,
-     * one of them will be returned, but it's not necessarily the firstly
-     * specified address in {@link #setLocalAddresses(SocketAddress...)}.
+     * Returns the local address which is bound currently.  If more than one
+     * address are bound, only one of them will be returned, but it's not
+     * necessarily the firstly bound address.
      */
     SocketAddress getLocalAddress();
     
     /**
-     * Returns a {@link List} of the local addresses to bind.
-     *
-     * @throws IllegalStateException if this service is already running.
+     * Returns a {@link Set} of the local addresses which are bound currently.
      */
-    List<SocketAddress> getLocalAddresses();
+    Set<SocketAddress> getLocalAddresses();
 
     /**
-     * Sets the local address to bind.
-     *
-     * @throws IllegalStateException if this service is already running.
+     * Returns the default local address to bind when no argument is specified
+     * in {@link #bind()} method.  Please note that the default will not be
+     * used if any local address is specified.  If more than one address are
+     * set, only one of them will be returned, but it's not necessarily the
+     * firstly specified address in {@link #setDefaultLocalAddresses(SocketAddress...)}.
+     * 
      */
-    void setLocalAddress(SocketAddress localAddress);
+    SocketAddress getDefaultLocalAddress();
     
     /**
-     * Sets the local addresses to bind.  If more than one address is
-     * specified, {@link #bind()} method binds to all the addresses with
-     * the same {@link IoHandler}.
-     *
-     * @throws IllegalStateException if this service is already running.
+     * Returns a {@link List} of the default local addresses to bind when no
+     * argument is specified in {@link #bind()} method.  Please note that the
+     * default will not be used if any local address is specified.
      */
-    void setLocalAddresses(SocketAddress... localAddresses);
+    List<SocketAddress> getDefaultLocalAddresses();
+
+    /**
+     * Sets the default local address to bind when no argument is specified in
+     * {@link #bind()} method.  Please note that the default will not be used
+     * if any local address is specified.
+     */
+    void setDefaultLocalAddress(SocketAddress localAddress);
     
     /**
-     * Sets the local addresses to bind.  If more than one address is
-     * specified, {@link #bind()} method binds to all the addresses with
-     * the same {@link IoHandler}.
-     *
-     * @throws IllegalStateException if this service is already running.
+     * Sets the default local addresses to bind when no argument is specified
+     * in {@link #bind()} method.  Please note that the default will not be
+     * used if any local address is specified.
      */
-    void setLocalAddresses(Iterable<SocketAddress> localAddresses);
+    void setDefaultLocalAddresses(SocketAddress... localAddresses);
+    
+    /**
+     * Sets the default local addresses to bind when no argument is specified
+     * in {@link #bind()} method.  Please note that the default will not be
+     * used if any local address is specified.
+     */
+    void setDefaultLocalAddresses(Iterable<? extends SocketAddress> localAddresses);
 
     /**
      * Returns <tt>true</tt> if and only if all clients are disconnected
@@ -94,18 +106,81 @@ public interface IoAcceptor extends IoService {
     void setDisconnectOnUnbind(boolean disconnectOnUnbind);
 
     /**
-     * Bind to the configured local address and start to accept incoming connections.
+     * Binds to the default local address(es) and start to accept incoming
+     * connections.
      *
      * @throws IOException if failed to bind
      */
     void bind() throws IOException;
-
+    
     /**
-     * Unbind from the configured local address and stop to accept incoming connections.
-     * All managed connections will be closed if <tt>disconnectOnUnbind</tt> property is set.
-     * This method does nothing if not bound yet.
+     * Binds to the specified local address and start to accept incoming
+     * connections.
+     *
+     * @throws IOException if failed to bind
+     */
+    void bind(SocketAddress localAddress) throws IOException;
+    
+    /**
+     * Binds to the specified local addresses and start to accept incoming
+     * connections.
+     *
+     * @throws IOException if failed to bind
+     */
+    void bind(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses) throws IOException;
+    
+    /**
+     * Binds to the specified local addresses and start to accept incoming
+     * connections.
+     *
+     * @throws IOException if failed to bind
+     */
+    void bind(Iterable<? extends SocketAddress> localAddresses) throws IOException;
+    
+    /**
+     * Unbinds from the default local address(es) and stop to accept incoming
+     * connections.  All managed connections will be closed if
+     * {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property is
+     * <tt>true</tt>.  This method returns silently if the default local
+     * address(es) are not bound yet.
      */
     void unbind();
+    
+    /**
+     * Unbinds from the specified local address and stop to accept incoming
+     * connections.  All managed connections will be closed if
+     * {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property is
+     * <tt>true</tt>.  This method returns silently if the default local
+     * address is not bound yet.
+     */
+    void unbind(SocketAddress localAddress);
+    
+    /**
+     * Unbinds from the specified local addresses and stop to accept incoming
+     * connections.  All managed connections will be closed if
+     * {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property is
+     * <tt>true</tt>.  This method returns silently if the default local
+     * addresses are not bound yet.
+     */
+    void unbind(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses);
+    
+    /**
+     * Unbinds from the specified local addresses and stop to accept incoming
+     * connections.  All managed connections will be closed if
+     * {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property is
+     * <tt>true</tt>.  This method returns silently if the default local
+     * addresses are not bound yet.
+     */
+    void unbind(Iterable<? extends SocketAddress> localAddresses);
+    
+    /**
+     * Unbinds from all local addresses that this service is bound to and stops
+     * to accept incoming connections.  All managed connections will be closed
+     * if {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property
+     * is <tt>true</tt>.  This method returns silently if no local address is
+     * bound yet.
+     */
+    void unbindAll();
 
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified

@@ -19,12 +19,12 @@
  */
 package org.apache.mina.example.imagine.step1.server;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
 import org.apache.mina.example.imagine.step1.codec.ImageCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
 
 /**
  * entry point for the server used in the tutorial on protocol codecs
@@ -40,9 +40,8 @@ public class ImageServer {
         ImageServerIoHandler handler = new ImageServerIoHandler();
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.getFilterChain().addLast("protocol", new ProtocolCodecFilter(new ImageCodecFactory(false)));
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(handler);
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
         System.out.println("server is listenig at port " + PORT);
     }
 }

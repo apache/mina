@@ -37,7 +37,7 @@ public class SslFilterTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         acceptor.setDisconnectOnUnbind(true);
-        acceptor.unbind();
+        acceptor.dispose();
         super.tearDown();
     }
 
@@ -60,11 +60,9 @@ public class SslFilterTest extends TestCase {
                 new ProtocolCodecFilter(new TextLineCodecFactory(Charset
                         .forName("UTF-8"))));
 
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
-
         EchoHandler handler = new EchoHandler();
         acceptor.setHandler(handler);
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
         System.out.println("MINA server started.");
 
         Socket socket = getClientSocket(useSSL);

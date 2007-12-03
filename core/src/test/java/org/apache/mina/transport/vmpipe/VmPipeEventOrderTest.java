@@ -42,7 +42,6 @@ public class VmPipeEventOrderTest extends TestCase {
         IoConnector connector = new VmPipeConnector();
         //connector.getFilterChain().addLast( "logger", new LoggingFilter() );
 
-        acceptor.setLocalAddress(new VmPipeAddress(1));
         acceptor.setHandler(new IoHandlerAdapter() {
             @Override
             public void sessionOpened(IoSession session) throws Exception {
@@ -56,7 +55,7 @@ public class VmPipeEventOrderTest extends TestCase {
             }
         });
 
-        acceptor.bind();
+        acceptor.bind(new VmPipeAddress(1));
 
         final StringBuffer actual = new StringBuffer();
 
@@ -84,7 +83,7 @@ public class VmPipeEventOrderTest extends TestCase {
 
         future.awaitUninterruptibly();
         future.getSession().getCloseFuture().awaitUninterruptibly();
-        acceptor.unbind();
+        acceptor.dispose();
 
         // sessionClosed() might not be invoked yet
         // even if the connection is closed.
@@ -104,7 +103,6 @@ public class VmPipeEventOrderTest extends TestCase {
 
         final StringBuffer actual = new StringBuffer();
 
-        acceptor.setLocalAddress(new VmPipeAddress(1));
         acceptor.setHandler(new IoHandlerAdapter() {
 
             @Override
@@ -125,7 +123,7 @@ public class VmPipeEventOrderTest extends TestCase {
 
         });
 
-        acceptor.bind();
+        acceptor.bind(new VmPipeAddress(1));
 
         connector.setHandler(new IoHandlerAdapter() {
             @Override
@@ -144,7 +142,8 @@ public class VmPipeEventOrderTest extends TestCase {
 
         future.awaitUninterruptibly();
         future.getSession().getCloseFuture().awaitUninterruptibly();
-        acceptor.unbind();
+        acceptor.dispose();
+        connector.dispose();
 
         // sessionClosed() might not be invoked yet
         // even if the connection is closed.

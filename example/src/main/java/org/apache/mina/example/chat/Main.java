@@ -19,6 +19,8 @@
  */
 package org.apache.mina.example.chat;
 
+import java.net.InetSocketAddress;
+
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -27,8 +29,6 @@ import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
-
-import java.net.InetSocketAddress;
 
 /**
  * (<b>Entry point</b>) Chat server
@@ -61,9 +61,8 @@ public class Main {
         addLogger(chain);
 
         // Bind
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new ChatProtocolHandler());
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
 
         System.out.println("Listening on port " + PORT);
     }

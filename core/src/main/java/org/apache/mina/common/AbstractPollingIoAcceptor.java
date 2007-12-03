@@ -55,10 +55,10 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     private final Object lock = new Object();
 
-    private final Queue<ServiceOperationFuture> registerQueue =
-        new ConcurrentLinkedQueue<ServiceOperationFuture>();
-    private final Queue<ServiceOperationFuture> cancelQueue =
-        new ConcurrentLinkedQueue<ServiceOperationFuture>();
+    private final Queue<AcceptorOperationFuture> registerQueue =
+        new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> cancelQueue =
+        new ConcurrentLinkedQueue<AcceptorOperationFuture>();
 
     private final Map<SocketAddress, H> boundHandles =
         Collections.synchronizedMap(new HashMap<SocketAddress, H>());
@@ -131,14 +131,14 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected abstract boolean select() throws Exception;
     protected abstract void wakeup();
     protected abstract Iterator<H> selectedHandles();
-    protected abstract H bind(SocketAddress localAddress) throws Exception;
+    protected abstract H open(SocketAddress localAddress) throws Exception;
     protected abstract SocketAddress localAddress(H handle) throws Exception;
     protected abstract T accept(IoProcessor<T> processor, H handle) throws Exception;
-    protected abstract void unbind(H handle) throws Exception;
+    protected abstract void close(H handle) throws Exception;
 
     @Override
     protected IoFuture dispose0() throws Exception {
-        unbind();
+        unbindAll();
         if (!disposalFuture.isDone()) {
             startupWorker();
             wakeup();
@@ -147,8 +147,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     }
 
     @Override
-    protected final void bind0() throws Exception {
-        ServiceOperationFuture request = new ServiceOperationFuture();
+    protected final Set<SocketAddress> bind0(List<? extends SocketAddress> localAddresses) throws Exception {
+        AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
 
         // adds the Registration request to the queue for the Workers
         // to handle
@@ -171,7 +171,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         for (H handle: boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
         }
-        setLocalAddresses(newLocalAddresses);
+
+        return newLocalAddresses;
     }
 
     /**
@@ -198,8 +199,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     }
 
     @Override
-    protected final void unbind0() throws Exception {
-        ServiceOperationFuture future = new ServiceOperationFuture();
+    protected final void unbind0(List<? extends SocketAddress> localAddresses) throws Exception {
+        AcceptorOperationFuture future = new AcceptorOperationFuture(localAddresses);
 
         cancelQueue.add(future);
         startupWorker();
@@ -316,17 +317,17 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      */
     private int registerHandles() {
         for (;;) {
-            ServiceOperationFuture future = registerQueue.poll();
+            AcceptorOperationFuture future = registerQueue.poll();
             if (future == null) {
                 break;
             }
             
             Map<SocketAddress, H> newHandles = new HashMap<SocketAddress, H>();
-            List<SocketAddress> localAddresses = getLocalAddresses();
+            List<SocketAddress> localAddresses = future.getLocalAddresses();
             
             try {
                 for (SocketAddress a: localAddresses) {
-                    H handle = bind(a);
+                    H handle = open(a);
                     newHandles.put(localAddress(handle), handle);
                 }
                 
@@ -334,7 +335,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
                 // and notify.
                 future.setDone();
-                return boundHandles.size();
+                return newHandles.size();
             } catch (Exception e) {
                 future.setException(e);
             } finally {
@@ -342,7 +343,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 if (future.getException() != null) {
                     for (H handle: newHandles.values()) {
                         try {
-                            unbind(handle);
+                            close(handle);
                         } catch (Exception e) {
                             ExceptionMonitor.getInstance().exceptionCaught(e);
                         }
@@ -364,24 +365,28 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     private int unregisterHandles() {
         int cancelledHandles = 0;
         for (; ;) {
-            ServiceOperationFuture future = cancelQueue.poll();
+            AcceptorOperationFuture future = cancelQueue.poll();
             if (future == null) {
                 break;
             }
-
+            
             // close the channels
-            for (H handle: boundHandles.values()) {
-                try {
-                    unbind(handle);
-                    wakeup(); // wake up again to trigger thread death
-                } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
+            for (SocketAddress a: future.getLocalAddresses()) {
+                H handle = boundHandles.remove(a);
+                if (handle == null) {
+                    continue;
                 }
-                
-                cancelledHandles ++;
+
+                try {
+                    close(handle);
+                    wakeup(); // wake up again to trigger thread death
+                } catch (Throwable e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                } finally {
+                    cancelledHandles ++;
+                }
             }
             
-            boundHandles.clear();
             future.setDone();
         }
         

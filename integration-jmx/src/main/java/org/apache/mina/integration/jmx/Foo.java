@@ -21,7 +21,6 @@ public class Foo {
 
         IoAcceptor service = new NioSocketAcceptor();
         service.setHandler(new IoHandlerAdapter());
-        service.setLocalAddress(new InetSocketAddress(8080));
         
         ExecutorFilter executorFilter = new ExecutorFilter(
                 new OrderedThreadPoolExecutor(
@@ -29,8 +28,7 @@ public class Foo {
                         new IoEventQueueThrottle(1048576)));
         
         service.getFilterChain().addLast("executor", executorFilter);
-
-        service.bind();
+        service.bind(new InetSocketAddress(8080));
         
         server.registerMBean(
                 new IoServiceMBean(service),

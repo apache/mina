@@ -32,8 +32,9 @@ import org.apache.mina.common.IoAcceptor;
  * @version $Rev$, $Date$
  */
 public interface SocketAcceptor extends SocketService, IoAcceptor {
-    public InetSocketAddress getLocalAddress();
-    public void setLocalAddress(InetSocketAddress localAddress);
+    InetSocketAddress getLocalAddress();
+    InetSocketAddress getDefaultLocalAddress();
+    void setDefaultLocalAddress(InetSocketAddress localAddress);
 
     /**
      * @see ServerSocket#getReuseAddress()

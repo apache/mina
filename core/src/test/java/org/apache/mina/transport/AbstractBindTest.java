@@ -76,7 +76,7 @@ public abstract class AbstractBindTest extends TestCase {
         for (port = 1; port <= 65535; port++) {
             socketBound = false;
             try {
-                acceptor.setLocalAddress(createSocketAddress(port));
+                acceptor.setDefaultLocalAddress(createSocketAddress(port));
                 acceptor.bind();
                 socketBound = true;
                 break;
@@ -105,25 +105,26 @@ public abstract class AbstractBindTest extends TestCase {
     @Override
     public void tearDown() {
         try {
-            acceptor.unbind();
+            acceptor.dispose();
         } catch (Exception e) {
             // ignore
         }
 
-        acceptor.setLocalAddress(null);
+        acceptor.setDefaultLocalAddress(null);
     }
 
     public void testAnonymousBind() throws Exception {
         acceptor.setHandler(new IoHandlerAdapter());
-        acceptor.setLocalAddress(null);
+        acceptor.setDefaultLocalAddress(null);
         acceptor.bind();
         Assert.assertNotNull(acceptor.getLocalAddress());
-        acceptor.unbind();
-        acceptor.setLocalAddress(createSocketAddress(0));
+        acceptor.unbind(acceptor.getLocalAddress());
+        Assert.assertNull(acceptor.getLocalAddress());
+        acceptor.setDefaultLocalAddress(createSocketAddress(0));
         acceptor.bind();
         Assert.assertNotNull(acceptor.getLocalAddress());
         Assert.assertTrue(getPort(acceptor.getLocalAddress()) != 0);
-        acceptor.unbind();
+        acceptor.unbind(acceptor.getLocalAddress());
     }
 
     public void testDuplicateBind() throws IOException {
@@ -131,8 +132,8 @@ public abstract class AbstractBindTest extends TestCase {
 
         try {
             acceptor.bind();
-            Assert.fail("IllegalStateException is not thrown");
-        } catch (IllegalStateException e) {
+            Assert.fail("Exception is not thrown");
+        } catch (Exception e) {
         }
     }
 
@@ -190,7 +191,7 @@ public abstract class AbstractBindTest extends TestCase {
 
         SocketAddress addr = createSocketAddress(port);
         EchoProtocolHandler handler = new EchoProtocolHandler();
-        acceptor.setLocalAddress(addr);
+        acceptor.setDefaultLocalAddress(addr);
         acceptor.setHandler(handler);
         for (int i = 0; i < 1048576; i++) {
             acceptor.bind();

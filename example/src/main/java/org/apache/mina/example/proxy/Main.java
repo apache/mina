@@ -62,10 +62,8 @@ public class Main {
                 new InetSocketAddress(args[1], Integer.parseInt(args[2])));
 
         // Start proxy.
-        acceptor.setLocalAddress(new InetSocketAddress(Integer
-                .parseInt(args[0])));
         acceptor.setHandler(handler);
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(Integer.parseInt(args[0])));
 
         System.out.println("Listening on port " + Integer.parseInt(args[0]));
     }

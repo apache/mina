@@ -41,15 +41,13 @@ import org.apache.mina.util.AvailablePortFinder;
 public abstract class AbstractConnectorTest extends TestCase {
 
     protected abstract IoAcceptor createAcceptor();
-
     protected abstract IoConnector createConnector();
 
     public void testConnectFutureSuccessTiming() throws Exception {
         int port = AvailablePortFinder.getNextAvailable(1025);
         IoAcceptor acceptor = createAcceptor();
-        acceptor.setLocalAddress(new InetSocketAddress(port));
         acceptor.setHandler(new IoHandlerAdapter());
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(port));
 
         try {
             final StringBuffer buf = new StringBuffer();
@@ -77,7 +75,7 @@ public abstract class AbstractConnectorTest extends TestCase {
             future.getSession().close();
             Assert.assertEquals("123", buf.toString());
         } finally {
-            acceptor.unbind();
+            acceptor.dispose();
         }
     }
 
@@ -102,16 +100,21 @@ public abstract class AbstractConnectorTest extends TestCase {
                 buf.append("Z");
             }
         });
-        ConnectFuture future = connector.connect(new InetSocketAddress(
-                "localhost", port));
-        future.awaitUninterruptibly();
-        buf.append("1");
+        
         try {
-            future.getSession().close();
-            fail();
-        } catch (RuntimeIoException e) {
-            // OK.
+            ConnectFuture future = connector.connect(new InetSocketAddress(
+                    "localhost", port));
+            future.awaitUninterruptibly();
+            buf.append("1");
+            try {
+                future.getSession().close();
+                fail();
+            } catch (RuntimeIoException e) {
+                // OK.
+            }
+            Assert.assertEquals("1", buf.toString());
+        } finally {
+            connector.dispose();
         }
-        Assert.assertEquals("1", buf.toString());
     }
 }

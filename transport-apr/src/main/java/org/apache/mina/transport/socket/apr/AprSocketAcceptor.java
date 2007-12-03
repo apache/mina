@@ -71,7 +71,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     }
 
     @Override
-    protected Long bind(SocketAddress localAddress) throws Exception {
+    protected Long open(SocketAddress localAddress) throws Exception {
         InetSocketAddress la = (InetSocketAddress) localAddress;
         long handle = Socket.create(
                 Socket.APR_INET, Socket.SOCK_STREAM, Socket.APR_PROTO_TCP, pool);
@@ -113,7 +113,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
             success = true;
         } finally {
             if (!success) {
-                unbind(handle);
+                close(handle);
             }
         }
         return handle;
@@ -218,7 +218,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     }
 
     @Override
-    protected void unbind(Long handle) throws Exception {
+    protected void close(Long handle) throws Exception {
         Poll.remove(pollset, handle);
         int result = Socket.close(handle);
         if (result != Status.APR_SUCCESS) {
@@ -258,8 +258,18 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
-    public void setLocalAddress(InetSocketAddress localAddress) {
-        super.setLocalAddress(localAddress);
+    @Override
+    public InetSocketAddress getLocalAddress() {
+        return (InetSocketAddress) super.getLocalAddress();
+    }
+
+    @Override
+    public InetSocketAddress getDefaultLocalAddress() {
+        return (InetSocketAddress) super.getDefaultLocalAddress();
+    }
+
+    public void setDefaultLocalAddress(InetSocketAddress localAddress) {
+        super.setDefaultLocalAddress(localAddress);
     }
 
     public void setReuseAddress(boolean reuseAddress) {
@@ -282,11 +292,6 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         return (SocketSessionConfig) super.getSessionConfig();
     }
     
-    @Override
-    public InetSocketAddress getLocalAddress() {
-        return (InetSocketAddress) super.getLocalAddress();
-    }
-
     private void throwException(int code) throws IOException {
         throw new IOException(
                 org.apache.tomcat.jni.Error.strerror(-code) +

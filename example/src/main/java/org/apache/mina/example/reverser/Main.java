@@ -48,9 +48,8 @@ public class Main {
                         .forName("UTF-8"))));
 
         // Bind
-        acceptor.setLocalAddress(new InetSocketAddress(PORT));
         acceptor.setHandler(new ReverseProtocolHandler());
-        acceptor.bind();
+        acceptor.bind(new InetSocketAddress(PORT));
 
         System.out.println("Listening on port " + PORT);
     }
