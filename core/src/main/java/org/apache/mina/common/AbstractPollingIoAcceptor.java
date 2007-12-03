@@ -264,15 +264,15 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                         processor.dispose();
                     }
                 } finally {
-                    if (createdExecutor) {
-                        ((ExecutorService) executor).shutdown();
-                    }
                     try {
                         destroy();
                     } catch (Exception e) {
                         ExceptionMonitor.getInstance().exceptionCaught(e);
                     } finally {
                         disposalFuture.setDone();
+                        if (createdExecutor) {
+                            ((ExecutorService) executor).shutdown();
+                        }
                     }
                 }
             }

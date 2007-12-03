@@ -353,15 +353,15 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             
             if (selectable && isDisposing()) {
                 selectable = false;
-                if (createdExecutor) {
-                    ((ExecutorService) executor).shutdown();
-                }
                 try {
                     destroy();
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 } finally {
                     disposalFuture.setValue(true);
+                    if (createdExecutor) {
+                        ((ExecutorService) executor).shutdown();
+                    }
                 }
             }
         }
