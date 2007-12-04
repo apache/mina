@@ -38,9 +38,10 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.support.AbstractIoFilterChain;
 import org.apache.mina.common.support.BaseIoConnector;
 import org.apache.mina.common.support.DefaultConnectFuture;
-import org.apache.mina.util.Queue;
-import org.apache.mina.util.NewThreadExecutor;
 import org.apache.mina.util.NamePreservingRunnable;
+import org.apache.mina.util.NewThreadExecutor;
+import org.apache.mina.util.Queue;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
@@ -292,14 +293,16 @@ public class SocketConnector extends BaseIoConnector {
 
             boolean success = false;
             try {
-                ch.finishConnect();
-                newSession(ch, entry.handler, entry.config, entry);
+                if (ch.finishConnect()) {
+                    key.cancel();
+                    newSession(ch, entry.handler, entry.config, entry);
+                }
                 success = true;
             } catch (Throwable e) {
                 entry.setException(e);
             } finally {
-                key.cancel();
                 if (!success) {
+                    key.cancel();
                     try {
                         ch.close();
                     } catch (IOException e) {
