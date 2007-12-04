@@ -161,6 +161,12 @@ public class DefaultIoFuture implements IoFuture {
     }
 
     private void checkDeadLock() {
+        // Only read / write / connect / write future can cause dead lock. 
+        if (!(this instanceof CloseFuture || this instanceof WriteFuture ||
+              this instanceof ReadFuture || this instanceof ConnectFuture)) {
+            return;
+        }
+        
         IllegalStateException e = new IllegalStateException(
                 "DEAD LOCK: " + IoFuture.class.getSimpleName() +
                 ".await() was invoked from an I/O processor thread.  " +
