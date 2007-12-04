@@ -19,6 +19,8 @@
  */
 package org.apache.mina.integration.beans;
 
+import java.beans.PropertyEditor;
+
 import org.apache.mina.transport.serial.SerialAddress;
 import org.apache.mina.transport.serial.SerialAddress.DataBits;
 import org.apache.mina.transport.serial.SerialAddress.FlowControl;
@@ -26,10 +28,10 @@ import org.apache.mina.transport.serial.SerialAddress.Parity;
 import org.apache.mina.transport.serial.SerialAddress.StopBits;
 
 /**
- * Java Bean {@link java.beans.PropertyEditor} for {@link SerialAddress}.
- * Valid values specify 6 address components separated by colon
- * (e.g. <tt>COM1:9600:7:1:even:rtscts-in</tt>); port name, bauds, data bits,
- * stop bits, parity and flow control respectively.
+ * Java Bean {@link PropertyEditor} which converts a {@link String} into a
+ * {@link SerialAddress} and vice versa.  Valid values specify 6 address
+ * components separated by colon (e.g. <tt>COM1:9600:7:1:even:rtscts-in</tt>);
+ * port name, bauds, data bits, stop bits, parity and flow control respectively.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$

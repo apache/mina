@@ -19,19 +19,15 @@
  */
 package org.apache.mina.integration.beans;
 
+import java.beans.PropertyEditor;
 import java.net.InetSocketAddress;
 
 /**
- * Java Bean {@link java.beans.PropertyEditor} which converts Strings into
- * {@link InetSocketAddress} objects. Valid values include a hostname or ip
- * address and a port number separated by a ':'. If the hostname or ip address
+ * Java Bean {@link PropertyEditor} which converts a {@link String} into an
+ * {@link InetSocketAddress}. Valid values include a hostname or IP
+ * address and a port number separated by a ':'. If the hostname or IP address
  * is omitted the wildcard address will be used. E.g.:
  * <code>google.com:80</code>, <code>:22</code>, <code>192.168.0.1:110</code>.
- * <p>
- * Use Spring's CustomEditorConfigurer to use this property editor in a Spring
- * configuration file. See chapter 3.14 of the Spring Reference Documentation
- * for more info.
- * </p>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$

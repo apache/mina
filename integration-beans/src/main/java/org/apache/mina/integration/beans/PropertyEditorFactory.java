@@ -22,6 +22,8 @@ package org.apache.mina.integration.beans;
 import java.beans.PropertyEditor;
 
 /**
+ * A factory that creates a new {@link PropertyEditor} which is appropriate for
+ * the specified object or class. 
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

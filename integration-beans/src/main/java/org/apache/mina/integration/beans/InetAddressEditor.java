@@ -19,23 +19,16 @@
  */
 package org.apache.mina.integration.beans;
 
+import java.beans.PropertyEditor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.apache.mina.filter.firewall.BlacklistFilter;
-
 /**
- * Java Bean {@link java.beans.PropertyEditor} which converts Strings into
- * {@link InetAddress} objects. This may be used together with Spring to be able
- * to set {@link InetAddress} bean properties, e.g.
- * {@link BlacklistFilter#setBlacklist(InetAddress[])}.
- * Simply calls {@link InetAddress#getByName(java.lang.String)} when
- * converting from a String.
- * <p>
- * Use Spring's CustomEditorConfigurer to use this property editor in a Spring
- * configuration file. See chapter 3.14 of the Spring Reference Documentation
- * for more info.
- * </p>
+ * Java Bean {@link PropertyEditor} which converts a {@link String} into a
+ * {@link InetAddress}.
+ * This editor simply calls {@link InetAddress#getByName(java.lang.String)}
+ * when converting from a {@link String}, and {@link InetAddress#getHostAddress()}
+ * when converting to a {@link String}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$

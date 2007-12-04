@@ -19,22 +19,19 @@
  */
 package org.apache.mina.integration.beans;
 
+import java.beans.PropertyEditor;
+
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
 
 /**
- * Java Bean {@link java.beans.PropertyEditor} which converts Strings into
- * {@link VmPipeAddress} objects. Valid values specify an integer port number
- * optionally prefixed with a ':'. E.g.: <code>:80</code>, <code>22</code>.
- * <p>
- * Use Spring's CustomEditorConfigurer to use this property editor in a Spring
- * configuration file. See chapter 3.14 of the Spring Reference Documentation
- * for more info.
- * </p>
+ * Java Bean {@link PropertyEditor} which converts a {@link String} into
+ * a {@link VmPipeAddress} and vice versa. Valid values specify an integer port
+ * number optionally prefixed with a ':'. E.g.: <code>:80</code>, <code>22</code>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$
  *
- * @see org.apache.mina.transport.vmpipe.VmPipeAddress
+ * @see VmPipeAddress
  */
 public class VmPipeAddressEditor extends AbstractPropertyEditor {
     @Override

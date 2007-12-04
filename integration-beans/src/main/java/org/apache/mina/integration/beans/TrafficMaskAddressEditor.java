@@ -19,12 +19,14 @@
  */
 package org.apache.mina.integration.beans;
 
+import java.beans.PropertyEditor;
+
 import org.apache.mina.common.TrafficMask;
 
 /**
- * Java Bean {@link java.beans.PropertyEditor} for {@link TrafficMask}.
- * "<tt>all</tt>", "<tt>read</tt>", "<tt>write</tt>" and "<tt>none</tt>" are
- * allowed.
+ * Java Bean {@link PropertyEditor} which converts a {@link String} into a
+ * {@link TrafficMask} and vice versa.   "<tt>all</tt>", "<tt>read</tt>", 
+ * "<tt>write</tt>" and "<tt>none</tt>" are allowed.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$
