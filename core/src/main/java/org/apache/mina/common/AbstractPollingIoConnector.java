@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -128,8 +129,16 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     @Override
     protected final IoFuture dispose0() throws Exception {
         if (!disposalFuture.isDone()) {
-            startupWorker();
-            wakeup();
+            try {
+                startupWorker();
+                wakeup();
+            } catch (RejectedExecutionException e) {
+                if (createdExecutor) {
+                    // Ignore.
+                } else {
+                    throw e;
+                }
+            }
         }
         return disposalFuture;
     }
