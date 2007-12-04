@@ -176,13 +176,14 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     }
 
     @Override
-    protected void finishConnect(Long handle) throws Exception {
+    protected boolean finishConnect(Long handle) throws Exception {
         Poll.remove(pollset, handle);
         requests.remove(handle);
         if (failedHandles.remove(handle)) {
             int rv = Socket.recvb(handle, dummyBuffer, 0, 1);
             throwException(rv);
         }
+        return true;
     }
 
     @Override

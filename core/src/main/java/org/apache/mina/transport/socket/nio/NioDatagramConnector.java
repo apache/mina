@@ -137,7 +137,7 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected void finishConnect(DatagramChannel handle) throws Exception {
+    protected boolean finishConnect(DatagramChannel handle) throws Exception {
         throw new UnsupportedOperationException();
     }
 

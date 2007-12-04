@@ -115,7 +115,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected abstract void destroy() throws Exception;
     protected abstract H newHandle(SocketAddress localAddress) throws Exception;
     protected abstract boolean connect(H handle, SocketAddress remoteAddress) throws Exception;
-    protected abstract void finishConnect(H handle) throws Exception;
+    protected abstract boolean finishConnect(H handle) throws Exception;
     protected abstract T newSession(IoProcessor<T> processor, H handle) throws Exception;
     protected abstract void close(H handle) throws Exception;
     protected abstract void wakeup();
@@ -241,12 +241,13 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             ConnectionRequest entry = connectionRequest(handle);
             boolean success = false;
             try {
-                finishConnect(handle);
-                T session = newSession(processor, handle);
-                finishSessionInitialization(session, entry);
-                // Forward the remaining process to the IoProcessor.
-                session.getProcessor().add(session);
-                nHandles ++;
+                if (finishConnect(handle)) {
+                    T session = newSession(processor, handle);
+                    finishSessionInitialization(session, entry);
+                    // Forward the remaining process to the IoProcessor.
+                    session.getProcessor().add(session);
+                    nHandles ++;
+                }
                 success = true;
             } catch (Throwable e) {
                 entry.setException(e);

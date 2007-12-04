@@ -125,13 +125,16 @@ public final class NioSocketConnector
     }
 
     @Override
-    protected void finishConnect(SocketChannel handle) throws Exception {
+    protected boolean finishConnect(SocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
-        if (key != null) {
-            key.cancel();
+        if (handle.finishConnect()) {
+            if (key != null) {
+                key.cancel();
+            }
+            return true;
         }
         
-        handle.finishConnect();
+        return false;
     }
 
     @Override
