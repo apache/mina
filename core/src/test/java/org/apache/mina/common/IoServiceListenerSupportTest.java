@@ -172,7 +172,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         chainControl.reset();
 
         listener.serviceDeactivated(acceptor);
-        acceptorControl.expectAndReturn(acceptor.isDisconnectOnUnbind(), true);
+        acceptorControl.expectAndReturn(acceptor.isCloseOnDeactivation(), true);
         listener.sessionDestroyed(session);
         chain.fireFilterClose();
         chain.fireSessionClosed();

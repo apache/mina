@@ -141,7 +141,7 @@ public class VmPipeSessionCrossCommunicationTest extends TestCase {
             }
         }
 
-        acceptor.setDisconnectOnUnbind(false);
+        acceptor.setCloseOnDeactivation(false);
         acceptor.dispose();
     }
 }

@@ -131,11 +131,11 @@ public abstract class AbstractIoAcceptor
         }
     }
 
-    public final boolean isDisconnectOnUnbind() {
+    public final boolean isCloseOnDeactivation() {
         return disconnectOnUnbind;
     }
 
-    public final void setDisconnectOnUnbind(boolean disconnectClientsOnUnbind) {
+    public final void setCloseOnDeactivation(boolean disconnectClientsOnUnbind) {
         this.disconnectOnUnbind = disconnectClientsOnUnbind;
     }
 

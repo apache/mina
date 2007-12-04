@@ -36,7 +36,7 @@ public class SslFilterTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        acceptor.setDisconnectOnUnbind(true);
+        acceptor.setCloseOnDeactivation(true);
         acceptor.dispose();
         super.tearDown();
     }

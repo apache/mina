@@ -230,7 +230,7 @@ public class IoServiceListenerSupport {
             return;
         }
 
-        if (!((IoAcceptor) service).isDisconnectOnUnbind()) {
+        if (!((IoAcceptor) service).isCloseOnDeactivation()) {
             return;
         }
 

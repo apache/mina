@@ -94,16 +94,18 @@ public interface IoAcceptor extends IoService {
     void setDefaultLocalAddresses(Iterable<? extends SocketAddress> localAddresses);
 
     /**
-     * Returns <tt>true</tt> if and only if all clients are disconnected
-     * when this acceptor unbinds the related local address.
+     * Returns <tt>true</tt> if and only if all clients are closed when this
+     * acceptor unbinds from all the related local address (i.e. when the
+     * service is deactivated).
      */
-    boolean isDisconnectOnUnbind();
+    boolean isCloseOnDeactivation();
 
     /**
-     * Sets whether all clients are disconnected when this acceptor unbinds the
-     * related local address.  The default value is <tt>true</tt>.
+     * Sets whether all client sessions are closed when this acceptor unbinds
+     * from all the related local addresses (i.e. when the service is
+     * deactivated).  The default value is <tt>true</tt>.
      */
-    void setDisconnectOnUnbind(boolean disconnectOnUnbind);
+    void setCloseOnDeactivation(boolean closeOnDeactivation);
 
     /**
      * Binds to the default local address(es) and start to accept incoming
@@ -140,7 +142,7 @@ public interface IoAcceptor extends IoService {
     /**
      * Unbinds from all local addresses that this service is bound to and stops
      * to accept incoming connections.  All managed connections will be closed
-     * if {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property
+     * if {@link #setCloseOnDeactivation(boolean) disconnectOnUnbind} property
      * is <tt>true</tt>.  This method returns silently if no local address is
      * bound yet.
      */
@@ -149,7 +151,7 @@ public interface IoAcceptor extends IoService {
     /**
      * Unbinds from the specified local address and stop to accept incoming
      * connections.  All managed connections will be closed if
-     * {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property is
+     * {@link #setCloseOnDeactivation(boolean) disconnectOnUnbind} property is
      * <tt>true</tt>.  This method returns silently if the default local
      * address is not bound yet.
      */
@@ -158,7 +160,7 @@ public interface IoAcceptor extends IoService {
     /**
      * Unbinds from the specified local addresses and stop to accept incoming
      * connections.  All managed connections will be closed if
-     * {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property is
+     * {@link #setCloseOnDeactivation(boolean) disconnectOnUnbind} property is
      * <tt>true</tt>.  This method returns silently if the default local
      * addresses are not bound yet.
      */
@@ -167,7 +169,7 @@ public interface IoAcceptor extends IoService {
     /**
      * Unbinds from the specified local addresses and stop to accept incoming
      * connections.  All managed connections will be closed if
-     * {@link #setDisconnectOnUnbind(boolean) disconnectOnUnbind} property is
+     * {@link #setCloseOnDeactivation(boolean) disconnectOnUnbind} property is
      * <tt>true</tt>.  This method returns silently if the default local
      * addresses are not bound yet.
      */
