@@ -182,6 +182,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         if (failedHandles.remove(handle)) {
             int rv = Socket.recvb(handle, dummyBuffer, 0, 1);
             throwException(rv);
+            throw new InternalError("Shouldn't reach here.");
         }
         return true;
     }
