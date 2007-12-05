@@ -23,9 +23,8 @@ import java.beans.PropertyEditor;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
-
-import com.sun.xml.internal.fastinfoset.sax.Properties;
 
 /**
  * A factory that creates a new {@link PropertyEditor} which is appropriate for
