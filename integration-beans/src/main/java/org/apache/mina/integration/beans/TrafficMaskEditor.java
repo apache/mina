@@ -33,7 +33,7 @@ import org.apache.mina.common.TrafficMask;
  *
  * @see org.apache.mina.transport.vmpipe.VmPipeAddress
  */
-public class TrafficMaskAddressEditor extends AbstractPropertyEditor {
+public class TrafficMaskEditor extends AbstractPropertyEditor {
     @Override
     protected String toText(Object value) {
         return ((TrafficMask) value).getName().toUpperCase();
