@@ -21,39 +21,29 @@ package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditor;
 
-import org.apache.mina.common.TrafficMask;
-
 /**
- * A {@link PropertyEditor} which converts a {@link String} into a
- * {@link TrafficMask} and vice versa.   "<tt>all</tt>", "<tt>read</tt>", 
- * "<tt>write</tt>" and "<tt>none</tt>" are allowed.
+ * A dummy {@link PropertyEditor} for a {@link String}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$
- *
- * @see org.apache.mina.transport.vmpipe.VmPipeAddress
  */
-public class TrafficMaskAddressEditor extends AbstractPropertyEditor {
+public class StringEditor extends AbstractPropertyEditor {
     @Override
     protected String toText(Object value) {
-        return ((TrafficMask) value).getName().toUpperCase();
+        if (value instanceof String) {
+            return (String) value;
+        }
+        
+        PropertyEditor e = PropertyEditorFactory.getInstance(value);
+        if (e == null) {
+            return String.valueOf(value);
+        }
+        e.setValue(value);
+        return e.getAsText();
     }
 
     @Override
     protected Object toValue(String text) throws IllegalArgumentException {
-        if ("all".equalsIgnoreCase(text)) {
-            return TrafficMask.ALL;
-        }
-        if ("read".equalsIgnoreCase(text)) {
-            return TrafficMask.READ;
-        }
-        if ("write".equalsIgnoreCase(text)) {
-            return TrafficMask.WRITE;
-        }
-        if ("none".equalsIgnoreCase(text)) {
-            return TrafficMask.NONE;
-        }
-        throw new IllegalArgumentException(
-                text + " (expected: all, read, write or none)");
+        return text;
     }
 }

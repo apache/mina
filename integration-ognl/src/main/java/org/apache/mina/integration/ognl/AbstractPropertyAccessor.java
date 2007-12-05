@@ -16,7 +16,6 @@
  */
 package org.apache.mina.integration.ognl;
 
-import java.beans.PropertyEditor;
 import java.util.Map;
 
 import ognl.ObjectPropertyAccessor;
@@ -24,8 +23,6 @@ import ognl.OgnlContext;
 import ognl.OgnlException;
 import ognl.OgnlRuntime;
 import ognl.PropertyAccessor;
-
-import org.apache.mina.integration.beans.PropertyEditorFactory;
 
 /**
  * An abstract OGNL {@link PropertyAccessor} for MINA constructs.
@@ -37,6 +34,7 @@ import org.apache.mina.integration.beans.PropertyEditorFactory;
 public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
 
     static final Object READ_ONLY_MODE = new Object();
+    static final Object QUERY = new Object();
     
     @Override
     public final boolean hasGetProperty(OgnlContext context, Object target,
@@ -78,12 +76,6 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
         if (answer == OgnlRuntime.NotFound) {
             answer = super.getPossibleProperty(context, target, name);
         }
-
-        PropertyEditor pe = PropertyEditorFactory.getInstance(answer);
-        if (pe != null) {
-            pe.setValue(answer);
-            answer = pe.getAsText();
-        }
         return answer;
     }
 
@@ -91,7 +83,7 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
     public final Object setPossibleProperty(Map context, Object target, String name,
             Object value) throws OgnlException {
         if (context.containsKey(READ_ONLY_MODE)) {
-            throw new OgnlException("Expression must be read-only.");
+            throw new OgnlException("Expression must be read-only: " + context.get(QUERY));
         }
         
         Object answer = setProperty0((OgnlContext) context, target, name, value);

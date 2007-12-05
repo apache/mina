@@ -20,44 +20,25 @@
 package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditor;
-
-import org.apache.mina.transport.vmpipe.VmPipeAddress;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A {@link PropertyEditor} which converts a {@link String} into
- * a {@link VmPipeAddress} and vice versa. Valid values specify an integer port
- * number optionally prefixed with a ':'. E.g.: <code>:80</code>, <code>22</code>.
+ * a {@link Set} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$
- *
- * @see VmPipeAddress
  */
-public class VmPipeAddressEditor extends AbstractPropertyEditor {
-    @Override
-    protected String toText(Object value) {
-        return ":" + ((VmPipeAddress) value).getPort();
+public class SetEditor extends CollectionEditor {
+
+    public SetEditor(Class<?> elementType) {
+        super(elementType);
     }
 
     @Override
-    protected String defaultText() {
-        return ":1";
-    }
-
-    @Override
-    protected Object defaultValue() {
-        return new VmPipeAddress(0);
-    }
-
-    @Override
-    protected Object toValue(String text) throws IllegalArgumentException {
-        if (text.startsWith(":")) {
-            text = text.substring(1);
-        }
-        try {
-            return new VmPipeAddress(Integer.parseInt(text.trim()));
-        } catch (NumberFormatException nfe) {
-            throw new IllegalArgumentException("Illegal VmPipeAddress: " + text);
-        }
+    protected Collection<Object> newCollection() {
+        return new LinkedHashSet<Object>();
     }
 }

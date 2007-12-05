@@ -32,7 +32,12 @@ public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
 
     private String text;
     private Object value;
+    private boolean trimText = true;
     
+    protected void setTrimText(boolean trimText) {
+        this.trimText = trimText;
+    }
+
     @Override
     public String getAsText() {
         return text;
@@ -47,9 +52,9 @@ public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
     public void setAsText(String text) throws IllegalArgumentException {
         this.text = text;
         if (text == null) {
-            value = null;
+            value = defaultValue();
         } else {
-            value = toValue(text.trim());
+            value = toValue(trimText? text.trim() : text);
         }
     }
 
@@ -57,12 +62,20 @@ public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
     public void setValue(Object value) {
         this.value = value;
         if (value == null) {
-            text = null;
+            text = defaultText();
         } else {
             text = toText(value);
         }
     }
     
+    protected String defaultText() {
+        return null;
+    }
+    
+    protected Object defaultValue() {
+        return null;
+    }
+
     protected abstract String toText(Object value);
     protected abstract Object toValue(String text) throws IllegalArgumentException;
     

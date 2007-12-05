@@ -23,7 +23,7 @@ import java.beans.PropertyEditor;
 import java.net.InetSocketAddress;
 
 /**
- * Java Bean {@link PropertyEditor} which converts a {@link String} into an
+ * A {@link PropertyEditor} which converts a {@link String} into an
  * {@link InetSocketAddress}. Valid values include a hostname or IP
  * address and a port number separated by a ':'. If the hostname or IP address
  * is omitted the wildcard address will be used. E.g.:
@@ -56,7 +56,10 @@ public class InetSocketAddressEditor extends AbstractPropertyEditor {
 
     @Override
     protected Object toValue(String text) throws IllegalArgumentException {
-        text = text.trim();
+        if (text.isEmpty()) {
+            return defaultValue();
+        }
+
         int colonIndex = text.lastIndexOf(":");
         if (colonIndex > 0) {
             String host = text.substring(0, colonIndex);
@@ -68,6 +71,16 @@ public class InetSocketAddressEditor extends AbstractPropertyEditor {
 
         int port = parsePort(text.substring(colonIndex + 1));
         return new InetSocketAddress(port);
+    }
+
+    @Override
+    protected String defaultText() {
+        return "*:0";
+    }
+
+    @Override
+    protected Object defaultValue() {
+        return new InetSocketAddress(0);
     }
 
     private int parsePort(String s) {

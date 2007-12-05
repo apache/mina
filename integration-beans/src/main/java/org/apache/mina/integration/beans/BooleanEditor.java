@@ -20,40 +20,36 @@
 package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditor;
-
-import org.apache.mina.common.TrafficMask;
+import java.util.regex.Pattern;
 
 /**
- * A {@link PropertyEditor} which converts a {@link String} into a
- * {@link TrafficMask} and vice versa.   "<tt>all</tt>", "<tt>read</tt>", 
- * "<tt>write</tt>" and "<tt>none</tt>" are allowed.
+ * A {@link PropertyEditor} which converts a {@link String} into
+ * a {@link Character} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$
- *
- * @see org.apache.mina.transport.vmpipe.VmPipeAddress
  */
-public class TrafficMaskAddressEditor extends AbstractPropertyEditor {
+public class BooleanEditor extends AbstractPropertyEditor {
+    private static final Pattern TRUE = Pattern.compile(
+            "(?:true|t|yes|y|1)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FALSE = Pattern.compile(
+            "(?:false|f|no|n|1)", Pattern.CASE_INSENSITIVE);
+    
     @Override
     protected String toText(Object value) {
-        return ((TrafficMask) value).getName().toUpperCase();
+        return String.valueOf(value);
     }
 
     @Override
     protected Object toValue(String text) throws IllegalArgumentException {
-        if ("all".equalsIgnoreCase(text)) {
-            return TrafficMask.ALL;
+        if (TRUE.matcher(text).matches()) {
+            return Boolean.TRUE;
         }
-        if ("read".equalsIgnoreCase(text)) {
-            return TrafficMask.READ;
+        
+        if (FALSE.matcher(text).matches()) {
+            return Boolean.FALSE;
         }
-        if ("write".equalsIgnoreCase(text)) {
-            return TrafficMask.WRITE;
-        }
-        if ("none".equalsIgnoreCase(text)) {
-            return TrafficMask.NONE;
-        }
-        throw new IllegalArgumentException(
-                text + " (expected: all, read, write or none)");
+        
+        throw new IllegalArgumentException("Wrong boolean value: " + text);
     }
 }

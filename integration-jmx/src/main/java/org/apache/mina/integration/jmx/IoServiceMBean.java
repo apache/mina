@@ -21,14 +21,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.management.MBeanException;
 import javax.management.MBeanParameterInfo;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
 import ognl.Ognl;
-import ognl.OgnlException;
 
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
@@ -57,64 +54,49 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
     }
 
     @Override
-    public Object invoke(String name, Object[] params, String[] signature)
-            throws MBeanException, ReflectionException {
+    protected Object invoke0(String name, Object[] params, String[] signature) throws Exception {
         if (name.equals("findSessions")) {
-            try {
-                IoSessionFinder finder = new IoSessionFinder((String) params[0]);
-                return convertReturnValue(finder.find(
-                        (getSource()).getManagedSessions()));
-            } catch (OgnlException e) {
-                throwMBeanException(e);
-            }
+            IoSessionFinder finder = new IoSessionFinder((String) params[0]);
+            return finder.find(getSource().getManagedSessions());
         }
         
         if (name.equals("findAndRegisterSessions")) {
-            try {
-                IoSessionFinder finder = new IoSessionFinder((String) params[0]);
-                Set<IoSession> registeredSessions = new LinkedHashSet<IoSession>();
-                for (IoSession s: finder.find(
-                        (getSource()).getManagedSessions())) {
-                    try {
-                        getServer().registerMBean(
-                                new IoSessionMBean(s),
-                                new ObjectName(
-                                        getName().getDomain() + 
-                                        ":type=session,name=" + 
-                                        getSessionIdAsString(s.getId())));
-                        registeredSessions.add(s);
-                    } catch (Exception e) {
-                        logger.warn("Failed to register a session as a MBean: " + s, e);
-                    }
+            IoSessionFinder finder = new IoSessionFinder((String) params[0]);
+            Set<IoSession> registeredSessions = new LinkedHashSet<IoSession>();
+            for (IoSession s: finder.find(getSource().getManagedSessions())) {
+                try {
+                    getServer().registerMBean(
+                            new IoSessionMBean(s),
+                            new ObjectName(
+                                    getName().getDomain() + 
+                                    ":type=session,name=" + 
+                                    getSessionIdAsString(s.getId())));
+                    registeredSessions.add(s);
+                } catch (Exception e) {
+                    logger.warn("Failed to register a session as a MBean: " + s, e);
                 }
-                
-                return convertReturnValue(registeredSessions);
-            } catch (OgnlException e) {
-                throwMBeanException(e);
             }
+            
+            return registeredSessions;
         }
         
         if (name.equals("findAndProcessSessions")) {
-            try {
-                IoSessionFinder finder = new IoSessionFinder((String) params[0]);
-                String command = (String) params[1];
-                Object expr = Ognl.parseExpression(command);
-                Set<IoSession> matches = finder.find(getSource().getManagedSessions());
-                
-                for (IoSession s: matches) {
-                    try {
-                        Ognl.getValue(expr, s);
-                    } catch (Exception e) {
-                        logger.warn("Failed to execute '" + command + "' for: " + s, e);
-                    }
+            IoSessionFinder finder = new IoSessionFinder((String) params[0]);
+            String command = (String) params[1];
+            Object expr = Ognl.parseExpression(command);
+            Set<IoSession> matches = finder.find(getSource().getManagedSessions());
+            
+            for (IoSession s: matches) {
+                try {
+                    Ognl.getValue(expr, s);
+                } catch (Exception e) {
+                    logger.warn("Failed to execute '" + command + "' for: " + s, e);
                 }
-                return convertReturnValue(matches);
-            } catch (OgnlException e) {
-                throwMBeanException(e);
             }
+            return matches;
         }
         
-        return super.invoke(name, params, signature);
+        return super.invoke0(name, params, signature);
     }
 
     @Override

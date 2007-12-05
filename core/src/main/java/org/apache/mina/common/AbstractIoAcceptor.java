@@ -84,27 +84,21 @@ public abstract class AbstractIoAcceptor
     }
 
     public final void setDefaultLocalAddress(SocketAddress localAddress) {
-        setDefaultLocalAddresses(new SocketAddress[] { localAddress });
+        setDefaultLocalAddresses(localAddress);
     }
 
     public final List<SocketAddress> getDefaultLocalAddresses() {
         return unmodifiableDefaultLocalAddresses;
     }
 
-    public final void setDefaultLocalAddresses(Iterable<? extends SocketAddress> localAddresses) {
+    public final void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");
         }
-        
-        List<SocketAddress> list = new ArrayList<SocketAddress>();
-        for (SocketAddress a: localAddresses) {
-            list.add(a);
-        }
-        
-        setDefaultLocalAddresses(list.toArray(new SocketAddress[list.size()]));
+        setDefaultLocalAddresses((Iterable<? extends SocketAddress>) localAddresses);
     }
 
-    public final void setDefaultLocalAddresses(SocketAddress... localAddresses) {
+    public final void setDefaultLocalAddresses(Iterable<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");
         }
@@ -129,6 +123,22 @@ public abstract class AbstractIoAcceptor
             this.defaultLocalAddresses.clear();
             this.defaultLocalAddresses.addAll(newLocalAddresses);
         }
+    }
+
+    public final void setDefaultLocalAddresses(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses) {
+        if (otherLocalAddresses == null) {
+            otherLocalAddresses = new SocketAddress[0];
+        }
+        
+        Collection<SocketAddress> newLocalAddresses =
+            new ArrayList<SocketAddress>(otherLocalAddresses.length + 1);
+        
+        newLocalAddresses.add(firstLocalAddress);
+        for (SocketAddress a: otherLocalAddresses) {
+            newLocalAddresses.add(a);
+        }
+        
+        setDefaultLocalAddresses(newLocalAddresses);
     }
 
     public final boolean isCloseOnDeactivation() {

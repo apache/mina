@@ -21,39 +21,21 @@ package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditor;
 
-import org.apache.mina.common.TrafficMask;
-
 /**
- * A {@link PropertyEditor} which converts a {@link String} into a
- * {@link TrafficMask} and vice versa.   "<tt>all</tt>", "<tt>read</tt>", 
- * "<tt>write</tt>" and "<tt>none</tt>" are allowed.
+ * A {@link PropertyEditor} which converts a {@link String} into
+ * a {@link Short} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Revision$, $Date$
- *
- * @see org.apache.mina.transport.vmpipe.VmPipeAddress
  */
-public class TrafficMaskAddressEditor extends AbstractPropertyEditor {
+public class ShortEditor extends NumberEditor {
     @Override
-    protected String toText(Object value) {
-        return ((TrafficMask) value).getName().toUpperCase();
+    protected Object toValue(String text, int radix) {
+        return Short.parseShort(text, radix);
     }
 
     @Override
-    protected Object toValue(String text) throws IllegalArgumentException {
-        if ("all".equalsIgnoreCase(text)) {
-            return TrafficMask.ALL;
-        }
-        if ("read".equalsIgnoreCase(text)) {
-            return TrafficMask.READ;
-        }
-        if ("write".equalsIgnoreCase(text)) {
-            return TrafficMask.WRITE;
-        }
-        if ("none".equalsIgnoreCase(text)) {
-            return TrafficMask.NONE;
-        }
-        throw new IllegalArgumentException(
-                text + " (expected: all, read, write or none)");
+    protected Object defaultValue() {
+        return Short.valueOf((short) 0);
     }
 }

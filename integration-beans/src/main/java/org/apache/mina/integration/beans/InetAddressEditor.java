@@ -24,7 +24,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * Java Bean {@link PropertyEditor} which converts a {@link String} into a
+ * A {@link PropertyEditor} which converts a {@link String} into an
  * {@link InetAddress}.
  * This editor simply calls {@link InetAddress#getByName(java.lang.String)}
  * when converting from a {@link String}, and {@link InetAddress#getHostAddress()}
@@ -38,17 +38,40 @@ import java.net.UnknownHostException;
 public class InetAddressEditor extends AbstractPropertyEditor {
     @Override
     protected String toText(Object value) {
-        return ((InetAddress) value).getHostAddress();
+        String hostname = ((InetAddress) value).getHostAddress();
+        if (hostname.equals("0:0:0:0:0:0:0:0") || hostname.equals("0.0.0.0") ||
+                hostname.equals("00:00:00:00:00:00:00:00")) {
+            hostname = "*";
+        }
+        return hostname;
     }
 
     @Override
     protected Object toValue(String text) throws IllegalArgumentException {
+        if (text.isEmpty() || text.equals("*")) {
+            return defaultValue();
+        }
+
         try {
             return InetAddress.getByName(text);
         } catch (UnknownHostException uhe) {
             IllegalArgumentException iae = new IllegalArgumentException();
             iae.initCause(uhe);
             throw iae;
+        }
+    }
+
+    @Override
+    protected String defaultText() {
+        return "*";
+    }
+
+    @Override
+    protected Object defaultValue() {
+        try {
+            return InetAddress.getByName("0.0.0.0");
+        } catch (UnknownHostException e) {
+            throw new InternalError();
         }
     }
 }

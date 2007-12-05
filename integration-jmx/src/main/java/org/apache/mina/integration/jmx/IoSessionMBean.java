@@ -16,13 +16,13 @@
  */
 package org.apache.mina.integration.jmx;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.management.MBeanException;
 import javax.management.MBeanParameterInfo;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
@@ -42,8 +42,20 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
     }
     
     @Override
-    public Object invoke(String name, Object[] params, String[] signature)
-            throws MBeanException, ReflectionException {
+    protected Object getAttribute0(String fqan) throws Exception {
+        if (fqan.equals("attributes")) {
+            Map<String, String> answer = new LinkedHashMap<String, String>();
+            for (Object key: getSource().getAttributeKeys()) {
+                answer.put(String.valueOf(key), String.valueOf(getSource().getAttribute(key)));
+            }
+            return answer;
+        }
+        
+        return super.getAttribute0(fqan);
+    }
+
+    @Override
+    protected Object invoke0(String name, Object[] params, String[] signature) throws Exception {
         if (name.equals("addFilterFirst")) {
             String filterName = (String) params[0];
             ObjectName filterRef = (ObjectName) params[1];
@@ -162,27 +174,5 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
         }
         
         return super.isOperation(methodName, paramTypes);
-    }
-
-    @Override
-    protected Class<?> convertAttributeType(String attrName, Class<?> attrType) {
-        if ((attrType == Long.class || attrType == long.class)) {
-            if (attrName.equals("id")) {
-                return String.class;
-            }
-        }
-        
-        return super.convertAttributeType(attrName, attrType);
-    }
-
-    @Override
-    protected Object convertAttributeValue(String attrName, Object v) {
-        if (v instanceof Long) {
-            if (attrName.equals("id")) {
-                return IoServiceMBean.getSessionIdAsString((Long) v);
-            }
-        }
-
-        return super.convertAttributeValue(attrName, v);
     }
 }

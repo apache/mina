@@ -22,6 +22,7 @@ import java.util.Set;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
+import ognl.TypeConverter;
 
 import org.apache.mina.common.IoSession;
 
@@ -34,6 +35,7 @@ import org.apache.mina.common.IoSession;
 public class IoSessionFinder {
     
     private final String query;
+    private final TypeConverter typeConverter = new PropertyTypeConverter();
     private final Object expression;
     
     /**
@@ -71,8 +73,9 @@ public class IoSessionFinder {
         Set<IoSession> answer = new LinkedHashSet<IoSession>();
         for (IoSession s: sessions) {
             OgnlContext context = (OgnlContext) Ognl.createDefaultContext(s);
+            context.setTypeConverter(typeConverter);
             context.put(AbstractPropertyAccessor.READ_ONLY_MODE, true);
-
+            context.put(AbstractPropertyAccessor.QUERY, query);
             Object result = Ognl.getValue(expression, context, s);
             if (result instanceof Boolean) {
                 if (((Boolean) result).booleanValue()) {

@@ -60,7 +60,7 @@ public interface IoAcceptor extends IoService {
      * in {@link #bind()} method.  Please note that the default will not be
      * used if any local address is specified.  If more than one address are
      * set, only one of them will be returned, but it's not necessarily the
-     * firstly specified address in {@link #setDefaultLocalAddresses(SocketAddress...)}.
+     * firstly specified address in {@link #setDefaultLocalAddresses(List)}.
      * 
      */
     SocketAddress getDefaultLocalAddress();
@@ -84,7 +84,7 @@ public interface IoAcceptor extends IoService {
      * in {@link #bind()} method.  Please note that the default will not be
      * used if any local address is specified.
      */
-    void setDefaultLocalAddresses(SocketAddress... localAddresses);
+    void setDefaultLocalAddresses(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses);
     
     /**
      * Sets the default local addresses to bind when no argument is specified
@@ -94,6 +94,13 @@ public interface IoAcceptor extends IoService {
     void setDefaultLocalAddresses(Iterable<? extends SocketAddress> localAddresses);
 
     /**
+     * Sets the default local addresses to bind when no argument is specified
+     * in {@link #bind()} method.  Please note that the default will not be
+     * used if any local address is specified.
+     */
+    void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses);
+
+        /**
      * Returns <tt>true</tt> if and only if all clients are closed when this
      * acceptor unbinds from all the related local address (i.e. when the
      * service is deactivated).
