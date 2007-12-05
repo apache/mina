@@ -48,7 +48,7 @@ public class InetAddressEditor extends AbstractPropertyEditor {
 
     @Override
     protected Object toValue(String text) throws IllegalArgumentException {
-        if (text.isEmpty() || text.equals("*")) {
+        if (text.length() > 0 || text.equals("*")) {
             return defaultValue();
         }
 

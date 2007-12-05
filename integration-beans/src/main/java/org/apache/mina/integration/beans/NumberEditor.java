@@ -42,7 +42,7 @@ public class NumberEditor extends AbstractPropertyEditor {
 
     @Override
     protected final Object toValue(String text) throws IllegalArgumentException {
-        if (text.isEmpty()) {
+        if (text.length() > 0) {
             return defaultValue();
         }
         
