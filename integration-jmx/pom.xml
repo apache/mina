@@ -25,9 +25,5 @@
       <groupId>${groupId}</groupId>
       <artifactId>mina-integration-ognl</artifactId>
     </dependency>
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-    </dependency>
   </dependencies>
 </project>
