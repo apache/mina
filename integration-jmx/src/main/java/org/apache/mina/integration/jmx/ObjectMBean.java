@@ -72,7 +72,6 @@ import ognl.OgnlException;
 import ognl.OgnlRuntime;
 import ognl.TypeConverter;
 
-import org.apache.commons.beanutils.MethodUtils;
 import org.apache.mina.common.DefaultIoFilterChainBuilder;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoFilter;
@@ -222,15 +221,6 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             }
         }
         
-        Class<?>[] paramTypes = new Class[signature.length];
-        for (int i = 0; i < paramTypes.length; i ++) {
-            try {
-                paramTypes[i] = getAttributeClass(signature[i]);
-            } catch (ClassNotFoundException e) {
-                throwMBeanException(e);
-            }
-        }
-        
         try {
             return convertValue(
                     null, null, invoke0(name, params, signature), false);
@@ -240,10 +230,61 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
         
         // And then try reflection.
+        Class<?>[] paramTypes = new Class[signature.length];
+        for (int i = 0; i < paramTypes.length; i ++) {
+            try {
+                paramTypes[i] = getAttributeClass(signature[i]);
+            } catch (ClassNotFoundException e) {
+                throwMBeanException(e);
+            }
+            
+            PropertyEditor e = getPropertyEditor(
+                    source.getClass(), "p" + i, paramTypes[i]);
+            if (e == null) {
+                throwMBeanException(new RuntimeException("Conversion failure: " + params[i]));
+            }
+            
+            e.setValue(params[i]);
+            params[i] = e.getAsText();
+        }
+        
         try {
-            return convertValue(
-                    null, null, MethodUtils.invokeMethod(
-                            source, name, params, paramTypes), false);
+            // Find the right method.
+            for (Method m: source.getClass().getMethods()) {
+                if (!m.getName().equalsIgnoreCase(name)) {
+                    continue;
+                }
+                Class<?>[] methodParamTypes = m.getParameterTypes();
+                if (methodParamTypes.length != params.length) {
+                    continue;
+                }
+                
+                Object[] convertedParams = new Object[params.length];
+                for (int i = 0; i < params.length; i ++) {
+                    if (Iterable.class.isAssignableFrom(methodParamTypes[i])) {
+                        // Generics are not supported.
+                        convertedParams = null;
+                        break;
+                    }
+                    PropertyEditor e = getPropertyEditor(source.getClass(), "p" + i, methodParamTypes[i]);
+                    if (e == null) {
+                        convertedParams = null;
+                        break;
+                    }
+
+                    e.setAsText((String) params[i]);
+                    convertedParams[i] = e.getValue();
+                }
+                if (convertedParams == null) {
+                    continue;
+                }
+                
+                return convertValue(
+                        null, null, m.invoke(source, convertedParams), false);
+            }
+            
+            // No methods matched.
+            throw new IllegalArgumentException("Failed to find a matching operation: " + name);
         } catch (Throwable e) {
             throwMBeanException(e);
         }
@@ -530,8 +571,13 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             int i = 1;
             for (Class<?> paramType: m.getParameterTypes()) {
                 String paramName = "p" + (i ++);
+                if (getPropertyEditor(source.getClass(), paramName, paramType) == null) {
+                    continue;
+                }
                 signature.add(new MBeanParameterInfo(
-                        paramName, convertType(null, null, paramType, false).getName(), paramName));
+                        paramName, convertType(
+                                null, null, paramType, true).getName(),
+                        paramName));
             }
     
             Class<?> returnType = convertType(null, null, m.getReturnType(), false);
@@ -861,7 +907,9 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     
     @SuppressWarnings("unused")
     protected Class<?> getElementType(Class<?> type, String attrName) {
-        if (IoAcceptor.class.isAssignableFrom(type) && "defaultLocalAddresses".equals(attrName)) {
+        if (transportMetadata != null &&
+                IoAcceptor.class.isAssignableFrom(type) &&
+                "defaultLocalAddresses".equals(attrName)) {
             return transportMetadata.getAddressType();
         }
         return String.class;

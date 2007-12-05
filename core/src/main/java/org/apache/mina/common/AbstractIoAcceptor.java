@@ -285,7 +285,7 @@ public abstract class AbstractIoAcceptor
                             "Failed to unbind from: " + getLocalAddresses(), e);
                 }
                 
-                boundAddresses.removeAll(boundAddresses);
+                boundAddresses.removeAll(localAddressesCopy);
                 if (boundAddresses.isEmpty()) {
                     deactivate = true;
                 }
