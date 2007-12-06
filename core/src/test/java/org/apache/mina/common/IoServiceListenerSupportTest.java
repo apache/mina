@@ -124,7 +124,7 @@ public class IoServiceListenerSupportTest extends TestCase {
 
         listenerControl.verify();
 
-        Assert.assertFalse(session.isClosing());
+        Assert.assertTrue(session.isClosing());
         Assert.assertEquals(0, support.getManagedSessions().size());
         Assert.assertFalse(support.getManagedSessions().contains(session));
     }
