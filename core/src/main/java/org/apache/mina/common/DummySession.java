@@ -54,15 +54,14 @@ public class DummySession extends AbstractIoSession {
 
     private volatile IoService service;
 
-    private volatile IoProcessor<IoSession> processor;
-
     private volatile IoSessionConfig config = new AbstractIoSessionConfig() {
         @Override
         protected void doSetAll(IoSessionConfig config) {
         }
     };
 
-    private volatile IoFilterChain filterChain = new DefaultIoFilterChain(this);
+    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
+    private final IoProcessor<IoSession> processor;
 
     private volatile IoHandler handler = new IoHandlerAdapter();
     private volatile SocketAddress localAddress = ANONYMOUS_ADDRESS;
@@ -164,17 +163,6 @@ public class DummySession extends AbstractIoSession {
         return filterChain;
     }
 
-    /**
-     * Sets the filter chain that affects this session.
-     */
-    public void setFilterChain(IoFilterChain filterChain) {
-        if (filterChain == null) {
-            throw new NullPointerException("filterChain");
-        }
-
-        this.filterChain = filterChain;
-    }
-
     public IoHandler getHandler() {
         return handler;
     }
@@ -237,16 +225,8 @@ public class DummySession extends AbstractIoSession {
     }
 
     @Override
-    public IoProcessor<IoSession> getProcessor() {
+    protected final IoProcessor<IoSession> getProcessor() {
         return processor;
-    }
-
-    public void setProcessor(IoProcessor<IoSession> processor) {
-        if (processor == null) {
-            throw new NullPointerException("processor");
-        }
-
-        this.processor = processor;
     }
 
     public TransportMetadata getTransportMetadata() {
