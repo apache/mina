@@ -363,19 +363,19 @@ public class DefaultIoFilterChain implements IoFilterChain {
     private void callNextSessionClosed(Entry entry, IoSession session) {
         try {
             entry.getFilter().sessionClosed(entry.getNextFilter(), session);
-
         } catch (Throwable e) {
             fireExceptionCaught(e);
         }
     }
 
     public void fireSessionIdle(IdleStatus status) {
+        session.increaseIdleCount(status, System.currentTimeMillis());
         Entry head = this.head;
         callNextSessionIdle(head, session, status);
     }
 
-    private void callNextSessionIdle(Entry entry, IoSession session,
-            IdleStatus status) {
+    private void callNextSessionIdle(
+            Entry entry, IoSession session, IdleStatus status) {
         try {
             entry.getFilter().sessionIdle(entry.getNextFilter(), session,
                     status);
@@ -390,11 +390,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         callNextMessageReceived(head, session, message);
     }
 
-    private void callNextMessageReceived(Entry entry, IoSession session,
-            Object message) {
+    private void callNextMessageReceived(
+            Entry entry, IoSession session, Object message) {
         try {
-            entry.getFilter().messageReceived(entry.getNextFilter(), session,
-                    message);
+            entry.getFilter().messageReceived(
+                    entry.getNextFilter(), session, message);
         } catch (Throwable e) {
             fireExceptionCaught(e);
         }

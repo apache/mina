@@ -255,7 +255,6 @@ public class IdleStatusChecker {
             long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
                 && currentTime - lastIoTime >= idleTime) {
-            session.increaseIdleCount(status, currentTime);
             session.getFilterChain().fireSessionIdle(status);
         }
     }
@@ -281,6 +280,6 @@ public class IdleStatusChecker {
 
     private static void updateThroughput(
             AbstractIoSession session, long currentTime) {
-        session.updateThroughput(currentTime);
+        session.updateThroughput(currentTime, false);
     }
 }

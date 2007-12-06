@@ -460,11 +460,25 @@ public abstract class AbstractIoSession implements IoSession {
         return writtenMessagesThroughput;
     }
     
-    protected final void updateThroughput(long currentTime) {
+    /**
+     * Update all statistical properties related with throughput assuming
+     * the specified time is the current time.  By default this method returns
+     * silently without updating the throughput properties if they were 
+     * calculated already within last 
+     * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
+     * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method 
+     * updates the throughput properties immediately.
+
+     * @param currentTime the current time in milliseconds
+     */
+    protected final void updateThroughput(long currentTime, boolean force) {
         int interval = (int) (currentTime - lastThroughputCalculationTime);
+        
         long minInterval = getConfig().getThroughputCalculationIntervalInMillis();
         if (minInterval == 0 || interval < minInterval) {
-            return;
+            if (!force) {
+                return;
+            }
         }
         
         readBytesThroughput = (readBytes - lastReadBytes) * 1000.0 / interval;

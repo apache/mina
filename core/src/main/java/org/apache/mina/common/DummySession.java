@@ -71,8 +71,7 @@ public class DummySession extends AbstractIoSession {
         IoAcceptor acceptor = new AbstractIoAcceptor(
                 new AbstractIoSessionConfig() {
                     @Override
-                    protected void doSetAll(IoSessionConfig config) {
-                    }
+                    protected void doSetAll(IoSessionConfig config) {}
                 }) {
 
             @Override
@@ -257,5 +256,17 @@ public class DummySession extends AbstractIoSession {
         }
 
         this.transportMetadata = transportMetadata;
+    }
+
+    /**
+     * Update all statistical properties related with throughput.  By default
+     * this method returns silently without updating the throughput properties
+     * if they were calculated already within last 
+     * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
+     * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method
+     * updates the throughput properties immediately.
+     */
+    public void updateThroughput(boolean force) {
+        super.updateThroughput(System.currentTimeMillis(), force);
     }
 }
