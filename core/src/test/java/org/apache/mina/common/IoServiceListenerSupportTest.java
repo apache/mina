@@ -81,10 +81,10 @@ public class IoServiceListenerSupportTest extends TestCase {
         session.setService(mockService);
         session.setLocalAddress(ADDRESS);
 
-        MockControl chainControl = MockControl
-                .createStrictControl(IoFilterChain.class);
-        IoFilterChain chain = (IoFilterChain) chainControl.getMock();
-        session.setFilterChain(chain);
+        MockControl handlerControl = MockControl
+                .createStrictControl(IoHandler.class);
+        IoHandler handler = (IoHandler) handlerControl.getMock();
+        session.setHandler(handler);
 
         MockControl listenerControl = MockControl
                 .createStrictControl(IoServiceListener.class);
@@ -93,25 +93,25 @@ public class IoServiceListenerSupportTest extends TestCase {
 
         // Test creation
         listener.sessionCreated(session);
-        chain.fireSessionCreated();
-        chain.fireSessionOpened();
+        handler.sessionCreated(session);
+        handler.sessionOpened(session);
 
         listenerControl.replay();
-        chainControl.replay();
+        handlerControl.replay();
 
         support.add(listener);
         support.fireSessionCreated(session);
 
         listenerControl.verify();
-        chainControl.verify();
+        handlerControl.verify();
 
         Assert.assertEquals(1, support.getManagedSessions().size());
         Assert.assertTrue(support.getManagedSessions().contains(session));
 
         // Test destruction & other side effects
         listenerControl.reset();
-        chainControl.reset();
-        chain.fireSessionClosed();
+        handlerControl.reset();
+        handler.sessionClosed(session);
         listener.sessionDestroyed(session);
 
         listenerControl.replay();
@@ -141,10 +141,10 @@ public class IoServiceListenerSupportTest extends TestCase {
         session.setService(acceptor);
         session.setLocalAddress(ADDRESS);
 
-        MockControl chainControl = MockControl
-                .createStrictControl(IoFilterChain.class);
-        IoFilterChain chain = (IoFilterChain) chainControl.getMock();
-        session.setFilterChain(chain);
+        MockControl handlerControl = MockControl
+                .createStrictControl(IoHandler.class);
+        IoHandler handler = (IoHandler) handlerControl.getMock();
+        session.setHandler(handler);
 
         final MockControl listenerControl = MockControl
                 .createStrictControl(IoServiceListener.class);
@@ -154,32 +154,31 @@ public class IoServiceListenerSupportTest extends TestCase {
         // Activate a service and create a session.
         listener.serviceActivated(acceptor);
         listener.sessionCreated(session);
-        chain.fireSessionCreated();
-        chain.fireSessionOpened();
+        handler.sessionCreated(session);
+        handler.sessionOpened(session);
 
         listenerControl.replay();
-        chainControl.replay();
+        handlerControl.replay();
 
         support.add(listener);
         support.fireServiceActivated();
         support.fireSessionCreated(session);
 
         listenerControl.verify();
-        chainControl.verify();
+        handlerControl.verify();
 
         // Deactivate a service and make sure the session is closed & destroyed.
         listenerControl.reset();
-        chainControl.reset();
+        handlerControl.reset();
 
         listener.serviceDeactivated(acceptor);
         acceptorControl.expectAndReturn(acceptor.isCloseOnDeactivation(), true);
         listener.sessionDestroyed(session);
-        chain.fireFilterClose();
-        chain.fireSessionClosed();
+        handler.sessionClosed(session);
 
         listenerControl.replay();
         acceptorControl.replay();
-        chainControl.replay();
+        handlerControl.replay();
 
         new Thread() {
             // Emulate I/O service
@@ -204,7 +203,7 @@ public class IoServiceListenerSupportTest extends TestCase {
             listenerControl.verify();
         }
         acceptorControl.verify();
-        chainControl.verify();
+        handlerControl.verify();
 
         Assert.assertTrue(session.isClosing());
         Assert.assertEquals(0, support.getManagedSessions().size());
@@ -223,10 +222,10 @@ public class IoServiceListenerSupportTest extends TestCase {
         session.setService(connector);
         session.setRemoteAddress(ADDRESS);
 
-        MockControl chainControl = MockControl
-                .createStrictControl(IoFilterChain.class);
-        IoFilterChain chain = (IoFilterChain) chainControl.getMock();
-        session.setFilterChain(chain);
+        MockControl handlerControl = MockControl
+                .createStrictControl(IoHandler.class);
+        IoHandler handler = (IoHandler) handlerControl.getMock();
+        session.setHandler(handler);
 
         MockControl listenerControl = MockControl
                 .createStrictControl(IoServiceListener.class);
@@ -236,32 +235,32 @@ public class IoServiceListenerSupportTest extends TestCase {
         // Creating a session should activate a service automatically.
         listener.serviceActivated(connector);
         listener.sessionCreated(session);
-        chain.fireSessionCreated();
-        chain.fireSessionOpened();
+        handler.sessionCreated(session);
+        handler.sessionOpened(session);
 
         listenerControl.replay();
-        chainControl.replay();
+        handlerControl.replay();
 
         support.add(listener);
         support.fireSessionCreated(session);
 
         listenerControl.verify();
-        chainControl.verify();
+        handlerControl.verify();
 
         // Destroying a session should deactivate a service automatically.
         listenerControl.reset();
-        chainControl.reset();
+        handlerControl.reset();
         listener.sessionDestroyed(session);
-        chain.fireSessionClosed();
+        handler.sessionClosed(session);
         listener.serviceDeactivated(connector);
 
         listenerControl.replay();
-        chainControl.replay();
+        handlerControl.replay();
 
         support.fireSessionDestroyed(session);
 
         listenerControl.verify();
-        chainControl.verify();
+        handlerControl.verify();
 
         Assert.assertEquals(0, support.getManagedSessions().size());
         Assert.assertFalse(support.getManagedSessions().contains(session));
