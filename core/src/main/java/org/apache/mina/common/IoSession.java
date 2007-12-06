@@ -235,6 +235,22 @@ public interface IoSession {
     Object setAttributeIfAbsent(Object key, Object value);
 
     /**
+     * Sets a user defined attribute without a value if the attribute with
+     * the specified key is not set yet.  This is useful when you just want to
+     * put a 'mark' attribute.  Its value is set to {@link Boolean#TRUE}.
+     * This method is same with the following code except that the operation
+     * is performed atomically.
+     * <pre>
+     * if (containsAttribute(key)) {
+     *     return getAttribute(key);  // might not always be Boolean.TRUE.
+     * } else {
+     *     return setAttribute(key);
+     * }
+     * </pre>
+     */
+    Object setAttributeIfAbsent(Object key);
+
+    /**
      * Removes a user-defined attribute with the specified key.
      *
      * @return The old value of the attribute.  <tt>null</tt> if not found.

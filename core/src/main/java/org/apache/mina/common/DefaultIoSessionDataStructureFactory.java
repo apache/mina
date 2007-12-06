@@ -55,20 +55,9 @@ public class DefaultIoSessionDataStructureFactory implements
         private final Map<Object, Object> attributes =
             Collections.synchronizedMap(new HashMap<Object, Object>(4));
 
-        public Object getAttribute(IoSession session, Object key) {
-            if (key == null) {
-                throw new NullPointerException("key");
-            }
-
-            return attributes.get(key);
-        }
-
         public Object getAttribute(IoSession session, Object key, Object defaultValue) {
             if (key == null) {
                 throw new NullPointerException("key");
-            }
-            if (defaultValue == null) {
-                return attributes.get(key);
             }
 
             Object answer = attributes.get(key);
@@ -89,10 +78,6 @@ public class DefaultIoSessionDataStructureFactory implements
             } else {
                 return attributes.put(key, value);
             }
-        }
-
-        public Object setAttribute(IoSession session, Object key) {
-            return setAttribute(session, key, Boolean.TRUE);
         }
 
         public Object setAttributeIfAbsent(IoSession session, Object key, Object value) {

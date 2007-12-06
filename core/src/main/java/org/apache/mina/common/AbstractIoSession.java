@@ -336,7 +336,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     public final Object getAttribute(Object key) {
-        return attributes.getAttribute(this, key);
+        return getAttribute(key, null);
     }
 
     public final Object getAttribute(Object key, Object defaultValue) {
@@ -348,11 +348,15 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     public final Object setAttribute(Object key) {
-        return attributes.setAttribute(this, key);
+        return setAttribute(key, Boolean.TRUE);
     }
 
     public final Object setAttributeIfAbsent(Object key, Object value) {
         return attributes.setAttributeIfAbsent(this, key, value);
+    }
+
+    public final Object setAttributeIfAbsent(Object key) {
+        return setAttributeIfAbsent(key, Boolean.TRUE);
     }
 
     public final Object removeAttribute(Object key) {
