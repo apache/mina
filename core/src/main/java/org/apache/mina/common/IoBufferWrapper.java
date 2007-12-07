@@ -199,6 +199,16 @@ public class IoBufferWrapper extends IoBuffer {
     }
 
     @Override
+    public IoBuffer getSlice(int index, int length) {
+        return buf.getSlice(index, length);
+    }
+
+    @Override
+    public IoBuffer getSlice(int length) {
+        return buf.getSlice(length);
+    }
+
+    @Override
     public IoBuffer get(byte[] dst) {
         buf.get(dst);
         return this;

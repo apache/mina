@@ -515,7 +515,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @see ByteBuffer#slice()
      */
     public abstract IoBuffer slice();
-
+    
     /**
      * @see ByteBuffer#asReadOnlyBuffer()
      */
@@ -575,6 +575,16 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @see ByteBuffer#get(byte[])
      */
     public abstract IoBuffer get(byte[] dst);
+
+    /**
+     * TODO document me.
+     */
+    public abstract IoBuffer getSlice(int index, int length);
+
+    /**
+     * TODO document me.
+     */
+    public abstract IoBuffer getSlice(int length);
 
     /**
      * Writes the content of the specified <tt>src</tt> into this buffer.

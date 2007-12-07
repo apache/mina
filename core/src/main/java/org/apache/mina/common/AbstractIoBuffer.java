@@ -685,6 +685,42 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         recapacityAllowed = false;
         return slice0();
     }
+    
+    @Override
+    public final IoBuffer getSlice(int index, int length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("length: " + length);
+        }
+        int pos = position();
+        int limit = limit();
+        position(index);
+        limit(index + length);
+        IoBuffer slice = slice();
+        position(pos);
+        limit(limit);
+        return slice;
+    }
+
+    @Override
+    public final IoBuffer getSlice(int length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("length: " + length);
+        }
+        int pos = position();
+        int limit = limit();
+        int nextPos = pos + length;
+        if (limit < nextPos) {
+            throw new IndexOutOfBoundsException(
+                    "position + length (" + nextPos + ") is greater " +
+                    "than limit (" + limit + ").");
+        }
+        
+        limit(pos + length);
+        IoBuffer slice = slice();
+        position(nextPos);
+        limit(limit);
+        return slice;
+    }
 
     /**
      * Implement this method to return the unexpandable slice of this
