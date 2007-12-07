@@ -1512,6 +1512,15 @@ public abstract class ByteBuffer implements Comparable {
                                 "Unexpected class descriptor type: " + type);
                     }
                 }
+                
+                protected Class resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                    String name = desc.getName();
+                    try {
+                        return Class.forName(name, false, classLoader);
+                    } catch (ClassNotFoundException ex) {
+                        return super.resolveClass(desc);
+                    }
+                }
             };
             return in.readObject();
         } catch (IOException e) {
