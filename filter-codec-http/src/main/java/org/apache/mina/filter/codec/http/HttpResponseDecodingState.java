@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.apache.mina.filter.codec.statemachine.ConsumeToDisconnectionDecodingState;
+import org.apache.mina.filter.codec.statemachine.ConsumeToEndOfSessionDecodingState;
 import org.apache.mina.filter.codec.statemachine.CrLfDecodingState;
 import org.apache.mina.filter.codec.statemachine.DecodingState;
 import org.apache.mina.filter.codec.statemachine.DecodingStateMachine;
@@ -218,7 +218,7 @@ abstract class HttpResponseDecodingState extends DecodingStateMachine {
                                 "request with unspecified length.");
                     }
                     // FIXME hard-coded max length.
-                    nextState = new ConsumeToDisconnectionDecodingState(1048576) {
+                    nextState = new ConsumeToEndOfSessionDecodingState(1048576) {
                         @Override
                         protected DecodingState finishDecode(IoBuffer readData,
                                 ProtocolDecoderOutput out) throws Exception {

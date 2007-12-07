@@ -29,31 +29,24 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class StateMachineProtocolDecoder implements ProtocolDecoder {
-    private final DecodingStateMachine stateMachine;
+public class DecodingStateProtocolDecoder implements ProtocolDecoder {
+    private final DecodingState state;
 
-    public StateMachineProtocolDecoder(DecodingStateMachine stateMachine) {
+    public DecodingStateProtocolDecoder(DecodingState stateMachine) {
         if (stateMachine == null) {
             throw new NullPointerException("stateMachine");
         }
-        this.stateMachine = stateMachine;
+        this.state = stateMachine;
     }
     
-    /**
-     * Returns the {@link DecodingStateMachine} employed by this decoder.
-     */
-    protected DecodingStateMachine getStateMachine() {
-        return stateMachine;
-    }
-
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
-        stateMachine.decode(in, out);
+        state.decode(in, out);
     }
 
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
-        stateMachine.finishDecode(out);
+        state.finishDecode(out);
     }
 
     public void dispose(IoSession session) throws Exception {}

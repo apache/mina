@@ -23,13 +23,13 @@ import java.util.List;
 
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.statemachine.DecodingState;
-import org.apache.mina.filter.codec.statemachine.StateMachineProtocolDecoder;
+import org.apache.mina.filter.codec.statemachine.DecodingStateProtocolDecoder;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class HttpResponseDecoder extends StateMachineProtocolDecoder {
+public class HttpResponseDecoder extends DecodingStateProtocolDecoder {
     public HttpResponseDecoder() {
         super(new HttpResponseDecodingState() {
             @Override

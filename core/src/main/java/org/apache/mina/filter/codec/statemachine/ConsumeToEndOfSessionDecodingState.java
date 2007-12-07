@@ -32,12 +32,12 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class ConsumeToDisconnectionDecodingState implements DecodingState {
+public abstract class ConsumeToEndOfSessionDecodingState implements DecodingState {
 
     private IoBuffer buffer;
     private final int maxLength;
     
-    public ConsumeToDisconnectionDecodingState(int maxLength) {
+    public ConsumeToEndOfSessionDecodingState(int maxLength) {
         this.maxLength = maxLength;
     }
 
