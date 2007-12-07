@@ -22,7 +22,6 @@ package org.apache.mina.protocol.http.client;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.apache.mina.common.IoBuffer;
@@ -125,7 +124,7 @@ public class AsyncHttpClientTest extends AbstractTest {
     private void doConnection(TestCallback callback, String url,
             HttpRequest request, boolean testForException)
             throws Exception {
-        URL url_connect = new URL(url);
+        URI url_connect = new URI(url);
 
         AsyncHttpClient ahc = new AsyncHttpClient(url_connect, callback);
         ahc.connect();

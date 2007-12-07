@@ -48,6 +48,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     };
 
     private DecodingState currentState;
+    private boolean initialized;
 
     protected abstract DecodingState init() throws Exception;
 
@@ -58,10 +59,7 @@ public abstract class DecodingStateMachine implements DecodingState {
 
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
-        DecodingState state = this.currentState;
-        if (state == null) {
-            state = init();
-        }
+        DecodingState state = getCurrentState();
 
         final int limit = in.limit();
         int pos = in.position();
@@ -99,13 +97,64 @@ public abstract class DecodingStateMachine implements DecodingState {
 
             // Destroy if decoding is finished or failed.
             if (state == null) {
-                childProducts.clear();
-                try {
-                    destroy();
-                } catch (Exception e2) {
-                    log.warn("Failed to destroy a decoding state machine.", e2);
-                }
+                cleanup();
             }
         }
+    }
+
+    public DecodingState finishDecode(ProtocolDecoderOutput out)
+            throws Exception {
+        DecodingState nextState;
+        DecodingState state = getCurrentState();
+        try {
+            for (;;) {
+                DecodingState oldState = state;
+                state = state.finishDecode(childOutput);
+                if (state == null) {
+                    // Finished
+                    break;
+                }
+    
+                // Exit if state didn't change.
+                if (oldState == state) {
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            state = null;
+            log.debug(
+                    "Ignoring the exception caused by a closed session.", e);
+        } finally {
+            this.currentState = state;
+            nextState = finishDecode(childProducts, out);
+            if (state == null) {
+                cleanup();
+
+            }
+        }
+        return nextState;
+    }
+
+    private void cleanup() {
+        if (!initialized) {
+            throw new IllegalStateException();
+        }
+        
+        initialized = false;
+        childProducts.clear();
+        try {
+            destroy();
+        } catch (Exception e2) {
+            log.warn("Failed to destroy a decoding state machine.", e2);
+        }
+    }
+
+    private DecodingState getCurrentState() throws Exception {
+        DecodingState state = this.currentState;
+        if (state == null) {
+            state = init();
+            initialized = true;
+        }
+        return state;
     }
 }

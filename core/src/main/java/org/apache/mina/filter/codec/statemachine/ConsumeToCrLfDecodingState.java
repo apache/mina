@@ -90,8 +90,7 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
             } else {
                 // When input contained only CR or LF rather than actual data...
                 if (buffer == null) {
-                    product = IoBuffer.allocate(1);
-                    product.limit(0);
+                    product = IoBuffer.allocate(0);
                 } else {
                     product = buffer.flip();
                     buffer = null;
@@ -112,6 +111,18 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
             }
             return this;
         }
+    }
+
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
+        IoBuffer product;
+        // When input contained only CR or LF rather than actual data...
+        if (buffer == null) {
+            product = IoBuffer.allocate(0);
+        } else {
+            product = buffer.flip();
+            buffer = null;
+        }
+        return finishDecode(product, out);
     }
 
     protected abstract DecodingState finishDecode(IoBuffer product,

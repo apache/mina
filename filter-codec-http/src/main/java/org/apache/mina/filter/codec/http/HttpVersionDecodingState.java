@@ -22,6 +22,7 @@ package org.apache.mina.filter.codec.http;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.common.IoBuffer;
+import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.statemachine.ConsumeToDynamicTerminatorDecodingState;
 import org.apache.mina.filter.codec.statemachine.DecodingState;
@@ -62,6 +63,11 @@ abstract class HttpVersionDecodingState implements DecodingState {
         return READ_PROTOCOL_VERSION.decode(in, out);
     }
 
+    public DecodingState finishDecode(ProtocolDecoderOutput out)
+            throws Exception {
+        throw new ProtocolDecoderException(
+                "Unexpected end of session while waiting for a HTTP version field.");
+    }
 
     protected abstract DecodingState finishDecode(
             HttpVersion version, ProtocolDecoderOutput out) throws Exception;

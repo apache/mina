@@ -87,6 +87,11 @@ public abstract class CrLfDecodingState implements DecodingState {
         }
     }
 
+    public DecodingState finishDecode(ProtocolDecoderOutput out)
+            throws Exception {
+        return finishDecode(false, out);
+    }
+
     protected abstract DecodingState finishDecode(boolean foundCRLF,
             ProtocolDecoderOutput out) throws Exception;
 }

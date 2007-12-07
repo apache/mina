@@ -35,7 +35,9 @@ public class HttpResponseDecoder extends StateMachineProtocolDecoder {
             @Override
             protected DecodingState finishDecode(List<Object> childProducts,
                     ProtocolDecoderOutput out) throws Exception {
-                // Never be executed.
+                for (Object m: childProducts) {
+                    out.write(m);
+                }
                 return null;
             }
         });

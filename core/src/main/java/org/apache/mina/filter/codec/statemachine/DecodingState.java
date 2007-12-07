@@ -20,6 +20,7 @@
 package org.apache.mina.filter.codec.statemachine;
 
 import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
@@ -28,7 +29,14 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @version $Rev$, $Date$
  */
 public interface DecodingState {
-    // TODO Find out the best way to provide init/destroy.
+    /**
+     * Invoked when data is available for this state.
+     */
     DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception;
+    
+    /**
+     * Invoked when the associated {@link IoSession} is closed.
+     */
+    DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception;
 }

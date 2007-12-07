@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.statemachine.ConsumeToDisconnectionDecodingState;
 import org.apache.mina.filter.codec.statemachine.CrLfDecodingState;
 import org.apache.mina.filter.codec.statemachine.DecodingState;
 import org.apache.mina.filter.codec.statemachine.DecodingStateMachine;
@@ -195,11 +196,29 @@ abstract class HttpResponseDecodingState extends DecodingStateMachine {
                 int length = getContentLength(response);
                 if (length > 0) {
                     if (LOG.isDebugEnabled()) {
-                        LOG
-                                .debug("Using fixed length decoder for request with length "
-                                        + length);
+                        LOG.debug(
+                                "Using fixed length decoder for request with " +
+                                "length " + length);
                     }
+
+                    // TODO max length limitation.
                     nextState = new FixedLengthDecodingState(length) {
+                        @Override
+                        protected DecodingState finishDecode(IoBuffer readData,
+                                ProtocolDecoderOutput out) throws Exception {
+                            response.setContent(readData);
+                            out.write(response);
+                            return null;
+                        }
+                    };
+                } else if (length < 0) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(
+                                "Using consume-to-disconnection decoder for " +
+                                "request with unspecified length.");
+                    }
+                    // FIXME hard-coded max length.
+                    nextState = new ConsumeToDisconnectionDecodingState(1048576) {
                         @Override
                         protected DecodingState finishDecode(IoBuffer readData,
                                 ProtocolDecoderOutput out) throws Exception {
@@ -221,12 +240,12 @@ abstract class HttpResponseDecodingState extends DecodingStateMachine {
          * Obtains the content length from the specified request
          *
          * @param response  The request
-         * @return         The content length, or 0 if not specified
+         * @return         The content length, or -1 if not specified
          * @throws HttpDecoderException If an invalid content length is specified
          */
         private int getContentLength(HttpResponse response)
                 throws ProtocolDecoderException {
-            int length = 0;
+            int length = -1;
             String lengthValue = response.getHeader(CONTENT_LENGTH);
             if (lengthValue != null) {
                 try {

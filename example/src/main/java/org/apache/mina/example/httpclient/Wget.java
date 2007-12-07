@@ -21,7 +21,8 @@
 package org.apache.mina.example.httpclient;
 
 import java.net.URI;
-import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.filter.codec.http.DefaultHttpRequest;
 import org.apache.mina.filter.codec.http.HttpResponse;
@@ -46,29 +47,26 @@ public class Wget {
      * Creates a new instance of HttpClient.  Constructor that does all
      * the work for this example.
      *
-     * @param url
+     * @param uri
      *  Example: http://www.google.com
      * @throws Exception
      *  thrown if something goes wrong.
      */
-    public Wget(URL url) throws Exception {
-        WgetCallback callback = new WgetCallback();
-
-        String path;
-        if (url.getPath() == null || url.getPath().length() == 0) {
-            path = "/index.html";
-        } else {
-            path = url.getPath();
+    public Wget(URI uri) throws Exception {
+        if (uri.getPath() == null || uri.getPath().length() == 0) {
+            uri = new URI(uri.toString() + "/index.html");
         }
 
+        WgetCallback callback = new WgetCallback();
         MutableHttpRequest request = new DefaultHttpRequest();
-        request.setRequestUri(new URI(path));
-        AsyncHttpClient ahc = new AsyncHttpClient(url, callback);
+        request.setRequestUri(uri);
+
+        AsyncHttpClient ahc = new AsyncHttpClient(uri, callback);
         ahc.connect();
         ahc.sendRequest(request);
         synchronized (semaphore) {
-            //5 second timeout due to no response
-            semaphore.wait(5000);
+            // 10 second timeout due to no response.
+            semaphore.wait(1000 * 10);
         }
 
         if (callback.isException()) {
@@ -76,7 +74,14 @@ public class Wget {
         }
 
         HttpResponse msg = callback.getMessage();
-        System.out.println(msg.getContent());
+        String charset = msg.getContentType().replaceAll(".*charset\\s*=\\s*", "");
+        CharsetDecoder decoder;
+        try {
+            decoder = Charset.forName(charset).newDecoder();
+        } catch (Exception e) {
+            decoder = Charset.forName("ISO-8859-1").newDecoder();
+        }
+        System.out.println(msg.getContent().getString(decoder));
     }
 
     class WgetCallback implements AsyncHttpClientCallback {
@@ -187,7 +192,7 @@ public class Wget {
      *  Thrown if something goes wrong.
      */
     public static void main(String[] args) throws Exception {
-        URL theUrlRequest = new URL(args[0]);
+        URI theUrlRequest = new URI(args[0]);
         new Wget(theUrlRequest);
 
         System.exit(0);

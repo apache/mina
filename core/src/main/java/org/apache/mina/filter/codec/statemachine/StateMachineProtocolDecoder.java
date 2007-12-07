@@ -30,10 +30,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @version $Rev$, $Date$
  */
 public class StateMachineProtocolDecoder implements ProtocolDecoder {
-
     private final DecodingStateMachine stateMachine;
-
-    private DecodingState currentState;
 
     public StateMachineProtocolDecoder(DecodingStateMachine stateMachine) {
         if (stateMachine == null) {
@@ -41,48 +38,23 @@ public class StateMachineProtocolDecoder implements ProtocolDecoder {
         }
         this.stateMachine = stateMachine;
     }
+    
+    /**
+     * Returns the {@link DecodingStateMachine} employed by this decoder.
+     */
+    protected DecodingStateMachine getStateMachine() {
+        return stateMachine;
+    }
 
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
-        DecodingState state = this.currentState;
-        if (state == null) {
-            state = stateMachine.init();
-        }
-
-        try {
-            for (;;) {
-                int remaining = in.remaining();
-
-                // Wait for more data if all data is consumed.
-                if (remaining == 0) {
-                    break;
-                }
-
-                DecodingState oldState = state;
-                state = state.decode(in, out);
-
-                if (state == null) {
-                    // Finished
-                    break;
-                }
-
-                // Wait for more data if nothing is consumed and state didn't change.
-                if (in.remaining() == remaining && oldState == state) {
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            state = null;
-            throw e;
-        } finally {
-            this.currentState = state;
-        }
-    }
-
-    public void dispose(IoSession session) throws Exception {
+        stateMachine.decode(in, out);
     }
 
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
+        stateMachine.finishDecode(out);
     }
+
+    public void dispose(IoSession session) throws Exception {}
 }

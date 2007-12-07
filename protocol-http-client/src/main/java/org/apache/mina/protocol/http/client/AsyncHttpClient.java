@@ -21,7 +21,7 @@ package org.apache.mina.protocol.http.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.URL;
+import java.net.URI;
 import java.security.GeneralSecurityException;
 
 import javax.net.ssl.SSLContext;
@@ -41,7 +41,7 @@ public class AsyncHttpClient {
 
     public static String DEFAULT_SSL_PROTOCOL = "TLS";
 
-    private URL url;
+    private URI uri;
 
     private boolean followRedirects = true;
 
@@ -53,8 +53,8 @@ public class AsyncHttpClient {
 
     private AsyncHttpClientCallback callback;
 
-    public AsyncHttpClient(URL url, AsyncHttpClientCallback callback) {
-        this.url = url;
+    public AsyncHttpClient(URI url, AsyncHttpClientCallback callback) {
+        this.uri = url;
         this.callback = callback;
     }
 
@@ -63,8 +63,8 @@ public class AsyncHttpClient {
 
         connector.setConnectTimeout(connectionTimeout);
 
-        String scheme = url.getProtocol();
-        int port = url.getPort();
+        String scheme = uri.getScheme();
+        int port = uri.getPort();
         if (scheme.toLowerCase().equals("https")) {
             SslFilter filter = new SslFilter(createClientSSLContext());
             filter.setUseClientMode(true);
@@ -80,11 +80,11 @@ public class AsyncHttpClient {
         connector.getFilterChain().addLast("protocolFilter",
                 new ProtocolCodecFilter(new HttpCodecFactory()));
         connector.setHandler(new HttpIoHandler(callback));
-        ConnectFuture future = connector.connect(new InetSocketAddress(url
+        ConnectFuture future = connector.connect(new InetSocketAddress(uri
                 .getHost(), port));
         future.awaitUninterruptibly();
         if (!future.isConnected()) {
-            throw new IOException("Cannot connect to " + url.toString());
+            throw new IOException("Cannot connect to " + uri.toString());
         }
         session = future.getSession();
     }

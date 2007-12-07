@@ -20,6 +20,7 @@
 package org.apache.mina.filter.codec.statemachine;
 
 import org.apache.mina.common.IoBuffer;
+import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
@@ -52,6 +53,12 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
             counter ++;
         }
         return this;
+    }
+
+    public DecodingState finishDecode(ProtocolDecoderOutput out)
+            throws Exception {
+        throw new ProtocolDecoderException(
+                "Unexpected end of session while waiting for a short integer.");
     }
 
     protected abstract DecodingState finishDecode(short value,

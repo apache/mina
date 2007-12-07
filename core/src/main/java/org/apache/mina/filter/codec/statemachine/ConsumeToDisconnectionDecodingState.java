@@ -24,52 +24,46 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
+ * A {@link DecodingState} which consumes all received bytes until a configured
+ * number of read bytes has been reached.  Please note that this state can
+ * produce the buffer with less data if the associated session has been
+ * closed unexpectedly.
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class IntegerDecodingState implements DecodingState {
-    
-    private int firstByte;
-    private int secondByte;
-    private int thirdByte;
-    private int counter;
+public abstract class ConsumeToDisconnectionDecodingState implements DecodingState {
 
-    public IntegerDecodingState() {
+    private IoBuffer buffer;
+    private final int maxLength;
+    
+    public ConsumeToDisconnectionDecodingState(int maxLength) {
+        this.maxLength = maxLength;
     }
 
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
-        while (in.hasRemaining()) {
-            switch (counter) {
-            case 0:
-                firstByte = in.getUnsigned();
-                break;
-            case 1:
-                secondByte = in.getUnsigned();
-                break;
-            case 2:
-                thirdByte = in.getUnsigned();
-                break;
-            case 3:
-                counter = 0;
-                return finishDecode(
-                        (firstByte << 24) | (secondByte << 16) | (thirdByte << 8) | in.getUnsigned(),
-                        out);
-            default:
-                throw new InternalError();
-            }
-            counter ++;
+        if (buffer == null) {
+            buffer = IoBuffer.allocate(256).setAutoExpand(true);
         }
 
+        if (buffer.position() + in.remaining() > maxLength) {
+            throw new ProtocolDecoderException("Received data exceeds " + maxLength + " byte(s).");
+        }
+        buffer.put(in);
         return this;
     }
 
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
-        throw new ProtocolDecoderException(
-                "Unexpected end of session while waiting for an integer.");
+        try {
+            buffer.flip();
+            return finishDecode(buffer, out);
+        } finally {
+            buffer = null;
+        }
     }
 
-    protected abstract DecodingState finishDecode(int value,
+    protected abstract DecodingState finishDecode(IoBuffer readData,
             ProtocolDecoderOutput out) throws Exception;
 }

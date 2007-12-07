@@ -24,7 +24,9 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
  * A {@link DecodingState} which consumes all received bytes until a configured
- * number of read bytes has been reached.
+ * number of read bytes has been reached.  Please note that this state can
+ * produce the buffer with less data if the associated session has been
+ * closed unexpectedly.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -73,6 +75,18 @@ public abstract class FixedLengthDecodingState implements DecodingState {
                 return this;
             }
         }
+    }
+
+    public DecodingState finishDecode(ProtocolDecoderOutput out)
+            throws Exception {
+        IoBuffer readData;
+        if (buffer == null) {
+            readData = IoBuffer.allocate(0);
+        } else {
+            readData = buffer.flip();
+            buffer = null;
+        }
+        return finishDecode(readData ,out);
     }
 
     protected abstract DecodingState finishDecode(IoBuffer readData,

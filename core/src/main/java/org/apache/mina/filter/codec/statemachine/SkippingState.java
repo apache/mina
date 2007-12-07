@@ -58,6 +58,11 @@ public abstract class SkippingState implements DecodingState {
         return this;
     }
 
+    public DecodingState finishDecode(ProtocolDecoderOutput out)
+            throws Exception {
+        return finishDecode(skippedBytes);
+    }
+
     protected abstract boolean canSkip(byte b);
 
     protected abstract DecodingState finishDecode(int skippedBytes)
