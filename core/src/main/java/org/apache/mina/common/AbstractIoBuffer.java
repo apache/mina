@@ -1524,6 +1524,16 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                                 "Unexpected class descriptor type: " + type);
                     }
                 }
+                
+                @Override
+                protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                    String name = desc.getName();
+                    try {
+                        return Class.forName(name, false, classLoader);
+                    } catch (ClassNotFoundException ex) {
+                        return super.resolveClass(desc);
+                    }
+                }
             };
             return in.readObject();
         } catch (IOException e) {
