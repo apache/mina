@@ -693,8 +693,18 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         }
         int pos = position();
         int limit = limit();
+        int endIndex = pos + length;
+
+        if (capacity() < endIndex) {
+            throw new IndexOutOfBoundsException(
+                    "index + length (" + endIndex + ") is greater " +
+                    "than capacity (" + capacity() + ").");
+        }
+
+        clear();
         position(index);
-        limit(index + length);
+        limit(endIndex);
+
         IoBuffer slice = slice();
         position(pos);
         limit(limit);
