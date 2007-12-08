@@ -28,14 +28,23 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * A map with expiration.
+ * A map with expiration.  This class contains a worker thread that will 
+ * periodically check this class in order to determine if any objects 
+ * should be removed based on the provided time-to-live value.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ExpiringMap<K, V> implements Map<K, V> {
+    
+    /**
+     * The default value, 60
+     */
     public static final int DEFAULT_TIME_TO_LIVE = 60;
 
+    /**
+     * The default value, 1
+     */
     public static final int DEFAULT_EXPIRATION_INTERVAL = 1;
 
     private static volatile int expirerCount = 1;
@@ -46,14 +55,35 @@ public class ExpiringMap<K, V> implements Map<K, V> {
 
     private final Expirer expirer;
 
+    /**
+     * Creates a new instance of ExpiringMap using the default values 
+     * DEFAULT_TIME_TO_LIVE and DEFAULT_EXPIRATION_INTERVAL
+     *
+     */
     public ExpiringMap() {
         this(DEFAULT_TIME_TO_LIVE, DEFAULT_EXPIRATION_INTERVAL);
     }
 
+    /**
+     * Creates a new instance of ExpiringMap using the supplied 
+     * time-to-live value and the default value for DEFAULT_EXPIRATION_INTERVAL
+     *
+     * @param timeToLive
+     *  The time-to-live value (seconds)
+     */
     public ExpiringMap(int timeToLive) {
         this(timeToLive, DEFAULT_EXPIRATION_INTERVAL);
     }
 
+    /**
+     * Creates a new instance of ExpiringMap using the supplied values and 
+     * a {@link ConcurrentHashMap} for the internal data structure.
+     *
+     * @param timeToLive
+     *  The time-to-live value (seconds)
+     * @param expirationInterval
+     *  The time between checks to see if a value should be removed (seconds)
+     */
     public ExpiringMap(int timeToLive, int expirationInterval) {
         this(new ConcurrentHashMap<K, ExpiringObject>(),
                 new CopyOnWriteArrayList<ExpirationListener<V>>(), timeToLive,
@@ -238,6 +268,13 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         }
     }
 
+    /**
+     * A Thread that monitors an {@link ExpiringMap} and will remove
+     * elements that have passed the threshold.
+     *
+     * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+     * @version $Rev$, $Date$
+     */
     public class Expirer implements Runnable {
         private final ReadWriteLock stateLock = new ReentrantReadWriteLock();
 
@@ -249,6 +286,10 @@ public class ExpiringMap<K, V> implements Map<K, V> {
 
         private final Thread expirerThread;
 
+        /**
+         * Creates a new instance of Expirer.  
+         *
+         */
         public Expirer() {
             expirerThread = new Thread(this, "ExpiringMapExpirer-"
                     + expirerCount++);
@@ -287,6 +328,10 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
         }
 
+        /**
+         * Kick off this thread which will look for old objects and remove them.
+         *
+         */
         public void startExpiring() {
             stateLock.writeLock().lock();
 
@@ -300,6 +345,10 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
         }
 
+        /**
+         * If this thread has not started, then start it.  
+         * Otherwise just return;
+         */
         public void startExpiringIfNotStarted() {
             stateLock.readLock().lock();
             try {
@@ -321,6 +370,9 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
         }
 
+        /**
+         * Stop the thread from monitoring the map.
+         */
         public void stopExpiring() {
             stateLock.writeLock().lock();
 
@@ -334,6 +386,12 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
         }
 
+        /**
+         * Checks to see if the thread is running
+         *
+         * @return
+         *  If the thread is running, true.  Otherwise false.
+         */
         public boolean isRunning() {
             stateLock.readLock().lock();
 
@@ -344,6 +402,12 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
         }
 
+        /**
+         * Returns the Time-to-live value.
+         *
+         * @return
+         *  The time-to-live (seconds)
+         */
         public int getTimeToLive() {
             stateLock.readLock().lock();
 
@@ -354,6 +418,12 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
         }
 
+        /**
+         * Update the value for the time-to-live
+         *
+         * @param timeToLive
+         *  The time-to-live (seconds)
+         */
         public void setTimeToLive(long timeToLive) {
             stateLock.writeLock().lock();
 
@@ -364,6 +434,13 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
         }
 
+        /**
+         * Get the interval in which an object will live in the map before
+         * it is removed.
+         *
+         * @return
+         *  The time in seconds.
+         */
         public int getExpirationInterval() {
             stateLock.readLock().lock();
 
@@ -374,6 +451,13 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
         }
 
+        /**
+         * Set the interval in which an object will live in the map before
+         * it is removed.
+         *
+         * @param expirationInterval
+         *  The time in seconds
+         */
         public void setExpirationInterval(long expirationInterval) {
             stateLock.writeLock().lock();
 
