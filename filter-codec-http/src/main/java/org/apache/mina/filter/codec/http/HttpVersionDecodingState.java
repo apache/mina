@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filter.codec.http;
 
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.common.IoBuffer;
@@ -41,9 +42,20 @@ abstract class HttpVersionDecodingState implements DecodingState {
         @Override
         protected DecodingState finishDecode(IoBuffer product,
                 ProtocolDecoderOutput out) throws Exception {
-            String versionStr = product.getString(asciiDecoder);
-            HttpVersion version = HttpVersion.valueOf(versionStr);
+            String versionStr = null;
+            HttpVersion version = null;
+            try {
+                versionStr = product.getString(asciiDecoder);
+                version = HttpVersion.valueOf(versionStr);
+            } catch (CharacterCodingException e) {
+                // Will take care down the
+            }
+            
             if (version == null) {
+                if (versionStr != null) {
+                    versionStr = product.getHexDump();
+                }
+
                 HttpCodecUtils.throwDecoderException(
                         "Unsupported HTTP version: " + versionStr,
                         HttpResponseStatus.HTTP_VERSION_NOT_SUPPORTED);
@@ -60,7 +72,12 @@ abstract class HttpVersionDecodingState implements DecodingState {
     
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
-        return READ_PROTOCOL_VERSION.decode(in, out);
+        DecodingState nextState = READ_PROTOCOL_VERSION.decode(in, out);
+        if (nextState == READ_PROTOCOL_VERSION) {
+            return this;
+        } else {
+            return nextState;
+        }
     }
 
     public DecodingState finishDecode(ProtocolDecoderOutput out)
