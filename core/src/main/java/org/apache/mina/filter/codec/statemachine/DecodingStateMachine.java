@@ -129,7 +129,6 @@ public abstract class DecodingStateMachine implements DecodingState {
             nextState = finishDecode(childProducts, out);
             if (state == null) {
                 cleanup();
-
             }
         }
         return nextState;

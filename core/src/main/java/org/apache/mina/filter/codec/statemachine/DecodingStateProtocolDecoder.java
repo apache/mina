@@ -21,7 +21,7 @@ package org.apache.mina.filter.codec.statemachine;
 
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
@@ -29,7 +29,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DecodingStateProtocolDecoder implements ProtocolDecoder {
+public class DecodingStateProtocolDecoder extends CumulativeProtocolDecoder {
     private final DecodingState state;
 
     public DecodingStateProtocolDecoder(DecodingState stateMachine) {
@@ -39,15 +39,19 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
         this.state = stateMachine;
     }
     
-    public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    @Override
+    protected boolean doDecode(IoSession session, IoBuffer in,
+            ProtocolDecoderOutput out) throws Exception {
         state.decode(in, out);
+        return !in.hasRemaining();
     }
 
+    @Override
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
         state.finishDecode(out);
     }
 
+    @Override
     public void dispose(IoSession session) throws Exception {}
 }
