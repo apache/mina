@@ -61,8 +61,15 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
                 break;
             }
 
+            int oldRemaining = b.remaining();
             state.decode(b, out);
-            if (b.hasRemaining()) {
+            int newRemaining = b.remaining();
+            if (newRemaining != 0) {
+                if (oldRemaining == newRemaining) {
+                    throw new IllegalStateException(
+                            DecodingState.class.getSimpleName() + " must " +
+                            "consume at least one byte per decode().");
+                }
                 return;
             } else {
                 undecodedBuffers.poll();
