@@ -37,5 +37,5 @@ public interface SingleSessionIoHandlerFactory {
      *
      * @param session the session for which a handler is requested
      */
-    SingleSessionIoHandler getHandler(IoSession session);
+    SingleSessionIoHandler getHandler(IoSession session) throws Exception;
 }
