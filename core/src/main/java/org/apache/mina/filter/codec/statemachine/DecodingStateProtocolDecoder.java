@@ -35,6 +35,7 @@ import org.apache.mina.util.CircularQueue;
 public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     private final DecodingState state;
     private final Queue<IoBuffer> undecodedBuffers = new CircularQueue<IoBuffer>();
+    private IoSession session;
 
     public DecodingStateProtocolDecoder(DecodingState state) {
         if (state == null) {
@@ -45,6 +46,14 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
+        if (this.session == null) {
+            this.session = session;
+        } else if (this.session != session) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " is a stateful decoder.  " +
+    		    "You have to create one per session.");
+        }
+
         undecodedBuffers.offer(in);
         for (;;) {
             IoBuffer b = undecodedBuffers.peek();
