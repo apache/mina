@@ -38,9 +38,9 @@ public class HttpCodecFactory implements ProtocolCodecFactory {
 
     public ProtocolEncoder getEncoder(IoSession session) throws Exception {
         if (session.getService() instanceof IoAcceptor) {
-            return new HttpRequestEncoder();
-        } else {
             return new HttpResponseEncoder();
+        } else {
+            return new HttpRequestEncoder();
         }
     }
 
