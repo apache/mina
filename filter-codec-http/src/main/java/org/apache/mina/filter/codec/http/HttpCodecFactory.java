@@ -33,17 +33,14 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  */
 public class HttpCodecFactory implements ProtocolCodecFactory {
 
-    private final ProtocolEncoder requestEncoder = new HttpRequestEncoder();
-    private final ProtocolEncoder responseEncoder = new HttpResponseEncoder();
-
     public HttpCodecFactory() {
     }
 
     public ProtocolEncoder getEncoder(IoSession session) throws Exception {
         if (session.getService() instanceof IoAcceptor) {
-            return responseEncoder;
+            return new HttpRequestEncoder();
         } else {
-            return requestEncoder;
+            return new HttpResponseEncoder();
         }
     }
 
