@@ -36,11 +36,11 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     private final DecodingState state;
     private final Queue<IoBuffer> undecodedBuffers = new CircularQueue<IoBuffer>();
 
-    public DecodingStateProtocolDecoder(DecodingState stateMachine) {
-        if (stateMachine == null) {
-            throw new NullPointerException("stateMachine");
+    public DecodingStateProtocolDecoder(DecodingState state) {
+        if (state == null) {
+            throw new NullPointerException("state");
         }
-        this.state = stateMachine;
+        this.state = state;
     }
     
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
