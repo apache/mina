@@ -118,6 +118,10 @@ abstract class HttpResponseDecodingState extends DecodingStateMachine {
         @Override
         protected DecodingState finishDecode(List<Object> childProducts,
                 ProtocolDecoderOutput out) throws Exception {
+            if (childProducts.size() < 3) {
+                // Session is closed.
+                return null;
+            }
             response.setProtocolVersion((HttpVersion) childProducts.get(0));
             response.setStatus(HttpResponseStatus.forId((Integer) childProducts.get(1)));
             String reasonPhrase = (String) childProducts.get(2);
