@@ -19,18 +19,22 @@
  */
 package org.apache.mina.filter.codec.statemachine;
 
+import java.util.Queue;
+
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.util.CircularQueue;
 
 /**
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DecodingStateProtocolDecoder extends CumulativeProtocolDecoder {
+public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     private final DecodingState state;
+    private final Queue<IoBuffer> undecodedBuffers = new CircularQueue<IoBuffer>();
 
     public DecodingStateProtocolDecoder(DecodingState stateMachine) {
         if (stateMachine == null) {
@@ -39,19 +43,28 @@ public class DecodingStateProtocolDecoder extends CumulativeProtocolDecoder {
         this.state = stateMachine;
     }
     
-    @Override
-    protected boolean doDecode(IoSession session, IoBuffer in,
-            ProtocolDecoderOutput out) throws Exception {
-        state.decode(in, out);
-        return !in.hasRemaining();
+    public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
+            throws Exception {
+        undecodedBuffers.offer(in);
+        for (;;) {
+            IoBuffer b = undecodedBuffers.peek();
+            if (b == null) {
+                break;
+            }
+
+            state.decode(b, out);
+            if (b.hasRemaining()) {
+                return;
+            } else {
+                undecodedBuffers.poll();
+            }
+        }
     }
 
-    @Override
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
         state.finishDecode(out);
     }
 
-    @Override
     public void dispose(IoSession session) throws Exception {}
 }
