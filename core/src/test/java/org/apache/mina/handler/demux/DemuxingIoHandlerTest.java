@@ -85,15 +85,15 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * Record expectations.
          */
-        handler1.messageReceived(session, msg[0]);
-        handler1.messageReceived(session, msg[1]);
-        handler1.messageReceived(session, msg[2]);
-        handler1.messageReceived(session, msg[3]);
-        handler2.messageReceived(session, msg[4]);
-        handler2.messageReceived(session, msg[5]);
-        handler1.messageReceived(session, msg[6]);
-        handler2.messageReceived(session, msg[7]);
-        handler3.messageReceived(session, msg[8]);
+        handler1.handleMessage(session, msg[0]);
+        handler1.handleMessage(session, msg[1]);
+        handler1.handleMessage(session, msg[2]);
+        handler1.handleMessage(session, msg[3]);
+        handler2.handleMessage(session, msg[4]);
+        handler2.handleMessage(session, msg[5]);
+        handler1.handleMessage(session, msg[6]);
+        handler2.handleMessage(session, msg[7]);
+        handler3.handleMessage(session, msg[8]);
 
         /*
          * Replay.
@@ -107,7 +107,7 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * First round. All messages should be handled by handler1
          */
-        ioHandler.addMessageHandler(C1.class, (MessageHandler) mockHandler1
+        ioHandler.addReceivedMessageHandler(C1.class, (MessageHandler) mockHandler1
                 .getMock());
         ioHandler.messageReceived(session, msg[0]);
         ioHandler.messageReceived(session, msg[1]);
@@ -117,7 +117,7 @@ public class DemuxingIoHandlerTest extends TestCase {
          * Second round. C1 messages should be handled by handler1. C2 and C3
          * messages should be handled by handler2.
          */
-        ioHandler.addMessageHandler(C2.class, (MessageHandler) mockHandler2
+        ioHandler.addReceivedMessageHandler(C2.class, (MessageHandler) mockHandler2
                 .getMock());
         ioHandler.messageReceived(session, msg[3]);
         ioHandler.messageReceived(session, msg[4]);
@@ -127,7 +127,7 @@ public class DemuxingIoHandlerTest extends TestCase {
          * Third round. C1 messages should be handled by handler1, C2 by
          * handler2 and C3 by handler3.
          */
-        ioHandler.addMessageHandler(C3.class, (MessageHandler) mockHandler3
+        ioHandler.addReceivedMessageHandler(C3.class, (MessageHandler) mockHandler3
                 .getMock());
         ioHandler.messageReceived(session, msg[6]);
         ioHandler.messageReceived(session, msg[7]);
@@ -145,15 +145,15 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * Record expectations.
          */
-        handler1.messageReceived(session, msg[0]);
-        handler1.messageReceived(session, msg[1]);
-        handler1.messageReceived(session, msg[2]);
-        handler1.messageReceived(session, msg[3]);
-        handler2.messageReceived(session, msg[4]);
-        handler1.messageReceived(session, msg[5]);
-        handler3.messageReceived(session, msg[6]);
-        handler2.messageReceived(session, msg[7]);
-        handler3.messageReceived(session, msg[8]);
+        handler1.handleMessage(session, msg[0]);
+        handler1.handleMessage(session, msg[1]);
+        handler1.handleMessage(session, msg[2]);
+        handler1.handleMessage(session, msg[3]);
+        handler2.handleMessage(session, msg[4]);
+        handler1.handleMessage(session, msg[5]);
+        handler3.handleMessage(session, msg[6]);
+        handler2.handleMessage(session, msg[7]);
+        handler3.handleMessage(session, msg[8]);
 
         /*
          * Replay.
@@ -167,7 +167,7 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * First round. All messages should be handled by handler1
          */
-        ioHandler.addMessageHandler(I4.class, (MessageHandler) mockHandler1
+        ioHandler.addReceivedMessageHandler(I4.class, (MessageHandler) mockHandler1
                 .getMock());
         ioHandler.messageReceived(session, msg[0]);
         ioHandler.messageReceived(session, msg[1]);
@@ -177,7 +177,7 @@ public class DemuxingIoHandlerTest extends TestCase {
          * Second round. C1 and C3 messages should be handled by handler1. C2
          * messages should be handled by handler2.
          */
-        ioHandler.addMessageHandler(I6.class, (MessageHandler) mockHandler2
+        ioHandler.addReceivedMessageHandler(I6.class, (MessageHandler) mockHandler2
                 .getMock());
         ioHandler.messageReceived(session, msg[3]);
         ioHandler.messageReceived(session, msg[4]);
@@ -187,7 +187,7 @@ public class DemuxingIoHandlerTest extends TestCase {
          * Third round. C1 and C3 messages should be handled by handler3. C2
          * messages should be handled by handler2.
          */
-        ioHandler.addMessageHandler(I3.class, (MessageHandler) mockHandler3
+        ioHandler.addReceivedMessageHandler(I3.class, (MessageHandler) mockHandler3
                 .getMock());
         ioHandler.messageReceived(session, msg[6]);
         ioHandler.messageReceived(session, msg[7]);
