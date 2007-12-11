@@ -32,7 +32,7 @@ import org.apache.mina.common.IoSession;
  */
 public interface MessageHandler<E> {
     /**
-     * A {@link MessageHandler} that does nothing.  This is usefule when
+     * A {@link MessageHandler} that does nothing.  This is useful when
      * you want to ignore messages of the specific type silently.
      */
     static MessageHandler<Object> NOOP = new MessageHandler<Object>() {
