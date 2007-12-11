@@ -23,9 +23,10 @@ import org.apache.mina.common.IoSession;
 
 /**
  * A handler interface that {@link DemuxingIoHandler} forwards
- * <code>messageReceived</code> events to.  You have to register your
- * handler with the type of message you want to get notified using
- * {@link DemuxingIoHandler#addMessageHandler(Class, MessageHandler)}.
+ * <tt>messageReceived</tt> or <tt>messageSent</tt> events to.  You have to
+ * register your handler with the type of the message you want to get notified
+ * using {@link DemuxingIoHandler#addReceivedMessageHandler(Class, MessageHandler)}
+ * or {@link DemuxingIoHandler#addSentMessageHandler(Class, MessageHandler)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -33,22 +34,15 @@ import org.apache.mina.common.IoSession;
 public interface MessageHandler<E> {
     /**
      * A {@link MessageHandler} that does nothing.  This is useful when
-     * you want to ignore messages of the specific type silently.
+     * you want to ignore a message of a specific type silently.
      */
     static MessageHandler<Object> NOOP = new MessageHandler<Object>() {
-        public void messageReceived(IoSession session, Object message) {}
-        public void messageSent(IoSession session, Object message) {}
+        public void handleMessage(IoSession session, Object message) {}
     };
 
     /**
-     * Invoked when the specific type of message is received from the
-     * specified <code>session</code>.
+     * Invoked when the specific type of message is received from or sent to
+     * the specified <code>session</code>.
      */
-    void messageReceived(IoSession session, E message) throws Exception;
-    
-    /**
-     * Invoked when the specific type of message is sent out to the
-     * specified <code>session</code>.
-     */
-    void messageSent(IoSession session, E message) throws Exception;
+    void handleMessage(IoSession session, E message) throws Exception;
 }

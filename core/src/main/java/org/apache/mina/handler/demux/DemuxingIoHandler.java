@@ -35,8 +35,8 @@ import org.apache.mina.util.IdentityHashSet;
  * to the appropriate {@link MessageHandler}.
  * <p>
  * You can freely register and deregister {@link MessageHandler}s using
- * {@link #addMessageHandler(Class, MessageHandler)} and
- * {@link #removeMessageHandler(Class)}.
+ * {@link #addReceivedMessageHandler(Class, MessageHandler)} and
+ * {@link #removeReceivedMessageHandler(Class)}.
  * </p>
  * <p>
  * When <code>message</code> is received through a call to
@@ -70,8 +70,8 @@ import org.apache.mina.util.IdentityHashSet;
  * </p>
  * <p>
  * For efficiency searches will be cached. Calls to
- * {@link #addMessageHandler(Class, MessageHandler)} and
- * {@link #removeMessageHandler(Class)} clear this cache.
+ * {@link #addReceivedMessageHandler(Class, MessageHandler)} and
+ * {@link #removeReceivedMessageHandler(Class)} clear this cache.
  * </p>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -79,10 +79,16 @@ import org.apache.mina.util.IdentityHashSet;
  */
 public class DemuxingIoHandler extends IoHandlerAdapter {
     
-    private final Map<Class<?>, MessageHandler<?>> messageHandlerCache =
+    private final Map<Class<?>, MessageHandler<?>> receivedMessageHandlerCache =
         new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
 
-    private final Map<Class<?>, MessageHandler<?>> messageHandlers =
+    private final Map<Class<?>, MessageHandler<?>> receivedMessageHandlers =
+        new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
+
+    private final Map<Class<?>, MessageHandler<?>> sentMessageHandlerCache =
+        new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
+
+    private final Map<Class<?>, MessageHandler<?>> sentMessageHandlers =
         new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
 
     private final Map<Class<?>, ExceptionHandler<?>> exceptionHandlerCache =
@@ -98,31 +104,57 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     /**
-     * Registers a {@link MessageHandler} that receives the messages of
+     * Registers a {@link MessageHandler} that handles the received messages of
      * the specified <code>type</code>.
      *
      * @return the old handler if there is already a registered handler for
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? super E> addMessageHandler(Class<E> type,
+    public <E> MessageHandler<? super E> addReceivedMessageHandler(Class<E> type,
             MessageHandler<? super E> handler) {
-        messageHandlerCache.clear();
-        return (MessageHandler<? super E>) messageHandlers.put(type, handler);
+        receivedMessageHandlerCache.clear();
+        return (MessageHandler<? super E>) receivedMessageHandlers.put(type, handler);
     }
 
     /**
-     * Deregisters a {@link MessageHandler} that receives the messages of
+     * Deregisters a {@link MessageHandler} that handles the received messages
+     * of the specified <code>type</code>.
+     *
+     * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
+     */
+    @SuppressWarnings("unchecked")
+    public <E> MessageHandler<? super E> removeReceivedMessageHandler(Class<E> type) {
+        receivedMessageHandlerCache.clear();
+        return (MessageHandler<? super E>) receivedMessageHandlers.remove(type);
+    }
+
+    /**
+     * Registers a {@link MessageHandler} that handles the sent messages of the
+     * specified <code>type</code>.
+     *
+     * @return the old handler if there is already a registered handler for
+     *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
+     */
+    @SuppressWarnings("unchecked")
+    public <E> MessageHandler<? super E> addSentMessageHandler(Class<E> type,
+            MessageHandler<? super E> handler) {
+        sentMessageHandlerCache.clear();
+        return (MessageHandler<? super E>) sentMessageHandlers.put(type, handler);
+    }
+
+    /**
+     * Deregisters a {@link MessageHandler} that handles the sent messages of
      * the specified <code>type</code>.
      *
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? super E> removeMessageHandler(Class<E> type) {
-        messageHandlerCache.clear();
-        return (MessageHandler<? super E>) messageHandlers.remove(type);
+    public <E> MessageHandler<? super E> removeSentMessageHandler(Class<E> type) {
+        sentMessageHandlerCache.clear();
+        return (MessageHandler<? super E>) sentMessageHandlers.remove(type);
     }
-
+    
     /**
      * Registers a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
@@ -157,15 +189,23 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      */
     @SuppressWarnings("unchecked")
     public <E> MessageHandler<? super E> getMessageHandler(Class<E> type) {
-        return (MessageHandler<? super E>) messageHandlers.get(type);
+        return (MessageHandler<? super E>) receivedMessageHandlers.get(type);
     }
 
     /**
      * Returns the {@link Map} which contains all messageType-{@link MessageHandler}
-     * pairs registered to this handler.
+     * pairs registered to this handler for received messages.
      */
-    public Map<Class<?>, MessageHandler<?>> getMessageHandlerMap() {
-        return Collections.unmodifiableMap(messageHandlers);
+    public Map<Class<?>, MessageHandler<?>> getReceivedMessageHandlerMap() {
+        return Collections.unmodifiableMap(receivedMessageHandlers);
+    }
+
+    /**
+     * Returns the {@link Map} which contains all messageType-{@link MessageHandler}
+     * pairs registered to this handler for sent messages.
+     */
+    public Map<Class<?>, MessageHandler<?>> getSentMessageHandlerMap() {
+        return Collections.unmodifiableMap(sentMessageHandlers);
     }
 
     /**
@@ -178,28 +218,30 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
 
     /**
      * Forwards the received events into the appropriate {@link MessageHandler}
-     * which is registered by {@link #addMessageHandler(Class, MessageHandler)}.
+     * which is registered by {@link #addReceivedMessageHandler(Class, MessageHandler)}.
      */
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
-        MessageHandler<Object> handler = findMessageHandler(message.getClass());
+        MessageHandler<Object> handler = findReceivedMessageHandler(message.getClass());
         if (handler != null) {
-            handler.messageReceived(session, message);
+            handler.handleMessage(session, message);
         } else {
             throw new UnknownMessageTypeException(
-                    "No message handler found for message: " + message);
+                    "No message handler found for message type: " +
+                    message.getClass().getSimpleName());
         }
     }
 
     @Override
     public void messageSent(IoSession session, Object message) throws Exception {
-        MessageHandler<Object> handler = findMessageHandler(message.getClass());
+        MessageHandler<Object> handler = findSentMessageHandler(message.getClass());
         if (handler != null) {
-            handler.messageSent(session, message);
+            handler.handleMessage(session, message);
         } else {
             throw new UnknownMessageTypeException(
-                    "No handler found for message: " + message.getClass().getName());
+                    "No handler found for message type: " +
+                    message.getClass().getSimpleName());
         }
     }
 
@@ -210,12 +252,17 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
             handler.exceptionCaught(session, cause);
         } else {
             throw new UnknownMessageTypeException(
-                    "No handler found for exception: " + cause.getClass().getName());
+                    "No handler found for exception type: " +
+                    cause.getClass().getSimpleName());
         }
     }
 
-    protected MessageHandler<Object> findMessageHandler(Class<?> type) {
-        return findMessageHandler(type, null);
+    protected MessageHandler<Object> findReceivedMessageHandler(Class<?> type) {
+        return findReceivedMessageHandler(type, null);
+    }
+
+    protected MessageHandler<Object> findSentMessageHandler(Class<?> type) {
+        return findSentMessageHandler(type, null);
     }
 
     protected ExceptionHandler<Throwable> findExceptionHandler(Class<? extends Throwable> type) {
@@ -223,11 +270,19 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     @SuppressWarnings("unchecked")
-    private MessageHandler<Object> findMessageHandler(
+    private MessageHandler<Object> findReceivedMessageHandler(
             Class type, Set<Class> triedClasses) {
         
         return (MessageHandler<Object>) findHandler(
-                messageHandlers, messageHandlerCache, type, triedClasses);
+                receivedMessageHandlers, receivedMessageHandlerCache, type, triedClasses);
+    }
+
+    @SuppressWarnings("unchecked")
+    private MessageHandler<Object> findSentMessageHandler(
+            Class type, Set<Class> triedClasses) {
+        
+        return (MessageHandler<Object>) findHandler(
+                sentMessageHandlers, sentMessageHandlerCache, type, triedClasses);
     }
 
     @SuppressWarnings("unchecked")

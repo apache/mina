@@ -32,11 +32,22 @@ import org.apache.mina.common.IoSession;
  */
 public interface ExceptionHandler<E extends Throwable> {
     /**
-     * A {@link ExceptionHandler} that does nothing.  This is usefule when
-     * you want to ignore messages of the specific type silently.
+     * A {@link ExceptionHandler} that does nothing.  This is useful when
+     * you want to ignore an exception of a specific type silently.
      */
     static ExceptionHandler<Throwable> NOOP = new ExceptionHandler<Throwable>() {
         public void exceptionCaught(IoSession session, Throwable cause) {}
+    };
+
+    /**
+     * A {@link ExceptionHandler} that closes the session immediately.
+     * This is useful when you want to close the session when an exception of
+     * a specific type is raised.
+     */
+    static ExceptionHandler<Throwable> CLOSE = new ExceptionHandler<Throwable>() {
+        public void exceptionCaught(IoSession session, Throwable cause) {
+            session.close();
+        }
     };
 
     /**
