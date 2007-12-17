@@ -19,14 +19,17 @@
  */
 package org.apache.mina.filter.codec;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 
 /**
  * Tests {@link CumulativeProtocolDecoder}.
@@ -48,6 +51,10 @@ public class CumulativeProtocolDecoderTest extends TestCase {
     protected void setUp() throws Exception {
         buf = IoBuffer.allocate(16);
         decoder = new IntegerDecoder();
+        session.setTransportMetadata(
+                new DefaultTransportMetadata(
+                        "mina", "dummy", false, true, SocketAddress.class,
+                        IoSessionConfig.class, IoBuffer.class));
     }
 
     @Override
