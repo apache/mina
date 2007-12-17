@@ -22,6 +22,7 @@ package org.apache.mina.filter.codec;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.common.UnderivableBuffer;
 
 /**
@@ -91,7 +92,13 @@ import org.apache.mina.common.UnderivableBuffer;
  *     }
  * }
  * </pre>
- *
+ * <p>
+ * Please not that this decoder simply forward the call to
+ * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)} if the
+ * underlying transport doesn't have a packet fragmentation.  Whether the
+ * transport has fragmentation or not is determined by querying 
+ * {@link TransportMetadata}.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -116,6 +123,11 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      */
     public void decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
+        if (!session.getTransportMetadata().hasFragmentation()) {
+            doDecode(session, in, out);
+            return;
+        }
+
         boolean usingSessionBuffer = true;
         IoBuffer buf = (IoBuffer) session.getAttribute(BUFFER);
         // If we have a session buffer, append data to that; otherwise
