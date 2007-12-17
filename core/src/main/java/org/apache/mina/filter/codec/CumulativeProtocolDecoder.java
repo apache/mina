@@ -93,7 +93,7 @@ import org.apache.mina.common.UnderivableBuffer;
  * }
  * </pre>
  * <p>
- * Please not that this decoder simply forward the call to
+ * Please note that this decoder simply forward the call to
  * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)} if the
  * underlying transport doesn't have a packet fragmentation.  Whether the
  * transport has fragmentation or not is determined by querying 
