@@ -21,7 +21,6 @@ package org.apache.mina.common;
 
 import java.net.SocketAddress;
 
-
 /**
  * A base implementation of {@link IoConnector}.
  *
@@ -78,15 +77,34 @@ public abstract class AbstractIoConnector
             throw new IllegalStateException("defaultRemoteAddress is not set.");
         }
         
-        return connect(defaultRemoteAddress, null);
+        return connect(defaultRemoteAddress, null, null);
+    }
+    
+    public ConnectFuture connect(IoSessionInitializer ioSessionInitializer) {
+        SocketAddress defaultRemoteAddress = getDefaultRemoteAddress();
+        if (defaultRemoteAddress == null) {
+            throw new IllegalStateException("defaultRemoteAddress is not set.");
+        }
+        
+        return connect(defaultRemoteAddress, null, ioSessionInitializer);
     }
 
     public final ConnectFuture connect(SocketAddress remoteAddress) {
-        return connect(remoteAddress, null);
+        return connect(remoteAddress, null, null);
+    }
+    
+    public ConnectFuture connect(SocketAddress remoteAddress,
+            IoSessionInitializer callback) {
+        return connect(remoteAddress, null, callback);
+    }
+    
+    public ConnectFuture connect(SocketAddress remoteAddress,
+            SocketAddress localAddress) {
+        return connect(remoteAddress, localAddress, null);
     }
 
     public final ConnectFuture connect(SocketAddress remoteAddress,
-            SocketAddress localAddress) {
+            SocketAddress localAddress, IoSessionInitializer ioSessionInitializer) {
         if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
         }
@@ -146,7 +164,7 @@ public abstract class AbstractIoConnector
             }
         }
 
-        return connect0(remoteAddress, localAddress);
+        return connect0(remoteAddress, localAddress, ioSessionInitializer);
     }
 
     /**
@@ -155,7 +173,7 @@ public abstract class AbstractIoConnector
      * @param localAddress <tt>null</tt> if no local address is specified
      */
     protected abstract ConnectFuture connect0(SocketAddress remoteAddress,
-            SocketAddress localAddress);
+            SocketAddress localAddress, IoSessionInitializer ioSessionInitializer);
 
     /**
      * Adds required internal attributes and {@link IoFutureListener}s

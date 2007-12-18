@@ -22,6 +22,7 @@ package org.apache.mina.transport.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.AbstractIoConnector;
@@ -33,6 +34,7 @@ import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoSessionInitializer;
 import org.apache.mina.common.TransportMetadata;
 
 /**
@@ -62,7 +64,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
     @Override
     protected ConnectFuture connect0(SocketAddress remoteAddress,
-                                      SocketAddress localAddress) {
+                                      SocketAddress localAddress, IoSessionInitializer ioSessionInitializer) {
         VmPipe entry = VmPipeAcceptor.boundHandlers.get(remoteAddress);
         if (entry == null) {
             return DefaultConnectFuture.newFailedFuture(new IOException(
@@ -82,7 +84,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
         VmPipeSessionImpl localSession = new VmPipeSessionImpl(this,
                 getListeners(), actualLocalAddress, getHandler(), entry);
 
-        finishSessionInitialization(localSession, future);
+        finishSessionInitialization(localSession, future, ioSessionInitializer);
 
         // and reclaim the local address when the connection is closed.
         localSession.getCloseFuture().addListener(LOCAL_ADDRESS_RECLAIMER);

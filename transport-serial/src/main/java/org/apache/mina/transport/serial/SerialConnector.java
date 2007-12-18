@@ -34,6 +34,7 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoSessionInitializer;
 import org.apache.mina.common.TransportMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public final class SerialConnector extends AbstractIoConnector {
 
     @Override
     protected ConnectFuture connect0(SocketAddress remoteAddress,
-            SocketAddress localAddress) {
+            SocketAddress localAddress, IoSessionInitializer ioSessionInitializer) {
 
         CommPortIdentifier portId;
         Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
@@ -82,7 +83,7 @@ public final class SerialConnector extends AbstractIoConnector {
                         ConnectFuture future = new DefaultConnectFuture();
                         SerialSessionImpl session = new SerialSessionImpl(
                                 this, getListeners(), portAddress, serialPort);
-                        finishSessionInitialization(session, future);
+                        finishSessionInitialization(session, future, ioSessionInitializer);
                         session.start();
                         return future;
                     } catch (PortInUseException e) {

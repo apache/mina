@@ -20,6 +20,8 @@
 package org.apache.mina.transport;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -30,6 +32,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.common.IoSessionInitializer;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -116,5 +119,44 @@ public abstract class AbstractConnectorTest extends TestCase {
         } finally {
             connector.dispose();
         }
+    }
+    
+    /**
+     * Test to make sure the SessionCallback gets invoked before IoHandler.sessionCreated.
+     */
+    public void testSessionCallbackInvocation() throws Exception {
+        final int callbackInvoked = 0;
+        final int sessionCreatedInvoked = 1;
+        final int sessionCreatedInvokedBeforeCallback = 2;
+        final boolean[] assertions = {false, false, false};
+        final CountDownLatch latch = new CountDownLatch(2);
+        
+        int port = AvailablePortFinder.getNextAvailable(1025);
+        IoAcceptor acceptor = createAcceptor();
+        acceptor.setHandler(new IoHandlerAdapter());
+        InetSocketAddress address = new InetSocketAddress(port);
+        acceptor.bind(address);
+
+        IoConnector connector = createConnector();
+        connector.setHandler(new IoHandlerAdapter() {
+           @Override
+            public void sessionCreated(IoSession session) throws Exception {
+                   assertions[sessionCreatedInvoked] = true;
+                   assertions[sessionCreatedInvokedBeforeCallback] = !assertions[callbackInvoked];
+                   latch.countDown();
+            } 
+        });
+        
+        connector.connect(address, new IoSessionInitializer() {
+            public void initSession(IoSession session) {
+                assertions[callbackInvoked] = true;
+                latch.countDown();
+            }
+        });
+        
+        assertTrue("Timed out waiting for callback and IoHandler.sessionCreated to be invoked", latch.await(5, TimeUnit.SECONDS));
+        assertTrue("Callback was not invoked", assertions[callbackInvoked]);
+        assertTrue("IoHandler.sessionCreated was not invoked", assertions[sessionCreatedInvoked]);
+        assertFalse("IoHandler.sessionCreated was invoked before session callback", assertions[sessionCreatedInvokedBeforeCallback]);
     }
 }

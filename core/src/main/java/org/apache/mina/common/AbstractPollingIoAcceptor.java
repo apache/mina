@@ -307,7 +307,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                     break;
                 }
                 
-                finishSessionInitialization(session, null);
+                finishSessionInitialization(session, null, null);
 
                 // add the session to the SocketIoProcessor
                 session.getProcessor().add(session);

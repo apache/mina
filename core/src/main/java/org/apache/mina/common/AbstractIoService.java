@@ -670,7 +670,7 @@ public abstract class AbstractIoService implements IoService {
         return listeners;
     }
     
-    protected final void finishSessionInitialization(IoSession session, IoFuture future) {
+    protected final void finishSessionInitialization(IoSession session, IoFuture future, IoSessionInitializer ioSessionInitializer) {
         // Update lastIoTime if needed.
         if (getLastReadTime() == 0) {
             setLastReadTime(getActivationTime());
@@ -706,6 +706,10 @@ public abstract class AbstractIoService implements IoService {
         if (future != null && future instanceof ConnectFuture) {
             // DefaultIoFilterChain will notify the future. (We support ConnectFuture only for now).
             session.setAttribute(DefaultIoFilterChain.SESSION_OPENED_FUTURE, future);
+        }
+        
+        if (ioSessionInitializer != null) {
+            ioSessionInitializer.initSession(session);
         }
         
         finishSessionInitialization0(session, future);

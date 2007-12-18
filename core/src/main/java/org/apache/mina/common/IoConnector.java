@@ -76,12 +76,37 @@ public interface IoConnector extends IoService {
     ConnectFuture connect();
     
     /**
+     * Connects to the {@link #setDefaultRemoteAddress(SocketAddress) default
+     * remote address} and invokes the <code>sessionCallback</code> when the
+     * IoSession is created but before {@link IoHandler#sessionCreated(IoSession)}
+     * is invoked.
+     * 
+     * @param ioSessionInitializer  the callback to invoke when the {@link IoSession} object is created
+     * 
+     * @throws IllegalStateException if no default remote address is set.
+     */
+    ConnectFuture connect(IoSessionInitializer ioSessionInitializer);
+    
+    /**
      * Connects to the specified remote address.
      *
      * @return the {@link ConnectFuture} instance which is completed when the
      *         connection attempt initiated by this call succeeds or fails.
      */
     ConnectFuture connect(SocketAddress remoteAddress);
+
+    /**
+     * Connects to the specified remote address and invokes
+     * the <code>sessionCallback</code> when the IoSession is created but before
+     * {@link IoHandler#sessionCreated(IoSession)} is invoked.
+     * 
+     * @param remoteAddress  the remote address to connect to
+     * @param ioSessionInitializer  the callback to invoke when the {@link IoSession} object is created
+     * 
+     * @return the {@link ConnectFuture} instance which is completed when the
+     *         connection attempt initiated by this call succeeds or fails.
+     */
+    ConnectFuture connect(SocketAddress remoteAddress, IoSessionInitializer ioSessionInitializer);
 
     /**
      * Connects to the specified remote address binding to the specified local address.
@@ -91,4 +116,20 @@ public interface IoConnector extends IoService {
      */
     ConnectFuture connect(SocketAddress remoteAddress,
             SocketAddress localAddress);
+    
+    /**
+     * Connects to the specified remote address binding to the specified local
+     * address and invokes the <code>sessionCallback</code> when the IoSession
+     * is created but before {@link IoHandler#sessionCreated(IoSession)} is
+     * invoked.
+     * 
+     * @param remoteAddress  the remote address to connect to
+     * @param localAddress  the local interface to bind to
+     * @param ioSessionInitializer  the callback to invoke when the {@link IoSession} object is created
+     *
+     * @return the {@link ConnectFuture} instance which is completed when the
+     *         connection attempt initiated by this call succeeds or fails.
+     */
+    ConnectFuture connect(SocketAddress remoteAddress,
+            SocketAddress localAddress, IoSessionInitializer ioSessionInitializer);
 }

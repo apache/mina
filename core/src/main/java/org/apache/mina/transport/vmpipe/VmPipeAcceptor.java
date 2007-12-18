@@ -143,6 +143,6 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     }
 
     void doFinishSessionInitialization(IoSession session, IoFuture future) {
-        finishSessionInitialization(session, future);
+        finishSessionInitialization(session, future, null);
     }
 }
