@@ -22,7 +22,6 @@ package org.apache.mina.transport.vmpipe;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.AbstractIoConnector;

@@ -31,8 +31,8 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.IoSessionInitializer;
+import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -148,7 +148,7 @@ public abstract class AbstractConnectorTest extends TestCase {
         });
         
         connector.connect(address, new IoSessionInitializer() {
-            public void initSession(IoSession session) {
+            public void initializeSession(IoSession session) {
                 assertions[callbackInvoked] = true;
                 latch.countDown();
             }

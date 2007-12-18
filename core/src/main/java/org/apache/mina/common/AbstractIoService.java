@@ -709,7 +709,7 @@ public abstract class AbstractIoService implements IoService {
         }
         
         if (ioSessionInitializer != null) {
-            ioSessionInitializer.initSession(session);
+            ioSessionInitializer.initializeSession(session);
         }
         
         finishSessionInitialization0(session, future);
@@ -718,7 +718,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * Implement this method to perform additional tasks required for session
      * initialization. Do not call this method directly;
-     * {@link #finishSessionInitialization(IoSession, IoFuture)} will call
+     * {@link #finishSessionInitialization(IoSession, IoFuture, IoSessionInitializer)} will call
      * this method instead.
      */
     @SuppressWarnings("unused")

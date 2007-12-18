@@ -27,7 +27,5 @@ package org.apache.mina.common;
  * @version $Rev: 600461 $, $Date: 2007-12-03 02:55:52 -0700 (Mon, 03 Dec 2007) $
  */
 public interface IoSessionInitializer {
-
-    void initSession(IoSession session);
-    
+    void initializeSession(IoSession session);
 }

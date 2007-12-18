@@ -179,8 +179,8 @@ public abstract class AbstractIoConnector
      * Adds required internal attributes and {@link IoFutureListener}s
      * related with event notifications to the specified {@code session}
      * and {@code future}.  Do not call this method directly;
-     * {@link #finishSessionInitialization(IoSession, IoFuture)} will call
-     * this method instead.
+     * {@link #finishSessionInitialization(IoSession, IoFuture, IoSessionInitializer)}
+     * will call this method instead.
      */
     @Override
     protected final void finishSessionInitialization0(
