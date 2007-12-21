@@ -22,8 +22,7 @@ package org.apache.mina.common;
 import java.util.EventListener;
 
 /**
- * Something interested in being notified when the result
- * of an {@link IoFuture} becomes available.
+ * Listens to events related to an {@link IoService}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
