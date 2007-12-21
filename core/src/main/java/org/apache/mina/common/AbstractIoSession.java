@@ -56,9 +56,6 @@ public abstract class AbstractIoSession implements IoSession {
                 s.readMessagesThroughput = 0;
                 s.writtenBytesThroughput = 0;
                 s.writtenMessagesThroughput = 0;
-                s.idleCountForBoth = 0;
-                s.idleCountForRead = 0;
-                s.idleCountForWrite = 0;
             }
     };
 
