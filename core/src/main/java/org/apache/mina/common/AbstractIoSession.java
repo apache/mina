@@ -502,21 +502,7 @@ public abstract class AbstractIoSession implements IoSession {
         return scheduledWriteMessages.get();
     }
 
-    protected final void increaseReadBytesAndMessages(
-            Object message, long currentTime) {
-        if (message instanceof IoBuffer) {
-            IoBuffer b = (IoBuffer) message;
-            if (b.hasRemaining()) {
-                increaseReadBytes(((IoBuffer) message).remaining(), currentTime);
-            } else {
-                increaseReadMessages(currentTime);
-            }
-        } else {
-            increaseReadMessages(currentTime);
-        }
-    }
-    
-    private void increaseReadBytes(long increment, long currentTime) {
+    protected final void increaseReadBytes(long increment, long currentTime) {
         if (increment <= 0) {
             return;
         }
@@ -531,11 +517,12 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
     
-    private void increaseReadMessages(long currentTime) {
+    protected final void increaseReadMessages(long currentTime) {
         readMessages++;
-        lastWriteTime = currentTime;
+        lastReadTime = currentTime;
         idleCountForBoth = 0;
         idleCountForRead = 0;
+        
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).increaseReadMessages(currentTime);
         }

@@ -385,7 +385,13 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public void fireMessageReceived(Object message) {
-        session.increaseReadBytesAndMessages(message, System.currentTimeMillis());
+        if (message instanceof IoBuffer) {
+            IoBuffer buf = (IoBuffer) message;
+            if (buf.hasRemaining()) {
+                session.increaseReadBytes(buf.remaining(), System.currentTimeMillis());
+            }
+        }
+
         Entry head = this.head;
         callNextMessageReceived(head, session, message);
     }
@@ -725,6 +731,12 @@ public class DefaultIoFilterChain implements IoFilterChain {
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
+            if (!(message instanceof IoBuffer)) {
+                s.increaseReadMessages(System.currentTimeMillis());
+            } else if (!((IoBuffer) message).hasRemaining()) {
+                s.increaseReadMessages(System.currentTimeMillis());
+            }
+
             try {
                 session.getHandler().messageReceived(s, message);
             } finally {
