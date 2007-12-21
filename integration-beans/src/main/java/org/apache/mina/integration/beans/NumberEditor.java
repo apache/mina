@@ -42,7 +42,7 @@ public class NumberEditor extends AbstractPropertyEditor {
 
     @Override
     protected final Object toValue(String text) throws IllegalArgumentException {
-        if (text.length() > 0) {
+        if (text.length() == 0) {
             return defaultValue();
         }
         
@@ -65,6 +65,7 @@ public class NumberEditor extends AbstractPropertyEditor {
         return Integer.parseInt(text, radix);
     }
     
+    @Override
     protected Object defaultValue() {
         return Integer.valueOf(0);
     }
