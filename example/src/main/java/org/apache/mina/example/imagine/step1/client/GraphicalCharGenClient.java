@@ -20,19 +20,6 @@
 
 package org.apache.mina.example.imagine.step1.client;
 
-import org.apache.mina.example.imagine.step1.ImageRequest;
-import org.apache.mina.example.imagine.step1.server.ImageServer;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -44,14 +31,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+
+import org.apache.mina.example.imagine.step1.ImageRequest;
+import org.apache.mina.example.imagine.step1.server.ImageServer;
+
 /**
  * Swing application that acts as a client of the {@link ImageServer}
  *
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-@SuppressWarnings({"FieldCanBeLocal"})
 public class GraphicalCharGenClient extends JFrame implements ImageListener {
+
+    private static final long serialVersionUID = 1L;
 
     public static final int PORT = 33789;
     public static final String HOST = "localhost";
@@ -137,6 +139,7 @@ public class GraphicalCharGenClient extends JFrame implements ImageListener {
         setTitle("not connected");
     }
 
+    @Override
     public void setTitle(String title) {
         super.setTitle("MINA - Chargen client - " + title);
     }

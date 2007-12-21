@@ -21,6 +21,7 @@ package org.apache.mina.example.imagine.step1.client;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+
 import javax.swing.JPanel;
 
 /**
@@ -32,9 +33,12 @@ import javax.swing.JPanel;
  */
 public class ImagePanel extends JPanel {
 
+    private static final long serialVersionUID = 1L;
+    
     private BufferedImage image1;
     private BufferedImage image2;
 
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (image1 != null) {
