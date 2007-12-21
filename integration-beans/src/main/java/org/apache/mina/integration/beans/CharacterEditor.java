@@ -39,7 +39,7 @@ public class CharacterEditor extends AbstractPropertyEditor {
 
     @Override
     protected Object toValue(String text) throws IllegalArgumentException {
-        if (text.length() > 0) {
+        if (text.length() == 0) {
             return Character.valueOf(Character.MIN_VALUE);
         }
         
