@@ -107,8 +107,8 @@ abstract class ChunkedBodyDecodingState extends DecodingStateMachine {
         protected boolean isTerminator(byte b) {
             if (!(b >= '0' && b <= '9' || b >= 'a' && b <= 'f' || b >= 'A'
                     && b <= 'F')) {
-                if (b == '\r' || b == ';') {
-                    chunkHasExtension = b == ';';
+                if (b == ' ' || b == '\r' || b == ';') {
+                    chunkHasExtension = (b == ';' || b == ' ');
                     return true;
                 }
                 throw new IllegalArgumentException();
