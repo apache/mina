@@ -367,6 +367,26 @@ public interface IoService {
     double getWrittenMessagesThroughput();
     
     /**
+     * Returns the maximum of the {@link #getReadBytesThroughput() readBytesThroughput}.
+     */
+    double getLargestReadBytesThroughput();
+    
+    /**
+     * Returns the maximum of the {@link #getWrittenBytesThroughput() writtenBytesThroughput}.
+     */
+    double getLargestWrittenBytesThroughput();
+    
+    /**
+     * Returns the maximum of the {@link #getReadMessagesThroughput() readMessagesThroughput}.
+     */
+    double getLargestReadMessagesThroughput();
+    
+    /**
+     * Returns the maximum of the {@link #getWrittenMessagesThroughput() writtenMessagesThroughput}.
+     */
+    double getLargestWrittenMessagesThroughput();
+
+    /**
      * Returns the interval (seconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */

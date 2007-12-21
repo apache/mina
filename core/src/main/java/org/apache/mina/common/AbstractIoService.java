@@ -101,6 +101,10 @@ public abstract class AbstractIoService implements IoService {
     private double writtenBytesThroughput;
     private double readMessagesThroughput;
     private double writtenMessagesThroughput;
+    private double largestReadBytesThroughput;
+    private double largestWrittenBytesThroughput;
+    private double largestReadMessagesThroughput;
+    private double largestWrittenMessagesThroughput;
 
     private final Object idlenessCheckLock = new Object();
     private int idleTimeForRead;
@@ -328,6 +332,22 @@ public abstract class AbstractIoService implements IoService {
         return writtenMessagesThroughput;
     }
     
+    public final double getLargestReadBytesThroughput() {
+        return largestReadBytesThroughput;
+    }
+    
+    public final double getLargestWrittenBytesThroughput() {
+        return largestWrittenBytesThroughput;
+    }
+    
+    public final double getLargestReadMessagesThroughput() {
+        return largestReadMessagesThroughput;
+    }
+    
+    public final double getLargestWrittenMessagesThroughput() {
+        return largestWrittenMessagesThroughput;
+    }
+    
     private void resetThroughput() {
         if (getManagedSessionCount() == 0) {
             readBytesThroughput = 0;
@@ -355,6 +375,19 @@ public abstract class AbstractIoService implements IoService {
             readMessagesThroughput = (readMessages - lastReadMessages) * 1000.0 / interval;
             writtenMessagesThroughput = (writtenMessages - lastWrittenMessages) * 1000.0 / interval;
             
+            if (readBytesThroughput > largestReadBytesThroughput) {
+                largestReadBytesThroughput = readBytesThroughput;
+            }
+            if (writtenBytesThroughput > largestWrittenBytesThroughput) {
+                largestWrittenBytesThroughput = writtenBytesThroughput;
+            }
+            if (readMessagesThroughput > largestReadMessagesThroughput) {
+                largestReadMessagesThroughput = readMessagesThroughput;
+            }
+            if (writtenMessagesThroughput > largestWrittenMessagesThroughput) {
+                largestWrittenMessagesThroughput = writtenMessagesThroughput;
+            }
+           
             lastReadBytes = readBytes;
             lastWrittenBytes = writtenBytes;
             lastReadMessages = readMessages;
