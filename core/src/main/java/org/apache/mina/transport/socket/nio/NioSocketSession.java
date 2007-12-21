@@ -200,6 +200,10 @@ class NioSocketSession extends NioSession implements SocketSession {
         }
 
         public boolean isTcpNoDelay() {
+            if (!isConnected()) {
+                return false;
+            }
+
             try {
                 return ch.socket().getTcpNoDelay();
             } catch (SocketException e) {
