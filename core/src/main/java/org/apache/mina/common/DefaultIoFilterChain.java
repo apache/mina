@@ -386,10 +386,9 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
     public void fireMessageReceived(Object message) {
         if (message instanceof IoBuffer) {
-            IoBuffer buf = (IoBuffer) message;
-            if (buf.hasRemaining()) {
-                session.increaseReadBytes(buf.remaining(), System.currentTimeMillis());
-            }
+            session.increaseReadBytes(
+                    ((IoBuffer) message).remaining(),
+                    System.currentTimeMillis());
         }
 
         Entry head = this.head;
