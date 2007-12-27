@@ -173,7 +173,8 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
     @Override
     protected int transferFile(NioSession session, FileRegion region, int length) throws Exception {
-        return (int) region.getFileChannel().transferTo(region.getPosition(), region.getCount(), session.getChannel());
+        int writtenBytes = (int) region.getFileChannel().transferTo(region.getPosition(), length, session.getChannel());
+        return writtenBytes;
     }
 
     protected static class IoSessionIterator implements Iterator<NioSession> {

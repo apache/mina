@@ -591,6 +591,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
             localWrittenBytes = transferFile(session, region, length);
             region.setPosition(region.getPosition() + localWrittenBytes);
+            
+            // Fix for Java bug on Linux http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
+            // If there's still data to be written in the FileRegion, return 0 indicating that we need
+            // to pause until writing may resume.
+            if (localWrittenBytes > 0 && region.getCount() > 0) {
+                return 0;
+            }
         } else {
             localWrittenBytes = 0;
         }

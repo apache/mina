@@ -281,35 +281,32 @@ public abstract class AbstractIoSession implements IoSession {
             return future;
         }
 
-        FileChannel channel = null;
-        if (message instanceof IoBuffer
-                && !((IoBuffer) message).hasRemaining()) {
-            throw new IllegalArgumentException(
-                    "message is empty. Forgot to call flip()?");
-        } else if (message instanceof FileChannel) {
-            channel = (FileChannel) message;
-            try {
-                message = new DefaultFileRegion(channel, 0, channel.size());
-            } catch (IOException e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-                return DefaultWriteFuture.newNotWrittenFuture(this, e);
+        FileChannel openedFileChannel = null;
+        try {
+            if (message instanceof IoBuffer
+                    && !((IoBuffer) message).hasRemaining()) {
+                throw new IllegalArgumentException(
+                "message is empty. Forgot to call flip()?");
+            } else if (message instanceof FileChannel) {
+                FileChannel fileChannel = (FileChannel) message;
+                message = new DefaultFileRegion(fileChannel, 0, fileChannel.size());
+            } else if (message instanceof File) {
+                File file = (File) message;
+                openedFileChannel = new FileInputStream(file).getChannel();
+                message = new DefaultFileRegion(openedFileChannel, 0, openedFileChannel.size());
             }
-        } else if (message instanceof File) {
-            File file = (File) message;
-            try {
-                channel = new FileInputStream(file).getChannel();
-            } catch (IOException e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-                return DefaultWriteFuture.newNotWrittenFuture(this, e);
-            }
+        } catch (IOException e) {
+            ExceptionMonitor.getInstance().exceptionCaught(e);
+            return DefaultWriteFuture.newNotWrittenFuture(this, e);
         }
 
         WriteFuture future = new DefaultWriteFuture(this);
         getFilterChain().fireFilterWrite(
                 new DefaultWriteRequest(message, future, remoteAddress));
 
-        if (message instanceof File) {
-            final FileChannel finalChannel = channel;
+        if (openedFileChannel != null) {
+            // If we opened a FinalChannel, it needs to be closed when the write has completed
+            final FileChannel finalChannel = openedFileChannel;
             future.addListener(new IoFutureListener<WriteFuture>() {
                 public void operationComplete(WriteFuture future) {
                     try {
