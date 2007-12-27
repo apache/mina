@@ -80,7 +80,7 @@ public abstract class AbstractIoConnector
         return connect(defaultRemoteAddress, null, null);
     }
     
-    public ConnectFuture connect(IoSessionInitializer ioSessionInitializer) {
+    public ConnectFuture connect(IoSessionInitializer<ConnectFuture> ioSessionInitializer) {
         SocketAddress defaultRemoteAddress = getDefaultRemoteAddress();
         if (defaultRemoteAddress == null) {
             throw new IllegalStateException("defaultRemoteAddress is not set.");
@@ -94,7 +94,7 @@ public abstract class AbstractIoConnector
     }
     
     public ConnectFuture connect(SocketAddress remoteAddress,
-            IoSessionInitializer callback) {
+            IoSessionInitializer<ConnectFuture> callback) {
         return connect(remoteAddress, null, callback);
     }
     
@@ -104,7 +104,7 @@ public abstract class AbstractIoConnector
     }
 
     public final ConnectFuture connect(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer ioSessionInitializer) {
+            SocketAddress localAddress, IoSessionInitializer<ConnectFuture> ioSessionInitializer) {
         if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
         }
@@ -173,7 +173,7 @@ public abstract class AbstractIoConnector
      * @param localAddress <tt>null</tt> if no local address is specified
      */
     protected abstract ConnectFuture connect0(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer ioSessionInitializer);
+            SocketAddress localAddress, IoSessionInitializer<ConnectFuture> ioSessionInitializer);
 
     /**
      * Adds required internal attributes and {@link IoFutureListener}s

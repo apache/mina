@@ -146,7 +146,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     @Override
     @SuppressWarnings("unchecked")
     protected final ConnectFuture connect0(SocketAddress remoteAddress,
-                                      SocketAddress localAddress, IoSessionInitializer callback) {
+                                      SocketAddress localAddress, IoSessionInitializer<ConnectFuture> callback) {
         H handle = null;
         boolean success = false;
         try {
@@ -346,9 +346,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected final class ConnectionRequest extends DefaultConnectFuture {
         private final H handle;
         private final long deadline;
-        private final IoSessionInitializer ioSessionInitializer;
+        private final IoSessionInitializer<ConnectFuture> ioSessionInitializer;
 
-        public ConnectionRequest(H handle, IoSessionInitializer callback) {
+        public ConnectionRequest(H handle, IoSessionInitializer<ConnectFuture> callback) {
             this.handle = handle;
             long timeout = getConnectTimeoutMillis();
             if (timeout <= 0L) {
@@ -367,7 +367,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             return deadline;
         }
 
-        public IoSessionInitializer getSessionCallback() {
+        public IoSessionInitializer<ConnectFuture> getSessionCallback() {
             return ioSessionInitializer;
         }
         

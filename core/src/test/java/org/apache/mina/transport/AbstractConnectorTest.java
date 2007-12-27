@@ -130,6 +130,7 @@ public abstract class AbstractConnectorTest extends TestCase {
         final int sessionCreatedInvokedBeforeCallback = 2;
         final boolean[] assertions = {false, false, false};
         final CountDownLatch latch = new CountDownLatch(2);
+        final ConnectFuture[] callbackFuture = new ConnectFuture[1];
         
         int port = AvailablePortFinder.getNextAvailable(1025);
         IoAcceptor acceptor = createAcceptor();
@@ -147,9 +148,10 @@ public abstract class AbstractConnectorTest extends TestCase {
             } 
         });
         
-        connector.connect(address, new IoSessionInitializer() {
-            public void initializeSession(IoSession session) {
+        ConnectFuture future = connector.connect(address, new IoSessionInitializer<ConnectFuture>() {
+            public void initializeSession(IoSession session, ConnectFuture future) {
                 assertions[callbackInvoked] = true;
+                callbackFuture[0] = future;
                 latch.countDown();
             }
         });
@@ -158,5 +160,6 @@ public abstract class AbstractConnectorTest extends TestCase {
         assertTrue("Callback was not invoked", assertions[callbackInvoked]);
         assertTrue("IoHandler.sessionCreated was not invoked", assertions[sessionCreatedInvoked]);
         assertFalse("IoHandler.sessionCreated was invoked before session callback", assertions[sessionCreatedInvokedBeforeCallback]);
+        assertSame("Callback future should have been same future as returned by connect", future, callbackFuture[0]);
     }
 }

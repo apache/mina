@@ -703,7 +703,7 @@ public abstract class AbstractIoService implements IoService {
         return listeners;
     }
     
-    protected final void finishSessionInitialization(IoSession session, IoFuture future, IoSessionInitializer ioSessionInitializer) {
+    protected final <T extends IoFuture> void finishSessionInitialization(IoSession session, T future, IoSessionInitializer<T> ioSessionInitializer) {
         // Update lastIoTime if needed.
         if (getLastReadTime() == 0) {
             setLastReadTime(getActivationTime());
@@ -742,7 +742,7 @@ public abstract class AbstractIoService implements IoService {
         }
         
         if (ioSessionInitializer != null) {
-            ioSessionInitializer.initializeSession(session);
+            ioSessionInitializer.initializeSession(session, future);
         }
         
         finishSessionInitialization0(session, future);

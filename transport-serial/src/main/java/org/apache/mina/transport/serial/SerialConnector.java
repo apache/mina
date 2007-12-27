@@ -55,7 +55,7 @@ public final class SerialConnector extends AbstractIoConnector {
 
     @Override
     protected ConnectFuture connect0(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer ioSessionInitializer) {
+            SocketAddress localAddress, IoSessionInitializer<ConnectFuture> ioSessionInitializer) {
 
         CommPortIdentifier portId;
         Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
