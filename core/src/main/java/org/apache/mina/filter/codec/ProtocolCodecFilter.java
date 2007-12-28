@@ -387,7 +387,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         public WriteFuture flush() {
-            Queue<Object> bufferQueue = getEncodedMessageQueue();
+            Queue<Object> bufferQueue = getMessageQueue();
             WriteFuture future = null;
             for (;;) {
                 Object encodedMessage = bufferQueue.poll();
@@ -413,7 +413,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
         
         public void flushWithoutFuture() {
-            Queue<Object> bufferQueue = getEncodedMessageQueue();
+            Queue<Object> bufferQueue = getMessageQueue();
             for (;;) {
                 Object encodedMessage = bufferQueue.poll();
                 if (encodedMessage == null) {

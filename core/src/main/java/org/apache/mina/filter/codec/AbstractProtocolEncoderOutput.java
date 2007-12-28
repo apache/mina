@@ -32,27 +32,27 @@ import org.apache.mina.util.CircularQueue;
  */
 public abstract class AbstractProtocolEncoderOutput implements
         ProtocolEncoderOutput {
-    private final Queue<Object> encodedMessageQueue = new CircularQueue<Object>();
+    private final Queue<Object> messageQueue = new CircularQueue<Object>();
     private boolean buffersOnly = true;
 
     public AbstractProtocolEncoderOutput() {
     }
 
-    public Queue<Object> getEncodedMessageQueue() {
-        return encodedMessageQueue;
+    public Queue<Object> getMessageQueue() {
+        return messageQueue;
     }
 
     public void write(Object encodedMessage) {
         if (encodedMessage instanceof IoBuffer) {
             IoBuffer buf = (IoBuffer) encodedMessage;
             if (buf.hasRemaining()) {
-                encodedMessageQueue.offer(buf);
+                messageQueue.offer(buf);
             } else {
                 throw new IllegalArgumentException(
                         "buf is empty. Forgot to call flip()?");
             }
         } else {
-            encodedMessageQueue.offer(encodedMessage);
+            messageQueue.offer(encodedMessage);
             buffersOnly = false;
         }
     }
@@ -63,7 +63,7 @@ public abstract class AbstractProtocolEncoderOutput implements
                     "the encoded message list contains a non-buffer.");
         }
         
-        final int size = encodedMessageQueue.size();
+        final int size = messageQueue.size();
 
         if (size < 2) {
             // no need to merge!
@@ -72,7 +72,7 @@ public abstract class AbstractProtocolEncoderOutput implements
 
         // Get the size of merged BB
         int sum = 0;
-        for (Object b : encodedMessageQueue) {
+        for (Object b : messageQueue) {
             sum += ((IoBuffer) b).remaining();
         }
 
@@ -81,7 +81,7 @@ public abstract class AbstractProtocolEncoderOutput implements
 
         // and merge all.
         for (; ;) {
-            IoBuffer buf = (IoBuffer) encodedMessageQueue.poll();
+            IoBuffer buf = (IoBuffer) messageQueue.poll();
             if (buf == null) {
                 break;
             }
@@ -91,6 +91,6 @@ public abstract class AbstractProtocolEncoderOutput implements
 
         // Push the new buffer finally.
         newBuf.flip();
-        encodedMessageQueue.add(newBuf);
+        messageQueue.add(newBuf);
     }
 }

@@ -93,7 +93,7 @@ public class ProtocolCodecSession extends DummySession {
      * Returns the {@link Queue} of the buffered encoder output.
      */
     public Queue<Object> getEncoderOutputQueue() {
-        return encoderOutput.getEncodedMessageQueue();
+        return encoderOutput.getMessageQueue();
     }
 
     /**

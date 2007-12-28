@@ -26,9 +26,8 @@ import org.apache.mina.common.IoSession;
  * Encodes higher-level message objects into binary or protocol-specific data.
  * MINA invokes {@link #encode(IoSession, Object, ProtocolEncoderOutput)}
  * method with message which is popped from the session write queue, and then
- * the encoder implementation puts encoded {@link IoBuffer}s into
- * {@link ProtocolEncoderOutput} by calling
- * {@link ProtocolEncoderOutput#write(IoBuffer)}.
+ * the encoder implementation puts encoded messages (typically {@link IoBuffer}s)
+ * into {@link ProtocolEncoderOutput} by calling {@link ProtocolEncoderOutput#write(Object)}.
  * <p>
  * Please refer to
  * <a href="../../../../../xref-examples/org/apache/mina/examples/reverser/TextLineEncoder.html"><code>TextLineEncoder</code></a>
@@ -45,8 +44,8 @@ public interface ProtocolEncoder {
      * Encodes higher-level message objects into binary or protocol-specific data.
      * MINA invokes {@link #encode(IoSession, Object, ProtocolEncoderOutput)}
      * method with message which is popped from the session write queue, and then
-     * the encoder implementation puts encoded {@link IoBuffer}s into
-     * {@link ProtocolEncoderOutput}.
+     * the encoder implementation puts encoded messages (typically {@link IoBuffer}s)
+     * into {@link ProtocolEncoderOutput}.
      *
      * @throws Exception if the message violated protocol specification
      */
