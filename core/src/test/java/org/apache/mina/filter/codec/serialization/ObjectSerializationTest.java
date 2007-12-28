@@ -48,7 +48,7 @@ public class ObjectSerializationTest extends TestCase {
         encoder.encode(session, expected, out);
 
         Assert.assertEquals(1, session.getEncoderOutputQueue().size());
-        IoBuffer buf = session.getEncoderOutputQueue().poll();
+        IoBuffer buf = (IoBuffer) session.getEncoderOutputQueue().poll();
 
         testDecoderAndInputStream(expected, buf);
     }

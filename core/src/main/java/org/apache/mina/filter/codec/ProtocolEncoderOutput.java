@@ -19,37 +19,42 @@
  */
 package org.apache.mina.filter.codec;
 
+import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.WriteFuture;
 
 /**
- * Callback for {@link ProtocolEncoder} to generate encoded {@link IoBuffer}s.
- * {@link ProtocolEncoder} must call {@link #write(IoBuffer)} for each encoded
- * message.
+ * Callback for {@link ProtocolEncoder} to generate encoded messages such as
+ * {@link IoBuffer}s.  {@link ProtocolEncoder} must call {@link #write(Object)}
+ * for each encoded message.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface ProtocolEncoderOutput {
     /**
-     * Callback for {@link ProtocolEncoder} to generate encoded
-     * {@link IoBuffer}s. {@link ProtocolEncoder} must call
-     * {@link #write(IoBuffer)} for each encoded message.
+     * Callback for {@link ProtocolEncoder} to generate an encoded message such
+     * as an {@link IoBuffer}. {@link ProtocolEncoder} must call
+     * {@link #write(Object)} for each encoded message.
      *
-     * @param buf the buffer which contains encoded data
+     * @param encodedMessage the encoded message, typically an {@link IoBuffer}
+     *                       or a {@link FileRegion}.
      */
-    void write(IoBuffer buf);
+    void write(Object encodedMessage);
 
     /**
-     * Merges all buffers you wrote via {@link #write(IoBuffer)} into
+     * Merges all buffers you wrote via {@link #write(Object)} into
      * one {@link IoBuffer} and replaces the old fragmented ones with it.
      * This method is useful when you want to control the way MINA generates
-     * network packets.
+     * network packets.  Please note that this method only works when you
+     * called {@link #write(Object)} method with only {@link IoBuffer}s.
+     * 
+     * @throws IllegalStateException if you wrote something else than {@link IoBuffer}
      */
     void mergeAll();
 
     /**
-     * Flushes all buffers you wrote via {@link #write(IoBuffer)} to
+     * Flushes all buffers you wrote via {@link #write(Object)} to
      * the session.  This operation is asynchronous; please wait for
      * the returned {@link WriteFuture} if you want to wait for
      * the buffers flushed.

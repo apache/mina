@@ -32,26 +32,38 @@ import org.apache.mina.util.CircularQueue;
  */
 public abstract class AbstractProtocolEncoderOutput implements
         ProtocolEncoderOutput {
-    private final Queue<IoBuffer> bufferQueue = new CircularQueue<IoBuffer>();
+    private final Queue<Object> encodedMessageQueue = new CircularQueue<Object>();
+    private boolean buffersOnly = true;
 
     public AbstractProtocolEncoderOutput() {
     }
 
-    public Queue<IoBuffer> getBufferQueue() {
-        return bufferQueue;
+    public Queue<Object> getEncodedMessageQueue() {
+        return encodedMessageQueue;
     }
 
-    public void write(IoBuffer buf) {
-        if (buf.hasRemaining()) {
-            bufferQueue.add(buf);
+    public void write(Object encodedMessage) {
+        if (encodedMessage instanceof IoBuffer) {
+            IoBuffer buf = (IoBuffer) encodedMessage;
+            if (buf.hasRemaining()) {
+                encodedMessageQueue.offer(buf);
+            } else {
+                throw new IllegalArgumentException(
+                        "buf is empty. Forgot to call flip()?");
+            }
         } else {
-            throw new IllegalArgumentException(
-                    "buf is empty. Forgot to call flip()?");
+            encodedMessageQueue.offer(encodedMessage);
+            buffersOnly = false;
         }
     }
 
     public void mergeAll() {
-        final int size = bufferQueue.size();
+        if (!buffersOnly) {
+            throw new IllegalStateException(
+                    "the encoded message list contains a non-buffer.");
+        }
+        
+        final int size = encodedMessageQueue.size();
 
         if (size < 2) {
             // no need to merge!
@@ -60,8 +72,8 @@ public abstract class AbstractProtocolEncoderOutput implements
 
         // Get the size of merged BB
         int sum = 0;
-        for (IoBuffer b : bufferQueue) {
-            sum += b.remaining();
+        for (Object b : encodedMessageQueue) {
+            sum += ((IoBuffer) b).remaining();
         }
 
         // Allocate a new BB that will contain all fragments
@@ -69,7 +81,7 @@ public abstract class AbstractProtocolEncoderOutput implements
 
         // and merge all.
         for (; ;) {
-            IoBuffer buf = bufferQueue.poll();
+            IoBuffer buf = (IoBuffer) encodedMessageQueue.poll();
             if (buf == null) {
                 break;
             }
@@ -79,6 +91,6 @@ public abstract class AbstractProtocolEncoderOutput implements
 
         // Push the new buffer finally.
         newBuf.flip();
-        bufferQueue.add(newBuf);
+        encodedMessageQueue.add(newBuf);
     }
 }

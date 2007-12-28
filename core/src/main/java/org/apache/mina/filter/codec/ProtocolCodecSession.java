@@ -92,8 +92,8 @@ public class ProtocolCodecSession extends DummySession {
     /**
      * Returns the {@link Queue} of the buffered encoder output.
      */
-    public Queue<IoBuffer> getEncoderOutputQueue() {
-        return encoderOutput.getBufferQueue();
+    public Queue<Object> getEncoderOutputQueue() {
+        return encoderOutput.getEncodedMessageQueue();
     }
 
     /**

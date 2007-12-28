@@ -335,7 +335,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
 
     private static class EncodedWriteRequest extends DefaultWriteRequest {
-        private EncodedWriteRequest(IoBuffer encodedMessage,
+        private EncodedWriteRequest(Object encodedMessage,
                 WriteFuture future, SocketAddress destination) {
             super(encodedMessage, future, destination);
         }
@@ -387,18 +387,19 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         public WriteFuture flush() {
-            Queue<IoBuffer> bufferQueue = getBufferQueue();
+            Queue<Object> bufferQueue = getEncodedMessageQueue();
             WriteFuture future = null;
             for (;;) {
-                IoBuffer buf = bufferQueue.poll();
-                if (buf == null) {
+                Object encodedMessage = bufferQueue.poll();
+                if (encodedMessage == null) {
                     break;
                 }
 
                 // Flush only when the buffer has remaining.
-                if (buf.hasRemaining()) {
+                if (!(encodedMessage instanceof IoBuffer) ||
+                        ((IoBuffer) encodedMessage).hasRemaining()) {
                     future = new DefaultWriteFuture(session);
-                    nextFilter.filterWrite(session, new EncodedWriteRequest(buf,
+                    nextFilter.filterWrite(session, new EncodedWriteRequest(encodedMessage,
                             future, writeRequest.getDestination()));
                 }
             }
@@ -412,18 +413,19 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
         
         public void flushWithoutFuture() {
-            Queue<IoBuffer> bufferQueue = getBufferQueue();
+            Queue<Object> bufferQueue = getEncodedMessageQueue();
             for (;;) {
-                IoBuffer buf = bufferQueue.poll();
-                if (buf == null) {
+                Object encodedMessage = bufferQueue.poll();
+                if (encodedMessage == null) {
                     break;
                 }
 
                 // Flush only when the buffer has remaining.
-                if (buf.hasRemaining()) {
+                if (!(encodedMessage instanceof IoBuffer) ||
+                        ((IoBuffer) encodedMessage).hasRemaining()) {
                     nextFilter.filterWrite(
                             session, new EncodedWriteRequest(
-                                    buf, null, writeRequest.getDestination()));
+                                    encodedMessage, null, writeRequest.getDestination()));
                 }
             }
         }
