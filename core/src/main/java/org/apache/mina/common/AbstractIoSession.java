@@ -496,6 +496,14 @@ public abstract class AbstractIoSession implements IoSession {
         return scheduledWriteMessages.get();
     }
 
+    protected void setScheduledWriteBytes(long byteCount){
+        scheduledWriteBytes.set(byteCount);
+    }
+
+    protected void setScheduledWriteMessages(int messages) {
+        scheduledWriteMessages.set(messages);
+    }
+
     protected final void increaseReadBytes(long increment, long currentTime) {
         if (increment <= 0) {
             return;
