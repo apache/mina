@@ -243,6 +243,16 @@ public class DummySession extends AbstractIoSession {
 
         this.transportMetadata = transportMetadata;
     }
+    
+    @Override
+    public void setScheduledWriteBytes(long byteCount){
+        super.setScheduledWriteBytes(byteCount);
+    }
+
+    @Override
+    public void setScheduledWriteMessages(int messages) {
+        super.setScheduledWriteMessages(messages);
+    }
 
     /**
      * Update all statistical properties related with throughput.  By default
