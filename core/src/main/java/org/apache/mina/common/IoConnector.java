@@ -82,11 +82,11 @@ public interface IoConnector extends IoService {
      * is invoked.  There is <em>no</em> guarantee that the <code>ioSessionInitializer</code>
      * will be invoked before this method returns.
      * 
-     * @param ioSessionInitializer  the callback to invoke when the {@link IoSession} object is created
+     * @param sessionInitializer  the callback to invoke when the {@link IoSession} object is created
      * 
      * @throws IllegalStateException if no default remote address is set.
      */
-    ConnectFuture connect(IoSessionInitializer<ConnectFuture> ioSessionInitializer);
+    ConnectFuture connect(IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
     
     /**
      * Connects to the specified remote address.
@@ -104,12 +104,12 @@ public interface IoConnector extends IoService {
      * this method returns.
      * 
      * @param remoteAddress  the remote address to connect to
-     * @param ioSessionInitializer  the callback to invoke when the {@link IoSession} object is created
+     * @param sessionInitializer  the callback to invoke when the {@link IoSession} object is created
      * 
      * @return the {@link ConnectFuture} instance which is completed when the
      *         connection attempt initiated by this call succeeds or fails.
      */
-    ConnectFuture connect(SocketAddress remoteAddress, IoSessionInitializer<ConnectFuture> ioSessionInitializer);
+    ConnectFuture connect(SocketAddress remoteAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
 
     /**
      * Connects to the specified remote address binding to the specified local address.
@@ -117,8 +117,7 @@ public interface IoConnector extends IoService {
      * @return the {@link ConnectFuture} instance which is completed when the
      *         connection attempt initiated by this call succeeds or fails.
      */
-    ConnectFuture connect(SocketAddress remoteAddress,
-            SocketAddress localAddress);
+    ConnectFuture connect(SocketAddress remoteAddress, SocketAddress localAddress);
     
     /**
      * Connects to the specified remote address binding to the specified local
@@ -129,11 +128,11 @@ public interface IoConnector extends IoService {
      * 
      * @param remoteAddress  the remote address to connect to
      * @param localAddress  the local interface to bind to
-     * @param ioSessionInitializer  the callback to invoke when the {@link IoSession} object is created
+     * @param sessionInitializer  the callback to invoke when the {@link IoSession} object is created
      *
      * @return the {@link ConnectFuture} instance which is completed when the
      *         connection attempt initiated by this call succeeds or fails.
      */
     ConnectFuture connect(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer<ConnectFuture> ioSessionInitializer);
+            SocketAddress localAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
 }

@@ -145,8 +145,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
     @Override
     @SuppressWarnings("unchecked")
-    protected final ConnectFuture connect0(SocketAddress remoteAddress,
-                                      SocketAddress localAddress, IoSessionInitializer<ConnectFuture> callback) {
+    protected final ConnectFuture connect0(
+            SocketAddress remoteAddress, SocketAddress localAddress,
+            IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         H handle = null;
         boolean success = false;
         try {
@@ -154,7 +155,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             if (connect(handle, remoteAddress)) {
                 ConnectFuture future = new DefaultConnectFuture();
                 T session = newSession(processor, handle);
-                finishSessionInitialization(session, future, callback);
+                finishSessionInitialization(session, future, sessionInitializer);
                 // Forward the remaining process to the IoProcessor.
                 session.getProcessor().add(session);
                 success = true;
@@ -174,7 +175,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             }
         }
 
-        ConnectionRequest request = new ConnectionRequest(handle, callback);
+        ConnectionRequest request = new ConnectionRequest(handle, sessionInitializer);
         connectQueue.add(request);
         startupWorker();
         wakeup();
@@ -252,7 +253,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             try {
                 if (finishConnect(handle)) {
                     T session = newSession(processor, handle);
-                    finishSessionInitialization(session, entry, entry.getSessionCallback());
+                    finishSessionInitialization(session, entry, entry.getSessionInitializer());
                     // Forward the remaining process to the IoProcessor.
                     session.getProcessor().add(session);
                     nHandles ++;
@@ -346,9 +347,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected final class ConnectionRequest extends DefaultConnectFuture {
         private final H handle;
         private final long deadline;
-        private final IoSessionInitializer<ConnectFuture> ioSessionInitializer;
+        private final IoSessionInitializer<? extends ConnectFuture> sessionInitializer;
 
-        public ConnectionRequest(H handle, IoSessionInitializer<ConnectFuture> callback) {
+        public ConnectionRequest(H handle, IoSessionInitializer<? extends ConnectFuture> callback) {
             this.handle = handle;
             long timeout = getConnectTimeoutMillis();
             if (timeout <= 0L) {
@@ -356,7 +357,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             } else {
                 this.deadline = System.currentTimeMillis() + timeout;
             }
-            this.ioSessionInitializer = callback;
+            this.sessionInitializer = callback;
         }
 
         public H getHandle() {
@@ -367,8 +368,8 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             return deadline;
         }
 
-        public IoSessionInitializer<ConnectFuture> getSessionCallback() {
-            return ioSessionInitializer;
+        public IoSessionInitializer<? extends ConnectFuture> getSessionInitializer() {
+            return sessionInitializer;
         }
         
         @Override

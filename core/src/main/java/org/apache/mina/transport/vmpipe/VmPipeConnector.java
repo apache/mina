@@ -64,7 +64,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
     @Override
     protected ConnectFuture connect0(SocketAddress remoteAddress,
                                       SocketAddress localAddress,
-                                      IoSessionInitializer<ConnectFuture> ioSessionInitializer) {
+                                      IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         VmPipe entry = VmPipeAcceptor.boundHandlers.get(remoteAddress);
         if (entry == null) {
             return DefaultConnectFuture.newFailedFuture(new IOException(
@@ -84,7 +84,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
         VmPipeSessionImpl localSession = new VmPipeSessionImpl(this,
                 getListeners(), actualLocalAddress, getHandler(), entry);
 
-        finishSessionInitialization(localSession, future, ioSessionInitializer);
+        finishSessionInitialization(localSession, future, sessionInitializer);
 
         // and reclaim the local address when the connection is closed.
         localSession.getCloseFuture().addListener(LOCAL_ADDRESS_RECLAIMER);

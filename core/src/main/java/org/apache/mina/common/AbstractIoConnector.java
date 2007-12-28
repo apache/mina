@@ -80,13 +80,13 @@ public abstract class AbstractIoConnector
         return connect(defaultRemoteAddress, null, null);
     }
     
-    public ConnectFuture connect(IoSessionInitializer<ConnectFuture> ioSessionInitializer) {
+    public ConnectFuture connect(IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         SocketAddress defaultRemoteAddress = getDefaultRemoteAddress();
         if (defaultRemoteAddress == null) {
             throw new IllegalStateException("defaultRemoteAddress is not set.");
         }
         
-        return connect(defaultRemoteAddress, null, ioSessionInitializer);
+        return connect(defaultRemoteAddress, null, sessionInitializer);
     }
 
     public final ConnectFuture connect(SocketAddress remoteAddress) {
@@ -94,8 +94,8 @@ public abstract class AbstractIoConnector
     }
     
     public ConnectFuture connect(SocketAddress remoteAddress,
-            IoSessionInitializer<ConnectFuture> callback) {
-        return connect(remoteAddress, null, callback);
+            IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
+        return connect(remoteAddress, null, sessionInitializer);
     }
     
     public ConnectFuture connect(SocketAddress remoteAddress,
@@ -104,7 +104,7 @@ public abstract class AbstractIoConnector
     }
 
     public final ConnectFuture connect(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer<ConnectFuture> ioSessionInitializer) {
+            SocketAddress localAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
         }
@@ -164,7 +164,7 @@ public abstract class AbstractIoConnector
             }
         }
 
-        return connect0(remoteAddress, localAddress, ioSessionInitializer);
+        return connect0(remoteAddress, localAddress, sessionInitializer);
     }
 
     /**
@@ -173,7 +173,7 @@ public abstract class AbstractIoConnector
      * @param localAddress <tt>null</tt> if no local address is specified
      */
     protected abstract ConnectFuture connect0(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer<ConnectFuture> ioSessionInitializer);
+            SocketAddress localAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
 
     /**
      * Adds required internal attributes and {@link IoFutureListener}s

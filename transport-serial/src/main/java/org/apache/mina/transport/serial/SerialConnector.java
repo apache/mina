@@ -54,8 +54,9 @@ public final class SerialConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected ConnectFuture connect0(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer<ConnectFuture> ioSessionInitializer) {
+    protected ConnectFuture connect0(
+            SocketAddress remoteAddress, SocketAddress localAddress,
+            IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
 
         CommPortIdentifier portId;
         Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
@@ -83,7 +84,7 @@ public final class SerialConnector extends AbstractIoConnector {
                         ConnectFuture future = new DefaultConnectFuture();
                         SerialSessionImpl session = new SerialSessionImpl(
                                 this, getListeners(), portAddress, serialPort);
-                        finishSessionInitialization(session, future, ioSessionInitializer);
+                        finishSessionInitialization(session, future, sessionInitializer);
                         session.start();
                         return future;
                     } catch (PortInUseException e) {

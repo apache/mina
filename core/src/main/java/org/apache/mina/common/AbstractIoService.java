@@ -703,7 +703,10 @@ public abstract class AbstractIoService implements IoService {
         return listeners;
     }
     
-    protected final <T extends IoFuture> void finishSessionInitialization(IoSession session, T future, IoSessionInitializer<T> ioSessionInitializer) {
+    // TODO Figure out make it work without causing a compiler error / warning.
+    @SuppressWarnings("unchecked")
+    protected final void finishSessionInitialization(
+            IoSession session, IoFuture future, IoSessionInitializer sessionInitializer) {
         // Update lastIoTime if needed.
         if (getLastReadTime() == 0) {
             setLastReadTime(getActivationTime());
@@ -741,8 +744,8 @@ public abstract class AbstractIoService implements IoService {
             session.setAttribute(DefaultIoFilterChain.SESSION_OPENED_FUTURE, future);
         }
         
-        if (ioSessionInitializer != null) {
-            ioSessionInitializer.initializeSession(session, future);
+        if (sessionInitializer != null) {
+            sessionInitializer.initializeSession(session, future);
         }
         
         finishSessionInitialization0(session, future);
