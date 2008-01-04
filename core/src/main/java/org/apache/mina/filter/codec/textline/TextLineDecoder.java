@@ -252,6 +252,8 @@ public class TextLineDecoder implements ProtocolDecoder {
                     matchCount = 0;
                 }
             } else {
+		// fix for DIRMINA-506
+		in.position(in.position()-matchCount);
                 matchCount = 0;
             }
         }
