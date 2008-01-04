@@ -79,6 +79,14 @@ public class TextLineDecoderTest extends TestCase {
         Assert.assertEquals("JKL", session.getDecoderOutputQueue().poll());
         Assert.assertEquals("MNO", session.getDecoderOutputQueue().poll());
 
+        // Test aborted delimiter (DIRMINA-506)
+        in.clear();
+        in.putString("ABC\r\r\n", encoder);
+        in.flip();
+        decoder.decode(session, in, out);
+        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
+        Assert.assertEquals("ABC\r", session.getDecoderOutputQueue().poll());
+
         // Test splitted long delimiter
         decoder = new TextLineDecoder(Charset.forName("UTF-8"),
                 new LineDelimiter("\n\n\n"));
