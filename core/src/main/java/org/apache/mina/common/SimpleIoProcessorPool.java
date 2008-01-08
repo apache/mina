@@ -206,7 +206,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
             if (!disposing) {
                 disposing = true;
                 for (int i = pool.length - 1; i >= 0; i --) {
-                    if (pool[i] == null) {
+                    if (pool[i] == null || pool[i].isDisposing()) {
                         continue;
                     }
 
