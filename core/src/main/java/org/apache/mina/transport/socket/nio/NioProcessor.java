@@ -173,8 +173,16 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
     @Override
     protected int transferFile(NioSession session, FileRegion region, int length) throws Exception {
-        int writtenBytes = (int) region.getFileChannel().transferTo(region.getPosition(), length, session.getChannel());
-        return writtenBytes;
+        try {
+            return (int) region.getFileChannel().transferTo(region.getPosition(), length, session.getChannel());
+        } catch (IOException e) {
+            // Check to see if the IOException is being thrown due to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
+            if (e.getMessage().contains("Resource temporarily unavailable")) {
+                return 0;
+            } else {
+                throw e;
+            }
+        }
     }
 
     protected static class IoSessionIterator implements Iterator<NioSession> {
