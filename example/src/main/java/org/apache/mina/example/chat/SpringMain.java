@@ -20,6 +20,7 @@
 package org.apache.mina.example.chat;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * (<b>Entry point</b>) Chat server which uses Spring and the serverContext.xml
@@ -38,11 +39,11 @@ public class SpringMain {
                     .println("JMX disabled. Please set the "
                             + "'com.sun.management.jmxremote' system property to enable JMX.");
         }
-        new ClassPathXmlApplicationContext(getApplicationContext());
+        getApplicationContext();
         System.out.println("Listening ...");
     }
 
-    public static String getApplicationContext() {
-        return "org/apache/mina/example/chat/serverContext.xml";
+    public static ConfigurableApplicationContext getApplicationContext() {
+        return new ClassPathXmlApplicationContext("org/apache/mina/example/chat/serverContext.xml");
     }
 }

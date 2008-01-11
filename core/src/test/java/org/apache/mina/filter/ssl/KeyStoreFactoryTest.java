@@ -37,7 +37,7 @@ public class KeyStoreFactoryTest extends TestCase {
     public void testCreateInstanceFromResource() throws Exception {
         // Test using default for now.
         KeyStoreFactory factory = new KeyStoreFactory();
-        factory.setData(getClass().getResource("keystore.cert"));
+        factory.setDataUrl(getClass().getResource("keystore.cert"));
         factory.setPassword("boguspw");
 
         KeyStore ks = factory.newInstance();
@@ -61,7 +61,7 @@ public class KeyStoreFactoryTest extends TestCase {
 
         // Test using default for now.
         KeyStoreFactory factory = new KeyStoreFactory();
-        factory.setData(file);
+        factory.setDataFile(file);
         factory.setPassword("boguspw");
 
         KeyStore ks = factory.newInstance();

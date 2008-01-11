@@ -19,62 +19,74 @@
   <bean id="chatHandler" class="org.apache.mina.example.chat.ChatProtocolHandler" />
 
   <!-- The SSL configuration -->
-  <bean id="keyStore" class="org.apache.mina.integration.spring.ssl.KeyStoreFactoryBean">
-    <property name="resource" value="classpath:org/apache/mina/example/echoserver/ssl/bogus.cert"/>
+  <bean id="keystoreFactory" class="org.apache.mina.filter.ssl.KeyStoreFactory">
     <property name="password" value="boguspw"/>
+    <property name="dataUrl" value="classpath:org/apache/mina/example/echoserver/ssl/bogus.cert"/>
   </bean>
-  
-  <bean id="bogusTrustManagerFactory" class="org.apache.mina.integration.spring.ssl.BogusTrustManagerFactory"/>
+
+  <bean id="keyStore" factory-bean="keystoreFactory" factory-method="newInstance"/>
+
+  <bean id="bogusTrustManagerFactory" class="org.apache.mina.filter.ssl.BogusTrustManagerFactory"/>
   
   <!-- SSLContext to be used -->
-  <bean id="sslContext"  class="org.apache.mina.integration.spring.ssl.SslContextFactoryBean">
+  <bean id="sslContextFactory"  class="org.apache.mina.filter.ssl.SslContextFactory">
     <property name="protocol" value="TLS"/>
     <property name="keyManagerFactoryAlgorithm" value="SunX509"/>
     <property name="keyManagerFactoryKeyStore"><ref local="keyStore"/></property>
     <property name="keyManagerFactoryKeyStorePassword" value="boguspw"/>
     <property name="trustManagerFactory"><ref local="bogusTrustManagerFactory"/></property>
   </bean>
-  
-  <!-- The non-SSL filter chain. Adds a TextLineCodec and a LoggingFilter -->
-  <bean id="filterChainBuilder" class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean">
+
+  <bean id="sslContext" factory-bean="sslContextFactory" factory-method="newInstance"/>
+
+  <!-- the IoFilters -->
+
+  <bean id="executorFilter" class="org.apache.mina.filter.executor.ExecutorFilter"/>
+
+  <bean id="mdcInjectionFilter" class="org.apache.mina.filter.logging.MdcInjectionFilter">
+      <constructor-arg value="remoteAddress"/>
+  </bean>
+
+  <bean id="codecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter">
+    <constructor-arg>
+      <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
+    </constructor-arg>
+  </bean>
+
+  <bean id="loggingFilter" class="org.apache.mina.filter.logging.LoggingFilter" />
+
+  <bean id="sslFilter" class="org.apache.mina.filter.ssl.SslFilter">
+    <constructor-arg ref="sslContext"/>
+  </bean>
+
+  <!-- The non-SSL filter chain. -->
+  <bean id="filterChainBuilder" class="org.apache.mina.common.DefaultIoFilterChainBuilder">
     <property name="filters">
-      <list>
-        <bean class="org.apache.mina.filter.executor.ExecutorFilter"/>
-        <bean class="org.apache.mina.filter.logging.MdcInjectionFilter">
-            <constructor-arg value="remoteAddress"/>
-        </bean>
-        <bean class="org.apache.mina.filter.codec.ProtocolCodecFilter">
-          <constructor-arg>
-            <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
-          </constructor-arg>
-        </bean>
-        <bean class="org.apache.mina.filter.logging.LoggingFilter" />
-      </list>
+      <map>
+        <entry key="executor" value-ref="executorFilter"/>
+        <entry key="mdcInjectionFilter" value-ref="mdcInjectionFilter"/>
+        <entry key="codecFilter" value-ref="codecFilter"/>
+        <entry key="loggingFilter" value-ref="loggingFilter"/>
+      </map>
     </property>
   </bean>
-  
-  <!-- The SSL filter chain. Adds an SSLFilter, a TextLineCodec and a LoggingFilter -->
-  <bean id="sslFilterChainBuilder" class="org.apache.mina.integration.spring.DefaultIoFilterChainBuilderFactoryBean">
+
+  <!-- The SSL filter chain. -->
+  <bean id="sslFilterChainBuilder" class="org.apache.mina.common.DefaultIoFilterChainBuilder">
     <property name="filters">
-      <list>
-        <bean class="org.apache.mina.filter.executor.ExecutorFilter"/>
-        <bean class="org.apache.mina.filter.logging.MdcInjectionFilter"/>
-        <bean class="org.apache.mina.filter.ssl.SslFilter">
-          <constructor-arg ref="sslContext"/>
-        </bean>      
-        <bean class="org.apache.mina.filter.codec.ProtocolCodecFilter">
-          <constructor-arg>
-            <bean class="org.apache.mina.filter.codec.textline.TextLineCodecFactory" />
-          </constructor-arg>
-        </bean>
-        <bean class="org.apache.mina.filter.logging.LoggingFilter" />
-      </list>
+      <map>
+        <entry key="executor" value-ref="executorFilter"/>
+        <entry key="mdcInjectionFilter" value-ref="mdcInjectionFilter"/>
+        <entry key="sslFilter" value-ref="sslFilter"/>
+        <entry key="codecFilter" value-ref="codecFilter"/>
+        <entry key="loggingFilter" value-ref="loggingFilter"/>
+      </map>
     </property>
   </bean>
 
   <!-- The IoAcceptor which binds to port 1234 -->
   <bean id="ioAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor" init-method="bind" destroy-method="unbind">
-    <property name="localAddress" value=":1234" />
+    <property name="defaultLocalAddress" value=":1234" />
     <property name="handler" ref="chatHandler" />
     <property name="reuseAddress" value="true" />
     <property name="filterChainBuilder" ref="filterChainBuilder" />
@@ -82,7 +94,7 @@
   
   <!-- The SSL enabled IoAcceptor which binds to port 1235 -->
   <bean id="ioAcceptorWithSSL" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor" init-method="bind" destroy-method="unbind">
-    <property name="localAddress" value=":1235" />
+    <property name="defaultLocalAddress" value=":1235" />
     <property name="handler" ref="chatHandler" />
     <property name="reuseAddress" value="true" />
     <property name="filterChainBuilder" ref="sslFilterChainBuilder" />

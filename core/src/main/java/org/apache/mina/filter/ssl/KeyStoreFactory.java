@@ -57,7 +57,7 @@ public class KeyStoreFactory {
             throw new IllegalStateException("data property is not set.");
         }
 
-        KeyStore ks = null;
+        KeyStore ks;
         if (provider == null) {
             ks = KeyStore.getInstance(type);
         } else {
@@ -133,7 +133,7 @@ public class KeyStoreFactory {
      *
      * @param dataStream the {@link InputStream} that contains the key store
      */
-    public void setData(InputStream dataStream) throws IOException {
+    private void setData(InputStream dataStream) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             for (;;) {
@@ -141,10 +141,8 @@ public class KeyStoreFactory {
                 if (data < 0) {
                     break;
                 }
-                
                 out.write(data);
             }
-            
             setData(out.toByteArray());
         } finally {
             try {
@@ -160,7 +158,7 @@ public class KeyStoreFactory {
      *
      * @param dataFile the {@link File} that contains the key store
      */
-    public void setData(File dataFile) throws IOException {
+    public void setDataFile(File dataFile) throws IOException {
         setData(new BufferedInputStream(new FileInputStream(dataFile)));
     }
     
@@ -169,7 +167,7 @@ public class KeyStoreFactory {
      *
      * @param dataUrl the {@link URL} that contains the key store.
      */
-    public void setData(URL dataUrl) throws IOException {
+    public void setDataUrl(URL dataUrl) throws IOException {
         setData(dataUrl.openStream());
     }
 }
