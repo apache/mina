@@ -1337,6 +1337,16 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 return getPrefixedString(2, decoder);
             }
 
+  /**
+   * Reads a string which has a length field before the actual
+   * encoded string, using the specified <code>decoder</code> and returns it.
+   *
+   * @param prefixLength the length of the length field (1, 2, or 4)
+   * @param decoder the decoder to use for decoding the string
+   * @return the prefixed string
+   * @throws CharacterCodingException when decoding fails
+   * @throws BufferUnderflowException when there is not enough data available
+   */
     @Override
     public String getPrefixedString(int prefixLength, CharsetDecoder decoder)
             throws CharacterCodingException {
