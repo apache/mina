@@ -8,14 +8,24 @@ import org.apache.mina.common.IoService;
  */
 public class SpringMainTest extends TestCase {
 
-  public void testContext() {
-    ConfigurableApplicationContext appContext = SpringMain.getApplicationContext();
-    IoService service = (IoService) appContext.getBean("ioAcceptor");
-    IoService ioAcceptorWithSSL = (IoService) appContext.getBean("ioAcceptorWithSSL");
-    assertTrue(service.isActive());
-    assertTrue(ioAcceptorWithSSL.isActive());
-    appContext.close();
-    assertFalse(service.isActive());    
-    assertFalse(ioAcceptorWithSSL.isActive());
-  }
+    private ConfigurableApplicationContext appContext;
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        if (appContext != null) {
+            appContext.close();
+        }
+    }
+
+    public void testContext() {
+        appContext = SpringMain.getApplicationContext();
+        IoService service = (IoService) appContext.getBean("ioAcceptor");
+        IoService ioAcceptorWithSSL = (IoService) appContext.getBean("ioAcceptorWithSSL");
+        assertTrue(service.isActive());
+        assertTrue(ioAcceptorWithSSL.isActive());
+        appContext.close();
+        assertFalse(service.isActive());
+        assertFalse(ioAcceptorWithSSL.isActive());
+    }
 }
