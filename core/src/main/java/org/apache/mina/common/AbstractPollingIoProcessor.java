@@ -434,8 +434,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             if (ret < 0) {
                 scheduleRemove(session);
             }
-        } catch (IOException e) {
-            session.getFilterChain().fireExceptionCaught(e);
         } catch (Throwable e) {
             if (e instanceof IOException) {
                 scheduleRemove(session);
