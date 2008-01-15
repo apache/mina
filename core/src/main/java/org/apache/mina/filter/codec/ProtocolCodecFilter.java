@@ -152,6 +152,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         ProtocolDecoder decoder = getDecoder(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
+        int oldPos = in.position();
         try {
             synchronized (decoderOut) {
                 decoder.decode(session, in, decoderOut);
@@ -163,7 +164,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             } else {
                 pde = new ProtocolDecoderException(t);
             }
-            pde.setHexdump(in.getHexDump());
+
+            if (pde.getHexdump() == null) {
+                int curPos = in.position();
+                in.position(oldPos);
+                pde.setHexdump(in.getHexDump());
+                in.position(curPos);
+            }
             throw pde;
         } finally {
             try {

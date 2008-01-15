@@ -242,6 +242,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             }
         }
 
+        @Override
         protected boolean doDecode(IoSession session, ByteBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
             if (currentDecoder == null) {
@@ -276,8 +277,10 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
                     // Throw an exception if all decoders cannot decode data.
                     String dump = in.getHexDump();
                     in.position(in.limit()); // Skip data
-                    throw new ProtocolDecoderException(
+                    ProtocolDecoderException e = new ProtocolDecoderException(
                             "No appropriate message decoder: " + dump);
+                    e.setHexdump(dump);
+                    throw e;
                 }
 
                 if (currentDecoder == null) {
@@ -305,6 +308,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             }
         }
 
+        @Override
         public void finishDecode(IoSession session, ProtocolDecoderOutput out)
                 throws Exception {
             if (currentDecoder == null) {
@@ -314,6 +318,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
             currentDecoder.finishDecode(session, out);
         }
 
+        @Override
         public void dispose(IoSession session) throws Exception {
             super.dispose(session);
 
