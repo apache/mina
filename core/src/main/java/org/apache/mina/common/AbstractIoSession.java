@@ -305,7 +305,7 @@ public abstract class AbstractIoSession implements IoSession {
                 new DefaultWriteRequest(message, future, remoteAddress));
 
         if (openedFileChannel != null) {
-            // If we opened a FinalChannel, it needs to be closed when the write has completed
+            // If we opened a FileChannel, it needs to be closed when the write has completed
             final FileChannel finalChannel = openedFileChannel;
             future.addListener(new IoFutureListener<WriteFuture>() {
                 public void operationComplete(WriteFuture future) {
