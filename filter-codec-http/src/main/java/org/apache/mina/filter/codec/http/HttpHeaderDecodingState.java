@@ -21,7 +21,7 @@ package org.apache.mina.filter.codec.http;
 
 import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,10 +49,8 @@ abstract class HttpHeaderDecodingState extends DecodingStateMachine {
     private final CharsetDecoder defaultDecoder =
         HttpCodecUtils.DEFAULT_CHARSET.newDecoder();
 
-    private Map<String, List<String>> headers = new HashMap<String, List<String>>();
-
+    private Map<String, List<String>> headers;
     private String lastHeaderName;
-
     private StringBuilder lastHeaderValue;
 
     HttpHeaderDecodingState() {
@@ -61,11 +59,15 @@ abstract class HttpHeaderDecodingState extends DecodingStateMachine {
 
     @Override
     protected DecodingState init() throws Exception {
+        headers = new LinkedHashMap<String, List<String>>();
         return FIND_EMPTY_LINE;
     }
 
     @Override
     protected void destroy() throws Exception {
+        headers = null;
+        lastHeaderName = null;
+        lastHeaderValue = null;
     }
 
     private final DecodingState FIND_EMPTY_LINE = new CrLfDecodingState() {
@@ -74,8 +76,6 @@ abstract class HttpHeaderDecodingState extends DecodingStateMachine {
                 ProtocolDecoderOutput out) throws Exception {
             if (foundCRLF) {
                 out.write(headers);
-                // Reset the state.
-                headers = new HashMap<String, List<String>>();
                 return null;
             } else {
                 return READ_HEADER_NAME;
@@ -83,8 +83,8 @@ abstract class HttpHeaderDecodingState extends DecodingStateMachine {
         }
     };
 
-    private final DecodingState READ_HEADER_NAME = new ConsumeToTerminatorDecodingState(
-            (byte) ':') {
+    private final DecodingState READ_HEADER_NAME =
+        new ConsumeToTerminatorDecodingState((byte) ':') {
         @Override
         protected DecodingState finishDecode(IoBuffer product,
                 ProtocolDecoderOutput out) throws Exception {

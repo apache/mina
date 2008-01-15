@@ -67,6 +67,7 @@ abstract class HttpRequestDecodingState extends DecodingStateMachine {
 
     @Override
     protected void destroy() throws Exception {
+        request = null;
     }
 
     private final DecodingState SKIP_EMPTY_LINES = new CrLfDecodingState() {
