@@ -94,7 +94,7 @@ abstract class ChunkedBodyDecodingState extends DecodingStateMachine {
                         .throwDecoderException("Expected a chunk length.");
             }
 
-            String length = product.getString(asciiDecoder);
+            String length = product.getString(asciiDecoder).trim();
             lastChunkLength = Integer.parseInt(length, 16);
             if (chunkHasExtension) {
                 return SKIP_CHUNK_EXTENSION;
@@ -106,7 +106,7 @@ abstract class ChunkedBodyDecodingState extends DecodingStateMachine {
         @Override
         protected boolean isTerminator(byte b) {
             if (!(b >= '0' && b <= '9' || b >= 'a' && b <= 'f' || b >= 'A'
-                    && b <= 'F')) {
+                && b <= 'F' || b == ' ')) {
                 if (b == ' ' || b == '\r' || b == ';') {
                     chunkHasExtension = (b == ';' || b == ' ');
                     return true;
