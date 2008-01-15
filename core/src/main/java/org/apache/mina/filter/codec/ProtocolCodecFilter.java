@@ -175,7 +175,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 } else {
                     pde = new ProtocolDecoderException(t);
                 }
-                pde.setHexdump(in.getHexDump());
+                
+                if (pde.getHexdump() == null) {
+                    int curPos = in.position();
+                    in.position(oldPos);
+                    pde.setHexdump(in.getHexDump());
+                    in.position(curPos);
+                }
 
                 // Fire the exceptionCaught event.
                 decoderOut.flush();

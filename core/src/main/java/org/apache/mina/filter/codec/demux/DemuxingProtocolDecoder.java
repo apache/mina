@@ -157,8 +157,10 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
                 // Throw an exception if all decoders cannot decode data.
                 String dump = in.getHexDump();
                 in.position(in.limit()); // Skip data
-                throw new ProtocolDecoderException(
+                ProtocolDecoderException e = new ProtocolDecoderException(
                         "No appropriate message decoder: " + dump);
+                e.setHexdump(dump);
+                throw e;
             }
 
             if (state.currentDecoder == null) {
