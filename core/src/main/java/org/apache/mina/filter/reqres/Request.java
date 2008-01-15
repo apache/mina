@@ -34,15 +34,13 @@ public class Request {
 
     private final Object message;
 
-    private final boolean useResponseQueue;
-
     private final long timeoutMillis;
 
     private volatile Runnable timeoutTask;
 
     private volatile ScheduledFuture<?> timeoutFuture;
 
-    private final BlockingQueue<Object> responses = new LinkedBlockingQueue<Object>();
+    private final BlockingQueue<Object> responses;
 
     private volatile boolean endOfResponses;
 
@@ -81,7 +79,7 @@ public class Request {
 
         this.id = id;
         this.message = message;
-        this.useResponseQueue = useResponseQueue;
+        this.responses = useResponseQueue ? new LinkedBlockingQueue<Object>() : null;
         this.timeoutMillis = unit.toMillis(timeout);
     }
 
@@ -98,7 +96,7 @@ public class Request {
     }
 
     public boolean isUseResponseQueue() {
-        return useResponseQueue;
+        return responses != null;
     }
 
     public boolean hasResponse() {
@@ -143,14 +141,14 @@ public class Request {
     }
 
     private void chechEndOfResponses() {
-        if (endOfResponses && responses.isEmpty() && useResponseQueue) {
+        if (responses != null && endOfResponses && responses.isEmpty()) {
             throw new NoSuchElementException(
                     "All responses has been retrieved already.");
         }
     }
 
     private void checkUseResponseQueue() {
-        if (!useResponseQueue) {
+        if (responses == null) {
             throw new UnsupportedOperationException(
                     "Response queue is not available; useResponseQueue is false.");
         }
@@ -169,7 +167,7 @@ public class Request {
     }
 
     private void signal0(Object answer) {
-        if (useResponseQueue) {
+        if (responses != null) {
             responses.add(answer);
         }
     }
