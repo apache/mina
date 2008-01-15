@@ -77,13 +77,6 @@ abstract class HttpResponseLineDecodingState extends DecodingStateMachine {
             } catch (NumberFormatException e) {
                 HttpCodecUtils.throwDecoderException("Bad status code");
             }
-            return AFTER_READ_STATUS_CODE;
-        }
-    };
-
-    private final DecodingState AFTER_READ_STATUS_CODE = new LinearWhitespaceSkippingState() {
-        @Override
-        protected DecodingState finishDecode(int skippedBytes) throws Exception {
             return READ_REASON_PHRASE;
         }
     };
