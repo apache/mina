@@ -221,7 +221,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * which is registered by {@link #addReceivedMessageHandler(Class, MessageHandler)}.
      */
     @Override
-    public void messageReceived(IoSession session, Object message)
+    public final void messageReceived(IoSession session, Object message)
             throws Exception {
         MessageHandler<Object> handler = findReceivedMessageHandler(message.getClass());
         if (handler != null) {
@@ -234,7 +234,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void messageSent(IoSession session, Object message) throws Exception {
+    public final void messageSent(IoSession session, Object message) throws Exception {
         MessageHandler<Object> handler = findSentMessageHandler(message.getClass());
         if (handler != null) {
             handler.handleMessage(session, message);
@@ -246,7 +246,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+    public final void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         ExceptionHandler<Throwable> handler = findExceptionHandler(cause.getClass());
         if (handler != null) {
             handler.exceptionCaught(session, cause);
