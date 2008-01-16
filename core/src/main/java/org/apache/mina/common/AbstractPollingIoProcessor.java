@@ -266,7 +266,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             // in AbstractIoFilterChain.fireSessionOpened().
             ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
             notified = true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (notified) {
                 // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
                 // and call ConnectFuture.setException().
@@ -279,6 +279,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     destroy(session);
                 } catch (Exception e1) {
                     ExceptionMonitor.getInstance().exceptionCaught(e1);
+                } finally {
+                    registered = false;
                 }
             }
         }
