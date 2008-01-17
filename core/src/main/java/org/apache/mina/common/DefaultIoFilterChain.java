@@ -429,27 +429,27 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public void fireExceptionCaught(Throwable cause) {
+        Entry head = this.head;
+        callNextExceptionCaught(head, session, cause);
+    }
+
+    private void callNextExceptionCaught(Entry entry, IoSession session,
+            Throwable cause) {
         // Notify the related future.
         ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_OPENED_FUTURE);
         if (future == null) {
-            Entry head = this.head;
-            callNextExceptionCaught(head, session, cause);
+            try {
+                entry.getFilter().exceptionCaught(entry.getNextFilter(), session,
+                        cause);
+            } catch (Throwable e) {
+                IoSessionLogger.getLogger(session, getClass()).warn(
+                        "Unexpected exception from exceptionCaught handler.", e);
+            }
         } else {
             // Please note that this place is not the only place that
             // calls ConnectFuture.setException().
             session.close();
             future.setException(cause);
-        }
-    }
-
-    private void callNextExceptionCaught(Entry entry, IoSession session,
-            Throwable cause) {
-        try {
-            entry.getFilter().exceptionCaught(entry.getNextFilter(), session,
-                    cause);
-        } catch (Throwable e) {
-            IoSessionLogger.getLogger(session, getClass()).warn(
-                    "Unexpected exception from exceptionCaught handler.", e);
         }
     }
 
