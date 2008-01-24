@@ -123,14 +123,29 @@ abstract class HttpResponseDecodingState extends DecodingStateMachine {
                 return null;
             }
             response.setProtocolVersion((HttpVersion) childProducts.get(0));
-            response.setStatus(HttpResponseStatus.forId((Integer) childProducts.get(1)));
-            String reasonPhrase = (String) childProducts.get(2);
-            if (reasonPhrase.length() > 0) {
-                response.setStatusReasonPhrase(reasonPhrase);
+            final HttpResponseStatus status = HttpResponseStatus.forId((Integer) childProducts.get(1));
+            if (status.isFinalResponse()) {
+                response.setStatus(status);
+                String reasonPhrase = (String) childProducts.get(2);
+                if (reasonPhrase.length() > 0) {
+                    response.setStatusReasonPhrase(reasonPhrase);
+                }
+                return READ_HEADERS;
+            } else {
+                return SKIP_HEADERS;
             }
-            return READ_HEADERS;
         }
     };
+    
+    private final DecodingState SKIP_HEADERS = new HttpHeaderDecodingState() {
+        @Override
+        @SuppressWarnings("unchecked")
+        protected DecodingState finishDecode(
+                List<Object> childProducts, ProtocolDecoderOutput out) throws Exception {
+            return READ_RESPONSE_LINE;
+        }
+    };
+
 
     private final DecodingState READ_HEADERS = new HttpHeaderDecodingState() {
         @Override

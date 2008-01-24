@@ -39,10 +39,10 @@ public class HttpResponseStatus implements Serializable {
     // Informational status codes
 
     public static final HttpResponseStatus CONTINUE = new HttpResponseStatus(
-            100, "Continue", true, false);
+            100, "Continue", false, false, false);
 
     public static final HttpResponseStatus SWITCHING_PROTOCOLS = new HttpResponseStatus(
-            101, "Switching Protocols", true, false);
+            101, "Switching Protocols", false, false);
 
     // Successful status codes
 
@@ -167,14 +167,12 @@ public class HttpResponseStatus implements Serializable {
             505, "HTTP Version not supported", true, false);
 
     private final int code;
-
     private final transient boolean allowsMessageBody;
-
     private final transient boolean forcesConnectionClosure;
-
     private final transient Category category;
-
     private final transient String description;
+    private final transient boolean finalResponse;
+
 
     /**
      * @return  <code>true</code> iff a message body may be transmitted in
@@ -190,6 +188,13 @@ public class HttpResponseStatus implements Serializable {
      */
     public boolean forcesConnectionClosure() {
         return forcesConnectionClosure;
+    }
+    
+    /**
+     * @return  Is this a final response? 100 Continue isn't.
+     */
+    public boolean isFinalResponse() {
+        return finalResponse;
     }
 
     /**
@@ -283,12 +288,18 @@ public class HttpResponseStatus implements Serializable {
 
     private HttpResponseStatus(int code, String description,
             boolean allowsMessageBody, boolean forcesConnectionClosure) {
+        this(code, description, allowsMessageBody, forcesConnectionClosure, true);
+    }
+    private HttpResponseStatus(int code, String description,
+            boolean allowsMessageBody, boolean forcesConnectionClosure,
+            boolean finalResponse) {
         RESPONSE_TABLE[code] = this;
         this.code = code;
         this.category = categoryForId(code);
         this.description = description;
         this.allowsMessageBody = allowsMessageBody;
         this.forcesConnectionClosure = forcesConnectionClosure;
+        this.finalResponse = finalResponse;
     }
 
     private Object readResolve() {
