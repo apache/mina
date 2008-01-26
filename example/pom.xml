@@ -20,10 +20,6 @@
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>mina-protocol-http-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${groupId}</groupId>
       <artifactId>mina-statemachine</artifactId>
     </dependency>
     <dependency>
