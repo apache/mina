@@ -90,16 +90,6 @@
       </dependency>
       <dependency>
         <groupId>${groupId}</groupId>
-        <artifactId>mina-filter-codec-http</artifactId>
-        <version>${pom.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${groupId}</groupId>
-        <artifactId>mina-protocol-http-client</artifactId>
-        <version>${pom.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${groupId}</groupId>
         <artifactId>mina-integration-beans</artifactId>
         <version>${pom.version}</version>
       </dependency>
