@@ -286,9 +286,7 @@
     <module>transport-apr</module>
     <module>filter-compression</module>
     <module>filter-codec-netty</module>
-    <module>filter-codec-http</module>
     <module>statemachine</module>
-    <module>protocol-http-client</module>
     <module>integration-beans</module>
     <module>integration-ognl</module>
     <module>integration-jmx</module>
