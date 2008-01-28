@@ -28,7 +28,8 @@ import java.util.Map;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link IoFilter} which blocks connections from connecting
@@ -44,6 +45,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
 
     private final Map<String, Long> clients;
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());    
     /**
      * Default constructor.  Sets the wait time to 1 second
      */
@@ -93,7 +95,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
 
             if (clients.containsKey(addr.getAddress().getHostAddress())) {
 
-                IoSessionLogger.getLogger(session, getClass()).debug("This is not a new client");
+                logger.debug("This is not a new client");
                 Long lastConnTime = clients.get(addr.getAddress()
                         .getHostAddress());
 
@@ -102,8 +104,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
                 // if the interval between now and the last connection is
                 // less than the allowed interval, return false
                 if (now - lastConnTime < allowedInterval) {
-                    IoSessionLogger.getLogger(session, getClass()).warn(
-                            "Session connection interval too short");
+                    logger.warn("Session connection interval too short");
                     return false;
                 } else {
                     return true;
@@ -121,8 +122,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     public void sessionCreated(NextFilter nextFilter, IoSession session)
             throws Exception {
         if (!isConnectionOk(session)) {
-            IoSessionLogger.getLogger(session, getClass()).warn(
-                    "Connections coming in too fast; closing.");
+            logger.warn("Connections coming in too fast; closing.");
             session.close();
         }
     }

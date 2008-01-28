@@ -30,7 +30,8 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link IoHandler} that adapts asynchronous MINA events to stream I/O.
@@ -44,6 +45,8 @@ import org.apache.mina.common.IoSessionLogger;
  * @version $Rev$, $Date$
  */
 public abstract class StreamIoHandler extends IoHandlerAdapter {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     private static final AttributeKey KEY_IN = new AttributeKey(StreamIoHandler.class, "in");
     private static final AttributeKey KEY_OUT = new AttributeKey(StreamIoHandler.class, "out");
 
@@ -153,8 +156,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
         if (e != null && in != null) {
             in.throwException(e);
         } else {
-            IoSessionLogger.getLogger(session, getClass()).warn(
-                    "Unexpected exception.", cause);
+            logger.warn("Unexpected exception.", cause);
             session.close();
         }
     }

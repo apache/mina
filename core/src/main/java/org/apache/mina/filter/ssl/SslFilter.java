@@ -38,7 +38,6 @@ import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestWrapper;
@@ -57,7 +56,6 @@ import org.apache.mina.common.WriteToClosedSessionException;
  * Java version 5 or above is mandatory to use this filter. And please note that
  * this filter only works for TCP/IP connections.
  * <p>
- * This filter logs debug information using {@link IoSessionLogger}.
  *
  * <h2>Implementing StartTLS</h2>
  * <p>

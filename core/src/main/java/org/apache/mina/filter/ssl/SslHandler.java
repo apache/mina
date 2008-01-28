@@ -36,12 +36,12 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 import org.apache.mina.util.CircularQueue;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A helper class using the SSLEngine API to decrypt/encrypt data.
@@ -56,7 +56,7 @@ import org.slf4j.Logger;
  */
 class SslHandler {
     
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final SslFilter parent;
     private final SSLContext ctx;
     private final IoSession session;
@@ -101,7 +101,6 @@ class SslHandler {
         this.parent = parent;
         this.session = session;
         this.ctx = sslc;
-        this.logger = IoSessionLogger.getLogger(session, SslFilter.class);
         init();
     }
 

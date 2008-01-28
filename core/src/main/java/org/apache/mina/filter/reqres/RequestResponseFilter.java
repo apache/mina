@@ -34,9 +34,10 @@ import java.util.concurrent.TimeUnit;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.filter.util.WriteRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -51,6 +52,8 @@ public class RequestResponseFilter extends WriteRequestFilter {
 
     private final ResponseInspectorFactory responseInspectorFactory;
     private final ScheduledExecutorService timeoutScheduler;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public RequestResponseFilter(final ResponseInspector responseInspector,
             ScheduledExecutorService timeoutScheduler) {
@@ -151,7 +154,6 @@ public class RequestResponseFilter extends WriteRequestFilter {
         if (request == null) {
             // A response message without request. Swallow the event because
             // the response might have arrived too late.
-            IoSessionLogger logger = IoSessionLogger.getLogger(session, getClass());
             if (logger.isWarnEnabled()) {
                 logger.warn("Unknown request ID '" + requestId
                         + "' for the response message. Timed out already?: "

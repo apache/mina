@@ -28,12 +28,13 @@ import junit.framework.TestCase;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests echo server example.
@@ -42,6 +43,8 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
  * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
 public abstract class AbstractTest extends TestCase {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected boolean useSSL;
 
     protected int port;
@@ -128,7 +131,7 @@ public abstract class AbstractTest extends TestCase {
                         if (session.getFilterChain().contains("SSL")
                                 && buf.remaining() == 1
                                 && buf.get() == (byte) '.') {
-                            IoSessionLogger.getLogger(session).info("TLS Reentrance");
+                            logger.info("TLS Reentrance");
                             ((SslFilter) session.getFilterChain().get("SSL"))
                                     .startSsl(session);
 

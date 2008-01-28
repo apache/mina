@@ -26,7 +26,6 @@ import java.util.Set;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +37,8 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class ChatProtocolHandler extends IoHandlerAdapter {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final Set<IoSession> sessions = Collections
             .synchronizedSet(new HashSet<IoSession>());
 
@@ -46,7 +47,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        IoSessionLogger.getLogger(session).warn(cause);
+        logger.warn("Unexpected exception.", cause);
         // Close connection when unexpected exception is caught.
         session.close();
     }
@@ -109,12 +110,12 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
                 }
                 break;
             default:
-                IoSessionLogger.getLogger(session).info("Unhandled command: " + command);
+                logger.info("Unhandled command: " + command);
                 break;
             }
 
         } catch (IllegalArgumentException e) {
-            IoSessionLogger.getLogger(session).debug(e);
+            logger.debug("Illegal argument", e);
         }
     }
 

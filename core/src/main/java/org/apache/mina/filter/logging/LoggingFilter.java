@@ -26,12 +26,13 @@ import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.CopyOnWriteMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Logs all MINA protocol events using the {@link IoSessionLogger}.  Each event can be
+ * Logs all MINA protocol events.  Each event can be
  * tuned to use a different level based on the user's specific requirements.  Methods
  * are in place that allow the user to use either the get or set method for each event
  * and pass in the {@link IoEventType} and the {@link LogLevel}.
@@ -47,7 +48,7 @@ public class LoggingFilter extends IoFilterAdapter {
 
     private final Map<IoEventType, LogLevel> logSettings = new CopyOnWriteMap<IoEventType, LogLevel>();
     private final String name;
-
+    private final Logger logger;
     /**
      * Default Constructor.
      */
@@ -60,7 +61,11 @@ public class LoggingFilter extends IoFilterAdapter {
     }
 
     public LoggingFilter(String name) {
+        if (name == null) {
+            throw new NullPointerException("name should not be null");
+        }
         this.name = name;
+        this.logger = LoggerFactory.getLogger(name);
 
         // Exceptions will be logged to WARN as default.
         setLogLevel(IoEventType.EXCEPTION_CAUGHT, LogLevel.WARN);
@@ -79,53 +84,53 @@ public class LoggingFilter extends IoFilterAdapter {
     @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) throws Exception {
-        getLogLevel(IoEventType.EXCEPTION_CAUGHT).log(
-                session, name, "EXCEPTION: ", cause);
+        getLogLevel(IoEventType.EXCEPTION_CAUGHT).log(logger, "EXCEPTION: ", cause);
         nextFilter.exceptionCaught(session, cause);
     }
 
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws Exception {
-        getLogLevel(IoEventType.MESSAGE_RECEIVED).log(
-                session, name, "RECEIVED: " + message);
+        log(IoEventType.MESSAGE_RECEIVED, "RECEIVED: {}", message);
         nextFilter.messageReceived(session, message);
     }
 
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception {
-        getLogLevel(IoEventType.MESSAGE_SENT).log(
-                session, name, "SENT: " + writeRequest.getMessage());
+        log(IoEventType.MESSAGE_SENT, "SENT: {}", writeRequest.getMessage());
         nextFilter.messageSent(session, writeRequest);
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        getLogLevel(IoEventType.SESSION_CLOSED).log(session, name, "CLOSED");
+    public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
+        log(IoEventType.SESSION_CLOSED, "CLOSED", null);
         nextFilter.sessionClosed(session);
     }
 
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session)
             throws Exception {
-        getLogLevel(IoEventType.SESSION_CREATED).log(session, name, "CREATED");
+        log(IoEventType.SESSION_CREATED, "CREATED", null);
         nextFilter.sessionCreated(session);
     }
 
     @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session,
             IdleStatus status) throws Exception {
-        getLogLevel(IoEventType.SESSION_IDLE).log(session, name, "IDLE: " + status);
+        log(IoEventType.SESSION_IDLE, "IDLE: {}", status);
         nextFilter.sessionIdle(session, status);
     }
 
     @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session)
             throws Exception {
-        getLogLevel(IoEventType.SESSION_OPENED).log(session, name, "OPENED");
+        log(IoEventType.SESSION_OPENED, "OPENED", null);
         nextFilter.sessionOpened(session);
+    }
+
+    private void log(IoEventType eventType, String format, Object arg) {
+        getLogLevel(eventType).log(logger, format, new Object[] { arg });    
     }
 
     /**

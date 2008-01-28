@@ -30,11 +30,12 @@ import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.NothingWrittenException;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IoFilter} which translates binary or protocol specific data into
@@ -53,6 +54,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     private final AttributeKey DECODER = new AttributeKey(getClass(), "decoder");
     private final AttributeKey DECODER_OUT = new AttributeKey(getClass(), "decoderOut");
     private final ProtocolCodecFactory factory;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ProtocolCodecFilter(ProtocolCodecFactory factory) {
         if (factory == null) {
@@ -316,7 +319,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         try {
             encoder.dispose(session);
         } catch (Throwable t) {
-            IoSessionLogger.getLogger(session, getClass()).warn(
+            logger.warn(
                     "Failed to dispose: " + encoder.getClass().getName() + " (" + encoder + ')');
         }
     }
@@ -331,7 +334,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         try {
             decoder.dispose(session);
         } catch (Throwable t) {
-            IoSessionLogger.getLogger(session, getClass()).warn(
+            logger.warn(
                     "Falied to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }

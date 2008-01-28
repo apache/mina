@@ -28,7 +28,6 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.WriteException;
 import org.apache.mina.common.WriteFuture;
@@ -37,6 +36,8 @@ import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests echo server example.
@@ -45,6 +46,8 @@ import org.apache.mina.util.AvailablePortFinder;
  * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
 public class ConnectorTest extends AbstractTest {
+    private final static Logger logger = LoggerFactory.getLogger(ConnectorTest.class);
+
     private static final int TIMEOUT = 10000; // 10 seconds
 
     private final int COUNT = 10;
@@ -193,7 +196,7 @@ public class ConnectorTest extends AbstractTest {
         //// in SocketIoProcessor if there was a read timeout because
         //// we share readBuf.
         readBuf.flip();
-        IoSessionLogger.getLogger(session).info("readBuf: " + readBuf);
+        logger.info("readBuf: " + readBuf);
         Assert.assertEquals(DATA_SIZE * COUNT, readBuf.remaining());
         IoBuffer expectedBuf = IoBuffer.allocate(DATA_SIZE * COUNT);
         for (int i = 0; i < COUNT; i++) {
@@ -245,10 +248,10 @@ public class ConnectorTest extends AbstractTest {
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
-            IoSessionLogger.getLogger(session).warn(cause);
+            logger.warn("Unexpected exception.", cause);
             if (cause instanceof WriteException) {
                 WriteException e = (WriteException) cause;
-                IoSessionLogger.getLogger(session).warn("Failed write requests: {}", e.getRequests());
+                logger.warn("Failed write requests: {}", e.getRequests());
             }
         }
     }

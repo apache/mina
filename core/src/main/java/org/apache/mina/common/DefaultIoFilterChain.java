@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.common.IoFilter.NextFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A default implementation of {@link IoFilterChain} that provides
@@ -51,6 +53,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
     private final EntryImpl head;
 
     private final EntryImpl tail;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public DefaultIoFilterChain(AbstractIoSession session) {
         if (session == null) {
@@ -442,8 +446,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 entry.getFilter().exceptionCaught(entry.getNextFilter(), session,
                         cause);
             } catch (Throwable e) {
-                IoSessionLogger.getLogger(session, getClass()).warn(
-                        "Unexpected exception from exceptionCaught handler.", e);
+                logger.warn("Unexpected exception from exceptionCaught handler.", e);
             }
         } else {
             // Please note that this place is not the only place that

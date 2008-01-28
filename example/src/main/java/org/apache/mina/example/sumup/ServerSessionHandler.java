@@ -23,9 +23,10 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.example.sumup.message.AddMessage;
 import org.apache.mina.example.sumup.message.ResultMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link IoHandler} for SumUp server.
@@ -36,6 +37,8 @@ import org.apache.mina.example.sumup.message.ResultMessage;
 public class ServerSessionHandler extends IoHandlerAdapter {
     
     private static final String SUM_KEY = "sum";
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());    
     
     @Override
     public void sessionOpened(IoSession session) {
@@ -78,7 +81,7 @@ public class ServerSessionHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
-        IoSessionLogger.getLogger(session).info("Disconnecting the idle.");
+        logger.info("Disconnecting the idle.");
         // disconnect an idle client
         session.close();
     }

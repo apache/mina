@@ -24,8 +24,9 @@ import java.nio.charset.Charset;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.TrafficMask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class of {@link org.apache.mina.common.IoHandler} classes which handle
@@ -38,6 +39,8 @@ import org.apache.mina.common.TrafficMask;
 public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
     private static final Charset CHARSET = Charset.forName("iso8859-1");
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Override
     public void sessionCreated(IoSession session) throws Exception {
         session.setTrafficMask(TrafficMask.NONE);
@@ -62,6 +65,6 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         wb.flip();
         ((IoSession) session.getAttribute("")).write(wb);
         rb.reset();
-        IoSessionLogger.getLogger(session).info(rb.getString(CHARSET.newDecoder()));
+        logger.info(rb.getString(CHARSET.newDecoder()));
     }
 }

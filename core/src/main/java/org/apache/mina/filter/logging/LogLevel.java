@@ -19,8 +19,6 @@
  */
 package org.apache.mina.filter.logging;
 
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.slf4j.Logger;
 
 /**
@@ -37,7 +35,7 @@ public enum LogLevel {
      * {@link LogLevel} which will not log any information
      */
     NONE(new LogLevelLogger() {
-        public void log(Logger logger, String message) {
+        public void log(Logger logger, String message, Object[] args) {
         }
 
         public void log(Logger logger, String message, Throwable cause) {
@@ -48,8 +46,8 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the TRACE level.
      */
     TRACE(new LogLevelLogger() {
-        public void log(Logger logger, String message) {
-            logger.trace(message);
+        public void log(Logger logger, String message, Object[] args) {
+            logger.trace(message, args);
         }
 
         public void log(Logger logger, String message, Throwable cause) {
@@ -61,8 +59,8 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the DEBUG level.
      */
     DEBUG(new LogLevelLogger() {
-        public void log(Logger logger, String message) {
-            logger.debug(message);
+        public void log(Logger logger, String message, Object[] args) {
+            logger.debug(message, args);
         }
 
         public void log(Logger logger, String message, Throwable cause) {
@@ -74,8 +72,8 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the INFO level.
      */
     INFO(new LogLevelLogger() {
-        public void log(Logger logger, String message) {
-            logger.info(message);
+        public void log(Logger logger, String message, Object[] args) {
+            logger.info(message, args);
         }
 
         public void log(Logger logger, String message, Throwable cause) {
@@ -87,8 +85,8 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the WARN level.
      */
     WARN(new LogLevelLogger() {
-        public void log(Logger logger, String message) {
-            logger.warn(message);
+        public void log(Logger logger, String message, Object[] args) {
+            logger.warn(message, args);
         }
 
         public void log(Logger logger, String message, Throwable cause) {
@@ -100,8 +98,8 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the ERROR level.
      */
     ERROR(new LogLevelLogger() {
-        public void log(Logger logger, String message) {
-            logger.error(message);
+        public void log(Logger logger, String message, Object[] args) {
+            logger.error(message, args);
         }
 
         public void log(Logger logger, String message, Throwable cause) {
@@ -114,17 +112,17 @@ public enum LogLevel {
     private LogLevel(LogLevelLogger logger) {
         this.logger = logger;
     }
-    
-    void log(IoSession session, String name, String message) {
-        this.logger.log(IoSessionLogger.getLogger(session, name), message);
+
+    void log(Logger logger, String format, Object[] args) {
+        this.logger.log(logger, format,  args);
     }
-    
-    void log(IoSession session, String name, String message, Throwable cause) {
-        this.logger.log(IoSessionLogger.getLogger(session, name), message, cause);
+
+    void log(Logger logger, String message, Throwable cause) {
+        this.logger.log(logger, message, cause);        
     }
-    
+
     private interface LogLevelLogger {
-        void log(Logger logger, String message);
+        void log(Logger logger, String message, Object[] args);
         void log(Logger logger, String message, Throwable cause);
     }
 }

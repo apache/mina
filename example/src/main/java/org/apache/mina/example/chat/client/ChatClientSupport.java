@@ -28,6 +28,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.filter.logging.MdcInjectionFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
@@ -59,6 +60,7 @@ public class ChatClientSupport {
         }
 
         try {
+            connector.getFilterChain().addLast("mdc", new MdcInjectionFilter());
 
             if (useSsl) {
                 SSLContext sslContext = BogusSslContextFactory

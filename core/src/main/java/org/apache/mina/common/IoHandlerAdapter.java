@@ -19,6 +19,9 @@
  */
 package org.apache.mina.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * An abstract adapter class for {@link IoHandler}.  You can extend this
@@ -29,6 +32,9 @@ package org.apache.mina.common;
  * @version $Rev$, $Date$
  */
 public class IoHandlerAdapter implements IoHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public void sessionCreated(IoSession session) throws Exception {
     }
 
@@ -44,7 +50,6 @@ public class IoHandlerAdapter implements IoHandler {
 
     public void exceptionCaught(IoSession session, Throwable cause)
             throws Exception {
-        IoSessionLogger logger = IoSessionLogger.getLogger(session, getClass());
         if (logger.isWarnEnabled()) {
             logger.warn("EXCEPTION, please implement "
                     + getClass().getName()

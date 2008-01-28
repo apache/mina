@@ -34,11 +34,11 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.TrafficMask;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.util.CopyOnWriteMap;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IoFilter} that throttles incoming traffic to
@@ -71,7 +71,8 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     
     private static final Object globalResumeLock = new Object();
     private static long lastGlobalResumeTime = 0;
-    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     /**
      * Returns the current amount of data in the buffer of the {@link ExecutorFilter}
      * for all {@link IoSession} whose {@link IoFilterChain} has been configured by
@@ -408,7 +409,6 @@ public class ReadThrottleFilter extends IoFilterAdapter {
 
     private void enter(IoSession session, int size) {
         State state = getState(session);
-        Logger logger = IoSessionLogger.getLogger(session, getClass());
 
         int globalBufferSize = ReadThrottleFilter.globalBufferSize.addAndGet(size);
         int serviceBufferSize = increaseServiceBufferSize(session.getService(), size);
@@ -470,7 +470,6 @@ public class ReadThrottleFilter extends IoFilterAdapter {
     
     private void exit(IoSession session, int size) {
         State state = getState(session);
-        Logger logger = IoSessionLogger.getLogger(session, getClass());
 
         int globalBufferSize = ReadThrottleFilter.globalBufferSize.addAndGet(-size);
         if (globalBufferSize < 0) {
@@ -585,7 +584,6 @@ public class ReadThrottleFilter extends IoFilterAdapter {
 
         if (resume) {
             session.resumeRead();
-            Logger logger = IoSessionLogger.getLogger(session, getClass());
             if (logger.isDebugEnabled()) {
                 logger.debug(getMessage(session, "  Resumed - "));
             }
@@ -607,7 +605,7 @@ public class ReadThrottleFilter extends IoFilterAdapter {
         }
         
         if (log) {
-            IoSessionLogger.getLogger(session, getClass()).warn(getMessage(session));
+            logger.warn(getMessage(session));
         }
     }
     

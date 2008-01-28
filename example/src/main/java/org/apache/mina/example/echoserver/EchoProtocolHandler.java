@@ -24,8 +24,9 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.filter.ssl.SslFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link IoHandler} implementation for echo server.
@@ -34,6 +35,8 @@ import org.apache.mina.filter.ssl.SslFilter;
  * @version $Rev$, $Date$,
  */
 public class EchoProtocolHandler extends IoHandlerAdapter {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Override
     public void sessionCreated(IoSession session) {
         session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
@@ -44,18 +47,17 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
-        IoSessionLogger.getLogger(session).info("CLOSED");
+        logger.info("CLOSED");
     }
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
-        IoSessionLogger.getLogger(session).info("OPENED");
+        logger.info("OPENED");
     }
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
-        IoSessionLogger.getLogger(session).info(
-                "*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE) + " ***");
+        logger.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE) + " ***");
     }
 
     @Override

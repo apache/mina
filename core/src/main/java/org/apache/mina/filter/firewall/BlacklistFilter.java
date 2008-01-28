@@ -29,8 +29,9 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link IoFilter} which blocks connections from blacklisted remote
@@ -42,6 +43,7 @@ import org.apache.mina.common.WriteRequest;
 public class BlacklistFilter extends IoFilterAdapter {
     private final List<InetAddress> blacklist = new CopyOnWriteArrayList<InetAddress>();
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     /**
      * Sets the addresses to be blacklisted.
      *
@@ -175,7 +177,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     private void blockSession(IoSession session) {
-        IoSessionLogger.getLogger(session, getClass()).warn("Remote address in the blacklist; closing.");
+        logger.warn("Remote address in the blacklist; closing.");
         session.close();
     }
 

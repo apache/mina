@@ -21,7 +21,6 @@ package org.apache.mina.example.imagine.step1.server;
 
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.example.imagine.step1.ImageRequest;
 import org.apache.mina.example.imagine.step1.ImageResponse;
 import org.slf4j.Logger;
@@ -52,8 +51,7 @@ public class ImageServerIoHandler extends IoHandlerAdapter {
     }
 
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-        IoSessionLogger sessionLogger = IoSessionLogger.getLogger(session, logger);
-        sessionLogger.warn(cause.getMessage(), cause);
+        logger.warn(cause.getMessage(), cause);
     }
 
     public void messageReceived(IoSession session, Object message) throws Exception {

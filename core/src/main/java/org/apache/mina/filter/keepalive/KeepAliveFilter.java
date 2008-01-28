@@ -27,9 +27,9 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteRequest;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IoFilter} that sends a keep-alive request on
@@ -128,6 +128,8 @@ public class KeepAliveFilter extends IoFilterAdapter {
     private volatile KeepAlivePolicy policy;
     private volatile int keepAliveRequestInterval;
     private volatile int keepAliveRequestTimeout;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     /**
      * Creates a new instance with the default {@link KeepAlivePolicy} and
@@ -311,7 +313,6 @@ public class KeepAliveFilter extends IoFilterAdapter {
     }
 
     private void logTimeout(IoSession session) {
-        Logger logger = IoSessionLogger.getLogger(session, getClass());
         if (logger.isWarnEnabled()) {
             logger.warn(getTimeoutMessage());
         }

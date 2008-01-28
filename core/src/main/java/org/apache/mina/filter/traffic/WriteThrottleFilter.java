@@ -28,11 +28,12 @@ import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionLogger;
 import org.apache.mina.common.WriteException;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.CopyOnWriteMap;
 import org.apache.mina.util.MapBackedSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IoFilter} that throttles outgoing traffic to prevent a unwanted
@@ -52,6 +53,8 @@ import org.apache.mina.util.MapBackedSet;
  */
 public class WriteThrottleFilter extends IoFilterAdapter {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     private static final Set<IoService> activeServices =
         new MapBackedSet<IoService>(new CopyOnWriteMap<IoService, Boolean>()); 
     
@@ -323,7 +326,7 @@ public class WriteThrottleFilter extends IoFilterAdapter {
         }
         
         if (log) {
-            IoSessionLogger.getLogger(session, getClass()).warn(getMessage(session));
+            logger.warn(getMessage(session));
         }
     }
     
