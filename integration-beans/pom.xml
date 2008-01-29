@@ -17,11 +17,13 @@
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
+    <!--
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-transport-serial</artifactId>
       <optional>true</optional>
     </dependency>
+    -->
   </dependencies>
 </project>
 
