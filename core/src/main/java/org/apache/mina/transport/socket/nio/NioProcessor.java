@@ -62,7 +62,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
     @Override
     protected boolean select(int timeout) throws Exception {
-        return selector.select(1000) > 0;
+        return selector.select(timeout) > 0;
     }
 
     @Override
