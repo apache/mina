@@ -11,7 +11,7 @@
     <url>http://mina.apache.org/</url>
   </organization>
   <groupId>org.apache.mina</groupId>
-  <version>1.0.9</version>
+  <version>1.0.10-SNAPSHOT</version>
   <artifactId>build</artifactId>
   <name>Apache MINA Root Build POM</name>
   <packaging>pom</packaging>
@@ -25,9 +25,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/1.0.9</connection>
-    <url>https://svn.apache.org/repos/asf/mina/tags/1.0.9</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/1.0.9</developerConnection>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/1.0</connection>
+    <url>https://svn.apache.org/repos/asf/mina/brchanes/1.0</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/1.0</developerConnection>
   </scm>
 
   <distributionManagement>
