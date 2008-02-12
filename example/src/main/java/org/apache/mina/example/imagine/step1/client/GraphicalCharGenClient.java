@@ -146,18 +146,18 @@ public class GraphicalCharGenClient extends JFrame implements ImageListener {
 
 
     private void initComponents() {
-        jLabel1 = new JLabel();
+        JLabel jLabel1 = new JLabel();
         jTextFieldHost = new JTextField();
         jButtonConnect = new JButton();
-        jLabel3 = new JLabel();
+        JLabel jLabel3 = new JLabel();
         jSpinnerWidth = new JSpinner();
-        label5 = new JLabel();
+        JLabel label5 = new JLabel();
         jSpinnerChars = new JSpinner();
         checkBoxContinuous = new JCheckBox();
-        jLabel2 = new JLabel();
+        JLabel jLabel2 = new JLabel();
         jTextFieldPort = new JTextField();
         jButtonDisconnect = new JButton();
-        jLabel4 = new JLabel();
+        JLabel jLabel4 = new JLabel();
         jSpinnerHeight = new JSpinner();
         jButtonSendRequest = new JButton();
         imagePanel1 = new ImagePanel();
@@ -301,18 +301,13 @@ public class GraphicalCharGenClient extends JFrame implements ImageListener {
         });
     }
 
-    private JLabel jLabel1;
     private JTextField jTextFieldHost;
     private JButton jButtonConnect;
-    private JLabel jLabel3;
     private JSpinner jSpinnerWidth;
-    private JLabel label5;
     private JSpinner jSpinnerChars;
     private JCheckBox checkBoxContinuous;
-    private JLabel jLabel2;
     private JTextField jTextFieldPort;
     private JButton jButtonDisconnect;
-    private JLabel jLabel4;
     private JSpinner jSpinnerHeight;
     private JButton jButtonSendRequest;
     private ImagePanel imagePanel1;
