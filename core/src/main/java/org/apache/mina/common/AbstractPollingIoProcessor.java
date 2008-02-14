@@ -43,7 +43,7 @@ import org.apache.mina.util.NamePreservingRunnable;
 public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
     /**
      * The maximum loop count for a write operation until
-     * {@link #write(IoSession, IoBuffer, int)} returns non-zero value.
+     * {@link #write(AbstractIoSession, IoBuffer, int)} returns non-zero value.
      * It is similar to what a spin lock is for in concurrency programming.
      * It improves memory utilization and write throughput significantly.
      */
@@ -528,10 +528,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     localWrittenBytes = writeBuffer(
                             session, req, hasFragmentation,
                             maxWrittenBytes - writtenBytes);
-                } else {
+                } else if (message instanceof FileRegion) {
                     localWrittenBytes = writeFile(
                             session, req, hasFragmentation,
                             maxWrittenBytes - writtenBytes);
+                } else {
+                	throw new IllegalStateException("Don't know how to handle message of type '" + message.getClass().getName() + "'.  Are you missing a protocol encoder?");
                 }
                 
                 writtenBytes += localWrittenBytes;
