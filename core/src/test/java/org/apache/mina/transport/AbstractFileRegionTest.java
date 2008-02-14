@@ -80,7 +80,8 @@ public abstract class AbstractFileRegionTest extends TestCase {
         ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
         future.awaitUninterruptibly();
         
-        future.getSession().write(file);
+        IoSession session = future.getSession();
+        session.write(file);
         
         latch.await();
         
@@ -88,6 +89,9 @@ public abstract class AbstractFileRegionTest extends TestCase {
             throw exception[0];
         }
         assertTrue("Did not complete file transfer successfully", success[0]);
+        
+        assertEquals("Written messages should be 1 (we wrote one file)", 1, session.getWrittenMessages());
+        assertEquals("Written bytes should match file size", FILE_SIZE, session.getWrittenBytes());
         
         connector.dispose();
         acceptor.dispose();
