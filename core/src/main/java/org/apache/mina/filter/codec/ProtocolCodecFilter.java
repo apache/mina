@@ -25,6 +25,7 @@ import java.util.Queue;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.DefaultWriteFuture;
 import org.apache.mina.common.DefaultWriteRequest;
+import org.apache.mina.common.FileRegion;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
@@ -222,7 +223,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
-        if (message instanceof IoBuffer) {
+        if (message instanceof IoBuffer || message instanceof FileRegion) {
             nextFilter.filterWrite(session, writeRequest);
             return;
         }
