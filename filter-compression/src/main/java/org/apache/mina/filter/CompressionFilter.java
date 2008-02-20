@@ -145,7 +145,7 @@ public class CompressionFilter extends IoFilterAdapter {
 
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws Exception {
-        if (!compressInbound) {
+        if (!compressInbound || !(message instanceof ByteBuffer)) {
             nextFilter.messageReceived(session, message);
             return;
         }
