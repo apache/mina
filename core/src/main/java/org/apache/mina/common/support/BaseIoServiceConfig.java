@@ -40,15 +40,14 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable 
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
 
     /**
-     * The default thread model.
+     * The default thread model (initialized lazily).
      */
-    private final ThreadModel defaultThreadModel = ExecutorThreadModel
-            .getInstance("AnonymousIoService");
+    private ThreadModel defaultThreadModel;
 
     /**
      * Current thread model.
      */
-    private ThreadModel threadModel = defaultThreadModel;
+    private ThreadModel threadModel;
 
     public BaseIoServiceConfig() {
         super();
@@ -75,6 +74,9 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable 
     }
 
     public ThreadModel getThreadModel() {
+        if (threadModel == null) {
+            threadModel = getDefaultThreadModel();
+        }
         return threadModel;
     }
 
@@ -82,11 +84,17 @@ public abstract class BaseIoServiceConfig implements IoServiceConfig, Cloneable 
         if (threadModel == null) {
             // We reuse the previous default model to prevent too much
             // daemon threads are created.
-            threadModel = defaultThreadModel;
+            threadModel = getDefaultThreadModel();
         }
         this.threadModel = threadModel;
     }
 
+    private synchronized ThreadModel getDefaultThreadModel() {
+        if (defaultThreadModel == null) {
+            defaultThreadModel = ExecutorThreadModel.getInstance("AnonymousIoService");
+        }
+        return defaultThreadModel;
+    }
     @Override
     public Object clone() {
         BaseIoServiceConfig ret;
