@@ -430,9 +430,11 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                         break;
                     }
                     
-                    queueHandler.polled(UnorderedThreadPoolExecutor.this, (IoEvent) task);
                     try {
-                        runTask(task);
+                        if (task != null) {
+                            queueHandler.polled(UnorderedThreadPoolExecutor.this, (IoEvent) task);
+                            runTask(task);
+                        }
                     } finally {
                         idleWorkers.incrementAndGet();
                     }

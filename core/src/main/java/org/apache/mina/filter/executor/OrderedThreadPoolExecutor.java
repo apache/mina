@@ -489,7 +489,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                     }
                     
                     try {
-                        runTasks(getSessionBuffer(session));
+                        if (session != null) {
+                            runTasks(getSessionBuffer(session));
+                        }
                     } finally {
                         idleWorkers.incrementAndGet();
                     }
