@@ -20,7 +20,6 @@
 package org.apache.mina.filter.reqres;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -208,20 +207,8 @@ public class RequestResponseFilter extends WriteRequestFilter {
         }
 
         // Schedule a task to be executed on timeout.
-        // Find the timeout date avoiding overflow.
-        Date timeoutDate = new Date(System.currentTimeMillis());
-        if (Long.MAX_VALUE - request.getTimeoutMillis() < timeoutDate
-                .getTime()) {
-            timeoutDate.setTime(Long.MAX_VALUE);
-        } else {
-            timeoutDate.setTime(timeoutDate.getTime()
-                    + request.getTimeoutMillis());
-        }
-
         TimeoutTask timeoutTask = new TimeoutTask(
                 nextFilter, request, session);
-
-        // Schedule the timeout task.
         ScheduledFuture<?> timeoutFuture = timeoutScheduler.schedule(
                 timeoutTask, request.getTimeoutMillis(),
                 TimeUnit.MILLISECONDS);
