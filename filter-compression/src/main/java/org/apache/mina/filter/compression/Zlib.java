@@ -99,9 +99,11 @@ class Zlib {
             throw new IllegalStateException("not initialized as INFLATER");
         }
 
-        byte[] inBytes = new byte[inBuffer.limit()];
+        byte[] inBytes = new byte[inBuffer.remaining()];
         inBuffer.get(inBytes).flip();
 
+        // We could probably do this better, if we're willing to return multiple buffers
+        // (e.g. with a callback function)
         byte[] outBytes = new byte[inBytes.length * 2];
         IoBuffer outBuffer = IoBuffer.allocate(outBytes.length);
         outBuffer.setAutoExpand(true);
@@ -152,7 +154,7 @@ class Zlib {
             throw new IllegalStateException("not initialized as DEFLATER");
         }
 
-        byte[] inBytes = new byte[inBuffer.limit()];
+        byte[] inBytes = new byte[inBuffer.remaining()];
         inBuffer.get(inBytes).flip();
 
         // according to spec, destination buffer should be 0.1% larger

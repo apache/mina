@@ -143,7 +143,7 @@ public class CompressionFilter extends WriteRequestFilter {
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws Exception {
-        if (!compressInbound) {
+        if (!compressInbound || !(message instanceof IoBuffer)) {
             nextFilter.messageReceived(session, message);
             return;
         }
