@@ -1800,22 +1800,22 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public <E extends Enum<E>> E getEnum(Class<E> enumClass) {
-        return toEnum(enumClass, get());
+        return toEnum(enumClass, getUnsigned());
     }
 
     @Override
     public <E extends Enum<E>> E getEnum(int index, Class<E> enumClass) {
-        return toEnum(enumClass, get(index));
+        return toEnum(enumClass, getUnsigned(index));
     }
 
     @Override
     public <E extends Enum<E>> E getEnumShort(Class<E> enumClass) {
-        return toEnum(enumClass, getShort());
+        return toEnum(enumClass, getUnsignedShort() & 0xffff);
     }
 
     @Override
     public <E extends Enum<E>> E getEnumShort(int index, Class<E> enumClass) {
-        return toEnum(enumClass, getShort(index));
+        return toEnum(enumClass, getUnsignedShort(index) & 0xffff);
     }
 
     @Override
@@ -1823,14 +1823,13 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         return toEnum(enumClass, getInt());
     }
 
-    @Override
     public <E extends Enum<E>> E getEnumInt(int index, Class<E> enumClass) {
         return toEnum(enumClass, getInt(index));
     }
 
     @Override
     public IoBuffer putEnum(Enum<?> e) {
-        if (e.ordinal() > Byte.MAX_VALUE) {
+        if (e.ordinal() > BYTE_MASK) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e,
                     "byte"));
         }
@@ -1839,7 +1838,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public IoBuffer putEnum(int index, Enum<?> e) {
-        if (e.ordinal() > Byte.MAX_VALUE) {
+        if (e.ordinal() > BYTE_MASK) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e,
                     "byte"));
         }
@@ -1848,7 +1847,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public IoBuffer putEnumShort(Enum<?> e) {
-        if (e.ordinal() > Short.MAX_VALUE) {
+        if (e.ordinal() > SHORT_MASK) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e,
                     "short"));
         }
@@ -1857,7 +1856,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public IoBuffer putEnumShort(int index, Enum<?> e) {
-        if (e.ordinal() > Short.MAX_VALUE) {
+        if (e.ordinal() > SHORT_MASK) {
             throw new IllegalArgumentException(enumConversionErrorMessage(e,
                     "short"));
         }
