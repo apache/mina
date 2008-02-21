@@ -1810,12 +1810,12 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public <E extends Enum<E>> E getEnumShort(Class<E> enumClass) {
-        return toEnum(enumClass, getUnsignedShort() & 0xffff);
+        return toEnum(enumClass, getUnsignedShort());
     }
 
     @Override
     public <E extends Enum<E>> E getEnumShort(int index, Class<E> enumClass) {
-        return toEnum(enumClass, getUnsignedShort(index) & 0xffff);
+        return toEnum(enumClass, getUnsignedShort(index));
     }
 
     @Override
