@@ -16,6 +16,7 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 import org.apache.mina.util.AvailablePortFinder;
 
 public abstract class AbstractFileRegionTest extends TestCase {
@@ -44,10 +45,6 @@ public abstract class AbstractFileRegionTest extends TestCase {
                 session.close();
             }
             @Override
-            public void sessionClosed(IoSession session) throws Exception {
-                latch.countDown();
-            }
-            @Override
             public void messageReceived(IoSession session, Object message) throws Exception {
                 IoBuffer buffer = (IoBuffer) message;
                 while (buffer.hasRemaining()) {
@@ -74,6 +71,10 @@ public abstract class AbstractFileRegionTest extends TestCase {
             public void exceptionCaught(IoSession session, Throwable cause)
                     throws Exception {
                 exception[0] = cause;
+                session.close();
+            }
+            @Override
+            public void sessionClosed(IoSession session) throws Exception {
                 latch.countDown();
             }
         });
