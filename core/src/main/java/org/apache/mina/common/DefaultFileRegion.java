@@ -1,5 +1,6 @@
 package org.apache.mina.common;
 
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 
@@ -7,32 +8,36 @@ public class DefaultFileRegion implements FileRegion {
 
     private final FileChannel channel;
 
-    private long originalPosition;
+    private final long originalPosition;
     private long position;
-    private long count;
+    private long remainingBytes;
 
-    public DefaultFileRegion(FileChannel channel, long position, long count) {
+    public DefaultFileRegion(FileChannel channel) throws IOException {
+        this(channel, 0, channel.size());
+    }
+    
+    public DefaultFileRegion(FileChannel channel, long position, long remainingBytes) {
         if (channel == null) {
             throw new IllegalArgumentException("channel can not be null");
         }
         if (position < 0) {
             throw new IllegalArgumentException("position may not be less than 0");
         }
-        if (count < 0) {
-            throw new IllegalArgumentException("count may not be less than 0");
+        if (remainingBytes < 0) {
+            throw new IllegalArgumentException("remainingBytes may not be less than 0");
         }
         this.channel = channel;
         this.originalPosition = position;
         this.position = position;
-        this.count = count;
+        this.remainingBytes = remainingBytes;
     }
 
     public long getWrittenBytes() {
         return position - originalPosition;
     }
 
-    public long getCount() {
-        return count;
+    public long getRemainingBytes() {
+        return remainingBytes;
     }
 
     public FileChannel getFileChannel() {
@@ -43,12 +48,9 @@ public class DefaultFileRegion implements FileRegion {
         return position;
     }
 
-    public void setPosition(long value) {
-        if (value < position) {
-            throw new IllegalArgumentException("New position value may not be less than old position value");
-        }
-        count -= value - position;
-        position = value;
+    public void update(long value) {
+        position += value;
+        remainingBytes -= value;
     }
 
 }

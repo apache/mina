@@ -584,27 +584,27 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             boolean hasFragmentation, int maxLength) throws Exception {
         int localWrittenBytes;
         FileRegion region = (FileRegion) req.getMessage();
-        if (region.getCount() > 0) {
+        if (region.getRemainingBytes() > 0) {
             int length;
             if (hasFragmentation) {
-                length = (int) Math.min(region.getCount(), maxLength);
+                length = (int) Math.min(region.getRemainingBytes(), maxLength);
             } else {
-                length = (int) Math.min(Integer.MAX_VALUE, region.getCount());
+                length = (int) Math.min(Integer.MAX_VALUE, region.getRemainingBytes());
             }
             localWrittenBytes = transferFile(session, region, length);
-            region.setPosition(region.getPosition() + localWrittenBytes);
+            region.update(localWrittenBytes);
             
             // Fix for Java bug on Linux http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
             // If there's still data to be written in the FileRegion, return 0 indicating that we need
             // to pause until writing may resume.
-            if (localWrittenBytes > 0 && region.getCount() > 0) {
+            if (localWrittenBytes > 0 && region.getRemainingBytes() > 0) {
                 return 0;
             }
         } else {
             localWrittenBytes = 0;
         }
 
-        if (region.getCount() <= 0 ||
+        if (region.getRemainingBytes() <= 0 ||
                 (!hasFragmentation && localWrittenBytes != 0)) {
             fireMessageSent(session, req);
         }

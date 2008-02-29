@@ -543,7 +543,7 @@ public abstract class AbstractIoSession implements IoSession {
             }
         } else if (message instanceof FileRegion) {
             FileRegion region = (FileRegion) message;
-            if (region.getCount() == 0) {
+            if (region.getRemainingBytes() == 0) {
                 increaseWrittenBytes(region.getWrittenBytes(), currentTime);
                 increaseWrittenMessages(currentTime);
             }

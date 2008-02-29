@@ -21,17 +21,11 @@ package org.apache.mina.filter.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Queue;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
-import org.apache.mina.util.CircularQueue;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -58,116 +52,11 @@ import org.apache.mina.util.CircularQueue;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class StreamWriteFilter extends IoFilterAdapter {
-    /**
-     * The default buffer size this filter uses for writing.
-     */
-    public static final int DEFAULT_STREAM_BUFFER_SIZE = 4096;
-
-    /**
-     * The attribute name used when binding the {@link InputStream} to the session.
-     */
-    public static final AttributeKey CURRENT_STREAM = new AttributeKey(StreamWriteFilter.class, "stream");
-
-    static final AttributeKey WRITE_REQUEST_QUEUE = new AttributeKey(StreamWriteFilter.class, "queue");
-    static final AttributeKey CURRENT_WRITE_REQUEST = new AttributeKey(StreamWriteFilter.class, "writeRequest");
-
-    private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
+public class StreamWriteFilter extends AbstractStreamWriteFilter<InputStream> {
 
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
-        if (parent.contains(StreamWriteFilter.class)) {
-            throw new IllegalStateException(
-                    "Only one " + StreamWriteFilter.class.getName() + " is permitted.");
-        }
-    }
-
-    @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-                            WriteRequest writeRequest) throws Exception {
-        // If we're already processing a stream we need to queue the WriteRequest.
-        if (session.getAttribute(CURRENT_STREAM) != null) {
-            Queue<WriteRequest> queue = getWriteRequestQueue(session);
-            if (queue == null) {
-                queue = new CircularQueue<WriteRequest>();
-                session.setAttribute(WRITE_REQUEST_QUEUE, queue);
-            }
-            queue.add(writeRequest);
-            return;
-        }
-
-        Object message = writeRequest.getMessage();
-
-        if (message instanceof InputStream) {
-
-            InputStream inputStream = (InputStream) message;
-
-            IoBuffer buffer = getNextBuffer(inputStream);
-            if (buffer == null) {
-                // End of stream reached.
-                writeRequest.getFuture().setWritten();
-                nextFilter.messageSent(session, writeRequest);
-            } else {
-                session.setAttribute(CURRENT_STREAM, inputStream);
-                session.setAttribute(CURRENT_WRITE_REQUEST, writeRequest);
-
-                nextFilter.filterWrite(session, new DefaultWriteRequest(
-                        buffer));
-            }
-
-        } else {
-            nextFilter.filterWrite(session, writeRequest);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Queue<WriteRequest> getWriteRequestQueue(IoSession session) {
-        return (Queue<WriteRequest>) session.getAttribute(WRITE_REQUEST_QUEUE);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Queue<WriteRequest> removeWriteRequestQueue(IoSession session) {
-        return (Queue<WriteRequest>) session.removeAttribute(WRITE_REQUEST_QUEUE);
-    }
-    @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-                            WriteRequest writeRequest) throws Exception {
-        InputStream inputStream = (InputStream) session
-                .getAttribute(CURRENT_STREAM);
-
-        if (inputStream == null) {
-            nextFilter.messageSent(session, writeRequest);
-        } else {
-            IoBuffer buffer = getNextBuffer(inputStream);
-
-            if (buffer == null) {
-                // End of stream reached.
-                session.removeAttribute(CURRENT_STREAM);
-                WriteRequest currentWriteRequest = (WriteRequest) session
-                        .removeAttribute(CURRENT_WRITE_REQUEST);
-
-                // Write queued WriteRequests.
-                Queue<WriteRequest> queue = removeWriteRequestQueue(session);
-                if (queue != null) {
-                    WriteRequest wr = queue.poll();
-                    while (wr != null) {
-                        filterWrite(nextFilter, session, wr);
-                        wr = queue.poll();
-                    }
-                }
-
-                currentWriteRequest.getFuture().setWritten();
-                nextFilter.messageSent(session, currentWriteRequest);
-            } else {
-                nextFilter.filterWrite(session, new DefaultWriteRequest(
-                        buffer));
-            }
-        }
-    }
-
-    private IoBuffer getNextBuffer(InputStream is) throws IOException {
-        byte[] bytes = new byte[writeBufferSize];
+    protected IoBuffer getNextBuffer(InputStream is) throws IOException {
+        byte[] bytes = new byte[getWriteBufferSize()];
 
         int off = 0;
         int n = 0;
@@ -184,29 +73,10 @@ public class StreamWriteFilter extends IoFilterAdapter {
 
         return buffer;
     }
-
-    /**
-     * Returns the size of the write buffer in bytes. Data will be read from the
-     * stream in chunks of this size and then written to the next filter.
-     *
-     * @return the write buffer size.
-     */
-    public int getWriteBufferSize() {
-        return writeBufferSize;
-    }
-
-    /**
-     * Sets the size of the write buffer in bytes. Data will be read from the
-     * stream in chunks of this size and then written to the next filter.
-     *
-     * @throws IllegalArgumentException if the specified size is &lt; 1.
-     */
-    public void setWriteBufferSize(int writeBufferSize) {
-        if (writeBufferSize < 1) {
-            throw new IllegalArgumentException(
-                    "writeBufferSize must be at least 1");
-        }
-        this.writeBufferSize = writeBufferSize;
+    
+    @Override
+    protected Class<InputStream> getMessageClass() {
+    	return InputStream.class;
     }
 
 }

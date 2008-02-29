@@ -19,8 +19,14 @@
  */
 package org.apache.mina.filter.stream;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
+import org.apache.mina.common.DefaultFileRegion;
+import org.apache.mina.common.FileRegion;
 
 /**
  * Tests {@link StreamWriteFilter}.
@@ -28,16 +34,20 @@ import java.io.InputStream;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class StreamWriteFilterTest extends AbstractStreamWriteFilterTest<InputStream, StreamWriteFilter> {
-    
+public class FileRegionWriteFilterTest extends AbstractStreamWriteFilterTest<FileRegion, FileRegionWriteFilter> {
+
     @Override
-    protected StreamWriteFilter createFilter() {
-        return new StreamWriteFilter();
+    protected FileRegionWriteFilter createFilter() {
+        return new FileRegionWriteFilter();
     }
     
     @Override
-    protected InputStream createMessage(byte[] data) throws Exception {
-        return new ByteArrayInputStream(data);
+    protected FileRegion createMessage(byte[] data) throws IOException {
+        File file = File.createTempFile("mina", "unittest");
+        FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
+        ByteBuffer buffer = ByteBuffer.wrap(data);
+        channel.write(buffer);
+        return new DefaultFileRegion(channel);
     }
-    
+
 }

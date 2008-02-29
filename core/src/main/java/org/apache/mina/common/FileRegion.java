@@ -11,7 +11,8 @@ import java.nio.channels.FileChannel;
 public interface FileRegion {
 
     /**
-     * The open <tt>FileChannel<tt> from which data will be read to send to remote host.
+     * The open <tt>FileChannel<tt> from which data will be read to send to
+     * remote host.
      *
      * @return  An open <tt>FileChannel<tt>.
      */
@@ -25,18 +26,22 @@ public interface FileRegion {
     long getPosition();
 
     /**
-     * Updates the current file position.  May not be negative.
+     * Updates the current file position based on the specified amount.  This
+     * increases the value returned by {@link #getPosition()} and
+     * {@link getWrittenBytes} by the given amount and decreases the value
+     * returned by {@link #getCount()} by the given {@code amount}.
      *
-     * @param value  The new value for the file position.
+     * @param amount  The new value for the file position.
      */
-    void setPosition(long value);
+    void update(long amount);
 
     /**
-     * The number of bytes to be written from the file to the remote host.
+     * The number of bytes remaining to be written from the file to the remote
+     * host.
      *
-     * @return  The number of bytes to be written.
+     * @return  The number of bytes remaining to be written.
      */
-    long getCount();
+    long getRemainingBytes();
 
     /**
      * The total number of bytes already written.
