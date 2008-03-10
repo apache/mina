@@ -19,14 +19,19 @@
  */
 package org.apache.mina.transport.vmpipe;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
  * Makes sure if the order of event is correct.
@@ -152,5 +157,56 @@ public class VmPipeEventOrderTest extends TestCase {
         }
 
         Assert.assertEquals("ABC", actual.toString());
+    }
+
+    public void testSessionCreated() throws Exception {
+        final Semaphore semaphore = new Semaphore(0);
+        final StringBuffer stringBuffer = new StringBuffer();
+        VmPipeAcceptor vmPipeAcceptor = new VmPipeAcceptor();
+        final VmPipeAddress vmPipeAddress = new VmPipeAddress(12345);
+        vmPipeAcceptor.setHandler(new IoHandlerAdapter() {
+            @Override
+            public void sessionCreated(IoSession session) throws Exception {
+                // pretend we are doing some time-consuming work. For
+                // performance reasons, you would never want to do time
+                // consuming work in sessionCreated.
+                // However, this increases the likelihood of the timing bug.
+                Thread.sleep(1000);
+                stringBuffer.append("A");
+            }
+
+            @Override
+            public void sessionOpened(IoSession session) throws Exception {
+                stringBuffer.append("B");
+            }
+
+            @Override
+            public void messageReceived(IoSession session, Object message)
+                    throws Exception {
+                stringBuffer.append("C");
+            }
+            
+            @Override
+            public void sessionClosed(IoSession session) throws Exception {
+                stringBuffer.append("D");
+                semaphore.release();
+            }
+        });
+        vmPipeAcceptor.bind(vmPipeAddress);
+
+        final VmPipeConnector vmPipeConnector = new VmPipeConnector();
+        vmPipeConnector.getFilterChain().addLast("executor", new ExecutorFilter());
+        vmPipeConnector.setHandler(new IoHandlerAdapter() {
+            @Override
+            public void sessionOpened(IoSession session) throws Exception {
+                session.write(IoBuffer.wrap(new byte[1]));
+            }
+        });
+        ConnectFuture connectFuture = vmPipeConnector.connect(vmPipeAddress);
+        connectFuture.awaitUninterruptibly();
+        connectFuture.getSession().close();
+        semaphore.tryAcquire(1, TimeUnit.SECONDS);
+        vmPipeAcceptor.unbind(vmPipeAddress);
+        Assert.assertEquals("ABCD", stringBuffer.toString());
     }
 }

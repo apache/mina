@@ -39,7 +39,10 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
     private static final int DEFAULT_CAPACITY = 4;
 
     private final int initialCapacity;
-    private Object[] items;
+    // XXX: This volatile keyword here is a workaround for SUN Java Compiler bug,
+    //      which produces buggy byte code.  I don't event know why adding a volatile
+    //      fixes the problem.  Eclipse Java Compiler seems to produce correct byte code.
+    private volatile Object[] items;
     private int mask;
     private int first = 0;
     private int last = 0;

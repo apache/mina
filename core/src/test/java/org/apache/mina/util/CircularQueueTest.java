@@ -31,9 +31,8 @@ import junit.framework.TestCase;
  * @version $Rev$, $Date$
  */
 public class CircularQueueTest extends TestCase {
-    private int pushCount;
-
-    private int popCount;
+    private volatile int pushCount;
+    private volatile int popCount;
 
     public void setUp() {
         pushCount = 0;

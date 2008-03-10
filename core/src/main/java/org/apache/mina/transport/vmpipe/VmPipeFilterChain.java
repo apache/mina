@@ -31,7 +31,6 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoEvent;
 import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.WriteRequestQueue;
 import org.apache.mina.common.WriteToClosedSessionException;
@@ -77,24 +76,23 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     }
 
     private void fireEvent(IoEvent e) {
-        IoSession session = getSession();
+        VmPipeSessionImpl session = (VmPipeSessionImpl) getSession();
         IoEventType type = e.getType();
         Object data = e.getParameter();
 
         if (type == IoEventType.MESSAGE_RECEIVED) {
-            VmPipeSessionImpl s = (VmPipeSessionImpl) session;
-            if (sessionOpened && s.getTrafficMask().isReadable() && s.getLock().tryLock()) {
+            if (sessionOpened && session.getTrafficMask().isReadable() && session.getLock().tryLock()) {
                 try {
-                    if (!s.getTrafficMask().isReadable()) {
-                        s.receivedMessageQueue.add(data);
+                    if (!session.getTrafficMask().isReadable()) {
+                        session.receivedMessageQueue.add(data);
                     } else {
                         super.fireMessageReceived(data);
                     }
                 } finally {
-                    s.getLock().unlock();
+                    session.getLock().unlock();
                 }
             } else {
-                s.receivedMessageQueue.add(data);
+                session.receivedMessageQueue.add(data);
             }
         } else if (type == IoEventType.WRITE) {
             super.fireFilterWrite((WriteRequest) data);
@@ -108,7 +106,12 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
             super.fireSessionOpened();
             sessionOpened = true;
         } else if (type == IoEventType.SESSION_CREATED) {
-            super.fireSessionCreated();
+            session.getLock().lock();
+            try {
+                super.fireSessionCreated();
+            } finally {
+                session.getLock().unlock();
+            }
         } else if (type == IoEventType.SESSION_CLOSED) {
             super.fireSessionClosed();
         } else if (type == IoEventType.CLOSE) {
@@ -173,32 +176,19 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 return;
             }
             if (session.isConnected()) {
-                if (session.getLock().tryLock()) {
-                    try {
-                        WriteRequest req;
-                        while ((req = queue.poll(session)) != null) {
-                            Object message = req.getMessage();
-                            Object messageCopy = message;
-                            if (message instanceof IoBuffer) {
-                                IoBuffer rb = (IoBuffer) message;
-                                rb.mark();
-                                IoBuffer wb = IoBuffer.allocate(rb.remaining());
-                                wb.put(rb);
-                                wb.flip();
-                                rb.reset();
-                                messageCopy = wb;
-                            }
-
-                            session.getRemoteSession().getFilterChain().fireMessageReceived(
-                                    messageCopy);
-                            session.getFilterChain().fireMessageSent(req);
-                        }
-                    } finally {
-                        session.getLock().unlock();
+                session.getLock().lock();
+                try {
+                    WriteRequest req;
+                    while ((req = queue.poll(session)) != null) {
+                        session.getRemoteSession().getFilterChain().fireMessageReceived(
+                                getMessageCopy(req.getMessage()));
+                        session.getFilterChain().fireMessageSent(req);
                     }
-
-                    flushPendingDataQueues(session);
+                } finally {
+                    session.getLock().unlock();
                 }
+
+                flushPendingDataQueues(session);
             } else {
                 List<WriteRequest> failedRequests = new ArrayList<WriteRequest>();
                 WriteRequest req;
@@ -214,6 +204,20 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                     session.getFilterChain().fireExceptionCaught(cause);
                 }
             }
+        }
+
+        private Object getMessageCopy(Object message) {
+            Object messageCopy = message;
+            if (message instanceof IoBuffer) {
+                IoBuffer rb = (IoBuffer) message;
+                rb.mark();
+                IoBuffer wb = IoBuffer.allocate(rb.remaining());
+                wb.put(rb);
+                wb.flip();
+                rb.reset();
+                messageCopy = wb;
+            }
+            return messageCopy;
         }
 
         public void remove(VmPipeSessionImpl session) {
