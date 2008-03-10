@@ -33,31 +33,31 @@ public interface IoServiceListener extends EventListener {
      *
      * @param service the {@link IoService}
      */
-    void serviceActivated(IoService service);
+    void serviceActivated(IoService service) throws Exception;
     
     /**
      * Invoked when a service is idle.
      */
-    void serviceIdle(IoService service, IdleStatus idleStatus);
+    void serviceIdle(IoService service, IdleStatus idleStatus) throws Exception;
 
     /**
      * Invoked when a service is deactivated by an {@link IoService}.
      *
      * @param service the {@link IoService}
      */
-    void serviceDeactivated(IoService service);
+    void serviceDeactivated(IoService service) throws Exception;
 
     /**
      * Invoked when a new session is created by an {@link IoService}.
      *
      * @param session the new session
      */
-    void sessionCreated(IoSession session);
+    void sessionCreated(IoSession session) throws Exception;
 
     /**
      * Invoked when a session is being destroyed by an {@link IoService}.
      *
      * @param session the session to be destroyed
      */
-    void sessionDestroyed(IoSession session);
+    void sessionDestroyed(IoSession session) throws Exception;
 }
