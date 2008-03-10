@@ -178,6 +178,22 @@ public class CircularQueueTest extends TestCase {
             // OK
         }
     }
+    
+    public void testExpandAndShrink() throws Exception {
+        CircularQueue<Integer> q = new CircularQueue<Integer>();
+        for (int i = 0; i < 1024; i ++) {
+            q.offer(i);
+        }
+        
+        for (int i = 0; i < 512; i ++) {
+            q.poll();
+            q.offer(i);
+        }
+        
+        for (int i = 0; i < 1024; i ++) { 
+            q.poll();
+        }
+    }
 
     private CircularQueue<Integer> getRotatedQueue() {
         CircularQueue<Integer> q = new CircularQueue<Integer>();

@@ -205,7 +205,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
     
     private void shrinkIfNeeded() {
         int size = size();
-        if (size < shrinkThreshold) {
+        if (size <= shrinkThreshold) {
             // shrink queue
             final int oldLen = items.length;
             int newLen = normalizeCapacity(size);
@@ -227,11 +227,14 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             
             Object[] tmp = new Object[newLen];
     
-            if (first < last) {
-                System.arraycopy(items, first, tmp, 0, last - first);
-            } else {
-                System.arraycopy(items, first, tmp, 0, oldLen - first);
-                System.arraycopy(items, 0, tmp, oldLen - first, last);
+            // Copy only when there's something to copy.
+            if (size > 0) {
+                if (first < last) {
+                    System.arraycopy(items, first, tmp, 0, last - first);
+                } else {
+                    System.arraycopy(items, first, tmp, 0, oldLen - first);
+                    System.arraycopy(items, 0, tmp, oldLen - first, last);
+                }
             }
     
             first = 0;
