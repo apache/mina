@@ -66,30 +66,28 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
     }
 
     private void fireEvent(Event e) {
-        IoSession session = getSession();
+        VmPipeSessionImpl session = (VmPipeSessionImpl) getSession();
         EventType type = e.getType();
         Object data = e.getData();
 
         if (type == EventType.RECEIVED) {
-            VmPipeSessionImpl s = (VmPipeSessionImpl) session;
-
-            if( sessionOpened && s.getTrafficMask().isReadable() && s.getLock().tryLock()) {
+            if( sessionOpened && session.getTrafficMask().isReadable() && session.getLock().tryLock()) {
                 try {
                     int byteCount = 1;
                     if (data instanceof ByteBuffer) {
                         byteCount = ((ByteBuffer) data).remaining();
                     }
 
-                    s.increaseReadBytes(byteCount);
+                    session.increaseReadBytes(byteCount);
 
-                    super.fireMessageReceived(s, data);
+                    super.fireMessageReceived(session, data);
                 } finally {
-                    s.getLock().unlock();
+                    session.getLock().unlock();
                 }
 
-                flushPendingDataQueues( s );
+                flushPendingDataQueues( session );
             } else {
-                s.pendingDataQueue.add(data);
+                session.pendingDataQueue.add(data);
             }
         } else if (type == EventType.WRITE) {
             super.fireFilterWrite(session, (WriteRequest) data);
@@ -103,7 +101,12 @@ public class VmPipeFilterChain extends AbstractIoFilterChain {
             super.fireSessionOpened(session);
             sessionOpened = true;
         } else if (type == EventType.CREATED) {
-            super.fireSessionCreated(session);
+            session.getLock().lock();
+            try {
+                super.fireSessionCreated(session);
+            } finally {
+                session.getLock().unlock();
+            }
         } else if (type == EventType.CLOSED) {
             super.fireSessionClosed(session);
         } else if (type == EventType.CLOSE) {
