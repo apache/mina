@@ -19,9 +19,9 @@
  */
 package org.apache.mina.integration.beans;
 
-import java.beans.PropertyEditor;
-
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
+
+import java.beans.PropertyEditor;
 
 /**
  * A {@link PropertyEditor} which converts a {@link String} into
@@ -41,7 +41,7 @@ public class VmPipeAddressEditor extends AbstractPropertyEditor {
 
     @Override
     protected String defaultText() {
-        return ":1";
+        return ":0";
     }
 
     @Override
