@@ -291,7 +291,10 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             int nHandles = 0;
             while (selectable) {
                 try {
-                    boolean selected = select(1000);
+                    // the timeout for select shall be smaller of the connect
+                    // timeout or 1 second...
+                    int timeout = (int)Math.min(getConnectTimeoutMillis(), 1000L);
+                    boolean selected = select(timeout);
 
                     nHandles += registerNew();
 

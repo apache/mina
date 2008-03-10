@@ -29,28 +29,52 @@ import java.net.SocketAddress;
  */
 public abstract class AbstractIoConnector 
         extends AbstractIoService implements IoConnector {
+    /**
+     * The minimum timeout value that is supported (in milliseconds).
+     */
+    public static final long MINIMUM_CONNECT_TIMEOUT = 50L;
     
-    private int connectTimeout = 60; // 1 minute
+    private long connectTimeoutInMillis = 60*1000L; // 1 minute by default
     private SocketAddress defaultRemoteAddress;
 
     protected AbstractIoConnector(IoSessionConfig sessionConfig) {
         super(sessionConfig);
     }
 
+    /**
+     * @deprecated
+     */
     public final int getConnectTimeout() {
-        return connectTimeout;
+        return (int)connectTimeoutInMillis/1000;
     }
 
     public final long getConnectTimeoutMillis() {
-        return connectTimeout * 1000L;
+        return connectTimeoutInMillis;
     }
 
+    /**
+     * @deprecated
+     */
     public final void setConnectTimeout(int connectTimeout) {
         if (connectTimeout <= 0) {
             throw new IllegalArgumentException("connectTimeout: "
                     + connectTimeout);
         }
-        this.connectTimeout = connectTimeout;
+        this.connectTimeoutInMillis = connectTimeout*1000L;
+    }
+    
+    /**
+     * Sets the connect timeout value in milliseconds.
+     * 
+     * @throws IllegalArgumentException if the value is smaller than 
+     * <tt>MINIMUM_CONNECT_TIMEOUT</tt>.
+     */
+    public final void setConnectTimeoutMillis(long connectTimeoutInMillis) {
+        if (connectTimeoutInMillis <= MINIMUM_CONNECT_TIMEOUT) {
+            throw new IllegalArgumentException("connectTimeoutInMillis: " + 
+                    connectTimeoutInMillis);
+        }
+        this.connectTimeoutInMillis = connectTimeoutInMillis;
     }
 
     public SocketAddress getDefaultRemoteAddress() {

@@ -56,7 +56,7 @@ public class Main {
         IoConnector connector = new NioSocketConnector();
 
         // Set connect timeout.
-        connector.setConnectTimeout(30);
+        connector.setConnectTimeoutMillis(30*1000L);
 
         ClientToProxyIoHandler handler = new ClientToProxyIoHandler(connector,
                 new InetSocketAddress(args[1], Integer.parseInt(args[2])));

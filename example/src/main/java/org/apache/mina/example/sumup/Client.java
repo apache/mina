@@ -41,7 +41,7 @@ public class Client {
 
     private static final int PORT = 8080;
 
-    private static final int CONNECT_TIMEOUT = 30; // seconds
+    private static final long CONNECT_TIMEOUT = 30*1000L; // 30 seconds
 
     // Set this to false to use object serialization instead of custom codec.
     private static final boolean USE_CUSTOM_CODEC = true;
@@ -61,7 +61,7 @@ public class Client {
         NioSocketConnector connector = new NioSocketConnector();
 
         // Configure the service.
-        connector.setConnectTimeout(CONNECT_TIMEOUT);
+        connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
         if (USE_CUSTOM_CODEC) {
             connector.getFilterChain().addLast(
                     "codec",

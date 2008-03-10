@@ -43,7 +43,7 @@ public class Main {
         NioSocketConnector connector = new NioSocketConnector();
 
         // Set connect timeout.
-        connector.setConnectTimeout(30);
+        connector.setConnectTimeoutMillis(30*1000L);
 
         // Start communication.
         connector.setHandler(new NetCatProtocolHandler());

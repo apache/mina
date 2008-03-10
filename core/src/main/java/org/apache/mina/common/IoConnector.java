@@ -43,6 +43,9 @@ import java.net.SocketAddress;
 public interface IoConnector extends IoService {
     /**
      * Returns the connect timeout in seconds.  The default value is 1 minute.
+     * 
+     * @deprecated
+     * @see getConnectTimeoutMillis()
      */
     int getConnectTimeout();
 
@@ -53,8 +56,16 @@ public interface IoConnector extends IoService {
 
     /**
      * Sets the connect timeout in seconds.  The default value is 1 minute.
+     * 
+     * @deprecated
+     * @see setConnectTimeoutMillis()
      */
     void setConnectTimeout(int connectTimeout);
+    
+    /**
+     * Sets the connect timeout in milliseconds.  The default value is 1 minute.
+     */
+    void setConnectTimeoutMillis(long connectTimeoutInMillis);
 
     /**
      * Returns the default remote address to connect to when no argument
