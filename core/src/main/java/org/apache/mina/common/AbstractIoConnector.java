@@ -31,8 +31,15 @@ public abstract class AbstractIoConnector
         extends AbstractIoService implements IoConnector {
     /**
      * The minimum timeout value that is supported (in milliseconds).
+     * 
+     * TODO: Make this configurable and automatically adjusted if the timeout
+     *       a user specified is smaller than the current minimum connect timeout.
+     *       Please refer to the mailing list archive about this issue:
+     *       
+     *           Message-ID: <1202880068.7504.38.camel@laptop>
+     *              Subject: Re: connect timeout
      */
-    public static final long MINIMUM_CONNECT_TIMEOUT = 50L;
+    private static final long MINIMUM_CONNECT_TIMEOUT = 50L;
     
     private long connectTimeoutInMillis = 60*1000L; // 1 minute by default
     private SocketAddress defaultRemoteAddress;
