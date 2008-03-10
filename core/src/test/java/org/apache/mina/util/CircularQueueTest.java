@@ -184,14 +184,20 @@ public class CircularQueueTest extends TestCase {
             q.offer(i);
         }
         
+        Assert.assertEquals(1024, q.capacity());
+        
         for (int i = 0; i < 512; i ++) {
-            q.poll();
             q.offer(i);
+            q.poll();
         }
+        
+        Assert.assertEquals(2048, q.capacity());
         
         for (int i = 0; i < 1024; i ++) { 
             q.poll();
         }
+        
+        Assert.assertEquals(4, q.capacity());
     }
 
     private CircularQueue<Integer> getRotatedQueue() {
