@@ -146,7 +146,9 @@ public class MdcInjectionFilterTest extends TestCase {
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("executor2" , new ExecutorFilter());
-        chain.addLast("mdc-injector2", mdcInjectionFilter);
+        // add the MdcInjectionFilter instance after every ExecutorFilter
+        // it's important to use the same MdcInjectionFilter instance   
+        chain.addLast("mdc-injector2",  mdcInjectionFilter);
         test(chain);
     }
 
@@ -163,9 +165,8 @@ public class MdcInjectionFilterTest extends TestCase {
         // create some clients
         NioSocketConnector connector = new NioSocketConnector();
         connector.setHandler(new IoHandlerAdapter());
-        SocketAddress remoteAddressClients[] = new SocketAddress[2];
-        remoteAddressClients[0] = connectAndWrite(connector,0);
-        remoteAddressClients[1] = connectAndWrite(connector,1);
+        connectAndWrite(connector,0);
+        connectAndWrite(connector,1);
         // wait until Iohandler has received all events
         simpleIoHandler.messageSentLatch.await();
         simpleIoHandler.sessionIdleLatch.await();
@@ -315,7 +316,7 @@ public class MdcInjectionFilterTest extends TestCase {
             String user = "user-" + message;
             MdcInjectionFilter.setProperty(session, "user", user);
             logger.info("messageReceived-2");
-            session.write(message);
+            session.getService().broadcast(message);
             throw new RuntimeException("just a test, forcing exceptionCaught");
         }
 

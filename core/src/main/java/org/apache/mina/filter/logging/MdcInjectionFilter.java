@@ -21,10 +21,11 @@ package org.apache.mina.filter.logging;
 
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoFilterEvent;
@@ -61,7 +62,10 @@ import org.slf4j.MDC;
  *
  * If you want the MDC to be set for ALL code, you should
  *   add an MdcInjectionFilter to the start of the chain
- *   and add one after EVERY ExecutorFilter in the chain
+ *   and add that same MdcInjectionFilter instance after EVERY ExecutorFilter in the chain
+ *
+ * Thus it's ok to have one instance of the MdcInjectionFilter and add it multiple times to the chain
+ * but you should avoid adding multiple instances to the chain.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 566952 $, $Date: 2007-08-17 09:25:04 +0200 (vr, 17 aug 2007) $
@@ -105,10 +109,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
      * @see #setProperty(org.apache.mina.common.IoSession, String, String)
      */
     public MdcInjectionFilter(MdcKey... keys) {
-        Set<MdcKey> keySet = new HashSet<MdcKey>();
-        for (MdcKey key : keys) {
-            keySet.add(key);
-        }
+        Set<MdcKey> keySet = new HashSet<MdcKey>(Arrays.asList(keys));
         this.mdcKeys = EnumSet.copyOf(keySet);
     }
 
@@ -159,7 +160,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
     private static Map<String, String> getContext(final IoSession session) {
         Map<String, String> context = (Map<String, String>) session.getAttribute(CONTEXT_KEY);
         if (context == null) {
-            context = new HashMap<String, String>();
+            context = new ConcurrentHashMap<String, String>();
             session.setAttribute(CONTEXT_KEY, context);
         }
         return context;
