@@ -120,7 +120,11 @@ public class IoServiceListenerSupport {
         activationTime = System.currentTimeMillis();
 
         for (IoServiceListener l : listeners) {
-            l.serviceActivated(service);
+            try {
+                l.serviceActivated(service);
+            } catch (Throwable e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
         }
     }
     
@@ -134,7 +138,11 @@ public class IoServiceListenerSupport {
         }
 
         for (IoServiceListener l : listeners) {
-            l.serviceIdle(service, status);
+            try {
+                l.serviceIdle(service, status);
+            } catch (Throwable e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
         }
     }
 
@@ -150,7 +158,11 @@ public class IoServiceListenerSupport {
 
         try {
             for (IoServiceListener l : listeners) {
-                l.serviceDeactivated(service);
+                try {
+                    l.serviceDeactivated(service);
+                } catch (Throwable e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
         } finally {
             disconnectSessions();
@@ -190,7 +202,11 @@ public class IoServiceListenerSupport {
 
         // Fire listener events.
         for (IoServiceListener l : listeners) {
-            l.sessionCreated(session);
+            try {
+                l.sessionCreated(session);
+            } catch (Throwable e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
         }
     }
 
@@ -209,7 +225,11 @@ public class IoServiceListenerSupport {
         // Fire listener events.
         try {
             for (IoServiceListener l : listeners) {
-                l.sessionDestroyed(session);
+                try {
+                    l.sessionDestroyed(session);
+                } catch (Throwable e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
         } finally {
             // Fire a virtual service deactivation event for the last session of the connector.

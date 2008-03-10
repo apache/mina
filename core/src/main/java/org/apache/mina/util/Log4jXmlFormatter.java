@@ -72,6 +72,7 @@ public class Log4jXmlFormatter extends Formatter {
         return properties;
     }
 
+    @SuppressWarnings("unchecked")
     public String format(final LogRecord record) {
         // Reset working buffer. If the buffer is too large, then we need a new
         // one in order to avoid the penalty of creating a large array.
