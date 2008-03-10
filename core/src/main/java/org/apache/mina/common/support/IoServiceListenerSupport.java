@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFuture;
@@ -126,8 +127,12 @@ public class IoServiceListenerSupport {
 
         synchronized (listeners) {
             for (Iterator i = listeners.iterator(); i.hasNext();) {
-                ((IoServiceListener) i.next()).serviceActivated(service,
-                        serviceAddress, handler, config);
+                try {
+                    ((IoServiceListener) i.next()).serviceActivated(service,
+                            serviceAddress, handler, config);
+                } catch (Throwable e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
         }
     }
@@ -148,8 +153,12 @@ public class IoServiceListenerSupport {
         try {
             synchronized (listeners) {
                 for (Iterator i = listeners.iterator(); i.hasNext();) {
-                    ((IoServiceListener) i.next()).serviceDeactivated(service,
-                            serviceAddress, handler, config);
+                    try {
+                        ((IoServiceListener) i.next()).serviceDeactivated(service,
+                                serviceAddress, handler, config);
+                    } catch (Throwable e) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e);
+                    }
                 }
             }
         } finally {
@@ -196,7 +205,11 @@ public class IoServiceListenerSupport {
         // Fire listener events.
         synchronized (listeners) {
             for (Iterator i = listeners.iterator(); i.hasNext();) {
-                ((IoServiceListener) i.next()).sessionCreated(session);
+                try {
+                    ((IoServiceListener) i.next()).sessionCreated(session);
+                } catch (Throwable e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
         }
     }
@@ -234,7 +247,11 @@ public class IoServiceListenerSupport {
         try {
             synchronized (listeners) {
                 for (Iterator i = listeners.iterator(); i.hasNext();) {
-                    ((IoServiceListener) i.next()).sessionDestroyed(session);
+                    try {
+                        ((IoServiceListener) i.next()).sessionDestroyed(session);
+                    } catch (Throwable e) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e);
+                    }
                 }
             }
         } finally {
