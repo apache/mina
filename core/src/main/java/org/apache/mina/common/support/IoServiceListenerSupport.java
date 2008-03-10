@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.mina.common.ExceptionMonitor;
 import org.apache.mina.common.IoAcceptorConfig;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoFuture;
@@ -116,7 +117,11 @@ public class IoServiceListenerSupport {
         }
 
         for (IoServiceListener listener : listeners) {
-            listener.serviceActivated(service, serviceAddress, handler, config);
+            try {
+                listener.serviceActivated(service, serviceAddress, handler, config);
+            } catch (Throwable e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
         }
     }
 
@@ -133,8 +138,12 @@ public class IoServiceListenerSupport {
 
         try {
             for (IoServiceListener listener : listeners) {
-                listener.serviceDeactivated(service, serviceAddress, handler,
-                        config);
+                try {
+                    listener.serviceDeactivated(service, serviceAddress, handler,
+                            config);
+                } catch (Throwable e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
         } finally {
             disconnectSessions(serviceAddress, config);
@@ -178,7 +187,11 @@ public class IoServiceListenerSupport {
 
         // Fire listener events.
         for (IoServiceListener listener : listeners) {
-            listener.sessionCreated(session);
+            try {
+                listener.sessionCreated(session);
+            } catch (Throwable e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
         }
     }
 
@@ -210,7 +223,11 @@ public class IoServiceListenerSupport {
         // Fire listener events.
         try {
             for (IoServiceListener listener : listeners) {
-                listener.sessionDestroyed(session);
+                try {
+                    listener.sessionDestroyed(session);
+                } catch (Throwable e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
         } finally {
             // Fire a virtual service deactivation event for the last session of the connector.
