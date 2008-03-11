@@ -31,15 +31,8 @@ public abstract class AbstractIoConnector
         extends AbstractIoService implements IoConnector {
     /**
      * The minimum timeout value that is supported (in milliseconds).
-     * 
-     * TODO: Make this configurable and automatically adjusted if the timeout
-     *       a user specified is smaller than the current minimum connect timeout.
-     *       Please refer to the mailing list archive about this issue:
-     *       
-     *           Message-ID: <1202880068.7504.38.camel@laptop>
-     *              Subject: Re: connect timeout
      */
-    private long minimumConnectTimeout = 50L;
+    private long connectTimeoutCheckInterval = 50L;
     
     private long connectTimeoutInMillis = 60*1000L; // 1 minute by default
     private SocketAddress defaultRemoteAddress;
@@ -55,16 +48,16 @@ public abstract class AbstractIoConnector
      *  The minimum time that this connector can have for a connection
      *  timeout in milliseconds.
      */
-    public long getMinimumConnectTimeout() {
-        return minimumConnectTimeout;
+    public long getConnectTimeoutCheckInterval() {
+        return connectTimeoutCheckInterval;
     }
 
-    public void setMinimumConnectTimeout(long minimumConnectTimeout) {
+    public void setConnectTimeoutCheckInterval(long minimumConnectTimeout) {
         if( getConnectTimeoutMillis() < minimumConnectTimeout ){
             this.connectTimeoutInMillis = minimumConnectTimeout;
         }
         
-        this.minimumConnectTimeout = minimumConnectTimeout;
+        this.connectTimeoutCheckInterval = minimumConnectTimeout;
     }
 
     /**
@@ -93,8 +86,8 @@ public abstract class AbstractIoConnector
      * 
      */
     public final void setConnectTimeoutMillis(long connectTimeoutInMillis) {
-        if (connectTimeoutInMillis <= minimumConnectTimeout) {
-            this.minimumConnectTimeout = connectTimeoutInMillis;
+        if (connectTimeoutInMillis <= connectTimeoutCheckInterval) {
+            this.connectTimeoutCheckInterval = connectTimeoutInMillis;
         }
         this.connectTimeoutInMillis = connectTimeoutInMillis;
     }
