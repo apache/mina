@@ -21,12 +21,8 @@ package org.apache.mina.common;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.util.ConcurrentHashSet;
-import org.apache.mina.util.NamePreservingRunnable;
 
 /**
  * Detects idle sessions and fires <tt>sessionIdle</tt> events to them.
@@ -35,97 +31,75 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @version $Rev: 525369 $, $Date: 2007-04-04 05:05:11 +0200 (mer., 04 avr. 2007) $
  */
 public class IdleStatusChecker {
-    private static final IdleStatusChecker INSTANCE = new IdleStatusChecker();
-
-    public static IdleStatusChecker getInstance() {
-        return INSTANCE;
-    }
-
     private final Set<AbstractIoSession> sessions =
         new ConcurrentHashSet<AbstractIoSession>();
     private final Set<AbstractIoService> services =
         new ConcurrentHashSet<AbstractIoService>();
 
-    private final Object lock = new Object();
-    private final Runnable notifyingTask = new NamePreservingRunnable(
-            new NotifyingTask(), "IdleStatusChecker");
+    private final NotifyingTask notifyingTask = new NotifyingTaskImpl();
     private final IoFutureListener<IoFuture> sessionCloseListener =
         new SessionCloseListener();
-    private volatile ScheduledExecutorService executor;
 
-    private IdleStatusChecker() {}
+    public IdleStatusChecker() {}
 
     public void addSession(AbstractIoSession session) {
-        synchronized (lock) {
-            boolean start = false;
-            if (sessions.isEmpty() && services.isEmpty()) {
-                start = true;
-            }
-            if (!sessions.add(session)) {
-                return;
-            }
-            if (start) {
-                start();
-            }
-        }
-        
+        sessions.add(session);
         session.getCloseFuture().addListener(sessionCloseListener);
     }
     
     public void addService(AbstractIoService service) {
-        synchronized (lock) {
-            boolean start = false;
-            if (sessions.isEmpty() && services.isEmpty()) {
-                start = true;
-            }
-            if (!services.add(service)) {
-                return;
-            }
-            if (start) {
-                start();
-            }
-        }
+        services.add(service);
     }
 
     public void removeSession(AbstractIoSession session) {
-        synchronized (lock) {
-            sessions.remove(session);
-            if (sessions.isEmpty() && services.isEmpty()) {
-                stop();
-            }
-        }
+        sessions.remove(session);
     }
     
     public void removeService(AbstractIoService service) {
-        synchronized (lock) {
-            services.remove(service);
-            if (sessions.isEmpty() && services.isEmpty()) {
-                stop();
-            }
-        }
-    }
-
-    private void start() {
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        this.executor = executor;
-        executor.scheduleWithFixedDelay(
-                notifyingTask, 1000, 1000, TimeUnit.MILLISECONDS);
+        services.remove(service);
     }
     
-    private void stop() {
-        ScheduledExecutorService executor = this.executor;
-        if (executor == null) {
-            return;
-        }
-        executor.shutdownNow();
-        this.executor = null;
+    public NotifyingTask getNotifyingTask() {
+        return notifyingTask;
+    }
+    
+    public interface NotifyingTask extends Runnable {
+        void cancel();
     }
 
-    private class NotifyingTask implements Runnable {
+    private class NotifyingTaskImpl implements NotifyingTask {
+        private volatile boolean cancelled;
+        private volatile Thread thread;
+        
         public void run() {
-            long currentTime = System.currentTimeMillis();
-            notifyServices(currentTime);
-            notifySessions(currentTime);
+            cancelled = false;
+            thread = Thread.currentThread();
+            try {
+                while (!cancelled) {
+                    // Check idleness with fixed delay (1 second).
+                    long currentTime = System.currentTimeMillis();
+                    notifyServices(currentTime);
+                    notifySessions(currentTime);
+                    
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // will exit the loop if interrupted from interrupt()
+                    }
+                }
+            } finally {
+                thread = null;
+            }
+        }
+        
+        public void cancel() {
+            Thread thread = this.thread;
+            if (thread == null) {
+                return;
+            }
+            
+            cancelled = true;
+            thread.interrupt();
         }
 
         private void notifyServices(long currentTime) {

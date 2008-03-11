@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,7 +40,9 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoService implements IoService {
-    private static final IoServiceListener SERVICE_ACTIVATION_LISTENER =
+    private static final AtomicInteger id = new AtomicInteger();
+
+    private final IoServiceListener serviceActivationListener =
         new IoServiceListener() {
             public void serviceActivated(IoService service) {
                 // Update lastIoTime.
@@ -49,12 +52,11 @@ public abstract class AbstractIoService implements IoService {
                 s.lastThroughputCalculationTime = s.getActivationTime();
                 
                 // Start idleness notification.
-                IdleStatusChecker.getInstance().addService(s);
+                idleStatusChecker.addService(s);
             }
 
             public void serviceDeactivated(IoService service) {
-                IdleStatusChecker.getInstance().removeService(
-                        (AbstractIoService) service);
+                idleStatusChecker.removeService((AbstractIoService) service);
             }
 
             public void serviceIdle(IoService service, IdleStatus idleStatus) {}
@@ -62,8 +64,6 @@ public abstract class AbstractIoService implements IoService {
             public void sessionDestroyed(IoSession session) {}
     };
     
-    private static final AtomicInteger id = new AtomicInteger();
-
     /**
      * Current filter chain builder.
      */
@@ -117,6 +117,7 @@ public abstract class AbstractIoService implements IoService {
     private double largestReadMessagesThroughput;
     private double largestWrittenMessagesThroughput;
 
+    private final IdleStatusChecker idleStatusChecker = new IdleStatusChecker();
     private final Object idlenessCheckLock = new Object();
     private int idleTimeForRead;
     private int idleTimeForWrite;
@@ -148,7 +149,7 @@ public abstract class AbstractIoService implements IoService {
         }
 
         this.listeners = new IoServiceListenerSupport(this);
-        this.listeners.add(SERVICE_ACTIVATION_LISTENER);
+        this.listeners.add(serviceActivationListener);
         this.sessionConfig = sessionConfig;
         
         // Make JVM load the exception monitor before some transports
@@ -164,6 +165,8 @@ public abstract class AbstractIoService implements IoService {
         }
         
         this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
+        
+        executeWorker(idleStatusChecker.getNotifyingTask(), "idleStatusChecker");
     }
 
     public final IoFilterChainBuilder getFilterChainBuilder() {
@@ -232,8 +235,19 @@ public abstract class AbstractIoService implements IoService {
             }
         }
         
+        idleStatusChecker.getNotifyingTask().cancel();
         if (disposalFuture != null) {
             disposalFuture.awaitUninterruptibly();
+        }
+        if (createdExecutor) {
+            ExecutorService e = (ExecutorService) executor;
+            while (!e.isTerminated()) {
+                try {
+                    e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                } catch (InterruptedException e1) {
+                    // Ignore; it should end shortly.
+                }
+            }
         }
 
         disposed = true;
@@ -726,6 +740,10 @@ public abstract class AbstractIoService implements IoService {
     
     protected final IoServiceListenerSupport getListeners() {
         return listeners;
+    }
+    
+    protected final IdleStatusChecker getIdleStatusChecker() {
+        return idleStatusChecker;
     }
     
     protected final void executeWorker(Runnable worker) {

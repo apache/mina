@@ -29,7 +29,6 @@ import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IdleStatusChecker;
 import org.apache.mina.common.IoFilterChain;
 import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoFutureListener;
@@ -104,7 +103,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
             // The following sentences don't throw any exceptions.
             getListeners().fireSessionCreated(localSession);
-            IdleStatusChecker.getInstance().addSession(localSession);
+            getIdleStatusChecker().addSession(localSession);
         } catch (Throwable t) {
             future.setException(t);
             return future;
@@ -120,7 +119,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
             // The following sentences don't throw any exceptions.
             entry.getListeners().fireSessionCreated(remoteSession);
-            IdleStatusChecker.getInstance().addSession(remoteSession);
+            getIdleStatusChecker().addSession(remoteSession);
         } catch (Throwable t) {
             ExceptionMonitor.getInstance().exceptionCaught(t);
             remoteSession.close();
