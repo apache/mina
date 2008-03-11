@@ -38,34 +38,34 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
             return;
         }
         
-//        if (config instanceof AbstractSocketSessionConfig) {
-//            // Minimize unnecessary system calls by checking all 'propertyChanged' properties.
-//            AbstractSocketSessionConfig cfg = (AbstractSocketSessionConfig) config;
-//            if (cfg.isKeepAliveChanged()) {
-//                setKeepAlive(cfg.isKeepAlive());
-//            }
-//            if (cfg.isOobInlineChanged()) {
-//                setOobInline(cfg.isOobInline());
-//            }
-//            if (cfg.isReceiveBufferSizeChanged()) {
-//                setReceiveBufferSize(cfg.getReceiveBufferSize());
-//            }
-//            if (cfg.isReuseAddressChanged()) {
-//                setReuseAddress(cfg.isReuseAddress());
-//            }
-//            if (cfg.isSendBufferSizeChanged()) {
-//                setSendBufferSize(cfg.getSendBufferSize());
-//            }
-//            if (cfg.isSoLingerChanged()) {
-//                setSoLinger(cfg.getSoLinger());
-//            }
-//            if (cfg.isTcpNoDelayChanged()) {
-//                setTcpNoDelay(cfg.isTcpNoDelay());
-//            }
-//            if (cfg.isTrafficClassChanged() && getTrafficClass() != cfg.getTrafficClass()) {
-//                setTrafficClass(cfg.getTrafficClass());
-//            }
-//        } else {
+        if (config instanceof AbstractSocketSessionConfig) {
+            // Minimize unnecessary system calls by checking all 'propertyChanged' properties.
+            AbstractSocketSessionConfig cfg = (AbstractSocketSessionConfig) config;
+            if (cfg.isKeepAliveChanged()) {
+                setKeepAlive(cfg.isKeepAlive());
+            }
+            if (cfg.isOobInlineChanged()) {
+                setOobInline(cfg.isOobInline());
+            }
+            if (cfg.isReceiveBufferSizeChanged()) {
+                setReceiveBufferSize(cfg.getReceiveBufferSize());
+            }
+            if (cfg.isReuseAddressChanged()) {
+                setReuseAddress(cfg.isReuseAddress());
+            }
+            if (cfg.isSendBufferSizeChanged()) {
+                setSendBufferSize(cfg.getSendBufferSize());
+            }
+            if (cfg.isSoLingerChanged()) {
+                setSoLinger(cfg.getSoLinger());
+            }
+            if (cfg.isTcpNoDelayChanged()) {
+                setTcpNoDelay(cfg.isTcpNoDelay());
+            }
+            if (cfg.isTrafficClassChanged() && getTrafficClass() != cfg.getTrafficClass()) {
+                setTrafficClass(cfg.getTrafficClass());
+            }
+        } else {
             SocketSessionConfig cfg = (SocketSessionConfig) config;
             setKeepAlive(cfg.isKeepAlive());
             setOobInline(cfg.isOobInline());
@@ -77,7 +77,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
             if (getTrafficClass() != cfg.getTrafficClass()) {
                 setTrafficClass(cfg.getTrafficClass());
             }
-//        }
+        }
     }
 
     /**
