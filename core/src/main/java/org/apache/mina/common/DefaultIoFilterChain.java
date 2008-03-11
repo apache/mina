@@ -41,10 +41,10 @@ public class DefaultIoFilterChain implements IoFilterChain {
     /**
      * A session attribute that stores an {@link IoFuture} related with
      * the {@link IoSession}.  {@link DefaultIoFilterChain} clears this
-     * attribute and notifies the future when {@link #fireSessionOpened()}
+     * attribute and notifies the future when {@link #fireSessionCreated()}
      * or {@link #fireExceptionCaught(Throwable)} is invoked.
      */
-    static final AttributeKey SESSION_OPENED_FUTURE = new AttributeKey(DefaultIoFilterChain.class, "connectFuture");
+    static final AttributeKey SESSION_CREATED_FUTURE = new AttributeKey(DefaultIoFilterChain.class, "connectFuture");
 
     private final AbstractIoSession session;
 
@@ -440,7 +440,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
     private void callNextExceptionCaught(Entry entry, IoSession session,
             Throwable cause) {
         // Notify the related future.
-        ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_OPENED_FUTURE);
+        ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
         if (future == null) {
             try {
                 entry.getFilter().exceptionCaught(entry.getNextFilter(), session,
@@ -671,7 +671,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 session.getHandler().sessionCreated(session);
             } finally {
                 // Notify the related future.
-                ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_OPENED_FUTURE);
+                ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
                 if (future != null) {
                     future.setSession(session);
                 }

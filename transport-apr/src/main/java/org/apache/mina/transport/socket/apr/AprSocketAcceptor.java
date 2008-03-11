@@ -39,20 +39,20 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         new CircularQueue<Long>(POLLSET_SIZE);
     
     public AprSocketAcceptor() {
-        super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
+        super(new DefaultSocketSessionConfig(true), AprIoProcessor.class);
     }
 
     public AprSocketAcceptor(int processorCount) {
-        super(new DefaultSocketSessionConfig(), AprIoProcessor.class, processorCount);
+        super(new DefaultSocketSessionConfig(true), AprIoProcessor.class, processorCount);
     }
 
     public AprSocketAcceptor(IoProcessor<AprSession> processor) {
-        super(new DefaultSocketSessionConfig(), processor);
+        super(new DefaultSocketSessionConfig(true), processor);
     }
 
     public AprSocketAcceptor(Executor executor,
             IoProcessor<AprSession> processor) {
-        super(new DefaultSocketSessionConfig(), executor, processor);
+        super(new DefaultSocketSessionConfig(true), executor, processor);
     }
 
     @Override

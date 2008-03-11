@@ -741,7 +741,7 @@ public abstract class AbstractIoService implements IoService {
 
         if (future != null && future instanceof ConnectFuture) {
             // DefaultIoFilterChain will notify the future. (We support ConnectFuture only for now).
-            session.setAttribute(DefaultIoFilterChain.SESSION_OPENED_FUTURE, future);
+            session.setAttribute(DefaultIoFilterChain.SESSION_CREATED_FUTURE, future);
         }
         
         if (sessionInitializer != null) {

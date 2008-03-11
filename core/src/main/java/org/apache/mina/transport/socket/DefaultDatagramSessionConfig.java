@@ -33,21 +33,13 @@ import org.apache.mina.common.ExceptionMonitor;
 public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig {
 
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
-
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
-
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
-
     private static final boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
-
     private static boolean DEFAULT_BROADCAST = false;
-
     private static boolean DEFAULT_REUSE_ADDRESS = false;
-
     private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
-
     private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
-
     private static int DEFAULT_TRAFFIC_CLASS = 0;
 
     static {
@@ -114,15 +106,11 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     }
 
     private boolean broadcast = DEFAULT_BROADCAST;
-
     private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
-
     private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
-
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
-
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
-
+    
     /**
      * Creates a new instance.
      */
@@ -198,4 +186,30 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     public void setTrafficClass(int trafficClass) {
         this.trafficClass = trafficClass;
     }
+
+    @Override
+    protected boolean isBroadcastChanged() {
+        return broadcast != DEFAULT_BROADCAST;
+    }
+
+    @Override
+    protected boolean isReceiveBufferSizeChanged() {
+        return receiveBufferSize != DEFAULT_RECEIVE_BUFFER_SIZE;
+    }
+
+    @Override
+    protected boolean isReuseAddressChanged() {
+        return reuseAddress != DEFAULT_REUSE_ADDRESS;
+    }
+
+    @Override
+    protected boolean isSendBufferSizeChanged() {
+        return sendBufferSize != DEFAULT_SEND_BUFFER_SIZE;
+    }
+
+    @Override
+    protected boolean isTrafficClassChanged() {
+        return trafficClass != DEFAULT_TRAFFIC_CLASS;
+    }
+    
 }

@@ -57,25 +57,23 @@ public final class NioSocketAcceptor
      * Create an acceptor with a single processing thread using a NewThreadExecutor
      */
     public NioSocketAcceptor() {
-        super(new DefaultSocketSessionConfig(), NioProcessor.class);
+        super(new DefaultSocketSessionConfig(true), NioProcessor.class);
     }
 
     public NioSocketAcceptor(int processorCount) {
-        super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
+        super(new DefaultSocketSessionConfig(true), NioProcessor.class, processorCount);
     }
     
     public NioSocketAcceptor(IoProcessor<NioSession> processor) {
-        super(new DefaultSocketSessionConfig(), processor);
+        super(new DefaultSocketSessionConfig(true), processor);
     }
 
     public NioSocketAcceptor(Executor executor, IoProcessor<NioSession> processor) {
-        super(new DefaultSocketSessionConfig(), executor, processor);
+        super(new DefaultSocketSessionConfig(true), executor, processor);
     }
 
     @Override
     protected void init() throws Exception {
-        // The default reuseAddress of an accepted socket should be 'true'.
-        getSessionConfig().setReuseAddress(true);
         this.selector = Selector.open();
     }
     
@@ -167,6 +165,7 @@ public final class NioSocketAcceptor
             c.configureBlocking(false);
             // Configure the server socket,
             c.socket().setReuseAddress(isReuseAddress());
+            // XXX: Do we need to provide this property? (I think we need to remove it.)
             c.socket().setReceiveBufferSize(
                     getSessionConfig().getReceiveBufferSize());
             // and bind.

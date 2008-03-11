@@ -49,19 +49,19 @@ public final class NioSocketConnector
     private volatile Selector selector;
 
     public NioSocketConnector() {
-        super(new DefaultSocketSessionConfig(), NioProcessor.class);
+        super(new DefaultSocketSessionConfig(false), NioProcessor.class);
     }
 
     public NioSocketConnector(int processorCount) {
-        super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
+        super(new DefaultSocketSessionConfig(false), NioProcessor.class, processorCount);
     }
 
     public NioSocketConnector(IoProcessor<NioSession> processor) {
-        super(new DefaultSocketSessionConfig(), processor);
+        super(new DefaultSocketSessionConfig(false), processor);
     }
 
     public NioSocketConnector(Executor executor, IoProcessor<NioSession> processor) {
-        super(new DefaultSocketSessionConfig(), executor, processor);
+        super(new DefaultSocketSessionConfig(false), executor, processor);
     }
     
     @Override
@@ -141,7 +141,6 @@ public final class NioSocketConnector
     protected SocketChannel newHandle(SocketAddress localAddress)
             throws Exception {
         SocketChannel ch = SocketChannel.open();
-        ch.socket().setReuseAddress(true);
         if (localAddress != null) {
             ch.socket().bind(localAddress);
         }

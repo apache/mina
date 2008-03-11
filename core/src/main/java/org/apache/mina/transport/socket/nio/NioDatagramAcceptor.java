@@ -100,19 +100,10 @@ public final class NioDatagramAcceptor
 
     @Override
     protected DatagramChannel open(SocketAddress localAddress) throws Exception {
-        DatagramChannel c = DatagramChannel.open();
+        final DatagramChannel c = DatagramChannel.open();
         boolean success = false;
         try {
-            DatagramSessionConfig cfg = getSessionConfig();
-            c.socket().setReuseAddress(cfg.isReuseAddress());
-            c.socket().setBroadcast(cfg.isBroadcast());
-            c.socket().setReceiveBufferSize(cfg.getReceiveBufferSize());
-            c.socket().setSendBufferSize(cfg.getSendBufferSize());
-    
-            if (c.socket().getTrafficClass() != cfg.getTrafficClass()) {
-                c.socket().setTrafficClass(cfg.getTrafficClass());
-            }
-    
+            new NioDatagramSessionConfig(c).setAll(getSessionConfig());
             c.configureBlocking(false);
             c.socket().bind(localAddress);
             c.register(selector, SelectionKey.OP_READ);

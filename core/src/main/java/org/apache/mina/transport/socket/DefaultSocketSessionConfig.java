@@ -43,27 +43,16 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     private static Map<InetSocketAddress, InetAddress> TEST_ADDRESSES = new LinkedHashMap<InetSocketAddress, InetAddress>();
 
     private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
-
     private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
-
     private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
-
     private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
-
     private static boolean DEFAULT_REUSE_ADDRESS = false;
-
     private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
-
     private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
-
     private static int DEFAULT_TRAFFIC_CLASS = 0;
-
     private static boolean DEFAULT_KEEP_ALIVE = false;
-
     private static boolean DEFAULT_OOB_INLINE = false;
-
     private static int DEFAULT_SO_LINGER = -1;
-
     private static boolean DEFAULT_TCP_NO_DELAY = false;
 
     static {
@@ -217,26 +206,26 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
         return SET_TRAFFIC_CLASS_AVAILABLE;
     }
 
-    private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
-
+    private final boolean defaultReuseAddress;
+    private boolean reuseAddress;
     private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
-
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
-
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
-
     private boolean keepAlive = DEFAULT_KEEP_ALIVE;
-
     private boolean oobInline = DEFAULT_OOB_INLINE;
-
     private int soLinger = DEFAULT_SO_LINGER;
-
     private boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
-
+    
     /**
      * Creates a new instance.
      */
-    public DefaultSocketSessionConfig() {
+    public DefaultSocketSessionConfig(boolean server) {
+        if (server) {
+            defaultReuseAddress = true;
+        } else {
+            defaultReuseAddress = DEFAULT_REUSE_ADDRESS;
+        }
+        reuseAddress = defaultReuseAddress;
     }
 
     public boolean isReuseAddress() {
@@ -301,5 +290,45 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     public void setTcpNoDelay(boolean tcpNoDelay) {
         this.tcpNoDelay = tcpNoDelay;
+    }
+
+    @Override
+    protected boolean isKeepAliveChanged() {
+        return keepAlive != DEFAULT_KEEP_ALIVE;
+    }
+
+    @Override
+    protected boolean isOobInlineChanged() {
+        return oobInline != DEFAULT_OOB_INLINE;
+    }
+
+    @Override
+    protected boolean isReceiveBufferSizeChanged() {
+        return receiveBufferSize != DEFAULT_RECEIVE_BUFFER_SIZE;
+    }
+
+    @Override
+    protected boolean isReuseAddressChanged() {
+        return reuseAddress != defaultReuseAddress;
+    }
+
+    @Override
+    protected boolean isSendBufferSizeChanged() {
+        return sendBufferSize != DEFAULT_SEND_BUFFER_SIZE;
+    }
+
+    @Override
+    protected boolean isSoLingerChanged() {
+        return soLinger != DEFAULT_SO_LINGER;
+    }
+
+    @Override
+    protected boolean isTcpNoDelayChanged() {
+        return tcpNoDelay != DEFAULT_TCP_NO_DELAY;
+    }
+
+    @Override
+    protected boolean isTrafficClassChanged() {
+        return trafficClass != DEFAULT_TRAFFIC_CLASS;
     }
 }

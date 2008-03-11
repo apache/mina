@@ -21,7 +21,6 @@ package org.apache.mina.transport.socket.nio;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
@@ -33,12 +32,9 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.transport.socket.DatagramSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
-import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 
 /**
  * An {@link IoSession} for datagram transport (UDP/IP).
@@ -55,19 +51,12 @@ class NioDatagramSession extends NioSession implements DatagramSession {
                     DatagramSessionConfig.class, IoBuffer.class);
 
     private final IoService service;
-
-    private final DatagramSessionConfig config = new SessionConfigImpl();
-
+    private final DatagramSessionConfig config;
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
-
     private final DatagramChannel ch;
-
     private final IoHandler handler;
-
     private final InetSocketAddress localAddress;
-
     private final InetSocketAddress remoteAddress;
-
     private final IoProcessor<NioSession> processor;
 
     private SelectionKey key;
@@ -80,13 +69,11 @@ class NioDatagramSession extends NioSession implements DatagramSession {
                         SocketAddress remoteAddress) {
         this.service = service;
         this.ch = ch;
+        this.config = new NioDatagramSessionConfig(ch);
         this.handler = service.getHandler();
         this.processor = processor;
         this.remoteAddress = (InetSocketAddress) remoteAddress;
-        this.localAddress = (InetSocketAddress) ch.socket()
-                .getLocalSocketAddress();
-
-        this.config.setAll(service.getSessionConfig());
+        this.localAddress = (InetSocketAddress) ch.socket().getLocalSocketAddress();
     }
 
     /**
@@ -148,100 +135,5 @@ class NioDatagramSession extends NioSession implements DatagramSession {
     @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();
-    }
-
-    private class SessionConfigImpl extends AbstractDatagramSessionConfig {
-
-        public int getReceiveBufferSize() {
-            try {
-                return ch.socket().getReceiveBufferSize();
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
-        }
-
-        public void setReceiveBufferSize(int receiveBufferSize) {
-            if (DefaultDatagramSessionConfig.isSetReceiveBufferSizeAvailable()) {
-                try {
-                    ch.socket().setReceiveBufferSize(receiveBufferSize);
-                    // Re-retrieve the effective receive buffer size.
-                    receiveBufferSize = ch.socket().getReceiveBufferSize();
-                } catch (SocketException e) {
-                    throw new RuntimeIoException(e);
-                }
-            }
-        }
-
-        public boolean isBroadcast() {
-            try {
-                return ch.socket().getBroadcast();
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
-        }
-
-        public void setBroadcast(boolean broadcast) {
-            try {
-                ch.socket().setBroadcast(broadcast);
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
-        }
-
-        public int getSendBufferSize() {
-            try {
-                return ch.socket().getSendBufferSize();
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
-        }
-
-        public void setSendBufferSize(int sendBufferSize) {
-            if (DefaultDatagramSessionConfig.isSetSendBufferSizeAvailable()) {
-                try {
-                    ch.socket().setSendBufferSize(sendBufferSize);
-                } catch (SocketException e) {
-                    throw new RuntimeIoException(e);
-                }
-            }
-        }
-
-        public boolean isReuseAddress() {
-            try {
-                return ch.socket().getReuseAddress();
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
-        }
-
-        public void setReuseAddress(boolean reuseAddress) {
-            try {
-                ch.socket().setReuseAddress(reuseAddress);
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
-        }
-
-        public int getTrafficClass() {
-            if (DefaultDatagramSessionConfig.isGetTrafficClassAvailable()) {
-                try {
-                    return ch.socket().getTrafficClass();
-                } catch (SocketException e) {
-                    throw new RuntimeIoException(e);
-                }
-            } else {
-                return 0;
-            }
-        }
-
-        public void setTrafficClass(int trafficClass) {
-            if (DefaultDatagramSessionConfig.isSetTrafficClassAvailable()) {
-                try {
-                    ch.socket().setTrafficClass(trafficClass);
-                } catch (SocketException e) {
-                    throw new RuntimeIoException(e);
-                }
-            }
-        }
     }
 }
