@@ -39,7 +39,7 @@ public abstract class AbstractIoConnector
      *           Message-ID: <1202880068.7504.38.camel@laptop>
      *              Subject: Re: connect timeout
      */
-    private static final long MINIMUM_CONNECT_TIMEOUT = 50L;
+    private long minimumConnectTimeout = 50L;
     
     private long connectTimeoutInMillis = 60*1000L; // 1 minute by default
     private SocketAddress defaultRemoteAddress;
@@ -49,7 +49,27 @@ public abstract class AbstractIoConnector
     }
 
     /**
+     * Returns the minimum connection timeout value for this connector
+     * 
+     * @return
+     *  The minimum time that this connector can have for a connection
+     *  timeout in milliseconds.
+     */
+    public long getMinimumConnectTimeout() {
+        return minimumConnectTimeout;
+    }
+
+    public void setMinimumConnectTimeout(long minimumConnectTimeout) {
+        if( getConnectTimeoutMillis() < minimumConnectTimeout ){
+            this.connectTimeoutInMillis = minimumConnectTimeout;
+        }
+        
+        this.minimumConnectTimeout = minimumConnectTimeout;
+    }
+
+    /**
      * @deprecated
+     *  Take a look at <tt>getConnectTimeoutMillis()</tt>
      */
     public final int getConnectTimeout() {
         return (int)connectTimeoutInMillis/1000;
@@ -61,25 +81,20 @@ public abstract class AbstractIoConnector
 
     /**
      * @deprecated
+     *  Take a look at <tt>setConnectTimeoutMillis(long)</tt>
      */
     public final void setConnectTimeout(int connectTimeout) {
-        if (connectTimeout <= 0) {
-            throw new IllegalArgumentException("connectTimeout: "
-                    + connectTimeout);
-        }
-        this.connectTimeoutInMillis = connectTimeout*1000L;
+        
+        setConnectTimeoutMillis( connectTimeout * 1000L );
     }
     
     /**
      * Sets the connect timeout value in milliseconds.
      * 
-     * @throws IllegalArgumentException if the value is smaller than 
-     * <tt>MINIMUM_CONNECT_TIMEOUT</tt>.
      */
     public final void setConnectTimeoutMillis(long connectTimeoutInMillis) {
-        if (connectTimeoutInMillis <= MINIMUM_CONNECT_TIMEOUT) {
-            throw new IllegalArgumentException("connectTimeoutInMillis: " + 
-                    connectTimeoutInMillis);
+        if (connectTimeoutInMillis <= minimumConnectTimeout) {
+            this.minimumConnectTimeout = connectTimeoutInMillis;
         }
         this.connectTimeoutInMillis = connectTimeoutInMillis;
     }
