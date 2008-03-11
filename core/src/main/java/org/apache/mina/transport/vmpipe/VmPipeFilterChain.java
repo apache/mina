@@ -113,6 +113,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 session.getLock().unlock();
             }
         } else if (type == IoEventType.SESSION_CLOSED) {
+            flushPendingDataQueues(session);
             super.fireSessionClosed();
         } else if (type == IoEventType.CLOSE) {
             super.fireFilterClose();
@@ -172,12 +173,12 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     private class VmPipeIoProcessor implements IoProcessor<VmPipeSessionImpl> {
         public void flush(VmPipeSessionImpl session) {
             WriteRequestQueue queue = session.getWriteRequestQueue0();
-            if (queue.isEmpty(session)) {
-                return;
-            }
-            if (session.isConnected()) {
+            if (!session.isClosing()) {
                 session.getLock().lock();
                 try {
+                    if (queue.isEmpty(session)) {
+                        return;
+                    }
                     WriteRequest req;
                     while ((req = queue.poll(session)) != null) {
                         session.getRemoteSession().getFilterChain().fireMessageReceived(

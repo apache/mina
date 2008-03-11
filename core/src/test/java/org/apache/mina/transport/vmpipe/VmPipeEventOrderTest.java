@@ -204,6 +204,12 @@ public class VmPipeEventOrderTest extends TestCase {
         });
         ConnectFuture connectFuture = vmPipeConnector.connect(vmPipeAddress);
         connectFuture.awaitUninterruptibly();
+        
+        // Wait until one byte is written.
+        while (connectFuture.getSession().getWrittenBytes() == 0) {
+            Thread.yield();
+        }
+        
         connectFuture.getSession().close();
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
         vmPipeAcceptor.unbind(vmPipeAddress);
