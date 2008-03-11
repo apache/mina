@@ -667,14 +667,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
         @Override
         public void sessionCreated(NextFilter nextFilter, IoSession session)
                 throws Exception {
-            session.getHandler().sessionCreated(session);
-        }
-
-        @Override
-        public void sessionOpened(NextFilter nextFilter, IoSession session)
-                throws Exception {
             try {
-                session.getHandler().sessionOpened(session);
+                session.getHandler().sessionCreated(session);
             } finally {
                 // Notify the related future.
                 ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_OPENED_FUTURE);
@@ -682,6 +676,12 @@ public class DefaultIoFilterChain implements IoFilterChain {
                     future.setSession(session);
                 }
             }
+        }
+
+        @Override
+        public void sessionOpened(NextFilter nextFilter, IoSession session)
+                throws Exception {
+            session.getHandler().sessionOpened(session);
         }
 
         @Override
