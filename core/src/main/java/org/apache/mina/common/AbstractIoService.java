@@ -23,7 +23,13 @@ import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.mina.util.NamePreservingRunnable;
 
 
 /**
@@ -56,6 +62,8 @@ public abstract class AbstractIoService implements IoService {
             public void sessionDestroyed(IoSession session) {}
     };
     
+    private static final AtomicInteger id = new AtomicInteger();
+
     /**
      * Current filter chain builder.
      */
@@ -73,7 +81,10 @@ public abstract class AbstractIoService implements IoService {
      * Maintains the {@link IoServiceListener}s of this service.
      */
     private final IoServiceListenerSupport listeners;
-    
+
+    private final Executor executor;
+    private final String threadName;
+    private final boolean createdExecutor;
     private final Object disposalLock = new Object();
     private volatile boolean disposing;
     private volatile boolean disposed;
@@ -124,7 +135,7 @@ public abstract class AbstractIoService implements IoService {
      */
     private IoSessionConfig sessionConfig;
 
-    protected AbstractIoService(IoSessionConfig sessionConfig) {
+    protected AbstractIoService(IoSessionConfig sessionConfig, Executor executor) {
         if (sessionConfig == null) {
             throw new NullPointerException("sessionConfig");
         }
@@ -143,6 +154,16 @@ public abstract class AbstractIoService implements IoService {
         // Make JVM load the exception monitor before some transports
         // change the thread context class loader.
         ExceptionMonitor.getInstance();
+        
+        if (executor == null) {
+            this.executor = Executors.newCachedThreadPool();
+            this.createdExecutor = true;
+        } else {
+            this.executor = executor;
+            this.createdExecutor = false;
+        }
+        
+        this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
     }
 
     public final IoFilterChainBuilder getFilterChainBuilder() {
@@ -200,6 +221,10 @@ public abstract class AbstractIoService implements IoService {
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 } finally {
+                    if (createdExecutor) {
+                        ((ExecutorService) executor).shutdown();
+                    }
+                    
                     if (disposalFuture == null) {
                         disposed = true;
                     }
@@ -701,6 +726,18 @@ public abstract class AbstractIoService implements IoService {
     
     protected final IoServiceListenerSupport getListeners() {
         return listeners;
+    }
+    
+    protected final void executeWorker(Runnable worker) {
+        executeWorker(worker, null);
+    }
+    
+    protected final void executeWorker(Runnable worker, String suffix) {
+        String actualThreadName = threadName;
+        if (suffix != null) {
+            actualThreadName = actualThreadName + '-' + suffix;
+        }
+        executor.execute(new NamePreservingRunnable(worker, actualThreadName));
     }
     
     // TODO Figure out make it work without causing a compiler error / warning.

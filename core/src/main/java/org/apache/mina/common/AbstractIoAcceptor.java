@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 
 /**
@@ -54,8 +55,8 @@ public abstract class AbstractIoAcceptor
      */
     protected final Object bindLock = new Object();
 
-    protected AbstractIoAcceptor(IoSessionConfig sessionConfig) {
-        super(sessionConfig);
+    protected AbstractIoAcceptor(IoSessionConfig sessionConfig, Executor executor) {
+        super(sessionConfig, executor);
         defaultLocalAddresses.add(null);
     }
 

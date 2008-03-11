@@ -22,6 +22,7 @@ package org.apache.mina.common;
 import java.net.SocketAddress;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 /**
  * A dummy {@link IoSession} for unit-testing or non-network-use of
@@ -77,6 +78,9 @@ public class DummySession extends AbstractIoSession {
                 new AbstractIoSessionConfig() {
                     @Override
                     protected void doSetAll(IoSessionConfig config) {}
+                },
+                new Executor() {
+                    public void execute(Runnable command) {}
                 }) {
 
             @Override

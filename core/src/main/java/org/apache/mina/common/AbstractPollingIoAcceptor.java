@@ -30,14 +30,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.mina.util.NamePreservingRunnable;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -46,11 +38,6 @@ import org.apache.mina.util.NamePreservingRunnable;
 public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         extends AbstractIoAcceptor {
 
-    private static final AtomicInteger id = new AtomicInteger();
-
-    private final Executor executor;
-    private final boolean createdExecutor;
-    private final String threadName;
     private final IoProcessor<T> processor;
     private final boolean createdProcessor;
 
@@ -89,23 +76,12 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     }
 
     private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor, boolean createdProcessor) {
-        super(sessionConfig);
+        super(sessionConfig, executor);
         
         if (processor == null) {
             throw new NullPointerException("processor");
         }
         
-        if (executor == null) {
-            this.executor = new ThreadPoolExecutor(
-                    1, 1, 1L, TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<Runnable>());
-            this.createdExecutor = true;
-        } else {
-            this.executor = executor;
-            this.createdExecutor = false;
-        }
-
-        this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
         this.processor = processor;
         this.createdProcessor = createdProcessor;
         
@@ -141,16 +117,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected IoFuture dispose0() throws Exception {
         unbind();
         if (!disposalFuture.isDone()) {
-            try {
-                startupWorker();
-                wakeup();
-            } catch (RejectedExecutionException e) {
-                if (createdExecutor) {
-                    // Ignore.
-                } else {
-                    throw e;
-                }
-            }
+            startupWorker();
+            wakeup();
         }
         return disposalFuture;
     }
@@ -202,7 +170,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
-                executor.execute(new NamePreservingRunnable(worker, threadName));
+                executeWorker(worker);
             }
         }
     }
@@ -279,9 +247,6 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                         ExceptionMonitor.getInstance().exceptionCaught(e);
                     } finally {
                         disposalFuture.setDone();
-                        if (createdExecutor) {
-                            ((ExecutorService) executor).shutdown();
-                        }
                     }
                 }
             }

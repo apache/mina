@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoAcceptor;
 import org.apache.mina.common.IoFuture;
@@ -47,7 +48,14 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
      * Creates a new instance.
      */
     public VmPipeAcceptor() {
-        super(new DefaultVmPipeSessionConfig());
+        this(null);
+    }
+    
+    /**
+     * Creates a new instance.
+     */
+    public VmPipeAcceptor(Executor executor) {
+        super(new DefaultVmPipeSessionConfig(), executor);
     }
 
     public TransportMetadata getTransportMetadata() {

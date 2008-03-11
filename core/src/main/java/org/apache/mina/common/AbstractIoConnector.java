@@ -20,6 +20,7 @@
 package org.apache.mina.common;
 
 import java.net.SocketAddress;
+import java.util.concurrent.Executor;
 
 /**
  * A base implementation of {@link IoConnector}.
@@ -33,12 +34,11 @@ public abstract class AbstractIoConnector
      * The minimum timeout value that is supported (in milliseconds).
      */
     private long connectTimeoutCheckInterval = 50L;
-    
-    private long connectTimeoutInMillis = 60*1000L; // 1 minute by default
+    private long connectTimeoutInMillis = 60 * 1000L; // 1 minute by default
     private SocketAddress defaultRemoteAddress;
 
-    protected AbstractIoConnector(IoSessionConfig sessionConfig) {
-        super(sessionConfig);
+    protected AbstractIoConnector(IoSessionConfig sessionConfig, Executor executor) {
+        super(sessionConfig, executor);
     }
 
     /**

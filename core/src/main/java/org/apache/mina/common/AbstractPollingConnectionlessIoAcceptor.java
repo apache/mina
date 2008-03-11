@@ -30,14 +30,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.mina.util.NamePreservingRunnable;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
@@ -50,12 +42,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
 
-    private static final AtomicInteger id = new AtomicInteger();
-
     private final Object lock = new Object();
-    private final Executor executor;
-    private final boolean createdExecutor;
-    private final String threadName;
     private final IoProcessor<T> processor = new ConnectionlessAcceptorProcessor();
     private final Queue<AcceptorOperationFuture> registerQueue = 
         new ConcurrentLinkedQueue<AcceptorOperationFuture>();
@@ -84,20 +71,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
      * Creates a new instance.
      */
     protected AbstractPollingConnectionlessIoAcceptor(IoSessionConfig sessionConfig, Executor executor) {
-        super(sessionConfig);
+        super(sessionConfig, executor);
 
-        threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
-        
-        if (executor == null) {
-            this.executor = new ThreadPoolExecutor(
-                    1, 1, 1L, TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<Runnable>());
-            this.createdExecutor = true;
-        } else {
-            this.executor = executor;
-            this.createdExecutor = false;
-        }
-        
         try {
             init();
             selectable = true;
@@ -135,16 +110,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected IoFuture dispose0() throws Exception {
         unbind();
         if (!disposalFuture.isDone()) {
-            try {
-                startupWorker();
-                wakeup();
-            } catch (RejectedExecutionException e) {
-                if (createdExecutor) {
-                    // Ignore.
-                } else {
-                    throw e;
-                }
-            }
+            startupWorker();
+            wakeup();
         }
         return disposalFuture;
     }
@@ -307,8 +274,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
-                executor.execute(
-                        new NamePreservingRunnable(worker, threadName));
+                executeWorker(worker);
             }
         }
     }
@@ -368,9 +334,6 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 } finally {
                     disposalFuture.setValue(true);
-                    if (createdExecutor) {
-                        ((ExecutorService) executor).shutdown();
-                    }
                 }
             }
         }

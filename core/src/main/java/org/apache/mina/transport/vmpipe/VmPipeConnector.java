@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import org.apache.mina.common.AbstractIoConnector;
 import org.apache.mina.common.ConnectFuture;
@@ -49,7 +50,14 @@ public final class VmPipeConnector extends AbstractIoConnector {
      * Creates a new instance.
      */
     public VmPipeConnector() {
-        super(new DefaultVmPipeSessionConfig());
+        this(null);
+    }
+    
+    /**
+     * Creates a new instance.
+     */
+    public VmPipeConnector(Executor executor) {
+        super(new DefaultVmPipeSessionConfig(), executor);
     }
 
     public TransportMetadata getTransportMetadata() {
