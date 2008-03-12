@@ -182,12 +182,12 @@ public class IoServiceListenerSupport {
                 managedSessions.put(serviceAddress, sessions);
                 firstSession = true;
             }
-        }
 
-        // If already registered, ignore.
-        synchronized (sessions) {
-            if (!sessions.add(session)) {
-                return;
+            // If already registered, ignore.
+            synchronized (sessions) {
+                if (!sessions.add(session)) {
+                    return;
+                }
             }
         }
 
@@ -230,7 +230,7 @@ public class IoServiceListenerSupport {
                 return;
             }
 
-            // Try to remove the remaining empty seession set after removal.
+            // Try to remove the remaining empty session set after removal.
             synchronized (sessions) {
                 sessions.remove(session);
                 if (sessions.isEmpty()) {
