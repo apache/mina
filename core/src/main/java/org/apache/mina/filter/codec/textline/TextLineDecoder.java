@@ -277,9 +277,14 @@ public class TextLineDecoder implements ProtocolDecoder {
                     matchCount = 0;
                 }
             } else {
-                // fix for DIRMINA-506
-                in.position(in.position()-matchCount);
-                matchCount = 0;
+                // fix for DIRMINA-506 & DIRMINA-536
+                if (in.position() >= matchCount) {
+                    in.position(in.position() - matchCount);
+                    matchCount = 0;
+                } else {
+                    matchCount -= in.position();
+                    in.position(0);
+                }
             }
         }
 

@@ -316,4 +316,21 @@ public class TextLineDecoderTest extends TestCase {
         // Memory consumption should be minimal.
         Assert.assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576);
     }
+    
+    public void testSMTPDataBounds() throws Exception {
+        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("ISO-8859-1"),
+                new LineDelimiter("\r\n.\r\n"));
+
+        CharsetEncoder encoder = Charset.forName("ISO-8859-1").newEncoder();
+        ProtocolCodecSession session = new ProtocolCodecSession();
+        IoBuffer in = IoBuffer.allocate(16).setAutoExpand(true);
+
+        in.putString("\r\n", encoder).flip().mark();
+        decoder.decode(session, in.reset().mark(), session.getDecoderOutput());
+        Assert.assertEquals(0, session.getDecoderOutputQueue().size());
+        in.putString("Body\r\n.\r\n", encoder).flip().mark();
+        decoder.decode(session, in.reset().mark(), session.getDecoderOutput());
+        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
+        Assert.assertEquals("\r\n\r\nBody", session.getDecoderOutputQueue().poll());
+    }
 }
