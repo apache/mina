@@ -41,7 +41,8 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class BlacklistFilter extends IoFilterAdapter {
-    private final List<InetAddress> blacklist = new CopyOnWriteArrayList<InetAddress>();
+	private final List<InetAddress> blacklist = new CopyOnWriteArrayList<InetAddress>();
+    private final List<InetAddressRange> rangeBlacklist = new CopyOnWriteArrayList<InetAddressRange>();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     /**
@@ -62,6 +63,23 @@ public class BlacklistFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * Sets the address ranges to be blacklisted.
+     *
+     * NOTE: this call will remove any previously blacklisted ranges.
+     *
+     * @param ranges an array of address ranges to be blacklisted.
+     */
+    public void setRangeBlacklist(InetAddressRange[] ranges) {
+        if (ranges == null) {
+            throw new NullPointerException("Ranges must not be null");
+        }
+        rangeBlacklist.clear();
+        for (InetAddressRange range : ranges) {
+            block(range);
+        }
+    }
+    
     /**
      * Sets the addresses to be blacklisted.
      *
@@ -85,6 +103,23 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     /**
+     * Sets the address ranges to be blacklisted.
+     *
+     * NOTE: this call will remove any previously blacklisted ranges.
+     *
+     * @param ranges an array of address ranges to be blacklisted.
+     */
+    public void setRangeBlacklist(Iterable<InetAddressRange> ranges) {
+        if (ranges == null) {
+            throw new NullPointerException("Ranges must not be null");
+        }
+        rangeBlacklist.clear();
+        for (InetAddressRange range : ranges) {
+            block(range);
+        }
+    }
+    
+    /**
      * Blocks the specified endpoint.
      */
     public void block(InetAddress address, String error_string) {
@@ -98,17 +133,38 @@ public class BlacklistFilter extends IoFilterAdapter {
      * Blocks the specified endpoint.
      */
     public void block(InetAddress address) {
-        block(address, "address");
+    	block(address, "address");
     }
 
+    /**
+     * Blocks the specified range.
+     */
+    public void block(InetAddressRange range) {
+    	if(range == null) {
+    		throw new NullPointerException("Range can not be null");
+    	}
+    	
+        rangeBlacklist.add(range);
+    }
+    
     /**
      * Unblocks the specified endpoint.
      */
     public void unblock(InetAddress address) {
-        if (address == null) {
-            throw new NullPointerException("address");
+    	if (address == null) {
+    		throw new NullPointerException("address");
+    	}
+    	blacklist.remove(address);
+    }
+
+    /**
+     * Unblocks the specified range.
+     */
+    public void unblock(InetAddressRange range) {
+        if (range == null) {
+            throw new NullPointerException("Range can not be null");
         }
-        blacklist.remove(address);
+        rangeBlacklist.remove(range);
     }
 
     @Override
@@ -184,9 +240,16 @@ public class BlacklistFilter extends IoFilterAdapter {
     private boolean isBlocked(IoSession session) {
         SocketAddress remoteAddress = session.getRemoteAddress();
         if (remoteAddress instanceof InetSocketAddress) {
-            if (blacklist.contains(((InetSocketAddress) remoteAddress)
-                    .getAddress())) {
+        	InetAddress address = ((InetSocketAddress) remoteAddress).getAddress(); 
+            if (blacklist.contains(address)) {
                 return true;
+            } 
+            
+            // check all ranges
+            for(InetAddressRange range : rangeBlacklist) {
+            	if(range.contains(address)) {
+            		return true;
+            	}
             }
         }
 
