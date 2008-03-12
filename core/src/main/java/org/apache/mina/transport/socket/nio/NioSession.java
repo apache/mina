@@ -25,11 +25,18 @@ import java.nio.channels.SelectionKey;
 import org.apache.mina.common.AbstractIoSession;
 
 /**
- *
+ * An {@link IoSession} which is managed by the NIO transport.
+ *  
  * @author Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-abstract class NioSession extends AbstractIoSession {
+public abstract class NioSession extends AbstractIoSession {
+    /**
+     * Creates a new instance.  This constructor does nothing particular
+     * but calls the default super constructor.
+     */
+    protected NioSession() {}
+    
     abstract ByteChannel getChannel();
     abstract SelectionKey getSelectionKey();
     abstract void setSelectionKey(SelectionKey key);
