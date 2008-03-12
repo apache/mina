@@ -90,14 +90,9 @@ public final class NioDatagramConnector
     protected DatagramChannel newHandle(SocketAddress localAddress)
             throws Exception {
         DatagramChannel ch = DatagramChannel.open();
-        ch.socket().setReuseAddress(getSessionConfig().isReuseAddress());
-        ch.socket().setReuseAddress(true);
-        ch.socket().setBroadcast(getSessionConfig().isBroadcast());
-
         if (localAddress != null) {
             ch.socket().bind(localAddress);
         }
-        
         return ch;
     }
 
@@ -111,7 +106,9 @@ public final class NioDatagramConnector
     @Override
     protected NioSession newSession(IoProcessor<NioSession> processor,
             DatagramChannel handle) {
-        return new NioDatagramSession(this, handle, processor);
+        NioSession session = new NioDatagramSession(this, handle, processor);
+        session.getConfig().setAll(getSessionConfig());
+        return session;
     }
 
     @Override
