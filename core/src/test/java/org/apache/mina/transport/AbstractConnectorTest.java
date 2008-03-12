@@ -148,7 +148,7 @@ public abstract class AbstractConnectorTest extends TestCase {
             } 
         });
         
-        ConnectFuture future = connector.connect(address, new IoSessionInitializer<ConnectFuture>() {
+        ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port), new IoSessionInitializer<ConnectFuture>() {
             public void initializeSession(IoSession session, ConnectFuture future) {
                 assertions[callbackInvoked] = true;
                 callbackFuture[0] = future;
