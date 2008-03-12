@@ -64,6 +64,11 @@ public class IdleStatusChecker {
     }
     
     public interface NotifyingTask extends Runnable {
+        /**
+         * Cancels this task.  Once canceled, {@link #run()} method will always return immediately.
+         * To start this task again after calling this method, you have to create a new instance of
+         * {@link IdleStatusChecker} again. 
+         */
         void cancel();
     }
 
@@ -72,7 +77,6 @@ public class IdleStatusChecker {
         private volatile Thread thread;
         
         public void run() {
-            cancelled = false;
             thread = Thread.currentThread();
             try {
                 while (!cancelled) {
@@ -93,13 +97,11 @@ public class IdleStatusChecker {
         }
         
         public void cancel() {
-            Thread thread = this.thread;
-            if (thread == null) {
-                return;
-            }
-            
             cancelled = true;
-            thread.interrupt();
+            Thread thread = this.thread;
+            if (thread != null) {
+                thread.interrupt();
+            }
         }
 
         private void notifyServices(long currentTime) {
