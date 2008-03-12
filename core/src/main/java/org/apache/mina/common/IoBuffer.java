@@ -36,7 +36,6 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -306,20 +305,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
         return newCapacity;
     }
     
-    protected static final Set<String> primitiveTypeNames = new HashSet<String>();
-    
-    static {
-        primitiveTypeNames.add("void");
-        primitiveTypeNames.add("boolean");
-        primitiveTypeNames.add("byte");
-        primitiveTypeNames.add("char");
-        primitiveTypeNames.add("short");
-        primitiveTypeNames.add("int");
-        primitiveTypeNames.add("long");
-        primitiveTypeNames.add("float");
-        primitiveTypeNames.add("double");
-    }
-
     /**
      * Creates a new instance.  This is an empty constructor.
      */

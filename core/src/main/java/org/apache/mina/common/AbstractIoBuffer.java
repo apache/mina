@@ -1608,8 +1608,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 @Override
                 protected void writeClassDescriptor(ObjectStreamClass desc)
                         throws IOException {
-                    String className = desc.getName();
-                    if (primitiveTypeNames.contains(className)) {
+                    if (desc.forClass().isPrimitive()) {
                         write(0);
                         super.writeClassDescriptor(desc);
                     } else {
