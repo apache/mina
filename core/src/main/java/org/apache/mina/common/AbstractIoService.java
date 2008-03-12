@@ -224,10 +224,6 @@ public abstract class AbstractIoService implements IoService {
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 } finally {
-                    if (createdExecutor) {
-                        ((ExecutorService) executor).shutdown();
-                    }
-                    
                     if (disposalFuture == null) {
                         disposed = true;
                     }
@@ -241,6 +237,7 @@ public abstract class AbstractIoService implements IoService {
         }
         if (createdExecutor) {
             ExecutorService e = (ExecutorService) executor;
+            e.shutdown();
             while (!e.isTerminated()) {
                 try {
                     e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
