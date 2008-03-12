@@ -62,12 +62,12 @@ public class SslContextFactory {
     private KeyManagerFactory keyManagerFactory = null;
     private String keyManagerFactoryAlgorithm = null;
     private String keyManagerFactoryProvider = null;
-    private boolean keyManagerFactoryAlgorithmUseDefault = false;
+    private boolean keyManagerFactoryAlgorithmUseDefault = true;
     private KeyStore trustManagerFactoryKeyStore = null;
     private TrustManagerFactory trustManagerFactory = null;
     private String trustManagerFactoryAlgorithm = null;
     private String trustManagerFactoryProvider = null;
-    private boolean trustManagerFactoryAlgorithmUseDefault = false;
+    private boolean trustManagerFactoryAlgorithmUseDefault = true;
     private ManagerFactoryParameters trustManagerFactoryParameters = null;
     private int clientSessionCacheSize = -1;
     private int clientSessionTimeout = -1;
@@ -185,6 +185,7 @@ public class SslContextFactory {
      * no algorithm has been set using
      * {@link #setKeyManagerFactoryAlgorithm(String)} the default algorithm
      * return by {@link KeyManagerFactory#getDefaultAlgorithm()} will be used.
+     * The default value of this property is <tt>true<tt/>.
      *
      * @param useDefault
      *            <code>true</code> or <code>false</code>.
@@ -199,6 +200,7 @@ public class SslContextFactory {
      * no algorithm has been set using
      * {@link #setTrustManagerFactoryAlgorithm(String)} the default algorithm
      * return by {@link TrustManagerFactory#getDefaultAlgorithm()} will be used.
+     * The default value of this property is <tt>true<tt/>.
      *
      * @param useDefault <code>true</code> or <code>false</code>.
      */
