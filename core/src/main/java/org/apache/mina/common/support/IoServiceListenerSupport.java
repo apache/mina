@@ -156,22 +156,24 @@ public class IoServiceListenerSupport {
     public void fireSessionCreated(IoSession session) {
         SocketAddress serviceAddress = session.getServiceAddress();
 
-        // Get the session set.
-        Set<IoSession> s = new IdentityHashSet<IoSession>();
-        Set<IoSession> sessions = managedSessions.putIfAbsent(serviceAddress,
-                Collections.synchronizedSet(s));
         boolean firstSession;
-
-        if (null == sessions) {
-            sessions = s;
-            firstSession = true;
-        } else {
-            firstSession = false;
-        }
-
-        // If already registered, ignore.
-        if (!sessions.add(session)) {
-            return;
+        Set<IoSession> s = new IdentityHashSet<IoSession>();
+        synchronized (managedSessions) {
+            // Get the session set.
+            Set<IoSession> sessions = managedSessions.putIfAbsent(serviceAddress,
+                    Collections.synchronizedSet(s));
+    
+            if (null == sessions) {
+                sessions = s;
+                firstSession = true;
+            } else {
+                firstSession = false;
+            }
+    
+            // If already registered, ignore.
+            if (!sessions.add(session)) {
+                return;
+            }
         }
 
         // If the first connector session, fire a virtual service activation event.
@@ -201,20 +203,21 @@ public class IoServiceListenerSupport {
     public void fireSessionDestroyed(IoSession session) {
         SocketAddress serviceAddress = session.getServiceAddress();
 
-        // Get the session set.
-        Set<IoSession> sessions = managedSessions.get(serviceAddress);
-        // Ignore if unknown.
-        if (sessions == null) {
-            return;
-        }
-
-        sessions.remove(session);
-
         boolean lastSession = false;
-
-        // Try to remove the remaining empty session set after removal.
-        if (sessions.isEmpty()) {
-            lastSession = managedSessions.remove(serviceAddress, sessions);
+        synchronized (managedSessions) {
+            // Get the session set.
+            Set<IoSession> sessions = managedSessions.get(serviceAddress);
+            // Ignore if unknown.
+            if (sessions == null) {
+                return;
+            }
+    
+            sessions.remove(session);
+    
+            // Try to remove the remaining empty session set after removal.
+            if (sessions.isEmpty()) {
+                lastSession = managedSessions.remove(serviceAddress, sessions);
+            }
         }
 
         // Fire session events.
