@@ -62,6 +62,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     private final Queue<T> trafficControllingSessions = new ConcurrentLinkedQueue<T>();
 
     private Worker worker;
+    private Thread workerThread;
     private long lastIdleCheckTime;
 
     private final Object disposalLock = new Object();
@@ -199,9 +200,15 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     public final void flush(T session) {
-        boolean needsWakeup = flushingSessions.isEmpty();
-        if (scheduleFlush(session) && needsWakeup) {
-            wakeup();
+        if (Thread.currentThread() == workerThread) {
+            // Bypass the queue if called from the worker thread itself
+            // (i.e. single thread model).
+            flushNow(session);
+        } else {
+            boolean needsWakeup = flushingSessions.isEmpty();
+            if (scheduleFlush(session) && needsWakeup) {
+                wakeup();
+            }
         }
     }
 
@@ -664,6 +671,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private class Worker implements Runnable {
         public void run() {
+            workerThread = Thread.currentThread();
             int nSessions = 0;
             lastIdleCheckTime = System.currentTimeMillis();
 
@@ -710,6 +718,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 }
             }
             
+            workerThread = null;
             if (isDisposing()) {
                 try {
                     dispose0();
