@@ -57,19 +57,23 @@ public final class NioSocketAcceptor
      * Create an acceptor with a single processing thread using a NewThreadExecutor
      */
     public NioSocketAcceptor() {
-        super(new DefaultSocketSessionConfig(true), NioProcessor.class);
+        super(new DefaultSocketSessionConfig(), NioProcessor.class);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
     public NioSocketAcceptor(int processorCount) {
-        super(new DefaultSocketSessionConfig(true), NioProcessor.class, processorCount);
+        super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
     
     public NioSocketAcceptor(IoProcessor<NioSession> processor) {
-        super(new DefaultSocketSessionConfig(true), processor);
+        super(new DefaultSocketSessionConfig(), processor);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
     public NioSocketAcceptor(Executor executor, IoProcessor<NioSession> processor) {
-        super(new DefaultSocketSessionConfig(true), executor, processor);
+        super(new DefaultSocketSessionConfig(), executor, processor);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
     @Override

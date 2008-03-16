@@ -49,19 +49,23 @@ public final class NioSocketConnector
     private volatile Selector selector;
 
     public NioSocketConnector() {
-        super(new DefaultSocketSessionConfig(false), NioProcessor.class);
+        super(new DefaultSocketSessionConfig(), NioProcessor.class);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
     public NioSocketConnector(int processorCount) {
-        super(new DefaultSocketSessionConfig(false), NioProcessor.class, processorCount);
+        super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
     public NioSocketConnector(IoProcessor<NioSession> processor) {
-        super(new DefaultSocketSessionConfig(false), processor);
+        super(new DefaultSocketSessionConfig(), processor);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
     public NioSocketConnector(Executor executor, IoProcessor<NioSession> processor) {
-        super(new DefaultSocketSessionConfig(false), executor, processor);
+        super(new DefaultSocketSessionConfig(), executor, processor);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
     
     @Override

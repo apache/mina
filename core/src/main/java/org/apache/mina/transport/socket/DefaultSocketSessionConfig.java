@@ -206,9 +206,12 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
         return SET_TRAFFIC_CLASS_AVAILABLE;
     }
 
-    private final boolean defaultReuseAddress;
+    private SocketService parent;
+    private boolean defaultReuseAddress;
+    private int defaultReceiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
+    
     private boolean reuseAddress;
-    private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
+    private int receiveBufferSize = defaultReceiveBufferSize;
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
     private boolean keepAlive = DEFAULT_KEEP_ALIVE;
@@ -219,8 +222,12 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     /**
      * Creates a new instance.
      */
-    public DefaultSocketSessionConfig(boolean server) {
-        if (server) {
+    public DefaultSocketSessionConfig() {
+    }
+    
+    public void init(SocketService parent) {
+        this.parent = parent;
+        if (parent instanceof SocketAcceptor) {
             defaultReuseAddress = true;
         } else {
             defaultReuseAddress = DEFAULT_REUSE_ADDRESS;
@@ -242,6 +249,18 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     public void setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
+        
+        // The acceptor configures the SO_RCVBUF value of the
+        // server socket when it is activated.  Consequently,
+        // a newly accepted session doesn't need to update its
+        // SO_RCVBUF parameter.  Therefore, we need to update
+        // the default receive buffer size if the acceptor is
+        // not bound yet to avoid a unnecessary system call
+        // when the acceptor is activated and new sessions are
+        // created.
+        if (!parent.isActive() && parent instanceof SocketAcceptor) {
+            defaultReceiveBufferSize = receiveBufferSize;
+        }
     }
 
     public int getSendBufferSize() {
@@ -304,7 +323,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     @Override
     protected boolean isReceiveBufferSizeChanged() {
-        return receiveBufferSize != DEFAULT_RECEIVE_BUFFER_SIZE;
+        return receiveBufferSize != defaultReceiveBufferSize;
     }
 
     @Override

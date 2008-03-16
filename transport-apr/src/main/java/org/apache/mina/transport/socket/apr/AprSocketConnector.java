@@ -68,19 +68,23 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     private volatile ByteBuffer dummyBuffer;
 
     public AprSocketConnector() {
-        super(new DefaultSocketSessionConfig(false), AprIoProcessor.class);
+        super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
     
     public AprSocketConnector(int processorCount) {
-        super(new DefaultSocketSessionConfig(false), AprIoProcessor.class, processorCount);
+        super(new DefaultSocketSessionConfig(), AprIoProcessor.class, processorCount);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
     
     public AprSocketConnector(IoProcessor<AprSession> processor) {
-        super(new DefaultSocketSessionConfig(false), processor);
+        super(new DefaultSocketSessionConfig(), processor);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
     public AprSocketConnector(Executor executor, IoProcessor<AprSession> processor) {
-        super(new DefaultSocketSessionConfig(false), executor, processor);
+        super(new DefaultSocketSessionConfig(), executor, processor);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
     
     @Override

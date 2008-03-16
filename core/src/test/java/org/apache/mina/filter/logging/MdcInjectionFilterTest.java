@@ -171,6 +171,8 @@ public class MdcInjectionFilterTest extends TestCase {
         simpleIoHandler.messageSentLatch.await();
         simpleIoHandler.sessionIdleLatch.await();
         simpleIoHandler.sessionClosedLatch.await();
+        connector.dispose();
+        
         // make a copy to prevent ConcurrentModificationException
         List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
         // verify that all logging events have correct MDC
@@ -204,6 +206,7 @@ public class MdcInjectionFilterTest extends TestCase {
         simpleIoHandler.messageSentLatch.await();
         simpleIoHandler.sessionIdleLatch.await();
         simpleIoHandler.sessionClosedLatch.await();
+        connector.dispose();
 
         // make a copy to prevent ConcurrentModificationException
         List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
