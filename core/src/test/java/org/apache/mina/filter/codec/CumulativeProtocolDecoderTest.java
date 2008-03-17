@@ -107,6 +107,42 @@ public class CumulativeProtocolDecoderTest extends TestCase {
             // OK
         }
     }
+    
+    public void testBufferDerivation() throws Exception {
+        decoder = new DuplicatingIntegerDecoder();
+        
+        buf.putInt(1);
+        
+        // Put some extra byte to make the decoder create an internal buffer.
+        buf.put((byte) 0);
+        buf.flip();
+
+        decoder.decode(session, buf, session.getDecoderOutput());
+        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
+        Assert.assertEquals(1, session.getDecoderOutputQueue().poll());
+        Assert.assertEquals(buf.limit(), buf.position());
+
+        // Keep appending to the internal buffer.
+        // DuplicatingIntegerDecoder will keep duplicating the internal
+        // buffer to disable auto-expansion, and CumulativeProtocolDecoder
+        // should detect that user derived its internal buffer.
+        // Consequently, CumulativeProtocolDecoder will perform 
+        // reallocation to avoid putting incoming data into
+        // the internal buffer with auto-expansion disabled.
+        for (int i = 2; i < 10; i ++) {
+            buf.clear();
+            buf.putInt(i);
+            // Put some extra byte to make the decoder keep the internal buffer.
+            buf.put((byte) 0);
+            buf.flip();
+            buf.position(1);
+    
+            decoder.decode(session, buf, session.getDecoderOutput());
+            Assert.assertEquals(1, session.getDecoderOutputQueue().size());
+            Assert.assertEquals(i, session.getDecoderOutputQueue().poll());
+            Assert.assertEquals(buf.limit(), buf.position());
+        }
+    }
 
     private static class IntegerDecoder extends CumulativeProtocolDecoder {
 
@@ -124,11 +160,9 @@ public class CumulativeProtocolDecoderTest extends TestCase {
 
         public void dispose() throws Exception {
         }
-
     }
-
+    
     private static class WrongDecoder extends CumulativeProtocolDecoder {
-
         @Override
         protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
@@ -138,4 +172,18 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         public void dispose() throws Exception {
         }
     }
+
+    private static class DuplicatingIntegerDecoder extends IntegerDecoder {
+        @Override
+        protected boolean doDecode(IoSession session, IoBuffer in,
+                ProtocolDecoderOutput out) throws Exception {
+            in.duplicate(); // Will disable auto-expansion.
+            Assert.assertFalse(in.isAutoExpand());
+            return super.doDecode(session, in, out);
+        }
+
+        public void dispose() throws Exception {
+        }
+    }
+
 }

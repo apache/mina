@@ -23,7 +23,6 @@ import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.UnderivableBuffer;
 
 /**
  * A {@link ProtocolDecoder} that cumulates the content of received
@@ -133,8 +132,37 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         // If we have a session buffer, append data to that; otherwise
         // use the buffer read from the network directly.
         if (buf != null) {
-            buf.put(in);
-            buf.flip();
+            boolean appended = false;
+            // Make sure that the buffer is auto-expanded.
+            if (buf.isAutoExpand()) {
+                try {
+                    buf.put(in);
+                    appended = true;
+                } catch (IllegalStateException e) {
+                    // A user called derivation method (e.g. slice()),
+                    // which disables auto-expansion of the parent buffer.
+                } catch (IndexOutOfBoundsException e) {
+                    // A user disabled auto-expansion.
+                }
+            }
+
+            if (appended) {
+                buf.flip();
+            } else {
+                // Reallocate the buffer if append operation failed due to
+                // derivation or disabled auto-expansion.
+                buf.flip();
+                IoBuffer newBuf = IoBuffer.allocate(
+                        buf.remaining() + in.remaining()).setAutoExpand(true);
+                newBuf.order(buf.order());
+                newBuf.put(buf);
+                newBuf.put(in);
+                newBuf.flip();
+                buf = newBuf;
+                
+                // Update the session attribute.
+                session.setAttribute(BUFFER, buf);
+            }
         } else {
             buf = in;
             usingSessionBuffer = false;
@@ -202,8 +230,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     }
 
     private void storeRemainingInSession(IoBuffer buf, IoSession session) {
-        final IoBuffer remainingBuf = new UnderivableBuffer(
-                IoBuffer.allocate(buf.capacity()).setAutoExpand(true));
+        final IoBuffer remainingBuf = IoBuffer.allocate(buf.capacity()).setAutoExpand(true);
         
         remainingBuf.order(buf.order());
         remainingBuf.put(buf);
