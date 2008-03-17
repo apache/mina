@@ -530,29 +530,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    protected final void increaseWrittenBytesAndMessages(
-            WriteRequest request, long currentTime) {
-        
-        Object message = request.getMessage();
-        if (message instanceof IoBuffer) {
-            IoBuffer b = (IoBuffer) message;
-            if (b.hasRemaining()) {
-                increaseWrittenBytes(((IoBuffer) message).remaining(), currentTime);
-            } else {
-                increaseWrittenMessages(currentTime);
-            }
-        } else if (message instanceof FileRegion) {
-            FileRegion region = (FileRegion) message;
-            if (region.getRemainingBytes() == 0) {
-                increaseWrittenBytes(region.getWrittenBytes(), currentTime);
-                increaseWrittenMessages(currentTime);
-            }
-        } else {
-            increaseWrittenMessages(currentTime);
-        }
-    }
-    
-    private void increaseWrittenBytes(long increment, long currentTime) {
+    protected final void increaseWrittenBytes(long increment, long currentTime) {
         if (increment <= 0) {
             return;
         }
@@ -569,7 +547,16 @@ public abstract class AbstractIoSession implements IoSession {
         increaseScheduledWriteBytes(-increment);
     }
 
-    private void increaseWrittenMessages(long currentTime) {
+    protected final void increaseWrittenMessages(
+            WriteRequest request, long currentTime) {
+        Object message = request.getMessage();
+        if (message instanceof IoBuffer) {
+            IoBuffer b = (IoBuffer) message;
+            if (b.hasRemaining()) {
+                return;
+            }
+        }
+
         writtenMessages++;
         lastWriteTime = currentTime;
         if (getService() instanceof AbstractIoService) {

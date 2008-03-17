@@ -410,7 +410,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public void fireMessageSent(WriteRequest request) {
-        session.increaseWrittenBytesAndMessages(request, System.currentTimeMillis());
+        session.increaseWrittenMessages(request, System.currentTimeMillis());
 
         try {
             request.getFuture().setWritten();
@@ -421,7 +421,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         Entry head = this.head;
         callNextMessageSent(head, session, request);
     }
-
+    
     private void callNextMessageSent(Entry entry, IoSession session,
             WriteRequest writeRequest) {
         try {

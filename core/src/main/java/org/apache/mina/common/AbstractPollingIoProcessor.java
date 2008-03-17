@@ -203,7 +203,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         if (Thread.currentThread() == workerThread) {
             // Bypass the queue if called from the worker thread itself
             // (i.e. single thread model).
-            flushNow(session);
+            flushNow(session, System.currentTimeMillis());
         } else {
             boolean needsWakeup = flushingSessions.isEmpty();
             if (scheduleFlush(session) && needsWakeup) {
@@ -451,16 +451,15 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         }
     }
 
-    private void notifyIdleSessions() throws Exception {
+    private void notifyIdleSessions(long currentTime) throws Exception {
         // process idle sessions
-        long currentTime = System.currentTimeMillis();
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
             IdleStatusChecker.notifyIdleness(allSessions(), currentTime);
         }
     }
 
-    private void flush() {
+    private void flush(long currentTime) {
         for (; ;) {
             T session = flushingSessions.poll();
 
@@ -473,7 +472,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             switch (state) {
             case OPEN:
                 try {
-                    boolean flushedAll = flushNow(session);
+                    boolean flushedAll = flushNow(session, currentTime);
                     if (flushedAll && !session.getWriteRequestQueue().isEmpty(session) &&
                         !session.isScheduledForFlush()) {
                         scheduleFlush(session);
@@ -497,7 +496,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         }
     }
 
-    private boolean flushNow(T session) {
+    private boolean flushNow(T session, long currentTime) {
         if (!session.isConnected()) {
             scheduleRemove(session);
             return false;
@@ -506,18 +505,17 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         final boolean hasFragmentation = 
             session.getTransportMetadata().hasFragmentation();
 
+        final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+        
+        // Set limitation for the number of written bytes for read-write
+        // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
+        // performance in my experience while not breaking fairness much.
+        final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize() +
+                              (session.getConfig().getMaxReadBufferSize() >>> 1);
+        int writtenBytes = 0;
         try {
             // Clear OP_WRITE
             setInterestedInWrite(session, false);
-    
-            WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
-    
-            // Set limitation for the number of written bytes for read-write
-            // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
-            // performance in my experience while not breaking fairness much.
-            int maxWrittenBytes = session.getConfig().getMaxReadBufferSize() +
-                                  (session.getConfig().getMaxReadBufferSize() >>> 1);
-            int writtenBytes = 0;
             do {
                 // Check for pending writes.
                 WriteRequest req = session.getCurrentWriteRequest();
@@ -540,7 +538,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                             session, req, hasFragmentation,
                             maxWrittenBytes - writtenBytes);
                 } else {
-                	throw new IllegalStateException("Don't know how to handle message of type '" + message.getClass().getName() + "'.  Are you missing a protocol encoder?");
+                    throw new IllegalStateException("Don't know how to handle message of type '" + message.getClass().getName() + "'.  Are you missing a protocol encoder?");
                 }
                 
                 writtenBytes += localWrittenBytes;
@@ -554,6 +552,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         } catch (Exception e) {
             session.getFilterChain().fireExceptionCaught(e);
             return false;
+        } finally {
+            session.increaseWrittenBytes(writtenBytes, currentTime);
         }
 
         return true;
@@ -686,9 +686,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                         process();
                     }
 
-                    flush();
+                    long currentTime = System.currentTimeMillis();
+                    flush(currentTime);
                     nSessions -= remove();
-                    notifyIdleSessions();
+                    notifyIdleSessions(currentTime);
 
                     if (nSessions == 0) {
                         synchronized (lock) {

@@ -303,10 +303,11 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                         processReadySessions(selectedHandles());
                     }
 
-                    flushSessions();
+                    long currentTime = System.currentTimeMillis();
+                    flushSessions(currentTime);
                     nHandles -= unregisterHandles();
 
-                    notifyIdleSessions();
+                    notifyIdleSessions(currentTime);
 
                     if (nHandles == 0) {
                         synchronized (lock) {
@@ -379,7 +380,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    private void flushSessions() {
+    private void flushSessions(long currentTime) {
         for (; ;) {
             T session = flushingSessions.poll();
             if (session == null) {
@@ -389,7 +390,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             session.setScheduledForFlush(false);
 
             try {
-                boolean flushedAll = flush(session);
+                boolean flushedAll = flush(session, currentTime);
                 if (flushedAll && !session.getWriteRequestQueue().isEmpty(session) &&
                     !session.isScheduledForFlush()) {
                     scheduleFlush(session);
@@ -400,55 +401,58 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    private boolean flush(T session) throws Exception {
+    private boolean flush(T session, long currentTime) throws Exception {
         // Clear OP_WRITE
         setInterestedInWrite(session, false);
         
-        WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
-
-        int maxWrittenBytes =
+        final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+        final int maxWrittenBytes =
             session.getConfig().getMaxReadBufferSize() +
             (session.getConfig().getMaxReadBufferSize() >>> 1);
 
         int writtenBytes = 0;
-        for (; ;) {
-            WriteRequest req = session.getCurrentWriteRequest();
-            if (req == null) {
-                req = writeRequestQueue.poll(session);
+        try {
+            for (; ;) {
+                WriteRequest req = session.getCurrentWriteRequest();
                 if (req == null) {
-                    break;
+                    req = writeRequestQueue.poll(session);
+                    if (req == null) {
+                        break;
+                    }
+                    session.setCurrentWriteRequest(req);
                 }
-                session.setCurrentWriteRequest(req);
+    
+                IoBuffer buf = (IoBuffer) req.getMessage();
+                if (buf.remaining() == 0) {
+                    // Clear and fire event
+                    session.setCurrentWriteRequest(null);
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(req);
+                    continue;
+                }
+    
+                SocketAddress destination = req.getDestination();
+                if (destination == null) {
+                    destination = session.getRemoteAddress();
+                }
+    
+                int localWrittenBytes = send(session, buf, destination);
+                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
+                    // Kernel buffer is full or wrote too much
+                    setInterestedInWrite(session, true);
+                    return false;
+                } else {
+                    setInterestedInWrite(session, false);
+    
+                    // Clear and fire event
+                    session.setCurrentWriteRequest(null);
+                    writtenBytes += localWrittenBytes;
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(req);
+                }
             }
-
-            IoBuffer buf = (IoBuffer) req.getMessage();
-            if (buf.remaining() == 0) {
-                // Clear and fire event
-                session.setCurrentWriteRequest(null);
-                buf.reset();
-                session.getFilterChain().fireMessageSent(req);
-                continue;
-            }
-
-            SocketAddress destination = req.getDestination();
-            if (destination == null) {
-                destination = session.getRemoteAddress();
-            }
-
-            int localWrittenBytes = send(session, buf, destination);
-            if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
-                // Kernel buffer is full or wrote too much
-                setInterestedInWrite(session, true);
-                return false;
-            } else {
-                setInterestedInWrite(session, false);
-
-                // Clear and fire event
-                session.setCurrentWriteRequest(null);
-                writtenBytes += localWrittenBytes;
-                buf.reset();
-                session.getFilterChain().fireMessageSent(req);
-            }
+        } finally {
+            session.increaseWrittenBytes(writtenBytes, currentTime);
         }
 
         return true;
@@ -524,9 +528,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         return nHandles;
     }
 
-    private void notifyIdleSessions() {
+    private void notifyIdleSessions(long currentTime) {
         // process idle sessions
-        long currentTime = System.currentTimeMillis();
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
             IdleStatusChecker.notifyIdleness(
