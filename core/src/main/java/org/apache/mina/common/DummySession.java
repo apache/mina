@@ -19,6 +19,7 @@
  */
 package org.apache.mina.common;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.List;
 import java.util.Set;
@@ -117,8 +118,19 @@ public class DummySession extends AbstractIoSession {
             }
 
             public void flush(IoSession session) {
-                getFilterChain().fireMessageSent(
-                        ((DummySession) session).getWriteRequestQueue().poll(session));
+                DummySession s = (DummySession) session;
+                WriteRequest req = s.getWriteRequestQueue().poll(session);
+                Object m = req.getMessage();
+                if (m instanceof FileRegion) {
+                    FileRegion file = (FileRegion) m;
+                    try {
+                        file.getFileChannel().position(file.getPosition() + file.getRemainingBytes());
+                        file.update(file.getRemainingBytes());
+                    } catch (IOException e) {
+                        s.getFilterChain().fireExceptionCaught(e);
+                    }
+                }
+                getFilterChain().fireMessageSent(req);
             }
 
             public void remove(IoSession session) {
