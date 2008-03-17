@@ -96,6 +96,17 @@ public class IoBufferTest extends TestCase {
         Assert.assertEquals(2, buf.position());
         Assert.assertEquals(4, buf.limit());
         Assert.assertEquals(4, buf.capacity());
+
+        // Make sure the buffer is doubled up.
+        buf = IoBuffer.allocate(1).setAutoExpand(true);
+        int lastCapacity = buf.capacity();
+        for (int i = 0; i < 1048576; i ++) {
+            buf.put((byte) 0);
+            if (lastCapacity != buf.capacity()) {
+                Assert.assertEquals(lastCapacity * 2, buf.capacity());
+                lastCapacity = buf.capacity();
+            }
+        }
     }
 
     public void testAutoExpandMark() throws Exception {

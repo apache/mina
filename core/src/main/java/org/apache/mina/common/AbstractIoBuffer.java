@@ -199,20 +199,34 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public final IoBuffer expand(int expectedRemaining) {
-        return expand(position(), expectedRemaining);
+        return expand(position(), expectedRemaining, false);
+    }
+    
+    private IoBuffer expand(int expectedRemaining, boolean autoExpand) {
+        return expand(position(), expectedRemaining, autoExpand);
     }
 
     @Override
     public final IoBuffer expand(int pos, int expectedRemaining) {
+        return expand(pos, expectedRemaining, false);
+    }
+    
+    private IoBuffer expand(int pos, int expectedRemaining, boolean autoExpand) {
         if (!recapacityAllowed) {
             throw new IllegalStateException(
                     "Derived buffers and their parent can't be expanded.");
         }
 
         int end = pos + expectedRemaining;
-        if (end > capacity()) {
+        int newCapacity;
+        if (autoExpand) {
+            newCapacity = IoBuffer.normalizeCapacity(end);
+        } else {
+            newCapacity = end;
+        }
+        if (newCapacity > capacity()) {
             // The buffer needs expansion.
-            capacity(end);
+            capacity(newCapacity);
         }
 
         if (end > limit()) {
@@ -2028,7 +2042,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     private IoBuffer autoExpand(int expectedRemaining) {
         if (isAutoExpand()) {
-            expand(expectedRemaining);
+            expand(expectedRemaining, true);
         }
         return this;
     }
@@ -2039,7 +2053,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     private IoBuffer autoExpand(int pos, int expectedRemaining) {
         if (isAutoExpand()) {
-            expand(pos, expectedRemaining);
+            expand(pos, expectedRemaining, true);
         }
         return this;
     }

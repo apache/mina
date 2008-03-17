@@ -464,7 +464,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      */
     public abstract IoBuffer sweep();
 
-    /**
+    /**double
      * Clears this buffer and fills its content with <tt>value</tt>.
      * The position is set to zero, the limit is set to the capacity,
      * and the mark is discarded.
