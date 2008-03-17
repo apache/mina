@@ -16,7 +16,6 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
 import org.apache.mina.util.AvailablePortFinder;
 
 public abstract class AbstractFileRegionTest extends TestCase {
