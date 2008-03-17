@@ -150,6 +150,10 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     public VmPipeAddress getServiceAddress() {
         return serviceAddress;
     }
+    
+    void increaseWrittenBytes0(long increment, long currentTime) {
+        super.increaseWrittenBytes(increment, currentTime);
+    }
 
     WriteRequestQueue getWriteRequestQueue0() {
         return super.getWriteRequestQueue();

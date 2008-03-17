@@ -180,9 +180,15 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                         return;
                     }
                     WriteRequest req;
+                    long currentTime = System.currentTimeMillis();
                     while ((req = queue.poll(session)) != null) {
+                        Object m = req.getMessage();
                         session.getRemoteSession().getFilterChain().fireMessageReceived(
-                                getMessageCopy(req.getMessage()));
+                                getMessageCopy(m));
+                        if (m instanceof IoBuffer) {
+                            session.increaseWrittenBytes0(
+                                    ((IoBuffer) m).remaining(), currentTime);
+                        }
                         session.getFilterChain().fireMessageSent(req);
                     }
                 } finally {

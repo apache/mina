@@ -204,6 +204,7 @@ public class VmPipeEventOrderTest extends TestCase {
 
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
         vmPipeAcceptor.unbind(vmPipeAddress);
+        Assert.assertEquals(1, connectFuture.getSession().getWrittenBytes());
         Assert.assertEquals("ABCD", stringBuffer.toString());
     }
 }
