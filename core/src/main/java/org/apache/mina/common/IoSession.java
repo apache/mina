@@ -424,6 +424,20 @@ public interface IoSession {
      * session.
      */
     long getScheduledWriteBytes();
+    
+    /**
+     * Returns the message which is being written by {@link IoService}.
+     * @return <tt>null</tt> if and if only no message is being written
+     */
+    Object getCurrentWriteMessage();
+
+    /**
+     * Returns the {@link WriteRequest} which is being processed by
+     * {@link IoService}.
+     * 
+     * @return <tt>null</tt> if and if only no message is being written
+     */
+    WriteRequest getCurrentWriteRequest();
 
     /**
      * Returns the time in millis when this session is created.

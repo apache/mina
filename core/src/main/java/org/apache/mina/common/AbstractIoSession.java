@@ -608,8 +608,16 @@ public abstract class AbstractIoSession implements IoSession {
         return writeRequestQueue;
     }
     
-    protected final WriteRequest getCurrentWriteRequest() {
+    public final WriteRequest getCurrentWriteRequest() {
         return currentWriteRequest;
+    }
+    
+    public final Object getCurrentWriteMessage() {
+        WriteRequest req = getCurrentWriteRequest();
+        if (req == null) {
+            return null;
+        }
+        return req.getMessage();
     }
     
     protected final void setCurrentWriteRequest(WriteRequest currentWriteRequest) {

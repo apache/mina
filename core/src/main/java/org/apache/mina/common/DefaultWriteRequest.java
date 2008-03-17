@@ -156,6 +156,10 @@ public class DefaultWriteRequest implements WriteRequest {
 
     @Override
     public String toString() {
-        return message.toString();
+        if (getDestination() == null) {
+            return message.toString();
+        } else {
+            return message.toString() + " => " + getDestination();
+        }
     }
 }
