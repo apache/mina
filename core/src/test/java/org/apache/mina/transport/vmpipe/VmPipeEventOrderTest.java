@@ -196,21 +196,12 @@ public class VmPipeEventOrderTest extends TestCase {
 
         final VmPipeConnector vmPipeConnector = new VmPipeConnector();
         vmPipeConnector.getFilterChain().addLast("executor", new ExecutorFilter());
-        vmPipeConnector.setHandler(new IoHandlerAdapter() {
-            @Override
-            public void sessionOpened(IoSession session) throws Exception {
-                session.write(IoBuffer.wrap(new byte[1]));
-            }
-        });
+        vmPipeConnector.setHandler(new IoHandlerAdapter());
         ConnectFuture connectFuture = vmPipeConnector.connect(vmPipeAddress);
         connectFuture.awaitUninterruptibly();
-        
-        // Wait until one byte is written.
-        while (connectFuture.getSession().getWrittenBytes() == 0) {
-            Thread.yield();
-        }
-        
-        connectFuture.getSession().close();
+        connectFuture.getSession().write(IoBuffer.wrap(new byte[1]));
+        connectFuture.getSession().closeOnFlush().awaitUninterruptibly();
+
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
         vmPipeAcceptor.unbind(vmPipeAddress);
         Assert.assertEquals("ABCD", stringBuffer.toString());
