@@ -124,9 +124,8 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * buf.putString( greeting, utf8encoder );
  * </pre>
  * NIO <tt>ByteBuffer</tt> is reallocated by MINA <tt>ByteBuffer</tt> behind
- * the scene if the encoded data is larger than 16 bytes.  Its capacity will
- * increase by two times, and its limit will increase to the last position
- * the string is written.
+ * the scene if the encoded data is larger than 16 bytes.  Its capacity and
+ * its limit will increase to the last position the string is written.
  * </p>
  *
  * <h2>Derived Buffers</h2>
