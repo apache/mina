@@ -137,7 +137,6 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
             return false;
         }
                 
-
         return super.isOperation(methodName, paramTypes);
     }
 }

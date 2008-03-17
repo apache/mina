@@ -96,7 +96,7 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
             return null;
         }
         
-        return super.invoke(name, params, signature);
+        return super.invoke0(name, params, signature);
     }
 
     private IoFilter getFilter(ObjectName filterRef) throws MBeanException {
