@@ -537,6 +537,15 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     localWrittenBytes = writeFile(
                             session, req, hasFragmentation,
                             maxWrittenBytes - writtenBytes);
+                    
+                    // Fix for Java bug on Linux http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
+                    // If there's still data to be written in the FileRegion, return 0 indicating that we need
+                    // to pause until writing may resume.
+                    if (localWrittenBytes > 0 && ((FileRegion) message).getRemainingBytes() > 0) {
+                        writtenBytes += localWrittenBytes;
+                        setInterestedInWrite(session, true);
+                        return false;
+                    }
                 } else {
                     throw new IllegalStateException("Don't know how to handle message of type '" + message.getClass().getName() + "'.  Are you missing a protocol encoder?");
                 }
@@ -600,13 +609,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
             localWrittenBytes = transferFile(session, region, length);
             region.update(localWrittenBytes);
-            
-            // Fix for Java bug on Linux http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
-            // If there's still data to be written in the FileRegion, return 0 indicating that we need
-            // to pause until writing may resume.
-            if (localWrittenBytes > 0 && region.getRemainingBytes() > 0) {
-                return 0;
-            }
         } else {
             localWrittenBytes = 0;
         }
