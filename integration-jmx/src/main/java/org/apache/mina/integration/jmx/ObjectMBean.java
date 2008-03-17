@@ -280,7 +280,8 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 }
                 
                 return convertValue(
-                        null, null, m.invoke(source, convertedParams), false);
+                        m.getReturnType(), "returnValue",
+                        m.invoke(source, convertedParams), false);
             }
             
             // No methods matched.
