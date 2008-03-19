@@ -41,8 +41,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class BlacklistFilter extends IoFilterAdapter {
-	private final List<InetAddress> blacklist = new CopyOnWriteArrayList<InetAddress>();
-    private final List<InetAddressRange> rangeBlacklist = new CopyOnWriteArrayList<InetAddressRange>();
+    private final List<Subnet> blacklist = new CopyOnWriteArrayList<Subnet>();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     /**
@@ -59,24 +58,24 @@ public class BlacklistFilter extends IoFilterAdapter {
         blacklist.clear();
         for (int i = 0; i < addresses.length; i++) {
             InetAddress addr = addresses[i];
-            block(addr, "addresses[" + i + ']');
+            block(addr);
         }
     }
 
     /**
-     * Sets the address ranges to be blacklisted.
+     * Sets the subnets to be blacklisted.
      *
-     * NOTE: this call will remove any previously blacklisted ranges.
+     * NOTE: this call will remove any previously blacklisted subnets.
      *
-     * @param ranges an array of address ranges to be blacklisted.
+     * @param subnets an array of subnets to be blacklisted.
      */
-    public void setRangeBlacklist(InetAddressRange[] ranges) {
-        if (ranges == null) {
-            throw new NullPointerException("Ranges must not be null");
+    public void setSubnetBlacklist(Subnet[] subnets) {
+        if (subnets == null) {
+            throw new NullPointerException("Subnets must not be null");
         }
-        rangeBlacklist.clear();
-        for (InetAddressRange range : ranges) {
-            block(range);
+        blacklist.clear();
+        for (Subnet subnet : subnets) {
+            block(subnet);
         }
     }
     
@@ -98,53 +97,47 @@ public class BlacklistFilter extends IoFilterAdapter {
         blacklist.clear();
         
         for( InetAddress address : addresses ){
-            block( address, address.getHostName() );
+            block(address);
         }
     }
 
     /**
-     * Sets the address ranges to be blacklisted.
+     * Sets the subnets to be blacklisted.
      *
-     * NOTE: this call will remove any previously blacklisted ranges.
+     * NOTE: this call will remove any previously blacklisted subnets.
      *
-     * @param ranges an array of address ranges to be blacklisted.
+     * @param subnets an array of subnets to be blacklisted.
      */
-    public void setRangeBlacklist(Iterable<InetAddressRange> ranges) {
-        if (ranges == null) {
-            throw new NullPointerException("Ranges must not be null");
+    public void setSubnetBlacklist(Iterable<Subnet> subnets) {
+        if (subnets == null) {
+            throw new NullPointerException("Subnets must not be null");
         }
-        rangeBlacklist.clear();
-        for (InetAddressRange range : ranges) {
-            block(range);
+        blacklist.clear();
+        for (Subnet subnet : subnets) {
+            block(subnet);
         }
-    }
-    
-    /**
-     * Blocks the specified endpoint.
-     */
-    public void block(InetAddress address, String error_string) {
-        if (address == null) {
-            throw new NullPointerException(error_string);
-        }
-        blacklist.add(address);
     }
 
     /**
      * Blocks the specified endpoint.
      */
     public void block(InetAddress address) {
-    	block(address, "address");
+    	if (address == null) {
+    		throw new NullPointerException("Adress to block can not be null");
+    	}
+
+    	block(new Subnet(address, 32));
     }
 
     /**
-     * Blocks the specified range.
+     * Blocks the specified subnet.
      */
-    public void block(InetAddressRange range) {
-    	if(range == null) {
-    		throw new NullPointerException("Range can not be null");
+    public void block(Subnet subnet) {
+    	if(subnet == null) {
+    		throw new NullPointerException("Subnet can not be null");
     	}
     	
-        rangeBlacklist.add(range);
+        blacklist.add(subnet);
     }
     
     /**
@@ -152,19 +145,20 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void unblock(InetAddress address) {
     	if (address == null) {
-    		throw new NullPointerException("address");
+    		throw new NullPointerException("Adress to unblock can not be null");
     	}
-    	blacklist.remove(address);
+    	
+    	unblock(new Subnet(address, 32));
     }
 
     /**
-     * Unblocks the specified range.
+     * Unblocks the specified subnet.
      */
-    public void unblock(InetAddressRange range) {
-        if (range == null) {
-            throw new NullPointerException("Range can not be null");
+    public void unblock(Subnet subnet) {
+        if (subnet == null) {
+            throw new NullPointerException("Subnet can not be null");
         }
-        rangeBlacklist.remove(range);
+        blacklist.remove(subnet);
     }
 
     @Override
@@ -241,13 +235,10 @@ public class BlacklistFilter extends IoFilterAdapter {
         SocketAddress remoteAddress = session.getRemoteAddress();
         if (remoteAddress instanceof InetSocketAddress) {
         	InetAddress address = ((InetSocketAddress) remoteAddress).getAddress(); 
-            if (blacklist.contains(address)) {
-                return true;
-            } 
             
-            // check all ranges
-            for(InetAddressRange range : rangeBlacklist) {
-            	if(range.contains(address)) {
+            // check all subnets
+            for(Subnet subnet : blacklist) {
+            	if(subnet.inSubnet(address)) {
             		return true;
             	}
             }
