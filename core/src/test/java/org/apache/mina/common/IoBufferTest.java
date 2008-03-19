@@ -127,14 +127,14 @@ public class IoBufferTest extends TestCase {
         buf.reset();
         Assert.assertEquals(3, buf.position());
     }
-    
+
     public void testAutoShrink() throws Exception {
         IoBuffer buf = IoBuffer.allocate(8).setAutoShrink(true);
-        
+
         // Make sure the buffer doesn't shrink too much (less than the initial
         // capacity.)
         buf.sweep((byte) 1);
-        buf.fill(7); 
+        buf.fill(7);
         buf.compact();
         Assert.assertEquals(8, buf.capacity());
         Assert.assertEquals(1, buf.position());
@@ -145,7 +145,7 @@ public class IoBufferTest extends TestCase {
         // Expand the buffer.
         buf.capacity(32).clear();
         Assert.assertEquals(32, buf.capacity());
-        
+
         // Make sure the buffer shrinks when only 1/4 is being used.
         buf.sweep((byte) 1);
         buf.fill(24);
@@ -161,7 +161,7 @@ public class IoBufferTest extends TestCase {
         // Expand the buffer.
         buf.capacity(32).clear();
         Assert.assertEquals(32, buf.capacity());
-        
+
         // Make sure the buffer shrinks when only 1/8 is being used.
         buf.sweep((byte) 1);
         buf.fill(28);
@@ -177,7 +177,7 @@ public class IoBufferTest extends TestCase {
         // Expand the buffer.
         buf.capacity(32).clear();
         Assert.assertEquals(32, buf.capacity());
-        
+
         // Make sure the buffer shrinks when 0 byte is being used.
         buf.fill(32);
         buf.compact();
@@ -188,7 +188,7 @@ public class IoBufferTest extends TestCase {
         // Expand the buffer.
         buf.capacity(32).clear();
         Assert.assertEquals(32, buf.capacity());
-        
+
         // Make sure the buffer doesn't shrink when more than 1/4 is being used.
         buf.sweep((byte) 1);
         buf.fill(23);
@@ -525,6 +525,7 @@ public class IoBufferTest extends TestCase {
                 for (int i = 0; i < 5; i++) {
                     try {
                         buffer.putString("\u89d2", encoder);
+                        buffer.putPrefixedString("\u89d2", encoder);
                     } catch (CharacterCodingException e) {
                         fail(e.getMessage());
                     }
