@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.apr;
 
@@ -39,17 +39,17 @@ import org.apache.tomcat.jni.Status;
 
 /**
  * The class in charge of processing socket level IO events for the {@link AprSocketConnector}
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 
 public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     private static final int POLLSET_SIZE = 1024;
-    
+
     private final Map<Long, AprSession> allSessions =
         new HashMap<Long, AprSession>(POLLSET_SIZE);
-    
+
     private final Object wakeupLock = new Object();
     private long wakeupSocket;
     private volatile boolean toBeWakenUp;
@@ -62,7 +62,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
 
     public AprIoProcessor(Executor executor) {
         super(executor);
-        
+
         try {
             wakeupSocket = Socket.create(
                     Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
@@ -77,7 +77,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
 
         // initialize a memory pool for APR functions
         bufferPool = Pool.create(AprLibrary.getInstance().getRootPool());
-        
+
         boolean success = false;
         long newPollset;
         try {
@@ -94,7 +94,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
                         Poll.APR_POLLSET_THREADSAFE,
                         Long.MAX_VALUE);
             }
-            
+
             pollset = newPollset;
             if (pollset < 0) {
                 if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
@@ -130,7 +130,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
             if (rv != -120001) {
                 throwException(rv);
             }
-            
+
             rv = Poll.maintain(pollset, polledSockets, true);
             if (rv > 0) {
                 for (int i = 0; i < rv; i ++) {
@@ -139,7 +139,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
                     if (session == null) {
                         continue;
                     }
-                    
+
                     int flag = (session.isInterestedInRead()? Poll.APR_POLLIN : 0) |
                                (session.isInterestedInWrite()? Poll.APR_POLLOUT : 0);
 
@@ -169,15 +169,20 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
                 if (session == null) {
                     continue;
                 }
-                
+
                 session.setReadable((flag & Poll.APR_POLLIN) != 0);
                 session.setWritable((flag & Poll.APR_POLLOUT) != 0);
-                
+
                 polledSessions.add(session);
             }
-            
+
             return !polledSessions.isEmpty();
         }
+    }
+
+    @Override
+    protected boolean isSelectorEmpty() {
+        return allSessions.isEmpty();
     }
 
     @Override
@@ -185,7 +190,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         if (toBeWakenUp) {
             return;
         }
-        
+
         // Add a dummy socket to the pollset.
         synchronized (wakeupLock) {
             toBeWakenUp = true;
@@ -208,12 +213,12 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         long s = session.getDescriptor();
         Socket.optSet(s, Socket.APR_SO_NONBLOCK, 1);
         Socket.timeoutSet(s, 0);
-        
+
         int rv = Poll.add(pollset, s, Poll.APR_POLLIN);
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
         }
-        
+
         session.setInterestedInRead(true);
         allSessions.put(s, session);
     }
@@ -342,7 +347,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
                 buf.skip(writtenBytes);
             }
         }
-        
+
         if (writtenBytes < 0) {
             if (Status.APR_STATUS_IS_EAGAIN(-writtenBytes)) {
                 writtenBytes = 0;

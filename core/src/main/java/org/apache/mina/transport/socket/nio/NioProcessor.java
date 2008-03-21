@@ -47,7 +47,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             throw new RuntimeIoException("Failed to open a selector.", e);
         }
     }
-    
+
     private final Selector selector;
 
     public NioProcessor(Executor executor) {
@@ -63,6 +63,11 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     @Override
     protected boolean select(int timeout) throws Exception {
         return selector.select(timeout) > 0;
+    }
+
+    @Override
+    protected boolean isSelectorEmpty() {
+        return selector.keys().isEmpty();
     }
 
     @Override
@@ -198,7 +203,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     protected static class IoSessionIterator implements Iterator<NioSession> {
         private final Iterator<SelectionKey> i;
         private IoSessionIterator(Set<SelectionKey> keys) {
-            i = keys.iterator(); 
+            i = keys.iterator();
         }
         public boolean hasNext() {
             return i.hasNext();

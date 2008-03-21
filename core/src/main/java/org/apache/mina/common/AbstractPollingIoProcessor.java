@@ -48,10 +48,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * It improves memory utilization and write throughput significantly.
      */
     private static final int WRITE_SPIN_COUNT = 256;
-    
+
     private static final Map<Class<?>, AtomicInteger> threadIds =
         new CopyOnWriteMap<Class<?>, AtomicInteger>();
-    
+
     private final Object lock = new Object();
     private final String threadName;
     private final Executor executor;
@@ -74,11 +74,11 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         if (executor == null) {
             throw new NullPointerException("executor");
         }
-        
+
         this.threadName = nextThreadName();
         this.executor = executor;
     }
-    
+
     private String nextThreadName() {
         Class<?> cls = getClass();
         AtomicInteger threadId = threadIds.get(cls);
@@ -89,18 +89,18 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         } else {
             newThreadId = threadId.incrementAndGet();
         }
-        
+
         return cls.getSimpleName() + '-' + newThreadId;
     }
-    
+
     public final boolean isDisposing() {
         return disposing;
     }
-    
+
     public final boolean isDisposed() {
         return disposed;
     }
-    
+
     public final void dispose() {
         if (disposed) {
             return;
@@ -112,11 +112,11 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 startupWorker();
             }
         }
-        
+
         disposalFuture.awaitUninterruptibly();
         disposed = true;
     }
-    
+
     protected abstract void dispose0() throws Exception;
 
     /**
@@ -126,6 +126,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean select(int timeout) throws Exception;
+    protected abstract boolean isSelectorEmpty();
     protected abstract void wakeup();
     protected abstract Iterator<T> allSessions();
     protected abstract Iterator<T> selectedSessions();
@@ -248,7 +249,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 break;
             }
 
-            
+
             if (addNow(session)) {
                 addedSessions ++;
             }
@@ -344,14 +345,14 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     private void clearWriteRequestQueue(T session) {
         WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
         WriteRequest req;
-        
+
         List<WriteRequest> failedRequests = new ArrayList<WriteRequest>();
-    
+
         if ((req = writeRequestQueue.poll(session)) != null) {
             Object m = req.getMessage();
             if (m instanceof IoBuffer) {
                 IoBuffer buf = (IoBuffer) req.getMessage();
-    
+
                 // The first unwritten empty buffer must be
                 // forwarded to the filter chain.
                 if (buf.hasRemaining()) {
@@ -363,13 +364,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             } else {
                 failedRequests.add(req);
             }
-    
+
             // Discard others.
             while ((req = writeRequestQueue.poll(session)) != null) {
                 failedRequests.add(req);
             }
         }
-        
+
         // Create an exception and notify.
         if (!failedRequests.isEmpty()) {
             WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
@@ -501,12 +502,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             scheduleRemove(session);
             return false;
         }
-        
-        final boolean hasFragmentation = 
+
+        final boolean hasFragmentation =
             session.getTransportMetadata().hasFragmentation();
 
         final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
-        
+
         // Set limitation for the number of written bytes for read-write
         // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
         // performance in my experience while not breaking fairness much.
@@ -526,7 +527,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     }
                     session.setCurrentWriteRequest(req);
                 }
-    
+
                 int localWrittenBytes = 0;
                 Object message = req.getMessage();
                 if (message instanceof IoBuffer) {
@@ -537,7 +538,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     localWrittenBytes = writeFile(
                             session, req, hasFragmentation,
                             maxWrittenBytes - writtenBytes);
-                    
+
                     // Fix for Java bug on Linux http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
                     // If there's still data to be written in the FileRegion, return 0 indicating that we need
                     // to pause until writing may resume.
@@ -549,9 +550,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 } else {
                     throw new IllegalStateException("Don't know how to handle message of type '" + message.getClass().getName() + "'.  Are you missing a protocol encoder?");
                 }
-                
+
                 writtenBytes += localWrittenBytes;
-    
+
                 if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much.
                     setInterestedInWrite(session, true);
@@ -695,13 +696,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
                     if (nSessions == 0) {
                         synchronized (lock) {
-                            if (newSessions.isEmpty()) {
+                            if (newSessions.isEmpty() && isSelectorEmpty()) {
                                 worker = null;
                                 break;
                             }
                         }
                     }
-                    
+
                     // Disconnect all sessions immediately if disposal has been
                     // requested so that we exit this loop eventually.
                     if (isDisposing()) {
@@ -720,7 +721,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     }
                 }
             }
-            
+
             workerThread = null;
             if (isDisposing()) {
                 try {
