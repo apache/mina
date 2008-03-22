@@ -137,12 +137,11 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
 
     @Override
     protected void init() throws Exception {
-        wakeupSocket = Socket.create(
-                Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
-                .getInstance().getRootPool());
-
         // initialize a memory pool for APR functions
         pool = Pool.create(AprLibrary.getInstance().getRootPool());
+
+        wakeupSocket = Socket.create(
+                Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
 
         pollset = Poll.create(
                         POLLSET_SIZE,
