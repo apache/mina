@@ -62,11 +62,11 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
     private AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor, boolean createdProcessor) {
         super(sessionConfig, executor);
-        
+
         if (processor == null) {
             throw new NullPointerException("processor");
         }
-        
+
         this.processor = processor;
         this.createdProcessor = createdProcessor;
 
@@ -292,7 +292,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     }
                 }
             }
-            
+
             if (selectable && isDisposing()) {
                 selectable = false;
                 try {
@@ -301,7 +301,11 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     }
                 } finally {
                     try {
-                        destroy();
+                        synchronized (disposalLock) {
+                            if (isDisposing()) {
+                                destroy();
+                            }
+                        }
                     } catch (Exception e) {
                         ExceptionMonitor.getInstance().exceptionCaught(e);
                     } finally {
@@ -339,7 +343,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         public IoSessionInitializer<? extends ConnectFuture> getSessionInitializer() {
             return sessionInitializer;
         }
-        
+
         @Override
         public void cancel() {
             super.cancel();
