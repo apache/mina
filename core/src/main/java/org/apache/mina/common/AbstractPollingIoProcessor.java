@@ -725,14 +725,16 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
 
             workerThread = null;
-            if (isDisposing()) {
-                try {
-                    dispose0();
-                } catch (Throwable t) {
-                    ExceptionMonitor.getInstance().exceptionCaught(t);
-                } finally {
-                    disposalFuture.setValue(true);
+            try {
+                synchronized (disposalLock) {
+                    if (isDisposing()) {
+                        dispose0();
+                    }
                 }
+            } catch (Throwable t) {
+                ExceptionMonitor.getInstance().exceptionCaught(t);
+            } finally {
+                disposalFuture.setValue(true);
             }
         }
     }
