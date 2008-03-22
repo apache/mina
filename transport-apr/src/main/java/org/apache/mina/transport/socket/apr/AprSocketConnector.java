@@ -197,7 +197,14 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
                 Socket.APR_INET, Socket.SOCK_STREAM, Socket.APR_PROTO_TCP, pool);
         boolean success = false;
         try {
-            Socket.optSet(handle, Socket.APR_SO_REUSEADDR, 1);
+            int result = Socket.optSet(handle, Socket.APR_SO_NONBLOCK, 1);
+            if (result != Status.APR_SUCCESS) {
+                throwException(result);
+            }
+            result = Socket.timeoutSet(handle, 0);
+            if (result != Status.APR_SUCCESS) {
+                throwException(result);
+            }
 
             if (localAddress != null) {
                 InetSocketAddress la = (InetSocketAddress) localAddress;
@@ -212,13 +219,12 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
                     sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, 0, 0, pool);
                 }
 
-                int result = Socket.bind(handle, sa);
+                result = Socket.bind(handle, sa);
                 if (result != Status.APR_SUCCESS) {
                     throwException(result);
                 }
             }
 
-            Socket.optSet(handle, Socket.APR_SO_NONBLOCK, 1);
             success = true;
             return handle;
         } finally {

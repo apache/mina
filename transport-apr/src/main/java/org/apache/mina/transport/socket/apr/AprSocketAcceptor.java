@@ -82,12 +82,24 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
 
         boolean success = false;
         try {
-            Socket.optSet(handle, Socket.APR_SO_NONBLOCK, 1);
-            Socket.timeoutSet(handle, 0);
+            int result = Socket.optSet(handle, Socket.APR_SO_NONBLOCK, 1);
+            if (result != Status.APR_SUCCESS) {
+                throwException(result);
+            }
+            result = Socket.timeoutSet(handle, 0);
+            if (result != Status.APR_SUCCESS) {
+                throwException(result);
+            }
 
             // Configure the server socket,
-            Socket.optSet(handle, Socket.APR_SO_REUSEADDR, isReuseAddress()? 1 : 0);
-            Socket.optSet(handle, Socket.APR_SO_RCVBUF, getSessionConfig().getReceiveBufferSize());
+            result = Socket.optSet(handle, Socket.APR_SO_REUSEADDR, isReuseAddress()? 1 : 0);
+            if (result != Status.APR_SUCCESS) {
+                throwException(result);
+            }
+            result = Socket.optSet(handle, Socket.APR_SO_RCVBUF, getSessionConfig().getReceiveBufferSize());
+            if (result != Status.APR_SUCCESS) {
+                throwException(result);
+            }
 
             // and bind.
             long sa;
@@ -101,7 +113,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
                 sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, 0, 0, pool);
             }
 
-            int result = Socket.bind(handle, sa);
+            result = Socket.bind(handle, sa);
             if (result != Status.APR_SUCCESS) {
                 throwException(result);
             }
