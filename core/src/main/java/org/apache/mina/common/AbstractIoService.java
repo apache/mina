@@ -50,7 +50,7 @@ public abstract class AbstractIoService implements IoService {
                 s.setLastReadTime(s.getActivationTime());
                 s.setLastWriteTime(s.getActivationTime());
                 s.lastThroughputCalculationTime = s.getActivationTime();
-                
+
                 // Start idleness notification.
                 idleStatusChecker.addService(s);
             }
@@ -63,7 +63,7 @@ public abstract class AbstractIoService implements IoService {
             public void sessionCreated(IoSession session) {}
             public void sessionDestroyed(IoSession session) {}
     };
-    
+
     /**
      * Current filter chain builder.
      */
@@ -73,7 +73,7 @@ public abstract class AbstractIoService implements IoService {
      * Current handler.
      */
     private IoHandler handler;
-    
+
     private IoSessionDataStructureFactory sessionDataStructureFactory =
         new DefaultIoSessionDataStructureFactory();
 
@@ -85,7 +85,12 @@ public abstract class AbstractIoService implements IoService {
     private final Executor executor;
     private final String threadName;
     private final boolean createdExecutor;
-    private final Object disposalLock = new Object();
+
+    /**
+     * A lock object which must be acquired when related resources are
+     * destroyed.
+     */
+    protected final Object disposalLock = new Object();
     private volatile boolean disposing;
     private volatile boolean disposed;
     private IoFuture disposalFuture;
@@ -96,7 +101,7 @@ public abstract class AbstractIoService implements IoService {
     private final AtomicLong writtenMessages = new AtomicLong();
     private long lastReadTime;
     private long lastWriteTime;
-    
+
     private final AtomicLong scheduledWriteBytes = new AtomicLong();
     private final AtomicLong scheduledWriteMessages = new AtomicLong();
 
@@ -130,11 +135,11 @@ public abstract class AbstractIoService implements IoService {
     private long lastIdleTimeForBoth;
     private long lastIdleTimeForRead;
     private long lastIdleTimeForWrite;
-    
+
     /**
      * The default {@link IoSessionConfig} which will be used to configure new sessions.
      */
-    private IoSessionConfig sessionConfig;
+    private final IoSessionConfig sessionConfig;
 
     protected AbstractIoService(IoSessionConfig sessionConfig, Executor executor) {
         if (sessionConfig == null) {
@@ -151,11 +156,11 @@ public abstract class AbstractIoService implements IoService {
         this.listeners = new IoServiceListenerSupport(this);
         this.listeners.add(serviceActivationListener);
         this.sessionConfig = sessionConfig;
-        
+
         // Make JVM load the exception monitor before some transports
         // change the thread context class loader.
         ExceptionMonitor.getInstance();
-        
+
         if (executor == null) {
             this.executor = Executors.newCachedThreadPool();
             this.createdExecutor = true;
@@ -163,9 +168,9 @@ public abstract class AbstractIoService implements IoService {
             this.executor = executor;
             this.createdExecutor = false;
         }
-        
+
         this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
-        
+
         executeWorker(idleStatusChecker.getNotifyingTask(), "idleStatusChecker");
     }
 
@@ -200,15 +205,15 @@ public abstract class AbstractIoService implements IoService {
     public final boolean isActive() {
         return listeners.isActive();
     }
-    
+
     public final boolean isDisposing() {
         return disposing;
     }
-    
+
     public final boolean isDisposed() {
         return disposed;
     }
-    
+
     public final void dispose() {
         if (disposed) {
             return;
@@ -230,7 +235,7 @@ public abstract class AbstractIoService implements IoService {
                 }
             }
         }
-        
+
         idleStatusChecker.getNotifyingTask().cancel();
         if (disposalFuture != null) {
             disposalFuture.awaitUninterruptibly();
@@ -249,7 +254,7 @@ public abstract class AbstractIoService implements IoService {
 
         disposed = true;
     }
-    
+
     /**
      * Implement this method to release any acquired resources.  This method
      * is invoked only once by {@link #dispose()}.
@@ -343,11 +348,11 @@ public abstract class AbstractIoService implements IoService {
 
         this.throughputCalculationInterval = throughputCalculationInterval;
     }
-    
+
     public final long getThroughputCalculationIntervalInMillis() {
         return throughputCalculationInterval * 1000L;
     }
-    
+
     public final double getReadBytesThroughput() {
         resetThroughput();
         return readBytesThroughput;
@@ -367,23 +372,23 @@ public abstract class AbstractIoService implements IoService {
         resetThroughput();
         return writtenMessagesThroughput;
     }
-    
+
     public final double getLargestReadBytesThroughput() {
         return largestReadBytesThroughput;
     }
-    
+
     public final double getLargestWrittenBytesThroughput() {
         return largestWrittenBytesThroughput;
     }
-    
+
     public final double getLargestReadMessagesThroughput() {
         return largestReadMessagesThroughput;
     }
-    
+
     public final double getLargestWrittenMessagesThroughput() {
         return largestWrittenMessagesThroughput;
     }
-    
+
     private void resetThroughput() {
         if (getManagedSessionCount() == 0) {
             readBytesThroughput = 0;
@@ -400,17 +405,17 @@ public abstract class AbstractIoService implements IoService {
             if (minInterval == 0 || interval < minInterval) {
                 return;
             }
-            
+
             long readBytes = this.readBytes.get();
             long writtenBytes = this.writtenBytes.get();
             long readMessages = this.readMessages.get();
             long writtenMessages = this.writtenMessages.get();
-            
+
             readBytesThroughput = (readBytes - lastReadBytes) * 1000.0 / interval;
             writtenBytesThroughput = (writtenBytes - lastWrittenBytes) * 1000.0 / interval;
             readMessagesThroughput = (readMessages - lastReadMessages) * 1000.0 / interval;
             writtenMessagesThroughput = (writtenMessages - lastWrittenMessages) * 1000.0 / interval;
-            
+
             if (readBytesThroughput > largestReadBytesThroughput) {
                 largestReadBytesThroughput = readBytesThroughput;
             }
@@ -423,16 +428,16 @@ public abstract class AbstractIoService implements IoService {
             if (writtenMessagesThroughput > largestWrittenMessagesThroughput) {
                 largestWrittenMessagesThroughput = writtenMessagesThroughput;
             }
-           
+
             lastReadBytes = readBytes;
             lastWrittenBytes = writtenBytes;
             lastReadMessages = readMessages;
             lastWrittenMessages = writtenMessages;
-            
+
             lastThroughputCalculationTime = currentTime;
         }
     }
-    
+
     public final long getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
@@ -472,7 +477,7 @@ public abstract class AbstractIoService implements IoService {
     public final long getLastWriteTime() {
         return lastWriteTime;
     }
-    
+
     protected final void setLastWriteTime(long lastWriteTime) {
         this.lastWriteTime = lastWriteTime;
     }
@@ -523,7 +528,7 @@ public abstract class AbstractIoService implements IoService {
         if (idleTime < 0) {
             throw new IllegalArgumentException("Illegal idle time: " + idleTime);
         }
-        
+
         if (status == IdleStatus.BOTH_IDLE) {
             idleTimeForBoth = idleTime;
         } else if (status == IdleStatus.READER_IDLE) {
@@ -533,7 +538,7 @@ public abstract class AbstractIoService implements IoService {
         } else {
             throw new IllegalArgumentException("Unknown idle status: " + status);
         }
-        
+
         if (idleTime == 0) {
             if (status == IdleStatus.BOTH_IDLE) {
                 idleCountForBoth = 0;
@@ -607,10 +612,10 @@ public abstract class AbstractIoService implements IoService {
             throw new IllegalArgumentException("Unknown idle status: " + status);
         }
     }
-    
+
     protected final void notifyIdleness(long currentTime) {
         updateThroughput(currentTime);
-        
+
         synchronized (idlenessCheckLock) {
             notifyIdleness(
                     currentTime,
@@ -618,14 +623,14 @@ public abstract class AbstractIoService implements IoService {
                     IdleStatus.BOTH_IDLE, Math.max(
                             getLastIoTime(),
                             getLastIdleTime(IdleStatus.BOTH_IDLE)));
-            
+
             notifyIdleness(
                     currentTime,
                     getIdleTimeInMillis(IdleStatus.READER_IDLE),
                     IdleStatus.READER_IDLE, Math.max(
                             getLastReadTime(),
                             getLastIdleTime(IdleStatus.READER_IDLE)));
-            
+
             notifyIdleness(
                     currentTime,
                     getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
@@ -634,7 +639,7 @@ public abstract class AbstractIoService implements IoService {
                             getLastIdleTime(IdleStatus.WRITER_IDLE)));
         }
     }
-    
+
     private void notifyIdleness(
             long currentTime, long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
@@ -667,7 +672,7 @@ public abstract class AbstractIoService implements IoService {
     public final int getWriterIdleCount() {
         return getIdleCount(IdleStatus.WRITER_IDLE);
     }
-    
+
     public final int getBothIdleTime() {
         return getIdleTime(IdleStatus.BOTH_IDLE);
     }
@@ -717,7 +722,7 @@ public abstract class AbstractIoService implements IoService {
     }
 
     public final Set<WriteFuture> broadcast(Object message) {
-        // Convert to Set.  We do not return a List here because only the 
+        // Convert to Set.  We do not return a List here because only the
         // direct caller of MessageBroadcaster knows the order of write
         // operations.
         final List<WriteFuture> futures = IoUtil.broadcast(
@@ -734,19 +739,19 @@ public abstract class AbstractIoService implements IoService {
             }
         };
     }
-    
+
     protected final IoServiceListenerSupport getListeners() {
         return listeners;
     }
-    
+
     protected final IdleStatusChecker getIdleStatusChecker() {
         return idleStatusChecker;
     }
-    
+
     protected final void executeWorker(Runnable worker) {
         executeWorker(worker, null);
     }
-    
+
     protected final void executeWorker(Runnable worker, String suffix) {
         String actualThreadName = threadName;
         if (suffix != null) {
@@ -754,7 +759,7 @@ public abstract class AbstractIoService implements IoService {
         }
         executor.execute(new NamePreservingRunnable(worker, actualThreadName));
     }
-    
+
     // TODO Figure out make it work without causing a compiler error / warning.
     @SuppressWarnings("unchecked")
     protected final void finishSessionInitialization(
@@ -795,14 +800,14 @@ public abstract class AbstractIoService implements IoService {
             // DefaultIoFilterChain will notify the future. (We support ConnectFuture only for now).
             session.setAttribute(DefaultIoFilterChain.SESSION_CREATED_FUTURE, future);
         }
-        
+
         if (sessionInitializer != null) {
             sessionInitializer.initializeSession(session, future);
         }
-        
+
         finishSessionInitialization0(session, future);
     }
-    
+
     /**
      * Implement this method to perform additional tasks required for session
      * initialization. Do not call this method directly;

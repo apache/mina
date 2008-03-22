@@ -50,7 +50,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     private final Map<SocketAddress, H> boundHandles =
         Collections.synchronizedMap(new HashMap<SocketAddress, H>());
-    
+
     private final ServiceOperationFuture disposalFuture =
         new ServiceOperationFuture();
     private volatile boolean selectable;
@@ -66,7 +66,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<T>> processorClass, int processorCount) {
         this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass, processorCount), true);
     }
-    
+
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, IoProcessor<T> processor) {
         this(sessionConfig, null, processor, false);
     }
@@ -77,14 +77,14 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor, boolean createdProcessor) {
         super(sessionConfig, executor);
-        
+
         if (processor == null) {
             throw new NullPointerException("processor");
         }
-        
+
         this.processor = processor;
         this.createdProcessor = createdProcessor;
-        
+
         try {
             init();
             selectable = true;
@@ -196,7 +196,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     private class Worker implements Runnable {
         public void run() {
             int nHandles = 0;
-            
+
             while (selectable) {
                 try {
                     // gets the number of keys that are ready to go
@@ -233,7 +233,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                     }
                 }
             }
-            
+
             if (selectable && isDisposing()) {
                 selectable = false;
                 try {
@@ -242,7 +242,11 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                     }
                 } finally {
                     try {
-                        destroy();
+                        synchronized (disposalLock) {
+                            if (isDisposing()) {
+                                destroy();
+                            }
+                        }
                     } catch (Exception e) {
                         ExceptionMonitor.getInstance().exceptionCaught(e);
                     } finally {
@@ -271,7 +275,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 if (session == null) {
                     break;
                 }
-                
+
                 finishSessionInitialization(session, null, null);
 
                 // add the session to the SocketIoProcessor
@@ -295,16 +299,16 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             if (future == null) {
                 break;
             }
-            
+
             Map<SocketAddress, H> newHandles = new HashMap<SocketAddress, H>();
             List<SocketAddress> localAddresses = future.getLocalAddresses();
-            
+
             try {
                 for (SocketAddress a: localAddresses) {
                     H handle = open(a);
                     newHandles.put(localAddress(handle), handle);
                 }
-                
+
                 boundHandles.putAll(newHandles);
 
                 // and notify.
@@ -326,7 +330,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 }
             }
         }
-        
+
         return 0;
     }
 
@@ -343,7 +347,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             if (future == null) {
                 break;
             }
-            
+
             // close the channels
             for (SocketAddress a: future.getLocalAddresses()) {
                 H handle = boundHandles.remove(a);
@@ -360,10 +364,10 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                     cancelledHandles ++;
                 }
             }
-            
+
             future.setDone();
         }
-        
+
         return cancelledHandles;
     }
 
