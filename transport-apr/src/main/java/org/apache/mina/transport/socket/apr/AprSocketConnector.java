@@ -89,12 +89,12 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
 
     @Override
     protected void init() throws Exception {
-        wakeupSocket = Socket.create(
-                Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
-                .getInstance().getRootPool());
-
         // initialize a memory pool for APR functions
         pool = Pool.create(AprLibrary.getInstance().getRootPool());
+
+        wakeupSocket = Socket.create(
+                Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
+
         dummyBuffer = Pool.alloc(pool, 1);
 
         pollset = Poll.create(
