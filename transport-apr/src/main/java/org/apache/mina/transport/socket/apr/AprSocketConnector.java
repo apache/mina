@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.apr;
 
@@ -55,9 +55,9 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
 
     private final Map<Long, ConnectionRequest> requests =
         new HashMap<Long, ConnectionRequest>(POLLSET_SIZE);
-    
+
     private final Object wakeupLock = new Object();
-    private long wakeupSocket;
+    private volatile long wakeupSocket;
     private volatile boolean toBeWakenUp;
 
     private volatile long pool;
@@ -71,12 +71,12 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
-    
+
     public AprSocketConnector(int processorCount) {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class, processorCount);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
-    
+
     public AprSocketConnector(IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
@@ -86,7 +86,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
-    
+
     @Override
     protected void init() throws Exception {
         wakeupSocket = Socket.create(
@@ -102,7 +102,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
                         pool,
                         Poll.APR_POLLSET_THREADSAFE,
                         Long.MAX_VALUE);
-        
+
         if (pollset <= 0) {
             pollset = Poll.create(
                     62,
@@ -151,12 +151,12 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         } else {
             sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, 0, 0, pool);
         }
-        
+
         int rv = Socket.connect(handle, sa);
         if (rv == Status.APR_SUCCESS) {
             return true;
         }
-        
+
         if (Status.APR_STATUS_IS_EINPROGRESS(rv)) {
             return false;
         }
@@ -198,7 +198,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         boolean success = false;
         try {
             Socket.optSet(handle, Socket.APR_SO_REUSEADDR, 1);
-            
+
             if (localAddress != null) {
                 InetSocketAddress la = (InetSocketAddress) localAddress;
                 long sa;
@@ -211,13 +211,13 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
                 } else {
                     sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, 0, 0, pool);
                 }
-                
+
                 int result = Socket.bind(handle, sa);
                 if (result != Status.APR_SUCCESS) {
                     throwException(result);
-                }            
+                }
             }
-            
+
             Socket.optSet(handle, Socket.APR_SO_NONBLOCK, 1);
             success = true;
             return handle;
@@ -244,7 +244,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
         }
-        
+
         requests.put(handle, request);
     }
 
@@ -255,7 +255,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
             if (rv != -120001) {
                 throwException(rv);
             }
-            
+
             rv = Poll.maintain(pollset, polledSockets, true);
             if (rv > 0) {
                 for (int i = 0; i < rv; i ++) {
@@ -264,7 +264,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
             } else if (rv < 0) {
                 throwException(rv);
             }
-            
+
             return false;
         } else {
             rv <<= 1;
@@ -301,7 +301,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         if (toBeWakenUp) {
             return;
         }
-        
+
         // Add a dummy socket to the pollset.
         synchronized (wakeupLock) {
             toBeWakenUp = true;
@@ -312,17 +312,17 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     public TransportMetadata getTransportMetadata() {
         return AprSocketSession.METADATA;
     }
-    
+
     @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
-    
+
     @Override
     public InetSocketAddress getDefaultRemoteAddress() {
         return (InetSocketAddress) super.getDefaultRemoteAddress();
     }
-    
+
     public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
         super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
