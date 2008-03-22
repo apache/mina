@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.apr;
 
@@ -33,12 +33,12 @@ import org.apache.tomcat.jni.Socket;
 
 /**
  * {@link IoSession} for the {@link AprSocketConnector}
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-abstract class AprSession extends AbstractIoSession {
-    private long descriptor;
+public abstract class AprSession extends AbstractIoSession {
+    private final long descriptor;
 
     private final IoService service;
     private final IoProcessor<AprSession> processor;
@@ -53,7 +53,7 @@ abstract class AprSession extends AbstractIoSession {
     private boolean writable = true;
     private boolean interestedInRead;
     private boolean interestedInWrite;
-    
+
     /**
      * Creates a new instance.
      */
@@ -63,7 +63,7 @@ abstract class AprSession extends AbstractIoSession {
         this.processor = processor;
         this.handler = service.getHandler();
         this.descriptor = descriptor;
-        
+
         long ra = Address.get(Socket.APR_REMOTE, descriptor);
         long la = Address.get(Socket.APR_LOCAL, descriptor);
 
@@ -78,7 +78,7 @@ abstract class AprSession extends AbstractIoSession {
         this.processor = processor;
         this.handler = service.getHandler();
         this.descriptor = descriptor;
-        
+
         long la = Address.get(Socket.APR_LOCAL, descriptor);
 
         this.remoteAddress = remoteAddress;
@@ -109,7 +109,7 @@ abstract class AprSession extends AbstractIoSession {
     public IoHandler getHandler() {
         return handler;
     }
-    
+
     public IoService getService() {
         return service;
     }
