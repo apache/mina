@@ -201,15 +201,17 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     public final void flush(T session) {
-        if (Thread.currentThread() == workerThread) {
-            // Bypass the queue if called from the worker thread itself
-            // (i.e. single thread model).
-            flushNow(session, System.currentTimeMillis());
-        } else {
-            boolean needsWakeup = flushingSessions.isEmpty();
-            if (scheduleFlush(session) && needsWakeup) {
-                wakeup();
-            }
+        // The following optimization has been disabled because it can cause StackOverflowError.
+        //if (Thread.currentThread() == workerThread) {
+        //    // Bypass the queue if called from the worker thread itself
+        //    // (i.e. single thread model).
+        //    flushNow(session, System.currentTimeMillis());
+        //    return;
+        //}
+
+        boolean needsWakeup = flushingSessions.isEmpty();
+        if (scheduleFlush(session) && needsWakeup) {
+            wakeup();
         }
     }
 
