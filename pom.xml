@@ -115,7 +115,7 @@
       <dependency>
         <groupId>tomcat</groupId>
         <artifactId>tomcat-apr</artifactId>
-        <version>5.5.15</version>
+        <version>5.5.23</version>
       </dependency>
       <!--
       <dependency>
