@@ -26,7 +26,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     private static final int POLLSET_SIZE = 1024;
 
     private final Object wakeupLock = new Object();
-    private long wakeupSocket;
+    private volatile long wakeupSocket;
     private volatile boolean toBeWakenUp;
 
     private int backlog = 50;
@@ -37,7 +37,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
     private final List<Long> polledHandles =
         new CircularQueue<Long>(POLLSET_SIZE);
-    
+
     public AprSocketAcceptor() {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
@@ -84,7 +84,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         try {
             Socket.optSet(handle, Socket.APR_SO_NONBLOCK, 1);
             Socket.timeoutSet(handle, 0);
-            
+
             // Configure the server socket,
             Socket.optSet(handle, Socket.APR_SO_REUSEADDR, isReuseAddress()? 1 : 0);
             Socket.optSet(handle, Socket.APR_SO_RCVBUF, getSessionConfig().getReceiveBufferSize());
@@ -100,7 +100,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
             } else {
                 sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, 0, 0, pool);
             }
-            
+
             int result = Socket.bind(handle, sa);
             if (result != Status.APR_SUCCESS) {
                 throwException(result);
@@ -109,7 +109,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
             if (result != Status.APR_SUCCESS) {
                 throwException(result);
             }
-            
+
             result = Poll.add(pollset, handle, Poll.APR_POLLIN);
             if (result != Status.APR_SUCCESS) {
                 throwException(result);
@@ -128,16 +128,16 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         wakeupSocket = Socket.create(
                 Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
                 .getInstance().getRootPool());
-    
+
         // initialize a memory pool for APR functions
         pool = Pool.create(AprLibrary.getInstance().getRootPool());
-        
+
         pollset = Poll.create(
                         POLLSET_SIZE,
                         pool,
                         Poll.APR_POLLSET_THREADSAFE,
                         Long.MAX_VALUE);
-        
+
         if (pollset <= 0) {
             pollset = Poll.create(
                     62,
@@ -180,7 +180,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
             if (rv != -120001) {
                 throwException(rv);
             }
-            
+
             rv = Poll.maintain(pollset, polledSockets, true);
             if (rv > 0) {
                 for (int i = 0; i < rv; i ++) {
@@ -189,7 +189,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
             } else if (rv < 0) {
                 throwException(rv);
             }
-            
+
             return false;
         } else {
             rv <<= 1;
@@ -207,7 +207,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
                     }
                     continue;
                 }
-                
+
                 if ((flag & Poll.APR_POLLIN) != 0) {
                     polledHandles.add(socket);
                 }
@@ -235,7 +235,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         if (toBeWakenUp) {
             return;
         }
-        
+
         // Add a dummy socket to the pollset.
         synchronized (wakeupLock) {
             toBeWakenUp = true;
@@ -295,7 +295,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
-    
+
     private void throwException(int code) throws IOException {
         throw new IOException(
                 org.apache.tomcat.jni.Error.strerror(-code) +

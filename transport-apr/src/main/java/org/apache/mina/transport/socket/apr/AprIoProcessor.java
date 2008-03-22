@@ -51,7 +51,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         new HashMap<Long, AprSession>(POLLSET_SIZE);
 
     private final Object wakeupLock = new Object();
-    private long wakeupSocket;
+    private final long wakeupSocket;
     private volatile boolean toBeWakenUp;
 
     private final long bufferPool; // memory pool
