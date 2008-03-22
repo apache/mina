@@ -54,6 +54,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     private final long wakeupSocket;
     private volatile boolean toBeWakenUp;
 
+    private final long pool;
     private final long bufferPool; // memory pool
     private final long pollset; // socket poller
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
@@ -63,10 +64,13 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     public AprIoProcessor(Executor executor) {
         super(executor);
 
+        // initialize a memory pool for APR functions
+        pool = Pool.create(AprLibrary.getInstance().getRootPool());
+        bufferPool = Pool.create(AprLibrary.getInstance().getRootPool());
+
         try {
             wakeupSocket = Socket.create(
-                    Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, AprLibrary
-                    .getInstance().getRootPool());
+                    Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
         } catch (RuntimeException e) {
             throw e;
         } catch (Error e) {
@@ -75,22 +79,19 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
             throw new RuntimeIoException("Failed to create a wakeup socket.", e);
         }
 
-        // initialize a memory pool for APR functions
-        bufferPool = Pool.create(AprLibrary.getInstance().getRootPool());
-
         boolean success = false;
         long newPollset;
         try {
             newPollset = Poll.create(
                     POLLSET_SIZE,
-                    AprLibrary.getInstance().getRootPool(),
+                    pool,
                     Poll.APR_POLLSET_THREADSAFE,
                     Long.MAX_VALUE);
 
             if (newPollset == 0) {
                 newPollset = Poll.create(
                         62,
-                        AprLibrary.getInstance().getRootPool(),
+                        pool,
                         Poll.APR_POLLSET_THREADSAFE,
                         Long.MAX_VALUE);
             }
@@ -119,8 +120,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     @Override
     protected void dispose0() {
         Poll.destroy(pollset);
-        Pool.destroy(bufferPool);
         Socket.close(wakeupSocket);
+        Pool.destroy(bufferPool);
+        Pool.destroy(pool);
     }
 
     @Override
