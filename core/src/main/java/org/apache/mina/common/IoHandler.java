@@ -43,7 +43,7 @@ public interface IoHandler {
      * Invoked when a connection has been opened.  This method is invoked after
      * {@link #sessionCreated(IoSession)}.  The biggest difference from
      * {@link #sessionCreated(IoSession)} is that it's invoked from other thread
-     * than an I/O processor thread once thread modesl is configured properly.
+     * than an I/O processor thread once thread model is configured properly.
      */
     void sessionOpened(IoSession session) throws Exception;
 
@@ -61,7 +61,7 @@ public interface IoHandler {
 
     /**
      * Invoked when any exception is thrown by user {@link IoHandler}
-     * implementation or by MINA.  If <code>cause</code> is instanceof
+     * implementation or by MINA.  If <code>cause</code> is an instance of
      * {@link IOException}, MINA will close the connection automatically.
      */
     void exceptionCaught(IoSession session, Throwable cause) throws Exception;
