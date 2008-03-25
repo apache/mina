@@ -70,6 +70,16 @@ public class CommandDecoder extends TextLineDecoder {
             return new QuitCommand();
         } else if (InfoCommand.NAME.equals(cmd)) {
             return new InfoCommand();
+        } else if (UserCommand.NAME.equals(cmd)) {
+            if (arg == null) {
+                throw new CommandSyntaxException("No username specified");
+            }
+            return new UserCommand(arg);
+        } else if (PasswordCommand.NAME.equals(cmd)) {
+            if (arg == null) {
+                throw new CommandSyntaxException("No password specified");
+            }
+            return new PasswordCommand(arg);
         }
         
         throw new CommandSyntaxException("Unknown command: " + cmd);

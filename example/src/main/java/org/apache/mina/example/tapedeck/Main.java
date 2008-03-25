@@ -21,12 +21,15 @@ package org.apache.mina.example.tapedeck;
 
 import java.net.InetSocketAddress;
 
+import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineEncoder;
+import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.StateMachineFactory;
-import org.apache.mina.statemachine.StateMachineProxyFactory;
+import org.apache.mina.statemachine.StateMachineProxyBuilder;
+import org.apache.mina.statemachine.annotation.IoFilterTransition;
 import org.apache.mina.statemachine.annotation.IoHandlerTransition;
 import org.apache.mina.statemachine.context.IoSessionStateContextLookup;
 import org.apache.mina.statemachine.context.StateContext;
@@ -46,15 +49,30 @@ public class Main {
     private static final int PORT = 12345;
     
     private static IoHandler createIoHandler() {
-        StateMachine sm = StateMachineFactory.getInstance(IoHandlerTransition.class)
-                                .create(TapeDeckServer.EMPTY, new TapeDeckServer());
-        
-        return StateMachineProxyFactory.create(IoHandler.class, sm, 
+        StateMachine sm = StateMachineFactory.getInstance(
+                IoHandlerTransition.class).create(TapeDeckServer.EMPTY,
+                new TapeDeckServer());
+
+        return new StateMachineProxyBuilder().setStateContextLookup(
                 new IoSessionStateContextLookup(new StateContextFactory() {
                     public StateContext create() {
                         return new TapeDeckServer.TapeDeckContext();
                     }
-                }));
+                })).create(IoHandler.class, sm);
+    }
+    
+    private static IoFilter createAuthenticationIoFilter() {
+        StateMachine sm = StateMachineFactory.getInstance(
+                IoFilterTransition.class).create(AuthenticationHandler.START,
+                new AuthenticationHandler());
+
+        return new StateMachineProxyBuilder().setStateContextLookup(
+                new IoSessionStateContextLookup(new StateContextFactory() {
+                    public StateContext create() {
+                        return new AuthenticationHandler.AuthenticationContext();
+                    }
+                }, "authContext")).setIgnoreUnhandledEvents(true).setIgnoreStateContextLookupFailure(true).create(
+                IoFilter.class, sm);
     }
     
     public static void main(String[] args) throws Exception {
@@ -62,7 +80,10 @@ public class Main {
         acceptor.setReuseAddress(true);
         ProtocolCodecFilter pcf = new ProtocolCodecFilter(
                 new TextLineEncoder(), new CommandDecoder());
+        acceptor.getFilterChain().addLast("log1", new LoggingFilter("log1"));
         acceptor.getFilterChain().addLast("codec", pcf);
+//        acceptor.getFilterChain().addLast("authentication", createAuthenticationIoFilter());
+        acceptor.getFilterChain().addLast("log2", new LoggingFilter("log2"));
         acceptor.setHandler(createIoHandler());
         acceptor.bind(new InetSocketAddress(PORT));
     }
