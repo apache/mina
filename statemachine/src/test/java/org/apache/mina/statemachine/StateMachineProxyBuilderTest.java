@@ -29,12 +29,12 @@ import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.MethodTransition;
 
 /**
- * Tests {@link StateMachineProxyFactory}.
+ * Tests {@link StateMachineProxyBuilder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class StateMachineProxyFactoryTest extends TestCase {
+public class StateMachineProxyBuilderTest extends TestCase {
 
     public void testReentrantStateMachine() throws Exception {
         ReentrantStateMachineHandler handler = new ReentrantStateMachineHandler();
@@ -48,7 +48,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
         s3.addTransition(new MethodTransition("call3", handler));
 
         StateMachine sm = new StateMachine(new State[] { s1, s2, s3 }, "s1");
-        Reentrant reentrant = StateMachineProxyFactory.create(Reentrant.class, sm);
+        Reentrant reentrant = new StateMachineProxyBuilder().create(Reentrant.class, sm);
         reentrant.call1(reentrant);
         assertTrue(handler.finished);
     }
@@ -72,7 +72,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
         s5.addTransition(new MethodTransition("pause", s3, "playing", handler));
 
         StateMachine sm = new StateMachine(new State[] { s1, s2, s3, s4, s5 }, "s1");
-        TapeDeck player = StateMachineProxyFactory.create(TapeDeck.class, sm);
+        TapeDeck player = new StateMachineProxyBuilder().create(TapeDeck.class, sm);
         player.insert("Kings of convenience - Riot on an empty street");
         player.start();
         player.pause();
@@ -97,7 +97,7 @@ public class StateMachineProxyFactoryTest extends TestCase {
 
         StateMachine sm = StateMachineFactory.getInstance(Transition.class).create(TapeDeckStateMachineHandler.S1, handler);
 
-        TapeDeck player = StateMachineProxyFactory.create(TapeDeck.class, sm);
+        TapeDeck player = new StateMachineProxyBuilder().create(TapeDeck.class, sm);
         player.insert("Kings of convenience - Riot on an empty street");
         player.start();
         player.pause();

@@ -116,7 +116,7 @@ public class StateMachine {
     /**
      * Processes the specified {@link Event} through this {@link StateMachine}.
      * Normally you wouldn't call this directly but rather use
-     * {@link StateMachineProxyFactory} to create a proxy for an interface of
+     * {@link StateMachineProxyBuilder} to create a proxy for an interface of
      * your choice. Any method calls on the proxy will be translated into
      * {@link Event} objects and then fed to the {@link StateMachine} by the
      * proxy using this method.

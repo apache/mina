@@ -21,11 +21,11 @@ package org.apache.mina.statemachine.event;
 
 import java.lang.reflect.Method;
 
-import org.apache.mina.statemachine.StateMachineProxyFactory;
+import org.apache.mina.statemachine.StateMachineProxyBuilder;
 import org.apache.mina.statemachine.context.StateContext;
 
 /**
- * Used by {@link StateMachineProxyFactory} to create {@link Event} objects when 
+ * Used by {@link StateMachineProxyBuilder} to create {@link Event} objects when 
  * methods are invoked on the proxy.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)

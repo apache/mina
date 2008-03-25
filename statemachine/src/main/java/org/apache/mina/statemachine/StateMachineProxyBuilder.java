@@ -30,6 +30,7 @@ import org.apache.mina.statemachine.event.DefaultEventFactory;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.event.EventArgumentsInterceptor;
 import org.apache.mina.statemachine.event.EventFactory;
+import org.apache.mina.statemachine.event.UnhandledEventException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,49 +41,63 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class StateMachineProxyFactory {
-    private static final Logger log = LoggerFactory.getLogger(StateMachineProxyFactory.class);
-    
+public class StateMachineProxyBuilder {
+    private static final Logger log = LoggerFactory
+            .getLogger(StateMachineProxyBuilder.class);
+
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
 
-    private StateMachineProxyFactory() {
+    private StateContextLookup contextLookup = new SingletonStateContextLookup();
+
+    private EventFactory eventFactory = new DefaultEventFactory();
+
+    private EventArgumentsInterceptor interceptor = null;
+
+    private boolean ignoreUnhandledEvents = false;
+
+    private boolean ignoreStateContextLookupFailure = false;
+
+    public StateMachineProxyBuilder() {
+    }
+
+    public StateMachineProxyBuilder setStateContextLookup(
+            StateContextLookup contextLookup) {
+        this.contextLookup = contextLookup;
+        return this;
+    }
+
+    public StateMachineProxyBuilder setEventFactory(EventFactory eventFactory) {
+        this.eventFactory = eventFactory;
+        return this;
+    }
+
+    public StateMachineProxyBuilder setEventArgumentsInterceptor(
+            EventArgumentsInterceptor interceptor) {
+        this.interceptor = interceptor;
+        return this;
+    }
+
+    public StateMachineProxyBuilder setIgnoreUnhandledEvents(boolean b) {
+        this.ignoreUnhandledEvents = b;
+        return this;
+    }
+
+    public StateMachineProxyBuilder setIgnoreStateContextLookupFailure(boolean b) {
+        this.ignoreStateContextLookupFailure = b;
+        return this;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T create(Class<T> iface, StateMachine sm) {
+    public <T> T create(Class<T> iface, StateMachine sm) {
         return (T) create(new Class[] { iface }, sm);
     }
-    
-    @SuppressWarnings("unchecked")
-    public static <T> T create(Class<T> iface, StateMachine sm, StateContextLookup contextLookup) {
-        return (T) create(new Class[] { iface }, sm, contextLookup);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public static <T> T create(Class<T> iface, StateMachine sm, StateContextLookup contextLookup,
-            EventArgumentsInterceptor interceptor) {
-        return (T) create(new Class[] { iface }, sm, contextLookup, interceptor, new DefaultEventFactory());
-    }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T create(Class<T> iface, StateMachine sm, StateContextLookup contextLookup,
-            EventArgumentsInterceptor interceptor, EventFactory eventFactory) {
-        return (T) create(new Class[] { iface }, sm, contextLookup, interceptor, eventFactory);
-    }
-    
-    public static Object create(Class<?>[] ifaces, StateMachine sm) {
-        return create(ifaces, sm, new SingletonStateContextLookup());
-    }
-    
-    public static Object create(Class<?>[] ifaces, StateMachine sm, StateContextLookup contextLookup) {
-        return create(ifaces, sm, contextLookup, null, new DefaultEventFactory());
-    }
-    
-    public static Object create(Class<?>[] ifaces, StateMachine sm, StateContextLookup contextLookup,
-            EventArgumentsInterceptor interceptor, EventFactory eventFactory) {
+    public Object create(Class<?>[] ifaces, StateMachine sm) {
 
-        ClassLoader cl = StateMachineProxyFactory.class.getClassLoader();
-        InvocationHandler handler = new MethodInvocationHandler(sm, contextLookup, interceptor, eventFactory);
+        ClassLoader cl = StateMachineProxyBuilder.class.getClassLoader();
+        InvocationHandler handler = new MethodInvocationHandler(sm,
+                contextLookup, interceptor, eventFactory,
+                ignoreUnhandledEvents, ignoreStateContextLookupFailure);
 
         return Proxy.newProxyInstance(cl, ifaces, handler);
     }
@@ -92,14 +107,19 @@ public class StateMachineProxyFactory {
         private final StateContextLookup contextLookup;
         private final EventArgumentsInterceptor interceptor;
         private final EventFactory eventFactory;
+        private final boolean ignoreUnhandledEvents;
+        private final boolean ignoreStateContextLookupFailure;
         
         public MethodInvocationHandler(StateMachine sm, StateContextLookup contextLookup,
-                EventArgumentsInterceptor interceptor, EventFactory eventFactory) {
+                EventArgumentsInterceptor interceptor, EventFactory eventFactory,
+                boolean ignoreUnhandledEvents, boolean ignoreStateContextLookupFailure) {
             
             this.contextLookup = contextLookup;
             this.sm = sm;
             this.interceptor = interceptor;
             this.eventFactory = eventFactory;
+            this.ignoreUnhandledEvents = ignoreUnhandledEvents;
+            this.ignoreStateContextLookupFailure = ignoreStateContextLookupFailure;
         }
         
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -126,13 +146,22 @@ public class StateMachineProxyFactory {
             StateContext context = contextLookup.lookup(args);
 
             if (context == null) {
-                throw new IllegalStateException("Cannot determine state " 
+                if (ignoreStateContextLookupFailure) {
+                    return null;
+                }
+                throw new IllegalStateException("Cannot determine state "
                         + "context for method invocation: " + method);
             }
 
             Event event = eventFactory.create(context, method, args);
 
-            sm.handle(event);
+            try {
+                sm.handle(event);
+            } catch (UnhandledEventException uee) {
+                if (!ignoreUnhandledEvents) {
+                    throw uee;
+                }
+            }
 
             return null;
         }
