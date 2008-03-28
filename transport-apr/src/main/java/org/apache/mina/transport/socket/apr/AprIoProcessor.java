@@ -320,11 +320,12 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     @Override
     protected int read(AprSession session, IoBuffer buffer) throws Exception {
         int bytes;
+        int capacity = buffer.remaining();
         // Using Socket.recv() directly causes memory leak. :-(
-        ByteBuffer b = Pool.alloc(bufferPool, buffer.remaining());
+        ByteBuffer b = Pool.alloc(bufferPool, capacity);
         try {
             bytes = Socket.recvb(
-                    session.getDescriptor(), b, 0, b.remaining());
+                    session.getDescriptor(), b, 0, capacity);
             if (bytes > 0) {
                 b.position(0);
                 b.limit(bytes);
