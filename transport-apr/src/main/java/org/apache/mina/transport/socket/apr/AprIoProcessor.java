@@ -275,6 +275,10 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
 
     @Override
     protected void setInterestedInRead(AprSession session, boolean value) throws Exception {
+        if (session.isInterestedInRead() == value) {
+            return;
+        }
+
         int rv = Poll.remove(pollset, session.getDescriptor());
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
@@ -293,6 +297,10 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
 
     @Override
     protected void setInterestedInWrite(AprSession session, boolean value) throws Exception {
+        if (session.isInterestedInWrite() == value) {
+            return;
+        }
+
         int rv = Poll.remove(pollset, session.getDescriptor());
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
