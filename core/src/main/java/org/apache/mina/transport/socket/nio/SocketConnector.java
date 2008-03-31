@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.transport.socket.nio;
 
@@ -84,7 +84,7 @@ public class SocketConnector extends BaseIoConnector {
     private int workerTimeout = 60; // 1 min.
 
     /**
-     * Create a connector with a single processing thread using a NewThreadExecutor 
+     * Create a connector with a single processing thread using a NewThreadExecutor
      */
     public SocketConnector() {
         this(1, new NewThreadExecutor());
@@ -146,19 +146,23 @@ public class SocketConnector extends BaseIoConnector {
     public ConnectFuture connect(SocketAddress address,
             SocketAddress localAddress, IoHandler handler,
             IoServiceConfig config) {
-        if (address == null)
+        if (address == null) {
             throw new NullPointerException("address");
-        if (handler == null)
+        }
+        if (handler == null) {
             throw new NullPointerException("handler");
+        }
 
-        if (!(address instanceof InetSocketAddress))
+        if (!(address instanceof InetSocketAddress)) {
             throw new IllegalArgumentException("Unexpected address type: "
                     + address.getClass());
+        }
 
         if (localAddress != null
-                && !(localAddress instanceof InetSocketAddress))
+                && !(localAddress instanceof InetSocketAddress)) {
             throw new IllegalArgumentException(
                     "Unexpected local address type: " + localAddress.getClass());
+        }
 
         if (config == null) {
             config = getDefaultConfig();
@@ -169,6 +173,17 @@ public class SocketConnector extends BaseIoConnector {
         try {
             ch = SocketChannel.open();
             ch.socket().setReuseAddress(true);
+
+            // Receive buffer size must be set BEFORE the socket is connected
+            // in order for the TCP window to be sized accordingly
+            if (config instanceof SocketConnectorConfig) {
+                int receiveBufferSize =
+                    ((SocketSessionConfig) config.getSessionConfig()).getReceiveBufferSize();
+                if (receiveBufferSize > 65535) {
+                    ch.socket().setReceiveBufferSize(receiveBufferSize);
+                }
+            }
+
             if (localAddress != null) {
                 ch.socket().bind(localAddress);
             }
@@ -205,10 +220,10 @@ public class SocketConnector extends BaseIoConnector {
                 } catch (IOException e2) {
                     ExceptionMonitor.getInstance().exceptionCaught(e2);
                 }
-    
+
                 return DefaultConnectFuture.newFailedFuture(e);
             }
-    
+
             synchronized (connectQueue) {
                 connectQueue.push(request);
             }
@@ -224,7 +239,7 @@ public class SocketConnector extends BaseIoConnector {
 
     /**
      * Sets the config this connector will use by default.
-     * 
+     *
      * @param defaultConfig the default config.
      * @throws NullPointerException if the specified value is <code>null</code>.
      */
@@ -234,7 +249,7 @@ public class SocketConnector extends BaseIoConnector {
         }
         this.defaultConfig = defaultConfig;
     }
-    
+
     private Selector getSelector() {
         synchronized (lock) {
             return this.selector;
@@ -252,8 +267,9 @@ public class SocketConnector extends BaseIoConnector {
     }
 
     private void registerNew() {
-        if (connectQueue.isEmpty())
+        if (connectQueue.isEmpty()) {
             return;
+        }
 
         Selector selector = getSelector();
         for (;;) {
@@ -262,8 +278,9 @@ public class SocketConnector extends BaseIoConnector {
                 req = (ConnectionRequest) connectQueue.pop();
             }
 
-            if (req == null)
+            if (req == null) {
                 break;
+            }
 
             SocketChannel ch = req.channel;
             try {
@@ -285,8 +302,9 @@ public class SocketConnector extends BaseIoConnector {
         while (it.hasNext()) {
             SelectionKey key = (SelectionKey) it.next();
 
-            if (!key.isConnectable())
+            if (!key.isConnectable()) {
                 continue;
+            }
 
             SocketChannel ch = (SocketChannel) key.channel();
             ConnectionRequest entry = (ConnectionRequest) key.attachment();
@@ -322,8 +340,9 @@ public class SocketConnector extends BaseIoConnector {
         while (it.hasNext()) {
             SelectionKey key = (SelectionKey) it.next();
 
-            if (!key.isValid())
+            if (!key.isValid()) {
                 continue;
+            }
 
             ConnectionRequest entry = (ConnectionRequest) key.attachment();
 
