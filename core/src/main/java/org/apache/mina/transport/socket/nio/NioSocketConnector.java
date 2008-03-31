@@ -67,12 +67,12 @@ public final class NioSocketConnector
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
-    
+
     @Override
     protected void init() throws Exception {
         this.selector = Selector.open();
     }
-    
+
     @Override
     protected void destroy() throws Exception {
         if (selector != null) {
@@ -93,7 +93,7 @@ public final class NioSocketConnector
     public InetSocketAddress getDefaultRemoteAddress() {
         return (InetSocketAddress) super.getDefaultRemoteAddress();
     }
-    
+
     public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
         super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
@@ -115,7 +115,7 @@ public final class NioSocketConnector
         if (key == null) {
             return null;
         }
-        
+
         return (ConnectionRequest) key.attachment();
     }
 
@@ -137,7 +137,7 @@ public final class NioSocketConnector
             }
             return true;
         }
-        
+
         return false;
     }
 
@@ -145,6 +145,13 @@ public final class NioSocketConnector
     protected SocketChannel newHandle(SocketAddress localAddress)
             throws Exception {
         SocketChannel ch = SocketChannel.open();
+
+        int receiveBufferSize =
+            (getSessionConfig()).getReceiveBufferSize();
+        if (receiveBufferSize > 65535) {
+            ch.socket().setReceiveBufferSize(receiveBufferSize);
+        }
+
         if (localAddress != null) {
             ch.socket().bind(localAddress);
         }
@@ -177,11 +184,11 @@ public final class NioSocketConnector
     protected void wakeup() {
         selector.wakeup();
     }
-    
+
     private static class SocketChannelIterator implements Iterator<SocketChannel> {
-        
+
         private final Iterator<SelectionKey> i;
-        
+
         private SocketChannelIterator(Collection<SelectionKey> selectedKeys) {
             this.i = selectedKeys.iterator();
         }
