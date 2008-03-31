@@ -140,19 +140,23 @@ public class SocketConnector extends BaseIoConnector {
     public ConnectFuture connect(SocketAddress address,
             SocketAddress localAddress, IoHandler handler,
             IoServiceConfig config) {
-        if (address == null)
+        if (address == null) {
             throw new NullPointerException("address");
-        if (handler == null)
+        }
+        if (handler == null) {
             throw new NullPointerException("handler");
+        }
 
-        if (!(address instanceof InetSocketAddress))
+        if (!(address instanceof InetSocketAddress)) {
             throw new IllegalArgumentException("Unexpected address type: "
                     + address.getClass());
+        }
 
         if (localAddress != null
-                && !(localAddress instanceof InetSocketAddress))
+                && !(localAddress instanceof InetSocketAddress)) {
             throw new IllegalArgumentException(
                     "Unexpected local address type: " + localAddress.getClass());
+        }
 
         if (config == null) {
             config = getDefaultConfig();
@@ -163,6 +167,17 @@ public class SocketConnector extends BaseIoConnector {
         try {
             ch = SocketChannel.open();
             ch.socket().setReuseAddress(true);
+
+            // Receive buffer size must be set BEFORE the socket is connected
+            // in order for the TCP window to be sized accordingly
+            if (config instanceof SocketConnectorConfig) {
+                int receiveBufferSize =
+                    ((SocketSessionConfig) config.getSessionConfig()).getReceiveBufferSize();
+                if (receiveBufferSize > 65535) {
+                    ch.socket().setReceiveBufferSize(receiveBufferSize);
+                }
+            }
+
             if (localAddress != null) {
                 ch.socket().bind(localAddress);
             }
@@ -199,10 +214,10 @@ public class SocketConnector extends BaseIoConnector {
                 } catch (IOException e2) {
                     ExceptionMonitor.getInstance().exceptionCaught(e2);
                 }
-    
+
                 return DefaultConnectFuture.newFailedFuture(e);
             }
-    
+
             connectQueue.add(request);
             selector.wakeup();
         }
@@ -238,15 +253,17 @@ public class SocketConnector extends BaseIoConnector {
     }
 
     private void registerNew() {
-        if (connectQueue.isEmpty())
+        if (connectQueue.isEmpty()) {
             return;
+        }
 
         Selector selector = this.selector;
         for (;;) {
             ConnectionRequest req = connectQueue.poll();
 
-            if (req == null)
+            if (req == null) {
                 break;
+            }
 
             SocketChannel ch = req.channel;
             try {
@@ -264,8 +281,9 @@ public class SocketConnector extends BaseIoConnector {
 
     private void processSessions(Set<SelectionKey> keys) {
         for (SelectionKey key : keys) {
-            if (!key.isConnectable())
+            if (!key.isConnectable()) {
                 continue;
+            }
 
             SocketChannel ch = (SocketChannel) key.channel();
             ConnectionRequest entry = (ConnectionRequest) key.attachment();
@@ -298,8 +316,9 @@ public class SocketConnector extends BaseIoConnector {
         long currentTime = System.currentTimeMillis();
 
         for (SelectionKey key : keys) {
-            if (!key.isValid())
+            if (!key.isValid()) {
                 continue;
+            }
 
             ConnectionRequest entry = (ConnectionRequest) key.attachment();
 
