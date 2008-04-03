@@ -463,13 +463,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     private void flush(long currentTime) {
+        final T firstSession = flushingSessions.peek();
+        if (firstSession == null) {
+            return;
+        }
+
+        T session = flushingSessions.poll(); // the same one with firstSession
         for (; ;) {
-            T session = flushingSessions.poll();
-
-            if (session == null) {
-                break;
-            }
-
             session.setScheduledForFlush(false);
             SessionState state = state(session);
             switch (state) {
@@ -496,6 +496,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             default:
                 throw new IllegalStateException(String.valueOf(state));
             }
+
+            session = flushingSessions.peek();
+            if (session == null || session == firstSession) {
+                break;
+            }
+            session = flushingSessions.poll();
         }
     }
 
@@ -553,11 +559,17 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     throw new IllegalStateException("Don't know how to handle message of type '" + message.getClass().getName() + "'.  Are you missing a protocol encoder?");
                 }
 
+                if (localWrittenBytes == 0) {
+                    // Kernel buffer is full.
+                    setInterestedInWrite(session, true);
+                    return false;
+                }
+
                 writtenBytes += localWrittenBytes;
 
-                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
-                    // Kernel buffer is full or wrote too much.
-                    setInterestedInWrite(session, true);
+                if (writtenBytes >= maxWrittenBytes) {
+                    // Wrote too much
+                    scheduleFlush(session);
                     return false;
                 }
             } while (writtenBytes < maxWrittenBytes);
