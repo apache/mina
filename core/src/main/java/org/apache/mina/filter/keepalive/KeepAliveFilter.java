@@ -35,18 +35,17 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IoFilter} that sends a keep-alive request on
- * <tt>sessionIdle</tt> event with {@link IdleStatus#READER_IDLE} and sends
- * back  the response for the keep-alive request.
+ * {@link IoEventType#SESSION_IDLE} and sends back the response for the
+ * sent keep-alive request.
  * 
  * <h2>Interference with {@link IoSessionConfig#setIdleTime(IdleStatus, int)}</h2>
  * 
- * This filter adjusts <tt>idleTime</tt> property for
- * {@link IdleStatus#READER_IDLE} automatically.  Changing the <tt>idleTime</tt>
- * property for {@link IdleStatus#READER_IDLE} will lead this filter to a
- * unexpected behavior.  Please also note that any {@link IoFilter} and
- * {@link IoHandler} behind {@link KeepAliveFilter} will not get
- * {@link IoEventType#SESSION_IDLE} event with {@link IdleStatus#READER_IDLE}
- * parameter at all.
+ * This filter adjusts <tt>idleTime</tt> of the {@link IdleStatus} that
+ * this filter is interested in automatically.  Changing the <tt>idleTime</tt>
+ * of the {@link IdleStatus} can lead this filter to a unexpected behavior.
+ * Please also note that any {@link IoFilter} and {@link IoHandler} behind
+ * {@link KeepAliveFilter} will not get {@link IoEventType#SESSION_IDLE} event
+ * for the {@link IdleStatus} this filter is interested in at all.
  * 
  * <h2>Implementing {@link KeepAliveMessageFactory}</h2>
  * 
@@ -131,6 +130,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
             getClass(), "waitingForResponse");
 
     private final KeepAliveMessageFactory messageFactory;
+    private final IdleStatus interestedIdleStatus;
     private volatile KeepAlivePolicy policy;
     private volatile int keepAliveRequestInterval;
     private volatile int keepAliveRequestTimeout;
@@ -138,43 +138,89 @@ public class KeepAliveFilter extends IoFilterAdapter {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
-     * Creates a new instance with the default {@link KeepAlivePolicy} and
-     * the default timeout values (<tt>policy</tt> =
-     * {@link KeepAlivePolicy#CLOSE}, <tt>keepAliveRequestInterval = 60</tt>
-     * and <tt>keepAliveRequestTimeout = 30</tt>).
+     * Creates a new instance with the default properties.
+     * The default property values are:
+     * <ul>
+     * <li><tt>interestedIdleStatus</tt> - {@link IdleStatus#READER_IDLE}</li>
+     * <li><tt>policy</tt> = {@link KeepAlivePolicy#CLOSE}</li>
+     * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
+     * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
+     * </ul>
      */
     public KeepAliveFilter(KeepAliveMessageFactory messageFactory) {
-        this(messageFactory, KeepAlivePolicy.CLOSE);
+        this(messageFactory, IdleStatus.READER_IDLE, KeepAlivePolicy.CLOSE);
     }
 
     /**
-     * Creates a new instance with the default timeout values
-     * (<tt>keepAliveRequestInterval = 60</tt> and
-     * <tt>keepAliveRequestTimeout = 30</tt>).
+     * Creates a new instance with the default properties.
+     * The default property values are:
+     * <ul>
+     * <li><tt>policy</tt> = {@link KeepAlivePolicy#CLOSE}</li>
+     * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
+     * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
+     * </ul>
+     */
+    public KeepAliveFilter(
+            KeepAliveMessageFactory messageFactory,
+            IdleStatus interestedIdleStatus) {
+        this(messageFactory, interestedIdleStatus, KeepAlivePolicy.CLOSE, 60, 30);
+    }
+
+    /**
+     * Creates a new instance with the default properties.
+     * The default property values are:
+     * <ul>
+     * <li><tt>interestedIdleStatus</tt> - {@link IdleStatus#READER_IDLE}</li>
+     * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
+     * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
+     * </ul>
      */
     public KeepAliveFilter(
             KeepAliveMessageFactory messageFactory, KeepAlivePolicy policy) {
-        this(messageFactory, policy, 60, 30);
+        this(messageFactory, IdleStatus.READER_IDLE, policy, 60, 30);
+    }
+
+    /**
+     * Creates a new instance with the default properties.
+     * The default property values are:
+     * <ul>
+     * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
+     * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
+     * </ul>
+     */
+    public KeepAliveFilter(
+            KeepAliveMessageFactory messageFactory,
+            IdleStatus interestedIdleStatus, KeepAlivePolicy policy) {
+        this(messageFactory, interestedIdleStatus, policy, 60, 30);
     }
 
     /**
      * Creates a new instance.
      */
     public KeepAliveFilter(
-            KeepAliveMessageFactory messageFactory, KeepAlivePolicy policy,
+            KeepAliveMessageFactory messageFactory,
+            IdleStatus interestedIdleStatus, KeepAlivePolicy policy,
             int keepAliveRequestInterval, int keepAliveRequestTimeout) {
         if (messageFactory == null) {
             throw new NullPointerException("messageFactory");
+        }
+        if (interestedIdleStatus == null) {
+            throw new NullPointerException("interestedIdleStatus");
         }
         if (policy == null) {
             throw new NullPointerException("policy");
         }
 
         this.messageFactory = messageFactory;
+        this.interestedIdleStatus = interestedIdleStatus;
         this.policy = policy;
 
         setKeepAliveRequestInterval(keepAliveRequestInterval);
         setKeepAliveRequestTimeout(keepAliveRequestTimeout);
+    }
+
+    public IdleStatus getInterestedIdleStatus() {
+        return interestedIdleStatus;
     }
 
     public KeepAlivePolicy getPolicy() {
@@ -276,7 +322,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
     @Override
     public void sessionIdle(
             NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
-        if (status == IdleStatus.READER_IDLE) {
+        if (status == interestedIdleStatus) {
             if (!session.containsAttribute(WAITING_FOR_RESPONSE)) {
                 Object pingMessage = messageFactory.getRequest(session);
                 if (pingMessage != null) {
@@ -329,13 +375,13 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
     private void markStatus(IoSession session) {
         session.getConfig().setIdleTime(
-                IdleStatus.READER_IDLE, getKeepAliveRequestTimeout());
+                interestedIdleStatus, getKeepAliveRequestTimeout());
         session.setAttribute(WAITING_FOR_RESPONSE);
     }
 
     private void resetStatus(IoSession session) {
         session.getConfig().setIdleTime(
-                IdleStatus.READER_IDLE, getKeepAliveRequestInterval());
+                interestedIdleStatus, getKeepAliveRequestInterval());
         session.removeAttribute(WAITING_FOR_RESPONSE);
     }
 
