@@ -22,9 +22,11 @@ package org.apache.mina.filter.keepalive;
 import org.apache.mina.common.AttributeKey;
 import org.apache.mina.common.DefaultWriteRequest;
 import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoEventType;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterAdapter;
 import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.WriteRequest;
@@ -41,7 +43,10 @@ import org.slf4j.LoggerFactory;
  * This filter adjusts <tt>idleTime</tt> property for
  * {@link IdleStatus#READER_IDLE} automatically.  Changing the <tt>idleTime</tt>
  * property for {@link IdleStatus#READER_IDLE} will lead this filter to a
- * unexpected behavior.
+ * unexpected behavior.  Please also note that any {@link IoFilter} and
+ * {@link IoHandler} behind {@link KeepAliveFilter} will not get
+ * {@link IoEventType#SESSION_IDLE} event with {@link IdleStatus#READER_IDLE}
+ * parameter at all.
  * 
  * <h2>Implementing {@link KeepAliveMessageFactory}</h2>
  * 
@@ -270,44 +275,42 @@ public class KeepAliveFilter extends IoFilterAdapter {
     @Override
     public void sessionIdle(
             NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
-        try {
-            if (status == IdleStatus.READER_IDLE) {
-                if (!session.containsAttribute(WAITING_FOR_RESPONSE)) {
-                    Object pingMessage = messageFactory.getRequest(session);
-                    if (pingMessage != null) {
-                        nextFilter.filterWrite(
-                                session,
-                                new DefaultWriteRequest(pingMessage));
+        if (status == IdleStatus.READER_IDLE) {
+            if (!session.containsAttribute(WAITING_FOR_RESPONSE)) {
+                Object pingMessage = messageFactory.getRequest(session);
+                if (pingMessage != null) {
+                    nextFilter.filterWrite(
+                            session,
+                            new DefaultWriteRequest(pingMessage));
 
-                        // If policy is OFF, there's no need to wait for
-                        // the response.
-                        if (getPolicy() != KeepAlivePolicy.OFF) {
-                            markStatus(session);
-                        } else {
-                            resetStatus(session);
-                        }
-                    }
-                } else {
-                    resetStatus(session);
-                    switch (getPolicy()) {
-                    case OFF:
-                        break;
-                    case LOG:
-                        logTimeout();
-                        break;
-                    case EXCEPTION:
-                        throw new KeepAliveTimeoutException(
-                                getTimeoutMessage());
-                    case CLOSE:
-                        logTimeout();
-                        session.close();
-                        break;
-                    default:
-                        throw new InternalError();
+                    // If policy is OFF, there's no need to wait for
+                    // the response.
+                    if (getPolicy() != KeepAlivePolicy.OFF) {
+                        markStatus(session);
+                    } else {
+                        resetStatus(session);
                     }
                 }
+            } else {
+                resetStatus(session);
+                switch (getPolicy()) {
+                case OFF:
+                    break;
+                case LOG:
+                    logTimeout();
+                    break;
+                case EXCEPTION:
+                    throw new KeepAliveTimeoutException(
+                            getTimeoutMessage());
+                case CLOSE:
+                    logTimeout();
+                    session.close();
+                    break;
+                default:
+                    throw new InternalError();
+                }
             }
-        } finally {
+        } else {
             nextFilter.sessionIdle(session, status);
         }
     }
