@@ -36,9 +36,11 @@ public enum LogLevel {
      */
     NONE(new LogLevelLogger() {
         public void log(Logger logger, String message, Object[] args) {
+            // Do nothing.
         }
 
         public void log(Logger logger, String message, Throwable cause) {
+            // Do nothing.
         }
     }),
 
@@ -106,9 +108,9 @@ public enum LogLevel {
             logger.error(message, cause);
         }
     });
-          
+
     private final LogLevelLogger logger;
-    
+
     private LogLevel(LogLevelLogger logger) {
         this.logger = logger;
     }
@@ -118,7 +120,7 @@ public enum LogLevel {
     }
 
     void log(Logger logger, String message, Throwable cause) {
-        this.logger.log(logger, message, cause);        
+        this.logger.log(logger, message, cause);
     }
 
     private interface LogLevelLogger {
