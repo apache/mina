@@ -96,9 +96,10 @@ import org.slf4j.LoggerFactory;
  * <td>You want a keep-alive request to be sent when the reader is idle, but
  * you don't want to send any response back.</td>
  * <td>{@link KeepAliveMessageFactory#getRequest(IoSession)} must return
- * a non-<tt>null</tt> and
+ * a non-<tt>null</tt>,
  * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- * return <tt>null</tt>.</td>
+ * return <tt>null</tt> and the {@link KeepAlivePolicy} must be set to
+ * {@link KeepAlivePolicy#OFF}.</td>
  * </tr>
  * <tr valign="top">
  * <td>Silent Listener</td>
