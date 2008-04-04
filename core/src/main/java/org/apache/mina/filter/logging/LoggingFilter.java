@@ -65,7 +65,7 @@ public class LoggingFilter extends IoFilterAdapter {
             throw new NullPointerException("name should not be null");
         }
         this.name = name;
-        this.logger = LoggerFactory.getLogger(name);
+        logger = LoggerFactory.getLogger(name);
 
         // Exceptions will be logged to WARN as default.
         setLogLevel(IoEventType.EXCEPTION_CAUGHT, LogLevel.WARN);
@@ -110,7 +110,7 @@ public class LoggingFilter extends IoFilterAdapter {
 
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    throws Exception {
         log(IoEventType.SESSION_CREATED, "CREATED", null);
         nextFilter.sessionCreated(session);
     }
@@ -124,13 +124,20 @@ public class LoggingFilter extends IoFilterAdapter {
 
     @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    throws Exception {
         log(IoEventType.SESSION_OPENED, "OPENED", null);
         nextFilter.sessionOpened(session);
     }
 
-    private void log(IoEventType eventType, String format, Object arg) {
-        getLogLevel(eventType).log(logger, format, new Object[] { arg });    
+    /**
+     * Logs the specified event.
+     * 
+     * @param eventType the type of the event
+     * @param format    the message (or SLF4J format string)
+     * @param arg       the argument of the SLF4J format string
+     */
+    protected void log(IoEventType eventType, String format, Object arg) {
+        getLogLevel(eventType).log(logger, format, arg);
     }
 
     /**

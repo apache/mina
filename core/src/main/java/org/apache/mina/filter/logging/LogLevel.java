@@ -35,6 +35,10 @@ public enum LogLevel {
      * {@link LogLevel} which will not log any information
      */
     NONE(new LogLevelLogger() {
+        public void log(Logger logger, String message, Object arg) {
+            // Do nothing.
+        }
+
         public void log(Logger logger, String message, Object[] args) {
             // Do nothing.
         }
@@ -48,6 +52,10 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the TRACE level.
      */
     TRACE(new LogLevelLogger() {
+        public void log(Logger logger, String message, Object arg) {
+            logger.trace(message, arg);
+        }
+
         public void log(Logger logger, String message, Object[] args) {
             logger.trace(message, args);
         }
@@ -61,6 +69,10 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the DEBUG level.
      */
     DEBUG(new LogLevelLogger() {
+        public void log(Logger logger, String message, Object arg) {
+            logger.debug(message, arg);
+        }
+
         public void log(Logger logger, String message, Object[] args) {
             logger.debug(message, args);
         }
@@ -74,6 +86,10 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the INFO level.
      */
     INFO(new LogLevelLogger() {
+        public void log(Logger logger, String message, Object arg) {
+            logger.info(message, arg);
+        }
+
         public void log(Logger logger, String message, Object[] args) {
             logger.info(message, args);
         }
@@ -87,6 +103,10 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the WARN level.
      */
     WARN(new LogLevelLogger() {
+        public void log(Logger logger, String message, Object arg) {
+            logger.warn(message, arg);
+        }
+
         public void log(Logger logger, String message, Object[] args) {
             logger.warn(message, args);
         }
@@ -100,6 +120,10 @@ public enum LogLevel {
      * {@link LogLevel} which logs messages on the ERROR level.
      */
     ERROR(new LogLevelLogger() {
+        public void log(Logger logger, String message, Object arg) {
+            logger.error(message, arg);
+        }
+
         public void log(Logger logger, String message, Object[] args) {
             logger.error(message, args);
         }
@@ -115,8 +139,12 @@ public enum LogLevel {
         this.logger = logger;
     }
 
+    void log(Logger logger, String format, Object arg) {
+        this.logger.log(logger, format, arg);
+    }
+
     void log(Logger logger, String format, Object[] args) {
-        this.logger.log(logger, format,  args);
+        this.logger.log(logger, format, args);
     }
 
     void log(Logger logger, String message, Throwable cause) {
@@ -124,6 +152,7 @@ public enum LogLevel {
     }
 
     private interface LogLevelLogger {
+        void log(Logger logger, String message, Object arg);
         void log(Logger logger, String message, Object[] args);
         void log(Logger logger, String message, Throwable cause);
     }
