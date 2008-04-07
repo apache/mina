@@ -45,7 +45,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
 
     private final Map<String, Long> clients;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     /**
      * Default constructor.  Sets the wait time to 1 second
      */
@@ -125,5 +125,6 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
             logger.warn("Connections coming in too fast; closing.");
             session.close();
         }
+        nextFilter.sessionCreated(session);
     }
 }
