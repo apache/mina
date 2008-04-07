@@ -28,7 +28,7 @@ import java.util.concurrent.Executor;
 /**
  * A dummy {@link IoSession} for unit-testing or non-network-use of
  * the classes that depends on {@link IoSession}.
- * 
+ *
  * <h2>Overriding I/O request methods</h2>
  * All I/O request methods (i.e. {@link #close()}, {@link #write(Object)} and
  * {@link #setTrafficMask(TrafficMask)}) are final and therefore cannot be
@@ -111,9 +111,9 @@ public class DummySession extends AbstractIoSession {
         // Set meaningless default values.
         acceptor.setHandler(new IoHandlerAdapter());
 
-        this.service = acceptor;
+        service = acceptor;
 
-        this.processor = new IoProcessor<IoSession>() {
+        processor = new IoProcessor<IoSession>() {
             public void add(IoSession session) {
             }
 
@@ -259,9 +259,9 @@ public class DummySession extends AbstractIoSession {
 
         this.transportMetadata = transportMetadata;
     }
-    
+
     @Override
-    public void setScheduledWriteBytes(long byteCount){
+    public void setScheduledWriteBytes(int byteCount){
         super.setScheduledWriteBytes(byteCount);
     }
 
@@ -273,7 +273,7 @@ public class DummySession extends AbstractIoSession {
     /**
      * Update all statistical properties related with throughput.  By default
      * this method returns silently without updating the throughput properties
-     * if they were calculated already within last 
+     * if they were calculated already within last
      * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
      * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method
      * updates the throughput properties immediately.

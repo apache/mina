@@ -28,7 +28,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.util.CircularQueue;
 
@@ -45,7 +44,7 @@ public abstract class AbstractIoSession implements IoSession {
         new AttributeKey(AbstractIoSession.class, "readyReadFutures");
     private static final AttributeKey WAITING_READ_FUTURES =
         new AttributeKey(AbstractIoSession.class, "waitingReadFutures");
-    
+
     private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER =
         new IoFutureListener<CloseFuture>() {
             public void operationComplete(CloseFuture future) {
@@ -67,12 +66,12 @@ public abstract class AbstractIoSession implements IoSession {
         new DefaultWriteRequest(new Object());
 
     private final Object lock = new Object();
-    
+
     private IoSessionAttributeMap attributes;
     private WriteRequestQueue writeRequestQueue;
     private WriteRequest currentWriteRequest;
     private final long creationTime;
-    
+
     /**
      * A future that will be set 'closed' when the connection is closed.
      */
@@ -83,7 +82,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     // Status variables
     private final AtomicBoolean scheduledForFlush = new AtomicBoolean();
-    private final AtomicLong scheduledWriteBytes = new AtomicLong();
+    private final AtomicInteger scheduledWriteBytes = new AtomicInteger();
     private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
 
     private long readBytes;
@@ -92,7 +91,7 @@ public abstract class AbstractIoSession implements IoSession {
     private long writtenMessages;
     private long lastReadTime;
     private long lastWriteTime;
-    
+
     private long lastThroughputCalculationTime;
     private long lastReadBytes;
     private long lastWrittenBytes;
@@ -114,13 +113,13 @@ public abstract class AbstractIoSession implements IoSession {
     private boolean deferDecreaseReadBuffer = true;
 
     protected AbstractIoSession() {
-        creationTime = lastThroughputCalculationTime = 
+        creationTime = lastThroughputCalculationTime =
             lastReadTime = lastWriteTime =
             lastIdleTimeForBoth = lastIdleTimeForRead =
             lastIdleTimeForWrite = System.currentTimeMillis();
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
-    
+
     public final long getId() {
         return hashCode() & 0xFFFFFFFFL;
     }
@@ -185,7 +184,7 @@ public abstract class AbstractIoSession implements IoSession {
         if (!getConfig().isUseReadOperation()) {
             throw new IllegalStateException("useReadOperation is not enabled.");
         }
-        
+
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
         ReadFuture future;
         synchronized (readyReadFutures) {
@@ -200,10 +199,10 @@ public abstract class AbstractIoSession implements IoSession {
                 getWaitingReadFutures().offer(future);
             }
         }
-        
+
         return future;
     }
-    
+
     protected final void offerReadFuture(Object message) {
         newReadFuture().setRead(message);
     }
@@ -235,20 +234,20 @@ public abstract class AbstractIoSession implements IoSession {
 
     @SuppressWarnings("unchecked")
     private Queue<ReadFuture> getReadyReadFutures() {
-        Queue<ReadFuture> readyReadFutures = 
+        Queue<ReadFuture> readyReadFutures =
             (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES);
         if (readyReadFutures == null) {
             readyReadFutures = new CircularQueue<ReadFuture>();
-            
+
             Queue<ReadFuture> oldReadyReadFutures =
                 (Queue<ReadFuture>) setAttributeIfAbsent(
                         READY_READ_FUTURES, readyReadFutures);
             if (oldReadyReadFutures != null) {
                 readyReadFutures = oldReadyReadFutures;
             }
-            
+
             // Initialize waitingReadFutures together.
-            Queue<ReadFuture> waitingReadFutures = 
+            Queue<ReadFuture> waitingReadFutures =
                 new CircularQueue<ReadFuture>();
             setAttributeIfAbsent(WAITING_READ_FUTURES, waitingReadFutures);
         }
@@ -372,7 +371,7 @@ public abstract class AbstractIoSession implements IoSession {
     public final Set<Object> getAttributeKeys() {
         return attributes.getAttributeKeys(this);
     }
-    
+
     protected final IoSessionAttributeMap getAttributeMap() {
         return attributes;
     }
@@ -380,7 +379,7 @@ public abstract class AbstractIoSession implements IoSession {
     protected final void setAttributeMap(IoSessionAttributeMap attributes) {
         this.attributes = attributes;
     }
-    
+
     protected final void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
         this.writeRequestQueue =
             new CloseRequestAwareWriteRequestQueue(writeRequestQueue);
@@ -394,14 +393,14 @@ public abstract class AbstractIoSession implements IoSession {
         if (trafficMask == null) {
             throw new NullPointerException("trafficMask");
         }
-        
+
         if (isClosing() || !isConnected()) {
             return;
         }
-        
+
         getFilterChain().fireFilterSetTrafficMask(trafficMask);
     }
-    
+
     protected final void setTrafficMaskNow(TrafficMask trafficMask) {
         this.trafficMask = trafficMask;
     }
@@ -453,38 +452,38 @@ public abstract class AbstractIoSession implements IoSession {
     public final double getWrittenMessagesThroughput() {
         return writtenMessagesThroughput;
     }
-    
+
     /**
      * Update all statistical properties related with throughput assuming
      * the specified time is the current time.  By default this method returns
-     * silently without updating the throughput properties if they were 
-     * calculated already within last 
+     * silently without updating the throughput properties if they were
+     * calculated already within last
      * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
-     * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method 
+     * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method
      * updates the throughput properties immediately.
 
      * @param currentTime the current time in milliseconds
      */
     protected final void updateThroughput(long currentTime, boolean force) {
         int interval = (int) (currentTime - lastThroughputCalculationTime);
-        
+
         long minInterval = getConfig().getThroughputCalculationIntervalInMillis();
         if (minInterval == 0 || interval < minInterval) {
             if (!force) {
                 return;
             }
         }
-        
+
         readBytesThroughput = (readBytes - lastReadBytes) * 1000.0 / interval;
         writtenBytesThroughput = (writtenBytes - lastWrittenBytes) * 1000.0 / interval;
         readMessagesThroughput = (readMessages - lastReadMessages) * 1000.0 / interval;
         writtenMessagesThroughput = (writtenMessages - lastWrittenMessages) * 1000.0 / interval;
-        
+
         lastReadBytes = readBytes;
         lastWrittenBytes = writtenBytes;
         lastReadMessages = readMessages;
         lastWrittenMessages = writtenMessages;
-        
+
         lastThroughputCalculationTime = currentTime;
     }
 
@@ -496,7 +495,7 @@ public abstract class AbstractIoSession implements IoSession {
         return scheduledWriteMessages.get();
     }
 
-    protected void setScheduledWriteBytes(long byteCount){
+    protected void setScheduledWriteBytes(int byteCount){
         scheduledWriteBytes.set(byteCount);
     }
 
@@ -508,7 +507,7 @@ public abstract class AbstractIoSession implements IoSession {
         if (increment <= 0) {
             return;
         }
-        
+
         readBytes += increment;
         lastReadTime = currentTime;
         idleCountForBoth = 0;
@@ -518,19 +517,19 @@ public abstract class AbstractIoSession implements IoSession {
             ((AbstractIoService) getService()).increaseReadBytes(increment, currentTime);
         }
     }
-    
+
     protected final void increaseReadMessages(long currentTime) {
         readMessages++;
         lastReadTime = currentTime;
         idleCountForBoth = 0;
         idleCountForRead = 0;
-        
+
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).increaseReadMessages(currentTime);
         }
     }
 
-    protected final void increaseWrittenBytes(long increment, long currentTime) {
+    protected final void increaseWrittenBytes(int increment, long currentTime) {
         if (increment <= 0) {
             return;
         }
@@ -566,7 +565,7 @@ public abstract class AbstractIoSession implements IoSession {
         decreaseScheduledWriteMessages();
     }
 
-    protected final void increaseScheduledWriteBytes(long increment) {
+    protected final void increaseScheduledWriteBytes(int increment) {
         scheduledWriteBytes.addAndGet(increment);
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).increaseScheduledWriteBytes(increment);
@@ -607,11 +606,11 @@ public abstract class AbstractIoSession implements IoSession {
         }
         return writeRequestQueue;
     }
-    
+
     public final WriteRequest getCurrentWriteRequest() {
         return currentWriteRequest;
     }
-    
+
     public final Object getCurrentWriteMessage() {
         WriteRequest req = getCurrentWriteRequest();
         if (req == null) {
@@ -619,7 +618,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
         return req.getMessage();
     }
-    
+
     protected final void setCurrentWriteRequest(WriteRequest currentWriteRequest) {
         this.currentWriteRequest = currentWriteRequest;
     }
@@ -691,7 +690,7 @@ public abstract class AbstractIoSession implements IoSession {
     public final boolean isWriterIdle() {
         return isIdle(IdleStatus.WRITER_IDLE);
     }
-    
+
     public final int getIdleCount(IdleStatus status) {
         if (getConfig().getIdleTime(status) == 0) {
             if (status == IdleStatus.BOTH_IDLE) {
@@ -806,7 +805,7 @@ public abstract class AbstractIoSession implements IoSession {
                     getLocalAddress() + " => " + getRemoteAddress() + ')';
         }
     }
-    
+
     private String getIdAsString() {
         String id = Long.toHexString(getId()).toUpperCase();
 
@@ -816,7 +815,7 @@ public abstract class AbstractIoSession implements IoSession {
             id = '0' + id; // padding
         }
         id = "0x" + id;
-        
+
         return id;
     }
 
@@ -828,11 +827,11 @@ public abstract class AbstractIoSession implements IoSession {
             return tm.getProviderName() + ' ' + tm.getName();
         }
     }
-    
+
     private class CloseRequestAwareWriteRequestQueue implements WriteRequestQueue {
-        
+
         private final WriteRequestQueue q;
-        
+
         public CloseRequestAwareWriteRequestQueue(WriteRequestQueue q) {
             this.q = q;
         }
@@ -846,7 +845,7 @@ public abstract class AbstractIoSession implements IoSession {
             }
             return answer;
         }
-        
+
         public void offer(IoSession session, WriteRequest e) {
             q.offer(session, e);
         }
@@ -854,7 +853,7 @@ public abstract class AbstractIoSession implements IoSession {
         public boolean isEmpty(IoSession session) {
             return q.isEmpty(session);
         }
-        
+
         public void clear(IoSession session) {
             q.clear(session);
         }

@@ -102,8 +102,8 @@ public abstract class AbstractIoService implements IoService {
     private long lastReadTime;
     private long lastWriteTime;
 
-    private final AtomicLong scheduledWriteBytes = new AtomicLong();
-    private final AtomicLong scheduledWriteMessages = new AtomicLong();
+    private final AtomicInteger scheduledWriteBytes = new AtomicInteger();
+    private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
 
     private final Object throughputCalculationLock = new Object();
     private int throughputCalculationInterval = 3;
@@ -153,8 +153,8 @@ public abstract class AbstractIoService implements IoService {
                     + getTransportMetadata().getSessionConfigType() + ")");
         }
 
-        this.listeners = new IoServiceListenerSupport(this);
-        this.listeners.add(serviceActivationListener);
+        listeners = new IoServiceListenerSupport(this);
+        listeners.add(serviceActivationListener);
         this.sessionConfig = sessionConfig;
 
         // Make JVM load the exception monitor before some transports
@@ -163,13 +163,13 @@ public abstract class AbstractIoService implements IoService {
 
         if (executor == null) {
             this.executor = Executors.newCachedThreadPool();
-            this.createdExecutor = true;
+            createdExecutor = true;
         } else {
             this.executor = executor;
-            this.createdExecutor = false;
+            createdExecutor = false;
         }
 
-        this.threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
+        threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
 
         executeWorker(idleStatusChecker.getNotifyingTask(), "idleStatusChecker");
     }
@@ -438,15 +438,15 @@ public abstract class AbstractIoService implements IoService {
         }
     }
 
-    public final long getScheduledWriteBytes() {
+    public final int getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
 
-    protected final void increaseScheduledWriteBytes(long increment) {
+    protected final void increaseScheduledWriteBytes(int increment) {
         scheduledWriteBytes.addAndGet(increment);
     }
 
-    public final long getScheduledWriteMessages() {
+    public final int getScheduledWriteMessages() {
         return scheduledWriteMessages.get();
     }
 

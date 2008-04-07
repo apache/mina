@@ -46,22 +46,22 @@ public interface IoService {
      * related with this service.
      */
     void removeListener(IoServiceListener listener);
-    
+
     /**
      * Returns <tt>true</tt> if and if only {@link #dispose()} method has
      * been called.  Please note that this method will return <tt>true</tt>
      * even after all the related resources are released.
      */
     boolean isDisposing();
-    
+
     /**
      * Returns <tt>true</tt> if and if only all resources of this processor
      * have been disposed.
      */
     boolean isDisposed();
-    
+
     /**
-     * Releases any resources allocated by this service.  Please note that 
+     * Releases any resources allocated by this service.  Please note that
      * this method might block as long as there are any sessions managed by
      * this service.
      */
@@ -83,19 +83,19 @@ public interface IoService {
      * @return the sessions. An empty collection if there's no session.
      */
     Set<IoSession> getManagedSessions();
-    
+
     /**
      * Returns the number of all sessions which are currently managed by this
      * service.
      */
     int getManagedSessionCount();
-    
+
     /**
      * Returns the maximum number of sessions which were being managed at the
      * same time.
      */
     int getLargestManagedSessionCount();
-    
+
     /**
      * Returns the cumulative number of sessions which were managed (or are
      * being managed) by this service, which means 'currently managed session
@@ -169,25 +169,25 @@ public interface IoService {
      * Returns the time in millis when write operation occurred lastly.
      */
     long getLastWriteTime();
-    
+
     /**
      * Returns <code>true</code> if this service is idle for the specified
      * {@link IdleStatus}.
      */
     boolean isIdle(IdleStatus status);
-    
+
     /**
      * Returns <code>true</code> if this service is {@link IdleStatus#READER_IDLE}.
      * @see #isIdle(IdleStatus)
      */
     boolean isReaderIdle();
-    
+
     /**
      * Returns <code>true</code> if this service is {@link IdleStatus#WRITER_IDLE}.
      * @see #isIdle(IdleStatus)
      */
     boolean isWriterIdle();
-    
+
     /**
      * Returns <code>true</code> if this service is {@link IdleStatus#BOTH_IDLE}.
      * @see #isIdle(IdleStatus)
@@ -219,34 +219,34 @@ public interface IoService {
      * @see #getIdleCount(IdleStatus)
      */
     int getWriterIdleCount();
-    
+
     /**
      * Returns the number of the fired continuous <tt>serviceIdle</tt> events
      * for {@link IdleStatus#BOTH_IDLE}.
      * @see #getIdleCount(IdleStatus)
      */
     int getBothIdleCount();
-    
+
     /**
      * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
      * is fired for the specified {@link IdleStatus}.
      */
     long getLastIdleTime(IdleStatus status);
-    
+
     /**
      * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
      * is fired for {@link IdleStatus#READER_IDLE}.
      * @see #getLastIdleTime(IdleStatus)
      */
     long getLastReaderIdleTime();
-    
+
     /**
      * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
      * is fired for {@link IdleStatus#WRITER_IDLE}.
      * @see #getLastIdleTime(IdleStatus)
      */
     long getLastWriterIdleTime();
-    
+
     /**
      * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
      * is fired for {@link IdleStatus#BOTH_IDLE}.
@@ -258,7 +258,7 @@ public interface IoService {
      * Returns idle time for the specified type of idleness in seconds.
      */
     int getIdleTime(IdleStatus status);
-    
+
     /**
      * Returns idle time for the specified type of idleness in milliseconds.
      */
@@ -268,47 +268,47 @@ public interface IoService {
      * Sets idle time for the specified type of idleness in seconds.
      */
     void setIdleTime(IdleStatus status, int idleTime);
-    
+
     /**
      * Returns idle time for {@link IdleStatus#READER_IDLE} in seconds.
      */
     int getReaderIdleTime();
-    
+
     /**
      * Returns idle time for {@link IdleStatus#READER_IDLE} in milliseconds.
      */
     long getReaderIdleTimeInMillis();
-    
+
     /**
      * Sets idle time for {@link IdleStatus#READER_IDLE} in seconds.
      */
     void setReaderIdleTime(int idleTime);
-    
+
     /**
      * Returns idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
      */
     int getWriterIdleTime();
-    
+
     /**
      * Returns idle time for {@link IdleStatus#WRITER_IDLE} in milliseconds.
      */
     long getWriterIdleTimeInMillis();
-    
+
     /**
      * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
      */
     void setWriterIdleTime(int idleTime);
-    
+
     /**
      * Returns idle time for {@link IdleStatus#BOTH_IDLE} in seconds.
      */
     int getBothIdleTime();
-    
+
     /**
      * Returns idle time for {@link IdleStatus#BOTH_IDLE} in milliseconds.
      */
     long getBothIdleTimeInMillis();
-    
+
     /**
      * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
      */
@@ -345,7 +345,7 @@ public interface IoService {
      * 	The number of messages this service has written
      */
     long getWrittenMessages();
-    
+
     /**
      * Returns the number of read bytes per second.
      */
@@ -355,32 +355,32 @@ public interface IoService {
      * Returns the number of written bytes per second.
      */
     double getWrittenBytesThroughput();
-    
+
     /**
      * Returns the number of read messages per second.
      */
     double getReadMessagesThroughput();
-    
+
     /**
      * Returns the number of written messages per second.
      */
     double getWrittenMessagesThroughput();
-    
+
     /**
      * Returns the maximum of the {@link #getReadBytesThroughput() readBytesThroughput}.
      */
     double getLargestReadBytesThroughput();
-    
+
     /**
      * Returns the maximum of the {@link #getWrittenBytesThroughput() writtenBytesThroughput}.
      */
     double getLargestWrittenBytesThroughput();
-    
+
     /**
      * Returns the maximum of the {@link #getReadMessagesThroughput() readMessagesThroughput}.
      */
     double getLargestReadMessagesThroughput();
-    
+
     /**
      * Returns the maximum of the {@link #getWrittenMessagesThroughput() writtenMessagesThroughput}.
      */
@@ -391,13 +391,13 @@ public interface IoService {
      * The default value is <tt>3</tt> seconds.
      */
     int getThroughputCalculationInterval();
-    
+
     /**
      * Returns the interval (milliseconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */
     long getThroughputCalculationIntervalInMillis();
-    
+
     /**
      * Sets the interval (seconds) between each throughput calculation.  The
      * default value is <tt>3</tt> seconds.
@@ -410,7 +410,7 @@ public interface IoService {
      * @return
      * 	The number of bytes scheduled to be written
      */
-    long getScheduledWriteBytes();
+    int getScheduledWriteBytes();
 
     /**
      * Returns the number of messages scheduled to be written
@@ -418,7 +418,7 @@ public interface IoService {
      * @return
      * 	The number of messages scheduled to be written
      */
-    long getScheduledWriteMessages();
+    int getScheduledWriteMessages();
 
     /**
      * Writes the specified {@code message} to all the {@link IoSession}s
@@ -426,13 +426,13 @@ public interface IoService {
      * {@link IoUtil#broadcast(Object, Collection)}.
      */
     Set<WriteFuture> broadcast(Object message);
-    
+
     /**
      * Returns the {@link IoSessionDataStructureFactory} that provides
      * related data structures for a new session created by this service.
      */
     IoSessionDataStructureFactory getSessionDataStructureFactory();
-    
+
     /**
      * Sets the {@link IoSessionDataStructureFactory} that provides
      * related data structures for a new session created by this service.

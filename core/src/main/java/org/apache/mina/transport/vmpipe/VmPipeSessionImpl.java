@@ -80,12 +80,12 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
                       VmPipeAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
         this.service = service;
         this.serviceListeners = serviceListeners;
-        this.lock = new ReentrantLock();
+        lock = new ReentrantLock();
         this.localAddress = localAddress;
-        this.remoteAddress = this.serviceAddress = remoteEntry.getAddress();
+        remoteAddress = serviceAddress = remoteEntry.getAddress();
         this.handler = handler;
-        this.filterChain = new VmPipeFilterChain(this);
-        this.receivedMessageQueue = new LinkedBlockingQueue<Object>();
+        filterChain = new VmPipeFilterChain(this);
+        receivedMessageQueue = new LinkedBlockingQueue<Object>();
 
         remoteSession = new VmPipeSessionImpl(this, remoteEntry);
     }
@@ -94,15 +94,15 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
      * Constructor for server-side session.
      */
     private VmPipeSessionImpl(VmPipeSessionImpl remoteSession, VmPipe entry) {
-        this.service = entry.getAcceptor();
-        this.serviceListeners = entry.getListeners();
-        this.lock = remoteSession.lock;
-        this.localAddress = this.serviceAddress = remoteSession.remoteAddress;
-        this.remoteAddress = remoteSession.localAddress;
-        this.handler = entry.getHandler();
-        this.filterChain = new VmPipeFilterChain(this);
+        service = entry.getAcceptor();
+        serviceListeners = entry.getListeners();
+        lock = remoteSession.lock;
+        localAddress = serviceAddress = remoteSession.remoteAddress;
+        remoteAddress = remoteSession.localAddress;
+        handler = entry.getHandler();
+        filterChain = new VmPipeFilterChain(this);
         this.remoteSession = remoteSession;
-        this.receivedMessageQueue = new LinkedBlockingQueue<Object>();
+        receivedMessageQueue = new LinkedBlockingQueue<Object>();
     }
 
     public IoService getService() {
@@ -150,8 +150,8 @@ class VmPipeSessionImpl extends AbstractIoSession implements VmPipeSession {
     public VmPipeAddress getServiceAddress() {
         return serviceAddress;
     }
-    
-    void increaseWrittenBytes0(long increment, long currentTime) {
+
+    void increaseWrittenBytes0(int increment, long currentTime) {
         super.increaseWrittenBytes(increment, currentTime);
     }
 
