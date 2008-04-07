@@ -59,7 +59,7 @@ public interface IoSession {
      * ID which is different from each other.
      */
     long getId();
-    
+
     /**
      * Returns the {@link IoService} which provides I/O service to this session.
      */
@@ -84,7 +84,7 @@ public interface IoSession {
      * Returns the {@link TransportMetadata} that this session runs on.
      */
     TransportMetadata getTransportMetadata();
-    
+
     /**
      * Returns a {@link ReadFuture} which is notified when a new message is
      * received, the connection is closed or an exception is caught.  This
@@ -94,8 +94,8 @@ public interface IoSession {
      * queued somewhere to support this operation, possibly leading to memory
      * leak.  This means you have to keep calling {@link #read()} once you
      * enabled this operation.  To enable this operation, please call
-     * {@link IoSessionConfig#setUseReadOperation(boolean)} with <tt>true</tt>. 
-     * 
+     * {@link IoSessionConfig#setUseReadOperation(boolean)} with <tt>true</tt>.
+     *
      * @throws IllegalStateException if
      * {@link IoSessionConfig#setUseReadOperation(boolean) useReadOperation}
      * option has not been enabled.
@@ -162,7 +162,7 @@ public interface IoSession {
     /**
      * Returns an attachment of this session.
      * This method is identical with <tt>getAttribute( "" )</tt>.
-     * 
+     *
      * @deprecated Use {@link #getAttribute(Object)} instead.
      */
     @Deprecated Object getAttachment();
@@ -403,17 +403,17 @@ public interface IoSession {
      * Returns the number of written bytes per second.
      */
     double getWrittenBytesThroughput();
-    
+
     /**
      * Returns the number of read messages per second.
      */
     double getReadMessagesThroughput();
-    
+
     /**
      * Returns the number of written messages per second.
      */
     double getWrittenMessagesThroughput();
-    
+
     /**
      * Returns the number of messages which are scheduled to be written to this session.
      */
@@ -424,7 +424,7 @@ public interface IoSession {
      * session.
      */
     long getScheduledWriteBytes();
-    
+
     /**
      * Returns the message which is being written by {@link IoService}.
      * @return <tt>null</tt> if and if only no message is being written
@@ -434,7 +434,7 @@ public interface IoSession {
     /**
      * Returns the {@link WriteRequest} which is being processed by
      * {@link IoService}.
-     * 
+     *
      * @return <tt>null</tt> if and if only no message is being written
      */
     WriteRequest getCurrentWriteRequest();
@@ -466,6 +466,24 @@ public interface IoSession {
     boolean isIdle(IdleStatus status);
 
     /**
+     * Returns <code>true</code> if this session is {@link IdleStatus#READER_IDLE}.
+     * @see #isIdle(IdleStatus)
+     */
+    boolean isReaderIdle();
+
+    /**
+     * Returns <code>true</code> if this session is {@link IdleStatus#WRITER_IDLE}.
+     * @see #isIdle(IdleStatus)
+     */
+    boolean isWriterIdle();
+
+    /**
+     * Returns <code>true</code> if this session is {@link IdleStatus#BOTH_IDLE}.
+     * @see #isIdle(IdleStatus)
+     */
+    boolean isBothIdle();
+
+    /**
      * Returns the number of the fired continuous <tt>sessionIdle</tt> events
      * for the specified {@link IdleStatus}.
      * <p/>
@@ -490,20 +508,20 @@ public interface IoSession {
      * @see #getIdleCount(IdleStatus)
      */
     int getWriterIdleCount();
-    
+
     /**
      * Returns the number of the fired continuous <tt>sessionIdle</tt> events
      * for {@link IdleStatus#BOTH_IDLE}.
      * @see #getIdleCount(IdleStatus)
      */
     int getBothIdleCount();
-    
+
     /**
      * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for the specified {@link IdleStatus}.
      */
     long getLastIdleTime(IdleStatus status);
-    
+
 
     /**
      * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
@@ -511,14 +529,14 @@ public interface IoSession {
      * @see #getLastIdleTime(IdleStatus)
      */
     long getLastReaderIdleTime();
-    
+
     /**
      * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for {@link IdleStatus#WRITER_IDLE}.
      * @see #getLastIdleTime(IdleStatus)
      */
     long getLastWriterIdleTime();
-    
+
     /**
      * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for {@link IdleStatus#BOTH_IDLE}.
