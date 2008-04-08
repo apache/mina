@@ -245,18 +245,25 @@ public abstract class AbstractIoSession implements IoSession {
             if (oldReadyReadFutures != null) {
                 readyReadFutures = oldReadyReadFutures;
             }
-
-            // Initialize waitingReadFutures together.
-            Queue<ReadFuture> waitingReadFutures =
-                new CircularQueue<ReadFuture>();
-            setAttributeIfAbsent(WAITING_READ_FUTURES, waitingReadFutures);
         }
         return readyReadFutures;
     }
 
     @SuppressWarnings("unchecked")
     private Queue<ReadFuture> getWaitingReadFutures() {
-        return (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES);
+        Queue<ReadFuture> waitingReadyReadFutures =
+            (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES);
+        if (waitingReadyReadFutures == null) {
+            waitingReadyReadFutures = new CircularQueue<ReadFuture>();
+
+            Queue<ReadFuture> oldWaitingReadyReadFutures =
+                (Queue<ReadFuture>) setAttributeIfAbsent(
+                        WAITING_READ_FUTURES, waitingReadyReadFutures);
+            if (oldWaitingReadyReadFutures != null) {
+                waitingReadyReadFutures = oldWaitingReadyReadFutures;
+            }
+        }
+        return waitingReadyReadFutures;
     }
 
     public final WriteFuture write(Object message) {
