@@ -93,9 +93,11 @@ public class StateMachineProxyBuilder {
     /**
      * Set the class loader to use for instanciate proxies.
      * @params cl the class loader
+     * @return StateMachineProxyBuilder this for chaining 
      */
-    public void setClassLoader(ClassLoader cl) {
+    public StateMachineProxyBuilder setClassLoader(ClassLoader cl) {
         this.defaultCl = cl;
+        return this;
     }
 
     @SuppressWarnings("unchecked")
