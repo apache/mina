@@ -57,6 +57,9 @@ public class StateMachineProxyBuilder {
 
     private boolean ignoreStateContextLookupFailure = false;
 
+    // the classloader to use, if null, then will use the class local one
+    private ClassLoader defaultCl = null; 
+
     public StateMachineProxyBuilder() {
     }
 
@@ -87,14 +90,25 @@ public class StateMachineProxyBuilder {
         return this;
     }
 
+    /**
+     * Set the class loader to use for instanciate proxies.
+     * @params cl the class loader
+     */
+    public void setClassLoader(ClassLoader cl) {
+        this.defaultCl = cl;
+    }
+
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> iface, StateMachine sm) {
         return (T) create(new Class[] { iface }, sm);
     }
 
     public Object create(Class<?>[] ifaces, StateMachine sm) {
+	ClassLoader cl = defaultCl;
+	if (cl == null) {
+	   cl = Thread.currentThread().getContextClassLoader();
+	}
 
-        ClassLoader cl = StateMachineProxyBuilder.class.getClassLoader();
         InvocationHandler handler = new MethodInvocationHandler(sm,
                 contextLookup, interceptor, eventFactory,
                 ignoreUnhandledEvents, ignoreStateContextLookupFailure);
