@@ -30,8 +30,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.WriteRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IoFilter} that sends a keep-alive request on
@@ -65,8 +63,9 @@ import org.slf4j.LoggerFactory;
  * <td>You want a keep-alive request is sent when the reader is idle.
  * Once the request is sent, the response for the request should be
  * received within <tt>keepAliveRequestTimeout</tt> seconds.  Otherwise,
- * the specified {@link KeepAlivePolicy} will be enforced.  If a keep-alive
- * request is received, its response also should be sent back.</td>
+ * the specified {@link KeepAliveRequestTimeoutHandler} will be invoked.
+ * If a keep-alive request is received, its response also should be sent back.
+ * </td>
  * <td>Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
  * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
  * return a non-<tt>null</tt>.</td>
@@ -80,8 +79,10 @@ import org.slf4j.LoggerFactory;
  * </td>
  * <td>Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
  * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- * return a non-<tt>null</tt>, and the <tt>policy</tt> property
- * should be set to {@link KeepAlivePolicy#OFF} or {@link KeepAlivePolicy#LOG}.
+ * return a non-<tt>null</tt>, and the <tt>timeoutHandler</tt> property
+ * should be set to {@link KeepAliveRequestTimeoutHandler#NOOP},
+ * {@link KeepAliveRequestTimeoutHandler#LOG} or the custom {@link KeepAliveRequestTimeoutHandler}
+ * implementation that doesn't affect the session state nor throw an exception.
  * </td>
  * </tr>
  * <tr valign="top">
@@ -99,8 +100,8 @@ import org.slf4j.LoggerFactory;
  * <td>{@link KeepAliveMessageFactory#getRequest(IoSession)} must return
  * a non-<tt>null</tt>,
  * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- * return <tt>null</tt> and the {@link KeepAlivePolicy} must be set to
- * {@link KeepAlivePolicy#OFF}.</td>
+ * return <tt>null</tt> and the <tt>timeoutHandler</tt> must be set to
+ * {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}.</td>
  * </tr>
  * <tr valign="top">
  * <td>Silent Listener</td>
@@ -116,12 +117,22 @@ import org.slf4j.LoggerFactory;
  * {@link KeepAliveMessageFactory#isResponse(IoSession, Object)} properly
  * whatever case you chose.
  *
- * <h2>Enforcing a policy</h2>
+ * <h2>Handling timeout</h2>
  *
- * You can enforce a predefined policy by specifying a {@link KeepAlivePolicy}.
- * The default policy is {@link KeepAlivePolicy#CLOSE}.  Setting the policy
- * to {@link KeepAlivePolicy#OFF} stops this filter from waiting for response
- * messages and therefore disables <tt>keepAliveRequestTimeout</tt> property.
+ * {@link KeepAliveFilter} will notify its {@link KeepAliveRequestTimeoutHandler}
+ * when {@link KeepAliveFilter} didn't receive the response message for a sent
+ * keep-alive message.  The default handler is {@link KeepAliveRequestTimeoutHandler#CLOSE},
+ * but you can use other presets such as {@link KeepAliveRequestTimeoutHandler#NOOP},
+ * {@link KeepAliveRequestTimeoutHandler#LOG} or {@link KeepAliveRequestTimeoutHandler#EXCEPTION}.
+ * You can even implement your own handler.
+ *
+ * <h3>Special handler: {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}</h3>
+ *
+ * {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER} is a special handler which is
+ * dedicated for the 'deaf speaker' mode mentioned above.  Setting the
+ * <tt>timeoutHandler</tt> property to {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}
+ * stops this filter from waiting for response messages and therefore disables
+ * response timeout detection.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -133,32 +144,30 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
     private final KeepAliveMessageFactory messageFactory;
     private final IdleStatus interestedIdleStatus;
-    private volatile KeepAlivePolicy policy;
-    private volatile int keepAliveRequestInterval;
-    private volatile int keepAliveRequestTimeout;
+    private volatile KeepAliveRequestTimeoutHandler requestTimeoutHandler;
+    private volatile int requestInterval;
+    private volatile int requestTimeout;
     private volatile boolean forwardEvent;
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * Creates a new instance with the default properties.
      * The default property values are:
      * <ul>
      * <li><tt>interestedIdleStatus</tt> - {@link IdleStatus#READER_IDLE}</li>
-     * <li><tt>policy</tt> = {@link KeepAlivePolicy#CLOSE}</li>
+     * <li><tt>policy</tt> = {@link KeepAliveRequestTimeoutHandler#CLOSE}</li>
      * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
      */
     public KeepAliveFilter(KeepAliveMessageFactory messageFactory) {
-        this(messageFactory, IdleStatus.READER_IDLE, KeepAlivePolicy.CLOSE);
+        this(messageFactory, IdleStatus.READER_IDLE, KeepAliveRequestTimeoutHandler.CLOSE);
     }
 
     /**
      * Creates a new instance with the default properties.
      * The default property values are:
      * <ul>
-     * <li><tt>policy</tt> = {@link KeepAlivePolicy#CLOSE}</li>
+     * <li><tt>policy</tt> = {@link KeepAliveRequestTimeoutHandler#CLOSE}</li>
      * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
@@ -166,7 +175,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
     public KeepAliveFilter(
             KeepAliveMessageFactory messageFactory,
             IdleStatus interestedIdleStatus) {
-        this(messageFactory, interestedIdleStatus, KeepAlivePolicy.CLOSE, 60, 30);
+        this(messageFactory, interestedIdleStatus, KeepAliveRequestTimeoutHandler.CLOSE, 60, 30);
     }
 
     /**
@@ -179,7 +188,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * </ul>
      */
     public KeepAliveFilter(
-            KeepAliveMessageFactory messageFactory, KeepAlivePolicy policy) {
+            KeepAliveMessageFactory messageFactory, KeepAliveRequestTimeoutHandler policy) {
         this(messageFactory, IdleStatus.READER_IDLE, policy, 60, 30);
     }
 
@@ -193,7 +202,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
      */
     public KeepAliveFilter(
             KeepAliveMessageFactory messageFactory,
-            IdleStatus interestedIdleStatus, KeepAlivePolicy policy) {
+            IdleStatus interestedIdleStatus, KeepAliveRequestTimeoutHandler policy) {
         this(messageFactory, interestedIdleStatus, policy, 60, 30);
     }
 
@@ -202,7 +211,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
      */
     public KeepAliveFilter(
             KeepAliveMessageFactory messageFactory,
-            IdleStatus interestedIdleStatus, KeepAlivePolicy policy,
+            IdleStatus interestedIdleStatus, KeepAliveRequestTimeoutHandler policy,
             int keepAliveRequestInterval, int keepAliveRequestTimeout) {
         if (messageFactory == null) {
             throw new NullPointerException("messageFactory");
@@ -216,51 +225,51 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
         this.messageFactory = messageFactory;
         this.interestedIdleStatus = interestedIdleStatus;
-        this.policy = policy;
+        requestTimeoutHandler = policy;
 
-        setKeepAliveRequestInterval(keepAliveRequestInterval);
-        setKeepAliveRequestTimeout(keepAliveRequestTimeout);
+        setRequestInterval(keepAliveRequestInterval);
+        setRequestTimeout(keepAliveRequestTimeout);
     }
 
     public IdleStatus getInterestedIdleStatus() {
         return interestedIdleStatus;
     }
 
-    public KeepAlivePolicy getPolicy() {
-        return policy;
+    public KeepAliveRequestTimeoutHandler getRequestTimeoutHandler() {
+        return requestTimeoutHandler;
     }
 
-    public void setPolicy(KeepAlivePolicy policy) {
-        if (policy == null) {
-            throw new NullPointerException("policy");
+    public void setRequestTimeoutHandler(KeepAliveRequestTimeoutHandler timeoutHandler) {
+        if (timeoutHandler == null) {
+            throw new NullPointerException("timeoutHandler");
         }
-        this.policy = policy;
+        requestTimeoutHandler = timeoutHandler;
     }
 
-    public int getKeepAliveRequestInterval() {
-        return keepAliveRequestInterval;
+    public int getRequestInterval() {
+        return requestInterval;
     }
 
-    public void setKeepAliveRequestInterval(int keepAliveRequestInterval) {
+    public void setRequestInterval(int keepAliveRequestInterval) {
         if (keepAliveRequestInterval <= 0) {
             throw new IllegalArgumentException(
                     "keepAliveRequestInterval must be a positive integer: " +
                     keepAliveRequestInterval);
         }
-        this.keepAliveRequestInterval = keepAliveRequestInterval;
+        requestInterval = keepAliveRequestInterval;
     }
 
-    public int getKeepAliveRequestTimeout() {
-        return keepAliveRequestTimeout;
+    public int getRequestTimeout() {
+        return requestTimeout;
     }
 
-    public void setKeepAliveRequestTimeout(int keepAliveRequestTimeout) {
+    public void setRequestTimeout(int keepAliveRequestTimeout) {
         if (keepAliveRequestTimeout <= 0) {
             throw new IllegalArgumentException(
                     "keepAliveRequestTimeout must be a positive integer: " +
                     keepAliveRequestTimeout);
         }
-        this.keepAliveRequestTimeout = keepAliveRequestTimeout;
+        requestTimeout = keepAliveRequestTimeout;
     }
 
     public KeepAliveMessageFactory getMessageFactory() {
@@ -353,7 +362,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
                     // If policy is OFF, there's no need to wait for
                     // the response.
-                    if (getPolicy() != KeepAlivePolicy.OFF) {
+                    if (getRequestTimeoutHandler() != KeepAliveRequestTimeoutHandler.DEAF_SPEAKER) {
                         markStatus(session);
                     } else {
                         resetStatus(session);
@@ -363,7 +372,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
                 handlePingTimeout(session);
             }
         } else if (status == IdleStatus.READER_IDLE) {
-            handlePingTimeout(session);
+            if (session.containsAttribute(WAITING_FOR_RESPONSE)) {
+                handlePingTimeout(session);
+            }
         }
 
         if (forwardEvent) {
@@ -371,48 +382,27 @@ public class KeepAliveFilter extends IoFilterAdapter {
         }
     }
 
-    private void handlePingTimeout(IoSession session) {
+    private void handlePingTimeout(IoSession session) throws Exception {
         resetStatus(session);
-        switch (getPolicy()) {
-        case OFF:
-            break;
-        case LOG:
-            logTimeout();
-            break;
-        case EXCEPTION:
-            throw new KeepAliveTimeoutException(
-                    getTimeoutMessage());
-        case CLOSE:
-            logTimeout();
-            session.close();
-            break;
-        default:
-            throw new InternalError();
+        KeepAliveRequestTimeoutHandler handler = getRequestTimeoutHandler();
+        if (handler == KeepAliveRequestTimeoutHandler.DEAF_SPEAKER) {
+            return;
         }
-    }
 
-    private void logTimeout() {
-        if (logger.isWarnEnabled()) {
-            logger.warn(getTimeoutMessage());
-        }
-    }
-
-    private String getTimeoutMessage() {
-        return "Keep-alive response message was not received within " +
-        getKeepAliveRequestTimeout() + " second(s).";
+        handler.keepAliveRequestTimedOut(this, session);
     }
 
     private void markStatus(IoSession session) {
         session.getConfig().setIdleTime(interestedIdleStatus, 0);
-        session.getConfig().setIdleTime(
-                IdleStatus.READER_IDLE, getKeepAliveRequestTimeout());
+        session.getConfig().setReaderIdleTime(getRequestTimeout());
         session.setAttribute(WAITING_FOR_RESPONSE);
     }
 
     private void resetStatus(IoSession session) {
-        session.getConfig().setIdleTime(IdleStatus.READER_IDLE, 0);
+        session.getConfig().setReaderIdleTime(0);
+        session.getConfig().setWriterIdleTime(0);
         session.getConfig().setIdleTime(
-                interestedIdleStatus, getKeepAliveRequestInterval());
+                interestedIdleStatus, getRequestInterval());
         session.removeAttribute(WAITING_FOR_RESPONSE);
     }
 
