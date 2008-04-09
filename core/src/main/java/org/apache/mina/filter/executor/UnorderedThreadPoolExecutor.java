@@ -47,79 +47,88 @@ import org.apache.mina.common.IoEvent;
  * </ul>
  * If you need to maintain the order of events per session, please use
  * {@link OrderedThreadPoolExecutor}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private static final Runnable EXIT_SIGNAL = new Runnable() {
-        public void run() {}
+        public void run() {
+            throw new Error(
+                    "This method shouldn't be called. " +
+                    "Please file a bug report.");
+        }
     };
+
     private static final IoEventQueueHandler NOOP_QUEUE_HANDLER = new IoEventQueueHandler() {
         public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
             return true;
         }
-        public void offered(ThreadPoolExecutor executor, IoEvent event) {}
-        public void polled(ThreadPoolExecutor executor, IoEvent event) {}
+        public void offered(ThreadPoolExecutor executor, IoEvent event) {
+            // NOOP
+        }
+        public void polled(ThreadPoolExecutor executor, IoEvent event) {
+            // NOOP
+        }
     };
 
     private final Set<Worker> workers = new HashSet<Worker>();
-    
+
     private volatile int corePoolSize;
     private volatile int maximumPoolSize;
     private volatile int largestPoolSize;
     private final AtomicInteger idleWorkers = new AtomicInteger();
-    
+
     private long completedTaskCount;
     private volatile boolean shutdown;
-    
+
     private final IoEventQueueHandler queueHandler;
-    
+
     public UnorderedThreadPoolExecutor() {
         this(16);
     }
-    
+
     public UnorderedThreadPoolExecutor(int maximumPoolSize) {
         this(0, maximumPoolSize);
     }
-    
+
     public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize) {
         this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS);
     }
-    
+
     public UnorderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory());
     }
-    
+
     public UnorderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize, 
+            int corePoolSize, int maximumPoolSize,
             long keepAliveTime, TimeUnit unit,
             IoEventQueueHandler queueHandler) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler);
     }
 
     public UnorderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize, 
+            int corePoolSize, int maximumPoolSize,
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, null);
     }
 
     public UnorderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize, 
+            int corePoolSize, int maximumPoolSize,
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
         super(0, 1, keepAliveTime, unit, new LinkedBlockingQueue<Runnable>(), threadFactory, new AbortPolicy());
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
         }
-        
+
         if (maximumPoolSize == 0 || maximumPoolSize < corePoolSize) {
             throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
         }
-        
+
         if (queueHandler == null) {
             queueHandler = NOOP_QUEUE_HANDLER;
         }
@@ -128,7 +137,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         this.maximumPoolSize = maximumPoolSize;
         this.queueHandler = queueHandler;
     }
-    
+
     public IoEventQueueHandler getQueueHandler() {
         return queueHandler;
     }
@@ -149,13 +158,13 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             idleWorkers.incrementAndGet();
             thread.start();
             workers.add(worker);
-            
+
             if (workers.size() > largestPoolSize) {
                 largestPoolSize = workers.size();
             }
         }
     }
-    
+
     private void addWorkerIfNecessary() {
         if (idleWorkers.get() == 0) {
             synchronized (workers) {
@@ -165,7 +174,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
     }
-    
+
     private void removeWorker() {
         synchronized (workers) {
             if (workers.size() <= corePoolSize) {
@@ -174,12 +183,12 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             getQueue().offer(EXIT_SIGNAL);
         }
     }
-    
+
     @Override
     public int getMaximumPoolSize() {
         return maximumPoolSize;
     }
-    
+
     @Override
     public void setMaximumPoolSize(int maximumPoolSize) {
         if (maximumPoolSize <= 0 || maximumPoolSize < corePoolSize) {
@@ -196,20 +205,20 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
     }
-    
+
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit)
             throws InterruptedException {
-        
+
         long deadline = System.currentTimeMillis() + unit.toMillis(timeout);
-        
+
         synchronized (workers) {
             while (!isTerminated()) {
                 long waitTime = deadline - System.currentTimeMillis();
                 if (waitTime <= 0) {
                     break;
                 }
-                
+
                 workers.wait(waitTime);
             }
         }
@@ -226,7 +235,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         if (!shutdown) {
             return false;
         }
-        
+
         synchronized (workers) {
             return workers.isEmpty();
         }
@@ -237,7 +246,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         if (shutdown) {
             return;
         }
-        
+
         shutdown = true;
 
         synchronized (workers) {
@@ -250,7 +259,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     public List<Runnable> shutdownNow() {
         shutdown();
-        
+
         List<Runnable> answer = new ArrayList<Runnable>();
         Runnable task;
         while ((task = getQueue().poll()) != null) {
@@ -259,11 +268,11 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                 Thread.yield(); // Let others take the signal.
                 continue;
             }
-            
+
             getQueueHandler().polled(this, (IoEvent) task);
             answer.add(task);
         }
-        
+
         return answer;
     }
 
@@ -274,24 +283,24 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
 
         checkTaskType(task);
-        
+
         IoEvent e = (IoEvent) task;
         boolean offeredEvent = queueHandler.accept(this, e);
         if (offeredEvent) {
             getQueue().offer(e);
         }
-        
+
         addWorkerIfNecessary();
-        
+
         if (offeredEvent) {
             queueHandler.offered(this, e);
         }
     }
-    
+
     private void rejectTask(Runnable task) {
         getRejectedExecutionHandler().rejectedExecution(task, this);
     }
-    
+
     private void checkTaskType(Runnable task) {
         if (!(task instanceof IoEvent)) {
             throw new IllegalArgumentException("task must be an IoEvent or its subclass.");
@@ -312,7 +321,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             for (Worker w: workers) {
                 answer += w.completedTaskCount;
             }
-            
+
             return answer;
         }
     }
@@ -364,9 +373,10 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
     }
-    
+
     @Override
     public void purge() {
+        // Nothing to purge in this implementation.
     }
 
     @Override
@@ -391,7 +401,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         if (corePoolSize > maximumPoolSize) {
             throw new IllegalArgumentException("corePoolSize exceeds maximumPoolSize");
         }
-                
+
         synchronized (workers) {
             if (this.corePoolSize > corePoolSize) {
                 for (int i = this.corePoolSize - corePoolSize; i > 0; i --) {
@@ -401,21 +411,21 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             this.corePoolSize = corePoolSize;
         }
     }
-    
+
     private class Worker implements Runnable {
-        
+
         private volatile long completedTaskCount;
         private Thread thread;
-        
+
         public void run() {
             thread = Thread.currentThread();
-            
+
             try {
                 for (;;) {
                     Runnable task = fetchTask();
-                    
+
                     idleWorkers.decrementAndGet();
-                    
+
                     if (task == null) {
                         synchronized (workers) {
                             if (workers.size() > corePoolSize) {
@@ -425,11 +435,11 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                             }
                         }
                     }
-                    
+
                     if (task == EXIT_SIGNAL) {
                         break;
                     }
-                    
+
                     try {
                         if (task != null) {
                             queueHandler.polled(UnorderedThreadPoolExecutor.this, (IoEvent) task);
@@ -484,8 +494,9 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                 afterExecute(task, null);
                 completedTaskCount ++;
             } catch (RuntimeException e) {
-                if (!ran)
+                if (!ran) {
                     afterExecute(task, e);
+                }
                 throw e;
             }
         }

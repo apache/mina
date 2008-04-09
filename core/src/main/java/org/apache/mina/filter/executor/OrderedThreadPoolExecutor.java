@@ -56,78 +56,82 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
             return true;
         }
-        public void offered(ThreadPoolExecutor executor, IoEvent event) {}
-        public void polled(ThreadPoolExecutor executor, IoEvent event) {}
+        public void offered(ThreadPoolExecutor executor, IoEvent event) {
+            // NOOP
+        }
+        public void polled(ThreadPoolExecutor executor, IoEvent event) {
+            // NOOP
+        }
     };
 
     private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
     private final BlockingQueue<IoSession> waitingSessions = new LinkedBlockingQueue<IoSession>();
-    
+
     private final Set<Worker> workers = new HashSet<Worker>();
-    
+
     private volatile int corePoolSize;
     private volatile int maximumPoolSize;
     private volatile int largestPoolSize;
     private final AtomicInteger idleWorkers = new AtomicInteger();
-    
+
     private long completedTaskCount;
     private volatile boolean shutdown;
-    
+
     private final IoEventQueueHandler queueHandler;
-    
+
     public OrderedThreadPoolExecutor() {
         this(16);
     }
-    
+
     public OrderedThreadPoolExecutor(int maximumPoolSize) {
         this(0, maximumPoolSize);
     }
-    
+
     public OrderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize) {
         this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS);
     }
-    
+
     public OrderedThreadPoolExecutor(
             int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory());
     }
-    
+
     public OrderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize, 
+            int corePoolSize, int maximumPoolSize,
             long keepAliveTime, TimeUnit unit,
             IoEventQueueHandler queueHandler) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler);
     }
 
     public OrderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize, 
+            int corePoolSize, int maximumPoolSize,
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, null);
     }
 
     public OrderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize, 
+            int corePoolSize, int maximumPoolSize,
             long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
         super(0, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), threadFactory, new AbortPolicy());
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
         }
-        
+
         if (maximumPoolSize == 0 || maximumPoolSize < corePoolSize) {
             throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
         }
-        
+
         if (queueHandler == null) {
             queueHandler = NOOP_QUEUE_HANDLER;
         }
-        
+
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
         this.queueHandler = queueHandler;
     }
-    
+
     public IoEventQueueHandler getQueueHandler() {
         return queueHandler;
     }
@@ -148,13 +152,13 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             idleWorkers.incrementAndGet();
             thread.start();
             workers.add(worker);
-            
+
             if (workers.size() > largestPoolSize) {
                 largestPoolSize = workers.size();
             }
         }
     }
-    
+
     private void addWorkerIfNecessary() {
         if (idleWorkers.get() == 0) {
             synchronized (workers) {
@@ -164,7 +168,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
     }
-    
+
     private void removeWorker() {
         synchronized (workers) {
             if (workers.size() <= corePoolSize) {
@@ -173,12 +177,12 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             waitingSessions.offer(EXIT_SIGNAL);
         }
     }
-    
+
     @Override
     public int getMaximumPoolSize() {
         return maximumPoolSize;
     }
-    
+
     @Override
     public void setMaximumPoolSize(int maximumPoolSize) {
         if (maximumPoolSize <= 0 || maximumPoolSize < corePoolSize) {
@@ -195,20 +199,20 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
     }
-    
+
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit)
             throws InterruptedException {
-        
+
         long deadline = System.currentTimeMillis() + unit.toMillis(timeout);
-        
+
         synchronized (workers) {
             while (!isTerminated()) {
                 long waitTime = deadline - System.currentTimeMillis();
                 if (waitTime <= 0) {
                     break;
                 }
-                
+
                 workers.wait(waitTime);
             }
         }
@@ -225,7 +229,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         if (!shutdown) {
             return false;
         }
-        
+
         synchronized (workers) {
             return workers.isEmpty();
         }
@@ -236,7 +240,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         if (shutdown) {
             return;
         }
-        
+
         shutdown = true;
 
         synchronized (workers) {
@@ -249,7 +253,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     public List<Runnable> shutdownNow() {
         shutdown();
-        
+
         List<Runnable> answer = new ArrayList<Runnable>();
         IoSession session;
         while ((session = waitingSessions.poll()) != null) {
@@ -258,7 +262,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                 Thread.yield(); // Let others take the signal.
                 continue;
             }
-            
+
             SessionBuffer buf = (SessionBuffer) session.getAttribute(BUFFER);
             synchronized (buf.queue) {
                 for (Runnable task: buf.queue) {
@@ -268,7 +272,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                 buf.queue.clear();
             }
         }
-        
+
         return answer;
     }
 
@@ -279,7 +283,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
 
         checkTaskType(task);
-        
+
         IoEvent e = (IoEvent) task;
         IoSession s = e.getSession();
         SessionBuffer buf = getSessionBuffer(s);
@@ -295,26 +299,26 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                 } else {
                     offerSession = false;
                 }
-            }            
+            }
         } else {
             offerSession = false;
         }
-        
+
         if (offerSession) {
             waitingSessions.offer(s);
         }
-        
+
         addWorkerIfNecessary();
-        
+
         if (offerEvent) {
             queueHandler.offered(this, e);
         }
     }
-    
+
     private void rejectTask(Runnable task) {
         getRejectedExecutionHandler().rejectedExecution(task, this);
     }
-    
+
     private void checkTaskType(Runnable task) {
         if (!(task instanceof IoEvent)) {
             throw new IllegalArgumentException("task must be an IoEvent or its subclass.");
@@ -335,7 +339,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             for (Worker w: workers) {
                 answer += w.completedTaskCount;
             }
-            
+
             return answer;
         }
     }
@@ -387,14 +391,15 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
     }
-    
+
     @Override
     public BlockingQueue<Runnable> getQueue() {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
     public void purge() {
+        // Nothing to purge in this implementation.
     }
 
     @Override
@@ -406,19 +411,19 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         if (buffer == null) {
             return false;
         }
-        
+
         boolean removed;
         synchronized (buffer.queue) {
             removed = buffer.queue.remove(task);
         }
-        
+
         if (removed) {
             getQueueHandler().polled(this, e);
         }
-        
+
         return removed;
     }
-    
+
     @Override
     public int getCorePoolSize() {
         return corePoolSize;
@@ -432,7 +437,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         if (corePoolSize > maximumPoolSize) {
             throw new IllegalArgumentException("corePoolSize exceeds maximumPoolSize");
         }
-        
+
         synchronized (workers) {
             if (this.corePoolSize > corePoolSize) {
                 for (int i = this.corePoolSize - corePoolSize; i > 0; i --) {
@@ -454,26 +459,26 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
         return buffer;
     }
-    
+
     private static class SessionBuffer {
         private final Queue<Runnable> queue = new CircularQueue<Runnable>();
         private boolean processingCompleted = true;
     }
-    
+
     private class Worker implements Runnable {
-        
+
         private volatile long completedTaskCount;
         private Thread thread;
-        
+
         public void run() {
             thread = Thread.currentThread();
 
             try {
                 for (;;) {
                     IoSession session = fetchSession();
-                    
+
                     idleWorkers.decrementAndGet();
-                    
+
                     if (session == null) {
                         synchronized (workers) {
                             if (workers.size() > corePoolSize) {
@@ -483,11 +488,11 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                             }
                         }
                     }
-                    
+
                     if (session == EXIT_SIGNAL) {
                         break;
                     }
-                    
+
                     try {
                         if (session != null) {
                             runTasks(getSessionBuffer(session));
@@ -537,7 +542,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                 Runnable task;
                 synchronized (buf.queue) {
                     task = buf.queue.poll();
-    
+
                     if (task == null) {
                         buf.processingCompleted = true;
                         break;
@@ -559,8 +564,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                 afterExecute(task, null);
                 completedTaskCount ++;
             } catch (RuntimeException e) {
-                if (!ran)
+                if (!ran) {
                     afterExecute(task, e);
+                }
                 throw e;
             }
         }
