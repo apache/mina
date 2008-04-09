@@ -37,23 +37,25 @@ import org.slf4j.LoggerFactory;
  * An {@link IoFilter} that sends a keep-alive request on
  * {@link IoEventType#SESSION_IDLE} and sends back the response for the
  * sent keep-alive request.
- * 
+ *
  * <h2>Interference with {@link IoSessionConfig#setIdleTime(IdleStatus, int)}</h2>
- * 
- * This filter adjusts <tt>idleTime</tt> of the {@link IdleStatus} that
- * this filter is interested in automatically.  Changing the <tt>idleTime</tt>
- * of the {@link IdleStatus} can lead this filter to a unexpected behavior.
+ *
+ * This filter adjusts <tt>idleTime</tt> of the {@link IdleStatus}s that
+ * this filter is interested in automatically (e.g. {@link IdleStatus#READER_IDLE}
+ * and {@link IdleStatus#WRITER_IDLE}.)  Changing the <tt>idleTime</tt>
+ * of the {@link IdleStatus}s can lead this filter to a unexpected behavior.
  * Please also note that any {@link IoFilter} and {@link IoHandler} behind
- * {@link KeepAliveFilter} will not get {@link IoEventType#SESSION_IDLE} event
- * for the {@link IdleStatus} this filter is interested in at all.
- * 
+ * {@link KeepAliveFilter} will not get any {@link IoEventType#SESSION_IDLE}
+ * event.  To receive the internal {@link IoEventType#SESSION_IDLE} event,
+ * you can call {@link #setForwardEvent(boolean)} with <tt>true</tt>.
+ *
  * <h2>Implementing {@link KeepAliveMessageFactory}</h2>
- * 
+ *
  * To use this filter, you have to provide an implementation of
  * {@link KeepAliveMessageFactory}, which determines a received or sent
  * message is a keep-alive message or not and creates a new keep-alive
  * message:
- * 
+ *
  * <table border="1">
  * <tr>
  * <th>Name</th><th>Description</th><th>Implementation</th>
@@ -113,14 +115,14 @@ import org.slf4j.LoggerFactory;
  * {@link KeepAliveMessageFactory#isRequest(IoSession, Object)} and
  * {@link KeepAliveMessageFactory#isResponse(IoSession, Object)} properly
  * whatever case you chose.
- * 
+ *
  * <h2>Enforcing a policy</h2>
- * 
+ *
  * You can enforce a predefined policy by specifying a {@link KeepAlivePolicy}.
  * The default policy is {@link KeepAlivePolicy#CLOSE}.  Setting the policy
  * to {@link KeepAlivePolicy#OFF} stops this filter from waiting for response
  * messages and therefore disables <tt>keepAliveRequestTimeout</tt> property.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -134,6 +136,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
     private volatile KeepAlivePolicy policy;
     private volatile int keepAliveRequestInterval;
     private volatile int keepAliveRequestTimeout;
+    private volatile boolean forwardEvent;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -264,6 +267,24 @@ public class KeepAliveFilter extends IoFilterAdapter {
         return messageFactory;
     }
 
+    /**
+     * Returns <tt>true</tt> if and only if this filter forwards
+     * a {@link IoEventType#SESSION_IDLE} event to the next filter.
+     * By default, the value of this property is <tt>false</tt>.
+     */
+    public boolean isForwardEvent() {
+        return forwardEvent;
+    }
+
+    /**
+     * Sets if this filter needs to forward a
+     * {@link IoEventType#SESSION_IDLE} event to the next filter.
+     * By default, the value of this property is <tt>false</tt>.
+     */
+    public void setForwardEvent(boolean forwardEvent) {
+        this.forwardEvent = forwardEvent;
+    }
+
     @Override
     public void onPreAdd(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
@@ -339,26 +360,34 @@ public class KeepAliveFilter extends IoFilterAdapter {
                     }
                 }
             } else {
-                resetStatus(session);
-                switch (getPolicy()) {
-                case OFF:
-                    break;
-                case LOG:
-                    logTimeout();
-                    break;
-                case EXCEPTION:
-                    throw new KeepAliveTimeoutException(
-                            getTimeoutMessage());
-                case CLOSE:
-                    logTimeout();
-                    session.close();
-                    break;
-                default:
-                    throw new InternalError();
-                }
+                handlePingTimeout(session);
             }
-        } else {
+        } else if (status == IdleStatus.READER_IDLE) {
+            handlePingTimeout(session);
+        }
+
+        if (forwardEvent) {
             nextFilter.sessionIdle(session, status);
+        }
+    }
+
+    private void handlePingTimeout(IoSession session) {
+        resetStatus(session);
+        switch (getPolicy()) {
+        case OFF:
+            break;
+        case LOG:
+            logTimeout();
+            break;
+        case EXCEPTION:
+            throw new KeepAliveTimeoutException(
+                    getTimeoutMessage());
+        case CLOSE:
+            logTimeout();
+            session.close();
+            break;
+        default:
+            throw new InternalError();
         }
     }
 
@@ -374,12 +403,14 @@ public class KeepAliveFilter extends IoFilterAdapter {
     }
 
     private void markStatus(IoSession session) {
+        session.getConfig().setIdleTime(interestedIdleStatus, 0);
         session.getConfig().setIdleTime(
-                interestedIdleStatus, getKeepAliveRequestTimeout());
+                IdleStatus.READER_IDLE, getKeepAliveRequestTimeout());
         session.setAttribute(WAITING_FOR_RESPONSE);
     }
 
     private void resetStatus(IoSession session) {
+        session.getConfig().setIdleTime(IdleStatus.READER_IDLE, 0);
         session.getConfig().setIdleTime(
                 interestedIdleStatus, getKeepAliveRequestInterval());
         session.removeAttribute(WAITING_FOR_RESPONSE);
