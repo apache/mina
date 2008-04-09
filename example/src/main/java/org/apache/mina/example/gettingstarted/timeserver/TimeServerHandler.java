@@ -1,4 +1,4 @@
-package org.apache.mina.gettingstarted.timeserver;
+package org.apache.mina.example.gettingstarted.timeserver;
 
 import java.util.Date;
 

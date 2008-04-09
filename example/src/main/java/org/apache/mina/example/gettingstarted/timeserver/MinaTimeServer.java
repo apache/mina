@@ -1,4 +1,4 @@
-package org.apache.mina.gettingstarted.timeserver;
+package org.apache.mina.example.gettingstarted.timeserver;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
