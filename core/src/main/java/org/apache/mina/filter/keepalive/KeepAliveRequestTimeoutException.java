@@ -26,23 +26,23 @@ package org.apache.mina.filter.keepalive;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class KeepAliveTimeoutException extends RuntimeException {
+public class KeepAliveRequestTimeoutException extends RuntimeException {
 
     private static final long serialVersionUID = -1985092764656546558L;
 
-    public KeepAliveTimeoutException() {
+    public KeepAliveRequestTimeoutException() {
         super();
     }
 
-    public KeepAliveTimeoutException(String message, Throwable cause) {
+    public KeepAliveRequestTimeoutException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public KeepAliveTimeoutException(String message) {
+    public KeepAliveRequestTimeoutException(String message) {
         super(message);
     }
 
-    public KeepAliveTimeoutException(Throwable cause) {
+    public KeepAliveRequestTimeoutException(Throwable cause) {
         super(cause);
     }
 }

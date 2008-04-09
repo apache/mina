@@ -56,12 +56,12 @@ public interface KeepAliveRequestTimeoutHandler {
     };
 
     /**
-     * Throws a {@link KeepAliveTimeoutException}.
+     * Throws a {@link KeepAliveRequestTimeoutException}.
      */
     static KeepAliveRequestTimeoutHandler EXCEPTION = new KeepAliveRequestTimeoutHandler() {
         public void keepAliveRequestTimedOut(
                 KeepAliveFilter filter, IoSession session) throws Exception {
-            throw new KeepAliveTimeoutException(
+            throw new KeepAliveRequestTimeoutException(
                     "A keep-alive response message was not received within " +
                     filter.getRequestTimeout() + " second(s).");
         }
