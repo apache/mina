@@ -117,13 +117,6 @@
         <artifactId>tomcat-apr</artifactId>
         <version>5.5.23</version>
       </dependency>
-      <!--
-      <dependency>
-        <groupId>org.rxtx</groupId>
-        <artifactId>rxtx</artifactId>
-        <version>2.1.7</version>
-      </dependency>
-      -->
 
       <!-- Filter -->
       <dependency>
