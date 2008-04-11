@@ -28,7 +28,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.util.CircularQueue;
 
 /**
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -43,7 +43,7 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
         }
         this.state = state;
     }
-    
+
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         if (this.session == null) {
@@ -70,7 +70,6 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
                             DecodingState.class.getSimpleName() + " must " +
                             "consume at least one byte per decode().");
                 }
-                return;
             } else {
                 undecodedBuffers.poll();
             }
