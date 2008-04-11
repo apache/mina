@@ -90,17 +90,20 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     private static void initializeTestAddresses() {
         try {
+            // These two tests were disabled due to DIRMINA-560
+            // (IPv4 localhost TEST_ADDRESS causes server to hang)
+
             // IPv6 localhost
-            TEST_ADDRESSES.put(new InetSocketAddress(InetAddress
-                    .getByAddress(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 0, 1 }), 0), InetAddress
-                    .getByAddress(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 0, 1 }));
+            //TEST_ADDRESSES.put(new InetSocketAddress(InetAddress
+            //        .getByAddress(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //                0, 0, 0, 0, 1 }), 0), InetAddress
+            //        .getByAddress(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //                0, 0, 0, 0, 1 }));
 
             // IPv4 localhost
-            TEST_ADDRESSES.put(new InetSocketAddress(InetAddress
-                    .getByAddress(new byte[] { 127, 0, 0, 1 }), 0), InetAddress
-                    .getByAddress(new byte[] { 127, 0, 0, 1 }));
+            //TEST_ADDRESSES.put(new InetSocketAddress(InetAddress
+            //        .getByAddress(new byte[] { 127, 0, 0, 1 }), 0), InetAddress
+            //        .getByAddress(new byte[] { 127, 0, 0, 1 }));
 
             // Bind to wildcard interface and connect to IPv6 localhost
             TEST_ADDRESSES.put(new InetSocketAddress(0), InetAddress
@@ -209,7 +212,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     private SocketService parent;
     private boolean defaultReuseAddress;
     private int defaultReceiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
-    
+
     private boolean reuseAddress;
     private int receiveBufferSize = defaultReceiveBufferSize;
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
@@ -218,13 +221,13 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     private boolean oobInline = DEFAULT_OOB_INLINE;
     private int soLinger = DEFAULT_SO_LINGER;
     private boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
-    
+
     /**
      * Creates a new instance.
      */
     public DefaultSocketSessionConfig() {
     }
-    
+
     public void init(SocketService parent) {
         this.parent = parent;
         if (parent instanceof SocketAcceptor) {
@@ -249,7 +252,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     public void setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
-        
+
         // The acceptor configures the SO_RCVBUF value of the
         // server socket when it is activated.  Consequently,
         // a newly accepted session doesn't need to update its
