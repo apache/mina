@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filter.executor;
 
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.common.IoEvent;
@@ -27,19 +26,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Throttles incoming events into {@link OrderedThreadPoolExecutor} or
- * {@link UnorderedThreadPoolExecutor}.
- * 
+ * Throttles incoming or outgoing events.
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class IoEventQueueThrottle implements IoEventQueueHandler {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     private final IoEventSizeEstimator eventSizeEstimator;
     private volatile int threshold;
-    
+
     private final Object lock = new Object();
     private final AtomicInteger counter = new AtomicInteger();
     private int waiters;
@@ -47,28 +45,28 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
     public IoEventQueueThrottle() {
         this(new DefaultIoEventSizeEstimator(), 65536);
     }
-    
+
     public IoEventQueueThrottle(int threshold) {
         this(new DefaultIoEventSizeEstimator(), threshold);
     }
-    
+
     public IoEventQueueThrottle(IoEventSizeEstimator eventSizeEstimator, int threshold) {
         if (eventSizeEstimator == null) {
             throw new NullPointerException("eventSizeEstimator");
         }
         this.eventSizeEstimator = eventSizeEstimator;
-        
+
         setThreshold(threshold);
     }
-    
+
     public IoEventSizeEstimator getEventSizeEstimator() {
         return eventSizeEstimator;
     }
-    
+
     public int getThreshold() {
         return threshold;
     }
-    
+
     public int getCounter() {
         return counter.get();
     }
@@ -80,11 +78,11 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         this.threshold = threshold;
     }
 
-    public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
+    public boolean accept(Object source, IoEvent event) {
         return true;
     }
-    
-    public void offered(ThreadPoolExecutor executor, IoEvent event) {
+
+    public void offered(Object source, IoEvent event) {
         int eventSize = estimateSize(event);
         int currentCounter = counter.addAndGet(eventSize);
         logState();
@@ -94,7 +92,7 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         }
     }
 
-    public void polled(ThreadPoolExecutor executor, IoEvent event) {
+    public void polled(Object source, IoEvent event) {
         int eventSize = estimateSize(event);
         int currentCounter = counter.addAndGet(-eventSize);
 
@@ -114,18 +112,18 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         }
         return size;
     }
-    
+
     private void logState() {
         if (logger.isDebugEnabled()) {
             logger.debug(Thread.currentThread().getName() + " state: " + counter.get() + " / " + getThreshold());
         }
     }
-    
+
     protected void block() {
         if (logger.isDebugEnabled()) {
             logger.debug(Thread.currentThread().getName() + " blocked: " + counter.get() + " >= " + threshold);
         }
-        
+
         synchronized (lock) {
             while (counter.get() >= threshold) {
                 waiters ++;
@@ -138,12 +136,12 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
                 }
             }
         }
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(Thread.currentThread().getName() + " unblocked: " + counter.get() + " < " + threshold);
         }
     }
-    
+
     protected void unblock() {
         synchronized (lock) {
             if (waiters > 0) {

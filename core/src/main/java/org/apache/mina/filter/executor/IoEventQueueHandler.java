@@ -20,7 +20,6 @@
 package org.apache.mina.filter.executor;
 
 import java.util.EventListener;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.mina.common.IoEvent;
 
@@ -37,13 +36,13 @@ public interface IoEventQueueHandler extends EventListener {
      * A dummy handler which always accepts event doing nothing particular.
      */
     static IoEventQueueHandler NOOP = new IoEventQueueHandler() {
-        public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
+        public boolean accept(Object source, IoEvent event) {
             return true;
         }
-        public void offered(ThreadPoolExecutor executor, IoEvent event) {
+        public void offered(Object source, IoEvent event) {
             // NOOP
         }
-        public void polled(ThreadPoolExecutor executor, IoEvent event) {
+        public void polled(Object source, IoEvent event) {
             // NOOP
         }
     };
@@ -53,17 +52,17 @@ public interface IoEventQueueHandler extends EventListener {
      * allowed to be offered to the event queue.  The <tt>event</tt> is dropped
      * if <tt>false</tt> is returned.
      */
-    boolean accept(ThreadPoolExecutor executor, IoEvent event);
+    boolean accept(Object source, IoEvent event);
 
     /**
      * Invoked after the specified <tt>event</tt> has been offered to the
      * event queue.
      */
-    void offered(ThreadPoolExecutor executor, IoEvent event);
+    void offered(Object source, IoEvent event);
 
     /**
      * Invoked after the specified <tt>event</tt> has been polled from the
      * event queue.
      */
-    void polled(ThreadPoolExecutor executor, IoEvent event);
+    void polled(Object source, IoEvent event);
 }
