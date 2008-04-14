@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoEvent;
+import org.apache.mina.common.WriteRequest;
 
 /**
  * A default {@link IoEventSizeEstimator} implementation.
@@ -39,14 +40,14 @@ import org.apache.mina.common.IoEvent;
  * (default: 64).
  * <p>
  * All the estimated sizes of classes are cached for performance improvement.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
 
     private final ConcurrentMap<Class<?>, Integer> class2size = new ConcurrentHashMap<Class<?>, Integer>();
-    
+
     public DefaultIoEventSizeEstimator() {
         class2size.put(boolean.class, 4); // Probably an integer.
         class2size.put(byte.class, 1);
@@ -58,20 +59,22 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         class2size.put(double.class, 8);
         class2size.put(void.class, 0);
     }
-    
+
     public int estimateSize(IoEvent event) {
         return estimateSize((Object) event) + estimateSize(event.getParameter());
     }
-    
+
     public int estimateSize(Object message) {
         if (message == null) {
             return 8;
         }
 
         int answer = 8 + estimateSize(message.getClass(), null);
-        
+
         if (message instanceof IoBuffer) {
             answer += ((IoBuffer) message).remaining();
+        } else if (message instanceof WriteRequest) {
+            answer += estimateSize(((WriteRequest) message).getMessage());
         } else if (message instanceof CharSequence) {
             answer += ((CharSequence) message).length() << 1;
         } else if (message instanceof Iterable) {
@@ -79,16 +82,16 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
                 answer += estimateSize(m);
             }
         }
-        
+
         return align(answer);
     }
-    
+
     private int estimateSize(Class<?> clazz, Set<Class<?>> visitedClasses) {
         Integer objectSize = class2size.get(clazz);
         if (objectSize != null) {
             return objectSize;
         }
-        
+
         if (visitedClasses != null) {
             if (visitedClasses.contains(clazz)) {
                 return 0;
@@ -96,9 +99,9 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         } else {
             visitedClasses = new HashSet<Class<?>>();
         }
-        
+
         visitedClasses.add(clazz);
-        
+
         int answer = 8; // Basic overhead.
         for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
             Field[] fields = c.getDeclaredFields();
@@ -107,21 +110,21 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
                     // Ignore static fields.
                     continue;
                 }
-                
+
                 answer += estimateSize(f.getType(), visitedClasses);
             }
         }
-            
+
         visitedClasses.remove(clazz);
-        
+
         // Some alignment.
         answer = align(answer);
-        
+
         // Put the final answer.
         class2size.putIfAbsent(clazz, answer);
         return answer;
     }
-    
+
     private static int align(int size) {
         if (size % 8 != 0) {
             size /= 8;
