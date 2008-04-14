@@ -25,9 +25,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.mina.common.IoEvent;
 
 /**
- * Listenes and filters all event queue operations occurring in
+ * Listens and filters all event queue operations occurring in
  * {@link OrderedThreadPoolExecutor} and {@link UnorderedThreadPoolExecutor}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -38,13 +38,13 @@ public interface IoEventQueueHandler extends EventListener {
      * if <tt>false</tt> is returned.
      */
     boolean accept(ThreadPoolExecutor executor, IoEvent event);
-    
+
     /**
      * Invoked after the specified <tt>event</tt> has been offered to the
      * event queue.
      */
     void offered(ThreadPoolExecutor executor, IoEvent event);
-    
+
     /**
      * Invoked after the specified <tt>event</tt> has been polled from the
      * event queue.
