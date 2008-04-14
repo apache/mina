@@ -1,0 +1,196 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+package org.apache.mina.filter.keepalive;
+
+import static org.apache.mina.filter.keepalive.KeepAliveRequestTimeoutHandler.*;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import junit.framework.TestCase;
+
+import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IdleStatus;
+import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.IoHandlerAdapter;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import org.apache.mina.util.AvailablePortFinder;
+
+/**
+ * Tests {@link KeepAliveFilter} used by the connector with different
+ * interested {@link IdleStatus}es.
+ *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
+public class KeepAliveFilterTest extends TestCase {
+    // Constants -----------------------------------------------------
+
+    private static final IoBuffer PING = IoBuffer.wrap(new byte[] { 1 });
+    private static final IoBuffer PONG = IoBuffer.wrap(new byte[] { 2 });
+    private static final int INTERVAL = 2;
+    private static final int TIMEOUT = 1;
+
+    private int port;
+    private NioSocketAcceptor acceptor;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        port = AvailablePortFinder.getNextAvailable();
+        acceptor = new NioSocketAcceptor();
+        KeepAliveMessageFactory factory = new ServerFactory();
+        KeepAliveFilter filter = new KeepAliveFilter(factory,
+                IdleStatus.BOTH_IDLE);
+        acceptor.getFilterChain().addLast("keep-alive", filter);
+        acceptor.setHandler(new IoHandlerAdapter());
+        acceptor.setDefaultLocalAddress(new InetSocketAddress(port));
+        acceptor.bind();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        acceptor.unbind();
+        acceptor.dispose();
+        super.tearDown();
+    }
+
+    public void testKeepAliveFilterForReaderIdle() throws Exception {
+        keepAliveFilterForIdleStatus(IdleStatus.READER_IDLE);
+    }
+
+    public void testKeepAliveFilterForBothIdle() throws Exception {
+        keepAliveFilterForIdleStatus(IdleStatus.BOTH_IDLE);
+    }
+
+    public void testKeepAliveFilterForWriterIdle() throws Exception {
+        keepAliveFilterForIdleStatus(IdleStatus.WRITER_IDLE);
+    }
+
+    // Package protected ---------------------------------------------
+
+    // Protected -----------------------------------------------------
+
+    // Private -------------------------------------------------------
+
+    private void keepAliveFilterForIdleStatus(IdleStatus status)
+            throws Exception {
+        NioSocketConnector connector = new NioSocketConnector();
+        KeepAliveFilter filter = new KeepAliveFilter(new ClientFactory(),
+                status, EXCEPTION, INTERVAL, TIMEOUT);
+        filter.setForwardEvent(true);
+        connector.getFilterChain().addLast("keep-alive", filter);
+
+        final AtomicBoolean gotException = new AtomicBoolean(false);
+        connector.setHandler(new IoHandlerAdapter() {
+            @Override
+            public void exceptionCaught(IoSession session, Throwable cause)
+                    throws Exception {
+                cause.printStackTrace();
+                gotException.set(true);
+            }
+
+            @Override
+            public void sessionIdle(IoSession session, IdleStatus status)
+                    throws Exception {
+                System.out.println("client idle:" + status);
+            }
+        });
+
+        ConnectFuture future = connector.connect(
+                new InetSocketAddress("127.0.0.1", port)).awaitUninterruptibly();
+        IoSession session = future.getSession();
+        assertNotNull(session);
+
+        Thread.sleep((INTERVAL + TIMEOUT + 1) * 1000);
+
+        assertFalse("got an exception on the client", gotException.get());
+
+        session.close(true);
+        connector.dispose();
+    }
+
+    private static boolean checkRequest(IoBuffer message) {
+        IoBuffer buff = message;
+        boolean check = buff.get() == 1;
+        buff.rewind();
+        return check;
+    }
+
+    private static boolean checkResponse(IoBuffer message) {
+        IoBuffer buff = message;
+        boolean check = buff.get() == 2;
+        buff.rewind();
+        return check;
+    }
+
+    // Inner classes -------------------------------------------------
+
+    private final class ServerFactory implements KeepAliveMessageFactory {
+        public Object getRequest(IoSession session) {
+            return null;
+        }
+
+        public Object getResponse(IoSession session, Object request) {
+            return PONG.duplicate();
+        }
+
+        public boolean isRequest(IoSession session, Object message) {
+            if (message instanceof IoBuffer) {
+                return checkRequest((IoBuffer) message);
+            }
+            return false;
+        }
+
+        public boolean isResponse(IoSession session, Object message) {
+            if (message instanceof IoBuffer) {
+                return checkResponse((IoBuffer) message);
+            }
+            return false;
+        }
+    }
+
+    private final class ClientFactory implements KeepAliveMessageFactory {
+        public Object getRequest(IoSession session) {
+            return PING.duplicate();
+        }
+
+        public Object getResponse(IoSession session, Object request) {
+            return null;
+        }
+
+        public boolean isRequest(IoSession session, Object message) {
+            if (message instanceof IoBuffer) {
+                return checkRequest((IoBuffer) message);
+            }
+            return false;
+        }
+
+        public boolean isResponse(IoSession session, Object message) {
+            if (message instanceof IoBuffer) {
+                return checkResponse((IoBuffer) message);
+            }
+            return false;
+        }
+    }
+}

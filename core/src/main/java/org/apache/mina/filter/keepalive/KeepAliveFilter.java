@@ -141,6 +141,8 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
     private final AttributeKey WAITING_FOR_RESPONSE = new AttributeKey(
             getClass(), "waitingForResponse");
+    private final AttributeKey IGNORE_READER_IDLE_ONCE = new AttributeKey(
+            getClass(), "ignoreReaderIdleOnce");
 
     private final KeepAliveMessageFactory messageFactory;
     private final IdleStatus interestedIdleStatus;
@@ -364,6 +366,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
                     // the response.
                     if (getRequestTimeoutHandler() != KeepAliveRequestTimeoutHandler.DEAF_SPEAKER) {
                         markStatus(session);
+                        if (interestedIdleStatus == IdleStatus.BOTH_IDLE) {
+                            session.setAttribute(IGNORE_READER_IDLE_ONCE);
+                        }
                     } else {
                         resetStatus(session);
                     }
@@ -372,8 +377,10 @@ public class KeepAliveFilter extends IoFilterAdapter {
                 handlePingTimeout(session);
             }
         } else if (status == IdleStatus.READER_IDLE) {
-            if (session.containsAttribute(WAITING_FOR_RESPONSE)) {
-                handlePingTimeout(session);
+            if (session.removeAttribute(IGNORE_READER_IDLE_ONCE) == null) {
+                if (session.containsAttribute(WAITING_FOR_RESPONSE)) {
+                    handlePingTimeout(session);
+                }
             }
         }
 
