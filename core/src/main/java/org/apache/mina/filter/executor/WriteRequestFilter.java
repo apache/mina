@@ -46,6 +46,18 @@ import org.apache.mina.common.WriteRequest;
  *             new WriteRequestFilter(new IoEventQueueThrottle()));
  * </pre>
  *
+ * <h3>Known issues</h3>
+ *
+ * You can run into a dead lock if you run this filter with the blocking
+ * {@link IoEventQueueHandler} implementation such as {@link IoEventQueueThrottle}
+ * in the {@link IoProcessor} thread.  It's because an {@link IoProcessor}
+ * thread is what processes the {@link WriteRequest}s and notifies related
+ * {@link WriteFuture}s; the {@link IoEventQueueHandler} implementation that
+ * waits for the size of the write request queue to decrease will never wake
+ * up.  To use such an handler, you have to insert an {@link ExecutorFilter}
+ * before this filter or call {@link IoSession#write(Object)} method always
+ * from a different thread.
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
