@@ -52,17 +52,6 @@ import org.apache.mina.util.CircularQueue;
 public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private static final IoSession EXIT_SIGNAL = new DummySession();
-    private static final IoEventQueueHandler NOOP_QUEUE_HANDLER = new IoEventQueueHandler() {
-        public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
-            return true;
-        }
-        public void offered(ThreadPoolExecutor executor, IoEvent event) {
-            // NOOP
-        }
-        public void polled(ThreadPoolExecutor executor, IoEvent event) {
-            // NOOP
-        }
-    };
 
     private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
     private final BlockingQueue<IoSession> waitingSessions = new LinkedBlockingQueue<IoSession>();
@@ -124,7 +113,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
 
         if (queueHandler == null) {
-            queueHandler = NOOP_QUEUE_HANDLER;
+            queueHandler = IoEventQueueHandler.NOOP;
         }
 
         this.corePoolSize = corePoolSize;

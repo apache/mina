@@ -32,6 +32,22 @@ import org.apache.mina.common.IoEvent;
  * @version $Rev$, $Date$
  */
 public interface IoEventQueueHandler extends EventListener {
+
+    /**
+     * A dummy handler which always accepts event doing nothing particular.
+     */
+    static IoEventQueueHandler NOOP = new IoEventQueueHandler() {
+        public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
+            return true;
+        }
+        public void offered(ThreadPoolExecutor executor, IoEvent event) {
+            // NOOP
+        }
+        public void polled(ThreadPoolExecutor executor, IoEvent event) {
+            // NOOP
+        }
+    };
+
     /**
      * Returns <tt>true</tt> if and only if the specified <tt>event</tt> is
      * allowed to be offered to the event queue.  The <tt>event</tt> is dropped

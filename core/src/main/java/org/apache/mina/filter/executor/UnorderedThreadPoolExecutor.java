@@ -61,18 +61,6 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
     };
 
-    private static final IoEventQueueHandler NOOP_QUEUE_HANDLER = new IoEventQueueHandler() {
-        public boolean accept(ThreadPoolExecutor executor, IoEvent event) {
-            return true;
-        }
-        public void offered(ThreadPoolExecutor executor, IoEvent event) {
-            // NOOP
-        }
-        public void polled(ThreadPoolExecutor executor, IoEvent event) {
-            // NOOP
-        }
-    };
-
     private final Set<Worker> workers = new HashSet<Worker>();
 
     private volatile int corePoolSize;
@@ -130,7 +118,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
 
         if (queueHandler == null) {
-            queueHandler = NOOP_QUEUE_HANDLER;
+            queueHandler = IoEventQueueHandler.NOOP;
         }
 
         this.corePoolSize = corePoolSize;
