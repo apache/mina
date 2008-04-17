@@ -22,6 +22,7 @@ package org.apache.mina.transport;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -76,7 +77,9 @@ public abstract class AbstractConnectorTest extends TestCase {
             future.awaitUninterruptibly();
             buf.append("3");
             future.getSession().close();
-            Assert.assertEquals("123", buf.toString());
+            // sessionCreated() will fire before the connect future completes
+            // but sessionOpened() may not
+            Assert.assertTrue(Pattern.matches("12?32?", buf.toString()));
         } finally {
             acceptor.dispose();
         }
