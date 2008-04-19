@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>build</artifactId>
-    <version>1.0.10-SNAPSHOT</version>
+    <version>1.0.10</version>
   </parent>
   <artifactId>mina-integration-spring</artifactId>
   <name>Apache MINA Spring Integration</name>
