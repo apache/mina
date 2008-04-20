@@ -52,7 +52,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
     public NioProcessor(Executor executor) {
         super(executor);
-        this.selector = newSelector();
+        selector = newSelector();
     }
 
     @Override
@@ -191,8 +191,10 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         try {
             return (int) region.getFileChannel().transferTo(region.getPosition(), length, session.getChannel());
         } catch (IOException e) {
-            // Check to see if the IOException is being thrown due to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
-            if (e.getMessage().contains("Resource temporarily unavailable")) {
+            // Check to see if the IOException is being thrown due to
+            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
+            String message = e.getMessage();
+            if (message != null && message.contains("temporarily unavailable")) {
                 return 0;
             } else {
                 throw e;
