@@ -21,11 +21,11 @@ package org.apache.mina.common;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.mina.util.ConcurrentHashSet;
 
 /**
  * A helper which provides addition and removal of {@link IoServiceListener}s and firing
@@ -48,13 +48,13 @@ public class IoServiceListenerSupport {
     /**
      * Tracks managed sessions.
      */
-    private final Set<IoSession> managedSessions = new ConcurrentHashSet<IoSession>();
+    private final ConcurrentMap<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
 
     /**
      * Read only version of {@link #managedSessions}.
      */
-    private final Set<IoSession> readOnlyManagedSessions = Collections.unmodifiableSet(managedSessions);
-    
+    private final Map<Long, IoSession> readOnlyManagedSessions = Collections.unmodifiableMap(managedSessions);
+
     private final AtomicBoolean activated = new AtomicBoolean();
     private volatile long activationTime;
     private volatile int largestManagedSessionCount;
@@ -83,23 +83,23 @@ public class IoServiceListenerSupport {
     public void remove(IoServiceListener listener) {
         listeners.remove(listener);
     }
-    
+
     public long getActivationTime() {
         return activationTime;
     }
 
-    public Set<IoSession> getManagedSessions() {
+    public Map<Long, IoSession> getManagedSessions() {
         return readOnlyManagedSessions;
     }
-    
+
     public int getManagedSessionCount() {
         return managedSessions.size();
     }
-    
+
     public int getLargestManagedSessionCount() {
         return largestManagedSessionCount;
     }
-    
+
     public long getCumulativeManagedSessionCount() {
         return cumulativeManagedSessionCount;
     }
@@ -127,7 +127,7 @@ public class IoServiceListenerSupport {
             }
         }
     }
-    
+
     /**
      * Calls {@link IoServiceListener#serviceIdle(IoService, IdleStatus)}
      * for all registered listeners.
@@ -181,10 +181,10 @@ public class IoServiceListenerSupport {
         }
 
         // If already registered, ignore.
-        if (!managedSessions.add(session)) {
+        if (managedSessions.putIfAbsent(Long.valueOf(session.getId()), session) != null) {
             return;
         }
-        
+
         // If the first connector session, fire a virtual service activation event.
         if (firstSession) {
             fireServiceActivated();
@@ -215,7 +215,7 @@ public class IoServiceListenerSupport {
      */
     public void fireSessionDestroyed(IoSession session) {
         // Try to remove the remaining empty session set after removal.
-        if (!managedSessions.remove(session)) {
+        if (managedSessions.remove(Long.valueOf(session.getId())) == null) {
             return;
         }
 
@@ -257,7 +257,7 @@ public class IoServiceListenerSupport {
         Object lock = new Object();
         IoFutureListener<IoFuture> listener = new LockNotifyingListener(lock);
 
-        for (IoSession s : managedSessions) {
+        for (IoSession s : managedSessions.values()) {
             s.close().addListener(listener);
         }
 

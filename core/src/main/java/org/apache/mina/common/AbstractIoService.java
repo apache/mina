@@ -22,6 +22,7 @@ package org.apache.mina.common;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -261,7 +262,7 @@ public abstract class AbstractIoService implements IoService {
      */
     protected abstract IoFuture dispose0() throws Exception;
 
-    public final Set<IoSession> getManagedSessions() {
+    public final Map<Long, IoSession> getManagedSessions() {
         return listeners.getManagedSessions();
     }
 
@@ -726,7 +727,7 @@ public abstract class AbstractIoService implements IoService {
         // direct caller of MessageBroadcaster knows the order of write
         // operations.
         final List<WriteFuture> futures = IoUtil.broadcast(
-                message, getManagedSessions());
+                message, getManagedSessions().values());
         return new AbstractSet<WriteFuture>() {
             @Override
             public Iterator<WriteFuture> iterator() {

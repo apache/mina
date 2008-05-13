@@ -172,7 +172,7 @@ public abstract class AbstractBindTest extends TestCase {
         // Wait for the server side sessions to be created.
         Thread.sleep(500);
 
-        Collection<IoSession> managedSessions = acceptor.getManagedSessions();
+        Collection<IoSession> managedSessions = acceptor.getManagedSessions().values();
         Assert.assertEquals(5, managedSessions.size());
 
         acceptor.unbind();

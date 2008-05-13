@@ -106,7 +106,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         handlerControl.verify();
 
         Assert.assertEquals(1, support.getManagedSessions().size());
-        Assert.assertTrue(support.getManagedSessions().contains(session));
+        Assert.assertSame(session, support.getManagedSessions().get(session.getId()));
 
         // Test destruction & other side effects
         listenerControl.reset();
@@ -126,7 +126,7 @@ public class IoServiceListenerSupportTest extends TestCase {
 
         Assert.assertTrue(session.isClosing());
         Assert.assertEquals(0, support.getManagedSessions().size());
-        Assert.assertFalse(support.getManagedSessions().contains(session));
+        Assert.assertNull(support.getManagedSessions().get(session.getId()));
     }
 
     public void testDisconnectOnUnbind() throws Exception {
@@ -207,7 +207,7 @@ public class IoServiceListenerSupportTest extends TestCase {
 
         Assert.assertTrue(session.isClosing());
         Assert.assertEquals(0, support.getManagedSessions().size());
-        Assert.assertFalse(support.getManagedSessions().contains(session));
+        Assert.assertNull(support.getManagedSessions().get(session.getId()));
     }
 
     public void testConnectorActivation() throws Exception {
@@ -263,6 +263,6 @@ public class IoServiceListenerSupportTest extends TestCase {
         handlerControl.verify();
 
         Assert.assertEquals(0, support.getManagedSessions().size());
-        Assert.assertFalse(support.getManagedSessions().contains(session));
+        Assert.assertNull(support.getManagedSessions().get(session.getId()));
     }
 }

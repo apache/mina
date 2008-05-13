@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 import javax.management.ObjectName;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
@@ -33,7 +34,7 @@ import org.apache.mina.integration.ognl.IoSessionFinder;
 
 /**
  * A JMX MBean wrapper for an {@link IoSession}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -48,7 +49,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
         id = "0x" + id;
         return id;
     }
-    
+
     public IoServiceMBean(IoService source) {
         super(source);
     }
@@ -57,35 +58,35 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
     protected Object invoke0(String name, Object[] params, String[] signature) throws Exception {
         if (name.equals("findSessions")) {
             IoSessionFinder finder = new IoSessionFinder((String) params[0]);
-            return finder.find(getSource().getManagedSessions());
+            return finder.find(getSource().getManagedSessions().values());
         }
-        
+
         if (name.equals("findAndRegisterSessions")) {
             IoSessionFinder finder = new IoSessionFinder((String) params[0]);
             Set<IoSession> registeredSessions = new LinkedHashSet<IoSession>();
-            for (IoSession s: finder.find(getSource().getManagedSessions())) {
+            for (IoSession s: finder.find(getSource().getManagedSessions().values())) {
                 try {
                     getServer().registerMBean(
                             new IoSessionMBean(s),
                             new ObjectName(
-                                    getName().getDomain() + 
-                                    ":type=session,name=" + 
+                                    getName().getDomain() +
+                                    ":type=session,name=" +
                                     getSessionIdAsString(s.getId())));
                     registeredSessions.add(s);
                 } catch (Exception e) {
                     logger.warn("Failed to register a session as a MBean: " + s, e);
                 }
             }
-            
+
             return registeredSessions;
         }
-        
+
         if (name.equals("findAndProcessSessions")) {
             IoSessionFinder finder = new IoSessionFinder((String) params[0]);
             String command = (String) params[1];
             Object expr = Ognl.parseExpression(command);
-            Set<IoSession> matches = finder.find(getSource().getManagedSessions());
-            
+            Set<IoSession> matches = finder.find(getSource().getManagedSessions().values());
+
             for (IoSession s: matches) {
                 try {
                     Ognl.getValue(expr, s);
@@ -95,7 +96,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
             }
             return matches;
         }
-        
+
         return super.invoke0(name, params, signature);
     }
 
@@ -106,13 +107,13 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
                 new MBeanParameterInfo[] {
                         new MBeanParameterInfo(
                                 "ognlQuery", String.class.getName(), "a boolean OGNL expression")
-                }, Set.class.getName(), ModelMBeanOperationInfo.INFO));
+                }, Set.class.getName(), MBeanOperationInfo.INFO));
         operations.add(new ModelMBeanOperationInfo(
                 "findAndRegisterSessions", "findAndRegisterSessions",
                 new MBeanParameterInfo[] {
                         new MBeanParameterInfo(
                                 "ognlQuery", String.class.getName(), "a boolean OGNL expression")
-                }, Set.class.getName(), ModelMBeanOperationInfo.ACTION_INFO));
+                }, Set.class.getName(), MBeanOperationInfo.ACTION_INFO));
         operations.add(new ModelMBeanOperationInfo(
                 "findAndProcessSessions", "findAndProcessSessions",
                 new MBeanParameterInfo[] {
@@ -120,7 +121,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
                                 "ognlQuery", String.class.getName(), "a boolean OGNL expression"),
                         new MBeanParameterInfo(
                                 "ognlCommand", String.class.getName(), "an OGNL expression that modifies the state of the sessions in the match result")
-                }, Set.class.getName(), ModelMBeanOperationInfo.ACTION_INFO));
+                }, Set.class.getName(), MBeanOperationInfo.ACTION_INFO));
     }
 
     @Override
@@ -130,13 +131,13 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
                 "(newSession|broadcast|(add|remove)Listener)")) {
             return false;
         }
-        
+
         if ((methodName.equals("bind") || methodName.equals("unbind")) &&
                 (paramTypes.length > 1 ||
-                        (paramTypes.length == 1 && !SocketAddress.class.isAssignableFrom(paramTypes[0])))) {
+                        paramTypes.length == 1 && !SocketAddress.class.isAssignableFrom(paramTypes[0]))) {
             return false;
         }
-                
+
         return super.isOperation(methodName, paramTypes);
     }
 }
