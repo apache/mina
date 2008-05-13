@@ -52,4 +52,8 @@ public class VmPipeTrafficControlTest extends AbstractTrafficControlTest {
         return new VmPipeAddress(port);
     }
 
+    @Override
+    protected int getPort(SocketAddress address) {
+        return ((VmPipeAddress) address).getPort();
+    }
 }

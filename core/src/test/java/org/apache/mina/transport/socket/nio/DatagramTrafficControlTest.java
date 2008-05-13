@@ -53,4 +53,8 @@ public class DatagramTrafficControlTest extends AbstractTrafficControlTest {
         return new InetSocketAddress(port);
     }
 
+    @Override
+    protected int getPort(SocketAddress address) {
+        return ((InetSocketAddress) address).getPort();
+    }
 }

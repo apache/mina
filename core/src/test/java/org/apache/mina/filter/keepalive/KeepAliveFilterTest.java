@@ -33,7 +33,6 @@ import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.apache.mina.util.AvailablePortFinder;
 
 /**
  * Tests {@link KeepAliveFilter} used by the connector with different
@@ -57,15 +56,15 @@ public class KeepAliveFilterTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        port = AvailablePortFinder.getNextAvailable();
         acceptor = new NioSocketAcceptor();
         KeepAliveMessageFactory factory = new ServerFactory();
         KeepAliveFilter filter = new KeepAliveFilter(factory,
                 IdleStatus.BOTH_IDLE);
         acceptor.getFilterChain().addLast("keep-alive", filter);
         acceptor.setHandler(new IoHandlerAdapter());
-        acceptor.setDefaultLocalAddress(new InetSocketAddress(port));
+        acceptor.setDefaultLocalAddress(new InetSocketAddress(0));
         acceptor.bind();
+        port = acceptor.getLocalAddress().getPort();
     }
 
     @Override
