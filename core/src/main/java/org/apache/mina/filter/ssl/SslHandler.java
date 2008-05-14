@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 class SslHandler {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final SslFilter parent;
     private final SSLContext ctx;
@@ -100,7 +100,7 @@ class SslHandler {
             throws SSLException {
         this.parent = parent;
         this.session = session;
-        this.ctx = sslc;
+        ctx = sslc;
         init();
     }
 
@@ -136,7 +136,7 @@ class SslHandler {
 
         sslEngine.beginHandshake();
         handshakeStatus = sslEngine.getHandshakeStatus();
-        
+
         handshakeComplete = false;
         initialHandshakeComplete = false;
         writingEncryptedData = false;
@@ -158,7 +158,7 @@ class SslHandler {
                     "Unexpected exception from SSLEngine.closeInbound().", e);
         }
 
-        
+
         if (outNetBuffer != null) {
             outNetBuffer.capacity(sslEngine.getSession().getPacketBufferSize());
         } else {
@@ -280,7 +280,7 @@ class SslHandler {
         if (inNetBuffer == null) {
             inNetBuffer = IoBuffer.allocate(buf.remaining()).setAutoExpand(true);
         }
-        
+
         inNetBuffer.put(buf);
         if (!handshakeComplete) {
             handshake(nextFilter);
@@ -317,7 +317,7 @@ class SslHandler {
         if (answer == null) {
             return emptyBuffer;
         }
-        
+
         outNetBuffer = null;
         return answer.shrink();
     }
@@ -332,7 +332,7 @@ class SslHandler {
         if (!handshakeComplete) {
             throw new IllegalStateException();
         }
-        
+
         if (!src.hasRemaining()) {
             if (outNetBuffer == null) {
                 outNetBuffer = emptyBuffer;
@@ -459,8 +459,9 @@ class SslHandler {
             } else if (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP) {
                 // we need more data read
                 SSLEngineResult.Status status = unwrapHandshake(nextFilter);
-                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW
-                        || isInboundDone()) {
+                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW &&
+                        handshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED ||
+                        isInboundDone()) {
                     // We need more data or the session is closed
                     break;
                 }
@@ -470,7 +471,7 @@ class SslHandler {
                 if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
                     break;
                 }
-                
+
                 SSLEngineResult result;
                 createOutNetBuffer(0);
                 for (;;) {
@@ -499,7 +500,7 @@ class SslHandler {
         int capacity = Math.max(
                 expectedRemaining,
                 sslEngine.getSession().getPacketBufferSize());
-        
+
         if (outNetBuffer != null) {
             outNetBuffer.capacity(capacity);
         } else {
@@ -538,7 +539,7 @@ class SslHandler {
                     newSsle.initCause(ssle);
                     throw newSsle;
                 }
-                
+
                 IoBuffer outNetBuffer = fetchOutNetBuffer();
                 if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
                     writeFuture = new DefaultWriteFuture(session);
@@ -582,7 +583,7 @@ class SslHandler {
         if (inNetBuffer != null) {
             inNetBuffer.flip();
         }
-        
+
         if (inNetBuffer == null || !inNetBuffer.hasRemaining()) {
             // Need more data.
             return SSLEngineResult.Status.BUFFER_UNDERFLOW;
@@ -638,7 +639,7 @@ class SslHandler {
         } else {
             appBuffer.expand(inNetBuffer.remaining());
         }
-        
+
         SSLEngineResult res;
         do {
             res = sslEngine.unwrap(inNetBuffer.buf(), appBuffer.buf());
