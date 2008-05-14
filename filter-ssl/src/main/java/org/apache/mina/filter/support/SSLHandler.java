@@ -91,7 +91,7 @@ public class SSLHandler {
     private SSLEngineResult.HandshakeStatus handshakeStatus;
 
     private boolean initialHandshakeComplete;
-    
+
     /**
      * Handshake complete?
      */
@@ -109,7 +109,7 @@ public class SSLHandler {
             throws SSLException {
         this.parent = parent;
         this.session = session;
-        this.ctx = sslc;
+        ctx = sslc;
         init();
     }
 
@@ -221,7 +221,7 @@ public class SSLHandler {
      * Check if there is any need to complete handshake.
      */
     public boolean needToCompleteHandshake() {
-        return (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone());
+        return handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone();
     }
 
     public void schedulePreHandshakeWriteRequest(NextFilter nextFilter,
@@ -254,7 +254,7 @@ public class SSLHandler {
         messageReceivedEventQueue.offer(new Event(EventType.RECEIVED, nextFilter,
                 message));
     }
-    
+
     public void flushScheduledEvents() {
         // Fire events only when no lock is hold for this handler.
         if (Thread.holdsLock(this)) {
@@ -262,7 +262,7 @@ public class SSLHandler {
         }
 
         Event e;
-        
+
         // We need synchronization here inevitably because filterWrite can be
         // called simultaneously and cause 'bad record MAC' integrity error.
         synchronized (this) {
@@ -289,7 +289,7 @@ public class SSLHandler {
         if (buf.limit() > inNetBuffer.remaining()) {
             // We have to expand inNetBuffer
             inNetBuffer = SSLByteBufferPool.expandBuffer(inNetBuffer,
-                    inNetBuffer.capacity() + (buf.limit() * 2));
+                    inNetBuffer.capacity() + buf.limit() * 2);
             // We also expand app. buffer (twice the size of in net. buffer)
             appBuffer = SSLByteBufferPool.expandBuffer(appBuffer, inNetBuffer
                     .capacity() * 2);
@@ -351,8 +351,8 @@ public class SSLHandler {
         // Loop until there is no more data in src
         while (src.hasRemaining()) {
 
-            if (src.remaining() > ((outNetBuffer.capacity() - outNetBuffer
-                    .position()) / 2)) {
+            if (src.remaining() > (outNetBuffer.capacity() - outNetBuffer
+                    .position()) / 2) {
                 // We have to expand outNetBuffer
                 // Note: there is no way to know the exact size required, but enrypted data
                 // shouln't need to be larger than twice the source data size?
@@ -429,9 +429,9 @@ public class SSLHandler {
      */
     private void checkStatus(SSLEngineResult res)
             throws SSLException {
-        
+
         SSLEngineResult.Status status = res.getStatus();
-        
+
         /*
          * The status may be:
          * OK - Normal operation
@@ -491,8 +491,9 @@ public class SSLHandler {
                             "  handshakeStatus=NEED_UNWRAP");
                 }
                 SSLEngineResult.Status status = unwrapHandshake(nextFilter);
-                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW
-                        || isInboundDone()) {
+                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW &&
+                        handshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED ||
+                        isInboundDone()) {
                     // We need more data or the session is closed
                     break;
                 }
@@ -596,9 +597,9 @@ public class SSLHandler {
 
         // prepare to be written again
         inNetBuffer.compact();
-        
+
         checkStatus(res);
-        
+
         renegotiateIfNeeded(nextFilter, res);
     }
 
@@ -621,7 +622,7 @@ public class SSLHandler {
                 && res.getStatus() == SSLEngineResult.Status.OK
                 && inNetBuffer.hasRemaining()) {
             res = unwrap0();
-            
+
             // prepare to be written again
             inNetBuffer.compact();
 
@@ -661,7 +662,7 @@ public class SSLHandler {
         } while (res.getStatus() == SSLEngineResult.Status.OK
                 && (handshakeComplete && res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING
                         || res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP));
-        
+
         return res;
     }
 
@@ -718,6 +719,7 @@ public class SSLHandler {
             this.value = value;
         }
 
+        @Override
         public String toString() {
             return value;
         }
