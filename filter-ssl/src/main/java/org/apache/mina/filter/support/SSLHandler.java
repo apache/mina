@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.support;
 
@@ -92,7 +92,7 @@ public class SSLHandler {
     private SSLEngineResult.HandshakeStatus handshakeStatus;
 
     private boolean initialHandshakeComplete;
-    
+
     /**
      * Handshake complete?
      */
@@ -104,13 +104,13 @@ public class SSLHandler {
      * Constuctor.
      *
      * @param sslc
-     * @throws SSLException 
+     * @throws SSLException
      */
     public SSLHandler(SSLFilter parent, SSLContext sslc, IoSession session)
             throws SSLException {
         this.parent = parent;
         this.session = session;
-        this.ctx = sslc;
+        ctx = sslc;
         init();
     }
 
@@ -222,7 +222,7 @@ public class SSLHandler {
      * Check if there is any need to complete handshake.
      */
     public boolean needToCompleteHandshake() {
-        return (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone());
+        return handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone();
     }
 
     public void schedulePreHandshakeWriteRequest(NextFilter nextFilter,
@@ -263,7 +263,7 @@ public class SSLHandler {
         }
 
         Event e;
-         
+
         // We need synchronization here inevitably because filterWrite can be
         // called simultaneously and cause 'bad record MAC' integrity error.
         synchronized (this) {
@@ -271,7 +271,7 @@ public class SSLHandler {
                 e.nextFilter.filterWrite(session, (WriteRequest) e.data);
             }
         }
- 
+
         while ((e = (Event) messageReceivedEventQueue.poll()) != null) {
             e.nextFilter.messageReceived(session, e.data);
         }
@@ -290,7 +290,7 @@ public class SSLHandler {
         if (buf.limit() > inNetBuffer.remaining()) {
             // We have to expand inNetBuffer
             inNetBuffer = SSLByteBufferPool.expandBuffer(inNetBuffer,
-                    inNetBuffer.capacity() + (buf.limit() * 2));
+                    inNetBuffer.capacity() + buf.limit() * 2);
             // We also expand app. buffer (twice the size of in net. buffer)
             appBuffer = SSLByteBufferPool.expandBuffer(appBuffer, inNetBuffer
                     .capacity() * 2);
@@ -354,8 +354,8 @@ public class SSLHandler {
         // Loop until there is no more data in src
         while (src.hasRemaining()) {
 
-            if (src.remaining() > ((outNetBuffer.capacity() - outNetBuffer
-                    .position()) / 2)) {
+            if (src.remaining() > (outNetBuffer.capacity() - outNetBuffer
+                    .position()) / 2) {
                 // We have to expand outNetBuffer
                 // Note: there is no way to know the exact size required, but enrypted data
                 // shouln't need to be larger than twice the source data size?
@@ -388,7 +388,7 @@ public class SSLHandler {
 
     /**
      * Start SSL shutdown process.
-     * 
+     *
      * @return <tt>true</tt> if shutdown process is started.
      *         <tt>false</tt> if shutdown process is already finished.
      *
@@ -432,9 +432,9 @@ public class SSLHandler {
      */
     private void checkStatus(SSLEngineResult res)
             throws SSLException {
-        
+
         SSLEngineResult.Status status = res.getStatus();
-        
+
         /*
          * The status may be:
          * OK - Normal operation
@@ -494,8 +494,9 @@ public class SSLHandler {
                             "  handshakeStatus=NEED_UNWRAP");
                 }
                 SSLEngineResult.Status status = unwrapHandshake(nextFilter);
-                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW
-                        || isInboundDone()) {
+                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW &&
+                        handshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED ||
+                        isInboundDone()) {
                     // We need more data or the session is closed
                     break;
                 }
@@ -604,9 +605,9 @@ public class SSLHandler {
 
         // prepare to be written again
         inNetBuffer.compact();
-        
+
         checkStatus(res);
-        
+
         renegotiateIfNeeded(nextFilter, res);
     }
 
@@ -629,7 +630,7 @@ public class SSLHandler {
                 && res.getStatus() == SSLEngineResult.Status.OK
                 && inNetBuffer.hasRemaining()) {
             res = unwrap0();
-            
+
             // prepare to be written again
             inNetBuffer.compact();
 
@@ -669,7 +670,7 @@ public class SSLHandler {
         } while (res.getStatus() == SSLEngineResult.Status.OK
                 && (handshakeComplete && res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING
                         || res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP));
-        
+
         return res;
     }
 
