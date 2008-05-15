@@ -227,7 +227,11 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
 
     @Override
     protected void destroy(AprSession session) throws Exception {
-        allSessions.remove(session.getDescriptor());
+        if (allSessions.remove(session.getDescriptor()) == null) {
+            // Already destroyed.
+            return;
+        }
+
         int ret = Poll.remove(pollset, session.getDescriptor());
         try {
             if (ret != Status.APR_SUCCESS) {
