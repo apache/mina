@@ -20,6 +20,7 @@
 package org.apache.mina.common;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -78,11 +79,13 @@ public interface IoService {
     void setHandler(IoHandler handler);
 
     /**
-     * Returns all sessions which are currently managed by this service.
+     * Returns the map of all sessions which are currently managed by this
+     * service.  The key of map is the {@link IoSession#getId() ID} of the
+     * session.
      *
      * @return the sessions. An empty collection if there's no session.
      */
-    Set<IoSession> getManagedSessions();
+    Map<Long, IoSession> getManagedSessions();
 
     /**
      * Returns the number of all sessions which are currently managed by this

@@ -45,11 +45,11 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
 public final class NioSocketAcceptor
-        extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel> 
+        extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel>
         implements SocketAcceptor {
 
     private int backlog = 50;
-    private boolean reuseAddress = true;
+    private boolean reuseAddress = false;
 
     private volatile Selector selector;
 
@@ -65,7 +65,7 @@ public final class NioSocketAcceptor
         super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
-    
+
     public NioSocketAcceptor(IoProcessor<NioSession> processor) {
         super(new DefaultSocketSessionConfig(), processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
@@ -78,9 +78,9 @@ public final class NioSocketAcceptor
 
     @Override
     protected void init() throws Exception {
-        this.selector = Selector.open();
+        selector = Selector.open();
     }
-    
+
     @Override
     protected void destroy() throws Exception {
         if (selector != null) {
@@ -101,7 +101,7 @@ public final class NioSocketAcceptor
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
-    
+
     @Override
     public InetSocketAddress getDefaultLocalAddress() {
         return (InetSocketAddress) super.getDefaultLocalAddress();
@@ -141,7 +141,7 @@ public final class NioSocketAcceptor
         }
     }
 
-    
+
     @Override
     protected NioSession accept(IoProcessor<NioSession> processor,
             ServerSocketChannel handle) throws Exception {
@@ -215,11 +215,11 @@ public final class NioSocketAcceptor
     }
 
     private static class ServerSocketChannelIterator implements Iterator<ServerSocketChannel> {
-        
+
         private final Iterator<SelectionKey> i;
-        
+
         private ServerSocketChannelIterator(Collection<SelectionKey> selectedKeys) {
-            this.i = selectedKeys.iterator();
+            i = selectedKeys.iterator();
         }
 
         public boolean hasNext() {

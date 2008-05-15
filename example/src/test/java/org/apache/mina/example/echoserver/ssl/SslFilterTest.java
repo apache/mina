@@ -14,19 +14,18 @@ import javax.net.ssl.X509TrustManager;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 public class SslFilterTest extends TestCase {
 
-    private static final int PORT = 17887;
-
-    private IoAcceptor acceptor;
+    private int port;
+    private SocketAcceptor acceptor;
 
     @Override
     protected void setUp() throws Exception {
@@ -62,7 +61,8 @@ public class SslFilterTest extends TestCase {
 
         EchoHandler handler = new EchoHandler();
         acceptor.setHandler(handler);
-        acceptor.bind(new InetSocketAddress(PORT));
+        acceptor.bind(new InetSocketAddress(0));
+        port = acceptor.getLocalAddress().getPort();
         System.out.println("MINA server started.");
 
         Socket socket = getClientSocket(useSSL);
@@ -112,9 +112,9 @@ public class SslFilterTest extends TestCase {
         if (ssl) {
             SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(null, trustManagers, null);
-            return ctx.getSocketFactory().createSocket("localhost", PORT);
+            return ctx.getSocketFactory().createSocket("localhost", port);
         }
-        return new Socket("localhost", PORT);
+        return new Socket("localhost", port);
     }
 
     private static class EchoHandler extends IoHandlerAdapter {

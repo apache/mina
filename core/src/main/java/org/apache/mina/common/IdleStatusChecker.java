@@ -46,7 +46,7 @@ public class IdleStatusChecker {
         sessions.add(session);
         session.getCloseFuture().addListener(sessionCloseListener);
     }
-    
+
     public void addService(AbstractIoService service) {
         services.add(service);
     }
@@ -54,20 +54,20 @@ public class IdleStatusChecker {
     public void removeSession(AbstractIoSession session) {
         sessions.remove(session);
     }
-    
+
     public void removeService(AbstractIoService service) {
         services.remove(service);
     }
-    
+
     public NotifyingTask getNotifyingTask() {
         return notifyingTask;
     }
-    
+
     public interface NotifyingTask extends Runnable {
         /**
          * Cancels this task.  Once canceled, {@link #run()} method will always return immediately.
          * To start this task again after calling this method, you have to create a new instance of
-         * {@link IdleStatusChecker} again. 
+         * {@link IdleStatusChecker} again.
          */
         void cancel();
     }
@@ -75,7 +75,7 @@ public class IdleStatusChecker {
     private class NotifyingTaskImpl implements NotifyingTask {
         private volatile boolean cancelled;
         private volatile Thread thread;
-        
+
         public void run() {
             thread = Thread.currentThread();
             try {
@@ -84,7 +84,7 @@ public class IdleStatusChecker {
                     long currentTime = System.currentTimeMillis();
                     notifyServices(currentTime);
                     notifySessions(currentTime);
-                    
+
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -95,7 +95,7 @@ public class IdleStatusChecker {
                 thread = null;
             }
         }
-        
+
         public void cancel() {
             cancelled = true;
             Thread thread = this.thread;
@@ -124,7 +124,7 @@ public class IdleStatusChecker {
             }
         }
     }
-    
+
     private class SessionCloseListener implements IoFutureListener<IoFuture> {
         public void operationComplete(IoFuture future) {
             removeSession((AbstractIoSession) future.getSession());
@@ -148,16 +148,16 @@ public class IdleStatusChecker {
     public static void notifyIdleness(IoService service, long currentTime) {
         notifyIdleness(service, currentTime, true);
     }
-    
+
     private static void notifyIdleness(IoService service, long currentTime, boolean includeSessions) {
         if (!(service instanceof AbstractIoService)) {
             return;
         }
-        
+
         ((AbstractIoService) service).notifyIdleness(currentTime);
-        
+
         if (includeSessions) {
-            notifyIdleness(service.getManagedSessions().iterator(), currentTime);
+            notifyIdleness(service.getManagedSessions().values().iterator(), currentTime);
         }
     }
 
@@ -176,21 +176,21 @@ public class IdleStatusChecker {
                     IdleStatus.BOTH_IDLE, Math.max(
                             s.getLastIoTime(),
                             s.getLastIdleTime(IdleStatus.BOTH_IDLE)));
-            
+
             notifyIdleSession1(
                     s, currentTime,
                     s.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
                     IdleStatus.READER_IDLE, Math.max(
                             s.getLastReadTime(),
                             s.getLastIdleTime(IdleStatus.READER_IDLE)));
-            
+
             notifyIdleSession1(
                     s, currentTime,
                     s.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
                     IdleStatus.WRITER_IDLE, Math.max(
                             s.getLastWriteTime(),
                             s.getLastIdleTime(IdleStatus.WRITER_IDLE)));
-    
+
             notifyWriteTimeout(s, currentTime);
             updateThroughput(s, currentTime);
         } else {
@@ -200,14 +200,14 @@ public class IdleStatusChecker {
                     IdleStatus.BOTH_IDLE, Math.max(
                             session.getLastIoTime(),
                             session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
-            
+
             notifyIdleSession0(
                     session, currentTime,
                     session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
                     IdleStatus.READER_IDLE, Math.max(
                             session.getLastReadTime(),
                             session.getLastIdleTime(IdleStatus.READER_IDLE)));
-            
+
             notifyIdleSession0(
                     session, currentTime,
                     session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),

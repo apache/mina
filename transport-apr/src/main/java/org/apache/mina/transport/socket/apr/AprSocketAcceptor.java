@@ -30,7 +30,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     private volatile boolean toBeWakenUp;
 
     private int backlog = 50;
-    private boolean reuseAddress = true;
+    private boolean reuseAddress = false;
 
     private volatile long pool;
     private volatile long pollset; // socket poller

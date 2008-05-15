@@ -44,9 +44,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     private final Object lock = new Object();
     private final IoProcessor<T> processor = new ConnectionlessAcceptorProcessor();
-    private final Queue<AcceptorOperationFuture> registerQueue = 
+    private final Queue<AcceptorOperationFuture> registerQueue =
         new ConcurrentLinkedQueue<AcceptorOperationFuture>();
-    private final Queue<AcceptorOperationFuture> cancelQueue = 
+    private final Queue<AcceptorOperationFuture> cancelQueue =
         new ConcurrentLinkedQueue<AcceptorOperationFuture>();
     private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
     private final Map<SocketAddress, H> boundHandles =
@@ -270,7 +270,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             cancelQueue.clear();
             flushingSessions.clear();
         }
-        
+
         synchronized (lock) {
             if (worker == null) {
                 worker = new Worker();
@@ -326,7 +326,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     }
                 }
             }
-            
+
             if (selectable && isDisposing()) {
                 selectable = false;
                 try {
@@ -351,7 +351,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                 }
 
                 if (isWritable(h)) {
-                    for (IoSession session : getManagedSessions()) {
+                    for (IoSession session : getManagedSessions().values()) {
                         scheduleFlush((T) session);
                     }
                 }
@@ -404,7 +404,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     private boolean flush(T session, long currentTime) throws Exception {
         // Clear OP_WRITE
         setInterestedInWrite(session, false);
-        
+
         final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
         final int maxWrittenBytes =
             session.getConfig().getMaxReadBufferSize() +
@@ -421,7 +421,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     }
                     session.setCurrentWriteRequest(req);
                 }
-    
+
                 IoBuffer buf = (IoBuffer) req.getMessage();
                 if (buf.remaining() == 0) {
                     // Clear and fire event
@@ -430,12 +430,12 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     session.getFilterChain().fireMessageSent(req);
                     continue;
                 }
-    
+
                 SocketAddress destination = req.getDestination();
                 if (destination == null) {
                     destination = session.getRemoteAddress();
                 }
-    
+
                 int localWrittenBytes = send(session, buf, destination);
                 if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
                     // Kernel buffer is full or wrote too much
@@ -443,7 +443,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     return false;
                 } else {
                     setInterestedInWrite(session, false);
-    
+
                     // Clear and fire event
                     session.setCurrentWriteRequest(null);
                     writtenBytes += localWrittenBytes;
@@ -473,7 +473,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     newHandles.put(localAddress(handle), handle);
                 }
                 boundHandles.putAll(newHandles);
-                
+
                 getListeners().fireServiceActivated();
                 req.setDone();
                 return newHandles.size();
@@ -493,7 +493,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                 }
             }
         }
-        
+
         return 0;
     }
 
@@ -521,10 +521,10 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     nHandles ++;
                 }
             }
-            
+
             request.setDone();
         }
-        
+
         return nHandles;
     }
 
@@ -533,7 +533,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
             IdleStatusChecker.notifyIdleness(
-                    getListeners().getManagedSessions().iterator(),
+                    getListeners().getManagedSessions().values().iterator(),
                     currentTime);
         }
     }

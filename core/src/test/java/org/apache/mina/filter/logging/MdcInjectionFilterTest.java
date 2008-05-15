@@ -63,10 +63,10 @@ import org.slf4j.LoggerFactory;
 public class MdcInjectionFilterTest extends TestCase {
 
     private static Logger logger = LoggerFactory.getLogger(MdcInjectionFilterTest.class);
-    private static final int PORT = 7475;
     private static final int TIMEOUT = 5000;
 
-    private MyAppender appender = new MyAppender();
+    private final MyAppender appender = new MyAppender();
+    private int port;
     private NioSocketAcceptor acceptor;
 
     @Override
@@ -147,7 +147,7 @@ public class MdcInjectionFilterTest extends TestCase {
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("executor2" , new ExecutorFilter());
         // add the MdcInjectionFilter instance after every ExecutorFilter
-        // it's important to use the same MdcInjectionFilter instance   
+        // it's important to use the same MdcInjectionFilter instance
         chain.addLast("mdc-injector2",  mdcInjectionFilter);
         test(chain);
     }
@@ -160,7 +160,8 @@ public class MdcInjectionFilterTest extends TestCase {
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         SimpleIoHandler simpleIoHandler = new SimpleIoHandler();
         acceptor.setHandler(simpleIoHandler);
-        acceptor.bind(new InetSocketAddress(PORT));
+        acceptor.bind(new InetSocketAddress(0));
+        port = acceptor.getLocalAddress().getPort();
         acceptor.setFilterChainBuilder(chain);
         // create some clients
         NioSocketConnector connector = new NioSocketConnector();
@@ -172,7 +173,7 @@ public class MdcInjectionFilterTest extends TestCase {
         simpleIoHandler.sessionIdleLatch.await();
         simpleIoHandler.sessionClosedLatch.await();
         connector.dispose();
-        
+
         // make a copy to prevent ConcurrentModificationException
         List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
         // verify that all logging events have correct MDC
@@ -194,7 +195,8 @@ public class MdcInjectionFilterTest extends TestCase {
         // configure the server
         SimpleIoHandler simpleIoHandler = new SimpleIoHandler();
         acceptor.setHandler(simpleIoHandler);
-        acceptor.bind(new InetSocketAddress(PORT));
+        acceptor.bind(new InetSocketAddress(0));
+        port = acceptor.getLocalAddress().getPort();
         acceptor.setFilterChainBuilder(chain);
         // create some clients
         NioSocketConnector connector = new NioSocketConnector();
@@ -247,7 +249,7 @@ public class MdcInjectionFilterTest extends TestCase {
     }
 
     private SocketAddress connectAndWrite(NioSocketConnector connector, int clientNr) {
-        ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost",PORT));
+        ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost", port));
         connectFuture.awaitUninterruptibly(TIMEOUT);
         IoBuffer message = IoBuffer.allocate(4).putInt(clientNr).flip();
         IoSession session = connectFuture.getSession();

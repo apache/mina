@@ -62,8 +62,12 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     }
 
     private void pushEvent(IoEvent e) {
+        pushEvent(e, flushEnabled);
+    }
+
+    private void pushEvent(IoEvent e, boolean flushNow) {
         eventQueue.add(e);
-        if (flushEnabled) {
+        if (flushNow) {
             flushEvents();
         }
     }
@@ -183,15 +187,18 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                     long currentTime = System.currentTimeMillis();
                     while ((req = queue.poll(session)) != null) {
                         Object m = req.getMessage();
+                        pushEvent(new IoEvent(IoEventType.MESSAGE_SENT, session, req), false);
                         session.getRemoteSession().getFilterChain().fireMessageReceived(
                                 getMessageCopy(m));
                         if (m instanceof IoBuffer) {
                             session.increaseWrittenBytes0(
                                     ((IoBuffer) m).remaining(), currentTime);
                         }
-                        session.getFilterChain().fireMessageSent(req);
                     }
                 } finally {
+                    if (flushEnabled) {
+                        flushEvents();
+                    }
                     session.getLock().unlock();
                 }
 
@@ -202,7 +209,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 while ((req = queue.poll(session)) != null) {
                     failedRequests.add(req);
                 }
-                
+
                 if (!failedRequests.isEmpty()) {
                     WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
                     for (WriteRequest r: failedRequests) {
@@ -240,6 +247,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
         }
 
         public void add(VmPipeSessionImpl session) {
+            // Unused
         }
 
         public void updateTrafficMask(VmPipeSessionImpl session) {
@@ -252,11 +260,12 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
             }
 
             if (session.getTrafficMask().isWritable()) {
-                flush(session); // The second parameter is unused.
+                flush(session);
             }
         }
 
         public void dispose() {
+            // Nothing to dispose
         }
 
         public boolean isDisposed() {

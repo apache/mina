@@ -30,7 +30,6 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.util.AvailablePortFinder;
 
 /**
  * Abstract base class for testing suspending and resuming reads and
@@ -40,10 +39,9 @@ import org.apache.mina.util.AvailablePortFinder;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractTrafficControlTest extends TestCase {
-    protected int port = 0;
 
+    protected int port;
     protected IoAcceptor acceptor;
-
     protected TransportMetadata transportType;
 
     public AbstractTrafficControlTest(IoAcceptor acceptor) {
@@ -54,15 +52,15 @@ public abstract class AbstractTrafficControlTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        port = AvailablePortFinder.getNextAvailable();
         acceptor.setHandler(new ServerIoHandler());
-        acceptor.bind(createServerSocketAddress(port));
+        acceptor.bind(createServerSocketAddress(0));
+        port = getPort(acceptor.getLocalAddress());
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-
+        acceptor.unbind();
         acceptor.dispose();
     }
 
@@ -70,6 +68,7 @@ public abstract class AbstractTrafficControlTest extends TestCase {
             throws Exception;
 
     protected abstract SocketAddress createServerSocketAddress(int port);
+    protected abstract int getPort(SocketAddress address);
 
     public void testSuspendResumeReadWrite() throws Exception {
         ConnectFuture future = connect(port, new ClientIoHandler());
