@@ -57,6 +57,9 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         try {
+            if (buffer == null) {
+                buffer = IoBuffer.allocate(0);
+            }
             buffer.flip();
             return finishDecode(buffer, out);
         } finally {
