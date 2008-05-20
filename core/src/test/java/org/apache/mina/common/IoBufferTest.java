@@ -35,6 +35,8 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.mina.util.Bar;
+
 /**
  * Tests {@link IoBuffer}.
  *
@@ -568,6 +570,28 @@ public class IoBufferTest extends TestCase {
 
         // This assertion is just to make sure that deserialization occurred.
         Assert.assertNotSame(o, o2);
+    }
+
+    public void testInheritedObjectSerialization() throws Exception {
+        IoBuffer buf = IoBuffer.allocate(16);
+        buf.setAutoExpand(true);
+
+        Bar expected = new Bar();
+        expected.setFooValue(0x12345678);
+        expected.setBarValue(0x90ABCDEF);
+
+        // Test writing an object.
+        buf.putObject(expected);
+
+        // Test reading an object.
+        buf.clear();
+        Bar actual = (Bar) buf.getObject();
+        Assert.assertSame(Bar.class, actual.getClass());
+        Assert.assertEquals(expected.getFooValue(), actual.getFooValue());
+        Assert.assertEquals(expected.getBarValue(), actual.getBarValue());
+
+        // This assertion is just to make sure that deserialization occurred.
+        Assert.assertNotSame(expected, actual);
     }
 
     public void testSweepWithZeros() throws Exception {
