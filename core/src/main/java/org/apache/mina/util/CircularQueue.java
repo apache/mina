@@ -6,33 +6,32 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.util;
 
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
 /**
  * A unbounded circular queue based on array.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<E>, Serializable {
+public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Serializable {
 
     private static final long serialVersionUID = 3993421269224511264L;
 
@@ -55,7 +54,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
     public CircularQueue() {
         this(DEFAULT_CAPACITY);
     }
-    
+
     public CircularQueue(int initialCapacity) {
         int actualCapacity = normalizeCapacity(initialCapacity);
         items = new Object[actualCapacity];
@@ -103,7 +102,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         Object ret = items[first];
         items[first] = null;
         decreaseSize();
-        
+
         if (first == last) {
             first = last = 0;
         }
@@ -140,7 +139,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
 
     @Override
     public boolean isEmpty() {
-        return (first == last) && !full;
+        return first == last && !full;
     }
 
     @Override
@@ -148,14 +147,14 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         if (full) {
             return capacity();
         }
-        
+
         if (last >= first) {
             return last - first;
         } else {
             return last - first + capacity();
         }
     }
-    
+
     @Override
     public String toString() {
         return "first=" + first + ", last=" + last + ", size=" + size()
@@ -169,16 +168,16 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
     }
 
     private int getRealIndex(int idx) {
-        return (first + idx) & mask;
+        return first + idx & mask;
     }
 
     private void increaseSize() {
-        last = (last + 1) & mask;
+        last = last + 1 & mask;
         full = first == last;
     }
 
     private void decreaseSize() {
-        first = (first + 1) & mask;
+        first = first + 1 & mask;
         full = false;
     }
 
@@ -188,14 +187,14 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             final int oldLen = items.length;
             final int newLen = oldLen << 1;
             Object[] tmp = new Object[newLen];
-    
+
             if (first < last) {
                 System.arraycopy(items, first, tmp, 0, last - first);
             } else {
                 System.arraycopy(items, first, tmp, 0, oldLen - first);
                 System.arraycopy(items, 0, tmp, oldLen - first, last);
             }
-    
+
             first = 0;
             last = oldLen;
             items = tmp;
@@ -205,7 +204,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             }
         }
     }
-    
+
     private void shrinkIfNeeded() {
         int size = size();
         if (size <= shrinkThreshold) {
@@ -215,11 +214,11 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             if (size == newLen) {
                 newLen <<= 1;
             }
-            
+
             if (newLen >= oldLen) {
                 return;
             }
-            
+
             if (newLen < initialCapacity) {
                 if (oldLen == initialCapacity) {
                     return;
@@ -227,9 +226,9 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
                     newLen = initialCapacity;
                 }
             }
-            
+
             Object[] tmp = new Object[newLen];
-    
+
             // Copy only when there's something to copy.
             if (size > 0) {
                 if (first < last) {
@@ -239,7 +238,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
                     System.arraycopy(items, 0, tmp, oldLen - first, last);
                 }
             }
-    
+
             first = 0;
             last = size;
             items = tmp;
