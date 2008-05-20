@@ -62,7 +62,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     private final Queue<T> trafficControllingSessions = new ConcurrentLinkedQueue<T>();
 
     private Worker worker;
-    private Thread workerThread;
     private long lastIdleCheckTime;
 
     private final Object disposalLock = new Object();
@@ -541,11 +540,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 if (message instanceof IoBuffer) {
                     localWrittenBytes = writeBuffer(
                             session, req, hasFragmentation,
-                            maxWrittenBytes - writtenBytes);
+                            maxWrittenBytes - writtenBytes,
+                            currentTime);
                 } else if (message instanceof FileRegion) {
                     localWrittenBytes = writeFile(
                             session, req, hasFragmentation,
-                            maxWrittenBytes - writtenBytes);
+                            maxWrittenBytes - writtenBytes,
+                            currentTime);
 
                     // Fix for Java bug on Linux http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
                     // If there's still data to be written in the FileRegion, return 0 indicating that we need
@@ -576,15 +577,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         } catch (Exception e) {
             session.getFilterChain().fireExceptionCaught(e);
             return false;
-        } finally {
-            session.increaseWrittenBytes(writtenBytes, currentTime);
         }
 
         return true;
     }
 
     private int writeBuffer(T session, WriteRequest req,
-            boolean hasFragmentation, int maxLength) throws Exception {
+            boolean hasFragmentation, int maxLength, long currentTime) throws Exception {
         IoBuffer buf = (IoBuffer) req.getMessage();
         int localWrittenBytes = 0;
         if (buf.hasRemaining()) {
@@ -602,8 +601,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
         }
 
+        session.increaseWrittenBytes(localWrittenBytes, currentTime);
+
         if (!buf.hasRemaining() ||
-                (!hasFragmentation && localWrittenBytes != 0)) {
+                !hasFragmentation && localWrittenBytes != 0) {
             // Buffer has been sent, clear the current request.
             buf.reset();
             fireMessageSent(session, req);
@@ -612,7 +613,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     private int writeFile(T session, WriteRequest req,
-            boolean hasFragmentation, int maxLength) throws Exception {
+            boolean hasFragmentation, int maxLength, long currentTime) throws Exception {
         int localWrittenBytes;
         FileRegion region = (FileRegion) req.getMessage();
         if (region.getRemainingBytes() > 0) {
@@ -628,10 +629,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             localWrittenBytes = 0;
         }
 
+        session.increaseWrittenBytes(localWrittenBytes, currentTime);
+
         if (region.getRemainingBytes() <= 0 ||
-                (!hasFragmentation && localWrittenBytes != 0)) {
+                    !hasFragmentation && localWrittenBytes != 0) {
             fireMessageSent(session, req);
         }
+
         return localWrittenBytes;
     }
 
@@ -688,7 +692,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private class Worker implements Runnable {
         public void run() {
-            workerThread = Thread.currentThread();
             int nSessions = 0;
             lastIdleCheckTime = System.currentTimeMillis();
 
@@ -736,7 +739,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 }
             }
 
-            workerThread = null;
             try {
                 synchronized (disposalLock) {
                     if (isDisposing()) {
