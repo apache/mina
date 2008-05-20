@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ *
  */
 package org.apache.mina.filter.codec;
 
@@ -35,7 +35,7 @@ import org.apache.mina.util.SessionLog;
  * An {@link IoFilter} which translates binary or protocol specific data into
  * message object and vice versa using {@link ProtocolCodecFactory},
  * {@link ProtocolEncoder}, or {@link ProtocolDecoder}.
- * 
+ *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
@@ -45,7 +45,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
     public static final String DECODER = ProtocolCodecFilter.class.getName()
             + ".decoder";
-    
+
     private static final String DECODER_OUT = ProtocolCodecFilter.class.getName()
             + ".decoderOut";
 
@@ -71,7 +71,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             throw new NullPointerException("decoder");
         }
 
-        this.factory = new ProtocolCodecFactory() {
+        factory = new ProtocolCodecFactory() {
             public ProtocolEncoder getEncoder() {
                 return encoder;
             }
@@ -111,7 +111,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     "decoderClass doesn't have a public default constructor.");
         }
 
-        this.factory = new ProtocolCodecFactory() {
+        factory = new ProtocolCodecFactory() {
             public ProtocolEncoder getEncoder() throws Exception {
                 return (ProtocolEncoder) encoderClass.newInstance();
             }
@@ -145,6 +145,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         ByteBuffer in = (ByteBuffer) message;
+        if (!in.hasRemaining()) {
+            in.release();
+            return;
+        }
+
         ProtocolDecoder decoder = getDecoder(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
@@ -160,7 +165,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             } else {
                 pde = new ProtocolDecoderException(t);
             }
-            
+
             if (pde.getHexdump() == null) {
                 int curPos = in.position();
                 in.position(oldPos);
@@ -312,11 +317,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }
-    
+
     private void disposeDecoderOut(IoSession session) {
         session.removeAttribute(DECODER_OUT);
     }
-    
+
     private static class HiddenByteBuffer extends ByteBufferProxy {
         private HiddenByteBuffer(ByteBuffer buf) {
             super(buf);
