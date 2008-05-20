@@ -71,7 +71,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             throw new NullPointerException("decoder");
         }
 
-        this.factory = new ProtocolCodecFactory() {
+        factory = new ProtocolCodecFactory() {
             public ProtocolEncoder getEncoder() {
                 return encoder;
             }
@@ -112,7 +112,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     "decoderClass doesn't have a public default constructor.");
         }
 
-        this.factory = new ProtocolCodecFactory() {
+        factory = new ProtocolCodecFactory() {
             public ProtocolEncoder getEncoder() throws Exception {
                 return encoderClass.newInstance();
             }
@@ -149,6 +149,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         ByteBuffer in = (ByteBuffer) message;
+        if (!in.hasRemaining()) {
+            in.release();
+            return;
+        }
+
         ProtocolDecoder decoder = getDecoder(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
 
@@ -318,11 +323,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }
-    
+
     private void disposeDecoderOut(IoSession session) {
         session.removeAttribute(DECODER_OUT);
     }
-    
+
     private static class HiddenByteBuffer extends ByteBufferProxy {
         private HiddenByteBuffer(ByteBuffer buf) {
             super(buf);
