@@ -41,6 +41,8 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
     float  removeFloat();
     double removeDouble();
 
+    void   discard(int length);
+
     byte   elementAsByte  ();
     short  elementAsShort ();
     int    elementAsInt   ();
