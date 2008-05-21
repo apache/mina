@@ -34,8 +34,8 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
     boolean offerFloat(float value);
     boolean offerDouble(double value);
 
-    ByteBuffer pollSlice(int length);
-    ByteBuffer removeSlice(int length);
+    ByteBufferQueue pollSlice(int length);
+    ByteBufferQueue removeSlice(int length);
 
     byte   removeByte();
     short  removeShort();
@@ -60,6 +60,8 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
     float  elementAsFloat (int byteIndex);
     double elementAsDouble(int byteIndex);
 
-    ByteBuffer peekSlice(int byteIndex, int length);
-    ByteBuffer elementAsSlice(int byteIndex, int length);
+    ByteBufferQueue peekSlice(int byteIndex, int length);
+    ByteBufferQueue elementAsSlice(int byteIndex, int length);
+
+    ByteBufferQueue duplicate();
 }
