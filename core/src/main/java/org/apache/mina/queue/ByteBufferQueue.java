@@ -117,7 +117,7 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
 
     /**
      * Retrieves and removes the specified number of bytes from this queue.
-     * This method differs from {@link #removeSlice(int)} only in that it
+     * This method differs from {@link #pollSlice(int)} only in that it
      * throws a {@link NoSuchElementException} when the length of this queue
      * is less than the specified length.
      *
@@ -135,6 +135,18 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * @param length the number of bytes to retrieve
      */
     ByteBufferQueue peekSlice(int length);
+
+    /**
+     * Retrieves, but does not remove, the specified number of bytes from this
+     * queue. This method differs from {@link #peekSlice(int)} only in that it
+     * throws a {@link NoSuchElementException} when the length of this queue
+     * is less than the specified length.
+     *
+     * @param length the number of bytes to retrieve
+     * @throws NoSuchElementException if the length of this queue is less
+     *                                than the specified length
+     */
+    ByteBufferQueue elementAsSlice(int length);
 
     /**
      * Retrieves and removes one byte from the head of this queue.
