@@ -29,6 +29,12 @@ import java.nio.ByteBuffer;
  * @version $Rev$, $Date$
  */
 public class HeapByteBufferFactory implements ByteBufferFactory {
+    /**
+     * A default instance.  There's usually no need to create an additional
+     * new instance.
+     */
+    public static HeapByteBufferFactory INSTANCE = new HeapByteBufferFactory();
+
     public ByteBuffer newByteBuffer(int capacity) {
         return ByteBuffer.allocate(capacity);
     }
