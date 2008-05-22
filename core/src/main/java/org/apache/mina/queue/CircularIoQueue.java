@@ -19,6 +19,8 @@
  */
 package org.apache.mina.queue;
 
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -50,6 +52,7 @@ public class CircularIoQueue<E> extends AbstractIoQueue<E> {
     private int last;
     private boolean full;
     private int shrinkThreshold;
+    private int modCount;
 
     /**
      * Creates a new empty queue.
@@ -83,13 +86,10 @@ public class CircularIoQueue<E> extends AbstractIoQueue<E> {
 
     @Override
     protected final void doOffer(E e) {
-        if (e == null) {
-            throw new NullPointerException("element");
-        }
-
         expandIfNeeded();
         items[last] = e;
         increaseSize();
+        modCount ++;
     }
 
     @Override
@@ -101,11 +101,7 @@ public class CircularIoQueue<E> extends AbstractIoQueue<E> {
         E ret = items[first];
         items[first] = null;
         decreaseSize();
-
-        if (first == last) {
-            first = last = 0;
-        }
-
+        modCount ++;
         shrinkIfNeeded();
         return ret;
     }
@@ -136,6 +132,38 @@ public class CircularIoQueue<E> extends AbstractIoQueue<E> {
         return items[first];
     }
 
+    @Override
+    public Iterator<E> iterator() {
+        final int expectedModCount = modCount;
+        return new Iterator<E>() {
+            private int index = 0;
+
+            public boolean hasNext() {
+                return index != size();
+            }
+
+            public E next() {
+                try {
+                    E next = element(index++);
+                    return next;
+                } catch (IndexOutOfBoundsException e) {
+                    checkForComodification();
+                    throw new NoSuchElementException();
+                }
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            private void checkForComodification() {
+                if (modCount != expectedModCount) {
+                    throw new ConcurrentModificationException();
+                }
+            }
+        };
+    }
+
     private void checkIndex(int idx) {
         if (idx < 0 || idx >= size()) {
             throw new NoSuchElementException(String.valueOf(idx));
@@ -154,6 +182,10 @@ public class CircularIoQueue<E> extends AbstractIoQueue<E> {
     private void decreaseSize() {
         first = first + 1 & mask;
         full = false;
+
+        if (first == last) {
+            first = last = 0;
+        }
     }
 
     private void expandIfNeeded() {
