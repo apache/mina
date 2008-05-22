@@ -29,110 +29,132 @@ import java.util.Iterator;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class SynchronizedIoQueue<E> implements IoQueue<E> {
+public class SynchronizedIoQueue<E> extends IoQueueWrapper<E> {
 
-    private final IoQueue<E> q;
-
+    /**
+     * Creates a new instance.
+     */
     public SynchronizedIoQueue(IoQueue<E> q) {
-        this.q = q;
+        super(q);
     }
 
+    @Override
     public synchronized boolean add(E e) {
-        return q.add(e);
+        return super.add(e);
     }
 
+    @Override
     public synchronized E element() {
-        return q.element();
+        return super.element();
     }
 
+    @Override
     public synchronized boolean offer(E e) {
-        return q.offer(e);
+        return super.offer(e);
     }
 
+    @Override
     public synchronized E peek() {
-        return q.peek();
+        return super.peek();
     }
 
+    @Override
     public synchronized E poll() {
-        return q.poll();
+        return super.poll();
     }
 
+    @Override
     public synchronized E remove() {
-        return q.remove();
+        return super.remove();
     }
 
+    @Override
     public synchronized boolean addAll(Collection<? extends E> c) {
-        return q.addAll(c);
+        return super.addAll(c);
     }
 
+    @Override
     public synchronized void clear() {
-        q.clear();
+        super.clear();
     }
 
+    @Override
     public synchronized boolean contains(Object o) {
-        return q.contains(o);
+        return super.contains(o);
     }
 
+    @Override
     public synchronized boolean containsAll(Collection<?> c) {
-        return q.containsAll(c);
+        return super.containsAll(c);
     }
 
+    @Override
     public synchronized boolean isEmpty() {
-        return q.isEmpty();
+        return super.isEmpty();
     }
 
+    @Override
     public synchronized Iterator<E> iterator() {
-        return q.iterator();
+        return super.iterator();
     }
 
+    @Override
     public synchronized boolean remove(Object o) {
-        return q.remove(o);
+        return super.remove(o);
     }
 
+    @Override
     public synchronized boolean removeAll(Collection<?> c) {
-        return q.removeAll(c);
+        return super.removeAll(c);
     }
 
+    @Override
     public synchronized boolean retainAll(Collection<?> c) {
-        return q.retainAll(c);
+        return super.retainAll(c);
     }
 
+    @Override
     public synchronized int size() {
-        return q.size();
+        return super.size();
     }
 
+    @Override
     public synchronized Object[] toArray() {
-        return q.toArray();
+        return super.toArray();
     }
 
+    @Override
     public synchronized <T> T[] toArray(T[] a) {
-        return q.toArray(a);
+        return super.toArray(a);
     }
 
     @Override
     public synchronized boolean equals(Object obj) {
-        return q.equals(obj);
+        return super.equals(obj);
     }
 
     @Override
     public synchronized int hashCode() {
-        return q.hashCode();
+        return super.hashCode();
     }
 
     @Override
     public synchronized String toString() {
-        return q.toString();
+        return super.toString();
     }
 
+    @Override
     public synchronized E element(int index) {
-        return q.element(index);
+        return super.element(index);
     }
 
+    @Override
     public synchronized void addListener(IoQueueListener<? super E> listener) {
-        q.addListener(listener);
+        super.addListener(listener);
     }
 
+    @Override
     public synchronized void removeListener(IoQueueListener<? super E> listener) {
-        q.removeListener(listener);
+        super.removeListener(listener);
     }
 }
