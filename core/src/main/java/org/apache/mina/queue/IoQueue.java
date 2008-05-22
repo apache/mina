@@ -21,7 +21,32 @@ package org.apache.mina.queue;
 
 import java.util.Queue;
 
+/**
+ * A {@link Queue} that stores the objects used for I/O operations.
+ * <p>
+ * {@link IoQueue} is different from an ordinary {@link Queue} in that it
+ * provides a way to listen to the state of the queue, {@link IoQueueListener}.
+ * This is often useful when you want to veto adding an element or to monitor
+ * the insertion and removal of an element, which allows a user to enforce
+ * various constraints to the queue dynamically in run time.
+ *
+ * @param <E> the type of the queue's elements
+ *
+ * @author The Apache MINA project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public interface IoQueue<E> extends Queue<E> {
+
+    /**
+     * Adds the specified {@link IoQueueListener} to this queue.  Once added,
+     * the listener will be notified whenever the state of this queue changes.
+     */
     void addListener(IoQueueListener<? super E> listener);
+
+    /**
+     * Removes the specified {@link IoQueueListener} from this queue.  Once
+     * removed, the listener will no longer be notified when the state of this
+     * queue changes.
+     */
     void removeListener(IoQueueListener<? super E> listener);
 }
