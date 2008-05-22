@@ -20,6 +20,9 @@
 package org.apache.mina.queue;
 
 import java.util.AbstractQueue;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +40,7 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIoQueue.class);
 
     private volatile IoQueueListener<? super E>[] listeners = newListenerArray(0);
+    private int modCount;
 
     /**
      * {@inheritDoc}
@@ -101,6 +105,10 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
      * {@inheritDoc}
      */
     public final boolean offer(E e) {
+        if (e == null) {
+            throw new NullPointerException("element");
+        }
+
         try {
             if (!accept(e)) {
                 return false;
@@ -114,6 +122,8 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
         }
 
         doOffer(e);
+
+        modCount ++;
         offered(e);
         return true;
     }
@@ -127,8 +137,41 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
             return null;
         }
 
+        modCount ++;
         polled(e);
         return e;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        final int expectedModCount = modCount;
+        return new Iterator<E>() {
+            private int index = 0;
+
+            public boolean hasNext() {
+                return index != size();
+            }
+
+            public E next() {
+                try {
+                    E next = element(index++);
+                    return next;
+                } catch (IndexOutOfBoundsException e) {
+                    checkForComodification();
+                    throw new NoSuchElementException();
+                }
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            private void checkForComodification() {
+                if (modCount != expectedModCount) {
+                    throw new ConcurrentModificationException();
+                }
+            }
+        };
     }
 
     /**

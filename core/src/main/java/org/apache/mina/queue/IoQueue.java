@@ -19,6 +19,7 @@
  */
 package org.apache.mina.queue;
 
+import java.util.NoSuchElementException;
 import java.util.Queue;
 
 /**
@@ -42,6 +43,13 @@ import java.util.Queue;
  * @version $Rev$, $Date$
  */
 public interface IoQueue<E> extends Queue<E> {
+
+    /**
+     * Returns the element at the specified position.
+     *
+     * @throws NoSuchElementException if a wrong index is specified
+     */
+    E element(int index);
 
     /**
      * Adds the specified {@link IoQueueListener} to this queue.  Once added,
