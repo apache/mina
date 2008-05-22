@@ -41,7 +41,7 @@ public class CircularIoQueue<E> extends AbstractIoQueue<E> {
 
     private final int initialCapacity;
     // XXX: This volatile keyword here is a workaround for SUN Java Compiler
-    //      bug, which produces buggy byte code.  I don't event know why adding
+    //      bug, which produces buggy byte code.  I don't even know why adding
     //      a volatile fixes the problem.  Eclipse Java Compiler seems to
     //      produce correct byte code.
     private volatile E[] items;
