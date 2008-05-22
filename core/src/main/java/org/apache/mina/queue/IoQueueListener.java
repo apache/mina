@@ -20,9 +20,40 @@
 package org.apache.mina.queue;
 
 import java.util.EventListener;
+import java.util.Queue;
 
+/**
+ * An {@link EventListener} which is notified when the state of the
+ * {@link IoQueue} it is listening to changes.
+ *
+ * @param <E> the type of the element of the queue that this listener
+ *            listens to
+ *
+ * @author The Apache MINA project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public interface IoQueueListener<E> extends EventListener {
-    boolean accept(IoQueue<? extends E> buffer, E o);
-    void offered(IoQueue<? extends E> buffer, E o);
-    void polled(IoQueue<? extends E> buffer, E o);
+    /**
+     * Invoked before the specified element is added to the specified queue.
+     * You can veto the insertion request by returning <tt>false</tt> or
+     * throwing an exception.
+     *
+     * @return <tt>true</tt> if and only if the specified element is OK to be
+     *         added to the specified queue.
+     */
+    boolean accept(IoQueue<? extends E> queue, E element) throws Exception;
+
+    /**
+     * Invoked right after the specified element is added to the specified
+     * queue.  This method runs in the same thread which called
+     * {@link Queue#offer(Object)}.
+     */
+    void offered(IoQueue<? extends E> queue, E element) throws Exception;
+
+    /**
+     * Invoked right after the specified element is removed from the specified
+     * queue.  This method runs in the same thread which called
+     * {@link Queue#poll()}.
+     */
+    void polled(IoQueue<? extends E> queue, E element) throws Exception;
 }
