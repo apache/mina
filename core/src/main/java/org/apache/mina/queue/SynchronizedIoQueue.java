@@ -144,11 +144,6 @@ public class SynchronizedIoQueue<E> extends IoQueueWrapper<E> {
     }
 
     @Override
-    public synchronized E element(int index) {
-        return super.element(index);
-    }
-
-    @Override
     public synchronized void addListener(IoQueueListener<? super E> listener) {
         super.addListener(listener);
     }

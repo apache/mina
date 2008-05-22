@@ -129,10 +129,6 @@ public class IoQueueWrapper<E> implements IoQueue<E> {
         return q.toString();
     }
 
-    public E element(int index) {
-        return q.element(index);
-    }
-
     public void addListener(IoQueueListener<? super E> listener) {
         q.addListener(listener);
     }
