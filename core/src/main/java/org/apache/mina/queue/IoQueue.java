@@ -28,7 +28,13 @@ import java.util.Queue;
  * provides a way to listen to the state of the queue, {@link IoQueueListener}.
  * This is often useful when you want to veto adding an element or to monitor
  * the insertion and removal of an element, which allows a user to enforce
- * various constraints to the queue dynamically in run time.
+ * various constraints to the queue dynamically in run time.  The following is
+ * the list of possible use cases:
+ * <ul>
+ * <li>implementation of dynamic or static bound queue</li>
+ * <li>throughput calculation</li>
+ * <li>logging, ...</li>
+ * </ul>
  *
  * @param <E> the type of the queue's elements
  *
