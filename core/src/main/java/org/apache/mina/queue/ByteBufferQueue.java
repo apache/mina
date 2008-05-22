@@ -164,7 +164,7 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * Retrieves and removes a float (4 bytes) from the head of this queue.
      *
      * @throws NoSuchElementException if the length of this queue is less than
-     *                                <tt>2</tt>
+     *                                <tt>4</tt>
      */
     float  removeFloat();
 
