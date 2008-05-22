@@ -53,7 +53,32 @@ public interface IoAbsoluteWriter {
     public void put(int index, ByteBuffer bb);
 
     /**
+     * Puts a <code>short</code> at the given index.
+     */
+    void putShort(int index, short s);
+
+    /**
      * Puts an <code>int</code> at the given index.
      */
     void putInt(int index, int i);
+
+    /**
+     * Puts a <code>long</code> at the given index.
+     */
+    void putLong(int index, long l);
+
+    /**
+     * Puts a <code>float</code> at the given index.
+     */
+    void putFloat(int index, float f);
+
+    /**
+     * Puts a <code>double</code> at the given index.
+     */
+    void putDouble(int index, double d);
+
+    /**
+     * Puts a <code>char</code> at the given index.
+     */
+    void putChar(int index, char c);
 }

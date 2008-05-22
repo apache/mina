@@ -1,8 +1,28 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
 package org.apache.mina.common;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictControl;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +49,7 @@ import org.easymock.IMocksControl;
  */
 public class ByteAccessTest extends TestCase {
 
-    private final List<String> operations = new ArrayList<String>();
+    private List<String> operations = new ArrayList<String>();
 
     private void resetOperations() {
         operations.clear();
@@ -308,6 +328,44 @@ public class ByteAccessTest extends TestCase {
             assertOperationCountEquals(1); // Frees ByteArray behind both buffers.
         }
     }
+    
+    public void testCompositeByteArraySlicing() {
+        CompositeByteArray cba = new CompositeByteArray();
+        cba.addLast(getByteArrayFactory().create(10));
+        cba.addLast(getByteArrayFactory().create(10));
+        cba.addLast(getByteArrayFactory().create(10));
+        testByteArraySlicing(cba, 0, 30);
+        testByteArraySlicing(cba, 5, 10);
+        testByteArraySlicing(cba, 10, 20);
+        testByteArraySlicing(cba, 1, 28);
+        testByteArraySlicing(cba, 19, 2);
+    }
+    
+    public void testBufferByteArraySlicing() {
+        ByteArray bba = getByteArrayFactory().create(30);
+        testByteArraySlicing(bba, 0, 30);
+        testByteArraySlicing(bba, 5, 10);
+        testByteArraySlicing(bba, 10, 20);
+        testByteArraySlicing(bba, 1, 28);
+        testByteArraySlicing(bba, 19, 2);
+        
+    }
+    
+    private void testByteArraySlicing(ByteArray ba, int start, int length) {
+        ByteArray slice = ba.slice(start, length);
+        for (int i = 0; i < length; i++) {
+            byte b1 = (byte) (i % 67);
+            byte b2 = (byte) (i % 36);
+            int sourceIndex = i + start;
+            int sliceIndex = i;
+            ba.put(sourceIndex, b1);
+            assertEquals(b1, ba.get(sourceIndex));
+            assertEquals(b1, slice.get(sliceIndex));
+            slice.put(sliceIndex, b2);
+            assertEquals(b2, ba.get(sourceIndex));
+            assertEquals(b2, slice.get(sliceIndex));
+        }
+    }
 
     private ChunkedExpander getExpander(final int chunkSize) {
         return new ChunkedExpander(getByteArrayFactory(), chunkSize) {
@@ -368,6 +426,86 @@ public class ByteAccessTest extends TestCase {
             writer.put(i, b);
             assertEquals(b, reader.get(i));
         }
+    }
+
+    public void testByteArrayPrimitiveAccess() {
+        ByteArray bbaBig = getByteArrayFactory().create(1000);
+        bbaBig.order(ByteOrder.BIG_ENDIAN);
+        testPrimitiveAccess(bbaBig.cursor(), bbaBig.cursor());
+
+        ByteArray bbaLittle = getByteArrayFactory().create(1000);
+        bbaLittle.order(ByteOrder.LITTLE_ENDIAN);
+        testPrimitiveAccess(bbaLittle.cursor(), bbaLittle.cursor());
+    }
+
+    public void testCompositeByteArrayPrimitiveAccess() {
+        CompositeByteArray cbaBig = new CompositeByteArray();
+        cbaBig.order(ByteOrder.BIG_ENDIAN);
+        for (int i = 0; i < 1000; i++) {
+            ByteArray component = getByteArrayFactory().create(1);
+            component.order(ByteOrder.BIG_ENDIAN);
+            cbaBig.addLast(component);
+        }
+        testPrimitiveAccess(cbaBig.cursor(), cbaBig.cursor());
+
+        CompositeByteArray cbaLittle = new CompositeByteArray();
+        cbaLittle.order(ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < 1000; i++) {
+            ByteArray component = getByteArrayFactory().create(1);
+            component.order(ByteOrder.LITTLE_ENDIAN);
+            cbaLittle.addLast(component);
+        }
+        testPrimitiveAccess(cbaLittle.cursor(), cbaLittle.cursor());
+    }
+
+    public void testCompositeByteArrayWrapperPrimitiveAccess() {
+        CompositeByteArray cbaBig = new CompositeByteArray();
+        cbaBig.order(ByteOrder.BIG_ENDIAN);
+        for (int i = 0; i < 1000; i++) {
+            ByteArray component = getByteArrayFactory().create(1);
+            component.order(ByteOrder.BIG_ENDIAN);
+            cbaBig.addLast(component);
+        }
+        testPrimitiveAccess(new CompositeByteArrayRelativeWriter(cbaBig, getExpander(10), getFlusher(), false), new CompositeByteArrayRelativeReader(cbaBig, true));
+
+        CompositeByteArray cbaLittle = new CompositeByteArray();
+        cbaLittle.order(ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < 1000; i++) {
+            ByteArray component = getByteArrayFactory().create(1);
+            component.order(ByteOrder.LITTLE_ENDIAN);
+            cbaLittle.addLast(component);
+        }
+        testPrimitiveAccess(new CompositeByteArrayRelativeWriter(cbaLittle, getExpander(10), getFlusher(), false), new CompositeByteArrayRelativeReader(cbaLittle, true));
+    }
+
+    private void testPrimitiveAccess(IoRelativeWriter write, IoRelativeReader read) {
+        byte b = (byte) 0x12;
+        write.put(b);
+        assertEquals(b, read.get());
+
+        short s = (short) 0x12;
+        write.putShort(s);
+        assertEquals(s, read.getShort());
+
+        int i = 0x12345678;
+        write.putInt(i);
+        assertEquals(i, read.getInt());
+
+        long l = 0x1234567890123456L;
+        write.putLong(l);
+        assertEquals(l, read.getLong());
+
+        float f = Float.intBitsToFloat(i);
+        write.putFloat(f);
+        assertEquals(f, read.getFloat());
+
+        double d = Double.longBitsToDouble(l);
+        write.putDouble(d);
+        assertEquals(d, read.getDouble());
+
+        char c = (char) 0x1234;
+        write.putChar(c);
+        assertEquals(c, read.getChar());
     }
 
 }

@@ -126,11 +126,18 @@ public class CompositeByteArrayRelativeWriter extends
         ByteArray removed = cba.removeTo(index);
         flusher.flush(removed);
     }
+    
+    /**
+     * @inheritDoc
+     */
+    public void skip(int length) {
+        cursor.skip(length);
+    }
 
     @Override
     protected void cursorPassedFirstComponent() {
         if (autoFlush) {
-            flushTo(cba.first() + cba.getFirst().last());
+            flushTo(cba.first() + cba.getFirst().length());
         }
     }
 
@@ -153,9 +160,48 @@ public class CompositeByteArrayRelativeWriter extends
     /**
      * @inheritDoc
      */
+    public void putShort(short s) {
+        prepareForAccess(2);
+        cursor.putShort(s);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public void putInt(int i) {
         prepareForAccess(4);
         cursor.putInt(i);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public void putLong(long l) {
+        prepareForAccess(8);
+        cursor.putLong(l);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putFloat(float f) {
+        prepareForAccess(4);
+        cursor.putFloat(f);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putDouble(double d) {
+        prepareForAccess(8);
+        cursor.putDouble(d);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putChar(char c) {
+        prepareForAccess(2);
+        cursor.putChar(c);
+    }
 }

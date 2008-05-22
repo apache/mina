@@ -28,6 +28,10 @@ import java.nio.ByteBuffer;
  */
 public class SimpleByteArrayFactory implements ByteArrayFactory {
 
+    public SimpleByteArrayFactory() {
+        super();
+    }
+
     /**
      * @inheritDoc
      */

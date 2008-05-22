@@ -30,7 +30,7 @@ import java.util.Collections;
  * a <code>SimpleByteArrayFactory</code>.
  *
  */
-public abstract class BufferByteArray implements ByteArray {
+public abstract class BufferByteArray extends AbstractByteArray {
 
     /**
      * The backing <code>ByteBuffer</code>.
@@ -53,6 +53,27 @@ public abstract class BufferByteArray implements ByteArray {
      */
     public ByteBuffer getSingleByteBuffer() {
         return bb;
+    }
+    
+    /**
+     * @inheritDoc
+     * 
+     * Calling <code>free()</code> on the returned slice has no effect.
+     */
+    public ByteArray slice(int index, int length) {
+        int oldLimit = bb.limit();
+        bb.position(index);
+        bb.limit(index + length);
+        ByteBuffer slice = bb.slice();
+        bb.limit(oldLimit);
+        return new BufferByteArray(slice) {
+            
+            @Override
+            public void free() {
+                // Do nothing.
+            }
+            
+        };
     }
 
     /**
@@ -86,13 +107,6 @@ public abstract class BufferByteArray implements ByteArray {
      */
     public int last() {
         return bb.limit();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public int length() {
-        return last() - first();
     }
 
     /**
@@ -142,6 +156,20 @@ public abstract class BufferByteArray implements ByteArray {
     /**
      * @inheritDoc
      */
+    public short getShort(int index) {
+        return bb.getShort(index);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putShort(int index, short s) {
+        bb.putShort(index, s);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public int getInt(int index) {
         return bb.getInt(index);
     }
@@ -151,6 +179,62 @@ public abstract class BufferByteArray implements ByteArray {
      */
     public void putInt(int index, int i) {
         bb.putInt(index, i);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public long getLong(int index) {
+        return bb.getLong(index);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putLong(int index, long l) {
+        bb.putLong(index, l);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public float getFloat(int index) {
+        return bb.getFloat(index);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putFloat(int index, float f) {
+        bb.putFloat(index, f);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public double getDouble(int index) {
+        return bb.getDouble(index);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putDouble(int index, double d) {
+        bb.putDouble(index, d);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public char getChar(int index) {
+        return bb.getChar(index);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putChar(int index, char c) {
+        bb.putChar(index, c);
     }
 
     private class CursorImpl implements Cursor {
@@ -194,6 +278,16 @@ public abstract class BufferByteArray implements ByteArray {
                 throw new IndexOutOfBoundsException();
             }
             this.index = index;
+        }
+        
+        public void skip(int length) {
+            setIndex(index + length);
+        }
+        
+        public ByteArray slice(int length) {
+            ByteArray slice = BufferByteArray.this.slice(index, length);
+            index += length;
+            return slice;
         }
 
         /**
@@ -241,6 +335,23 @@ public abstract class BufferByteArray implements ByteArray {
         /**
          * @inheritDoc
          */
+        public short getShort() {
+            short s = BufferByteArray.this.getShort(index);
+            index += 2;
+            return s;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putShort(short s) {
+            BufferByteArray.this.putShort(index, s);
+            index += 2;
+        }
+
+        /**
+         * @inheritDoc
+         */
         public int getInt() {
             int i = BufferByteArray.this.getInt(index);
             index += 4;
@@ -255,5 +366,72 @@ public abstract class BufferByteArray implements ByteArray {
             index += 4;
         }
 
+        /**
+         * @inheritDoc
+         */
+        public long getLong() {
+            long l = BufferByteArray.this.getLong(index);
+            index += 8;
+            return l;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putLong(long l) {
+            BufferByteArray.this.putLong(index, l);
+            index += 8;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public float getFloat() {
+            float f = BufferByteArray.this.getFloat(index);
+            index += 4;
+            return f;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putFloat(float f) {
+            BufferByteArray.this.putFloat(index, f);
+            index += 4;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public double getDouble() {
+            double d = BufferByteArray.this.getDouble(index);
+            index += 8;
+            return d;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putDouble(double d) {
+            BufferByteArray.this.putDouble(index, d);
+            index += 8;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public char getChar() {
+            char c = BufferByteArray.this.getChar(index);
+            index += 2;
+            return c;
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putChar(char c) {
+            BufferByteArray.this.putChar(index, c);
+            index += 2;
+        }
     }
 }

@@ -30,8 +30,11 @@ import org.apache.mina.util.byteaccess.ByteArrayList.Node;
 /**
  * A ByteArray composed of other ByteArrays. Optimised for fast relative access
  * via cursors. Absolute access methods are provided, but may perform poorly.
+ *
+ * TODO: Write about laziness of cursor implementation - how movement doesn't
+ * happen until actual get/put.
  */
-public final class CompositeByteArray implements ByteArray {
+public final class CompositeByteArray extends AbstractByteArray {
 
     /**
      * Allows for efficient detection of component boundaries when using a cursor.
@@ -91,7 +94,7 @@ public final class CompositeByteArray implements ByteArray {
     }
 
     public void addFirst(ByteArray ba) {
-        handleAdd(ba);
+        addHook(ba);
         bas.addFirst(ba);
     }
 
@@ -128,9 +131,9 @@ public final class CompositeByteArray implements ByteArray {
                 remaining -= component.last();
             } else {
                 // Remove part of component. Do this by removing entire
-                // component
-                // then readding remaining bytes.
-                // TODO: Consider using getByteBuffers(), as more generic.
+                // component then readding remaining bytes.
+                // TODO: Consider using getByteBuffers(), as would avoid
+                // performance problems for nested ComponentByteArrays.
                 ByteBuffer bb = component.getSingleByteBuffer();
                 int originalLimit = bb.limit();
                 bb.position(0);
@@ -163,7 +166,7 @@ public final class CompositeByteArray implements ByteArray {
     }
 
     public void addLast(ByteArray ba) {
-        handleAdd(ba);
+        addHook(ba);
         bas.addLast(ba);
     }
 
@@ -280,6 +283,13 @@ public final class CompositeByteArray implements ByteArray {
     public Cursor cursor(int index, CursorListener listener) {
         return new CursorImpl(index, listener);
     }
+    
+    /**
+     * @inheritDoc
+     */
+    public ByteArray slice(int index, int length) {
+        return cursor(index).slice(length);
+    }
 
     /**
      * @inheritDoc
@@ -312,20 +322,6 @@ public final class CompositeByteArray implements ByteArray {
     /**
      * @inheritDoc
      */
-    public int getInt(int index) {
-        return cursor(index).getInt();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public void putInt(int index, int i) {
-        cursor(index).putInt(i);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public int first() {
         return bas.firstByte();
     }
@@ -338,13 +334,13 @@ public final class CompositeByteArray implements ByteArray {
     }
 
     /**
-     * @inheritDoc
+     * This method should be called prior to adding any component
+     * <code>ByteArray</code> to a composite.
+     *
+     * @param ba
+     *            The component to add.
      */
-    public int length() {
-        return last() - first();
-    }
-
-    private void handleAdd(ByteArray ba) {
+    private void addHook(ByteArray ba) {
         // Check first() is zero, otherwise cursor might not work.
         // TODO: Remove this restriction?
         if (ba.first() != 0) {
@@ -385,6 +381,90 @@ public final class CompositeByteArray implements ByteArray {
                 }
             }
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public short getShort(int index) {
+        return cursor(index).getShort();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putShort(int index, short s) {
+        cursor(index).putShort(s);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public int getInt(int index) {
+        return cursor(index).getInt();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putInt(int index, int i) {
+        cursor(index).putInt(i);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public long getLong(int index) {
+        return cursor(index).getLong();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putLong(int index, long l) {
+        cursor(index).putLong(l);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public float getFloat(int index) {
+        return cursor(index).getFloat();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putFloat(int index, float f) {
+        cursor(index).putFloat(f);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public double getDouble(int index) {
+        return cursor(index).getDouble();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putDouble(int index, double d) {
+        cursor(index).putDouble(d);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public char getChar(int index) {
+        return cursor(index).getChar();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void putChar(int index, char c) {
+        cursor(index).putChar(c);
     }
 
     private class CursorImpl implements Cursor {
@@ -431,6 +511,30 @@ public final class CompositeByteArray implements ByteArray {
         public void setIndex(int index) {
             checkBounds(index, 0);
             this.index = index;
+        }
+        
+        /**
+         * @inheritDoc
+         */
+        public void skip(int length) {
+            setIndex(index + length);
+        }
+        
+        /**
+         * @inheritDoc
+         */
+        public ByteArray slice(int length) {
+            CompositeByteArray slice = new CompositeByteArray(byteArrayFactory);
+            int remaining = length;
+            while (remaining > 0) {
+                prepareForAccess(remaining);
+                int componentSliceSize = Math.min(remaining, componentCursor.getRemaining());
+                ByteArray componentSlice = componentCursor.slice(componentSliceSize);
+                slice.addLast(componentSlice);
+                index += componentSliceSize;
+                remaining -= componentSliceSize;
+            }
+            return slice;
         }
 
         /**
@@ -490,7 +594,7 @@ public final class CompositeByteArray implements ByteArray {
 
             // Go forward, if necessary.
             while (index >= componentIndex + componentNode.getByteArray()
-                    .last()) {
+                    .length()) {
                 componentIndex += componentNode.getByteArray().last();
                 componentNode = componentNode.getNextNode();
                 if (listener != null) {
@@ -573,6 +677,49 @@ public final class CompositeByteArray implements ByteArray {
         /**
          * @inheritDoc
          */
+        public short getShort() {
+            prepareForAccess(2);
+            if (componentCursor.getRemaining() >= 4) {
+                short s = componentCursor.getShort();
+                index += 2;
+                return s;
+            } else {
+                byte b0 = get();
+                byte b1 = get();
+                if (order.equals(ByteOrder.BIG_ENDIAN)) {
+                    return (short) ((b0 << 8) | (b1 << 0));
+                } else {
+                    return (short) ((b1 << 8) | (b0 << 0));
+                }
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putShort(short s) {
+            prepareForAccess(2);
+            if (componentCursor.getRemaining() >= 4) {
+                componentCursor.putShort(s);
+                index += 2;
+            } else {
+                byte b0;
+                byte b1;
+                if (order.equals(ByteOrder.BIG_ENDIAN)) {
+                    b0 = (byte) ((s >> 8) & 0xff);
+                    b1 = (byte) ((s >> 0) & 0xff);
+                } else {
+                    b0 = (byte) ((s >> 0) & 0xff);
+                    b1 = (byte) ((s >> 8) & 0xff);
+                }
+                put(b0);
+                put(b1);
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
         public int getInt() {
             prepareForAccess(4);
             if (componentCursor.getRemaining() >= 4) {
@@ -580,14 +727,14 @@ public final class CompositeByteArray implements ByteArray {
                 index += 4;
                 return i;
             } else {
+                byte b0 = get();
                 byte b1 = get();
                 byte b2 = get();
                 byte b3 = get();
-                byte b4 = get();
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    return b1 << 24 & b2 << 16 & b3 << 8 & b4;
+                    return ((b0 << 24) | (b1 << 16) | (b2 << 8) | (b3 << 0));
                 } else {
-                    return b4 << 24 & b3 << 16 & b2 << 8 & b1;
+                    return ((b3 << 24) | (b2 << 16) | (b1 << 8) | (b0 << 0));
                 }
             }
         }
@@ -601,32 +748,201 @@ public final class CompositeByteArray implements ByteArray {
                 componentCursor.putInt(i);
                 index += 4;
             } else {
+                byte b0;
+                byte b1;
+                byte b2;
+                byte b3;
+                if (order.equals(ByteOrder.BIG_ENDIAN)) {
+                    b0 = (byte) ((i >> 24) & 0xff);
+                    b1 = (byte) ((i >> 16) & 0xff);
+                    b2 = (byte) ((i >> 8) & 0xff);
+                    b3 = (byte) ((i >> 0) & 0xff);
+                } else {
+                    b0 = (byte) ((i >> 0) & 0xff);
+                    b1 = (byte) ((i >> 8) & 0xff);
+                    b2 = (byte) ((i >> 16) & 0xff);
+                    b3 = (byte) ((i >> 24) & 0xff);
+                }
+                put(b0);
+                put(b1);
+                put(b2);
+                put(b3);
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public long getLong() {
+            prepareForAccess(8);
+            if (componentCursor.getRemaining() >= 4) {
+                long l = componentCursor.getLong();
+                index += 8;
+                return l;
+            } else {
+                byte b0 = get();
+                byte b1 = get();
+                byte b2 = get();
+                byte b3 = get();
+                byte b4 = get();
+                byte b5 = get();
+                byte b6 = get();
+                byte b7 = get();
+                if (order.equals(ByteOrder.BIG_ENDIAN)) {
+                    return ((b0 & 0xffL) << 56) | ((b1 & 0xffL) << 48) | ((b2 & 0xffL) << 40) | ((b3 & 0xffL) << 32) | ((b4 & 0xffL) << 24) | ((b5 & 0xffL) << 16) | ((b6 & 0xffL) << 8) | ((b7 & 0xffL) << 0);
+                } else {
+                    return ((b7 & 0xffL) << 56) | ((b6 & 0xffL) << 48) | ((b5 & 0xffL) << 40) | ((b4 & 0xffL) << 32) | ((b3 & 0xffL) << 24) | ((b2 & 0xffL) << 16) | ((b1 & 0xffL) << 8) | ((b0 & 0xffL) << 0);
+                }
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putLong(long l) {
+            prepareForAccess(8);
+            if (componentCursor.getRemaining() >= 4) {
+                componentCursor.putLong(l);
+                index += 8;
+            } else {
+                byte b0;
                 byte b1;
                 byte b2;
                 byte b3;
                 byte b4;
+                byte b5;
+                byte b6;
+                byte b7;
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    b4 = (byte) (i & 0xff);
-                    i >>= 8;
-                    b3 = (byte) (i & 0xff);
-                    i >>= 8;
-                    b2 = (byte) (i & 0xff);
-                    i >>= 8;
-                    b1 = (byte) (i & 0xff);
+                    b0 = (byte) ((l >> 56) & 0xff);
+                    b1 = (byte) ((l >> 48) & 0xff);
+                    b2 = (byte) ((l >> 40) & 0xff);
+                    b3 = (byte) ((l >> 32) & 0xff);
+                    b4 = (byte) ((l >> 24) & 0xff);
+                    b5 = (byte) ((l >> 16) & 0xff);
+                    b6 = (byte) ((l >> 8) & 0xff);
+                    b7 = (byte) ((l >> 0) & 0xff);
                 } else {
-                    b1 = (byte) (i & 0xff);
-                    i >>= 8;
-                    b2 = (byte) (i & 0xff);
-                    i >>= 8;
-                    b3 = (byte) (i & 0xff);
-                    i >>= 8;
-                    b4 = (byte) (i & 0xff);
+                    b0 = (byte) ((l >> 0) & 0xff);
+                    b1 = (byte) ((l >> 8) & 0xff);
+                    b2 = (byte) ((l >> 16) & 0xff);
+                    b3 = (byte) ((l >> 24) & 0xff);
+                    b4 = (byte) ((l >> 32) & 0xff);
+                    b5 = (byte) ((l >> 40) & 0xff);
+                    b6 = (byte) ((l >> 48) & 0xff);
+                    b7 = (byte) ((l >> 56) & 0xff);
                 }
+                put(b0);
                 put(b1);
                 put(b2);
                 put(b3);
                 put(b4);
+                put(b5);
+                put(b6);
+                put(b7);
             }
         }
+
+        /**
+         * @inheritDoc
+         */
+        public float getFloat() {
+            prepareForAccess(4);
+            if (componentCursor.getRemaining() >= 4) {
+                float f = componentCursor.getFloat();
+                index += 4;
+                return f;
+            } else {
+                int i = getInt();
+                return Float.intBitsToFloat(i);
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putFloat(float f) {
+            prepareForAccess(4);
+            if (componentCursor.getRemaining() >= 4) {
+                componentCursor.putFloat(f);
+                index += 4;
+            } else {
+                int i = Float.floatToIntBits(f);
+                putInt(i);
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public double getDouble() {
+            prepareForAccess(8);
+            if (componentCursor.getRemaining() >= 4) {
+                double d = componentCursor.getDouble();
+                index += 8;
+                return d;
+            } else {
+                long l = getLong();
+                return Double.longBitsToDouble(l);
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putDouble(double d) {
+            prepareForAccess(8);
+            if (componentCursor.getRemaining() >= 4) {
+                componentCursor.putDouble(d);
+                index += 8;
+            } else {
+                long l = Double.doubleToLongBits(d);
+                putLong(l);
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public char getChar() {
+            prepareForAccess(2);
+            if (componentCursor.getRemaining() >= 4) {
+                char c = componentCursor.getChar();
+                index += 2;
+                return c;
+            } else {
+                byte b0 = get();
+                byte b1 = get();
+                if (order.equals(ByteOrder.BIG_ENDIAN)) {
+                    return (char) ((b0 << 8) | (b1 << 0));
+                } else {
+                    return (char) ((b1 << 8) | (b0 << 0));
+                }
+            }
+        }
+
+        /**
+         * @inheritDoc
+         */
+        public void putChar(char c) {
+            prepareForAccess(2);
+            if (componentCursor.getRemaining() >= 4) {
+                componentCursor.putChar(c);
+                index += 2;
+            } else {
+                byte b0;
+                byte b1;
+                if (order.equals(ByteOrder.BIG_ENDIAN)) {
+                    b0 = (byte) ((c >> 8) & 0xff);
+                    b1 = (byte) ((c >> 0) & 0xff);
+                } else {
+                    b0 = (byte) ((c >> 0) & 0xff);
+                    b1 = (byte) ((c >> 8) & 0xff);
+                }
+                put(b0);
+                put(b1);
+            }
+        }
+
     }
 }

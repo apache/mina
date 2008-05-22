@@ -70,6 +70,13 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
     ByteBuffer getSingleByteBuffer();
 
     /**
+     * A ByteArray is equal to another ByteArray if they start and end at the
+     * same index, have the same byte order, and contain the same bytes at each
+     * index.
+     */
+    public boolean equals(Object other);
+
+    /**
      * @inheritDoc
      */
     byte get(int index);

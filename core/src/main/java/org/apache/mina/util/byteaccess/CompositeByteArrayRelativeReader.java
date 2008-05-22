@@ -50,6 +50,20 @@ public class CompositeByteArrayRelativeReader extends
             cba.removeFirst().free();
         }
     }
+    
+    /**
+     * @inheritDoc
+     */
+    public void skip(int length) {
+        cursor.skip(length);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public ByteArray slice(int length) {
+        return cursor.slice(length);
+    }
 
     public byte get() {
         return cursor.get();
@@ -58,9 +72,46 @@ public class CompositeByteArrayRelativeReader extends
     public void get(ByteBuffer bb) {
         cursor.get(bb);
     }
+    /**
+     * @inheritDoc
+     */
+    public short getShort() {
+        return cursor.getShort();
+    }
 
+    /**
+     * @inheritDoc
+     */
     public int getInt() {
         return cursor.getInt();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public long getLong() {
+        return cursor.getLong();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public float getFloat() {
+        return cursor.getFloat();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public double getDouble() {
+        return cursor.getDouble();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public char getChar() {
+        return cursor.getChar();
     }
 
 }

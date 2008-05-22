@@ -36,6 +36,16 @@ public interface IoRelativeReader {
      * Checks if there are any remaining bytes that can be read.
      */
     boolean hasRemaining();
+    
+    /**
+     * Advances the reader by the given number of bytes.
+     */
+    void skip(int length);
+
+    /**
+     * Creates an array with a view of part of this array.
+     */
+    ByteArray slice(int length);
 
     /**
      * Gets the order of the bytes.
@@ -53,8 +63,32 @@ public interface IoRelativeReader {
     void get(ByteBuffer bb);
 
     /**
+     * Gets a <code>short</code> and advances the reader.
+     */
+    short getShort();
+
+    /**
      * Gets an <code>int</code> and advances the reader.
      */
     int getInt();
 
+    /**
+     * Gets a <code>long</code> and advances the reader.
+     */
+    long getLong();
+
+    /**
+     * Gets a <code>float</code> and advances the reader.
+     */
+    float getFloat();
+
+    /**
+     * Gets a <code>double</code> and advances the reader.
+     */
+    double getDouble();
+
+    /**
+     * Gets a <code>char</code> and advances the reader.
+     */
+    char getChar();
 }

@@ -43,10 +43,15 @@ public interface IoAbsoluteReader {
     int length();
 
     /**
+     * Creates an array with a view of part of this array.
+     */
+    ByteArray slice(int index, int length);
+
+    /**
      * Gets the order of the bytes.
      */
     ByteOrder order();
-
+    
     /**
      * Gets a <code>byte</code> from the given index.
      */
@@ -58,7 +63,32 @@ public interface IoAbsoluteReader {
     public void get(int index, ByteBuffer bb);
 
     /**
+     * Gets a <code>short</code> from the given index.
+     */
+    short getShort(int index);
+
+    /**
      * Gets an <code>int</code> from the given index.
      */
     int getInt(int index);
+
+    /**
+     * Gets a <code>long</code> from the given index.
+     */
+    long getLong(int index);
+
+    /**
+     * Gets a <code>float</code> from the given index.
+     */
+    float getFloat(int index);
+
+    /**
+     * Gets a <code>double</code> from the given index.
+     */
+    double getDouble(int index);
+
+    /**
+     * Gets a <code>char</code> from the given index.
+     */
+    char getChar(int index);
 }

@@ -36,6 +36,11 @@ public interface IoRelativeWriter {
      * Checks if there are any remaining bytes that can be read.
      */
     boolean hasRemaining();
+    
+    /**
+     * Advances the writer by the given number of bytes.
+     */
+    void skip(int length);
 
     /**
      * Gets the order of the bytes.
@@ -53,7 +58,32 @@ public interface IoRelativeWriter {
     void put(ByteBuffer bb);
 
     /**
+     * Puts a <code>short</code> and advances the reader.
+     */
+    void putShort(short s);
+
+    /**
      * Puts an <code>int</code> and advances the reader.
      */
     void putInt(int i);
+
+    /**
+     * Puts a <code>long</code> and advances the reader.
+     */
+    void putLong(long l);
+
+    /**
+     * Puts a <code>float</code> and advances the reader.
+     */
+    void putFloat(float f);
+
+    /**
+     * Puts a <code>double</code> and advances the reader.
+     */
+    void putDouble(double d);
+
+    /**
+     * Puts a <code>char</code> and advances the reader.
+     */
+    void putChar(char c);
 }
