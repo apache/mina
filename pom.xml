@@ -269,9 +269,6 @@
 
   <modules>
     <module>core</module>
-    <!--
-    <module>transport-serial</module>
-    -->
     <module>transport-apr</module>
     <module>filter-compression</module>
     <module>filter-codec-netty</module>
@@ -281,6 +278,23 @@
     <module>integration-jmx</module>
     <module>example</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>default</id>
+    </profile>
+    <profile>
+      <id>serial</id>
+      <activation>
+        <property>
+          <name>with-LGPL-dependencies</name>
+        </property>
+      </activation>
+      <modules>
+        <module>transport-serial</module>
+      </modules>
+    </profile>
+  </profiles>
   
   <build>
     <plugins>
