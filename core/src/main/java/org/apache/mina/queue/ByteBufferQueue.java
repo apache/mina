@@ -128,6 +128,15 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
     ByteBufferQueue removeSlice(int length);
 
     /**
+     * Retrieves, but does not remove, the specified number of bytes from this
+     * queue, or returns <tt>null</tt> if the length of this queue is less
+     * than the specified length.
+     *
+     * @param length the number of bytes to retrieve
+     */
+    ByteBufferQueue peekSlice(int length);
+
+    /**
      * Retrieves and removes one byte from the head of this queue.
      *
      * @throws NoSuchElementException if this queue is empty
@@ -333,4 +342,12 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * list of the {@link ByteBuffer}s, not {@link ByteBuffer}s themselves.
      */
     ByteBufferQueue duplicate();
+
+    /**
+     * Merges all elements of this queue into one {@link ByteBuffer}.  This
+     * operation doesn't change the state of this queue.
+     *
+     * @return the merged buffer
+     */
+    ByteBuffer merge();
 }
