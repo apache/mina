@@ -185,46 +185,61 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
     boolean offerDouble(double value);
 
     /**
-     * Retrieves and removes the specified number of bytes from this queue,
-     * or returns <tt>null</tt> if the length of this queue is less than the
-     * specified length.
+     * Retrieves and removes the specified number of bytes from this queue.
      *
-     * @param length the number of bytes to retrieve and remove
+     * @param destination the queue that the slice will be added to
+     * @param length      the number of bytes to retrieve and remove
+     *
+     * @return <tt>true</tt> if succeeded to transfer all bytes to the
+     *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    ByteBufferQueue pollSlice(int length);
+    boolean pollSlice(IoQueue<ByteBuffer> destination, int length);
 
     /**
      * Retrieves and removes the specified number of bytes from this queue.
-     * This method differs from {@link #pollSlice(int)} only in that it
-     * throws a {@link NoSuchElementException} when the length of this queue
-     * is less than the specified length.
+     * This method differs from {@link #pollSlice(IoQueue, int)} only
+     * in that it throws a {@link NoSuchElementException} when the length of
+     * this queue is less than the specified length.
      *
-     * @param length the number of bytes to retrieve and remove
+     * @param destination the queue that the slice will be added to
+     * @param length      the number of bytes to retrieve and remove
+     *
      * @throws NoSuchElementException if the length of this queue is less
      *                                than the specified length
+     *
+     * @return <tt>true</tt> if succeeded to transfer all bytes to the
+     *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    ByteBufferQueue removeSlice(int length);
+    boolean removeSlice(IoQueue<ByteBuffer> destination, int length);
 
     /**
      * Retrieves, but does not remove, the specified number of bytes from this
-     * queue, or returns <tt>null</tt> if the length of this queue is less
-     * than the specified length.
+     * queue.
      *
-     * @param length the number of bytes to retrieve
+     * @param destination the queue that the slice will be added to
+     * @param length      the number of bytes to retrieve
+     *
+     * @return <tt>true</tt> if succeeded to transfer all bytes to the
+     *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    ByteBufferQueue peekSlice(int length);
+    boolean peekSlice(IoQueue<ByteBuffer> destination, int length);
 
     /**
      * Retrieves, but does not remove, the specified number of bytes from this
-     * queue. This method differs from {@link #peekSlice(int)} only in that it
-     * throws a {@link NoSuchElementException} when the length of this queue
-     * is less than the specified length.
+     * queue. This method differs from {@link #peekSlice(IoQueue, int)} only in
+     * that it throws a {@link NoSuchElementException} when the length of this
+     * queue is less than the specified length.
      *
-     * @param length the number of bytes to retrieve
+     * @param destination the queue that the slice will be added to
+     * @param length      the number of bytes to retrieve and remove
+     *
      * @throws NoSuchElementException if the length of this queue is less
      *                                than the specified length
+     *
+     * @return <tt>true</tt> if succeeded to transfer all bytes to the
+     *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    ByteBufferQueue elementAsSlice(int length);
+    boolean elementAsSlice(IoQueue<ByteBuffer> destination, int length);
 
     /**
      * Retrieves and removes one byte from the head of this queue.
@@ -342,10 +357,10 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      *
      * @param byteIndex the offset (byte-unit position) of this queue
      *
-     * @throws NoSuchElementException if the length of this queue is less than
-     *                                <tt>byteIndex + 1</tt>
+     * @throws IndexOutOfBoundsException if the length of this queue is less
+     *                                   than <tt>byteIndex + 1</tt>
      */
-    byte   elementAsByte  (int byteIndex);
+    byte   getByte  (int byteIndex);
 
     /**
      * Retrieves, but does not remove, a short integer (2 bytes) from the
@@ -353,10 +368,10 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      *
      * @param byteIndex the offset (byte-unit position) of this queue
      *
-     * @throws NoSuchElementException if the length of this queue is less than
-     *                                <tt>byteIndex + 2</tt>
+     * @throws IndexOutOfBoundsException if the length of this queue is less
+     *                                   than <tt>byteIndex + 2</tt>
      */
-    short  elementAsShort (int byteIndex);
+    short  getShort (int byteIndex);
 
     /**
      * Retrieves, but does not remove, an integer (4 bytes) from the
@@ -364,10 +379,10 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      *
      * @param byteIndex the offset (byte-unit position) of this queue
      *
-     * @throws NoSuchElementException if the length of this queue is less than
-     *                                <tt>byteIndex + 4</tt>
+     * @throws IndexOutOfBoundsException if the length of this queue is less
+     *                                   than <tt>byteIndex + 4</tt>
      */
-    int    elementAsInt   (int byteIndex);
+    int    getInt   (int byteIndex);
 
     /**
      * Retrieves, but does not remove, a long integer (8 bytes) from the
@@ -375,10 +390,10 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      *
      * @param byteIndex the offset (byte-unit position) of this queue
      *
-     * @throws NoSuchElementException if the length of this queue is less than
-     *                                <tt>byteIndex + 8</tt>
+     * @throws IndexOutOfBoundsException if the length of this queue is less
+     *                                   than <tt>byteIndex + 8</tt>
      */
-    long   elementAsLong  (int byteIndex);
+    long   getLong  (int byteIndex);
 
     /**
      * Retrieves, but does not remove, a float (4 bytes) from the
@@ -386,10 +401,10 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      *
      * @param byteIndex the offset (byte-unit position) of this queue
      *
-     * @throws NoSuchElementException if the length of this queue is less than
-     *                                <tt>byteIndex + 4</tt>
+     * @throws IndexOutOfBoundsException if the length of this queue is less
+     *                                   than <tt>byteIndex + 4</tt>
      */
-    float  elementAsFloat (int byteIndex);
+    float  getFloat (int byteIndex);
 
     /**
      * Retrieves, but does not remove, a double (8 bytes) from the
@@ -397,41 +412,26 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      *
      * @param byteIndex the offset (byte-unit position) of this queue
      *
-     * @throws NoSuchElementException if the length of this queue is less than
-     *                                <tt>byteIndex + 8</tt>
+     * @throws IndexOutOfBoundsException if the length of this queue is less
+     *                                   than <tt>byteIndex + 8</tt>
      */
-    double elementAsDouble(int byteIndex);
+    double getDouble(int byteIndex);
 
     /**
      * Retrieves, but does not remove, the specified number of bytes from the
-     * specified position of this queue, or returns <tt>null</tt> if the length
-     * of this queue is less than <tt>byteIndex + length</tt>.
+     * specified position of this queue.
      *
-     * @param byteIndex the offset (byte-unit position) of this queue
-     * @param length the number of bytes to retrieve
-     */
-    ByteBufferQueue peekSlice(int byteIndex, int length);
-
-    /**
-     * Retrieves, but does not remove, the specified number of bytes from the
-     * specified position of this queue.  This method differs from
-     * {@link #peekSlice(int, int)} only in that it throws a
-     * {@link NoSuchElementException} when the length of this queue
-     * is less than <tt>byteIndex + length</tt>.
+     * @param destination the queue that the slice will be added to
+     * @param byteIndex   the offset (byte-unit position) of this queue
+     * @param length      the number of bytes to retrieve
      *
-     * @param byteIndex the offset (byte-unit position) of this queue
-     * @param length the number of bytes to retrieve
+     * @throws IndexOutOfBoundsException if the length of this queue is less
+     *                                   than <tt>byteIndex + length</tt>
      *
-     * @throws NoSuchElementException if the length of this queue is less
-     *                                than <tt>byteIndex + length</tt>
+     * @return <tt>true</tt> if succeeded to transfer all bytes to the
+     *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    ByteBufferQueue elementAsSlice(int byteIndex, int length);
-
-    /**
-     * Returns the shallow copy of this queue.  This operation copies only the
-     * list of the {@link ByteBuffer}s, not {@link ByteBuffer}s themselves.
-     */
-    ByteBufferQueue duplicate();
+    boolean getSlice(IoQueue<ByteBuffer> destination, int byteIndex, int length);
 
     /**
      * Merges all elements of this queue into one {@link ByteBuffer}.  This
