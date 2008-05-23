@@ -32,6 +32,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class ConcurrentLinkedIoQueue<E> extends QueueBackedIoQueue<E> {
 
+    /**
+     * Creates a new instance.
+     */
     public ConcurrentLinkedIoQueue() {
         super(new ConcurrentLinkedQueue<E>());
     }
