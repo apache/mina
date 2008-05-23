@@ -438,18 +438,7 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
 
         // Otherwise, read byte by byte. (inefficient!)
-        int value = 0;
-        for (int bytesToRead = 2; bytesToRead > 0; bytesToRead --) {
-            value = value << 8 | e.get();
-            remaining --;
-            length --;
-            if (remaining == 0) {
-                e = safeElement();
-                remaining = e.remaining();
-            }
-        }
-
-        return applyByteOrder((short) value);
+        return applyByteOrder((short) readByteByByte(2));
     }
 
     public int    removeInt() {
@@ -471,18 +460,7 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
 
         // Otherwise, read byte by byte. (inefficient!)
-        int value = 0;
-        for (int bytesToRead = 4; bytesToRead > 0; bytesToRead --) {
-            value = value << 8 | e.get();
-            length --;
-            remaining --;
-            if (remaining == 0) {
-                e = safeElement();
-                remaining = e.remaining();
-            }
-        }
-
-        return applyByteOrder(value);
+        return applyByteOrder((int) readByteByByte(4));
     }
 
     public long   removeLong() {
@@ -504,18 +482,7 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
 
         // Otherwise, read byte by byte. (inefficient!)
-        long value = 0;
-        for (int bytesToRead = 8; bytesToRead > 0; bytesToRead --) {
-            value = value << 8 | e.get();
-            length --;
-            remaining --;
-            if (remaining == 0) {
-                e = safeElement();
-                remaining = e.remaining();
-            }
-        }
-
-        return applyByteOrder(value);
+        return applyByteOrder(readByteByByte(8));
     }
 
     public float  removeFloat() {
