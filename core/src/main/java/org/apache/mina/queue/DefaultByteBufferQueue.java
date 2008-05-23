@@ -533,7 +533,7 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
 
         // Otherwise, read byte by byte. (inefficient!)
-        return applyByteOrder((short) readByteByByte(2));
+        return applyByteOrder((short) getByteByByte(2));
     }
 
     public int    elementAsInt   () {
@@ -545,7 +545,7 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
 
         // Otherwise, read byte by byte. (inefficient!)
-        return applyByteOrder((int) readByteByByte(4));
+        return applyByteOrder((int) getByteByByte(4));
     }
 
     public long   elementAsLong  () {
@@ -557,7 +557,7 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
 
         // Otherwise, read byte by byte. (inefficient!)
-        return applyByteOrder(readByteByByte(8));
+        return applyByteOrder(getByteByByte(8));
     }
 
     public float  elementAsFloat () {
@@ -757,6 +757,25 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
             }
         }
 
+        throw new ConcurrentModificationException();
+    }
+
+    private long getByteByByte(int bytesToRead) {
+        long value = 0;
+        for (ByteBuffer b: this) {
+            int remaining = b.remaining();
+            if (remaining == 0) {
+                continue;
+            }
+
+            for (int i = 0; i < remaining; i ++) {
+                value = value << 8 | b.get(b.position() + i);
+                bytesToRead --;
+                if (bytesToRead == 0) {
+                    return value;
+                }
+            }
+        }
         throw new ConcurrentModificationException();
     }
 
