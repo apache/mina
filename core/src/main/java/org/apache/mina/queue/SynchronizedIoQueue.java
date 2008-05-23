@@ -34,8 +34,8 @@ public class SynchronizedIoQueue<E> extends IoQueueWrapper<E> {
     /**
      * Creates a new instance.
      */
-    public SynchronizedIoQueue(IoQueue<E> q) {
-        super(q);
+    public SynchronizedIoQueue(IoQueue<E> queue) {
+        super(queue);
     }
 
     @Override
