@@ -659,6 +659,15 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return buf;
     }
 
+    /**
+     * Creates a tail buffer if necessary.
+     *
+     * @param length the length of the value to put into the tail buffer
+     *
+     * @return a new tail buffer whose capacity is {@link #capacityIncrement}
+     *         if there's no tail buffer created yet or the current tail buffer
+     *         doesn't have enough room.  an existing tail buffer otherwise.
+     */
     private ByteBuffer tail(int length) {
         ByteBuffer oldTail = tail;
         if (oldTail == null || oldTail.capacity() - oldTail.limit() < length) {
@@ -744,6 +753,10 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
     }
 
+    /**
+     * Retrieves the specified number of bytes from the head of this queue,
+     * modifying the state of this queue and its elements.
+     */
     private long readByteByByte(int bytesToRead) {
         long value = 0;
         for (ByteBuffer b: this) {
@@ -760,6 +773,10 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         throw new ConcurrentModificationException();
     }
 
+    /**
+     * Retrieves the specified number of bytes from the head of this queue,
+     * not modifying the state of this queue and its elements.
+     */
     private long getByteByByte(int bytesToRead) {
         long value = 0;
         for (ByteBuffer b: this) {
@@ -779,6 +796,11 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         throw new ConcurrentModificationException();
     }
 
+    /**
+     * Retrieves the specified number of bytes from the specified byte-level
+     * position of this queue, not modifying the state of this queue and its
+     * elements.
+     */
     private long getByteByByte(int byteIndex, int bytesToRead) {
         long value = 0;
         for (ByteBuffer b: this) {
@@ -803,6 +825,11 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         throw new ConcurrentModificationException();
     }
 
+    /**
+     * Reverses the bytes of the specified value if the byte order of this
+     * queue is {@link ByteOrder#LITTLE_ENDIAN}.  Otherwise, this method does
+     * nothing.
+     */
     private short applyByteOrder(short value) {
         // Reverse the bytes if necessary.
         if (order == ByteOrder.LITTLE_ENDIAN) {
@@ -812,6 +839,11 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return value;
     }
 
+    /**
+     * Reverses the bytes of the specified value if the byte order of this
+     * queue is {@link ByteOrder#LITTLE_ENDIAN}.  Otherwise, this method does
+     * nothing.
+     */
     private int applyByteOrder(int value) {
         // Reverse the bytes if necessary.
         if (order == ByteOrder.LITTLE_ENDIAN) {
@@ -823,6 +855,11 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return value;
     }
 
+    /**
+     * Reverses the bytes of the specified value if the byte order of this
+     * queue is {@link ByteOrder#LITTLE_ENDIAN}.  Otherwise, this method does
+     * nothing.
+     */
     private long applyByteOrder(long value) {
         // Reverse the bytes if necessary.
         if (order == ByteOrder.LITTLE_ENDIAN) {
