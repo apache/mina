@@ -19,8 +19,6 @@
  */
 package org.apache.mina.queue;
 
-import java.util.Iterator;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -32,41 +30,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @param <E> the type of this queue's elements
  */
-public class ConcurrentLinkedIoQueue<E> extends AbstractIoQueue<E> {
+public class ConcurrentLinkedIoQueue<E> extends QueueBackedIoQueue<E> {
 
-    private final Queue<E> q = new ConcurrentLinkedQueue<E>();
-
-    public E peek() {
-        return q.peek();
-    }
-
-    @Override
-    public Iterator<E> iterator() {
-        return q.iterator();
-    }
-
-    @Override
-    public int size() {
-        return q.size();
-    }
-
-    @Override
-    public Object[] toArray() {
-        return q.toArray();
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return q.toArray(a);
-    }
-
-    @Override
-    protected void doOffer(E e) {
-        q.offer(e);
-    }
-
-    @Override
-    protected E doPoll() {
-        return q.poll();
+    public ConcurrentLinkedIoQueue() {
+        super(new ConcurrentLinkedQueue<E>());
     }
 }
