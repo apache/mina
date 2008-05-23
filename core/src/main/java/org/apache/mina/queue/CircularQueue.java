@@ -88,6 +88,14 @@ public class CircularQueue<E> extends AbstractQueue<E> {
         return actualCapacity;
     }
 
+    /**
+     * Returns the current capacity of this queue.  It's always equal to or
+     * greater than the size of this queue.
+     */
+    public int capacity() {
+        return items.length;
+    }
+
     public boolean offer(E e) {
         expandIfNeeded();
         items[last] = e;
