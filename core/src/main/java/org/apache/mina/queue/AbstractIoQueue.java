@@ -117,7 +117,9 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
             throw new RuntimeException("Failed to accept: " + e, t);
         }
 
-        doOffer(e);
+        if (!doOffer(e)) {
+            return false;
+        }
         offered(e);
         return true;
     }
@@ -140,7 +142,7 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
      *
      * @param e an element to add to the tail of this queue.
      */
-    protected abstract void doOffer(E e);
+    protected abstract boolean doOffer(E e);
 
     /**
      * Performs the actual removal operation.

@@ -22,6 +22,7 @@ package org.apache.mina.queue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 
 /**
  * An {@link IoQueue} of {@link ByteBuffer}s.  {@link ByteBufferQueue} is
@@ -193,11 +194,11 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * @return <tt>true</tt> if succeeded to transfer all bytes to the
      *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    boolean pollSlice(IoQueue<ByteBuffer> destination, int length);
+    boolean pollSlice(Queue<ByteBuffer> destination, int length);
 
     /**
      * Retrieves and removes the specified number of bytes from this queue.
-     * This method differs from {@link #pollSlice(IoQueue, int)} only
+     * This method differs from {@link #pollSlice(Queue, int)} only
      * in that it throws a {@link NoSuchElementException} when the length of
      * this queue is less than the specified length.
      *
@@ -210,7 +211,7 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * @return <tt>true</tt> if succeeded to transfer all bytes to the
      *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    boolean removeSlice(IoQueue<ByteBuffer> destination, int length);
+    boolean removeSlice(Queue<ByteBuffer> destination, int length);
 
     /**
      * Retrieves, but does not remove, the specified number of bytes from this
@@ -222,11 +223,11 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * @return <tt>true</tt> if succeeded to transfer all bytes to the
      *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    boolean peekSlice(IoQueue<ByteBuffer> destination, int length);
+    boolean peekSlice(Queue<ByteBuffer> destination, int length);
 
     /**
      * Retrieves, but does not remove, the specified number of bytes from this
-     * queue. This method differs from {@link #peekSlice(IoQueue, int)} only in
+     * queue. This method differs from {@link #peekSlice(Queue, int)} only in
      * that it throws a {@link NoSuchElementException} when the length of this
      * queue is less than the specified length.
      *
@@ -239,7 +240,7 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * @return <tt>true</tt> if succeeded to transfer all bytes to the
      *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    boolean elementAsSlice(IoQueue<ByteBuffer> destination, int length);
+    boolean elementAsSlice(Queue<ByteBuffer> destination, int length);
 
     /**
      * Retrieves and removes one byte from the head of this queue.
@@ -431,7 +432,7 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * @return <tt>true</tt> if succeeded to transfer all bytes to the
      *         destination.  <tt>false</tt> if failed partially or entirely.
      */
-    boolean getSlice(IoQueue<ByteBuffer> destination, int byteIndex, int length);
+    boolean getSlice(Queue<ByteBuffer> destination, int byteIndex, int length);
 
     /**
      * Merges all elements of this queue into one {@link ByteBuffer}.  This

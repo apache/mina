@@ -71,8 +71,8 @@ public class QueueBackedIoQueue<E> extends AbstractIoQueue<E> {
     }
 
     @Override
-    protected void doOffer(E e) {
-        q.offer(e);
+    protected boolean doOffer(E e) {
+        return q.offer(e);
     }
 
     @Override
