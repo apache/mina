@@ -583,9 +583,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         // Otherwise, start expensive traversal.
         for (ByteBuffer b: this) {
             if (b.remaining() > byteIndex) {
-                return e.get(e.position() + byteIndex);
+                return b.get(b.position() + byteIndex);
             } else {
-                byteIndex -= e.remaining();
+                byteIndex -= b.remaining();
             }
         }
 
@@ -813,7 +813,7 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
             }
 
             for (int i = 0; i < remaining; i ++) {
-                value = value << 8 | b.get(b.position() + byteIndex);
+                value = value << 8 | b.get(b.position() + byteIndex) & 0xFF;
                 bytesToRead --;
                 if (bytesToRead == 0) {
                     return value;

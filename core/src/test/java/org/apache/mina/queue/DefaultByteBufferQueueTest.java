@@ -58,6 +58,7 @@ public class DefaultByteBufferQueueTest {
         }
 
         assertLength(256, queue);
+        assertEquals(256 / CAPACITY_INCREMENT + 1, queue.size());
 
         for (int i = 0; i < 256; i ++) {
             assertEquals(i, queue.removeByte() & 0xFF);
@@ -121,9 +122,80 @@ public class DefaultByteBufferQueueTest {
         assertEmpty(queue);
     }
 
+    @Test
+    public void randomByteAccess() {
+        ByteBufferQueue queue = new DefaultByteBufferQueue(CAPACITY_INCREMENT);
+        for (int i = 0; i < 256; i ++) {
+            assertTrue(queue.offerByte((byte) i));
+        }
+
+        assertLength(256, queue);
+        assertEquals(256 / CAPACITY_INCREMENT + 1, queue.size());
+
+        for (int i = 0; i < 256; i ++) {
+            assertEquals(i, queue.getByte(i) & 0xFF);
+            assertLength(256, queue);
+            assertEquals(256 / CAPACITY_INCREMENT + 1, queue.size());
+        }
+    }
+
+    @Test
+    public void randomShortAccess() {
+        ByteBufferQueue queue = new DefaultByteBufferQueue(CAPACITY_INCREMENT);
+        for (int i = 0; i < 4096; i ++) {
+            assertTrue(queue.offerShort((short) i));
+        }
+
+        assertLength(4096 * 2, queue);
+        assertEquals(4096 / (CAPACITY_INCREMENT / 2), queue.size());
+
+        for (int i = 0; i < 4096; i ++) {
+            assertEquals(i, queue.getShort(i * 2) & 0xFFFF);
+            assertLength(4096 * 2, queue);
+            assertEquals(4096 / (CAPACITY_INCREMENT / 2), queue.size());
+        }
+    }
+
+    @Test
+    public void randomIntAccess() {
+        ByteBufferQueue queue = new DefaultByteBufferQueue(CAPACITY_INCREMENT);
+        for (int i = 0; i < 4096; i ++) {
+            assertTrue(queue.offerInt(i));
+        }
+
+        assertLength(4096 * 4, queue);
+        assertEquals(4096 / (CAPACITY_INCREMENT / 4), queue.size());
+
+        for (int i = 0; i < 4096; i ++) {
+            assertEquals(i, queue.getInt(i * 4));
+            assertLength(4096 * 4, queue);
+            assertEquals(4096 / (CAPACITY_INCREMENT / 4), queue.size());
+        }
+    }
+
+    @Test
+    public void randomLongAccess() {
+        ByteBufferQueue queue = new DefaultByteBufferQueue(CAPACITY_INCREMENT);
+        for (int i = 0; i < 4096; i ++) {
+            assertTrue(queue.offerLong(i));
+        }
+
+        assertLength(4096 * 8, queue);
+        assertEquals(4096 / (CAPACITY_INCREMENT / 8), queue.size());
+
+        for (int i = 0; i < 4096; i ++) {
+            assertEquals(i, queue.getLong(i * 8));
+            assertLength(4096 * 8, queue);
+            assertEquals(4096 / (CAPACITY_INCREMENT / 8), queue.size());
+        }
+    }
+
     private void assertLength(int expected, ByteBufferQueue queue) {
         assertEquals(expected, queue.length());
         assertEquals(expected == 0, queue.isEmpty());
+        if (expected == 0) {
+            assertEmpty(queue);
+        }
     }
 
     private void assertEmpty(ByteBufferQueue queue) {
