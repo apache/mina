@@ -52,6 +52,84 @@ public interface ByteBufferQueue extends IoQueue<ByteBuffer> {
      * first.  Otherwise, the value will be put into the last (i.e. tail)
      * {@link ByteBuffer}.
      *
+     * @throws IllegalStateException if the element cannot be inserted
+     *                               due to capacity restriction or an
+     *                               {@link IoQueueListener#accept(IoQueue, Object)}
+     *                               which returned <tt>false</tt>
+     */
+    void addByte(byte value);
+
+    /**
+     * Inserts the specified <tt>short</tt> value to the tail of this queue.
+     * If there's not enough room, a new {@link ByteBuffer} will be inserted
+     * first.  Otherwise, the value will be put into the last (i.e. tail)
+     * {@link ByteBuffer}.
+     *
+     * @throws IllegalStateException if the element cannot be inserted
+     *                               due to capacity restriction or an
+     *                               {@link IoQueueListener#accept(IoQueue, Object)}
+     *                               which returned <tt>false</tt>
+     */
+    void addShort(short value);
+
+    /**
+     * Inserts the specified <tt>int</tt> value to the tail of this queue.
+     * If there's not enough room, a new {@link ByteBuffer} will be inserted
+     * first.  Otherwise, the value will be put into the last (i.e. tail)
+     * {@link ByteBuffer}.
+     *
+     * @throws IllegalStateException if the element cannot be inserted
+     *                               due to capacity restriction or an
+     *                               {@link IoQueueListener#accept(IoQueue, Object)}
+     *                               which returned <tt>false</tt>
+     */
+    void addInt(int value);
+
+    /**
+     * Inserts the specified <tt>long</tt> value to the tail of this queue.
+     * If there's not enough room, a new {@link ByteBuffer} will be inserted
+     * first.  Otherwise, the value will be put into the last (i.e. tail)
+     * {@link ByteBuffer}.
+     *
+     * @throws IllegalStateException if the element cannot be inserted
+     *                               due to capacity restriction or an
+     *                               {@link IoQueueListener#accept(IoQueue, Object)}
+     *                               which returned <tt>false</tt>
+     */
+    void addLong(long value);
+
+    /**
+     * Inserts the specified <tt>float</tt> value to the tail of this queue.
+     * If there's not enough room, a new {@link ByteBuffer} will be inserted
+     * first.  Otherwise, the value will be put into the last (i.e. tail)
+     * {@link ByteBuffer}.
+     *
+     * @throws IllegalStateException if the element cannot be inserted
+     *                               due to capacity restriction or an
+     *                               {@link IoQueueListener#accept(IoQueue, Object)}
+     *                               which returned <tt>false</tt>
+     */
+    void addFloat(float value);
+
+    /**
+     * Inserts the specified <tt>double</tt> value to the tail of this queue.
+     * If there's not enough room, a new {@link ByteBuffer} will be inserted
+     * first.  Otherwise, the value will be put into the last (i.e. tail)
+     * {@link ByteBuffer}.
+     *
+     * @throws IllegalStateException if the element cannot be inserted
+     *                               due to capacity restriction or an
+     *                               {@link IoQueueListener#accept(IoQueue, Object)}
+     *                               which returned <tt>false</tt>
+     */
+    void addDouble(double value);
+
+    /**
+     * Inserts the specified <tt>byte</tt> value to the tail of this queue.
+     * If there's not enough room, a new {@link ByteBuffer} will be inserted
+     * first.  Otherwise, the value will be put into the last (i.e. tail)
+     * {@link ByteBuffer}.
+     *
      * @return <tt>true</tt> if and only if the insertion succeeded
      */
     boolean offerByte(byte value);
