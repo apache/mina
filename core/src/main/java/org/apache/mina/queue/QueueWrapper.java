@@ -43,88 +43,151 @@ public class QueueWrapper<E> implements Queue<E> {
         this.q = queue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean add(E e) {
         return q.add(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E element() {
         return q.element();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offer(E e) {
         return q.offer(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E peek() {
         return q.peek();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E poll() {
         return q.poll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E remove() {
         return q.remove();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean addAll(Collection<? extends E> c) {
         return q.addAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void clear() {
         q.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean contains(Object o) {
         return q.contains(o);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean containsAll(Collection<?> c) {
         return q.containsAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isEmpty() {
         return q.isEmpty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Iterator<E> iterator() {
         return q.iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean remove(Object o) {
         return q.remove(o);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean removeAll(Collection<?> c) {
         return q.removeAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean retainAll(Collection<?> c) {
         return q.retainAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int size() {
         return q.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Object[] toArray() {
         return q.toArray();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public <T> T[] toArray(T[] a) {
         return q.toArray(a);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         return q.equals(obj);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return q.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return q.toString();

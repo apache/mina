@@ -35,6 +35,9 @@ public class HeapByteBufferFactory implements ByteBufferFactory {
      */
     public static HeapByteBufferFactory INSTANCE = new HeapByteBufferFactory();
 
+    /**
+     * {@inheritDoc}
+     */
     public ByteBuffer newByteBuffer(int capacity) {
         return ByteBuffer.allocate(capacity);
     }

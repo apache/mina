@@ -26,7 +26,7 @@ package org.apache.mina.queue;
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoQueueWrapper<E> extends QueueWrapper<E> {
+public class IoQueueWrapper<E> extends QueueWrapper<E> implements IoQueue<E> {
 
     /**
      * Creates a new instance.
@@ -35,10 +35,16 @@ public class IoQueueWrapper<E> extends QueueWrapper<E> {
         super(queue);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addListener(IoQueueListener<? super E> listener) {
         ((IoQueue<E>) q).addListener(listener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void removeListener(IoQueueListener<? super E> listener) {
         ((IoQueue<E>) q).removeListener(listener);
     }

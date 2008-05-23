@@ -38,116 +38,185 @@ public class SynchronizedIoQueue<E> extends IoQueueWrapper<E> {
         super(queue);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean add(E e) {
         return super.add(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized E element() {
         return super.element();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean offer(E e) {
         return super.offer(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized E peek() {
         return super.peek();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized E poll() {
         return super.poll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized E remove() {
         return super.remove();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean addAll(Collection<? extends E> c) {
         return super.addAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void clear() {
         super.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean contains(Object o) {
         return super.contains(o);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean containsAll(Collection<?> c) {
         return super.containsAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean isEmpty() {
         return super.isEmpty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized Iterator<E> iterator() {
         return super.iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean remove(Object o) {
         return super.remove(o);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean removeAll(Collection<?> c) {
         return super.removeAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean retainAll(Collection<?> c) {
         return super.retainAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized int size() {
         return super.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized Object[] toArray() {
         return super.toArray();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized <T> T[] toArray(T[] a) {
         return super.toArray(a);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean equals(Object obj) {
         return super.equals(obj);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized int hashCode() {
         return super.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized String toString() {
         return super.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void addListener(IoQueueListener<? super E> listener) {
         super.addListener(listener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void removeListener(IoQueueListener<? super E> listener) {
         super.removeListener(listener);

@@ -93,6 +93,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         this.capacityIncrement = capacityIncrement;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean doOffer(ByteBuffer e) {
         e = e.duplicate();
@@ -107,6 +110,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return queue.offer(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected ByteBuffer doPoll() {
         ByteBuffer buf = queue.poll();
@@ -116,6 +122,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return buf;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<ByteBuffer> iterator() {
         final Iterator<ByteBuffer> i = queue.iterator();
@@ -134,59 +143,92 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size() {
         return queue.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ByteBuffer peek() {
         return queue.peek();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ByteOrder order() {
         return order;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int length() {
         return length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addByte(byte value) {
         if (!offerByte(value)) {
             throw new IllegalStateException();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addShort(short value) {
         if (!offerShort(value)) {
             throw new IllegalStateException();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addInt(int value) {
         if (!offerInt(value)) {
             throw new IllegalStateException();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addLong(long value) {
         if (!offerLong(value)) {
             throw new IllegalStateException();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addFloat(float value) {
         if (!offerFloat(value)) {
             throw new IllegalStateException();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addDouble(double value) {
         if (!offerDouble(value)) {
             throw new IllegalStateException();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offerByte(byte value) {
         ByteBuffer tail = tail(1);
         if (tail == null) {
@@ -199,6 +241,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offerShort(short value) {
         ByteBuffer tail = tail(2);
         if (tail == null) {
@@ -211,6 +256,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offerInt(int value) {
         ByteBuffer tail = tail(4);
         if (tail == null) {
@@ -223,6 +271,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offerLong(long value) {
         ByteBuffer tail = tail(8);
         if (tail == null) {
@@ -235,14 +286,23 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offerFloat(float value) {
         return offerInt(Float.floatToIntBits(value));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offerDouble(double value) {
         return offerLong(Double.doubleToLongBits(value));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean pollSlice(Queue<ByteBuffer> destination, int length) {
         if (length < 0) {
             throw new IllegalArgumentException(
@@ -296,6 +356,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean peekSlice(Queue<ByteBuffer> destination, int length) {
         if (length < 0) {
             throw new IllegalArgumentException(
@@ -348,16 +411,25 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         throw new ConcurrentModificationException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean elementAsSlice(Queue<ByteBuffer> destination, int length) {
         checkSequentialAccess(length);
         return peekSlice(destination, length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean removeSlice(Queue<ByteBuffer> destination, int length) {
         checkSequentialAccess(length);
         return pollSlice(destination, length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean getSlice(Queue<ByteBuffer> destination, int byteIndex, int length) {
         checkRandomAccess(byteIndex, length);
 
@@ -407,6 +479,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         throw new ConcurrentModificationException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public byte   removeByte() {
         checkSequentialAccess(1);
         ByteBuffer e = safeElement();
@@ -419,6 +494,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public short  removeShort() {
         checkSequentialAccess(2);
         // Try to read in one shot.
@@ -441,6 +519,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder((short) readByteByByte(2));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int    removeInt() {
         checkSequentialAccess(4);
         // Try to read in one shot.
@@ -463,6 +544,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder((int) readByteByByte(4));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public long   removeLong() {
         checkSequentialAccess(8);
         // Try to read in one shot.
@@ -485,14 +569,23 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder(readByteByByte(8));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public float  removeFloat() {
         return Float.intBitsToFloat(removeInt());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public double removeDouble() {
         return Double.longBitsToDouble(removeLong());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void   discard(int length) {
         checkSequentialAccess(length);
 
@@ -518,12 +611,18 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public byte   elementAsByte  () {
         checkSequentialAccess(1);
         ByteBuffer e = safeElement();
         return e.get(e.position());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public short  elementAsShort () {
         checkSequentialAccess(2);
         // Try to read in one shot.
@@ -536,6 +635,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder((short) getByteByByte(2));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int    elementAsInt   () {
         checkSequentialAccess(4);
         // Try to read in one shot.
@@ -548,6 +650,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder((int) getByteByByte(4));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public long   elementAsLong  () {
         checkSequentialAccess(8);
         // Try to read in one shot.
@@ -560,14 +665,23 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder(getByteByByte(8));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public float  elementAsFloat () {
         return Float.intBitsToFloat(elementAsInt());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public double elementAsDouble() {
         return Double.longBitsToDouble(elementAsLong());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public byte   getByte  (int byteIndex) {
         checkRandomAccess(byteIndex, 1);
         if (byteIndex == 0) {
@@ -593,6 +707,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         throw new ConcurrentModificationException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public short  getShort (int byteIndex) {
         checkRandomAccess(byteIndex, 2);
         if (byteIndex == 0) {
@@ -609,6 +726,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder((short) getByteByByte(byteIndex, 2));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int    getInt   (int byteIndex) {
         checkRandomAccess(byteIndex, 4);
         if (byteIndex == 0) {
@@ -625,6 +745,9 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder((int) getByteByByte(byteIndex, 4));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public long   getLong  (int byteIndex) {
         checkRandomAccess(byteIndex, 8);
         if (byteIndex == 0) {
@@ -641,14 +764,23 @@ public class DefaultByteBufferQueue extends AbstractIoQueue<ByteBuffer> implemen
         return applyByteOrder(getByteByByte(byteIndex, 8));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public float  getFloat (int byteIndex) {
         return Float.intBitsToFloat(getInt(byteIndex));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public double getDouble(int byteIndex) {
         return Double.longBitsToDouble(getLong(byteIndex));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ByteBuffer merge() {
         ByteBuffer buf = bufferFactory.newByteBuffer(length);
         buf.order(order);

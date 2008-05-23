@@ -76,6 +76,11 @@ public class CircularQueue<E> extends AbstractQueue<E> {
         this.shrinkThreshold = 0;
     }
 
+    /**
+     * Normalized the specified capacity value to the power of two.
+     *
+     * @return the normalized actual capacity
+     */
     private static int normalizeCapacity(int initialCapacity) {
         int actualCapacity = 1;
         while (actualCapacity < initialCapacity) {
@@ -96,6 +101,9 @@ public class CircularQueue<E> extends AbstractQueue<E> {
         return items.length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offer(E e) {
         expandIfNeeded();
         items[last] = e;
@@ -104,6 +112,9 @@ public class CircularQueue<E> extends AbstractQueue<E> {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E poll() {
         if (isEmpty()) {
             return null;
@@ -117,11 +128,17 @@ public class CircularQueue<E> extends AbstractQueue<E> {
         return ret;
     }
 
+    /**
+     * Returns the index-th element.
+     */
     public final E element(int index) {
         checkIndex(index);
         return items[getRealIndex(index)];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size() {
         if (full) {
@@ -135,6 +152,9 @@ public class CircularQueue<E> extends AbstractQueue<E> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E peek() {
         if (isEmpty()) {
             return null;
@@ -143,6 +163,9 @@ public class CircularQueue<E> extends AbstractQueue<E> {
         return items[first];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<E> iterator() {
         final int expectedModCount = modCount;

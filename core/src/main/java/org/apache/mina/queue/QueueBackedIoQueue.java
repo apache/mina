@@ -46,35 +46,56 @@ public class QueueBackedIoQueue<E> extends AbstractIoQueue<E> {
         this.q = queue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E peek() {
         return q.peek();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<E> iterator() {
         return q.iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size() {
         return q.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object[] toArray() {
         return q.toArray();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T[] toArray(T[] a) {
         return q.toArray(a);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean doOffer(E e) {
         return q.offer(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected E doPoll() {
         return q.poll();

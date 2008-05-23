@@ -38,6 +38,9 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
 
     private volatile IoQueueListener<? super E>[] listeners = newListenerArray(0);
 
+    /**
+     * {@inheritDoc}
+     */
     public final void addListener(IoQueueListener<? super E> listener) {
         if (listener == null) {
             throw new NullPointerException("listener");
@@ -54,6 +57,9 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void removeListener(IoQueueListener<? super E> listener) {
         synchronized (this) {
             int index = -1;
@@ -91,6 +97,9 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean offer(E e) {
         if (e == null) {
             throw new NullPointerException("element");
@@ -115,6 +124,9 @@ public abstract class AbstractIoQueue<E> extends AbstractQueue<E> implements IoQ
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final E poll() {
         E e = doPoll();
         if (e == null) {
