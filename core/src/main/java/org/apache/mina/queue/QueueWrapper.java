@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Queue;
 
 /**
- * A skeletal decorator which wraps an existing {@link IoQueue} instance.
+ * A skeletal decorator which wraps an existing {@link Queue} instance.
  *
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
  * @version $Rev$, $Date$
