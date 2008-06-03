@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * {@link IoFilterAdapter#exceptionCaught(IoFilter.NextFilter, IoSession, Throwable)},
  * which is logged to {@link LogLevel#WARN}.
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class LoggingFilter extends IoFilterAdapter {

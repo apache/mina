@@ -30,7 +30,7 @@ import org.apache.mina.common.IoSession;
  * Class the extends IoHandlerAdapter in order to properly handle
  * connections and the data the connections send
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class MemoryMonitorHandler extends IoHandlerAdapter {

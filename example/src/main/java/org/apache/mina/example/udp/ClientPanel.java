@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 /**
  * Class the represents a client connection using a JPanel
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ClientPanel extends JPanel {
