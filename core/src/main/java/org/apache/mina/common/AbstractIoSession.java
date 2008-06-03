@@ -120,6 +120,9 @@ public abstract class AbstractIoSession implements IoSession {
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getId() {
         return hashCode() & 0xFFFFFFFFL;
     }
@@ -127,14 +130,23 @@ public abstract class AbstractIoSession implements IoSession {
     @SuppressWarnings("unchecked")
     protected abstract IoProcessor getProcessor();
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isConnected() {
         return !closeFuture.isClosed();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isClosing() {
         return closing || closeFuture.isClosed();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final CloseFuture getCloseFuture() {
         return closeFuture;
     }
@@ -152,6 +164,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final CloseFuture close(boolean rightNow) {
         if (rightNow) {
             return close();
@@ -160,6 +175,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final CloseFuture close() {
         synchronized (lock) {
             if (isClosing()) {
@@ -173,13 +191,18 @@ public abstract class AbstractIoSession implements IoSession {
         return closeFuture;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * {@inheritDoc}
+     */
     public final CloseFuture closeOnFlush() {
         getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);
         return closeFuture;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final ReadFuture read() {
         if (!getConfig().isUseReadOperation()) {
             throw new IllegalStateException("useReadOperation is not enabled.");
@@ -232,7 +255,6 @@ public abstract class AbstractIoSession implements IoSession {
         return future;
     }
 
-    @SuppressWarnings("unchecked")
     private Queue<ReadFuture> getReadyReadFutures() {
         Queue<ReadFuture> readyReadFutures =
             (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES);
@@ -249,7 +271,6 @@ public abstract class AbstractIoSession implements IoSession {
         return readyReadFutures;
     }
 
-    @SuppressWarnings("unchecked")
     private Queue<ReadFuture> getWaitingReadFutures() {
         Queue<ReadFuture> waitingReadyReadFutures =
             (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES);
@@ -266,10 +287,16 @@ public abstract class AbstractIoSession implements IoSession {
         return waitingReadyReadFutures;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final WriteFuture write(Object message) {
         return write(message, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final WriteFuture write(Object message, SocketAddress remoteAddress) {
         if (message == null) {
             throw new NullPointerException("message");
@@ -327,54 +354,93 @@ public abstract class AbstractIoSession implements IoSession {
         return future;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object getAttachment() {
         return getAttribute("");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object setAttachment(Object attachment) {
         return setAttribute("", attachment);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object getAttribute(Object key) {
         return getAttribute(key, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object getAttribute(Object key, Object defaultValue) {
         return attributes.getAttribute(this, key, defaultValue);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object setAttribute(Object key, Object value) {
         return attributes.setAttribute(this, key, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object setAttribute(Object key) {
         return setAttribute(key, Boolean.TRUE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object setAttributeIfAbsent(Object key, Object value) {
         return attributes.setAttributeIfAbsent(this, key, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object setAttributeIfAbsent(Object key) {
         return setAttributeIfAbsent(key, Boolean.TRUE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object removeAttribute(Object key) {
         return attributes.removeAttribute(this, key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean removeAttribute(Object key, Object value) {
         return attributes.removeAttribute(this, key, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean replaceAttribute(Object key, Object oldValue, Object newValue) {
         return attributes.replaceAttribute(this, key, oldValue, newValue);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean containsAttribute(Object key) {
         return attributes.containsAttribute(this, key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Set<Object> getAttributeKeys() {
         return attributes.getAttributeKeys(this);
     }
@@ -392,10 +458,16 @@ public abstract class AbstractIoSession implements IoSession {
             new CloseRequestAwareWriteRequestQueue(writeRequestQueue);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final TrafficMask getTrafficMask() {
         return trafficMask;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setTrafficMask(TrafficMask trafficMask) {
         if (trafficMask == null) {
             throw new NullPointerException("trafficMask");
@@ -412,50 +484,86 @@ public abstract class AbstractIoSession implements IoSession {
         this.trafficMask = trafficMask;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void suspendRead() {
         setTrafficMask(getTrafficMask().and(TrafficMask.READ.not()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void suspendWrite() {
         setTrafficMask(getTrafficMask().and(TrafficMask.WRITE.not()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void resumeRead() {
         setTrafficMask(getTrafficMask().or(TrafficMask.READ));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void resumeWrite() {
         setTrafficMask(getTrafficMask().or(TrafficMask.WRITE));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getReadBytes() {
         return readBytes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getWrittenBytes() {
         return writtenBytes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getReadMessages() {
         return readMessages;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getWrittenMessages() {
         return writtenMessages;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getReadBytesThroughput() {
         return readBytesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getWrittenBytesThroughput() {
         return writtenBytesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getReadMessagesThroughput() {
         return readMessagesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getWrittenMessagesThroughput() {
         return writtenMessagesThroughput;
     }
@@ -494,10 +602,16 @@ public abstract class AbstractIoSession implements IoSession {
         lastThroughputCalculationTime = currentTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getScheduledWriteMessages() {
         return scheduledWriteMessages.get();
     }
@@ -614,10 +728,16 @@ public abstract class AbstractIoSession implements IoSession {
         return writeRequestQueue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final WriteRequest getCurrentWriteRequest() {
         return currentWriteRequest;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Object getCurrentWriteMessage() {
         WriteRequest req = getCurrentWriteRequest();
         if (req == null) {
@@ -654,22 +774,37 @@ public abstract class AbstractIoSession implements IoSession {
         deferDecreaseReadBuffer = true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getCreationTime() {
         return creationTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastIoTime() {
         return Math.max(lastReadTime, lastWriteTime);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastReadTime() {
         return lastReadTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastWriteTime() {
         return lastWriteTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isIdle(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth > 0;
@@ -686,18 +821,30 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isBothIdle() {
         return isIdle(IdleStatus.BOTH_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isReaderIdle() {
         return isIdle(IdleStatus.READER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isWriterIdle() {
         return isIdle(IdleStatus.WRITER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getIdleCount(IdleStatus status) {
         if (getConfig().getIdleTime(status) == 0) {
             if (status == IdleStatus.BOTH_IDLE) {
@@ -728,6 +875,9 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastIdleTime(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return lastIdleTimeForBoth;
@@ -759,30 +909,51 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getBothIdleCount() {
         return getIdleCount(IdleStatus.BOTH_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastBothIdleTime() {
         return getLastIdleTime(IdleStatus.BOTH_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastReaderIdleTime() {
         return getLastIdleTime(IdleStatus.READER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastWriterIdleTime() {
         return getLastIdleTime(IdleStatus.WRITER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getReaderIdleCount() {
         return getIdleCount(IdleStatus.READER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getWriterIdleCount() {
         return getIdleCount(IdleStatus.WRITER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SocketAddress getServiceAddress() {
         IoService service = getService();
         if (service instanceof IoAcceptor) {
@@ -792,16 +963,25 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final int hashCode() {
         return super.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final boolean equals(Object o) {
         return super.equals(o);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         if (getService() instanceof IoAcceptor) {

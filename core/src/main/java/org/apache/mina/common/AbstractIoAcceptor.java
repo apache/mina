@@ -60,6 +60,9 @@ public abstract class AbstractIoAcceptor
         defaultLocalAddresses.add(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SocketAddress getLocalAddress() {
         Set<SocketAddress> localAddresses = getLocalAddresses();
         if (localAddresses.isEmpty()) {
@@ -69,6 +72,9 @@ public abstract class AbstractIoAcceptor
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Set<SocketAddress> getLocalAddresses() {
         Set<SocketAddress> localAddresses = new HashSet<SocketAddress>();
         synchronized (bindLock) {
@@ -77,6 +83,9 @@ public abstract class AbstractIoAcceptor
         return localAddresses;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SocketAddress getDefaultLocalAddress() {
         if (defaultLocalAddresses.isEmpty()) {
             return null;
@@ -84,14 +93,23 @@ public abstract class AbstractIoAcceptor
         return defaultLocalAddresses.iterator().next();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setDefaultLocalAddress(SocketAddress localAddress) {
         setDefaultLocalAddresses(localAddress);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final List<SocketAddress> getDefaultLocalAddresses() {
         return unmodifiableDefaultLocalAddresses;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");
@@ -99,6 +117,9 @@ public abstract class AbstractIoAcceptor
         setDefaultLocalAddresses((Iterable<? extends SocketAddress>) localAddresses);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setDefaultLocalAddresses(Iterable<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");
@@ -126,6 +147,9 @@ public abstract class AbstractIoAcceptor
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setDefaultLocalAddresses(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses) {
         if (otherLocalAddresses == null) {
             otherLocalAddresses = new SocketAddress[0];
@@ -142,18 +166,30 @@ public abstract class AbstractIoAcceptor
         setDefaultLocalAddresses(newLocalAddresses);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isCloseOnDeactivation() {
         return disconnectOnUnbind;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setCloseOnDeactivation(boolean disconnectClientsOnUnbind) {
         this.disconnectOnUnbind = disconnectClientsOnUnbind;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void bind() throws IOException {
         bind(getDefaultLocalAddresses());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void bind(SocketAddress localAddress) throws IOException {
         if (localAddress == null) {
             throw new NullPointerException("localAddress");
@@ -164,6 +200,9 @@ public abstract class AbstractIoAcceptor
         bind(localAddresses);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void bind(
             SocketAddress firstLocalAddress,
             SocketAddress... otherLocalAddresses) throws IOException {
@@ -180,6 +219,9 @@ public abstract class AbstractIoAcceptor
         bind(localAddresses);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void bind(Iterable<? extends SocketAddress> localAddresses) throws IOException {
         if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
@@ -224,10 +266,16 @@ public abstract class AbstractIoAcceptor
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void unbind() {
         unbind(getLocalAddresses());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void unbind(SocketAddress localAddress) {
         if (localAddress == null) {
             throw new NullPointerException("localAddress");
@@ -238,6 +286,9 @@ public abstract class AbstractIoAcceptor
         unbind(localAddresses);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void unbind(SocketAddress firstLocalAddress,
             SocketAddress... otherLocalAddresses) {
         if (firstLocalAddress == null) {
@@ -253,6 +304,9 @@ public abstract class AbstractIoAcceptor
         unbind(localAddresses);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void unbind(Iterable<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");

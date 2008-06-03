@@ -106,6 +106,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected abstract T newSession(IoProcessor<T> processor, H handle, SocketAddress remoteAddress) throws Exception;
     protected abstract void setInterestedInWrite(T session, boolean interested) throws Exception;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected IoFuture dispose0() throws Exception {
         unbind();
@@ -116,6 +119,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         return disposalFuture;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final Set<SocketAddress> bind0(
             List<? extends SocketAddress> localAddresses) throws Exception {
@@ -138,6 +144,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         return newLocalAddresses;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final void unbind0(
             List<? extends SocketAddress> localAddresses) throws Exception {
@@ -154,6 +163,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");

@@ -68,6 +68,9 @@ public abstract class AbstractIoConnector
         return (int)connectTimeoutInMillis/1000;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getConnectTimeoutMillis() {
         return connectTimeoutInMillis;
     }
@@ -92,10 +95,16 @@ public abstract class AbstractIoConnector
         this.connectTimeoutInMillis = connectTimeoutInMillis;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SocketAddress getDefaultRemoteAddress() {
         return defaultRemoteAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress) {
         if (defaultRemoteAddress == null) {
             throw new NullPointerException("defaultRemoteAddress");
@@ -110,6 +119,9 @@ public abstract class AbstractIoConnector
         this.defaultRemoteAddress = defaultRemoteAddress;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public final ConnectFuture connect() {
         SocketAddress defaultRemoteAddress = getDefaultRemoteAddress();
         if (defaultRemoteAddress == null) {
@@ -119,6 +131,9 @@ public abstract class AbstractIoConnector
         return connect(defaultRemoteAddress, null, null);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public ConnectFuture connect(IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         SocketAddress defaultRemoteAddress = getDefaultRemoteAddress();
         if (defaultRemoteAddress == null) {
@@ -128,20 +143,32 @@ public abstract class AbstractIoConnector
         return connect(defaultRemoteAddress, null, sessionInitializer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final ConnectFuture connect(SocketAddress remoteAddress) {
         return connect(remoteAddress, null, null);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public ConnectFuture connect(SocketAddress remoteAddress,
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         return connect(remoteAddress, null, sessionInitializer);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public ConnectFuture connect(SocketAddress remoteAddress,
             SocketAddress localAddress) {
         return connect(remoteAddress, localAddress, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final ConnectFuture connect(SocketAddress remoteAddress,
             SocketAddress localAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         if (isDisposing()) {
@@ -236,6 +263,9 @@ public abstract class AbstractIoConnector
         });
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         TransportMetadata m = getTransportMetadata();

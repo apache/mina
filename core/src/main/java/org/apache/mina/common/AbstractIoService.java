@@ -175,10 +175,16 @@ public abstract class AbstractIoService implements IoService {
         executeWorker(idleStatusChecker.getNotifyingTask(), "idleStatusChecker");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final IoFilterChainBuilder getFilterChainBuilder() {
         return filterChainBuilder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setFilterChainBuilder(IoFilterChainBuilder builder) {
         if (builder == null) {
             builder = new DefaultIoFilterChainBuilder();
@@ -186,6 +192,9 @@ public abstract class AbstractIoService implements IoService {
         filterChainBuilder = builder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final DefaultIoFilterChainBuilder getFilterChain() {
         if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
             return (DefaultIoFilterChainBuilder) filterChainBuilder;
@@ -195,26 +204,44 @@ public abstract class AbstractIoService implements IoService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void addListener(IoServiceListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void removeListener(IoServiceListener listener) {
         listeners.remove(listener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isActive() {
         return listeners.isActive();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isDisposing() {
         return disposing;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isDisposed() {
         return disposed;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void dispose() {
         if (disposed) {
             return;
@@ -262,26 +289,44 @@ public abstract class AbstractIoService implements IoService {
      */
     protected abstract IoFuture dispose0() throws Exception;
 
+    /**
+     * {@inheritDoc}
+     */
     public final Map<Long, IoSession> getManagedSessions() {
         return listeners.getManagedSessions();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getCumulativeManagedSessionCount() {
         return listeners.getCumulativeManagedSessionCount();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getLargestManagedSessionCount() {
         return listeners.getLargestManagedSessionCount();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getManagedSessionCount() {
         return listeners.getManagedSessionCount();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final IoHandler getHandler() {
         return handler;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setHandler(IoHandler handler) {
         if (handler == null) {
             throw new NullPointerException("handler");
@@ -294,14 +339,23 @@ public abstract class AbstractIoService implements IoService {
         this.handler = handler;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final IoSessionDataStructureFactory getSessionDataStructureFactory() {
         return sessionDataStructureFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory) {
         if (sessionDataStructureFactory == null) {
             throw new NullPointerException("sessionDataStructureFactory");
@@ -315,6 +369,9 @@ public abstract class AbstractIoService implements IoService {
         this.sessionDataStructureFactory = sessionDataStructureFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getReadBytes() {
         return readBytes.get();
     }
@@ -326,6 +383,9 @@ public abstract class AbstractIoService implements IoService {
         idleCountForRead = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getReadMessages() {
         return readMessages.get();
     }
@@ -337,10 +397,16 @@ public abstract class AbstractIoService implements IoService {
         idleCountForRead = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getThroughputCalculationInterval() {
         return throughputCalculationInterval;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setThroughputCalculationInterval(int throughputCalculationInterval) {
         if (throughputCalculationInterval < 0) {
             throw new IllegalArgumentException(
@@ -350,42 +416,69 @@ public abstract class AbstractIoService implements IoService {
         this.throughputCalculationInterval = throughputCalculationInterval;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getThroughputCalculationIntervalInMillis() {
         return throughputCalculationInterval * 1000L;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getReadBytesThroughput() {
         resetThroughput();
         return readBytesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getWrittenBytesThroughput() {
         resetThroughput();
         return writtenBytesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getReadMessagesThroughput() {
         resetThroughput();
         return readMessagesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getWrittenMessagesThroughput() {
         resetThroughput();
         return writtenMessagesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getLargestReadBytesThroughput() {
         return largestReadBytesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getLargestWrittenBytesThroughput() {
         return largestWrittenBytesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getLargestReadMessagesThroughput() {
         return largestReadMessagesThroughput;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final double getLargestWrittenMessagesThroughput() {
         return largestWrittenMessagesThroughput;
     }
@@ -439,6 +532,9 @@ public abstract class AbstractIoService implements IoService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
@@ -447,6 +543,9 @@ public abstract class AbstractIoService implements IoService {
         scheduledWriteBytes.addAndGet(increment);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getScheduledWriteMessages() {
         return scheduledWriteMessages.get();
     }
@@ -459,14 +558,23 @@ public abstract class AbstractIoService implements IoService {
         scheduledWriteMessages.decrementAndGet();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getActivationTime() {
         return listeners.getActivationTime();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastIoTime() {
         return Math.max(lastReadTime, lastWriteTime);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastReadTime() {
         return lastReadTime;
     }
@@ -475,6 +583,9 @@ public abstract class AbstractIoService implements IoService {
         this.lastReadTime = lastReadTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastWriteTime() {
         return lastWriteTime;
     }
@@ -483,6 +594,9 @@ public abstract class AbstractIoService implements IoService {
         this.lastWriteTime = lastWriteTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getWrittenBytes() {
         return writtenBytes.get();
     }
@@ -494,6 +608,9 @@ public abstract class AbstractIoService implements IoService {
         idleCountForWrite = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getWrittenMessages() {
         return writtenMessages.get();
     }
@@ -505,6 +622,9 @@ public abstract class AbstractIoService implements IoService {
         idleCountForWrite = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getIdleTime(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleTimeForBoth;
@@ -521,10 +641,16 @@ public abstract class AbstractIoService implements IoService {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getIdleTimeInMillis(IdleStatus status) {
         return getIdleTime(status) * 1000L;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setIdleTime(IdleStatus status, int idleTime) {
         if (idleTime < 0) {
             throw new IllegalArgumentException("Illegal idle time: " + idleTime);
@@ -551,6 +677,9 @@ public abstract class AbstractIoService implements IoService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isIdle(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth > 0;
@@ -567,6 +696,9 @@ public abstract class AbstractIoService implements IoService {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getIdleCount(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleCountForBoth;
@@ -583,6 +715,9 @@ public abstract class AbstractIoService implements IoService {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastIdleTime(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return lastIdleTimeForBoth;
@@ -650,78 +785,135 @@ public abstract class AbstractIoService implements IoService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getBothIdleCount() {
         return getIdleCount(IdleStatus.BOTH_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastBothIdleTime() {
         return getLastIdleTime(IdleStatus.BOTH_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastReaderIdleTime() {
         return getLastIdleTime(IdleStatus.READER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getLastWriterIdleTime() {
         return getLastIdleTime(IdleStatus.WRITER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getReaderIdleCount() {
         return getIdleCount(IdleStatus.READER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getWriterIdleCount() {
         return getIdleCount(IdleStatus.WRITER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getBothIdleTime() {
         return getIdleTime(IdleStatus.BOTH_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getBothIdleTimeInMillis() {
         return getIdleTimeInMillis(IdleStatus.BOTH_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getReaderIdleTime() {
         return getIdleTime(IdleStatus.READER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getReaderIdleTimeInMillis() {
         return getIdleTimeInMillis(IdleStatus.READER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final int getWriterIdleTime() {
         return getIdleTime(IdleStatus.WRITER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final long getWriterIdleTimeInMillis() {
         return getIdleTimeInMillis(IdleStatus.WRITER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isBothIdle() {
         return isIdle(IdleStatus.BOTH_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isReaderIdle() {
         return isIdle(IdleStatus.READER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isWriterIdle() {
         return isIdle(IdleStatus.WRITER_IDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setBothIdleTime(int idleTime) {
         setIdleTime(IdleStatus.BOTH_IDLE, idleTime);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setReaderIdleTime(int idleTime) {
         setIdleTime(IdleStatus.READER_IDLE, idleTime);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setWriterIdleTime(int idleTime) {
         setIdleTime(IdleStatus.WRITER_IDLE, idleTime);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Set<WriteFuture> broadcast(Object message) {
         // Convert to Set.  We do not return a List here because only the
         // direct caller of MessageBroadcaster knows the order of write
