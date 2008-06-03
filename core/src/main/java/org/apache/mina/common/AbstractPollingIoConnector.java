@@ -316,7 +316,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         }
     }
 
-    protected final class ConnectionRequest extends DefaultConnectFuture {
+    public final class ConnectionRequest extends DefaultConnectFuture {
         private final H handle;
         private final long deadline;
         private final IoSessionInitializer<? extends ConnectFuture> sessionInitializer;
