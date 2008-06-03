@@ -32,6 +32,13 @@ import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 
+/**
+ * 
+ * TODO ExecutorFilterRegressionTest.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class ExecutorFilterRegressionTest extends TestCase {
     private ExecutorFilter filter;
 

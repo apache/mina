@@ -23,6 +23,13 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoSession;
 
+/**
+ * 
+ * TODO DatagramSession.
+ *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public interface DatagramSession extends IoSession {
     DatagramSessionConfig getConfig();
 

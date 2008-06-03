@@ -30,6 +30,9 @@ import java.util.ArrayList;
  * Utility class for working with xml data
  *
  * Implementation is heavily based on org.apache.log4j.helpers.Transform
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
  */
 public class Transform {
 

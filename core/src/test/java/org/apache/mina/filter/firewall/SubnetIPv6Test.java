@@ -26,6 +26,13 @@ import java.net.UnknownHostException;
 
 import junit.framework.TestCase;
 
+/**
+ * 
+ * TODO SubnetIPv6Test.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class SubnetIPv6Test extends TestCase {
 
 	public void testIPv6() throws UnknownHostException {

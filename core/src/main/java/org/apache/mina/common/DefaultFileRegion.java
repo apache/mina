@@ -23,6 +23,13 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 
+/**
+ * 
+ * TODO DefaultFileRegion.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class DefaultFileRegion implements FileRegion {
 
     private final FileChannel channel;

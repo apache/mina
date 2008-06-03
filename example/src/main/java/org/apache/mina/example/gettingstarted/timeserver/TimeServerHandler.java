@@ -25,6 +25,13 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 
+/**
+ * 
+ * TODO TimeServerHandler.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class TimeServerHandler extends IoHandlerAdapter
 {
     @Override

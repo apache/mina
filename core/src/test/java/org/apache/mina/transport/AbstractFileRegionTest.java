@@ -37,6 +37,13 @@ import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.util.AvailablePortFinder;
 
+/**
+ * 
+ * TODO AbstractFileRegionTest.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public abstract class AbstractFileRegionTest extends TestCase {
 
     private static final int FILE_SIZE = 1 * 1024 * 1024; // 1MB file

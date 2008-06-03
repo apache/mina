@@ -46,6 +46,13 @@ import org.apache.mina.util.AvailablePortFinder;
 import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.EasyMock;
 
+/**
+ * 
+ * TODO AbstractStreamWriteFilterTest.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamWriteFilter<M>> extends TestCase {
 
     protected final IoSession session = new DummySession();

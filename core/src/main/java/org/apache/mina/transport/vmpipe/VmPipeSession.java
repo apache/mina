@@ -21,6 +21,13 @@ package org.apache.mina.transport.vmpipe;
 
 import org.apache.mina.common.IoSession;
 
+/**
+ * 
+ * TODO VmPipeSession.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public interface VmPipeSession extends IoSession {
     VmPipeSessionConfig getConfig();
 

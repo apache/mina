@@ -23,6 +23,13 @@ import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.IoConnector;
 import org.apache.mina.transport.AbstractFileRegionTest;
 
+/**
+ * 
+ * TODO NioFileRegionTest.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public class NioFileRegionTest extends AbstractFileRegionTest{
 
     @Override

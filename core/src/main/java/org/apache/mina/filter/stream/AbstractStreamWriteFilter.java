@@ -31,6 +31,13 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
 import org.apache.mina.util.CircularQueue;
 
+/**
+ * 
+ * TODO AbstractStreamWriteFilter.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     /**
      * The default buffer size this filter uses for writing.

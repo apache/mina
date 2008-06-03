@@ -26,6 +26,13 @@ import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 
+/**
+ * 
+ * TODO NioDatagramSessionConfig.
+ *
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
     private final DatagramChannel c;
 

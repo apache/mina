@@ -23,6 +23,13 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoSession;
 
+/**
+ * 
+ * TODO SocketSession.
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ */
 public interface SocketSession extends IoSession {
     SocketSessionConfig getConfig();
 
