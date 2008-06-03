@@ -25,8 +25,9 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * A default implementation of {@link IoFuture}.
- *
+ * A default implementation of {@link IoFuture} associated with
+ * an {@link IoSession}.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -43,7 +44,7 @@ public class DefaultIoFuture implements IoFuture {
     private int waiters;
 
     /**
-     * Creates a new instance.
+     * Creates a new instance associated with an {@link IoSession}.
      *
      * @param session an {@link IoSession} which is associated with this future
      */
@@ -52,18 +53,30 @@ public class DefaultIoFuture implements IoFuture {
         this.lock = this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoSession getSession() {
         return session;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void join() {
         awaitUninterruptibly();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean join(long timeoutMillis) {
         return awaitUninterruptibly(timeoutMillis);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoFuture await() throws InterruptedException {
         synchronized (lock) {
             while (!ready) {
@@ -79,15 +92,24 @@ public class DefaultIoFuture implements IoFuture {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean await(long timeout, TimeUnit unit)
             throws InterruptedException {
         return await(unit.toMillis(timeout));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean await(long timeoutMillis) throws InterruptedException {
         return await0(timeoutMillis, true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoFuture awaitUninterruptibly() {
         synchronized (lock) {
             while (!ready) {
@@ -107,10 +129,16 @@ public class DefaultIoFuture implements IoFuture {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean awaitUninterruptibly(long timeout, TimeUnit unit) {
         return awaitUninterruptibly(unit.toMillis(timeout));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean awaitUninterruptibly(long timeoutMillis) {
         try {
             return await0(timeoutMillis, false);
@@ -195,6 +223,9 @@ public class DefaultIoFuture implements IoFuture {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isReady() {
         synchronized (lock) {
             return ready;
@@ -230,6 +261,9 @@ public class DefaultIoFuture implements IoFuture {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoFuture addListener(IoFutureListener<?> listener) {
         if (listener == null) {
             throw new NullPointerException("listener");
@@ -257,6 +291,9 @@ public class DefaultIoFuture implements IoFuture {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoFuture removeListener(IoFutureListener<?> listener) {
         if (listener == null) {
             throw new NullPointerException("listener");

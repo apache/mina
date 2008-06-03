@@ -22,8 +22,8 @@ package org.apache.mina.common;
 import java.util.EventListener;
 
 /**
- * Something interested in being notified when the result
- * of an {@link IoFuture} becomes available.
+ * Something interested in being notified when the completion
+ * of an asynchronous I/O operation : {@link IoFuture}. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -41,7 +41,7 @@ public interface IoFutureListener<F extends IoFuture> extends EventListener {
 
     /**
      * Invoked when the operation associated with the {@link IoFuture}
-     * has been completed.
+     * has been completed even if you add the listener after the completion.
      *
      * @param future  The source {@link IoFuture} which called this
      *                callback.

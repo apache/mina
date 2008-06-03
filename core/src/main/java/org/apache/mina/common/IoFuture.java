@@ -22,51 +22,58 @@ package org.apache.mina.common;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Represents the result of an ashynchronous I/O operation.
- *
+ * Represents the completion of an asynchronous I/O operation on an 
+ * {@link IoSession}.
+ * Can be listened for completion using a {@link IoFutureListener}.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoFuture {
+	
     /**
      * Returns the {@link IoSession} which is associated with this future.
      */
     IoSession getSession();
 
     /**
-     * Wait for the asynchronous operation to end.
+     * Wait for the asynchronous operation to complete.
+     * The attached listeners will be notified when the operation is 
+     * completed.
      */
     IoFuture await() throws InterruptedException;
 
     /**
-     * Wait for the asynchronous operation to end with the specified timeout.
+     * Wait for the asynchronous operation to complete with the specified timeout.
      *
-     * @return <tt>true</tt> if the operation is finished.
+     * @return <tt>true</tt> if the operation is completed.
      */
     boolean await(long timeout, TimeUnit unit) throws InterruptedException;
 
     /**
-     * Wait for the asynchronous operation to end with the specified timeout.
+     * Wait for the asynchronous operation to complete with the specified timeout.
      *
-     * @return <tt>true</tt> if the operation is finished.
+     * @return <tt>true</tt> if the operation is completed.
      */
     boolean await(long timeoutMillis) throws InterruptedException;
 
     /**
-     * Wait for the asynchronous operation to end uninterruptibly.
+     * Wait for the asynchronous operation to complete uninterruptibly.
+     * The attached listeners will be notified when the operation is 
+     * completed.
      */
     IoFuture awaitUninterruptibly();
 
     /**
-     * Wait for the asynchronous operation to end with the specified timeout
+     * Wait for the asynchronous operation to complete with the specified timeout
      * uninterruptibly.
      *
-     * @return <tt>true</tt> if the operation is finished.
+     * @return <tt>true</tt> if the operation is completed.
      */
     boolean awaitUninterruptibly(long timeout, TimeUnit unit);
 
     /**
-     * Wait for the asynchronous operation to end with the specified timeout
+     * Wait for the asynchronous operation to complete with the specified timeout
      * uninterruptibly.
      *
      * @return <tt>true</tt> if the operation is finished.
@@ -86,19 +93,20 @@ public interface IoFuture {
     boolean join(long timeoutMillis);
 
     /**
-     * Returns if the asynchronous operation is finished.
+     * Returns if the asynchronous operation is completed.
      */
     boolean isReady();
 
     /**
      * Adds an event <tt>listener</tt> which is notified when
-     * the state of this future changes.
+     * this future is completed. If the listener is added
+     * after the completion, the listener is directly notified.
      */
     IoFuture addListener(IoFutureListener<?> listener);
 
     /**
-     * Removes an existing event <tt>listener</tt> which is notified when
-     * the state of this future changes.
+     * Removes an existing event <tt>listener</tt> so it won't be notified when
+     * the future is completed.
      */
     IoFuture removeListener(IoFutureListener<?> listener);
 }
