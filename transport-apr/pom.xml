@@ -16,10 +16,12 @@
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>tomcat</groupId>
       <artifactId>tomcat-apr</artifactId>
+      <version>5.5.23</version>
     </dependency>
   </dependencies>
   
