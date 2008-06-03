@@ -272,9 +272,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
      * A Thread that monitors an {@link ExpiringMap} and will remove
      * elements that have passed the threshold.
      *
-     * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
-     * @version $Rev$, $Date$
-     */
+     */ 
     public class Expirer implements Runnable {
         private final ReadWriteLock stateLock = new ReentrantReadWriteLock();
 

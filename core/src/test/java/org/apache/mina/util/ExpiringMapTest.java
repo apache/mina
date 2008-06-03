@@ -29,7 +29,7 @@ import org.junit.Before;
  * Simple test that checks to see if the {@link ExpiringMap} can
  * properly clean up itself.
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class ExpiringMapTest extends TestCase

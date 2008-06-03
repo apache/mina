@@ -53,7 +53,7 @@ import org.apache.mina.common.IoSession;
  * }
  * </pre>
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public interface IoHandlerCommand {
