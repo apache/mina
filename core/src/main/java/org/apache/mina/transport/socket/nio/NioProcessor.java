@@ -35,7 +35,7 @@ import org.apache.mina.common.RuntimeIoException;
 
 /**
  *
- * @author Apache MINA Project (dev@mina.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {

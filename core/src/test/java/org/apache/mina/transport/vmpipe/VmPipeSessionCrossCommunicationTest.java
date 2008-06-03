@@ -34,7 +34,7 @@ import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 
 /**
- * @author Apache Mina Project (dev@mina.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: $, $Date:  $
  */
 public class VmPipeSessionCrossCommunicationTest extends TestCase {

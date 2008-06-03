@@ -27,7 +27,7 @@ import org.apache.mina.common.AbstractIoSession;
 /**
  * An {@link IoSession} which is managed by the NIO transport.
  *  
- * @author Apache MINA Project (dev@mina.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class NioSession extends AbstractIoSession {

@@ -25,7 +25,7 @@ package org.apache.mina.common;
  * reactor frameworks such as Java NIO once again to simplify transport
  * implementations.
  *
- * @author Apache MINA Project (dev@mina.apache.org)
+ * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * 
  * @param <T> the type of the {@link IoSession} this processor can handle
