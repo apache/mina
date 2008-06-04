@@ -29,6 +29,9 @@ import org.apache.mina.common.WriteRequest;
 /**
  * Extend this class when you want to create a filter that
  * wraps the same logic around all 9 IoEvents
+ * 
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev:$, $Date:$
  */
 public abstract class CommonEventFilter extends IoFilterAdapter {
 

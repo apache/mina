@@ -20,7 +20,8 @@
 package org.apache.mina.filter.reqres;
 
 /**
- *
+ * @TODO Add documentation
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */

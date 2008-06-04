@@ -36,6 +36,8 @@ import org.apache.mina.common.WriteRequestQueue;
 import org.apache.mina.common.WriteToClosedSessionException;
 
 /**
+ * @TODO Add documentation
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */

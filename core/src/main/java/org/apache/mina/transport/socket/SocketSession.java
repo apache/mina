@@ -24,8 +24,7 @@ import java.net.InetSocketAddress;
 import org.apache.mina.common.IoSession;
 
 /**
- * 
- * TODO SocketSession.
+ * @TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

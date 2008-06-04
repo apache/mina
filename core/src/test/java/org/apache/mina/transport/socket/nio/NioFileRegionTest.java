@@ -24,8 +24,7 @@ import org.apache.mina.common.IoConnector;
 import org.apache.mina.transport.AbstractFileRegionTest;
 
 /**
- * 
- * TODO NioFileRegionTest.
+ * @TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

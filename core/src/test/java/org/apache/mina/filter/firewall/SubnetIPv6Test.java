@@ -27,8 +27,7 @@ import java.net.UnknownHostException;
 import junit.framework.TestCase;
 
 /**
- * 
- * TODO SubnetIPv6Test.
+ * @TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

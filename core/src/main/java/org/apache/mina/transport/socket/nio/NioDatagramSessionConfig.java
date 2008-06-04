@@ -27,9 +27,8 @@ import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 
 /**
+ * @TODO Add documentation
  * 
- * TODO NioDatagramSessionConfig.
- *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */

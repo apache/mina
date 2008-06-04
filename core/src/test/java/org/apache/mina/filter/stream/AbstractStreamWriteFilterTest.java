@@ -47,8 +47,7 @@ import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.EasyMock;
 
 /**
- * 
- * TODO AbstractStreamWriteFilterTest.
+ * @TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

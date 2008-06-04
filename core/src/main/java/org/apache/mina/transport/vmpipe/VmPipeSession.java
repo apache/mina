@@ -22,8 +22,7 @@ package org.apache.mina.transport.vmpipe;
 import org.apache.mina.common.IoSession;
 
 /**
- * 
- * TODO VmPipeSession.
+ * @TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

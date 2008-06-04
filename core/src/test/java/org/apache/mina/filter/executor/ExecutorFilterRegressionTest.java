@@ -33,8 +33,7 @@ import org.apache.mina.common.WriteRequest;
 import org.apache.mina.common.IoFilter.NextFilter;
 
 /**
- * 
- * TODO ExecutorFilterRegressionTest.
+ * @TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
