@@ -35,28 +35,42 @@ import com.jcraft.jzlib.ZStream;
  * @version $Rev$, $Date$
  */
 class Zlib {
+    /** Try o get the best possible compression */
     public static final int COMPRESSION_MAX = JZlib.Z_BEST_COMPRESSION;
 
+    /** Favor speed over compression ratio */ 
     public static final int COMPRESSION_MIN = JZlib.Z_BEST_SPEED;
 
+    /** No compression */
     public static final int COMPRESSION_NONE = JZlib.Z_NO_COMPRESSION;
 
+    /** Default compression */
     public static final int COMPRESSION_DEFAULT = JZlib.Z_DEFAULT_COMPRESSION;
 
+    /** Compression mode */ 
     public static final int MODE_DEFLATER = 1;
 
+    /** Uncompress mode */ 
     public static final int MODE_INFLATER = 2;
 
+    /** The requested compression level */
     private int compressionLevel;
 
+    /** The inner stream used to inflate or deflate the data */
     private ZStream zStream = null;
 
+    /** The selected operation mode : INFLATE or DEFLATE */
     private int mode = -1;
 
     /**
-     * @param compressionLevel the level of compression that should be used
+     * Creates an instance of the ZLib class.
+     * 
+     * @param compressionLevel the level of compression that should be used. One of
+     * <tt>COMPRESSION_MAX</tt>, <tt>COMPRESSION_MIN</tt>,
+     * <tt>COMPRESSION_NONE</tt> or <tt>COMPRESSION_DEFAULT</tt>
      * @param mode the mode in which the instance will operate. Can be either
      * of <tt>MODE_DEFLATER</tt> or <tt>MODE_INFLATER</tt>
+     * @throws IllegalArgumentException if the mode is incorrect
      */
     public Zlib(int compressionLevel, int mode) {
         switch (compressionLevel) {
@@ -88,11 +102,14 @@ class Zlib {
     }
 
     /**
+     * Uncompress the given buffer, returning it in a new buffer.
+     * 
      * @param inBuffer the {@link IoBuffer} to be decompressed. The contents
      * of the buffer are transferred into a local byte array and the buffer is
      * flipped and returned intact.
      * @return the decompressed data
      * @throws IOException if the decompression of the data failed for some reason.
+     * @throws IllegalArgumentException if the mode is not <code>MODE_DEFLATER</code>
      */
     public IoBuffer inflate(IoBuffer inBuffer) throws IOException {
         if (mode == MODE_DEFLATER) {
@@ -144,10 +161,13 @@ class Zlib {
     }
 
     /**
+     * Compress the input. The result will be put in a new buffer.
+     *  
      * @param inBuffer the buffer to be compressed. The contents are transferred
      * into a local byte array and the buffer is flipped and returned intact.
      * @return the buffer with the compressed data
      * @throws IOException if the compression of teh buffer failed for some reason
+     * @throws IllegalStateException if the mode is not <code>MODE_DEFLATER</code>
      */
     public IoBuffer deflate(IoBuffer inBuffer) throws IOException {
         if (mode == MODE_INFLATER) {
