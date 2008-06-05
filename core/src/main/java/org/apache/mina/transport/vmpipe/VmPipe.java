@@ -23,7 +23,7 @@ import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoServiceListenerSupport;
 
 /**
- * @TODO Add documentation
+ * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

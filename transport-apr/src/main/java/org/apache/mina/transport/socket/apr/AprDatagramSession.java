@@ -33,7 +33,7 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.tomcat.jni.Socket;
 
 /**
- * @TODO Add documentation
+ * TODO Add documentation
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

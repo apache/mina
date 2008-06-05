@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 import org.apache.mina.common.DummySession;
 
 /**
- * @TODO Add documentation
+ * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

@@ -26,7 +26,7 @@ import java.net.UnknownHostException;
 import junit.framework.TestCase;
 
 /**
- * @TODO Add documentation
+ * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

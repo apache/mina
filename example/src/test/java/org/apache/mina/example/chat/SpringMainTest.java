@@ -24,8 +24,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.apache.mina.common.IoService;
 
 /**
- * 
- * TODO SpringMainTest.
+ * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

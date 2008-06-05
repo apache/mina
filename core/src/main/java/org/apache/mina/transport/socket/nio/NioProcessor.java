@@ -34,7 +34,7 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.RuntimeIoException;
 
 /**
- * @TODO Add documentation
+ * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

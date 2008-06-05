@@ -22,6 +22,8 @@ package org.apache.mina.example.imagine.step1.client;
 import java.awt.image.BufferedImage;
 
 /**
+ * TODO Add documentation
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
