@@ -52,6 +52,9 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
         super(session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isWritten() {
         if (isReady()) {
             Object v = getValue();
@@ -62,6 +65,9 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
         return false;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Throwable getException() {
         if (isReady()) {
             Object v = getValue();
@@ -72,10 +78,16 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setWritten() {
         setValue(Boolean.TRUE);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void setException(Throwable exception) {
         if (exception == null) {
             throw new NullPointerException("exception");
@@ -84,21 +96,33 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
         setValue(exception);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WriteFuture await() throws InterruptedException {
         return (WriteFuture) super.await();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WriteFuture awaitUninterruptibly() {
         return (WriteFuture) super.awaitUninterruptibly();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WriteFuture addListener(IoFutureListener<?> listener) {
         return (WriteFuture) super.addListener(listener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WriteFuture removeListener(IoFutureListener<?> listener) {
         return (WriteFuture) super.removeListener(listener);
