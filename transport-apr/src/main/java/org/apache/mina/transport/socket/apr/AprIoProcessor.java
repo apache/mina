@@ -253,7 +253,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     @Override
     protected SessionState state(AprSession session) {
         long socket = session.getDescriptor();
-        if (socket > 0) {
+        if (socket != 0) {
             return SessionState.OPEN;
         } else if (allSessions.get(socket) != null) {
             return SessionState.PREPARING; // will occur ?
