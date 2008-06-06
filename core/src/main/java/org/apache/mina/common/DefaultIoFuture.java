@@ -188,6 +188,11 @@ public class DefaultIoFuture implements IoFuture {
         }
     }
 
+    /** 
+     * see DIRMINA-601 for some clarification
+     * this method is called every 5 second per awaiting thread for check if we aren't in a
+     * awaiting deadlock
+     */
     private void checkDeadLock() {
         // Only read / write / connect / write future can cause dead lock. 
         if (!(this instanceof CloseFuture || this instanceof WriteFuture ||
