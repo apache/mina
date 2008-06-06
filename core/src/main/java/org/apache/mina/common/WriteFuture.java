@@ -69,11 +69,28 @@ public interface WriteFuture extends IoFuture {
      */
     void setException(Throwable cause);
 
+    /**
+     * Wait for the asynchronous operation to complete.
+     * The attached listeners will be notified when the operation is 
+     * completed.
+     * 
+     * @return the created {@link WriteFuture}
+     * @throws InterruptedException
+     */
     WriteFuture await() throws InterruptedException;
 
+    /**
+     * {@inheritDoc}
+     */
     WriteFuture awaitUninterruptibly();
 
+    /**
+     * {@inheritDoc}
+     */
     WriteFuture addListener(IoFutureListener<?> listener);
 
+    /**
+     * {@inheritDoc}
+     */
     WriteFuture removeListener(IoFutureListener<?> listener);
 }
