@@ -61,6 +61,8 @@ public interface IoFuture {
      * Wait for the asynchronous operation to complete uninterruptibly.
      * The attached listeners will be notified when the operation is 
      * completed.
+     * 
+     * @return the current IoFuture
      */
     IoFuture awaitUninterruptibly();
 
