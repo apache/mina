@@ -33,9 +33,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class DefaultIoFuture implements IoFuture {
 
+    /** A number of seconds to wait between two deadlock controls ( 5 seconds ) */
     private static final int DEAD_LOCK_CHECK_INTERVAL = 5000;
 
     private final IoSession session;
+    
+    /** A lock used by the wait() method */
     private final Object lock;
     private IoFutureListener<?> firstListener;
     private List<IoFutureListener<?>> otherListeners;
@@ -61,15 +64,17 @@ public class DefaultIoFuture implements IoFuture {
     }
 
     /**
-     * {@inheritDoc}
+     * @deprecated Replaced with {@link #awaitUninterruptibly()}.
      */
+    @Deprecated
     public void join() {
         awaitUninterruptibly();
     }
 
     /**
-     * {@inheritDoc}
+     * @deprecated Replaced with {@link #awaitUninterruptibly(long)}.
      */
+    @Deprecated
     public boolean join(long timeoutMillis) {
         return awaitUninterruptibly(timeoutMillis);
     }
@@ -82,10 +87,15 @@ public class DefaultIoFuture implements IoFuture {
             while (!ready) {
                 waiters++;
                 try {
+                    // Wait for a notify, or if no notify is called,
+                    // assume that we have a deadlock and exit the 
+                    // loop to check for a potential deadlock.
                     lock.wait(DEAD_LOCK_CHECK_INTERVAL);
-                    checkDeadLock();
                 } finally {
                     waiters--;
+                    if (!ready) {
+                        checkDeadLock();
+                    }
                 }
             }
         }
@@ -116,7 +126,8 @@ public class DefaultIoFuture implements IoFuture {
                 waiters++;
                 try {
                     lock.wait(DEAD_LOCK_CHECK_INTERVAL);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ie) {
+                    // Do nothing : this catch is just mandatory by contract
                 } finally {
                     waiters--;
                     if (!ready) {
@@ -188,10 +199,11 @@ public class DefaultIoFuture implements IoFuture {
         }
     }
 
-    /** 
-     * see DIRMINA-601 for some clarification
-     * this method is called every 5 second per awaiting thread for check if we aren't in a
-     * awaiting deadlock
+    
+    /**
+     * 
+     * TODO checkDeadLock.
+     *
      */
     private void checkDeadLock() {
         // Only read / write / connect / write future can cause dead lock. 
@@ -200,18 +212,24 @@ public class DefaultIoFuture implements IoFuture {
             return;
         }
         
-        IllegalStateException e = new IllegalStateException(
-                "DEAD LOCK: " + IoFuture.class.getSimpleName() +
-                ".await() was invoked from an I/O processor thread.  " +
-                "Please use " + IoFutureListener.class.getSimpleName() +
-                " or configure a proper thread model alternatively.");
-
-        StackTraceElement[] stackTrace = e.getStackTrace();
+        // Get the current thread stackTrace. 
+        // Using Thread.currentThread().getStackTrace() is the best solution,
+        // even if slightly less efficient than doing a new Exception().getStackTrace(),
+        // as internally, it does exactly the same thing. The advantage of using
+        // this solution is that we may benefit some improvement with some
+        // future versions of Java.
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
         // Simple and quick check.
         for (StackTraceElement s: stackTrace) {
             if (AbstractPollingIoProcessor.class.getName().equals(s.getClassName())) {
-                throw e;
+                IllegalStateException e = new IllegalStateException( "t" );
+                e.getStackTrace();
+                throw new IllegalStateException(
+                    "DEAD LOCK: " + IoFuture.class.getSimpleName() +
+                    ".await() was invoked from an I/O processor thread.  " +
+                    "Please use " + IoFutureListener.class.getSimpleName() +
+                    " or configure a proper thread model alternatively.");
             }
         }
 
@@ -220,7 +238,11 @@ public class DefaultIoFuture implements IoFuture {
             try {
                 Class<?> cls = DefaultIoFuture.class.getClassLoader().loadClass(s.getClassName());
                 if (IoProcessor.class.isAssignableFrom(cls)) {
-                    throw e;
+                    throw new IllegalStateException(
+                        "DEAD LOCK: " + IoFuture.class.getSimpleName() +
+                        ".await() was invoked from an I/O processor thread.  " +
+                        "Please use " + IoFutureListener.class.getSimpleName() +
+                        " or configure a proper thread model alternatively.");
                 }
             } catch (Exception cnfe) {
                 // Ignore
