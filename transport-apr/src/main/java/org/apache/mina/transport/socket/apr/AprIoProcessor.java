@@ -238,6 +238,12 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
             }
         } finally {
             ret = Socket.close(session.getDescriptor());
+            
+        	// destroying the session because it won't be reused 
+            // after this point
+            Socket.destroy(session.getDescriptor());
+            session.setDescriptor(0);
+            
             if (ret != Status.APR_SUCCESS) {
                 throwException(ret);
             }

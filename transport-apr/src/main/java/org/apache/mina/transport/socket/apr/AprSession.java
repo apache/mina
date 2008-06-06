@@ -38,7 +38,7 @@ import org.apache.tomcat.jni.Socket;
  * @version $Rev$, $Date$
  */
 public abstract class AprSession extends AbstractIoSession {
-    private final long descriptor;
+    private long descriptor;
 
     private final IoService service;
     private final IoProcessor<AprSession> processor;
@@ -87,6 +87,10 @@ public abstract class AprSession extends AbstractIoSession {
 
     long getDescriptor() {
         return descriptor;
+    }
+
+    void setDescriptor(long desc) {
+       this.descriptor = desc;
     }
 
     @Override
