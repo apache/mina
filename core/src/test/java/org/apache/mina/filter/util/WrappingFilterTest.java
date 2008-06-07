@@ -32,7 +32,7 @@ import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoFilterEvent;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteRequest;
-import org.easymock.MockControl;
+import org.easymock.EasyMock;
 
 /**
  * Tests {@link CommonEventFilter}.
@@ -42,9 +42,6 @@ import org.easymock.MockControl;
  */
 
 public class WrappingFilterTest extends TestCase {
-
-    private MockControl mockNextFilter;
-
     private IoSession session;
 
     private IoFilter.NextFilter nextFilter;
@@ -56,8 +53,8 @@ public class WrappingFilterTest extends TestCase {
          * Create the mocks.
          */
         session = new DummySession();
-        mockNextFilter = MockControl.createControl(IoFilter.NextFilter.class);
-        nextFilter = (IoFilter.NextFilter) mockNextFilter.getMock();
+        nextFilter = EasyMock.createMock(IoFilter.NextFilter.class);
+        //nextFilter = (IoFilter.NextFilter) mockNextFilter.getClass();
     }
 
     public void testFilter() throws Exception {
@@ -83,7 +80,7 @@ public class WrappingFilterTest extends TestCase {
         nextFilter.sessionClosed(session);
 
         /* replay */
-        mockNextFilter.replay();
+        EasyMock.replay( nextFilter );
         wrappingFilter.sessionCreated(nextFilter, session);
         wrappingFilter.sessionOpened(nextFilter, session);
         wrappingFilter.sessionIdle(nextFilter, session, IdleStatus.READER_IDLE);
@@ -97,7 +94,7 @@ public class WrappingFilterTest extends TestCase {
         wrappingFilter.sessionClosed(nextFilter, session);
 
         /* verify */
-        mockNextFilter.verify();
+        EasyMock.verify( nextFilter );
 
         /* check event lists */
         assertEquals(11, wrappingFilter.eventsBefore.size());
