@@ -20,7 +20,8 @@
 package org.apache.mina.filter.codec.statemachine;
 
 /**
- * TODO Add documentation
+ * {@link DecodingState} which consumes all bytes until a space (0x20) or tab 
+ * (0x09) character is reached. The terminator is skipped.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

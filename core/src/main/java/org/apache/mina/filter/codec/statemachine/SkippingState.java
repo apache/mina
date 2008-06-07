@@ -23,7 +23,8 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * Skips data until {@link #canSkip(byte)} returns <tt>false</tt>.
+ * {@link DecodingState} which skips data until {@link #canSkip(byte)} returns 
+ * <tt>false</tt>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -31,12 +32,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 public abstract class SkippingState implements DecodingState {
 
     private int skippedBytes;
-
-    /**
-     * Creates a new instance.
-     */
-    public SkippingState() {
-    }
 
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
@@ -63,8 +58,23 @@ public abstract class SkippingState implements DecodingState {
         return finishDecode(skippedBytes);
     }
 
+    /**
+     * Called to determine whether the specified byte can be skipped.
+     * 
+     * @param b the byte to check.
+     * @return <code>true</code> if the byte can be skipped.
+     */
     protected abstract boolean canSkip(byte b);
 
+    /**
+     * Invoked when this state cannot skip any more bytes.
+     * 
+     * @param skippedBytes the number of bytes skipped.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
     protected abstract DecodingState finishDecode(int skippedBytes)
             throws Exception;
 }

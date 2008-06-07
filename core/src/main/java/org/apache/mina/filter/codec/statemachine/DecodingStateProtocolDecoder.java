@@ -28,7 +28,12 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.util.CircularQueue;
 
 /**
- * TODO Add documentation
+ * {@link ProtocolDecoder} which uses a {@link DecodingState} to decode data.
+ * Use a {@link DecodingStateMachine} as {@link DecodingState} to create
+ * a state machine which can decode your protocol.
+ * <p>
+ * NOTE: This is a stateful decoder. You should create one instance per session.
+ * </p>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -38,6 +43,13 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     private final Queue<IoBuffer> undecodedBuffers = new CircularQueue<IoBuffer>();
     private IoSession session;
 
+    /**
+     * Creates a new instance using the specified {@link DecodingState} 
+     * instance.
+     * 
+     * @param state the {@link DecodingState}.
+     * @throws NullPointerException if the specified state is <code>null</code>.
+     */
     public DecodingStateProtocolDecoder(DecodingState state) {
         if (state == null) {
             throw new NullPointerException("state");

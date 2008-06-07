@@ -23,8 +23,8 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * Consumes until a fixed (ASCII) character is reached.
- * The terminator is skipped.
+ * {@link DecodingState} which consumes all bytes until a fixed (ASCII) 
+ * character is reached. The terminator is skipped.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -33,12 +33,6 @@ public abstract class ConsumeToDynamicTerminatorDecodingState implements
         DecodingState {
 
     private IoBuffer buffer;
-
-    /**
-     * Creates a new instance.
-     */
-    public ConsumeToDynamicTerminatorDecodingState() {
-    }
 
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
@@ -103,8 +97,26 @@ public abstract class ConsumeToDynamicTerminatorDecodingState implements
         return finishDecode(product, out);
     }
 
+    /**
+     * Determines whether the specified <code>byte</code> is a terminator.
+     * 
+     * @param b the <code>byte</code> to check.
+     * @return <code>true</code> if <code>b</code> is a terminator, 
+     *         <code>false</code> otherwise.
+     */
     protected abstract boolean isTerminator(byte b);
 
+    /**
+     * Invoked when this state has reached the terminator byte.
+     * 
+     * @param product the read bytes not including the terminator.
+     * @param out the current {@link ProtocolDecoderOutput} used to write 
+     *        decoded messages.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
     protected abstract DecodingState finishDecode(IoBuffer product,
             ProtocolDecoderOutput out) throws Exception;
 }

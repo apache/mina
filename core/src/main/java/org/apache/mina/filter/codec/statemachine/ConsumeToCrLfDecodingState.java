@@ -23,8 +23,8 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * A decoder which writes all read bytes in to a known <code>Bytes</code>
- * context until a <code>CRLF</code> has been encountered
+ * {@link DecodingState} which consumes all bytes until a <code>CRLF</code> 
+ * has been encountered.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -125,6 +125,17 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
         return finishDecode(product, out);
     }
 
+    /**
+     * Invoked when this state has reached a <code>CRLF</code>.
+     * 
+     * @param product the read bytes including the <code>CRLF</code>.
+     * @param out the current {@link ProtocolDecoderOutput} used to write 
+     *        decoded messages.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
     protected abstract DecodingState finishDecode(IoBuffer product,
             ProtocolDecoderOutput out) throws Exception;
 }

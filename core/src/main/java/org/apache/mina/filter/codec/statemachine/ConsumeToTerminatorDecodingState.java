@@ -23,8 +23,8 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * Consumes until a fixed (ASCII) character is reached.
- * The terminator is skipped.
+ * {@link DecodingState} which consumes all bytes until a fixed (ASCII) 
+ * character is reached. The terminator is skipped.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -36,7 +36,9 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState 
     private IoBuffer buffer;
 
     /**
-     * @param terminator  The terminator character
+     * Creates a new instance using the specified terminator character.
+     * 
+     * @param terminator the terminator character.
      */
     public ConsumeToTerminatorDecodingState(byte terminator) {
         this.terminator = terminator;
@@ -96,6 +98,17 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState 
         return finishDecode(product, out);
     }
 
+    /**
+     * Invoked when this state has reached the terminator byte.
+     * 
+     * @param product the read bytes not including the terminator.
+     * @param out the current {@link ProtocolDecoderOutput} used to write 
+     *        decoded messages.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
     protected abstract DecodingState finishDecode(IoBuffer product,
             ProtocolDecoderOutput out) throws Exception;
 }

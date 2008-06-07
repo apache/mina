@@ -24,7 +24,8 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * TODO Add documentation
+ * {@link DecodingState} which decodes <code>short</code> values in big-endian 
+ * order (high bytes come first).
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -34,9 +35,6 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
     private int highByte;
     private int counter;
     
-    public ShortIntegerDecodingState() {
-    }
-
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         
@@ -63,6 +61,17 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
                 "Unexpected end of session while waiting for a short integer.");
     }
 
+    /**
+     * Invoked when this state has consumed a complete <code>short</code>.
+     * 
+     * @param value the short.
+     * @param out the current {@link ProtocolDecoderOutput} used to write 
+     *        decoded messages.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
     protected abstract DecodingState finishDecode(short value,
             ProtocolDecoderOutput out) throws Exception;
 }

@@ -23,10 +23,10 @@ import org.apache.mina.common.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * A {@link DecodingState} which consumes all received bytes until a configured
- * number of read bytes has been reached.  Please note that this state can
- * produce the buffer with less data if the associated session has been
- * closed unexpectedly.
+ * {@link DecodingState} which consumes all received bytes until a configured
+ * number of read bytes has been reached. Please note that this state can
+ * produce a buffer with less data than the configured length if the associated 
+ * session has been closed unexpectedly.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -38,9 +38,9 @@ public abstract class FixedLengthDecodingState implements DecodingState {
     private IoBuffer buffer;
 
     /**
-     * Constructs with a known decode length.
+     * Constructs a new instance using the specified decode length.
      *
-     * @param length    The decode length
+     * @param length the number of bytes to read.
      */
     public FixedLengthDecodingState(int length) {
         this.length = length;
@@ -89,6 +89,17 @@ public abstract class FixedLengthDecodingState implements DecodingState {
         return finishDecode(readData ,out);
     }
 
-    protected abstract DecodingState finishDecode(IoBuffer readData,
+    /**
+     * Invoked when this state has consumed the configured number of bytes.
+     * 
+     * @param product the data.
+     * @param out the current {@link ProtocolDecoderOutput} used to write 
+     *        decoded messages.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
+    protected abstract DecodingState finishDecode(IoBuffer product,
             ProtocolDecoderOutput out) throws Exception;
 }

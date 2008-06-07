@@ -24,7 +24,8 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * TODO Add documentation
+ * {@link DecodingState} which decodes <code>int</code> values in big-endian 
+ * order (high bytes come first).
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -35,9 +36,6 @@ public abstract class IntegerDecodingState implements DecodingState {
     private int secondByte;
     private int thirdByte;
     private int counter;
-
-    public IntegerDecodingState() {
-    }
 
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
@@ -72,6 +70,17 @@ public abstract class IntegerDecodingState implements DecodingState {
                 "Unexpected end of session while waiting for an integer.");
     }
 
+    /**
+     * Invoked when this state has consumed a complete <code>int</code>.
+     * 
+     * @param value the integer.
+     * @param out the current {@link ProtocolDecoderOutput} used to write 
+     *        decoded messages.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
     protected abstract DecodingState finishDecode(int value,
             ProtocolDecoderOutput out) throws Exception;
 }

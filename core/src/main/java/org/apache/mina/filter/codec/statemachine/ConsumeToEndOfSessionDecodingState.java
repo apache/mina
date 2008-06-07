@@ -24,10 +24,8 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * A {@link DecodingState} which consumes all received bytes until a configured
- * number of read bytes has been reached.  Please note that this state can
- * produce the buffer with less data if the associated session has been
- * closed unexpectedly.
+ * {@link DecodingState} which consumes all received bytes until the session is
+ * closed.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -37,6 +35,13 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
     private IoBuffer buffer;
     private final int maxLength;
     
+    /**
+     * Creates a new instance using the specified maximum length.
+     * 
+     * @param maxLength the maximum number of bytes which will be consumed. If
+     *        this max is reached a {@link ProtocolDecoderException} will be 
+     *        thrown by {@link #decode(IoBuffer, ProtocolDecoderOutput)}.
+     */
     public ConsumeToEndOfSessionDecodingState(int maxLength) {
         this.maxLength = maxLength;
     }
@@ -67,6 +72,18 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
         }
     }
 
-    protected abstract DecodingState finishDecode(IoBuffer readData,
+    /**
+     * Invoked when this state has consumed all bytes until the session is 
+     * closed.
+     * 
+     * @param product the bytes read.
+     * @param out the current {@link ProtocolDecoderOutput} used to write 
+     *        decoded messages.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
+    protected abstract DecodingState finishDecode(IoBuffer product,
             ProtocolDecoderOutput out) throws Exception;
 }

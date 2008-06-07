@@ -24,10 +24,10 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * Decodes a single <code>CRLF</code>.
- * If it is found, the bytes are consumed and <code>Boolean.TRUE</code>
+ * {@link DecodingState} which decodes a single <code>CRLF</code>.
+ * If it is found, the bytes are consumed and <code>true</code>
  * is provided as the product. Otherwise, read bytes are pushed back
- * to the stream, and <code>Boolean.FALSE</code> is provided as the
+ * to the stream, and <code>false</code> is provided as the
  * product.
  * Note that if we find a CR but do not find a following LF, we raise
  * an error.
@@ -92,6 +92,17 @@ public abstract class CrLfDecodingState implements DecodingState {
         return finishDecode(false, out);
     }
 
+    /**
+     * Invoked when this state has found a <code>CRLF</code>.
+     * 
+     * @param foundCRLF <code>true</code> if <code>CRLF</code> was found.
+     * @param out the current {@link ProtocolDecoderOutput} used to write 
+     *        decoded messages.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
+     */
     protected abstract DecodingState finishDecode(boolean foundCRLF,
             ProtocolDecoderOutput out) throws Exception;
 }

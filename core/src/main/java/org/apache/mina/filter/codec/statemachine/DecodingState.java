@@ -24,7 +24,8 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * TODO Add documentation
+ * Represents a state in a decoder state machine used by 
+ * {@link DecodingStateMachine}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -32,12 +33,30 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 public interface DecodingState {
     /**
      * Invoked when data is available for this state.
+     * 
+     * @param in the data to be decoded.
+     * @param out used to write decoded objects.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
      */
     DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception;
     
     /**
-     * Invoked when the associated {@link IoSession} is closed.
+     * Invoked when the associated {@link IoSession} is closed. This method is 
+     * useful when you deal with protocols which don't specify the length of a 
+     * message (e.g. HTTP responses without <tt>content-length</tt> header). 
+     * Implement this method to process the remaining data that 
+     * {@link #decode(IoBuffer, ProtocolDecoderOutput)} method didn't process 
+     * completely.
+     * 
+     * @param out used to write decoded objects.
+     * @return the next state if a state transition was triggered (use 
+     *         <code>this</code> for loop transitions) or <code>null</code> if 
+     *         the state machine has reached its end.
+     * @throws Exception if the read data violated protocol specification.
      */
     DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception;
 }
