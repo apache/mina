@@ -22,7 +22,7 @@ package org.apache.mina.handler.demux;
 import junit.framework.TestCase;
 
 import org.apache.mina.common.IoSession;
-import org.easymock.MockControl;
+import org.easymock.EasyMock;
 
 /**
  * Tests {@link org.apache.mina.handler.demux.DemuxingIoHandler}.
@@ -32,12 +32,6 @@ import org.easymock.MockControl;
  */
 @SuppressWarnings("unchecked")
 public class DemuxingIoHandlerTest extends TestCase {
-    MockControl mockHandler1;
-
-    MockControl mockHandler2;
-
-    MockControl mockHandler3;
-
     MessageHandler handler1;
 
     MessageHandler handler2;
@@ -69,16 +63,11 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * Create mocks.
          */
-        mockHandler1 = MockControl.createControl(MessageHandler.class);
-        mockHandler2 = MockControl.createControl(MessageHandler.class);
-        mockHandler3 = MockControl.createControl(MessageHandler.class);
+        handler1 = EasyMock.createMock(MessageHandler.class);
+        handler2 = EasyMock.createMock(MessageHandler.class);
+        handler3 = EasyMock.createMock(MessageHandler.class);
 
-        handler1 = (MessageHandler) mockHandler1.getMock();
-        handler2 = (MessageHandler) mockHandler2.getMock();
-        handler3 = (MessageHandler) mockHandler3.getMock();
-
-        session = MockControl.createControl(IoSession.class)
-                .getMock();
+        session = EasyMock.createMock( IoSession.class);
     }
 
     public void testFindHandlerByClass() throws Exception {
@@ -98,17 +87,16 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * Replay.
          */
-        mockHandler1.replay();
-        mockHandler2.replay();
-        mockHandler3.replay();
+        EasyMock.replay(handler1);
+        EasyMock.replay(handler2);
+        EasyMock.replay(handler3);
 
         DemuxingIoHandler ioHandler = new DemuxingIoHandler();
 
         /*
          * First round. All messages should be handled by handler1
          */
-        ioHandler.addReceivedMessageHandler(C1.class, (MessageHandler) mockHandler1
-                .getMock());
+        ioHandler.addReceivedMessageHandler(C1.class, handler1);
         ioHandler.messageReceived(session, msg[0]);
         ioHandler.messageReceived(session, msg[1]);
         ioHandler.messageReceived(session, msg[2]);
@@ -117,8 +105,7 @@ public class DemuxingIoHandlerTest extends TestCase {
          * Second round. C1 messages should be handled by handler1. C2 and C3
          * messages should be handled by handler2.
          */
-        ioHandler.addReceivedMessageHandler(C2.class, (MessageHandler) mockHandler2
-                .getMock());
+        ioHandler.addReceivedMessageHandler(C2.class, handler2);
         ioHandler.messageReceived(session, msg[3]);
         ioHandler.messageReceived(session, msg[4]);
         ioHandler.messageReceived(session, msg[5]);
@@ -127,8 +114,7 @@ public class DemuxingIoHandlerTest extends TestCase {
          * Third round. C1 messages should be handled by handler1, C2 by
          * handler2 and C3 by handler3.
          */
-        ioHandler.addReceivedMessageHandler(C3.class, (MessageHandler) mockHandler3
-                .getMock());
+        ioHandler.addReceivedMessageHandler(C3.class, handler3);
         ioHandler.messageReceived(session, msg[6]);
         ioHandler.messageReceived(session, msg[7]);
         ioHandler.messageReceived(session, msg[8]);
@@ -136,9 +122,9 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * Verify.
          */
-        mockHandler1.verify();
-        mockHandler2.verify();
-        mockHandler3.verify();
+        EasyMock.verify(handler1);
+        EasyMock.verify(handler2);
+        EasyMock.verify(handler3);
     }
 
     public void testFindHandlerByInterface() throws Exception {
@@ -158,17 +144,16 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * Replay.
          */
-        mockHandler1.replay();
-        mockHandler2.replay();
-        mockHandler3.replay();
+        EasyMock.replay(handler1);
+        EasyMock.replay(handler2);
+        EasyMock.replay(handler3);
 
         DemuxingIoHandler ioHandler = new DemuxingIoHandler();
 
         /*
          * First round. All messages should be handled by handler1
          */
-        ioHandler.addReceivedMessageHandler(I4.class, (MessageHandler) mockHandler1
-                .getMock());
+        ioHandler.addReceivedMessageHandler(I4.class, handler1);
         ioHandler.messageReceived(session, msg[0]);
         ioHandler.messageReceived(session, msg[1]);
         ioHandler.messageReceived(session, msg[2]);
@@ -177,8 +162,7 @@ public class DemuxingIoHandlerTest extends TestCase {
          * Second round. C1 and C3 messages should be handled by handler1. C2
          * messages should be handled by handler2.
          */
-        ioHandler.addReceivedMessageHandler(I6.class, (MessageHandler) mockHandler2
-                .getMock());
+        ioHandler.addReceivedMessageHandler(I6.class, handler2);
         ioHandler.messageReceived(session, msg[3]);
         ioHandler.messageReceived(session, msg[4]);
         ioHandler.messageReceived(session, msg[5]);
@@ -187,8 +171,7 @@ public class DemuxingIoHandlerTest extends TestCase {
          * Third round. C1 and C3 messages should be handled by handler3. C2
          * messages should be handled by handler2.
          */
-        ioHandler.addReceivedMessageHandler(I3.class, (MessageHandler) mockHandler3
-                .getMock());
+        ioHandler.addReceivedMessageHandler(I3.class, handler3);
         ioHandler.messageReceived(session, msg[6]);
         ioHandler.messageReceived(session, msg[7]);
         ioHandler.messageReceived(session, msg[8]);
@@ -196,9 +179,9 @@ public class DemuxingIoHandlerTest extends TestCase {
         /*
          * Verify.
          */
-        mockHandler1.verify();
-        mockHandler2.verify();
-        mockHandler3.verify();
+        EasyMock.verify(handler1);
+        EasyMock.verify(handler2);
+        EasyMock.verify(handler3);
     }
 
     /*
