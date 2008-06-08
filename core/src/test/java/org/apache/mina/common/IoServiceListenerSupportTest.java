@@ -25,7 +25,7 @@ import java.net.SocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
+import org.easymock.EasyMock;
 
 /**
  * Tests {@link IoServiceListenerSupport}.
@@ -36,33 +36,29 @@ import org.easymock.MockControl;
 public class IoServiceListenerSupportTest extends TestCase {
     private static final SocketAddress ADDRESS = new InetSocketAddress(8080);
 
-    private final IoService mockService = MockControl
-            .createControl(IoService.class).getMock();
+    private final IoService mockService = EasyMock.createMock(IoService.class);
 
     public void testServiceLifecycle() throws Exception {
         IoServiceListenerSupport support = new IoServiceListenerSupport(
                 mockService);
 
-        MockControl listenerControl = MockControl
-                .createStrictControl(IoServiceListener.class);
-        IoServiceListener listener = (IoServiceListener) listenerControl
-                .getMock();
+        IoServiceListener listener = EasyMock.createStrictMock(IoServiceListener.class);
 
         // Test activation
         listener.serviceActivated(mockService);
 
-        listenerControl.replay();
+        EasyMock.replay(listener);
 
         support.add(listener);
         support.fireServiceActivated();
 
-        listenerControl.verify();
+        EasyMock.verify(listener);
 
         // Test deactivation & other side effects
-        listenerControl.reset();
+        EasyMock.reset(listener);
         listener.serviceDeactivated(mockService);
 
-        listenerControl.replay();
+        EasyMock.replay(listener);
         //// Activate more than once
         support.fireServiceActivated();
         //// Deactivate
@@ -70,7 +66,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         //// Deactivate more than once
         support.fireServiceDeactivated();
 
-        listenerControl.verify();
+        EasyMock.verify(listener);
     }
 
     public void testSessionLifecycle() throws Exception {
@@ -81,40 +77,35 @@ public class IoServiceListenerSupportTest extends TestCase {
         session.setService(mockService);
         session.setLocalAddress(ADDRESS);
 
-        MockControl handlerControl = MockControl
-                .createStrictControl(IoHandler.class);
-        IoHandler handler = (IoHandler) handlerControl.getMock();
+        IoHandler handler = EasyMock.createStrictMock( IoHandler.class );
         session.setHandler(handler);
 
-        MockControl listenerControl = MockControl
-                .createStrictControl(IoServiceListener.class);
-        IoServiceListener listener = (IoServiceListener) listenerControl
-                .getMock();
+        IoServiceListener listener = EasyMock.createStrictMock(IoServiceListener.class);
 
         // Test creation
         listener.sessionCreated(session);
         handler.sessionCreated(session);
         handler.sessionOpened(session);
 
-        listenerControl.replay();
-        handlerControl.replay();
+        EasyMock.replay(listener);
+        EasyMock.replay(handler);
 
         support.add(listener);
         support.fireSessionCreated(session);
 
-        listenerControl.verify();
-        handlerControl.verify();
+        EasyMock.verify(listener);
+        EasyMock.verify(handler);
 
         Assert.assertEquals(1, support.getManagedSessions().size());
         Assert.assertSame(session, support.getManagedSessions().get(session.getId()));
 
         // Test destruction & other side effects
-        listenerControl.reset();
-        handlerControl.reset();
+        EasyMock.reset(listener);
+        EasyMock.reset(handler);
         handler.sessionClosed(session);
         listener.sessionDestroyed(session);
 
-        listenerControl.replay();
+        EasyMock.replay(listener);
         //// Activate more than once
         support.fireSessionCreated(session);
         //// Deactivate
@@ -122,7 +113,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         //// Deactivate more than once
         support.fireSessionDestroyed(session);
 
-        listenerControl.verify();
+        EasyMock.verify(listener);
 
         Assert.assertTrue(session.isClosing());
         Assert.assertEquals(0, support.getManagedSessions().size());
@@ -130,9 +121,7 @@ public class IoServiceListenerSupportTest extends TestCase {
     }
 
     public void testDisconnectOnUnbind() throws Exception {
-        MockControl acceptorControl = MockControl
-                .createStrictControl(IoAcceptor.class);
-        IoAcceptor acceptor = (IoAcceptor) acceptorControl.getMock();
+        IoAcceptor acceptor = EasyMock.createStrictMock(IoAcceptor.class);
 
         final IoServiceListenerSupport support = new IoServiceListenerSupport(
                 acceptor);
@@ -141,15 +130,10 @@ public class IoServiceListenerSupportTest extends TestCase {
         session.setService(acceptor);
         session.setLocalAddress(ADDRESS);
 
-        MockControl handlerControl = MockControl
-                .createStrictControl(IoHandler.class);
-        IoHandler handler = (IoHandler) handlerControl.getMock();
+        IoHandler handler = EasyMock.createStrictMock(IoHandler.class);
         session.setHandler(handler);
 
-        final MockControl listenerControl = MockControl
-                .createStrictControl(IoServiceListener.class);
-        IoServiceListener listener = (IoServiceListener) listenerControl
-                .getMock();
+        final IoServiceListener listener = EasyMock.createStrictMock(IoServiceListener.class);
 
         // Activate a service and create a session.
         listener.serviceActivated(acceptor);
@@ -157,28 +141,28 @@ public class IoServiceListenerSupportTest extends TestCase {
         handler.sessionCreated(session);
         handler.sessionOpened(session);
 
-        listenerControl.replay();
-        handlerControl.replay();
+        EasyMock.replay(listener);
+        EasyMock.replay(handler);
 
         support.add(listener);
         support.fireServiceActivated();
         support.fireSessionCreated(session);
 
-        listenerControl.verify();
-        handlerControl.verify();
+        EasyMock.verify(listener);
+        EasyMock.verify(handler);
 
         // Deactivate a service and make sure the session is closed & destroyed.
-        listenerControl.reset();
-        handlerControl.reset();
+        EasyMock.reset(listener);
+        EasyMock.reset(handler);
 
         listener.serviceDeactivated(acceptor);
-        acceptorControl.expectAndReturn(acceptor.isCloseOnDeactivation(), true);
+        EasyMock.expect(acceptor.isCloseOnDeactivation()).andReturn(true);
         listener.sessionDestroyed(session);
         handler.sessionClosed(session);
 
-        listenerControl.replay();
-        acceptorControl.replay();
-        handlerControl.replay();
+        EasyMock.replay(listener);
+        EasyMock.replay(acceptor);
+        EasyMock.replay(handler);
 
         new Thread() {
             // Emulate I/O service
@@ -192,18 +176,18 @@ public class IoServiceListenerSupportTest extends TestCase {
                 // This synchronization block is a workaround for
                 // the visibility problem of simultaneous EasyMock
                 // state update. (not sure if it fixes the failing test yet.)
-                synchronized (listenerControl) {
+                synchronized (listener) {
                     support.fireSessionDestroyed(session);
                 }
             }
         }.start();
         support.fireServiceDeactivated();
 
-        synchronized (listenerControl) {
-            listenerControl.verify();
+        synchronized (listener) {
+            EasyMock.verify(listener);
         }
-        acceptorControl.verify();
-        handlerControl.verify();
+        EasyMock.verify(acceptor);
+        EasyMock.verify(handler);
 
         Assert.assertTrue(session.isClosing());
         Assert.assertEquals(0, support.getManagedSessions().size());
@@ -211,9 +195,7 @@ public class IoServiceListenerSupportTest extends TestCase {
     }
 
     public void testConnectorActivation() throws Exception {
-        MockControl connectorControl = MockControl
-                .createStrictControl(IoConnector.class);
-        IoConnector connector = (IoConnector) connectorControl.getMock();
+        IoConnector connector = EasyMock.createStrictMock(IoConnector.class);
 
         IoServiceListenerSupport support = new IoServiceListenerSupport(
                 connector);
@@ -222,15 +204,10 @@ public class IoServiceListenerSupportTest extends TestCase {
         session.setService(connector);
         session.setRemoteAddress(ADDRESS);
 
-        MockControl handlerControl = MockControl
-                .createStrictControl(IoHandler.class);
-        IoHandler handler = (IoHandler) handlerControl.getMock();
+        IoHandler handler = EasyMock.createStrictMock(IoHandler.class);
         session.setHandler(handler);
 
-        MockControl listenerControl = MockControl
-                .createStrictControl(IoServiceListener.class);
-        IoServiceListener listener = (IoServiceListener) listenerControl
-                .getMock();
+        IoServiceListener listener = EasyMock.createStrictMock(IoServiceListener.class);
 
         // Creating a session should activate a service automatically.
         listener.serviceActivated(connector);
@@ -238,29 +215,29 @@ public class IoServiceListenerSupportTest extends TestCase {
         handler.sessionCreated(session);
         handler.sessionOpened(session);
 
-        listenerControl.replay();
-        handlerControl.replay();
+        EasyMock.replay(listener);
+        EasyMock.replay(handler);
 
         support.add(listener);
         support.fireSessionCreated(session);
 
-        listenerControl.verify();
-        handlerControl.verify();
+        EasyMock.verify(listener);
+        EasyMock.verify(handler);
 
         // Destroying a session should deactivate a service automatically.
-        listenerControl.reset();
-        handlerControl.reset();
+        EasyMock.reset(listener);
+        EasyMock.reset(handler);
         listener.sessionDestroyed(session);
         handler.sessionClosed(session);
         listener.serviceDeactivated(connector);
 
-        listenerControl.replay();
-        handlerControl.replay();
+        EasyMock.replay(listener);
+        EasyMock.replay(handler);
 
         support.fireSessionDestroyed(session);
 
-        listenerControl.verify();
-        handlerControl.verify();
+        EasyMock.verify(listener);
+        EasyMock.verify(handler);
 
         Assert.assertEquals(0, support.getManagedSessions().size());
         Assert.assertNull(support.getManagedSessions().get(session.getId()));
