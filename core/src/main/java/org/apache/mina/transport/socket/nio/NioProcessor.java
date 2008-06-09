@@ -40,20 +40,23 @@ import org.apache.mina.common.RuntimeIoException;
  * @version $Rev$, $Date$
  */
 public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
+    /** The selector associated with this processor */
+    private final Selector selector;
 
-    private static Selector newSelector() {
+    /**
+     * 
+     * Creates a new instance of NioProcessor.
+     *
+     * @param executor
+     */
+    public NioProcessor(Executor executor) {
+        super(executor);
         try {
-            return Selector.open();
+            // Open a new selector
+            selector = Selector.open();
         } catch (IOException e) {
             throw new RuntimeIoException("Failed to open a selector.", e);
         }
-    }
-
-    private final Selector selector;
-
-    public NioProcessor(Executor executor) {
-        super(executor);
-        selector = newSelector();
     }
 
     @Override
