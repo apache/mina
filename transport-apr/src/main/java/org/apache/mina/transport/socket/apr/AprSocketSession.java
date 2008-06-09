@@ -25,6 +25,8 @@ import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
@@ -33,13 +35,15 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.tomcat.jni.Socket;
 
 /**
- * TODO Add documentation
+ * An {@link IoSession} for APR socket based session.
+ * It's implementing the usual common features for {@SocketSession}. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 class AprSocketSession extends AprSession implements SocketSession {
 
+	
     static final TransportMetadata METADATA =
         new DefaultTransportMetadata(
                 "apr", "socket", false, true,
@@ -49,24 +53,39 @@ class AprSocketSession extends AprSession implements SocketSession {
 
     private final SocketSessionConfig config = new SessionConfigImpl();
     
+    /**
+     * Create an instance of {@link AprSocketSession}. 
+     * 
+     * {@inheritDoc} 
+     */
     AprSocketSession(
             IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
         super(service, processor, descriptor);
         this.config.setAll(service.getSessionConfig());
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public SocketSessionConfig getConfig() {
         return config;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
 
-
+    /**
+     * The implementation for the {@link IoSessionConfig} related to APR socket.
+     * @author The Apache MINA Project (dev@mina.apache.org)
+     */
     private class SessionConfigImpl extends AbstractSocketSessionConfig {
-
+    	/**
+         * {@inheritDoc}
+         */
         public boolean isKeepAlive() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_KEEPALIVE) == 1;
@@ -74,18 +93,32 @@ class AprSocketSession extends AprSession implements SocketSession {
                 throw new RuntimeIoException("Failed to get SO_KEEPALIVE.", e);
             }
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         public void setKeepAlive(boolean on) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_KEEPALIVE, on ? 1 : 0);
         }
 
+        /**
+         * {@inheritDoc}
+         * not supported for the moment
+         */
         public boolean isOobInline() {
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         * not supported for the moment
+         */
         public void setOobInline(boolean on) {
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean isReuseAddress() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_REUSEADDR) == 1;
@@ -94,10 +127,16 @@ class AprSocketSession extends AprSession implements SocketSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void setReuseAddress(boolean on) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_REUSEADDR, on ? 1 : 0);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int getSoLinger() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_LINGER);
@@ -106,11 +145,17 @@ class AprSocketSession extends AprSession implements SocketSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void setSoLinger(int linger) {
             // TODO: Figure out how to disable this.
             Socket.optSet(getDescriptor(), Socket.APR_SO_LINGER, linger);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean isTcpNoDelay() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_TCP_NODELAY) == 1;
@@ -119,17 +164,29 @@ class AprSocketSession extends AprSession implements SocketSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void setTcpNoDelay(boolean on) {
             Socket.optSet(getDescriptor(), Socket.APR_TCP_NODELAY, on ? 1 : 0);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int getTrafficClass() {
             return 0;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void setTrafficClass(int tc) {
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int getSendBufferSize() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_SNDBUF);
@@ -137,11 +194,17 @@ class AprSocketSession extends AprSession implements SocketSession {
                 throw new RuntimeException("APR Exception", e);
             }
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         public void setSendBufferSize(int size) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_SNDBUF, size);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int getReceiveBufferSize() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_RCVBUF);
@@ -150,6 +213,9 @@ class AprSocketSession extends AprSession implements SocketSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void setReceiveBufferSize(int size) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_RCVBUF, size);
         }

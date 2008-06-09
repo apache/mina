@@ -29,33 +29,49 @@ import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.tomcat.jni.Address;
+import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Socket;
 
 /**
- * {@link IoSession} for the {@link AprSocketConnector}
- *
+ * An abstract {@link IoSession} serving of base for APR based sessions.
+ * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class AprSession extends AbstractIoSession {
-    private long descriptor;
+   
+	// good old socket descriptor
+	private long descriptor;
 
+	// the service handling this session
     private final IoService service;
+    
+    // the processor processing this session
     private final IoProcessor<AprSession> processor;
 
+    // the mandatory filter chain of this session
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
+    
+    // handler listeneing this session event
     private final IoHandler handler;
 
+    // the two endpoint addresses
     private final InetSocketAddress remoteAddress;
     private final InetSocketAddress localAddress;
 
+    // current polling results
     private boolean readable = true;
     private boolean writable = true;
     private boolean interestedInRead;
     private boolean interestedInWrite;
 
     /**
-     * Creates a new instance.
+     * Creates a new instance of {@link AprSession}. Need to be called by extending types
+     * @param service the {@link IoService} creating this session. Can be {@link AprSocketAcceptor} or 
+     *         {@link AprSocketConnector}
+     * @param processor the {@link AprIoProcessor} managing this session.
+     * @param descriptor the low level APR socket descriptor for this socket. {@see Socket#create(int, int, int, long)}
+     * @throws Exception exception produced during the setting of all the socket parameters. 
      */
     AprSession(
             IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
@@ -71,6 +87,16 @@ public abstract class AprSession extends AbstractIoSession {
         this.localAddress = new InetSocketAddress(Address.getip(la), Address.getInfo(la).port);
     }
 
+    /**
+     * Creates a new instance of {@link AprSession}. Need to be called by extending types. 
+     * The constructor add remote address for UDP based sessions. 
+     * @param service the {@link IoService} creating this session. Can be {@link AprSocketAcceptor} or 
+     *         {@link AprSocketConnector}
+     * @param processor the {@link AprIoProcessor} managing this session.
+     * @param descriptor the low level APR socket descriptor for this socket. {@see Socket#create(int, int, int, long)}
+     * @param remoteAddress the remote end-point
+     * @throws Exception exception produced during the setting of all the socket parameters. 
+     */
     AprSession(
             IoService service, IoProcessor<AprSession> processor,
             long descriptor, InetSocketAddress remoteAddress) throws Exception {
@@ -85,72 +111,137 @@ public abstract class AprSession extends AbstractIoSession {
         this.localAddress = new InetSocketAddress(Address.getip(la), Address.getInfo(la).port);
     }
 
+    /**
+     * Get the socket descriptor {@see Socket#create(int, int, int, long)}.
+     * @return the low level APR socket descriptor
+     */
     long getDescriptor() {
         return descriptor;
     }
 
+    /**
+     * Set the socket descriptor.
+     * @param desc the low level APR socket descriptor created by {@see Socket#create(int, int, int, long)}
+     */
     void setDescriptor(long desc) {
        this.descriptor = desc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected IoProcessor<AprSession> getProcessor() {
         return processor;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public InetSocketAddress getLocalAddress() {
         return localAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public InetSocketAddress getRemoteAddress() {
         return remoteAddress;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     public IoFilterChain getFilterChain() {
         return filterChain;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoHandler getHandler() {
         return handler;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoService getService() {
         return service;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
+    /**
+     * Is this session was tagged are readable after a call to {@link Socket#pool(long)}.
+     * @return true if this session is ready for read operations
+     */
     boolean isReadable() {
         return readable;
     }
 
+    /**
+     * Set if this session is readable after a call to {@link Socket#pool(long)}.
+     * @param readable  true for set this session ready for read operations
+     */
     void setReadable(boolean readable) {
         this.readable = readable;
     }
 
+    /**
+     * Is this session is tagged writable after a call to {@link Socket#pool(long)}.
+     * @return true if this session is ready for write operations
+     */
     boolean isWritable() {
         return writable;
     }
 
+    /**
+     * Set if this session is writable after a call to {@link Socket#pool(long)}.
+     * @param writable true for set this session ready for write operations
+     */
     void setWritable(boolean writable) {
         this.writable = writable;
     }
-
+    
+    /**
+     * Does this session needs to be registered for read events.
+     * Used for building poll set {@see Poll}. 
+     * @return true if registered
+     */
     boolean isInterestedInRead() {
         return interestedInRead;
     }
 
+    /**
+     * Set if this session needs to be registered for read events. 
+     * Used for building poll set {@see Poll}.
+     * @param isOpRead true if need to be registered
+     */
     void setInterestedInRead(boolean isOpRead) {
         this.interestedInRead = isOpRead;
     }
 
+    /**
+     * Does this session needs to be registered for write events.
+     * Used for building poll set {@see Poll}. 
+     * @return true if registered
+     */
     boolean isInterestedInWrite() {
         return interestedInWrite;
     }
 
+    /**
+     * Set if this session needs to be registered for write events.
+     * Used for building poll set {@see Poll}.
+     * @param isOpWrite true if need to be registered
+     */
     void setInterestedInWrite(boolean isOpWrite) {
         this.interestedInWrite = isOpWrite;
     }

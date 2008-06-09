@@ -22,9 +22,16 @@ package org.apache.mina.transport.socket.apr;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
+
 /**
- * Internal singleton used for initializing corretcly the APR native library
- * and the associated memory pool.
+ * Internal singleton used for initializing correctly the APR native library
+ * and the associated root memory pool.
+ * 
+ * It'll finalize nicely the native resources (libraries and memory pools).
+ * 
+ * Each memory pool used in the APR transport module needs to be children of the
+ * root pool {@link AprLibrary#getRootPool()}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -34,17 +41,29 @@ class AprLibrary {
     // is APR library was initialized (load of native libraries)
     private static AprLibrary library = null;
 
+    /**
+     * get the shared instance of APR library, if none, initialize one
+     * @return the current APR library singleton
+     */
     static synchronized AprLibrary getInstance() {
         if (!isInitialized())
             initialize();
         return library;
     }
 
-    static synchronized void initialize() {
+    /**
+     * initialize the APR Library by loading the associated native libraries
+     * and creating the associated singleton
+     */
+    private static synchronized void initialize() {
         if (library == null)
             library = new AprLibrary();
     }
 
+    /**
+     * is the APR library was initialized.
+     * @return
+     */
     static synchronized boolean isInitialized() {
         return library != null;
     }
@@ -52,6 +71,11 @@ class AprLibrary {
     // APR memory pool (package wide mother pool)	
     private final long pool;
 
+    /**
+     * APR library singleton constructor. Called only when accessing the
+     * singleton the first time.
+     * It's initializing an APR memory pool for the whole package (a.k.a mother or root pool).
+     */
     private AprLibrary() {
         try {
             Library.initialize(null);
@@ -68,6 +92,11 @@ class AprLibrary {
         Pool.destroy(pool);
     }
 
+    /**
+     * get the package wide root pool, the mother of all the pool created 
+     * in APR transport module.
+     * @return number identifying the root pool 
+     */
     long getRootPool() {
         return pool;
     }
