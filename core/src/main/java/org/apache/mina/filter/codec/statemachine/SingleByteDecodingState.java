@@ -39,7 +39,10 @@ public abstract class SingleByteDecodingState implements DecodingState {
             return this;
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         throw new ProtocolDecoderException(

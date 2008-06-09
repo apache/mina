@@ -34,7 +34,10 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
     
     private int highByte;
     private int counter;
-    
+
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         
@@ -55,6 +58,9 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         throw new ProtocolDecoderException(

@@ -33,6 +33,9 @@ public abstract class SkippingState implements DecodingState {
 
     private int skippedBytes;
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         int beginPos = in.position();
@@ -53,6 +56,9 @@ public abstract class SkippingState implements DecodingState {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         return finishDecode(skippedBytes);

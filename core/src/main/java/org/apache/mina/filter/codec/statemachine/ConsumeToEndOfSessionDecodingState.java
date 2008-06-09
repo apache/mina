@@ -46,6 +46,9 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
         this.maxLength = maxLength;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         if (buffer == null) {
@@ -59,6 +62,9 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         try {

@@ -34,6 +34,9 @@ public abstract class ConsumeToDynamicTerminatorDecodingState implements
 
     private IoBuffer buffer;
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         int beginPos = in.position();
@@ -84,6 +87,9 @@ public abstract class ConsumeToDynamicTerminatorDecodingState implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         IoBuffer product;

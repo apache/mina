@@ -57,6 +57,9 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
         this.state = state;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         if (this.session == null) {
@@ -88,11 +91,17 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
             }
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
         state.finishDecode(out);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void dispose(IoSession session) throws Exception {}
 }

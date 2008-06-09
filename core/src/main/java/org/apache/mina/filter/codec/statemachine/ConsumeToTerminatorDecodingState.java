@@ -44,6 +44,9 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState 
         this.terminator = terminator;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         int terminatorPos = in.indexOf(terminator);
@@ -85,6 +88,9 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         IoBuffer product;

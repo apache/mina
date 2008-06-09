@@ -90,6 +90,9 @@ public abstract class DecodingStateMachine implements DecodingState {
      */
     protected abstract void destroy() throws Exception;
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         DecodingState state = getCurrentState();
@@ -135,6 +138,9 @@ public abstract class DecodingStateMachine implements DecodingState {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         DecodingState nextState;

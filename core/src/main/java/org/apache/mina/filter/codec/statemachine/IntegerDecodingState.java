@@ -37,6 +37,9 @@ public abstract class IntegerDecodingState implements DecodingState {
     private int thirdByte;
     private int counter;
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         while (in.hasRemaining()) {
@@ -64,6 +67,9 @@ public abstract class IntegerDecodingState implements DecodingState {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         throw new ProtocolDecoderException(

@@ -113,6 +113,9 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         IoBuffer product;
         // When input contained only CR or LF rather than actual data...

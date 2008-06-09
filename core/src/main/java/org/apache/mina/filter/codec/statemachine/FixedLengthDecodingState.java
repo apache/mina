@@ -46,6 +46,9 @@ public abstract class FixedLengthDecodingState implements DecodingState {
         this.length = length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
             throws Exception {
         if (buffer == null) {
@@ -77,6 +80,9 @@ public abstract class FixedLengthDecodingState implements DecodingState {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DecodingState finishDecode(ProtocolDecoderOutput out)
             throws Exception {
         IoBuffer readData;
