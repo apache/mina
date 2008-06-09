@@ -24,13 +24,11 @@ import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.util.CopyOnWriteMap;
 import org.apache.mina.util.NamePreservingRunnable;
 
 /**
@@ -49,8 +47,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      */
     private static final int WRITE_SPIN_COUNT = 256;
 
-    private static final Map<Class<?>, AtomicInteger> threadIds =
-        new CopyOnWriteMap<Class<?>, AtomicInteger>();
+    /** A incremental Id used for thread naming */
+    private static final AtomicInteger threadId = new AtomicInteger(0);
 
     private final Object lock = new Object();
     private final String threadName;
@@ -78,18 +76,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         this.executor = executor;
     }
 
+    /**
+     * @return a name for the current thread, based on the class name and
+     * an incremental value,starting at 1. 
+     */
     private String nextThreadName() {
-        Class<?> cls = getClass();
-        AtomicInteger threadId = threadIds.get(cls);
-        int newThreadId;
-        if (threadId == null) {
-            newThreadId = 1;
-            threadIds.put(cls, new AtomicInteger(newThreadId));
-        } else {
-            newThreadId = threadId.incrementAndGet();
-        }
-
-        return cls.getSimpleName() + '-' + newThreadId;
+        return getClass().getSimpleName() + "-" + threadId.incrementAndGet();
     }
 
     public final boolean isDisposing() {
