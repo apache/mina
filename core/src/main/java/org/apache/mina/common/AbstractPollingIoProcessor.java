@@ -22,8 +22,10 @@ package org.apache.mina.common;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
@@ -47,8 +49,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      */
     private static final int WRITE_SPIN_COUNT = 256;
 
-    /** A incremental Id used for thread naming */
-    private static final AtomicInteger threadId = new AtomicInteger(0);
+    /** A map containing the last Thread ID for each class */
+    private static final Map<Class<?>, AtomicInteger> threadIds = 
+        new HashMap<Class<?>, AtomicInteger>();
 
     private final Object lock = new Object();
     private final String threadName;
@@ -77,11 +80,38 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     /**
+     * Compute the thread ID for this class instance. As we may have different
+     * classes, we store the last ID number into a Map associating the class
+     * name to the last assigned ID.
+     *   
      * @return a name for the current thread, based on the class name and
-     * an incremental value,starting at 1. 
+     * an incremental value, starting at 1. 
      */
     private String nextThreadName() {
-        return getClass().getSimpleName() + "-" + threadId.incrementAndGet();
+        Class<?> cls = getClass();
+        int newThreadId;
+        
+        // We synchronize this block to avoid a concurrent access to 
+        // the actomicInteger (it can be modified by another thread, while
+        // being seen as null by another thread)
+        synchronized( threadIds ) {
+            // Get the current ID associated to this class' name
+            AtomicInteger threadId = threadIds.get(cls);
+            
+            if (threadId == null) {
+                // We never have seen this class before, just create a
+                // new ID starting at 1 for it, and associate this ID
+                // with the class name in the map.
+                newThreadId = 1;
+                threadIds.put(cls, new AtomicInteger(newThreadId));
+            } else {
+                // Just increment the lat ID, and get it.
+                newThreadId = threadId.incrementAndGet();
+            }
+        }
+        
+        // Now we can compute the name for this thread
+        return cls.getSimpleName() + '-' + newThreadId;
     }
 
     public final boolean isDisposing() {
