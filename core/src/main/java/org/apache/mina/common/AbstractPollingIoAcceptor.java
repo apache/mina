@@ -201,7 +201,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
             while (selectable) {
                 try {
-                    // gets the number of keys that are ready to go
+                    // Detect if we have some keys ready to be processed
                     boolean selected = select();
 
                     // this actually sets the selector to OP_ACCEPT,
@@ -299,7 +299,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         for (;;) {
             AcceptorOperationFuture future = registerQueue.poll();
             if (future == null) {
-                break;
+                return 0;
             }
 
             Map<SocketAddress, H> newHandles = new HashMap<SocketAddress, H>();
@@ -332,8 +332,6 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 }
             }
         }
-
-        return 0;
     }
 
     /**
