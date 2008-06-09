@@ -190,6 +190,19 @@ public final class NioSocketAcceptor
         return handle.socket().getLocalSocketAddress();
     }
 
+    /**
+      * Check if we have at least one key whose corresponding channels is 
+      * ready for I/O operations.
+      *
+      * This method performs a blocking selection operation. 
+      * It returns only after at least one channel is selected, 
+      * this selector's wakeup method is invoked, or the current thread 
+      * is interrupted, whichever comes first.
+      * 
+      * @return <code>true</code> if one key has its ready-operation set updated
+      * @throws IOException If an I/O error occurs
+      * @throws ClosedSelectorException If this selector is closed 
+      */
     @Override
     protected boolean select() throws Exception {
         return selector.select() > 0;
