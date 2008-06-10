@@ -35,7 +35,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.tomcat.jni.Socket;
 
 /**
- * An {@link IoSession} for APR socket based session.
+ * An {@link IoSession} for APR TCP socket based session.
  * It's implementing the usual common features for {@SocketSession}. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -79,7 +79,7 @@ class AprSocketSession extends AprSession implements SocketSession {
     }
 
     /**
-     * The implementation for the {@link IoSessionConfig} related to APR socket.
+     * The implementation for the {@link IoSessionConfig} related to APR TCP socket.
      * @author The Apache MINA Project (dev@mina.apache.org)
      */
     private class SessionConfigImpl extends AbstractSocketSessionConfig {

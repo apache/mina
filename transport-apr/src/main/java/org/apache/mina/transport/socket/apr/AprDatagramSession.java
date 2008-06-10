@@ -33,7 +33,8 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.tomcat.jni.Socket;
 
 /**
- * TODO Add documentation
+ * An {@link IoSession} for APR UDP datagram based session.
+ * It's implementing the usual common features for {@DatagramSession}. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -47,7 +48,12 @@ class AprDatagramSession extends AprSession implements DatagramSession {
                 DatagramSessionConfig.class, IoBuffer.class);
 
     private final DatagramSessionConfig config = new SessionConfigImpl();
-    
+
+    /**
+     * Create an instance of {@link AprDatagramSession}. 
+     * 
+     * {@inheritDoc} 
+     */    
     AprDatagramSession(
             IoService service, IoProcessor<AprSession> processor,
             long descriptor, InetSocketAddress remoteAddress) throws Exception {
@@ -55,18 +61,28 @@ class AprDatagramSession extends AprSession implements DatagramSession {
         this.config.setAll(service.getSessionConfig());
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public DatagramSessionConfig getConfig() {
         return config;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
 
-
+    /**
+     * The implementation for the {@link IoSessionConfig} related to APR UDP socket.
+     * @author The Apache MINA Project (dev@mina.apache.org)
+     */
     private class SessionConfigImpl extends AbstractDatagramSessionConfig {
-
+    	/**
+         * {@inheritDoc}
+         */
         public boolean isReuseAddress() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_REUSEADDR) == 1;
@@ -75,17 +91,29 @@ class AprDatagramSession extends AprSession implements DatagramSession {
             }
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public void setReuseAddress(boolean on) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_REUSEADDR, on ? 1 : 0);
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public int getTrafficClass() {
             return 0;
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public void setTrafficClass(int tc) {
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public int getSendBufferSize() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_SNDBUF);
@@ -94,10 +122,16 @@ class AprDatagramSession extends AprSession implements DatagramSession {
             }
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public void setSendBufferSize(int size) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_SNDBUF, size);
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public int getReceiveBufferSize() {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_RCVBUF);
@@ -106,14 +140,23 @@ class AprDatagramSession extends AprSession implements DatagramSession {
             }
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public void setReceiveBufferSize(int size) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_RCVBUF, size);
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public boolean isBroadcast() {
             return false;
         }
 
+    	/**
+         * {@inheritDoc}
+         */
         public void setBroadcast(boolean broadcast) {
         }
     }

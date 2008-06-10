@@ -46,7 +46,7 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 
 /**
- * TODO add documentation
+ * {@link IoConnector} for ABR based socket transport (TCP/IP).
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -69,26 +69,41 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     private final Set<Long> failedHandles = new HashSet<Long>(POLLSET_SIZE);
     private volatile ByteBuffer dummyBuffer;
 
+    /**
+     * TODO : document superclass
+     */
     public AprSocketConnector() {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * TODO : document superclass
+     */
     public AprSocketConnector(int processorCount) {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class, processorCount);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * TODO : document superclass
+     */
     public AprSocketConnector(IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * TODO : document superclass
+     */
     public AprSocketConnector(Executor executor, IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init() throws Exception {
         // initialize a memory pool for APR functions
@@ -121,6 +136,9 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void destroy() throws Exception {
         if (wakeupSocket > 0) {
@@ -134,11 +152,17 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Iterator<Long> allHandles() {
         return polledHandles.iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean connect(Long handle, SocketAddress remoteAddress)
             throws Exception {
@@ -167,11 +191,17 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         throw new InternalError(); // This sentence will never be executed.
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected ConnectionRequest connectionRequest(Long handle) {
         return requests.get(handle);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void close(Long handle) throws Exception {
         finishConnect(handle);
@@ -180,7 +210,10 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
             throwException(rv);
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean finishConnect(Long handle) throws Exception {
         Poll.remove(pollset, handle);
@@ -193,6 +226,9 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Long newHandle(SocketAddress localAddress) throws Exception {
         long handle = Socket.create(
@@ -239,12 +275,18 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected AprSession newSession(IoProcessor<AprSession> processor,
             Long handle) throws Exception {
         return new AprSocketSession(this, processor, handle);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void register(Long handle, ConnectionRequest request)
             throws Exception {
@@ -256,6 +298,9 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         requests.put(handle, request);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean select(int timeout) throws Exception {
         int rv = Poll.poll(pollset, timeout * 1000, polledSockets, false);
@@ -299,11 +344,17 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Iterator<Long> selectedHandles() {
         return polledHandles.iterator();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void wakeup() {
         if (toBeWakenUp) {
@@ -317,24 +368,41 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return AprSocketSession.METADATA;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getDefaultRemoteAddress() {
         return (InetSocketAddress) super.getDefaultRemoteAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
         super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
 
+    /**
+     * transform an APR error number in a more fancy exception
+     * @param code APR error code
+     * @throws IOException the produced exception for the given APR error number
+     */
     private void throwException(int code) throws IOException {
         throw new IOException(
                 org.apache.tomcat.jni.Error.strerror(-code) +
