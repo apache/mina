@@ -30,6 +30,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * TODO Add documentation
@@ -41,43 +42,121 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         extends AbstractIoAcceptor {
 
     private final IoProcessor<T> processor;
+
     private final boolean createdProcessor;
 
     private final Object lock = new Object();
 
-    private final Queue<AcceptorOperationFuture> registerQueue =
-        new ConcurrentLinkedQueue<AcceptorOperationFuture>();
-    private final Queue<AcceptorOperationFuture> cancelQueue =
-        new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
 
-    private final Map<SocketAddress, H> boundHandles =
-        Collections.synchronizedMap(new HashMap<SocketAddress, H>());
+    private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
 
-    private final ServiceOperationFuture disposalFuture =
-        new ServiceOperationFuture();
+    private final Map<SocketAddress, H> boundHandles = Collections
+            .synchronizedMap(new HashMap<SocketAddress, H>());
+
+    private final ServiceOperationFuture disposalFuture = new ServiceOperationFuture();
+
     private volatile boolean selectable;
+
     private Worker worker;
 
     /**
-     * Create an acceptor with a single processing thread using a NewThreadExecutor
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
+     * session configuration, a class of {@link IoProcessor} which will be instantiated in a
+     * {@link SimpleIoProcessorPool} for better scaling in multiprocessor systems. The default
+     * pool size will be used.
+     * 
+     * @see SimpleIoProcessorPool
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param processorClass a {@link Class} of {@link IoProcessor} for the associated {@link IoSession}
+     *            type.
      */
-    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<T>> processorClass) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass), true);
+    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
+            Class<? extends IoProcessor<T>> processorClass) {
+        this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass),
+                true);
     }
 
-    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<T>> processorClass, int processorCount) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass, processorCount), true);
+    /**
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
+     * session configuration, a class of {@link IoProcessor} which will be instantiated in a
+     * {@link SimpleIoProcessorPool} for using multiple thread for better scaling in multiprocessor
+     * systems.
+     * 
+     * @see SimpleIoProcessorPool
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param processorClass a {@link Class} of {@link IoProcessor} for the associated {@link IoSession}
+     *            type.
+     * @param processorCount the amount of processor to instantiate for the pool
+     */
+    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
+            Class<? extends IoProcessor<T>> processorClass, int processorCount) {
+        this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass,
+                processorCount), true);
     }
 
-    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, IoProcessor<T> processor) {
+    /**
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
+     * session configuration, a default {@link Executor} will be created using
+     * {@link Executors#newCachedThreadPool()}.
+     * 
+     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
+     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter} 
+     */
+    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
+            IoProcessor<T> processor) {
         this(sessionConfig, null, processor, false);
     }
 
-    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor) {
+    /**
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
+     * session configuration and an {@link Executor} for handling I/O events. If
+     * null {@link Executor} is provided, a default one will be created using
+     * {@link Executors#newCachedThreadPool()}.
+     * 
+     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param executor
+     *            the {@link Executor} used for handling asynchronous execution of I/O
+     *            events. Can be <code>null</code>.
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
+     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter} 
+     */
+    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
+            Executor executor, IoProcessor<T> processor) {
         this(sessionConfig, executor, processor, false);
     }
 
-    private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor, boolean createdProcessor) {
+    /**
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
+     * session configuration and an {@link Executor} for handling I/O events. If
+     * null {@link Executor} is provided, a default one will be created using
+     * {@link Executors#newCachedThreadPool()}.
+     * 
+     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param executor
+     *            the {@link Executor} used for handling asynchronous execution of I/O
+     *            events. Can be <code>null</code>.
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
+     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
+     * @param createdProcessor tagging the processor as automatically created, so it will be automatically disposed 
+     */
+    private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
+            Executor executor, IoProcessor<T> processor,
+            boolean createdProcessor) {
         super(sessionConfig, executor);
 
         if (processor == null) {
@@ -90,7 +169,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         try {
             init();
             selectable = true;
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeIoException("Failed to initialize.", e);
@@ -106,13 +185,22 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     }
 
     protected abstract void init() throws Exception;
+
     protected abstract void destroy() throws Exception;
+
     protected abstract boolean select() throws Exception;
+
     protected abstract void wakeup();
+
     protected abstract Iterator<H> selectedHandles();
+
     protected abstract H open(SocketAddress localAddress) throws Exception;
+
     protected abstract SocketAddress localAddress(H handle) throws Exception;
-    protected abstract T accept(IoProcessor<T> processor, H handle) throws Exception;
+
+    protected abstract T accept(IoProcessor<T> processor, H handle)
+            throws Exception;
+
     protected abstract void close(H handle) throws Exception;
 
     @Override
@@ -126,8 +214,10 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     }
 
     @Override
-    protected final Set<SocketAddress> bind0(List<? extends SocketAddress> localAddresses) throws Exception {
-        AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
+    protected final Set<SocketAddress> bind0(
+            List<? extends SocketAddress> localAddresses) throws Exception {
+        AcceptorOperationFuture request = new AcceptorOperationFuture(
+                localAddresses);
 
         // adds the Registration request to the queue for the Workers
         // to handle
@@ -147,7 +237,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         // setLocalAddresses() shouldn't be called from the worker thread
         // because of deadlock.
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
-        for (H handle: boundHandles.values()) {
+        for (H handle : boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
         }
 
@@ -178,8 +268,10 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     }
 
     @Override
-    protected final void unbind0(List<? extends SocketAddress> localAddresses) throws Exception {
-        AcceptorOperationFuture future = new AcceptorOperationFuture(localAddresses);
+    protected final void unbind0(List<? extends SocketAddress> localAddresses)
+            throws Exception {
+        AcceptorOperationFuture future = new AcceptorOperationFuture(
+                localAddresses);
 
         cancelQueue.add(future);
         startupWorker();
@@ -218,8 +310,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
                     if (nHandles == 0) {
                         synchronized (lock) {
-                            if (registerQueue.isEmpty() &&
-                                cancelQueue.isEmpty()) {
+                            if (registerQueue.isEmpty()
+                                    && cancelQueue.isEmpty()) {
                                 worker = null;
                                 break;
                             }
@@ -306,7 +398,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             List<SocketAddress> localAddresses = future.getLocalAddresses();
 
             try {
-                for (SocketAddress a: localAddresses) {
+                for (SocketAddress a : localAddresses) {
                     H handle = open(a);
                     newHandles.put(localAddress(handle), handle);
                 }
@@ -321,7 +413,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             } finally {
                 // Roll back if failed to bind all addresses.
                 if (future.getException() != null) {
-                    for (H handle: newHandles.values()) {
+                    for (H handle : newHandles.values()) {
                         try {
                             close(handle);
                         } catch (Exception e) {
@@ -342,14 +434,14 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      */
     private int unregisterHandles() {
         int cancelledHandles = 0;
-        for (; ;) {
+        for (;;) {
             AcceptorOperationFuture future = cancelQueue.poll();
             if (future == null) {
                 break;
             }
 
             // close the channels
-            for (SocketAddress a: future.getLocalAddresses()) {
+            for (SocketAddress a : future.getLocalAddresses()) {
                 H handle = boundHandles.remove(a);
                 if (handle == null) {
                     continue;
@@ -361,7 +453,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 } catch (Throwable e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 } finally {
-                    cancelledHandles ++;
+                    cancelledHandles++;
                 }
             }
 
@@ -371,7 +463,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         return cancelledHandles;
     }
 
-    public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
+    public final IoSession newSession(SocketAddress remoteAddress,
+            SocketAddress localAddress) {
         throw new UnsupportedOperationException();
     }
 }

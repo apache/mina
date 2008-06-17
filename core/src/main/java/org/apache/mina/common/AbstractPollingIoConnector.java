@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * TODO Add documentation
@@ -46,22 +47,94 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     private volatile boolean selectable;
     private Worker worker;
 
+    /**
+     * Constructor for {@link AbstractPollingIoConnector}. You need to provide a default
+     * session configuration, a class of {@link IoProcessor} which will be instantiated in a
+     * {@link SimpleIoProcessorPool} for better scaling in multiprocessor systems. The default
+     * pool size will be used.
+     * 
+     * @see SimpleIoProcessorPool
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param processorClass a {@link Class} of {@link IoProcessor} for the associated {@link IoSession}
+     *            type.
+     */
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<T>> processorClass) {
         this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass), true);
     }
 
+    /**
+     * Constructor for {@link AbstractPollingIoConnector}. You need to provide a default
+     * session configuration, a class of {@link IoProcessor} which will be instantiated in a
+     * {@link SimpleIoProcessorPool} for using multiple thread for better scaling in multiprocessor
+     * systems.
+     * 
+     * @see SimpleIoProcessorPool
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param processorClass a {@link Class} of {@link IoProcessor} for the associated {@link IoSession}
+     *            type.
+     * @param processorCount the amount of processor to instantiate for the pool
+     */
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<T>> processorClass, int processorCount) {
         this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass, processorCount), true);
     }
 
+    /**
+     * Constructor for {@link AbstractPollingIoConnector}. You need to provide a default
+     * session configuration, a default {@link Executor} will be created using
+     * {@link Executors#newCachedThreadPool()}.
+     * 
+     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
+     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter} 
+     */
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, IoProcessor<T> processor) {
         this(sessionConfig, null, processor, false);
     }
 
+    /**
+     * Constructor for {@link AbstractPollingIoConnector}. You need to provide a default
+     * session configuration and an {@link Executor} for handling I/O events. If
+     * null {@link Executor} is provided, a default one will be created using
+     * {@link Executors#newCachedThreadPool()}.
+     * 
+     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param executor
+     *            the {@link Executor} used for handling asynchronous execution of I/O
+     *            events. Can be <code>null</code>.
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
+     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter} 
+     */
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor) {
         this(sessionConfig, executor, processor, false);
     }
 
+    /**
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
+     * session configuration and an {@link Executor} for handling I/O events. If
+     * null {@link Executor} is provided, a default one will be created using
+     * {@link Executors#newCachedThreadPool()}.
+     * 
+     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * 
+     * @param sessionConfig
+     *            the default configuration for the managed {@link IoSession}
+     * @param executor
+     *            the {@link Executor} used for handling asynchronous execution of I/O
+     *            events. Can be <code>null</code>.
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
+     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
+     * @param createdProcessor tagging the processor as automatically created, so it will be automatically disposed 
+     */
     private AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor, boolean createdProcessor) {
         super(sessionConfig, executor);
 
