@@ -37,7 +37,6 @@ import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
-import org.apache.mina.transport.socket.SocketSession;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 
 /**
@@ -46,7 +45,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class NioSocketSession extends NioSession implements SocketSession {
+class NioSocketSession extends NioSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(
@@ -69,7 +68,16 @@ class NioSocketSession extends NioSession implements SocketSession {
 
     private SelectionKey key;
 
-    NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel ch) {
+    
+    /**
+     * 
+     * Creates a new instance of NioSocketSession.
+     *
+     * @param service the associated IoService 
+     * @param processor the associated IoProcessor
+     * @param ch the used channel
+     */
+    public NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel ch) {
         this.service = service;
         this.processor = processor;
         this.ch = ch;

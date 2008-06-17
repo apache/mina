@@ -19,20 +19,147 @@
  */
 package org.apache.mina.transport.vmpipe;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.mina.common.AbstractIoSession;
+import org.apache.mina.common.DefaultTransportMetadata;
+import org.apache.mina.common.IoFilterChain;
+import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.IoProcessor;
+import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoServiceListenerSupport;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.WriteRequestQueue;
 
 /**
- * TODO Add documentation
- * 
+ * A {@link IoSession} for in-VM transport (VM_PIPE).
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface VmPipeSession extends IoSession {
-    VmPipeSessionConfig getConfig();
+class VmPipeSession extends AbstractIoSession {
 
-    VmPipeAddress getRemoteAddress();
+    static final TransportMetadata METADATA =
+            new DefaultTransportMetadata(
+                    "mina", "vmpipe", false, false,
+                    VmPipeAddress.class,
+                    VmPipeSessionConfig.class,
+                    Object.class);
 
-    VmPipeAddress getLocalAddress();
+    private static final VmPipeSessionConfig CONFIG = new DefaultVmPipeSessionConfig();
 
-    VmPipeAddress getServiceAddress();
+    private final IoService service;
+
+    private final IoServiceListenerSupport serviceListeners;
+
+    private final VmPipeAddress localAddress;
+
+    private final VmPipeAddress remoteAddress;
+
+    private final VmPipeAddress serviceAddress;
+
+    private final IoHandler handler;
+
+    private final VmPipeFilterChain filterChain;
+
+    private final VmPipeSession remoteSession;
+
+    private final Lock lock;
+
+    final BlockingQueue<Object> receivedMessageQueue;
+
+    /*
+     * Constructor for client-side session.
+     */
+    VmPipeSession(IoService service,
+                      IoServiceListenerSupport serviceListeners,
+                      VmPipeAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
+        this.service = service;
+        this.serviceListeners = serviceListeners;
+        lock = new ReentrantLock();
+        this.localAddress = localAddress;
+        remoteAddress = serviceAddress = remoteEntry.getAddress();
+        this.handler = handler;
+        filterChain = new VmPipeFilterChain(this);
+        receivedMessageQueue = new LinkedBlockingQueue<Object>();
+
+        remoteSession = new VmPipeSession(this, remoteEntry);
+    }
+
+    /*
+     * Constructor for server-side session.
+     */
+    private VmPipeSession(VmPipeSession remoteSession, VmPipe entry) {
+        service = entry.getAcceptor();
+        serviceListeners = entry.getListeners();
+        lock = remoteSession.lock;
+        localAddress = serviceAddress = remoteSession.remoteAddress;
+        remoteAddress = remoteSession.localAddress;
+        handler = entry.getHandler();
+        filterChain = new VmPipeFilterChain(this);
+        this.remoteSession = remoteSession;
+        receivedMessageQueue = new LinkedBlockingQueue<Object>();
+    }
+
+    public IoService getService() {
+        return service;
+    }
+
+    @Override
+    protected IoProcessor<VmPipeSession> getProcessor() {
+        return filterChain.getProcessor();
+    }
+
+    IoServiceListenerSupport getServiceListeners() {
+        return serviceListeners;
+    }
+
+    public VmPipeSessionConfig getConfig() {
+        return CONFIG;
+    }
+
+    public IoFilterChain getFilterChain() {
+        return filterChain;
+    }
+
+    public VmPipeSession getRemoteSession() {
+        return remoteSession;
+    }
+
+    public IoHandler getHandler() {
+        return handler;
+    }
+
+    public TransportMetadata getTransportMetadata() {
+        return METADATA;
+    }
+
+    public VmPipeAddress getRemoteAddress() {
+        return remoteAddress;
+    }
+
+    public VmPipeAddress getLocalAddress() {
+        return localAddress;
+    }
+
+    @Override
+    public VmPipeAddress getServiceAddress() {
+        return serviceAddress;
+    }
+
+    void increaseWrittenBytes0(int increment, long currentTime) {
+        super.increaseWrittenBytes(increment, currentTime);
+    }
+
+    WriteRequestQueue getWriteRequestQueue0() {
+        return super.getWriteRequestQueue();
+    }
+
+    Lock getLock() {
+        return lock;
+    }
 }

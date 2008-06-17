@@ -60,7 +60,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
     }
 
     public TransportMetadata getTransportMetadata() {
-        return VmPipeSessionImpl.METADATA;
+        return VmPipeSession.METADATA;
     }
 
     @Override
@@ -88,7 +88,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
             return DefaultConnectFuture.newFailedFuture(e);
         }
 
-        VmPipeSessionImpl localSession = new VmPipeSessionImpl(this,
+        VmPipeSession localSession = new VmPipeSession(this,
                 getListeners(), actualLocalAddress, getHandler(), entry);
 
         finishSessionInitialization(localSession, future, sessionInitializer);
@@ -110,7 +110,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
         }
 
         // initialize acceptor session
-        VmPipeSessionImpl remoteSession = localSession.getRemoteSession();
+        VmPipeSession remoteSession = localSession.getRemoteSession();
         ((VmPipeAcceptor) remoteSession.getService()).doFinishSessionInitialization(remoteSession, null);
         try {
             IoFilterChain filterChain = remoteSession.getFilterChain();

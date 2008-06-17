@@ -27,7 +27,7 @@ import java.util.Set;
  * transport types.
  * <p/>
  * {@link IoSession} provides user-defined attributes.  User-defined attributes
- * are application-specific data which is associated with a session.
+ * are application-specific data which are associated with a session.
  * It often contains objects that represents the state of a higher-level protocol
  * and becomes a way to exchange data between filters and handlers.
  * <p/>
@@ -38,14 +38,17 @@ import java.util.Set;
  * <p/>
  * <h3>Thread Safety</h3>
  * <p/>
+ * TODO : The following paragraph does not make any sense.
  * {@link IoSession} is thread-safe.  But please note that performing
  * more than one {@link #write(Object)} calls at the same time will
  * cause the {@link IoFilter#filterWrite(IoFilter.NextFilter,IoSession,WriteRequest)}
- * is executed simultaneously, and therefore you have to make sure the
+ * to be executed simultaneously, and therefore you have to make sure the
  * {@link IoFilter} implementations you're using are thread-safe, too.
  * </p>
  * <p/>
  * <h3>Equality of Sessions</h3>
+ * TODO : this is BS. The getId() method is totally worng. We can't base
+ * a method which is designed to create a unique ID on the hashCode method.
  * {@link #equals(Object)} and {@link #hashCode()} shall not be overriden
  * to the default behavior that is defined in {@link Object}.
  *
@@ -53,42 +56,47 @@ import java.util.Set;
  * @version $Rev$, $Date$
  */
 public interface IoSession {
-
     /**
-     * Returns a unique identifier of this session.  Every session has its own
+     * @return a unique identifier for this session.  Every session has its own
      * ID which is different from each other.
+     * 
+     * TODO : The way it's implemented does not guarantee that the contract is
+     * respected. It uses the HashCode() method which don't guarantee the key
+     * unicity.
      */
     long getId();
 
     /**
-     * Returns the {@link IoService} which provides I/O service to this session.
+     * @return the {@link IoService} which provides I/O service to this session.
      */
     IoService getService();
 
     /**
-     * Returns the {@link IoHandler} which handles this session.
+     * @return the {@link IoHandler} which handles this session.
      */
     IoHandler getHandler();
 
     /**
-     * Returns the configuration of this session.
+     * @return the configuration of this session.
      */
     IoSessionConfig getConfig();
 
     /**
-     * Returns the filter chain that only affects this session.
+     * @return the filter chain that only affects this session.
      */
     IoFilterChain getFilterChain();
 
     /**
-     * Returns the {@link TransportMetadata} that this session runs on.
+     * @return the {@link TransportMetadata} that this session runs on.
      */
     TransportMetadata getTransportMetadata();
 
     /**
-     * Returns a {@link ReadFuture} which is notified when a new message is
+     * TODO This javadoc is wrong. The return tag should be short.
+     * @return a {@link ReadFuture} which is notified when a new message is
      * received, the connection is closed or an exception is caught.  This
      * operation is especially useful when you implement a client application.
+     * TODO : Describe here how we enable this feature.
      * However, please note that this operation is disabled by default and
      * throw {@link IllegalStateException} because all received events must be
      * queued somewhere to support this operation, possibly leading to memory
@@ -440,7 +448,7 @@ public interface IoSession {
     WriteRequest getCurrentWriteRequest();
 
     /**
-     * Returns the time in millis when this session is created.
+     * @return the session's creation time in nanoseconds
      */
     long getCreationTime();
 

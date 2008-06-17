@@ -44,7 +44,7 @@ import org.apache.mina.common.WriteToClosedSessionException;
 class VmPipeFilterChain extends DefaultIoFilterChain {
 
     private final Queue<IoEvent> eventQueue = new ConcurrentLinkedQueue<IoEvent>();
-    private final IoProcessor<VmPipeSessionImpl> processor = new VmPipeIoProcessor();
+    private final IoProcessor<VmPipeSession> processor = new VmPipeIoProcessor();
 
     private volatile boolean flushEnabled;
     private volatile boolean sessionOpened;
@@ -53,14 +53,14 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
         super(session);
     }
 
-    IoProcessor<VmPipeSessionImpl> getProcessor() {
+    IoProcessor<VmPipeSession> getProcessor() {
         return processor;
     }
 
     public void start() {
         flushEnabled = true;
         flushEvents();
-        flushPendingDataQueues((VmPipeSessionImpl) getSession());
+        flushPendingDataQueues((VmPipeSession) getSession());
     }
 
     private void pushEvent(IoEvent e) {
@@ -82,7 +82,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     }
 
     private void fireEvent(IoEvent e) {
-        VmPipeSessionImpl session = (VmPipeSessionImpl) getSession();
+        VmPipeSession session = (VmPipeSession) getSession();
         IoEventType type = e.getType();
         Object data = e.getParameter();
 
@@ -126,7 +126,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
         }
     }
 
-    private static void flushPendingDataQueues(VmPipeSessionImpl s) {
+    private static void flushPendingDataQueues(VmPipeSession s) {
         s.getProcessor().updateTrafficMask(s);
         s.getRemoteSession().getProcessor().updateTrafficMask(s);
     }
@@ -176,8 +176,8 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
         pushEvent(new IoEvent(IoEventType.MESSAGE_RECEIVED, getSession(), message));
     }
 
-    private class VmPipeIoProcessor implements IoProcessor<VmPipeSessionImpl> {
-        public void flush(VmPipeSessionImpl session) {
+    private class VmPipeIoProcessor implements IoProcessor<VmPipeSession> {
+        public void flush(VmPipeSession session) {
             WriteRequestQueue queue = session.getWriteRequestQueue0();
             if (!session.isClosing()) {
                 session.getLock().lock();
@@ -236,7 +236,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
             return messageCopy;
         }
 
-        public void remove(VmPipeSessionImpl session) {
+        public void remove(VmPipeSession session) {
             try {
                 session.getLock().lock();
                 if (!session.getCloseFuture().isClosed()) {
@@ -248,11 +248,11 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
             }
         }
 
-        public void add(VmPipeSessionImpl session) {
+        public void add(VmPipeSession session) {
             // Unused
         }
 
-        public void updateTrafficMask(VmPipeSessionImpl session) {
+        public void updateTrafficMask(VmPipeSession session) {
             if (session.getTrafficMask().isReadable()) {
                 List<Object> data = new ArrayList<Object>();
                 session.receivedMessageQueue.drainTo(data);

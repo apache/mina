@@ -40,9 +40,10 @@ import org.apache.mina.util.CircularQueue;
  */
 public abstract class AbstractIoSession implements IoSession {
 
-    private static final AttributeKey READY_READ_FUTURES =
+    private static final AttributeKey READY_READ_FUTURES_KEY =
         new AttributeKey(AbstractIoSession.class, "readyReadFutures");
-    private static final AttributeKey WAITING_READ_FUTURES =
+    
+    private static final AttributeKey WAITING_READ_FUTURES_KEY =
         new AttributeKey(AbstractIoSession.class, "waitingReadFutures");
 
     private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER =
@@ -70,6 +71,8 @@ public abstract class AbstractIoSession implements IoSession {
     private IoSessionAttributeMap attributes;
     private WriteRequestQueue writeRequestQueue;
     private WriteRequest currentWriteRequest;
+    
+    // The Session creation's time */
     private final long creationTime;
 
     /**
@@ -112,22 +115,37 @@ public abstract class AbstractIoSession implements IoSession {
 
     private boolean deferDecreaseReadBuffer = true;
 
+    /**
+     * TODO Add method documentation
+     */
     protected AbstractIoSession() {
-        creationTime = lastThroughputCalculationTime =
-            lastReadTime = lastWriteTime =
-            lastIdleTimeForBoth = lastIdleTimeForRead =
-            lastIdleTimeForWrite = System.currentTimeMillis();
+        // Initialize all the Session counters to the current time 
+        long currentTime = System.currentTimeMillis();
+        creationTime = currentTime;
+        lastThroughputCalculationTime = currentTime;
+        lastReadTime = currentTime;
+        lastWriteTime = currentTime;
+        lastIdleTimeForBoth = currentTime;
+        lastIdleTimeForRead = currentTime;
+        lastIdleTimeForWrite = currentTime;
+        
+        // TODO add documentation
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * TODO this method implementation is totally wrong. It has to
+     * be rewritten.
      */
     public final long getId() {
         return hashCode() & 0xFFFFFFFFL;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * TODO Add method documentation
+     */
     protected abstract IoProcessor getProcessor();
 
     /**
@@ -151,10 +169,16 @@ public abstract class AbstractIoSession implements IoSession {
         return closeFuture;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final boolean isScheduledForFlush() {
         return scheduledForFlush.get();
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final boolean setScheduledForFlush(boolean flag) {
         if (flag) {
             return scheduledForFlush.compareAndSet(false, true);
@@ -226,14 +250,23 @@ public abstract class AbstractIoSession implements IoSession {
         return future;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void offerReadFuture(Object message) {
         newReadFuture().setRead(message);
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void offerFailedReadFuture(Throwable exception) {
         newReadFuture().setException(exception);
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void offerClosedReadFuture() {
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
         synchronized (readyReadFutures) {
@@ -241,6 +274,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation
+     */
     private ReadFuture newReadFuture() {
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
         Queue<ReadFuture> waitingReadFutures = getWaitingReadFutures();
@@ -255,15 +291,18 @@ public abstract class AbstractIoSession implements IoSession {
         return future;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     private Queue<ReadFuture> getReadyReadFutures() {
         Queue<ReadFuture> readyReadFutures =
-            (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES);
+            (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES_KEY);
         if (readyReadFutures == null) {
             readyReadFutures = new CircularQueue<ReadFuture>();
 
             Queue<ReadFuture> oldReadyReadFutures =
                 (Queue<ReadFuture>) setAttributeIfAbsent(
-                        READY_READ_FUTURES, readyReadFutures);
+                        READY_READ_FUTURES_KEY, readyReadFutures);
             if (oldReadyReadFutures != null) {
                 readyReadFutures = oldReadyReadFutures;
             }
@@ -271,15 +310,18 @@ public abstract class AbstractIoSession implements IoSession {
         return readyReadFutures;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     private Queue<ReadFuture> getWaitingReadFutures() {
         Queue<ReadFuture> waitingReadyReadFutures =
-            (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES);
+            (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES_KEY);
         if (waitingReadyReadFutures == null) {
             waitingReadyReadFutures = new CircularQueue<ReadFuture>();
 
             Queue<ReadFuture> oldWaitingReadyReadFutures =
                 (Queue<ReadFuture>) setAttributeIfAbsent(
-                        WAITING_READ_FUTURES, waitingReadyReadFutures);
+                        WAITING_READ_FUTURES_KEY, waitingReadyReadFutures);
             if (oldWaitingReadyReadFutures != null) {
                 waitingReadyReadFutures = oldWaitingReadyReadFutures;
             }
@@ -445,14 +487,23 @@ public abstract class AbstractIoSession implements IoSession {
         return attributes.getAttributeKeys(this);
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final IoSessionAttributeMap getAttributeMap() {
         return attributes;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void setAttributeMap(IoSessionAttributeMap attributes) {
         this.attributes = attributes;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
         this.writeRequestQueue =
             new CloseRequestAwareWriteRequestQueue(writeRequestQueue);
@@ -480,6 +531,9 @@ public abstract class AbstractIoSession implements IoSession {
         getFilterChain().fireFilterSetTrafficMask(trafficMask);
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void setTrafficMaskNow(TrafficMask trafficMask) {
         this.trafficMask = trafficMask;
     }
@@ -616,14 +670,23 @@ public abstract class AbstractIoSession implements IoSession {
         return scheduledWriteMessages.get();
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected void setScheduledWriteBytes(int byteCount){
         scheduledWriteBytes.set(byteCount);
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected void setScheduledWriteMessages(int messages) {
         scheduledWriteMessages.set(messages);
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void increaseReadBytes(long increment, long currentTime) {
         if (increment <= 0) {
             return;
@@ -639,6 +702,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void increaseReadMessages(long currentTime) {
         readMessages++;
         lastReadTime = currentTime;
@@ -650,6 +716,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void increaseWrittenBytes(int increment, long currentTime) {
         if (increment <= 0) {
             return;
@@ -667,6 +736,9 @@ public abstract class AbstractIoSession implements IoSession {
         increaseScheduledWriteBytes(-increment);
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void increaseWrittenMessages(
             WriteRequest request, long currentTime) {
         Object message = request.getMessage();
@@ -686,6 +758,9 @@ public abstract class AbstractIoSession implements IoSession {
         decreaseScheduledWriteMessages();
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void increaseScheduledWriteBytes(int increment) {
         scheduledWriteBytes.addAndGet(increment);
         if (getService() instanceof AbstractIoService) {
@@ -693,6 +768,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
         if (getService() instanceof AbstractIoService) {
@@ -700,6 +778,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation
+     */
     private void decreaseScheduledWriteMessages() {
         scheduledWriteMessages.decrementAndGet();
         if (getService() instanceof AbstractIoService) {
@@ -707,6 +788,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void decreaseScheduledBytesAndMessages(WriteRequest request) {
         Object message = request.getMessage();
         if (message instanceof IoBuffer) {
@@ -721,6 +805,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final WriteRequestQueue getWriteRequestQueue() {
         if (writeRequestQueue == null) {
             throw new IllegalStateException();
@@ -746,10 +833,16 @@ public abstract class AbstractIoSession implements IoSession {
         return req.getMessage();
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void setCurrentWriteRequest(WriteRequest currentWriteRequest) {
         this.currentWriteRequest = currentWriteRequest;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void increaseReadBufferSize() {
         int newReadBufferSize = getConfig().getReadBufferSize() << 1;
         if (newReadBufferSize <= getConfig().getMaxReadBufferSize()) {
@@ -761,6 +854,9 @@ public abstract class AbstractIoSession implements IoSession {
         deferDecreaseReadBuffer = true;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void decreaseReadBufferSize() {
         if (deferDecreaseReadBuffer) {
             deferDecreaseReadBuffer = false;
@@ -894,6 +990,9 @@ public abstract class AbstractIoSession implements IoSession {
         throw new IllegalArgumentException("Unknown idle status: " + status);
     }
 
+    /**
+     * TODO Add method documentation
+     */
     protected final void increaseIdleCount(IdleStatus status, long currentTime) {
         if (status == IdleStatus.BOTH_IDLE) {
             idleCountForBoth++;
@@ -973,6 +1072,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * {@inheritDoc}
+     * TODO This is a ridiculous implementation. Need to be replaced.
      */
     @Override
     public final boolean equals(Object o) {
@@ -993,6 +1093,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation
+     */
     private String getIdAsString() {
         String id = Long.toHexString(getId()).toUpperCase();
 
@@ -1006,6 +1109,9 @@ public abstract class AbstractIoSession implements IoSession {
         return id;
     }
 
+    /**
+     * TODO Add method documentation
+     */
     private String getServiceName() {
         TransportMetadata tm = getTransportMetadata();
         if (tm == null) {
@@ -1015,6 +1121,9 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * TODO Add method documentation. Name is ridiculously too long.
+     */
     private class CloseRequestAwareWriteRequestQueue implements WriteRequestQueue {
 
         private final WriteRequestQueue q;

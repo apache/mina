@@ -33,7 +33,6 @@ import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.transport.socket.DatagramSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 
 /**
@@ -42,7 +41,7 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class NioDatagramSession extends NioSession implements DatagramSession {
+class NioDatagramSession extends NioSession {
 
     static final TransportMetadata METADATA =
             new DefaultTransportMetadata(

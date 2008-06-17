@@ -31,12 +31,6 @@ import org.apache.mina.common.AbstractIoSession;
  * @version $Rev$, $Date$
  */
 public abstract class NioSession extends AbstractIoSession {
-    /**
-     * Creates a new instance.  This constructor does nothing particular
-     * but calls the default super constructor.
-     */
-    protected NioSession() {}
-    
     abstract ByteChannel getChannel();
     abstract SelectionKey getSelectionKey();
     abstract void setSelectionKey(SelectionKey key);

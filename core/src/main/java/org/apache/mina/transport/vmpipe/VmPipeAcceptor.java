@@ -59,7 +59,7 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     }
 
     public TransportMetadata getTransportMetadata() {
-        return VmPipeSessionImpl.METADATA;
+        return VmPipeSession.METADATA;
     }
 
     @Override
