@@ -30,18 +30,25 @@ import java.util.Map;
  * @version $Rev$, $Date$
  */
 public final class AttributeKey implements Serializable {
+    /** The serial version UID */
     private static final long serialVersionUID = -583377473376683096L;
     
+    /** The attribute's name */
     private final String name;
 
     /**
-     * Creates a new instance.
+     * Creates a new instance. It's built from :
+     * - the class' name
+     * - the attribute's name
+     * - this attribute hashCode
      */
     public AttributeKey(Class<?> source, String name) {
-        this.name = source.getName() + '.' + String.valueOf(name) + '@' +
-                Integer.toHexString(System.identityHashCode(this));
+        this.name = source.getName() + '.' + name + '@' + Integer.toHexString(this.hashCode());
     }
 
+    /**
+     * The String representation of tis objection is its constructed name.
+     */
     @Override
     public String toString() {
         return name;
