@@ -31,7 +31,7 @@ import org.apache.mina.common.IoAcceptor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface SocketAcceptor extends SocketService, IoAcceptor {
+public interface SocketAcceptor extends IoAcceptor {
     InetSocketAddress getLocalAddress();
     InetSocketAddress getDefaultLocalAddress();
     void setDefaultLocalAddress(InetSocketAddress localAddress);

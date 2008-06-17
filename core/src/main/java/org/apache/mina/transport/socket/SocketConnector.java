@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoService;
 
 /**
  * {@link IoConnector} for socket transport (TCP/IP).
@@ -29,7 +30,7 @@ import org.apache.mina.common.IoConnector;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface SocketConnector extends SocketService, IoConnector {
+public interface SocketConnector extends IoConnector {
     InetSocketAddress getDefaultRemoteAddress();
     void setDefaultRemoteAddress(InetSocketAddress remoteAddress);
 }

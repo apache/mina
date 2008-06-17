@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.mina.common.ExceptionMonitor;
+import org.apache.mina.common.IoService;
 
 /**
  * A default implementation of {@link SocketSessionConfig}.
@@ -209,7 +210,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
         return SET_TRAFFIC_CLASS_AVAILABLE;
     }
 
-    private SocketService parent;
+    private IoService parent;
     private boolean defaultReuseAddress;
     private int defaultReceiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
 
@@ -228,7 +229,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     public DefaultSocketSessionConfig() {
     }
 
-    public void init(SocketService parent) {
+    public void init(IoService parent) {
         this.parent = parent;
         if (parent instanceof SocketAcceptor) {
             defaultReuseAddress = true;

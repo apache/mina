@@ -30,7 +30,7 @@ import org.apache.mina.common.IoSessionRecycler;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface DatagramAcceptor extends DatagramService, IoAcceptor {
+public interface DatagramAcceptor extends IoAcceptor {
     InetSocketAddress getLocalAddress();
     InetSocketAddress getDefaultLocalAddress();
     void setDefaultLocalAddress(InetSocketAddress localAddress);

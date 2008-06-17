@@ -29,7 +29,7 @@ import org.apache.mina.common.IoConnector;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public interface DatagramConnector extends DatagramService, IoConnector {
+public interface DatagramConnector extends IoConnector {
     InetSocketAddress getDefaultRemoteAddress();
     void setDefaultRemoteAddress(InetSocketAddress remoteAddress);
 }
