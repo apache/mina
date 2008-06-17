@@ -265,15 +265,20 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private int add() {
         int addedSessions = 0;
-        for (; ;) {
+        
+        // Loop on the new sessions blocking queue, to count
+        // the number of sessions who has been created
+        for (;;) {
             T session = newSessions.poll();
 
             if (session == null) {
+                // We don't have anymore new sessions
                 break;
             }
 
 
             if (addNow(session)) {
+                // The new session has been added to the 
                 addedSessions ++;
             }
         }
@@ -712,6 +717,11 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         }
     }
 
+    
+    /**
+     *  
+     *
+     */
     private class Worker implements Runnable {
         public void run() {
             int nSessions = 0;
