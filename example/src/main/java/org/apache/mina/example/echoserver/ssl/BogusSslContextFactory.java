@@ -29,7 +29,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
 /**
- * Factory to create a bougus SSLContext.
+ * Factory to create a bogus SSLContext.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -70,7 +70,7 @@ public class BogusSslContextFactory {
     private static final char[] BOGUS_PW = { 'b', 'o', 'g', 'u', 's', 'p', 'w' };
 
     private static SSLContext serverInstance = null;
-
+    
     private static SSLContext clientInstance = null;
 
     /**
@@ -84,25 +84,21 @@ public class BogusSslContextFactory {
             throws GeneralSecurityException {
         SSLContext retInstance = null;
         if (server) {
-            if (serverInstance == null) {
-                synchronized (BogusSslContextFactory.class) {
-                    if (serverInstance == null) {
-                        try {
-                            serverInstance = createBougusServerSslContext();
-                        } catch (Exception ioe) {
-                            throw new GeneralSecurityException(
-                                    "Can't create Server SSLContext:" + ioe);
-                        }
+            synchronized(BogusSslContextFactory.class) {
+                if (serverInstance == null) {
+                    try {
+                        serverInstance = createBougusServerSslContext();
+                    } catch (Exception ioe) {
+                        throw new GeneralSecurityException(
+                                "Can't create Server SSLContext:" + ioe);
                     }
                 }
             }
             retInstance = serverInstance;
         } else {
-            if (clientInstance == null) {
-                synchronized (BogusSslContextFactory.class) {
-                    if (clientInstance == null) {
-                        clientInstance = createBougusClientSslContext();
-                    }
+            synchronized (BogusSslContextFactory.class) {
+                if (clientInstance == null) {
+                    clientInstance = createBougusClientSslContext();
                 }
             }
             retInstance = clientInstance;
