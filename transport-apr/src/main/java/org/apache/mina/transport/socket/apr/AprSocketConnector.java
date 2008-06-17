@@ -247,14 +247,11 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
             if (localAddress != null) {
                 InetSocketAddress la = (InetSocketAddress) localAddress;
                 long sa;
-                if (la != null) {
-                    if (la.getAddress() == null) {
-                        sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, la.getPort(), 0, pool);
-                    } else {
-                        sa = Address.info(la.getAddress().getHostAddress(), Socket.APR_INET, la.getPort(), 0, pool);
-                    }
+
+                if (la.getAddress() == null) {
+                    sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, la.getPort(), 0, pool);
                 } else {
-                    sa = Address.info(Address.APR_ANYADDR, Socket.APR_INET, 0, 0, pool);
+                    sa = Address.info(la.getAddress().getHostAddress(), Socket.APR_INET, la.getPort(), 0, pool);
                 }
 
                 result = Socket.bind(handle, sa);
