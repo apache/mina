@@ -30,7 +30,6 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
-import org.apache.mina.transport.socket.SocketSession;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.tomcat.jni.Socket;
 
@@ -41,7 +40,7 @@ import org.apache.tomcat.jni.Socket;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class AprSocketSession extends AprSession implements SocketSession {
+class AprSocketSession extends AprSession {
 
 	
     static final TransportMetadata METADATA =

@@ -25,10 +25,10 @@ import org.apache.mina.common.DefaultTransportMetadata;
 import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.IoService;
+import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
 import org.apache.mina.common.TransportMetadata;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
-import org.apache.mina.transport.socket.DatagramSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.tomcat.jni.Socket;
 
@@ -39,7 +39,7 @@ import org.apache.tomcat.jni.Socket;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-class AprDatagramSession extends AprSession implements DatagramSession {
+class AprDatagramSession extends AprSession {
 
     static final TransportMetadata METADATA =
         new DefaultTransportMetadata(
