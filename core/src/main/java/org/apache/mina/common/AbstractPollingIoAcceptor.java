@@ -184,23 +184,71 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         }
     }
 
+    /**
+     * Initialize the polling system, will be called at construction time.
+     * @throws Exception any exception thrown by the underlying system calls  
+     */
     protected abstract void init() throws Exception;
 
+    /**
+     * Destroy the polling system, will be called when this {@link IoAcceptor}
+     * implementation will be disposed.  
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract void destroy() throws Exception;
 
+    /**
+     * Check for acceptable connections, interrupt when at least a server is ready for accepting.
+     * All the ready server socket descriptors need to be returned by {@link #selectedHandles()}
+     * @return true if one server socket have got incoming client
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract boolean select() throws Exception;
 
+    /**
+     * Interrupt the {@link #select()} method. Used when the poll set need to be modified.
+     */
     protected abstract void wakeup();
 
+    /**
+     * {@link Iterator} for the set of server sockets found with acceptable incoming connections
+     *  during the last {@link #select()} call.
+     * @return the list of server handles ready
+     */
     protected abstract Iterator<H> selectedHandles();
 
+    /**
+     * Open a server socket for a given local address.
+     * @param localAddress the associated local address
+     * @return the opened server socket
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract H open(SocketAddress localAddress) throws Exception;
 
+    /**
+     * Get the local address associated with a given server socket
+     * @param handle the server socket
+     * @return the local {@link SocketAddress} associated with this handle
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract SocketAddress localAddress(H handle) throws Exception;
 
+    /**
+     * Accept a client connection for a server socket and return a new {@link IoSession}
+     * associated with the given {@link IoProcessor}
+     * @param processor the {@link IoProcessor} to associate with the {@link IoSession}  
+     * @param handle the server handle
+     * @return the created {@link IoSession}
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract T accept(IoProcessor<T> processor, H handle)
             throws Exception;
 
+    /**
+     * Close a server socket.
+     * @param handle the server socket
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract void close(H handle) throws Exception;
 
     @Override
