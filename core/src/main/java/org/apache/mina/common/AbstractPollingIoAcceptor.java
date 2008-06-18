@@ -32,8 +32,20 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+
 /**
- * TODO Add documentation
+ * A base class for implementing transport using a polling strategy. The underlying sockets
+ * will be checked in an active loop and woke up when an socket needed to be processed.
+ * This class handle the logic behind binding, accepting and disposing the server sockets.
+ * The {@link AbstractIoAcceptor} {@link Executor} will be used for running client accepting 
+ * class and an {@link AbstractPollingIoProcessor} will be used for processing client I/O operations
+ * like reading, writing and closing.
+ * 
+ * All the low level methods for binding, accepting, closing need to be provided by the subclassing 
+ * implementation.
+ * 
+ * @see NioSocketAcceptor for a example of implementation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -251,6 +263,9 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      */
     protected abstract void close(H handle) throws Exception;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected IoFuture dispose0() throws Exception {
         unbind();
@@ -261,6 +276,9 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         return disposalFuture;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final Set<SocketAddress> bind0(
             List<? extends SocketAddress> localAddresses) throws Exception {
@@ -315,6 +333,9 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final void unbind0(List<? extends SocketAddress> localAddresses)
             throws Exception {
@@ -511,6 +532,9 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         return cancelledHandles;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final IoSession newSession(SocketAddress remoteAddress,
             SocketAddress localAddress) {
         throw new UnsupportedOperationException();
