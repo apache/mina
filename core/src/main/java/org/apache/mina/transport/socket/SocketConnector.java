@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.IoSessionConfig;
 
 
 /**
@@ -31,6 +32,21 @@ import org.apache.mina.common.IoConnector;
  * @version $Rev$, $Date$
  */
 public interface SocketConnector extends IoConnector {
+    
+    /**
+     * {@inheritDoc}
+     */
     InetSocketAddress getDefaultRemoteAddress();
+    
+    /**
+     * TODO : add documentation
+     * @param remoteAddress
+     */
     void setDefaultRemoteAddress(InetSocketAddress remoteAddress);
+    
+    /**
+     * Returns the default configuration of the new SocketSessions created by 
+     * this connect service.
+     */
+    SocketSessionConfig getSessionConfig();
 }

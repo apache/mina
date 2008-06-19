@@ -56,4 +56,10 @@ public interface SocketAcceptor extends IoAcceptor {
      * class is not bound
      */
     public void setBacklog(int backlog);
+    
+    /**
+     * Returns the default configuration of the new SocketSessions created by 
+     * this acceptor service.
+     */
+    SocketSessionConfig getSessionConfig();
 }
