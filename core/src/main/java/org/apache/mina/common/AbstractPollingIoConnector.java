@@ -163,20 +163,70 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         }
     }
 
+    /**
+     * Initialize the polling system, will be called at construction time.
+     * @throws Exception any exception thrown by the underlying system calls  
+     */
     protected abstract void init() throws Exception;
+
+    /**
+     * Destroy the polling system, will be called when this {@link IoConnector}
+     * implementation will be disposed.  
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract void destroy() throws Exception;
+    
     protected abstract H newHandle(SocketAddress localAddress) throws Exception;
     protected abstract boolean connect(H handle, SocketAddress remoteAddress) throws Exception;
+    
+    /**
+     * Finish the connection process of a client socket after it was marked as ready to process
+     * by the {@link #select(int)} call. The socket will be connected or reported as connection
+     * failed.
+     * @param handle the client socket handle to finsh to connect
+     * @return true if the socket is connected
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract boolean finishConnect(H handle) throws Exception;
     protected abstract T newSession(IoProcessor<T> processor, H handle) throws Exception;
+
+    /**
+     * Close a client socket.
+     * @param handle the client socket
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract void close(H handle) throws Exception;
+    
+    /**
+     * Interrupt the {@link #select()} method. Used when the poll set need to be modified.
+     */
     protected abstract void wakeup();
+    
+    /**
+     * Check for connected sockets, interrupt when at least a connection is processed (connected or
+     * failed to connect). All the client socket descriptors processed need to be returned by 
+     * {@link #selectedHandles()}
+     * @return true if one server socket have got incoming client
+     * @throws Exception any exception thrown by the underlying systems calls
+     */
     protected abstract boolean select(int timeout) throws Exception;
+    
+    /**
+     * {@link Iterator} for the set of client sockets found connected or 
+     * failed to connect during the last {@link #select()} call.
+     * @return the list of client socket handles to process
+     */
     protected abstract Iterator<H> selectedHandles();
+    
     protected abstract Iterator<H> allHandles();
+    
     protected abstract void register(H handle, ConnectionRequest request) throws Exception;
+    
     protected abstract ConnectionRequest connectionRequest(H handle);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final IoFuture dispose0() throws Exception {
         if (!disposalFuture.isDone()) {
@@ -186,6 +236,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         return disposalFuture;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("unchecked")
     protected final ConnectFuture connect0(
