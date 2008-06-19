@@ -52,7 +52,13 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
             try {
                 c.socket().setReceiveBufferSize(receiveBufferSize);
                 // Re-retrieve the effective receive buffer size.
-                receiveBufferSize = c.socket().getReceiveBufferSize();
+                
+                // TODO clean this dead code. 
+                // Do we really need to do this ???
+                // Is there any secret reason why we should read the 
+                // receiveBufferSize just after having set it ? I don't think so...
+                // Commented :
+                //c.socket().getReceiveBufferSize();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
