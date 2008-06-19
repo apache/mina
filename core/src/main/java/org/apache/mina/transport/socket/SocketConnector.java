@@ -22,7 +22,6 @@ package org.apache.mina.transport.socket;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoSessionConfig;
 
 
 /**
