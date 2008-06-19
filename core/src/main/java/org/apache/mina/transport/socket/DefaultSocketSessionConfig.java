@@ -137,7 +137,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
             initializeDefaultSocketParameters(socket);
             return true;
-        } catch (Exception e) {
+        } catch (IOException ioe) {
             return false;
         } finally {
             if (socket != null) {
@@ -155,7 +155,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
-        }
+       }
     }
 
     private static void initializeDefaultSocketParameters(Socket socket)
