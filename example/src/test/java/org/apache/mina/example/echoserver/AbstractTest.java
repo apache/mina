@@ -33,6 +33,7 @@ import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.util.AvailablePortFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,7 @@ public abstract class AbstractTest extends TestCase {
                 .setReuseAddress(true);
         ((NioSocketAcceptor) socketAcceptor).setReuseAddress(true);
 
-        // Find an availble test port and bind to it.
+        // Find an available test port and bind to it.
         boolean socketBound = false;
         boolean datagramBound = false;
 
@@ -104,65 +105,65 @@ public abstract class AbstractTest extends TestCase {
 
         SocketAddress address = null;
 
-        for (port = 1; port <= 65535; port++) {
-            socketBound = false;
-            datagramBound = false;
+        // Find the first available port above 1024
+        port = AvailablePortFinder.getNextAvailable(1024);
 
-            address = new InetSocketAddress(port);
+        socketBound = false;
+        datagramBound = false;
 
-            try {
-                socketAcceptor.setHandler(new EchoProtocolHandler() {
-                    @Override
-                    public void sessionCreated(IoSession session) {
-                        if (useSSL) {
-                            session.getFilterChain().addFirst("SSL", sslFilter);
-                        }
+        address = new InetSocketAddress(port);
+        
+        try {
+            socketAcceptor.setHandler(new EchoProtocolHandler() {
+                @Override
+                public void sessionCreated(IoSession session) {
+                    if (useSSL) {
+                        session.getFilterChain().addFirst("SSL", sslFilter);
+                    }
+                }
+
+                // This is for TLS re-entrance test
+                @Override
+                public void messageReceived(IoSession session,
+                        Object message) throws Exception {
+                    if (!(message instanceof IoBuffer)) {
+                        return;
                     }
 
-                    // This is for TLS reentrance test
-                    @Override
-                    public void messageReceived(IoSession session,
-                            Object message) throws Exception {
-                        if (!(message instanceof IoBuffer)) {
-                            return;
-                        }
+                    IoBuffer buf = (IoBuffer) message;
+                    if (session.getFilterChain().contains("SSL")
+                            && buf.remaining() == 1
+                            && buf.get() == (byte) '.') {
+                        logger.info("TLS Reentrance");
+                        ((SslFilter) session.getFilterChain().get("SSL"))
+                                .startSsl(session);
 
-                        IoBuffer buf = (IoBuffer) message;
-                        if (session.getFilterChain().contains("SSL")
-                                && buf.remaining() == 1
-                                && buf.get() == (byte) '.') {
-                            logger.info("TLS Reentrance");
-                            ((SslFilter) session.getFilterChain().get("SSL"))
-                                    .startSsl(session);
-
-                            // Send a response
-                            buf = IoBuffer.allocate(1);
-                            buf.put((byte) '.');
-                            buf.flip();
-                            session
-                                    .setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE);
-                            session.write(buf);
-                        } else {
-                            super.messageReceived(session, message);
-                        }
+                        // Send a response
+                        buf = IoBuffer.allocate(1);
+                        buf.put((byte) '.');
+                        buf.flip();
+                        session
+                                .setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE);
+                        session.write(buf);
+                    } else {
+                        super.messageReceived(session, message);
                     }
-                });
+                }
+            });
                 socketAcceptor.bind(address);
                 socketBound = true;
 
                 datagramAcceptor.setHandler(new EchoProtocolHandler());
                 datagramAcceptor.bind(address);
                 datagramBound = true;
-
-                break;
-            } catch (IOException e) {
-            } finally {
-                if (socketBound && !datagramBound) {
-                    socketAcceptor.unbind();
-                }
-                if (datagramBound && !socketBound) {
-                    datagramAcceptor.unbind();
-                }
+        } catch (IOException e) {
+            // Do nothing
+        } finally {
+            if (socketBound && !datagramBound) {
+                socketAcceptor.unbind();
+            }
+            if (datagramBound && !socketBound) {
+                datagramAcceptor.unbind();
             }
         }
 
