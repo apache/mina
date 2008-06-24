@@ -21,11 +21,11 @@ package org.apache.mina.filter.codec;
 
 import java.util.Queue;
 
-import org.apache.mina.common.DefaultWriteFuture;
-import org.apache.mina.common.DummySession;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.future.DefaultWriteFuture;
+import org.apache.mina.common.future.WriteFuture;
+import org.apache.mina.common.session.DummySession;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * A virtual {@link IoSession} that provides {@link ProtocolEncoderOutput}

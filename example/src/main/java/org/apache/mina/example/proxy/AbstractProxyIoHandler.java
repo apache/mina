@@ -21,15 +21,15 @@ package org.apache.mina.example.proxy;
 
 import java.nio.charset.Charset;
 
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TrafficMask;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.session.TrafficMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class of {@link org.apache.mina.common.IoHandler} classes which handle
+ * Base class of {@link org.apache.mina.common.service.IoHandler} classes which handle
  * proxied connections.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)

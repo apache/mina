@@ -22,9 +22,9 @@ package org.apache.mina.filter.codec.textline;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.session.AttributeKey;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;

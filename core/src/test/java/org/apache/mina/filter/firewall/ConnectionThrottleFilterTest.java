@@ -24,7 +24,7 @@ import java.net.InetSocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.DummySession;
+import org.apache.mina.common.session.DummySession;
 
 /**
  * TODO Add documentation

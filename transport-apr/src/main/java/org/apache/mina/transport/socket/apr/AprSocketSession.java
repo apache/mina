@@ -21,14 +21,14 @@ package org.apache.mina.transport.socket.apr;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.DefaultTransportMetadata;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.RuntimeIoException;
-import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.service.DefaultTransportMetadata;
+import org.apache.mina.common.service.IoProcessor;
+import org.apache.mina.common.service.IoService;
+import org.apache.mina.common.service.TransportMetadata;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.session.IoSessionConfig;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.tomcat.jni.Socket;

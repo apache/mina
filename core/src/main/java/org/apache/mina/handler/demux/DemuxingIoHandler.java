@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.UnknownMessageTypeException;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.session.UnknownMessageTypeException;
 import org.apache.mina.util.IdentityHashSet;
 
 /**

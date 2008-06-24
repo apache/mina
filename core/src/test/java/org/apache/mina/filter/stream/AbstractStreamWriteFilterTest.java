@@ -30,16 +30,16 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.DefaultWriteRequest;
-import org.apache.mina.common.DummySession;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
-import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.IoFilter.NextFilter;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.filterchain.IoFilter.NextFilter;
+import org.apache.mina.common.future.IoFutureListener;
+import org.apache.mina.common.future.WriteFuture;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.DummySession;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.DefaultWriteRequest;
+import org.apache.mina.common.write.WriteRequest;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;

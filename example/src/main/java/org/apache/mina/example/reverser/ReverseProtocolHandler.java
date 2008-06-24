@@ -19,9 +19,9 @@
  */
 package org.apache.mina.example.reverser;
 
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * {@link IoHandler} implementation of reverser server protocol.

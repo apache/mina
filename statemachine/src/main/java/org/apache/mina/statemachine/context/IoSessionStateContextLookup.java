@@ -19,7 +19,7 @@
  */
 package org.apache.mina.statemachine.context;
 
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * MINA specific {@link StateContextLookup} which uses an {@link IoSession}

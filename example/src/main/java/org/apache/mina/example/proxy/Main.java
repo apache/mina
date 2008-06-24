@@ -21,7 +21,7 @@ package org.apache.mina.example.proxy;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.service.IoConnector;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 

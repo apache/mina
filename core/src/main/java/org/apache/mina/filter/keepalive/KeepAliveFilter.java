@@ -19,17 +19,17 @@
  */
 package org.apache.mina.filter.keepalive;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.DefaultWriteRequest;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoEventType;
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.common.filterchain.IoFilterAdapter;
+import org.apache.mina.common.filterchain.IoFilterChain;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.session.AttributeKey;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoEventType;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.session.IoSessionConfig;
+import org.apache.mina.common.write.DefaultWriteRequest;
+import org.apache.mina.common.write.WriteRequest;
 
 /**
  * An {@link IoFilter} that sends a keep-alive request on

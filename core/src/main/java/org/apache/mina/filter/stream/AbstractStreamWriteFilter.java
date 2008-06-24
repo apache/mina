@@ -22,13 +22,13 @@ package org.apache.mina.filter.stream;
 import java.io.IOException;
 import java.util.Queue;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.DefaultWriteRequest;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.filterchain.IoFilterAdapter;
+import org.apache.mina.common.filterchain.IoFilterChain;
+import org.apache.mina.common.session.AttributeKey;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.DefaultWriteRequest;
+import org.apache.mina.common.write.WriteRequest;
 import org.apache.mina.util.CircularQueue;
 
 /**

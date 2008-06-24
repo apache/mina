@@ -21,9 +21,9 @@ package org.apache.mina.example.sumup;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;

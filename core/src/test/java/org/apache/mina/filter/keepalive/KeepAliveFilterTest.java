@@ -26,11 +26,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 

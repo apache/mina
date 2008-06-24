@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IoService;
+import org.apache.mina.common.service.IoService;
 
 /**
  * A default implementation of {@link SocketSessionConfig}.

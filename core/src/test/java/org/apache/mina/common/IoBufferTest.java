@@ -35,6 +35,7 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.apache.mina.common.buffer.IoBuffer;
 import org.apache.mina.util.Bar;
 
 /**

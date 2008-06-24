@@ -25,8 +25,8 @@ import net.gleamynode.netty2.Message;
 import net.gleamynode.netty2.MessageParseException;
 import net.gleamynode.netty2.MessageRecognizer;
 
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
 import org.apache.mina.filter.codec.ProtocolDecoderException;

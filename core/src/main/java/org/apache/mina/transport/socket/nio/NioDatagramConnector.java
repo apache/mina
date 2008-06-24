@@ -25,10 +25,10 @@ import java.nio.channels.DatagramChannel;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.apache.mina.common.AbstractPollingIoConnector;
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.polling.AbstractPollingIoConnector;
+import org.apache.mina.common.service.IoConnector;
+import org.apache.mina.common.service.IoProcessor;
+import org.apache.mina.common.service.TransportMetadata;
 import org.apache.mina.transport.socket.DatagramConnector;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;

@@ -24,15 +24,15 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
-import org.apache.mina.common.DefaultIoFilterChain;
-import org.apache.mina.common.DefaultTransportMetadata;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.filterchain.DefaultIoFilterChain;
+import org.apache.mina.common.filterchain.IoFilterChain;
+import org.apache.mina.common.service.DefaultTransportMetadata;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.service.IoProcessor;
+import org.apache.mina.common.service.IoService;
+import org.apache.mina.common.service.TransportMetadata;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 
 /**
@@ -88,7 +88,7 @@ class NioDatagramSession extends NioSession {
     }
 
     @Override
-    protected IoProcessor<NioSession> getProcessor() {
+    public IoProcessor<NioSession> getProcessor() {
         return processor;
     }
 

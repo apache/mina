@@ -22,9 +22,9 @@ package org.apache.mina.handler.stream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * An {@link InputStream} that buffers data read from

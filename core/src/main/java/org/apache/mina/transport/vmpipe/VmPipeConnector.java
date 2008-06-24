@@ -25,16 +25,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.DefaultConnectFuture;
 import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSessionInitializer;
-import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.filterchain.IoFilterChain;
+import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.common.future.DefaultConnectFuture;
+import org.apache.mina.common.future.IoFuture;
+import org.apache.mina.common.future.IoFutureListener;
+import org.apache.mina.common.service.AbstractIoConnector;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.service.TransportMetadata;
+import org.apache.mina.common.session.IoSessionInitializer;
 
 /**
  * Connects to {@link IoHandler}s which is bound on the specified

@@ -21,12 +21,12 @@ package org.apache.mina.example.proxy;
 
 import java.net.SocketAddress;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIoException;
-import org.apache.mina.common.TrafficMask;
+import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.common.future.IoFutureListener;
+import org.apache.mina.common.service.IoConnector;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.session.TrafficMask;
 
 /**
  * Handles the client to proxy part of the proxied connection.

@@ -26,10 +26,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.AbstractPollingIoAcceptor;
-import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.RuntimeIoException;
-import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.polling.AbstractPollingIoAcceptor;
+import org.apache.mina.common.service.IoProcessor;
+import org.apache.mina.common.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;

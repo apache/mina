@@ -19,9 +19,9 @@
  */
 package org.apache.mina.filter.codec.prefixedstring;
 
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.BufferDataException;
+import org.apache.mina.common.buffer.BufferDataException;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;

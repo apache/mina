@@ -30,10 +30,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.filterchain.IoFilterChain;
+import org.apache.mina.common.session.AttributeKey;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.WriteRequest;
 import org.apache.mina.filter.util.WriteRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

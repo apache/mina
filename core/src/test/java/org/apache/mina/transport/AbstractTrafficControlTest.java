@@ -23,13 +23,13 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.common.service.IoAcceptor;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.service.TransportMetadata;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * Abstract base class for testing suspending and resuming reads and

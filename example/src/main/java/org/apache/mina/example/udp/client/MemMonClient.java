@@ -21,13 +21,13 @@ package org.apache.mina.example.udp.client;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.common.future.IoFutureListener;
+import org.apache.mina.common.service.IoConnector;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.example.udp.MemoryMonitor;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.slf4j.Logger;

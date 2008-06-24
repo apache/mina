@@ -22,7 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SelectionKey;
 
-import org.apache.mina.common.AbstractIoSession;
+import org.apache.mina.common.session.AbstractIoSession;
 
 /**
  * An {@link IoSession} which is managed by the NIO transport.

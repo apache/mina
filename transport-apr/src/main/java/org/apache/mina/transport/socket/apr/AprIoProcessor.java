@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.AbstractPollingIoProcessor;
-import org.apache.mina.common.FileRegion;
-import org.apache.mina.common.IoBuffer;
 import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.file.FileRegion;
+import org.apache.mina.common.polling.AbstractPollingIoProcessor;
 import org.apache.mina.util.CircularQueue;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;

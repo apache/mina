@@ -21,8 +21,8 @@ package org.apache.mina.example.imagine.step1.codec;
 
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.example.imagine.step1.ImageResponse;
 
 import javax.imageio.ImageIO;

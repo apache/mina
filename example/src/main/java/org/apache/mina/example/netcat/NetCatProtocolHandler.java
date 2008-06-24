@@ -19,11 +19,11 @@
  */
 package org.apache.mina.example.netcat;
 
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * {@link IoHandler} implementation for NetCat client.  This class extended

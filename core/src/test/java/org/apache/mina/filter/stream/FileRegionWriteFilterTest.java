@@ -25,8 +25,8 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import org.apache.mina.common.DefaultFileRegion;
-import org.apache.mina.common.FileRegion;
+import org.apache.mina.common.file.DefaultFileRegion;
+import org.apache.mina.common.file.FileRegion;
 
 /**
  * Tests {@link StreamWriteFilter}.

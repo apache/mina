@@ -21,7 +21,7 @@ package org.apache.mina.filter.codec;
 
 import java.util.Queue;
 
-import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.buffer.IoBuffer;
 import org.apache.mina.util.CircularQueue;
 
 /**

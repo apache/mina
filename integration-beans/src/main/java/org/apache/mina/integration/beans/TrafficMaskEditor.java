@@ -21,7 +21,7 @@ package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditor;
 
-import org.apache.mina.common.TrafficMask;
+import org.apache.mina.common.session.TrafficMask;
 
 /**
  * A {@link PropertyEditor} which converts a {@link String} into a

@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.executor;
 
-import org.apache.mina.common.IoEvent;
+import org.apache.mina.common.session.IoEvent;
 
 /**
  * Estimates the amount of memory that the specified {@link IoEvent} occupies

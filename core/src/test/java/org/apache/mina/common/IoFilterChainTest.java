@@ -22,7 +22,18 @@ package org.apache.mina.common;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoFilterChain.Entry;
+import org.apache.mina.common.filterchain.DefaultIoFilterChain;
+import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.common.filterchain.IoFilterAdapter;
+import org.apache.mina.common.filterchain.IoFilterChain;
+import org.apache.mina.common.filterchain.IoFilterChain.Entry;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.DummySession;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.DefaultWriteRequest;
+import org.apache.mina.common.write.WriteRequest;
 
 /**
  * Tests {@link DefaultIoFilterChain}.

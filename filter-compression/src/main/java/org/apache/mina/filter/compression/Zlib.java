@@ -21,7 +21,7 @@ package org.apache.mina.filter.compression;
 
 import java.io.IOException;
 
-import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.buffer.IoBuffer;
 
 import com.jcraft.jzlib.JZlib;
 import com.jcraft.jzlib.ZStream;

@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.buffer.IoBuffer;
 
 /**
  * An exception that is thrown when {@link ProtocolDecoder}

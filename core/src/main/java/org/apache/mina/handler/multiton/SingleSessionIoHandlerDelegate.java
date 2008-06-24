@@ -19,10 +19,10 @@
  */
 package org.apache.mina.handler.multiton;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.session.AttributeKey;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * An {@link IoHandler} implementation which delegates all requests to
@@ -73,7 +73,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * this class.  The created handler is stored as a session
      * attribute named {@link #HANDLER}.
      *
-     * @see org.apache.mina.common.IoHandler#sessionCreated(org.apache.mina.common.IoSession)
+     * @see org.apache.mina.common.service.IoHandler#sessionCreated(org.apache.mina.common.session.IoSession)
      */
     public void sessionCreated(IoSession session) throws Exception {
         SingleSessionIoHandler handler = factory.getHandler(session);

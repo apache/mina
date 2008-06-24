@@ -19,8 +19,8 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.service.IoAcceptor;
+import org.apache.mina.common.service.IoConnector;
 import org.apache.mina.transport.AbstractConnectorTest;
 
 /**

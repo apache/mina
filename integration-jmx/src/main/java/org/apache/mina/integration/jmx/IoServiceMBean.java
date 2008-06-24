@@ -28,8 +28,8 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
 
 import ognl.Ognl;
 
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.service.IoService;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.integration.ognl.IoSessionFinder;
 
 /**

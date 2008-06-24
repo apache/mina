@@ -21,9 +21,9 @@ package org.apache.mina.transport.vmpipe;
 
 import java.net.SocketAddress;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoHandler;
+import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.common.service.IoConnector;
+import org.apache.mina.common.service.IoHandler;
 import org.apache.mina.transport.AbstractTrafficControlTest;
 
 /**

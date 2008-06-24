@@ -22,9 +22,9 @@ package org.apache.mina.handler.stream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.future.WriteFuture;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * An {@link OutputStream} that forwards all write operations to

@@ -25,12 +25,12 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.DefaultWriteRequest;
-import org.apache.mina.common.DummySession;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.IoFilter.NextFilter;
+import org.apache.mina.common.filterchain.IoFilterChain;
+import org.apache.mina.common.filterchain.IoFilter.NextFilter;
+import org.apache.mina.common.session.DummySession;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.DefaultWriteRequest;
+import org.apache.mina.common.write.WriteRequest;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 import org.junit.After;

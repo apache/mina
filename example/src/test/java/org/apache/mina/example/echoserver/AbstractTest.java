@@ -25,9 +25,9 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.service.IoAcceptor;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -150,12 +150,13 @@ public abstract class AbstractTest extends TestCase {
                     }
                 }
             });
-                socketAcceptor.bind(address);
-                socketBound = true;
 
-                datagramAcceptor.setHandler(new EchoProtocolHandler());
-                datagramAcceptor.bind(address);
-                datagramBound = true;
+            socketAcceptor.bind(address);
+            socketBound = true;
+
+            datagramAcceptor.setHandler(new EchoProtocolHandler());
+            datagramAcceptor.bind(address);
+            datagramBound = true;
         } catch (IOException e) {
             // Do nothing
         } finally {

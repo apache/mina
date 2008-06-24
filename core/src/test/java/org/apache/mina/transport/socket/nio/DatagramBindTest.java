@@ -22,7 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.apache.mina.common.IoConnector;
+import org.apache.mina.common.service.IoConnector;
 import org.apache.mina.transport.AbstractBindTest;
 
 /**

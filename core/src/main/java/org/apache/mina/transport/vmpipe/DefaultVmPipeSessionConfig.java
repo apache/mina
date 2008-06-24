@@ -19,8 +19,8 @@
  */
 package org.apache.mina.transport.vmpipe;
 
-import org.apache.mina.common.AbstractIoSessionConfig;
-import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.session.AbstractIoSessionConfig;
+import org.apache.mina.common.session.IoSessionConfig;
 
 /**
  * A default implementation of {@link VmPipeSessionConfig}.

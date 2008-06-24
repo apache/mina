@@ -22,7 +22,10 @@ package org.apache.mina.common;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.IoFilterChain.Entry;
+import org.apache.mina.common.filterchain.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.common.filterchain.IoFilterAdapter;
+import org.apache.mina.common.filterchain.IoFilterChain.Entry;
 
 /**
  * Tests {@link DefaultIoFilterChainBuilder}.

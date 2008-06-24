@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.common.filterchain.IoFilterAdapter;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * An {@link IoFilter} that sets initial attributes when a new

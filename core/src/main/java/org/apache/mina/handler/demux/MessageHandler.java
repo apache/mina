@@ -19,7 +19,7 @@
  */
 package org.apache.mina.handler.demux;
 
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * A handler interface that {@link DemuxingIoHandler} forwards

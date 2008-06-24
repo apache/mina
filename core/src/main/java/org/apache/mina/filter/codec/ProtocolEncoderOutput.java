@@ -19,9 +19,9 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.common.FileRegion;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.file.FileRegion;
+import org.apache.mina.common.future.WriteFuture;
 
 /**
  * Callback for {@link ProtocolEncoder} to generate encoded messages such as

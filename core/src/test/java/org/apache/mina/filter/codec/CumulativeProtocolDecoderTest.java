@@ -26,10 +26,10 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.DefaultTransportMetadata;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.service.DefaultTransportMetadata;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.session.IoSessionConfig;
 
 /**
  * Tests {@link CumulativeProtocolDecoder}.

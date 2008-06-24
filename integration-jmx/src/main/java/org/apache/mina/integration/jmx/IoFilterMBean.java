@@ -16,8 +16,8 @@
  */
 package org.apache.mina.integration.jmx;
 
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * A JMX MBean wrapper for an {@link IoSession}.

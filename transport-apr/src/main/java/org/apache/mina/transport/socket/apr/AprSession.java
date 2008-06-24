@@ -21,13 +21,13 @@ package org.apache.mina.transport.socket.apr;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.DefaultIoFilterChain;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.filterchain.DefaultIoFilterChain;
+import org.apache.mina.common.filterchain.IoFilterChain;
+import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.common.service.IoProcessor;
+import org.apache.mina.common.service.IoService;
+import org.apache.mina.common.session.AbstractIoSession;
+import org.apache.mina.common.session.IoSession;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Socket;
@@ -131,7 +131,7 @@ public abstract class AprSession extends AbstractIoSession {
      * {@inheritDoc}
      */
     @Override
-    protected IoProcessor<AprSession> getProcessor() {
+    public IoProcessor<AprSession> getProcessor() {
         return processor;
     }
 

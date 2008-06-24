@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.OutputStream;
 
-import org.apache.mina.common.IoBuffer;
+import org.apache.mina.common.buffer.IoBuffer;
 
 /**
  * An {@link ObjectOutput} and {@link OutputStream} that can write the objects as

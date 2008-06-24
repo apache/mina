@@ -27,9 +27,9 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.IoFilterEvent;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.filterchain.IoFilterEvent;
+import org.apache.mina.common.session.AttributeKey;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.filter.util.CommonEventFilter;
 import org.slf4j.MDC;
 
@@ -95,7 +95,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
      * You could still add custom keys via {@link #setProperty(IoSession, String, String)}
      * @param keys set of keys that should be added to the MDC
      *
-     * @see #setProperty(org.apache.mina.common.IoSession, String, String)
+     * @see #setProperty(org.apache.mina.common.session.IoSession, String, String)
      */
     public MdcInjectionFilter(EnumSet<MdcKey> keys) {
         this.mdcKeys = keys.clone();
@@ -106,7 +106,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
      * You could still add custom keys via {@link #setProperty(IoSession, String, String)}
      * @param keys list of keys that should be added to the MDC
      *
-     * @see #setProperty(org.apache.mina.common.IoSession, String, String)
+     * @see #setProperty(org.apache.mina.common.session.IoSession, String, String)
      */
     public MdcInjectionFilter(MdcKey... keys) {
         Set<MdcKey> keySet = new HashSet<MdcKey>(Arrays.asList(keys));

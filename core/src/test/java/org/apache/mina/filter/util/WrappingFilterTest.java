@@ -24,14 +24,14 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.DefaultWriteRequest;
-import org.apache.mina.common.DummySession;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoEventType;
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterEvent;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.common.filterchain.IoFilterEvent;
+import org.apache.mina.common.session.DummySession;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoEventType;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.DefaultWriteRequest;
+import org.apache.mina.common.write.WriteRequest;
 import org.easymock.EasyMock;
 
 /**

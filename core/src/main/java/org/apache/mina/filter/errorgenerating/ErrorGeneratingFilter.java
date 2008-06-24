@@ -22,12 +22,12 @@ package org.apache.mina.filter.errorgenerating;
 
 import java.util.Random;
 
-import org.apache.mina.common.DefaultWriteRequest;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.common.filterchain.IoFilterAdapter;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.DefaultWriteRequest;
+import org.apache.mina.common.write.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

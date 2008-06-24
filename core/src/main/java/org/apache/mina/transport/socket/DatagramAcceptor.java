@@ -21,8 +21,8 @@ package org.apache.mina.transport.socket;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.IoAcceptor;
-import org.apache.mina.common.IoSessionRecycler;
+import org.apache.mina.common.service.IoAcceptor;
+import org.apache.mina.common.session.IoSessionRecycler;
 
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).

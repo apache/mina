@@ -19,12 +19,12 @@
  */
 package org.apache.mina.filter.util;
 
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoEventType;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoFilterEvent;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteRequest;
+import org.apache.mina.common.filterchain.IoFilterAdapter;
+import org.apache.mina.common.filterchain.IoFilterEvent;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoEventType;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.WriteRequest;
 
 /**
  * Extend this class when you want to create a filter that

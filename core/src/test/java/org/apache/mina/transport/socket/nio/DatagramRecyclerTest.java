@@ -24,13 +24,13 @@ import java.net.InetSocketAddress;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.ExpiringSessionRecycler;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.common.future.WriteFuture;
+import org.apache.mina.common.service.IoHandlerAdapter;
+import org.apache.mina.common.session.ExpiringSessionRecycler;
+import org.apache.mina.common.session.IdleStatus;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**

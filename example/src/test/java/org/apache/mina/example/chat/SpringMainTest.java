@@ -21,7 +21,7 @@ package org.apache.mina.example.chat;
 
 import junit.framework.TestCase;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.apache.mina.common.IoService;
+import org.apache.mina.common.service.IoService;
 
 /**
  * TODO Add documentation

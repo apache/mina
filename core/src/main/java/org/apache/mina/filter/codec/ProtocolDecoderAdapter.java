@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.session.IoSession;
 
 /**
  * An abstract {@link ProtocolDecoder} implementation for those who don't need

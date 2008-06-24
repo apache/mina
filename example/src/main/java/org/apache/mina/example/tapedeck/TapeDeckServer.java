@@ -21,8 +21,8 @@ package org.apache.mina.example.tapedeck;
 
 import static org.apache.mina.statemachine.event.IoHandlerEvents.*;
 
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.future.IoFutureListener;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.statemachine.StateControl;
 import org.apache.mina.statemachine.annotation.IoHandlerTransition;
 import org.apache.mina.statemachine.annotation.IoHandlerTransitions;

@@ -21,7 +21,7 @@ package org.apache.mina.transport.socket;
 
 import java.net.DatagramSocket;
 
-import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.common.session.IoSessionConfig;
 
 /**
  * An {@link IoSessionConfig} for datagram transport type.

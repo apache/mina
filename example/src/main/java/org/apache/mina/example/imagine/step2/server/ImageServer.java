@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-import org.apache.mina.common.DefaultIoFilterChainBuilder;
+import org.apache.mina.common.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.example.imagine.step1.codec.ImageCodecFactory;
 import org.apache.mina.example.imagine.step1.server.ImageServerIoHandler;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;

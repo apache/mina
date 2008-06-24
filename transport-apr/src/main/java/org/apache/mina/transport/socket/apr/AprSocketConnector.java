@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.AbstractPollingIoConnector;
-import org.apache.mina.common.IoProcessor;
 import org.apache.mina.common.RuntimeIoException;
-import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.common.polling.AbstractPollingIoConnector;
+import org.apache.mina.common.service.IoProcessor;
+import org.apache.mina.common.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.SocketSessionConfig;

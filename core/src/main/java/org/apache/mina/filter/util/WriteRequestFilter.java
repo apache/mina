@@ -19,12 +19,12 @@
  */
 package org.apache.mina.filter.util;
 
-import org.apache.mina.common.IoEventType;
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteRequest;
-import org.apache.mina.common.WriteRequestWrapper;
+import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.common.filterchain.IoFilterAdapter;
+import org.apache.mina.common.session.IoEventType;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.common.write.WriteRequestWrapper;
 
 /**
  * An abstract {@link IoFilter} that simplifies the implementation of

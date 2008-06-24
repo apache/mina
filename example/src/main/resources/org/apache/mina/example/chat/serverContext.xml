@@ -80,7 +80,7 @@
   </bean>
 
   <!-- The non-SSL filter chain. -->
-  <bean id="filterChainBuilder" class="org.apache.mina.common.DefaultIoFilterChainBuilder">
+  <bean id="filterChainBuilder" class="org.apache.mina.common.filterchain.DefaultIoFilterChainBuilder">
     <property name="filters">
       <map>
         <entry key="executor" value-ref="executorFilter"/>
@@ -92,7 +92,7 @@
   </bean>
 
   <!-- The SSL filter chain. -->
-  <bean id="sslFilterChainBuilder" class="org.apache.mina.common.DefaultIoFilterChainBuilder">
+  <bean id="sslFilterChainBuilder" class="org.apache.mina.common.filterchain.DefaultIoFilterChainBuilder">
     <property name="filters">
       <map>
         <entry key="executor" value-ref="executorFilter"/>

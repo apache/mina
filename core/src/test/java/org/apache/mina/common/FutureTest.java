@@ -21,6 +21,14 @@ package org.apache.mina.common;
 
 import java.io.IOException;
 
+import org.apache.mina.common.future.DefaultCloseFuture;
+import org.apache.mina.common.future.DefaultConnectFuture;
+import org.apache.mina.common.future.DefaultWriteFuture;
+import org.apache.mina.common.future.IoFuture;
+import org.apache.mina.common.future.IoFutureListener;
+import org.apache.mina.common.session.DummySession;
+import org.apache.mina.common.session.IoSession;
+
 import junit.framework.TestCase;
 
 /**

@@ -23,10 +23,10 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.BufferDataException;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.common.buffer.BufferDataException;
+import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.common.session.AttributeKey;
+import org.apache.mina.common.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderException;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;

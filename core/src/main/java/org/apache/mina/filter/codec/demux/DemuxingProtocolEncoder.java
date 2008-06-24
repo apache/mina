@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.common.AttributeKey;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.UnknownMessageTypeException;
+import org.apache.mina.common.session.AttributeKey;
+import org.apache.mina.common.session.IoSession;
+import org.apache.mina.common.session.UnknownMessageTypeException;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.util.CopyOnWriteMap;
