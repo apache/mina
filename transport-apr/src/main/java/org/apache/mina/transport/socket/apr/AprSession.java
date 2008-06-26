@@ -29,7 +29,6 @@ import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.tomcat.jni.Address;
-import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Socket;
 
 /**

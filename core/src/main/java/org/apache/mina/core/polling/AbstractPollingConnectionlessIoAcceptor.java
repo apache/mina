@@ -38,7 +38,6 @@ import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoProcessor;
-import org.apache.mina.core.service.AbstractIoAcceptor.AcceptorOperationFuture;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.ExpiringSessionRecycler;
 import org.apache.mina.core.session.IdleStatusChecker;

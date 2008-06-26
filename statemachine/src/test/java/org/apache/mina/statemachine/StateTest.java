@@ -21,7 +21,6 @@ package org.apache.mina.statemachine;
 
 import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.transition.Transition;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

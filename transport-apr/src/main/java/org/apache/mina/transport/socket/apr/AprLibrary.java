@@ -22,7 +22,6 @@ package org.apache.mina.transport.socket.apr;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 /**
  * Internal singleton used for initializing correctly the APR native library
