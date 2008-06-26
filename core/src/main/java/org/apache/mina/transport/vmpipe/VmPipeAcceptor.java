@@ -28,11 +28,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.future.IoFuture;
-import org.apache.mina.common.service.AbstractIoAcceptor;
-import org.apache.mina.common.service.IoHandler;
-import org.apache.mina.common.service.TransportMetadata;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.future.IoFuture;
+import org.apache.mina.core.service.AbstractIoAcceptor;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * Binds the specified {@link IoHandler} to the specified

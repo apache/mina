@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.mina.common.filterchain.IoFilterAdapter;
-import org.apache.mina.common.session.IdleStatus;
-import org.apache.mina.common.session.IoEventType;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoEventType;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.util.CopyOnWriteMap;
 
 /**

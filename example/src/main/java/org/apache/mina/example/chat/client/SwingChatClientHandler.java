@@ -19,10 +19,10 @@
  */
 package org.apache.mina.example.chat.client;
 
-import org.apache.mina.common.filterchain.IoFilter;
-import org.apache.mina.common.service.IoHandler;
-import org.apache.mina.common.service.IoHandlerAdapter;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.chat.ChatCommand;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;

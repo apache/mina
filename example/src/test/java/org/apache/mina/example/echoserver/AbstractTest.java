@@ -25,9 +25,9 @@ import java.net.SocketAddress;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.service.IoAcceptor;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.service.IoAcceptor;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;

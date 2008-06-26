@@ -19,8 +19,8 @@
  */
 package org.apache.mina.handler.multiton;
 
-import org.apache.mina.common.session.IdleStatus;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * Adapter class for implementors of the {@link SingleSessionIoHandler}

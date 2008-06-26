@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * A chain of {@link IoHandlerCommand}s.

@@ -22,7 +22,7 @@ package org.apache.mina.transport.socket;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 
-import org.apache.mina.common.service.IoAcceptor;
+import org.apache.mina.core.service.IoAcceptor;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).  This class

@@ -19,8 +19,8 @@
  */
 package org.apache.mina.transport.socket;
 
-import org.apache.mina.common.session.AbstractIoSessionConfig;
-import org.apache.mina.common.session.IoSessionConfig;
+import org.apache.mina.core.session.AbstractIoSessionConfig;
+import org.apache.mina.core.session.IoSessionConfig;
 
 /**
  * TODO Add documentation

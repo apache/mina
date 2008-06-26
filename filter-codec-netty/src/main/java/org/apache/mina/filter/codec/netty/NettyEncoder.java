@@ -21,8 +21,8 @@ package org.apache.mina.filter.codec.netty;
 
 import net.gleamynode.netty2.Message;
 
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderException;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;

@@ -25,12 +25,12 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.filterchain.IoFilter.NextFilter;
-import org.apache.mina.common.session.DummySession;
-import org.apache.mina.common.session.IdleStatus;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.session.TrafficMask;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.filterchain.IoFilter.NextFilter;
+import org.apache.mina.core.session.DummySession;
+import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.TrafficMask;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
  * TODO Add documentation

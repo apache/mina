@@ -26,8 +26,8 @@ import javax.management.ObjectName;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
-import org.apache.mina.common.filterchain.IoFilter;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * A JMX MBean wrapper for an {@link IoSession}.

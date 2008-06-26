@@ -23,9 +23,9 @@ import java.net.SocketAddress;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.mina.common.future.ConnectFuture;
-import org.apache.mina.common.service.IoHandler;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;

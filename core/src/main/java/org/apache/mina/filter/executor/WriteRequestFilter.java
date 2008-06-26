@@ -19,14 +19,14 @@
  */
 package org.apache.mina.filter.executor;
 
-import org.apache.mina.common.filterchain.IoFilterAdapter;
-import org.apache.mina.common.future.IoFutureListener;
-import org.apache.mina.common.future.WriteFuture;
-import org.apache.mina.common.service.IoProcessor;
-import org.apache.mina.common.session.IoEvent;
-import org.apache.mina.common.session.IoEventType;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.future.IoFutureListener;
+import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.session.IoEvent;
+import org.apache.mina.core.session.IoEventType;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
  * Attaches an {@link IoEventQueueHandler} to an {@link IoSession}'s

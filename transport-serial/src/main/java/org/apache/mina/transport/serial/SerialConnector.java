@@ -30,14 +30,14 @@ import java.util.Enumeration;
 import java.util.TooManyListenersException;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.AbstractIoConnector;
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.DefaultConnectFuture;
-import org.apache.mina.common.IdleStatusChecker;
-import org.apache.mina.common.IoConnector;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoSessionInitializer;
-import org.apache.mina.common.TransportMetadata;
+import org.apache.mina.core.service.AbstractIoConnector;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.DefaultConnectFuture;
+import org.apache.mina.core.session.IdleStatusChecker;
+import org.apache.mina.core.service.IoConnector;
+import org.apache.mina.core.future.IoFuture;
+import org.apache.mina.core.session.IoSessionInitializer;
+import org.apache.mina.core.service.TransportMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

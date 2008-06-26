@@ -34,10 +34,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.common.session.AttributeKey;
-import org.apache.mina.common.session.DummySession;
-import org.apache.mina.common.session.IoEvent;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.AttributeKey;
+import org.apache.mina.core.session.DummySession;
+import org.apache.mina.core.session.IoEvent;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.CircularQueue;
 
 /**

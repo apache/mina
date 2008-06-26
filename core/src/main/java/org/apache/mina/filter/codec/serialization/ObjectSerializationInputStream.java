@@ -26,8 +26,8 @@ import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.StreamCorruptedException;
 
-import org.apache.mina.common.buffer.BufferDataException;
-import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.core.buffer.BufferDataException;
+import org.apache.mina.core.buffer.IoBuffer;
 
 /**
  * An {@link ObjectInput} and {@link InputStream} that can read the objects encoded

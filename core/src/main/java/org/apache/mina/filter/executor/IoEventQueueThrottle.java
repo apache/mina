@@ -21,7 +21,7 @@ package org.apache.mina.filter.executor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.common.session.IoEvent;
+import org.apache.mina.core.session.IoEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

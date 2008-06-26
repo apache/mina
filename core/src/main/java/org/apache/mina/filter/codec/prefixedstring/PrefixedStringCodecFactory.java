@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.codec.prefixedstring;
 
-import org.apache.mina.common.buffer.BufferDataException;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.buffer.BufferDataException;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;

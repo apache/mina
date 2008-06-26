@@ -19,9 +19,9 @@
  */
 package org.apache.mina.example.tennis;
 
-import org.apache.mina.common.service.IoHandler;
-import org.apache.mina.common.service.IoHandlerAdapter;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * A {@link IoHandler} implementation which plays a tennis game.

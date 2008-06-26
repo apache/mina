@@ -28,10 +28,10 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.common.RuntimeIoException;
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.file.FileRegion;
-import org.apache.mina.common.polling.AbstractPollingIoProcessor;
+import org.apache.mina.core.RuntimeIoException;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.file.FileRegion;
+import org.apache.mina.core.polling.AbstractPollingIoProcessor;
 
 /**
  * TODO Add documentation

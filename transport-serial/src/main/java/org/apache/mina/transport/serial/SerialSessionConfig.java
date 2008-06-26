@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.serial;
 
-import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.core.session.IoSessionConfig;
 
 /**
  * An {@link IoSessionConfig} for serial transport type.

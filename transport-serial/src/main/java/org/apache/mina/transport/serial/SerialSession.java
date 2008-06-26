@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.serial;
 
-import org.apache.mina.common.IoSession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * An {@link IoSession} for serial communication transport.

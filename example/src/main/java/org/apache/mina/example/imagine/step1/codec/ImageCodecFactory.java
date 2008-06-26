@@ -22,7 +22,7 @@ package org.apache.mina.example.imagine.step1.codec;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolDecoder;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * a {@link ProtocolCodecFactory} for the tutorial on how to write a protocol codec

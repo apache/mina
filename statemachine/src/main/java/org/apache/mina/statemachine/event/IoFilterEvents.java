@@ -19,7 +19,7 @@
  */
 package org.apache.mina.statemachine.event;
 
-import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.statemachine.annotation.IoFilterTransition;
 
 /**

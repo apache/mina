@@ -21,12 +21,12 @@ package org.apache.mina.filter.logging;
 
 import java.util.Map;
 
-import org.apache.mina.common.filterchain.IoFilter;
-import org.apache.mina.common.filterchain.IoFilterAdapter;
-import org.apache.mina.common.session.IdleStatus;
-import org.apache.mina.common.session.IoEventType;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoEventType;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.util.CopyOnWriteMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

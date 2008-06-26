@@ -24,7 +24,7 @@ import ognl.OgnlContext;
 import ognl.OgnlException;
 import ognl.TypeConverter;
 
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * Finds {@link IoSession}s that match a boolean OGNL expression.

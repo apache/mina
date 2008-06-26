@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;

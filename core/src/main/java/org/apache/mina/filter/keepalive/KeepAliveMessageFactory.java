@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.keepalive;
 
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * Provides keep-alive messages to {@link KeepAliveFilter}.

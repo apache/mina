@@ -22,10 +22,10 @@ package org.apache.mina.filter.stream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.filterchain.IoFilter;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -35,17 +35,17 @@ import org.apache.mina.common.write.WriteRequest;
  * to the next filter. When end of stream has been reached this filter will
  * call {@link IoFilter.NextFilter#messageSent(IoSession,WriteRequest)} using the original
  * {@link InputStream} written to the session and notifies
- * {@link org.apache.mina.common.future.WriteFuture} on the
- * original {@link org.apache.mina.common.write.WriteRequest}.
+ * {@link org.apache.mina.core.future.WriteFuture} on the
+ * original {@link org.apache.mina.core.write.WriteRequest}.
  * <p/>
  * This filter will ignore written messages which aren't {@link InputStream}
  * instances. Such messages will be passed to the next filter directly.
  * </p>
  * <p/>
  * NOTE: this filter does not close the stream after all data from stream
- * has been written. The {@link org.apache.mina.common.service.IoHandler} should take
+ * has been written. The {@link org.apache.mina.core.service.IoHandler} should take
  * care of that in its
- * {@link org.apache.mina.common.service.IoHandler#messageSent(IoSession,Object)}
+ * {@link org.apache.mina.core.service.IoHandler#messageSent(IoSession,Object)}
  * callback.
  * </p>
  *

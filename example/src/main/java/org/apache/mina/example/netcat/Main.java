@@ -21,7 +21,7 @@ package org.apache.mina.example.netcat;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.future.ConnectFuture;
+import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**

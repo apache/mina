@@ -19,8 +19,8 @@
  */
 package org.apache.mina.transport.vmpipe;
 
-import org.apache.mina.common.service.IoHandler;
-import org.apache.mina.common.service.IoServiceListenerSupport;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.service.IoServiceListenerSupport;
 
 /**
  * TODO Add documentation

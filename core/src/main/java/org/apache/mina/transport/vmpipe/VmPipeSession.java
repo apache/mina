@@ -24,22 +24,22 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.mina.common.filterchain.IoFilterChain;
-import org.apache.mina.common.service.DefaultTransportMetadata;
-import org.apache.mina.common.service.IoHandler;
-import org.apache.mina.common.service.IoProcessor;
-import org.apache.mina.common.service.IoService;
-import org.apache.mina.common.service.IoServiceListenerSupport;
-import org.apache.mina.common.service.TransportMetadata;
-import org.apache.mina.common.session.AbstractIoSession;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequestQueue;
+import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.service.DefaultTransportMetadata;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
+import org.apache.mina.core.service.IoServiceListenerSupport;
+import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.session.AbstractIoSession;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequestQueue;
 
 /**
  * A {@link IoSession} for in-VM transport (VM_PIPE).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 668702 $, $Date: 2008-06-17 17:11:14 +0200 (Tue, 17 Jun 2008) $
+ * @version $Rev$, $Date$
  */
 class VmPipeSession extends AbstractIoSession {
 

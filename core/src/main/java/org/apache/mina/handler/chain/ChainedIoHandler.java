@@ -19,9 +19,9 @@
  */
 package org.apache.mina.handler.chain;
 
-import org.apache.mina.common.service.IoHandler;
-import org.apache.mina.common.service.IoHandlerAdapter;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * An {@link IoHandler} which executes an {@link IoHandlerChain}

@@ -19,7 +19,7 @@
  */
 package org.apache.mina.util;
 
-import org.apache.mina.common.IoBufferTest;
+import org.apache.mina.core.IoBufferTest;
 
 /**
  * The subtype of {@link Foo}.  It is used to test the serialization of inherited object

@@ -24,7 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.mina.common.service.IoHandler;
+import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.statemachine.StateMachine;
 
 /**

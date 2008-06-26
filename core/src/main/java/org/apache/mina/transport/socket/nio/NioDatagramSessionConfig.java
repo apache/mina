@@ -22,7 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 
-import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 

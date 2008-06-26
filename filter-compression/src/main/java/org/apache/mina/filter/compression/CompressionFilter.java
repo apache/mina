@@ -21,12 +21,12 @@ package org.apache.mina.filter.compression;
 
 import java.io.IOException;
 
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.filterchain.IoFilter;
-import org.apache.mina.common.filterchain.IoFilterChain;
-import org.apache.mina.common.session.AttributeKey;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.session.AttributeKey;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.util.WriteRequestFilter;
 
 /**
@@ -159,7 +159,7 @@ public class CompressionFilter extends WriteRequestFilter {
     }
 
     /*
-     * @see org.apache.mina.common.IoFilter#filterWrite(org.apache.mina.common.IoFilter.NextFilter, org.apache.mina.common.IoSession, org.apache.mina.common.IoFilter.WriteRequest)
+     * @see org.apache.mina.core.IoFilter#filterWrite(org.apache.mina.core.IoFilter.NextFilter, org.apache.mina.core.IoSession, org.apache.mina.core.IoFilter.WriteRequest)
      */
     @Override
     protected Object doFilterWrite(

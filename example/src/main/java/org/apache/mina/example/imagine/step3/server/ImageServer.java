@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.mina.common.filterchain.DefaultIoFilterChainBuilder;
+import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.example.imagine.step1.codec.ImageCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;

@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.buffer.IoBuffer;
+import org.apache.mina.core.buffer.IoBuffer;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)

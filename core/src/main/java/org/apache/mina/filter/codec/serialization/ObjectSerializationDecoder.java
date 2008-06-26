@@ -21,9 +21,9 @@ package org.apache.mina.filter.codec.serialization;
 
 import java.io.Serializable;
 
-import org.apache.mina.common.buffer.BufferDataException;
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.buffer.BufferDataException;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;

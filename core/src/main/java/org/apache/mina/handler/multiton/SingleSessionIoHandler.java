@@ -21,9 +21,9 @@ package org.apache.mina.handler.multiton;
 
 import java.io.IOException;
 
-import org.apache.mina.common.service.IoHandler;
-import org.apache.mina.common.session.IdleStatus;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * A session handler without an {@link IoSession} parameter for simplicity.

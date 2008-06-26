@@ -29,13 +29,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.common.filterchain.IoFilterAdapter;
-import org.apache.mina.common.filterchain.IoFilterChain;
-import org.apache.mina.common.filterchain.IoFilterEvent;
-import org.apache.mina.common.session.IdleStatus;
-import org.apache.mina.common.session.IoEventType;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.filterchain.IoFilterEvent;
+import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoEventType;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
  * A filter that forwards I/O events to {@link Executor} to enforce a certain

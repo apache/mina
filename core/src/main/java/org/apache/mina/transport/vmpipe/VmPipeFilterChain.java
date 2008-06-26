@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.filterchain.DefaultIoFilterChain;
-import org.apache.mina.common.service.IoProcessor;
-import org.apache.mina.common.session.AbstractIoSession;
-import org.apache.mina.common.session.IdleStatus;
-import org.apache.mina.common.session.IoEvent;
-import org.apache.mina.common.session.IoEventType;
-import org.apache.mina.common.write.WriteRequest;
-import org.apache.mina.common.write.WriteRequestQueue;
-import org.apache.mina.common.write.WriteToClosedSessionException;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.DefaultIoFilterChain;
+import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.session.AbstractIoSession;
+import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoEvent;
+import org.apache.mina.core.session.IoEventType;
+import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.core.write.WriteRequestQueue;
+import org.apache.mina.core.write.WriteToClosedSessionException;
 
 /**
  * TODO Add documentation

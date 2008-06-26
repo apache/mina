@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.session.IoEvent;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.session.IoEvent;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
  * A default {@link IoEventSizeEstimator} implementation.

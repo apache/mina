@@ -21,7 +21,7 @@ package org.apache.mina.filter.executor;
 
 import java.util.EventListener;
 
-import org.apache.mina.common.session.IoEvent;
+import org.apache.mina.core.session.IoEvent;
 
 /**
  * Listens and filters all event queue operations occurring in

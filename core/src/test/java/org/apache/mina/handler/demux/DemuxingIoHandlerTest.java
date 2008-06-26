@@ -21,7 +21,7 @@ package org.apache.mina.handler.demux;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.IoSession;
 import org.easymock.EasyMock;
 
 /**

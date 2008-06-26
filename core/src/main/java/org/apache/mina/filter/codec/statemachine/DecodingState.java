@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.codec.statemachine;
 
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**

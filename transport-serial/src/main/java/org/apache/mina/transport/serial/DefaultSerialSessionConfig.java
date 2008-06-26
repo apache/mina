@@ -19,8 +19,8 @@
  */
 package org.apache.mina.transport.serial;
 
-import org.apache.mina.common.AbstractIoSessionConfig;
-import org.apache.mina.common.IoSessionConfig;
+import org.apache.mina.core.session.AbstractIoSessionConfig;
+import org.apache.mina.core.session.IoSessionConfig;
 
 /**
  * The default configuration for a serial session {@link SerialSessionConfig}.

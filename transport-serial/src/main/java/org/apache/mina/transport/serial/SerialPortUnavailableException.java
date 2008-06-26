@@ -19,7 +19,7 @@
  */
 package org.apache.mina.transport.serial;
 
-import org.apache.mina.common.RuntimeIoException;
+import org.apache.mina.core.RuntimeIoException;
 
 /**
  * Exception thrown when the serial port can't be open because

@@ -19,12 +19,12 @@
  */
 package org.apache.mina.filter.util;
 
-import org.apache.mina.common.filterchain.IoFilter;
-import org.apache.mina.common.filterchain.IoFilterChain;
-import org.apache.mina.common.session.IdleStatus;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.session.TrafficMask;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.TrafficMask;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
  * An {@link IoFilter}s wrapper that keeps track of the number of usages of this filter and will call init/destroy

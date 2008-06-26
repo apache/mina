@@ -21,11 +21,11 @@ package org.apache.mina.filter.stream;
 
 import java.io.IOException;
 
-import org.apache.mina.common.buffer.IoBuffer;
-import org.apache.mina.common.file.FileRegion;
-import org.apache.mina.common.filterchain.IoFilter;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.file.FileRegion;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
  * Filter implementation that converts a {@link FileRegion} to {@link IoBuffer}
@@ -33,10 +33,10 @@ import org.apache.mina.common.write.WriteRequest;
  * {@code FileRegion} has been reached this filter will call
  * {@link IoFilter.NextFilter#messageSent(IoSession,WriteRequest)} using the
  * original {@link FileRegion} written to the session and notifies
- * {@link org.apache.mina.common.future.WriteFuture} on the original
- * {@link org.apache.mina.common.write.WriteRequest}.
+ * {@link org.apache.mina.core.future.WriteFuture} on the original
+ * {@link org.apache.mina.core.write.WriteRequest}.
  * <p>Normall {@code FileRegion} objects should be handled by the
- * {@link org.apache.mina.common.service.IoProcessor} but this is not always possible
+ * {@link org.apache.mina.core.service.IoProcessor} but this is not always possible
  * if a filter is being used that needs to modify the contents of the file
  * before sending over the network (i.e. the
  * {@link org.apache.mina.filter.ssl.SslFilter} or a data compression filter.)
@@ -47,8 +47,8 @@ import org.apache.mina.common.write.WriteRequest;
  * <p><b>NOTE:</b> this filter does not close the file channel in
  * {@link FileRegion#getFileChannel()} after the data from the file has been
  * written.  The {@code FileChannel} should be closed in either 
- * {@link org.apache.mina.common.service.IoHandler#messageSent(IoSession,Object)}
- * or in an {@link org.apache.mina.common.future.IoFutureListener} associated with the
+ * {@link org.apache.mina.core.service.IoHandler#messageSent(IoSession,Object)}
+ * or in an {@link org.apache.mina.core.future.IoFutureListener} associated with the
  * {@code WriteFuture}.
  * </p>
  *

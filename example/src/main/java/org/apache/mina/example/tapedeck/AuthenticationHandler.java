@@ -21,10 +21,10 @@ package org.apache.mina.example.tapedeck;
 
 import static org.apache.mina.statemachine.event.IoFilterEvents.*;
 
-import org.apache.mina.common.filterchain.IoFilter.NextFilter;
-import org.apache.mina.common.future.IoFutureListener;
-import org.apache.mina.common.session.IoSession;
-import org.apache.mina.common.write.WriteRequest;
+import org.apache.mina.core.filterchain.IoFilter.NextFilter;
+import org.apache.mina.core.future.IoFutureListener;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.example.tapedeck.TapeDeckServer.TapeDeckContext;
 import org.apache.mina.statemachine.StateControl;
 import org.apache.mina.statemachine.annotation.IoFilterTransition;

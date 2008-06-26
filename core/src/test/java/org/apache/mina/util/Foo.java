@@ -21,7 +21,7 @@ package org.apache.mina.util;
 
 import java.io.Serializable;
 
-import org.apache.mina.common.IoBufferTest;
+import org.apache.mina.core.IoBufferTest;
 
 /**
  * The parent class of {@link Bar}.  It is used to test the serialization of inherited object

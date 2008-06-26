@@ -28,18 +28,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
-import org.apache.mina.common.AbstractIoSession;
-import org.apache.mina.common.DefaultIoFilterChain;
-import org.apache.mina.common.DefaultTransportMetadata;
-import org.apache.mina.common.ExceptionMonitor;
-import org.apache.mina.common.IoBuffer;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoProcessor;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceListenerSupport;
-import org.apache.mina.common.TransportMetadata;
-import org.apache.mina.common.WriteRequest;
+import org.apache.mina.core.session.AbstractIoSession;
+import org.apache.mina.core.filterchain.DefaultIoFilterChain;
+import org.apache.mina.core.service.DefaultTransportMetadata;
+import org.apache.mina.core.ExceptionMonitor;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
+import org.apache.mina.core.service.IoServiceListenerSupport;
+import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.write.WriteRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,7 +236,7 @@ class SerialSessionImpl extends AbstractIoSession implements
     }
 
     @Override
-    protected IoProcessor<SerialSessionImpl> getProcessor() {
+    public IoProcessor<SerialSessionImpl> getProcessor() {
         return processor;
     }
 

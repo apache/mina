@@ -22,8 +22,8 @@ package org.apache.mina.handler.chain;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.common.session.DummySession;
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.DummySession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * A test case for {@link ChainedIoHandler}.

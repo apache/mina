@@ -19,7 +19,7 @@
  */
 package org.apache.mina.handler.multiton;
 
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * A factory that creates {@link SingleSessionIoHandler} to be used with one

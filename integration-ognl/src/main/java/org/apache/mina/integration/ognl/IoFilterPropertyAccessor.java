@@ -21,7 +21,7 @@ import ognl.OgnlException;
 import ognl.OgnlRuntime;
 import ognl.PropertyAccessor;
 
-import org.apache.mina.common.filterchain.IoFilter;
+import org.apache.mina.core.filterchain.IoFilter;
 
 /**
  * An OGNL {@link PropertyAccessor} for {@link IoFilter}.

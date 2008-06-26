@@ -31,7 +31,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.common.session.IoEvent;
+import org.apache.mina.core.session.IoEvent;
 
 /**
  * A {@link ThreadPoolExecutor} that does not maintain the order of {@link IoEvent}s.

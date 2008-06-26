@@ -21,7 +21,7 @@ import ognl.OgnlException;
 import ognl.OgnlRuntime;
 import ognl.PropertyAccessor;
 
-import org.apache.mina.common.service.IoService;
+import org.apache.mina.core.service.IoService;
 
 /**
  * An OGNL {@link PropertyAccessor} for {@link IoService}.

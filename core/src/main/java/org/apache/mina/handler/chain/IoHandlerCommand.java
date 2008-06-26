@@ -19,7 +19,7 @@
  */
 package org.apache.mina.handler.chain;
 
-import org.apache.mina.common.session.IoSession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * <p>A {@link IoHandlerCommand} encapsulates a unit of processing work to be
