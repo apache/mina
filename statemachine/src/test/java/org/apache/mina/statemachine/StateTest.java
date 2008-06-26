@@ -21,6 +21,9 @@ package org.apache.mina.statemachine;
 
 import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.transition.Transition;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.agical.rmock.extension.junit.RMockTestCase;
 
@@ -35,14 +38,16 @@ public class StateTest extends RMockTestCase {
     Transition transition1;
     Transition transition2;
     Transition transition3;
-    
+
+    @BeforeClass
     protected void setUp() throws Exception {
         state = new State("test");
         transition1 = (Transition) mock(Transition.class);
-        transition2 = (Transition) mock(Transition.class);
-        transition3 = (Transition) mock(Transition.class);
+        transition2 = transition1; //(Transition) mock(Transition.class);
+        transition3 = transition1; //(Transition) mock(Transition.class);
     }
 
+    @Test
     public void testAddFirstTransition() throws Exception {
         assertTrue(state.getTransitions().isEmpty());
         state.addTransition(transition1);
@@ -51,6 +56,7 @@ public class StateTest extends RMockTestCase {
         assertSame(transition1, state.getTransitions().get(0));
     }
 
+    @Test
     public void testUnweightedTransitions() throws Exception {
         assertTrue(state.getTransitions().isEmpty());
         state.addTransition(transition1);
@@ -62,6 +68,7 @@ public class StateTest extends RMockTestCase {
         assertSame(transition3, state.getTransitions().get(2));
     }
     
+    @Test
     public void testWeightedTransitions() throws Exception {
         assertTrue(state.getTransitions().isEmpty());
         state.addTransition(transition1, 10);
@@ -73,10 +80,12 @@ public class StateTest extends RMockTestCase {
         assertSame(transition1, state.getTransitions().get(2));
     }
 
+    @Test
     public void testAddTransitionReturnsSelf() throws Exception {
         assertSame(state, state.addTransition(transition1));
     }
 
+    @Test
     public void testAddNullTransitionThrowsException() throws Exception {
         try {
             state.addTransition(null);

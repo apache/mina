@@ -88,6 +88,7 @@
         <artifactId>mina-core</artifactId>
         <version>${pom.version}</version>
       </dependency>
+
       <!--
       <dependency>
         <groupId>${groupId}</groupId>
@@ -95,36 +96,43 @@
         <version>${pom.version}</version>
       </dependency>
       -->
+
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>mina-transport-apr</artifactId>
         <version>${pom.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>mina-filter-compression</artifactId>
         <version>${pom.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>mina-filter-codec-netty</artifactId>
         <version>${pom.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>mina-integration-beans</artifactId>
         <version>${pom.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>mina-integration-ognl</artifactId>
         <version>${pom.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>mina-integration-jmx</artifactId>
         <version>${pom.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>mina-statemachine</artifactId>
@@ -158,10 +166,11 @@
         <artifactId>netty2</artifactId>
         <version>1.9.2</version>
       </dependency>
+
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring</artifactId>
-        <version>2.5.1</version>
+        <version>2.5.5</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -177,40 +186,45 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>ognl</groupId>
         <artifactId>ognl</artifactId>
-        <version>2.7.1</version>
+        <version>2.7.2</version>
       </dependency> 
+
       <dependency>
         <groupId>jboss</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.6.ga</version>
+        <version>3.7.ga</version>
       </dependency> 
 
       <!-- State Machine -->
       <dependency>
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
-        <version>2.1</version>
+        <version>2.4</version>
       </dependency>
 
       <!-- Logging -->
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.2</version>
       </dependency>
+
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl104-over-slf4j</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.2</version>
       </dependency>
+
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.2</version>
       </dependency>
+
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
@@ -223,20 +237,23 @@
         <artifactId>junit</artifactId>
         <version>4.4</version>
       </dependency>
+
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <version>2.3</version>
       </dependency>
+
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymockclassextension</artifactId>
-        <version>2.2.2</version>
+        <version>2.3</version>
       </dependency>
+
       <dependency>
         <groupId>com.agical.rmock</groupId>
         <artifactId>rmock</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -248,16 +265,19 @@
       <artifactId>slf4j-api</artifactId>
       <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl104-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -270,16 +290,19 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymockclassextension</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>com.agical.rmock</groupId>
       <artifactId>rmock</artifactId>
@@ -321,6 +344,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <source>1.5</source>
@@ -330,8 +354,10 @@
           <showDeprecations>true</showDeprecations>
         </configuration>
       </plugin>
+
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.3</version>
         <configuration>
           <excludes>
             <exclude>**/Abstract*</exclude>
@@ -339,9 +365,11 @@
           </excludes>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>2.0.4</version>
         <executions>
           <execution>
             <id>attach-source</id>
@@ -351,8 +379,10 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-2</version>
         <configuration>
           <descriptors>
             <descriptor>release.xml</descriptor>
@@ -362,18 +392,21 @@
           <tarLongFileMode>gnu</tarLongFileMode>
         </configuration>
       </plugin>
+
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
+        <version>2.0-beta-7</version>
         <configuration>
           <tagBase>
             https://svn.apache.org/repos/asf/mina/tags
           </tagBase>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.4.1</version>
         <inherited>true</inherited>
         <extensions>true</extensions>
         <configuration>
@@ -383,8 +416,10 @@
           </instructions>
         </configuration>
       </plugin>
+
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.1</version>
         <executions>
           <execution>
             <id>add-license</id>
@@ -430,6 +465,7 @@
           </dependency>
         </dependencies>
       </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>rat-maven-plugin</artifactId>
@@ -437,11 +473,13 @@
       </plugin>
     </plugins>
   </build>
+
   <reporting>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.4</version>
         <inherited>false</inherited>
         <configuration>
           <aggregate>true</aggregate>
@@ -461,9 +499,11 @@
           <locale>en_US</locale>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.1</version>
         <inherited>false</inherited>
         <configuration>
           <aggregate>true</aggregate>
