@@ -33,7 +33,6 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.SocketSessionConfig;
