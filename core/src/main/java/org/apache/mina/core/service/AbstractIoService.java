@@ -1037,7 +1037,6 @@ public abstract class AbstractIoService implements IoService {
      * {@link #finishSessionInitialization(IoSession, IoFuture, IoSessionInitializer)} will call
      * this method instead.
      */
-    @SuppressWarnings("unused")
     protected void finishSessionInitialization0(IoSession session, IoFuture future) {}
 
     protected static class ServiceOperationFuture extends DefaultIoFuture {
