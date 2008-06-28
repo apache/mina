@@ -31,7 +31,9 @@ import java.util.concurrent.Executor;
 import org.apache.mina.core.polling.AbstractPollingIoConnector;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.SocketSessionConfig;
@@ -48,31 +50,57 @@ public final class NioSocketConnector
 
     private volatile Selector selector;
 
+    /**
+     * Constructor for {@link NioSocketConnector} with default configuration.
+     */
     public NioSocketConnector() {
         super(new DefaultSocketSessionConfig(), NioProcessor.class);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * Constructor for {@link NioSocketConnector} with default configuration, and 
+     * given number of {@link NioProcessor}
+     * @param processorCount the number of processor to create and place in a
+     * {@link SimpleIoProcessorPool} 
+     */
     public NioSocketConnector(int processorCount) {
         super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     *  Constructor for {@link NioSocketConnector} with default configuration but a
+     *  specific {@link IoProcessor}
+     * @param processor the processor to use for managing I/O events
+     */
     public NioSocketConnector(IoProcessor<NioSession> processor) {
         super(new DefaultSocketSessionConfig(), processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     *  Constructor for {@link NioSocketConnector} with a given {@link Executor} for handling 
+     *  connection events and a given {@link IoProcessor} for handling I/O events.
+     * @param executor the executor for connection
+     * @param processor the processor for I/O operations
+     */
     public NioSocketConnector(Executor executor, IoProcessor<NioSession> processor) {
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init() throws Exception {
         this.selector = Selector.open();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void destroy() throws Exception {
         if (selector != null) {
@@ -80,35 +108,56 @@ public final class NioSocketConnector
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return NioSocketSession.METADATA;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getDefaultRemoteAddress() {
         return (InetSocketAddress) super.getDefaultRemoteAddress();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
         super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Iterator<SocketChannel> allHandles() {
         return new SocketChannelIterator(selector.keys());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean connect(SocketChannel handle, SocketAddress remoteAddress)
             throws Exception {
         return handle.connect(remoteAddress);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected ConnectionRequest connectionRequest(SocketChannel handle) {
         SelectionKey key = handle.keyFor(selector);
@@ -119,6 +168,9 @@ public final class NioSocketConnector
         return (ConnectionRequest) key.attachment();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void close(SocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
@@ -128,6 +180,9 @@ public final class NioSocketConnector
         handle.close();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean finishConnect(SocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
@@ -141,6 +196,9 @@ public final class NioSocketConnector
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SocketChannel newHandle(SocketAddress localAddress)
             throws Exception {
@@ -159,27 +217,42 @@ public final class NioSocketConnector
         return ch;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected NioSession newSession(IoProcessor<NioSession> processor, SocketChannel handle) {
         return new NioSocketSession(this, processor, handle);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void register(SocketChannel handle, ConnectionRequest request)
             throws Exception {
         handle.register(selector, SelectionKey.OP_CONNECT, request);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean select(int timeout) throws Exception {
         return selector.select(timeout) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Iterator<SocketChannel> selectedHandles() {
         return new SocketChannelIterator(selector.selectedKeys());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void wakeup() {
         selector.wakeup();
@@ -193,15 +266,24 @@ public final class NioSocketConnector
             this.i = selectedKeys.iterator();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean hasNext() {
             return i.hasNext();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public SocketChannel next() {
             SelectionKey key = i.next();
             return (SocketChannel) key.channel();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void remove() {
             i.remove();
         }
