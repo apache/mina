@@ -32,6 +32,7 @@ import java.util.concurrent.Executor;
 import org.apache.mina.core.polling.AbstractPollingIoAcceptor;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
@@ -54,33 +55,59 @@ public final class NioSocketAcceptor
     private volatile Selector selector;
 
     /**
-     * Create an acceptor with a single processing thread using a NewThreadExecutor
+     * Constructor for {@link NioSocketAcceptor} using default parameters (multiple thread model).
      */
     public NioSocketAcceptor() {
         super(new DefaultSocketSessionConfig(), NioProcessor.class);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * Constructor for {@link NioSocketAcceptor} using default parameters, and 
+     * given number of {@link NioProcessor} for multithreading I/O operations.
+     * 
+     * @param processorCount the number of processor to create and place in a
+     * {@link SimpleIoProcessorPool} 
+     */
     public NioSocketAcceptor(int processorCount) {
         super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+    *  Constructor for {@link NioSocketAcceptor} with default configuration but a
+     *  specific {@link IoProcessor}, useful for sharing the same processor over multiple
+     *  {@link IoService} of the same type.
+     * @param processor the processor to use for managing I/O events
+     */
     public NioSocketAcceptor(IoProcessor<NioSession> processor) {
         super(new DefaultSocketSessionConfig(), processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     *  Constructor for {@link NioSocketAcceptor} with a given {@link Executor} for handling 
+     *  connection events and a given {@link IoProcessor} for handling I/O events, useful for 
+     *  sharing the same processor and executor over multiple {@link IoService} of the same type.
+     * @param executor the executor for connection
+     * @param processor the processor for I/O operations
+     */
     public NioSocketAcceptor(Executor executor, IoProcessor<NioSession> processor) {
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init() throws Exception {
         selector = Selector.open();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void destroy() throws Exception {
         if (selector != null) {
@@ -88,33 +115,54 @@ public final class NioSocketAcceptor
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return NioSocketSession.METADATA;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getDefaultLocalAddress() {
         return (InetSocketAddress) super.getDefaultLocalAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         setDefaultLocalAddress((SocketAddress) localAddress);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isReuseAddress() {
         return reuseAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setReuseAddress(boolean reuseAddress) {
         synchronized (bindLock) {
             if (isActive()) {
@@ -126,10 +174,16 @@ public final class NioSocketAcceptor
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int getBacklog() {
         return backlog;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setBacklog(int backlog) {
         synchronized (bindLock) {
             if (isActive()) {
@@ -141,7 +195,9 @@ public final class NioSocketAcceptor
         }
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected NioSession accept(IoProcessor<NioSession> processor,
             ServerSocketChannel handle) throws Exception {
@@ -160,6 +216,9 @@ public final class NioSocketAcceptor
         return new NioSocketSession(this, processor, ch);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected ServerSocketChannel open(SocketAddress localAddress)
             throws Exception {
@@ -184,6 +243,9 @@ public final class NioSocketAcceptor
         return c;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SocketAddress localAddress(ServerSocketChannel handle)
             throws Exception {
@@ -208,11 +270,17 @@ public final class NioSocketAcceptor
         return selector.select() > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Iterator<ServerSocketChannel> selectedHandles() {
         return new ServerSocketChannelIterator(selector.selectedKeys());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void close(ServerSocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
@@ -222,6 +290,9 @@ public final class NioSocketAcceptor
         handle.close();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void wakeup() {
         selector.wakeup();
@@ -235,15 +306,24 @@ public final class NioSocketAcceptor
             i = selectedKeys.iterator();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean hasNext() {
             return i.hasNext();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public ServerSocketChannel next() {
             SelectionKey key = i.next();
             return (ServerSocketChannel) key.channel();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void remove() {
             i.remove();
         }

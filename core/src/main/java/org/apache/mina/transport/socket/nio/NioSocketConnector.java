@@ -50,7 +50,7 @@ public final class NioSocketConnector
     private volatile Selector selector;
 
     /**
-     * Constructor for {@link NioSocketConnector} with default configuration.
+     * Constructor for {@link NioSocketConnector} with default configuration (multiple thread model).
      */
     public NioSocketConnector() {
         super(new DefaultSocketSessionConfig(), NioProcessor.class);
@@ -59,7 +59,7 @@ public final class NioSocketConnector
 
     /**
      * Constructor for {@link NioSocketConnector} with default configuration, and 
-     * given number of {@link NioProcessor}
+     * given number of {@link NioProcessor} for multithreading I/O operations
      * @param processorCount the number of processor to create and place in a
      * {@link SimpleIoProcessorPool} 
      */
@@ -70,7 +70,8 @@ public final class NioSocketConnector
 
     /**
      *  Constructor for {@link NioSocketConnector} with default configuration but a
-     *  specific {@link IoProcessor}
+     *  specific {@link IoProcessor}, useful for sharing the same processor over multiple
+     *  {@link IoService} of the same type.
      * @param processor the processor to use for managing I/O events
      */
     public NioSocketConnector(IoProcessor<NioSession> processor) {
@@ -80,7 +81,8 @@ public final class NioSocketConnector
 
     /**
      *  Constructor for {@link NioSocketConnector} with a given {@link Executor} for handling 
-     *  connection events and a given {@link IoProcessor} for handling I/O events.
+     *  connection events and a given {@link IoProcessor} for handling I/O events, useful for sharing 
+     *  the same processor and executor over multiple {@link IoService} of the same type.
      * @param executor the executor for connection
      * @param processor the processor for I/O operations
      */
