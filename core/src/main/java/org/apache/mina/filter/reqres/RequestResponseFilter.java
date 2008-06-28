@@ -272,7 +272,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      * than the default one ({@link HashMap}).
      */
     protected Map<Object, Request> createRequestStore(
-            @SuppressWarnings("unused") IoSession session) {
+            IoSession session) {
         return new HashMap<Object, Request>();
     }
 
@@ -289,7 +289,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      * can be used.
      */
     protected Set<Request> createUnrespondedRequestStore(
-            @SuppressWarnings("unused") IoSession session) {
+            IoSession session) {
         return new LinkedHashSet<Request>();
     }
 
@@ -301,7 +301,6 @@ public class RequestResponseFilter extends WriteRequestFilter {
      * @param requestStore what you returned in {@link #createRequestStore(IoSession)}
      */
     protected void destroyRequestStore(
-            @SuppressWarnings("unused")
             Map<Object, Request> requestStore) {
     }
 
@@ -313,7 +312,6 @@ public class RequestResponseFilter extends WriteRequestFilter {
      * @param unrespondedRequestStore what you returned in {@link #createUnrespondedRequestStore(IoSession)}
      */
     protected void destroyUnrespondedRequestStore(
-            @SuppressWarnings("unused")
             Set<Request> unrespondedRequestStore) {
     }
 
