@@ -44,10 +44,22 @@ import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionInitializer;
 
 /**
- * TODO Add documentation
+ * A base class for implementing client transport using a polling strategy. The
+ * underlying sockets will be checked in an active loop and woke up when an
+ * socket needed to be processed. This class handle the logic behind binding,
+ * connecting and disposing the client sockets. A {@link Executor} will be used
+ * for running client connection, and an {@link AbstractPollingIoProcessor} will
+ * be used for processing connected client I/O operations like reading, writing
+ * and closing.
+ * 
+ * All the low level methods for binding, connecting, closing need to be
+ * provided by the subclassing implementation.
+ * 
+ * @see NioSocketConnector for a example of implementation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev$, $Date: 2008-06-28 23:27:00 +0200 (sam., 28 juin
+ *          2008) $
  */
 public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         extends AbstractIoConnector {

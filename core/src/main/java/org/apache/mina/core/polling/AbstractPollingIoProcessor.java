@@ -126,14 +126,23 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         return cls.getSimpleName() + '-' + newThreadId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isDisposing() {
         return disposing;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isDisposed() {
         return disposed;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     public final void dispose() {
         if (disposed) {
             return;
@@ -160,6 +169,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      */
     protected abstract boolean select(int timeout) throws Exception;
     protected abstract boolean isSelectorEmpty();
+    
+    /**
+     * Interrupt the {@link AbstractPollingIoProcessor#select(int) call.
+     */
     protected abstract void wakeup();
     protected abstract Iterator<T> allSessions();
     protected abstract Iterator<T> selectedSessions();
@@ -215,6 +228,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     protected abstract int write(T session, IoBuffer buf, int length) throws Exception;
     protected abstract int transferFile(T session, FileRegion region, int length) throws Exception;
 
+    /**
+     * {@inheritDoc}
+     */
     public final void add(T session) {
         if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
@@ -224,6 +240,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         startupWorker();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void remove(T session) {
         scheduleRemove(session);
         startupWorker();
@@ -233,6 +252,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         removingSessions.add(session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void flush(T session) {
         // The following optimization has been disabled because it can cause StackOverflowError.
         //if (Thread.currentThread() == workerThread) {
@@ -256,6 +278,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void updateTrafficMask(T session) {
         scheduleTrafficControl(session);
         wakeup();

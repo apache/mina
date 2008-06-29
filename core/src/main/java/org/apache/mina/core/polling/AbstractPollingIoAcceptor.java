@@ -47,20 +47,22 @@ import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
- * A base class for implementing transport using a polling strategy. The underlying sockets
- * will be checked in an active loop and woke up when an socket needed to be processed.
- * This class handle the logic behind binding, accepting and disposing the server sockets.
- * The {@link AbstractIoAcceptor} {@link Executor} will be used for running client accepting 
- * class and an {@link AbstractPollingIoProcessor} will be used for processing client I/O operations
- * like reading, writing and closing.
+ * A base class for implementing transport using a polling strategy. The
+ * underlying sockets will be checked in an active loop and woke up when an
+ * socket needed to be processed. This class handle the logic behind binding,
+ * accepting and disposing the server sockets. An {@link Executor} will be used
+ * for running client accepting and an {@link AbstractPollingIoProcessor} will
+ * be used for processing client I/O operations like reading, writing and
+ * closing.
  * 
- * All the low level methods for binding, accepting, closing need to be provided by the subclassing 
- * implementation.
+ * All the low level methods for binding, accepting, closing need to be provided
+ * by the subclassing implementation.
  * 
  * @see NioSocketAcceptor for a example of implementation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev$, $Date: 2008-06-26 17:58:30 +0200 (jeu, 26 jun 2008)
+ *          $
  */
 public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         extends AbstractIoAcceptor {
