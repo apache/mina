@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>build</artifactId>
-    <version>2.0.0-M2</version>
+    <version>2.0.0-M3-SNAPSHOT</version>
   </parent>
   <artifactId>mina-filter-codec-netty</artifactId>
   <name>Apache MINA Netty Codec</name>
