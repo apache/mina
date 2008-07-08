@@ -54,12 +54,48 @@ import org.apache.mina.util.NamePreservingRunnable;
 
 /**
  * Base implementation of {@link IoService}s.
+ * 
+ * An instance of IoService contains an Executor which will handle the incoming
+ * events.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoService implements IoService {
+    /** 
+     * The unique number identifying the Service. It's incremented
+     * for each new IoService created.
+     */
     private static final AtomicInteger id = new AtomicInteger();
+
+    /** The thread name built from the IoService unherited 
+     * instance class name and the IoService Id 
+     **/
+    private final String threadName;
+    
+    /**
+     * The associated executor, responsible for handling execution of I/O events.
+     */
+    private final Executor executor;
+
+    /**
+     * A flag used to indicate that the local executor has been created
+     * inside this instance, and not passed by a caller.
+     * 
+     * If the executor is locally created, then it will be an instance
+     * of the ThreadPoolExecutor class.
+     */
+    private final boolean createdExecutor;
+
+    /**
+     * The IoHandler in charge of managing all the I/O Events. It is 
+     */
+    private IoHandler handler;
+
+    /**
+     * The default {@link IoSessionConfig} which will be used to configure new sessions.
+     */
+    private final IoSessionConfig sessionConfig;
 
     private final IoServiceListener serviceActivationListener =
         new IoServiceListener() {
@@ -88,11 +124,6 @@ public abstract class AbstractIoService implements IoService {
      */
     private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
 
-    /**
-     * Current handler.
-     */
-    private IoHandler handler;
-
     private IoSessionDataStructureFactory sessionDataStructureFactory =
         new DefaultIoSessionDataStructureFactory();
 
@@ -100,10 +131,6 @@ public abstract class AbstractIoService implements IoService {
      * Maintains the {@link IoServiceListener}s of this service.
      */
     private final IoServiceListenerSupport listeners;
-
-    private final Executor executor;
-    private final String threadName;
-    private final boolean createdExecutor;
 
     /**
      * A lock object which must be acquired when related resources are
@@ -156,14 +183,9 @@ public abstract class AbstractIoService implements IoService {
     private long lastIdleTimeForWrite;
 
     /**
-     * The default {@link IoSessionConfig} which will be used to configure new sessions.
-     */
-    private final IoSessionConfig sessionConfig;
-
-    /**
 	 * Constructor for {@link AbstractIoService}. You need to provide a default
 	 * session configuration and an {@link Executor} for handling I/O events. If
-	 * null {@link Executor} is provided, a default one will be created using
+	 * a null {@link Executor} is provided, a default one will be created using
 	 * {@link Executors#newCachedThreadPool()}.
 	 * 
 	 * @param sessionConfig
@@ -176,6 +198,10 @@ public abstract class AbstractIoService implements IoService {
         if (sessionConfig == null) {
             throw new NullPointerException("sessionConfig");
         }
+        
+        if (getTransportMetadata() == null) {
+            throw new NullPointerException("TransportMetadata");
+        }
 
         if (!getTransportMetadata().getSessionConfigType().isAssignableFrom(
                 sessionConfig.getClass())) {
@@ -184,8 +210,12 @@ public abstract class AbstractIoService implements IoService {
                     + getTransportMetadata().getSessionConfigType() + ")");
         }
 
+        // Create the listeners, and add a first listener : a activation listener
+        // for this service, which will give information on the service state.
         listeners = new IoServiceListenerSupport(this);
         listeners.add(serviceActivationListener);
+        
+        // Stores the given session configuration
         this.sessionConfig = sessionConfig;
 
         // Make JVM load the exception monitor before some transports
@@ -298,6 +328,7 @@ public abstract class AbstractIoService implements IoService {
         if (disposalFuture != null) {
             disposalFuture.awaitUninterruptibly();
         }
+        
         if (createdExecutor) {
             ExecutorService e = (ExecutorService) executor;
             e.shutdown();
@@ -359,7 +390,7 @@ public abstract class AbstractIoService implements IoService {
      */
     public final void setHandler(IoHandler handler) {
         if (handler == null) {
-            throw new NullPointerException("handler");
+            throw new NullPointerException("handler cannot be null");
         }
 
         if (isActive()) {
