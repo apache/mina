@@ -31,7 +31,7 @@
     <url>http://mina.apache.org/</url>
   </organization>
   <groupId>org.apache.mina</groupId>
-  <version>2.0.0-M2-SNAPSHOT</version>
+  <version>2.0.0-M2</version>
   <artifactId>build</artifactId>
   <name>Apache MINA Parent POM</name>
   <packaging>pom</packaging>
@@ -45,9 +45,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/trunk</connection>
-    <url>http://svn.apache.org/viewvc/directory/mina/trunk</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/trunk</developerConnection>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/tags/2.0.0-M2</connection>
+    <url>http://svn.apache.org/viewvc/directory/mina/tags/2.0.0-M2</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/2.0.0-M2</developerConnection>
   </scm>
 
   <distributionManagement>
