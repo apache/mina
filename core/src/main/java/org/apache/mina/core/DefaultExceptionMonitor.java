@@ -39,7 +39,9 @@ public class DefaultExceptionMonitor extends ExceptionMonitor {
 
     @Override
     public void exceptionCaught(Throwable cause) {
-        if (log.isWarnEnabled()) {
+        if (cause instanceof Error) {
+            throw (Error) cause;
+        } else {
             log.warn("Unexpected exception.", cause);
         }
     }
