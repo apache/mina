@@ -135,7 +135,7 @@ public abstract class AbstractConnectorTest extends TestCase {
         final CountDownLatch latch = new CountDownLatch(2);
         final ConnectFuture[] callbackFuture = new ConnectFuture[1];
         
-        int port = AvailablePortFinder.getNextAvailable(1025);
+        int port = AvailablePortFinder.getNextAvailable(4025);
         IoAcceptor acceptor = createAcceptor();
         acceptor.setHandler(new IoHandlerAdapter());
         InetSocketAddress address = new InetSocketAddress(port);
