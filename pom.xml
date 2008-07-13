@@ -215,7 +215,7 @@
 
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>jcl104-over-slf4j</artifactId>
+        <artifactId>jcl-over-slf4j</artifactId>
         <version>1.5.2</version>
       </dependency>
 
@@ -272,7 +272,7 @@
 
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl104-over-slf4j</artifactId>
+      <artifactId>jcl-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
 
