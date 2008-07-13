@@ -48,7 +48,7 @@ public abstract class AbstractConnectorTest extends TestCase {
     protected abstract IoConnector createConnector();
 
     public void testConnectFutureSuccessTiming() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(1025);
+        int port = AvailablePortFinder.getNextAvailable(2025);
         IoAcceptor acceptor = createAcceptor();
         acceptor.setHandler(new IoHandlerAdapter());
         acceptor.bind(new InetSocketAddress(port));
@@ -86,7 +86,7 @@ public abstract class AbstractConnectorTest extends TestCase {
     }
 
     public void testConnectFutureFailureTiming() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(1025);
+        int port = AvailablePortFinder.getNextAvailable(3025);
         final StringBuffer buf = new StringBuffer();
 
         IoConnector connector = createConnector();
