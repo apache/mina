@@ -39,6 +39,7 @@ import org.apache.mina.core.service.AbstractIoService;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IdleStatusChecker;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
@@ -48,6 +49,8 @@ import org.apache.mina.util.NamePreservingRunnable;
 /**
  * An abstract implementation of {@link IoProcessor} which helps
  * transport developers to write an {@link IoProcessor} easily.
+ * This class is in charge of active polling a set of {@link IoSession}
+ * and trigger events when some I/O operation is possible.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -82,6 +85,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     private volatile boolean disposed;
     private final DefaultIoFuture disposalFuture = new DefaultIoFuture(null);
 
+    /**
+     * Create an {@link AbstractPollingIoProcessor} with the given {@link Executor}
+     * for handling I/Os events.
+     * 
+     * @param executor the {@link Executor} for handling I/O events
+     */
     protected AbstractPollingIoProcessor(Executor executor) {
         if (executor == null) {
             throw new NullPointerException("executor");
@@ -159,6 +168,11 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         disposed = true;
     }
 
+    /**
+     * Dispose the resources used by this {@link IoProcessor} for polling 
+     * the client connections
+     * @throws Exception if some low level IO error occurs
+     */
     protected abstract void dispose0() throws Exception;
 
     /**
@@ -168,14 +182,38 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * @throws Exception if some low level IO error occurs
      */
     protected abstract boolean select(int timeout) throws Exception;
+    
+    /**
+     * Say if the list of {@link IoSession} polled by this {@link IoProcessor} 
+     * is empty
+     * @return true if at least a session is managed by this {@link IoProcessor}
+     */
     protected abstract boolean isSelectorEmpty();
     
     /**
      * Interrupt the {@link AbstractPollingIoProcessor#select(int) call.
      */
     protected abstract void wakeup();
+    
+    /**
+     * Get an {@link Iterator} for the list of {@link IoSession} polled by this
+     * {@link IoProcessor}   
+     * @return {@link Iterator} of {@link IoSession}
+     */
     protected abstract Iterator<T> allSessions();
+    
+    /**
+     * Get an {@link Iterator} for the list of {@link IoSession} found selected 
+     * by the last call of {@link AbstractPollingIoProcessor#select(int)
+     * @return {@link Iterator} of {@link IoSession} read for I/Os operation
+     */
     protected abstract Iterator<T> selectedSessions();
+    
+    /**
+     * Get the sate of a session (preparing, open, closed)
+     * @param session the {@link IoSession} to inspect
+     * @return the state of the session
+     */
     protected abstract SessionState state(T session);
 
     /**
@@ -222,9 +260,30 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      */
     protected abstract boolean isInterestedInWrite(T session);
 
+    /**
+     * Initialize the polling of a session. Add it to the polling process. 
+     * @param session the {@link IoSession} to add to the polling
+     * @throws Exception any exception thrown by the underlying system calls
+     */
     protected abstract void init(T session) throws Exception;
+    
+    /**
+     * Destroy the underlying client socket handle
+     * @param session the {@link IoSession}
+     * @throws Exception any exception thrown by the underlying system calls
+     */
     protected abstract void destroy(T session) throws Exception;
+    
+    /**
+     * Reads a sequence of bytes from a {@link IoSession} into the given {@link IoBuffer}. 
+     * Is called when the session was found ready for readying.
+     * @param session the session to read
+     * @param buf the buffer to fill
+     * @return the number of bytes read
+     * @throws Exception any exception thrown by the underlying system calls
+     */
     protected abstract int read(T session, IoBuffer buf) throws Exception;
+    
     protected abstract int write(T session, IoBuffer buf, int length) throws Exception;
     protected abstract int transferFile(T session, FileRegion region, int length) throws Exception;
 
