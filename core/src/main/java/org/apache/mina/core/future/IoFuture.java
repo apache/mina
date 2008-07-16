@@ -29,7 +29,7 @@ import org.apache.mina.core.session.IoSession;
  * Can be listened for completion using a {@link IoFutureListener}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
 public interface IoFuture {
 	
@@ -99,7 +99,7 @@ public interface IoFuture {
     /**
      * Returns if the asynchronous operation is completed.
      */
-    boolean isReady();
+    boolean isDone();
 
     /**
      * Adds an event <tt>listener</tt> which is notified when

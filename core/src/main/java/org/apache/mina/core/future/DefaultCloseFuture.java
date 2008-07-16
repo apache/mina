@@ -26,7 +26,7 @@ import org.apache.mina.core.session.IoSession;
  * A default implementation of {@link CloseFuture}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
 public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture {
     /**
@@ -37,7 +37,7 @@ public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture {
     }
 
     public boolean isClosed() {
-        if (isReady()) {
+        if (isDone()) {
             return ((Boolean) getValue()).booleanValue();
         } else {
             return false;

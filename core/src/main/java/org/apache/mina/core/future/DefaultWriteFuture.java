@@ -26,7 +26,7 @@ import org.apache.mina.core.session.IoSession;
  * A default implementation of {@link WriteFuture}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
 public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**
@@ -58,7 +58,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
      * {@inheritDoc}
      */
     public boolean isWritten() {
-        if (isReady()) {
+        if (isDone()) {
             Object v = getValue();
             if (v instanceof Boolean) {
                 return ((Boolean) v).booleanValue();
@@ -71,7 +71,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
      * {@inheritDoc}
      */
     public Throwable getException() {
-        if (isReady()) {
+        if (isDone()) {
             Object v = getValue();
             if (v instanceof Throwable) {
                 return (Throwable) v;

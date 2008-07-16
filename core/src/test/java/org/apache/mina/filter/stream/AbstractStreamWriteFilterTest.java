@@ -508,7 +508,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
             return true;
         }
 
-        public boolean isReady() {
+        public boolean isDone() {
             return true;
         }
 

@@ -34,7 +34,7 @@ import org.apache.mina.core.session.IoSession;
  * an {@link IoSession}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
 public class DefaultIoFuture implements IoFuture {
 
@@ -258,7 +258,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
-    public boolean isReady() {
+    public boolean isDone() {
         synchronized (lock) {
             return ready;
         }

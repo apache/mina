@@ -29,7 +29,7 @@ import org.apache.mina.core.session.IoSession;
  * A default implementation of {@link WriteFuture}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
 public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     
@@ -43,7 +43,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     }
     
     public Object getMessage() {
-        if (isReady()) {
+        if (isDone()) {
             Object v = getValue();
             if (v == CLOSED) {
                 return null;
@@ -70,7 +70,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
 
 
     public boolean isRead() {
-        if (isReady()) {
+        if (isDone()) {
             Object v = getValue();
             return (v != CLOSED && !(v instanceof ExceptionHolder));
         }
@@ -78,14 +78,14 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     }
     
     public boolean isClosed() {
-        if (isReady()) {
+        if (isDone()) {
             return getValue() == CLOSED;
         }
         return false;
     }
 
     public Throwable getException() {
-        if (isReady()) {
+        if (isDone()) {
             Object v = getValue();
             if (v instanceof ExceptionHolder) {
                 return ((ExceptionHolder) v).exception;

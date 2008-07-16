@@ -35,13 +35,13 @@ import junit.framework.TestCase;
  * Tests {@link IoFuture} implementations.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
 public class FutureTest extends TestCase {
 
     public void testCloseFuture() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
-        assertFalse(future.isReady());
+        assertFalse(future.isDone());
         assertFalse(future.isClosed());
 
         TestThread thread = new TestThread(future);
@@ -51,13 +51,13 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertTrue(future.isClosed());
     }
 
     public void testConnectFuture() throws Exception {
         DefaultConnectFuture future = new DefaultConnectFuture();
-        assertFalse(future.isReady());
+        assertFalse(future.isDone());
         assertFalse(future.isConnected());
         assertNull(future.getSession());
         assertNull(future.getException());
@@ -71,7 +71,7 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertTrue(future.isConnected());
         assertEquals(session, future.getSession());
         assertNull(future.getException());
@@ -83,7 +83,7 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertFalse(future.isConnected());
         assertTrue(future.getException() instanceof IOException);
 
@@ -96,7 +96,7 @@ public class FutureTest extends TestCase {
 
     public void testWriteFuture() throws Exception {
         DefaultWriteFuture future = new DefaultWriteFuture(null);
-        assertFalse(future.isReady());
+        assertFalse(future.isDone());
         assertFalse(future.isWritten());
 
         TestThread thread = new TestThread(future);
@@ -106,7 +106,7 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertTrue(future.isWritten());
 
         future = new DefaultWriteFuture(null);
@@ -117,14 +117,14 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertFalse(future.isWritten());
         assertTrue(future.getException().getClass() == Exception.class);
     }
 
     public void testAddListener() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
-        assertFalse(future.isReady());
+        assertFalse(future.isDone());
         assertFalse(future.isClosed());
 
         TestListener listener1 = new TestListener();
@@ -139,7 +139,7 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertTrue(future.isClosed());
 
         assertSame(future, listener1.notifiedFuture);
@@ -148,7 +148,7 @@ public class FutureTest extends TestCase {
 
     public void testLateAddListener() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
-        assertFalse(future.isReady());
+        assertFalse(future.isDone());
         assertFalse(future.isClosed());
 
         TestThread thread = new TestThread(future);
@@ -158,7 +158,7 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertTrue(future.isClosed());
 
         TestListener listener = new TestListener();
@@ -168,7 +168,7 @@ public class FutureTest extends TestCase {
 
     public void testRemoveListener1() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
-        assertFalse(future.isReady());
+        assertFalse(future.isDone());
         assertFalse(future.isClosed());
 
         TestListener listener1 = new TestListener();
@@ -184,7 +184,7 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertTrue(future.isClosed());
 
         assertSame(null, listener1.notifiedFuture);
@@ -193,7 +193,7 @@ public class FutureTest extends TestCase {
 
     public void testRemoveListener2() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
-        assertFalse(future.isReady());
+        assertFalse(future.isDone());
         assertFalse(future.isClosed());
 
         TestListener listener1 = new TestListener();
@@ -209,7 +209,7 @@ public class FutureTest extends TestCase {
         thread.join();
 
         assertTrue(thread.success);
-        assertTrue(future.isReady());
+        assertTrue(future.isDone());
         assertTrue(future.isClosed());
 
         assertSame(future, listener1.notifiedFuture);
