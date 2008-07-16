@@ -276,15 +276,36 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     
     /**
      * Reads a sequence of bytes from a {@link IoSession} into the given {@link IoBuffer}. 
-     * Is called when the session was found ready for readying.
+     * Is called when the session was found ready for reading.
      * @param session the session to read
      * @param buf the buffer to fill
      * @return the number of bytes read
      * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract int read(T session, IoBuffer buf) throws Exception;
-    
+
+    /**
+     * Write a sequence of bytes to a {@link IoSession}, means to be called when a session
+     * was found ready for writing.
+     * @param session the session to write
+     * @param buf the buffer to write
+     * @param length the number of bytes to write can be superior to the number of bytes remaining
+     * in the buffer
+     * @return the number of byte written
+     * @throws Exception any exception thrown by the underlying system calls
+     */
     protected abstract int write(T session, IoBuffer buf, int length) throws Exception;
+    
+    /**
+     * Write a part of a file to a {@link IoSession}, if the underlying API isn't supporting
+     * system calls like sendfile(), you can throw a {@link UnsupportedOperationException} so 
+     * the file will be send using usual {@link #write(AbstractIoSession, IoBuffer, int)} call. 
+     * @param session the session to write
+     * @param region the file region to write
+     * @param length the length of the portion to send
+     * @return the number of written bytes
+     * @throws Exception any exception thrown by the underlying system calls
+     */
     protected abstract int transferFile(T session, FileRegion region, int length) throws Exception;
 
     /**
@@ -814,10 +835,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     
-    /**
-     *  
-     *
-     */
     private class Worker implements Runnable {
         public void run() {
             int nSessions = 0;
