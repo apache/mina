@@ -50,7 +50,6 @@ import org.apache.mina.core.write.WriteRequest;
  * <p/>
  * <h3>Thread Safety</h3>
  * <p/>
- * TODO : The following paragraph does not make any sense.
  * {@link IoSession} is thread-safe.  But please note that performing
  * more than one {@link #write(Object)} calls at the same time will
  * cause the {@link IoFilter#filterWrite(IoFilter.NextFilter,IoSession,WriteRequest)}
@@ -59,7 +58,7 @@ import org.apache.mina.core.write.WriteRequest;
  * </p>
  * <p/>
  * <h3>Equality of Sessions</h3>
- * TODO : this is BS. The getId() method is totally worng. We can't base
+ * TODO : The getId() method is totally wrong. We can't base
  * a method which is designed to create a unique ID on the hashCode method.
  * {@link #equals(Object)} and {@link #hashCode()} shall not be overriden
  * to the default behavior that is defined in {@link Object}.
@@ -105,6 +104,7 @@ public interface IoSession {
 
     /**
      * TODO This javadoc is wrong. The return tag should be short.
+     * 
      * @return a {@link ReadFuture} which is notified when a new message is
      * received, the connection is closed or an exception is caught.  This
      * operation is especially useful when you implement a client application.
