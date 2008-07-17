@@ -61,7 +61,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public abstract class AbstractIoService implements IoService {
+public abstract class AbstractIoService implements IoService, IoServiceStatistics, IoServiceIdleState {
     /** 
      * The unique number identifying the Service. It's incremented
      * for each new IoService created.
@@ -430,6 +430,20 @@ public abstract class AbstractIoService implements IoService {
         this.sessionDataStructureFactory = sessionDataStructureFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public IoServiceIdleState getIdleState() {
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoServiceStatistics getStatistics() {
+        return this;
+    }
+       
     /**
      * {@inheritDoc}
      */

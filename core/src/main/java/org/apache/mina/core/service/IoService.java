@@ -28,7 +28,6 @@ import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.filterchain.IoFilterChainBuilder;
 import org.apache.mina.core.future.WriteFuture;
-import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionDataStructureFactory;
@@ -104,19 +103,6 @@ public interface IoService {
     int getManagedSessionCount();
 
     /**
-     * Returns the maximum number of sessions which were being managed at the
-     * same time.
-     */
-    int getLargestManagedSessionCount();
-
-    /**
-     * Returns the cumulative number of sessions which were managed (or are
-     * being managed) by this service, which means 'currently managed session
-     * count + closed session count'.
-     */
-    long getCumulativeManagedSessionCount();
-
-    /**
      * Returns the default configuration of the new {@link IoSession}s
      * created by this service.
      */
@@ -169,253 +155,23 @@ public interface IoService {
     long getActivationTime();
 
     /**
-     * Returns the time in millis when I/O occurred lastly.
+     * Writes the specified {@code message} to all the {@link IoSession}s
+     * managed by this service.  This method is a convenience shortcut for
+     * {@link IoUtil#broadcast(Object, Collection)}.
      */
-    long getLastIoTime();
+    Set<WriteFuture> broadcast(Object message);
 
     /**
-     * Returns the time in millis when read operation occurred lastly.
+     * Returns the {@link IoSessionDataStructureFactory} that provides
+     * related data structures for a new session created by this service.
      */
-    long getLastReadTime();
+    IoSessionDataStructureFactory getSessionDataStructureFactory();
 
     /**
-     * Returns the time in millis when write operation occurred lastly.
+     * Sets the {@link IoSessionDataStructureFactory} that provides
+     * related data structures for a new session created by this service.
      */
-    long getLastWriteTime();
-
-    /**
-     * Returns <code>true</code> if this service is idle for the specified
-     * {@link IdleStatus}.
-     */
-    boolean isIdle(IdleStatus status);
-
-    /**
-     * Returns <code>true</code> if this service is {@link IdleStatus#READER_IDLE}.
-     * @see #isIdle(IdleStatus)
-     */
-    boolean isReaderIdle();
-
-    /**
-     * Returns <code>true</code> if this service is {@link IdleStatus#WRITER_IDLE}.
-     * @see #isIdle(IdleStatus)
-     */
-    boolean isWriterIdle();
-
-    /**
-     * Returns <code>true</code> if this service is {@link IdleStatus#BOTH_IDLE}.
-     * @see #isIdle(IdleStatus)
-     */
-    boolean isBothIdle();
-
-    /**
-     * Returns the number of the fired continuous <tt>serviceIdle</tt> events
-     * for the specified {@link IdleStatus}.
-     * <p/>
-     * If <tt>serviceIdle</tt> event is fired first after some time after I/O,
-     * <tt>idleCount</tt> becomes <tt>1</tt>.  <tt>idleCount</tt> resets to
-     * <tt>0</tt> if any I/O occurs again, otherwise it increases to
-     * <tt>2</tt> and so on if <tt>serviceIdle</tt> event is fired again without
-     * any I/O between two (or more) <tt>serviceIdle</tt> events.
-     */
-    int getIdleCount(IdleStatus status);
-
-    /**
-     * Returns the number of the fired continuous <tt>serviceIdle</tt> events
-     * for {@link IdleStatus#READER_IDLE}.
-     * @see #getIdleCount(IdleStatus)
-     */
-    int getReaderIdleCount();
-
-    /**
-     * Returns the number of the fired continuous <tt>serviceIdle</tt> events
-     * for {@link IdleStatus#WRITER_IDLE}.
-     * @see #getIdleCount(IdleStatus)
-     */
-    int getWriterIdleCount();
-
-    /**
-     * Returns the number of the fired continuous <tt>serviceIdle</tt> events
-     * for {@link IdleStatus#BOTH_IDLE}.
-     * @see #getIdleCount(IdleStatus)
-     */
-    int getBothIdleCount();
-
-    /**
-     * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
-     * is fired for the specified {@link IdleStatus}.
-     */
-    long getLastIdleTime(IdleStatus status);
-
-    /**
-     * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
-     * is fired for {@link IdleStatus#READER_IDLE}.
-     * @see #getLastIdleTime(IdleStatus)
-     */
-    long getLastReaderIdleTime();
-
-    /**
-     * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
-     * is fired for {@link IdleStatus#WRITER_IDLE}.
-     * @see #getLastIdleTime(IdleStatus)
-     */
-    long getLastWriterIdleTime();
-
-    /**
-     * Returns the time in milliseconds when the last <tt>serviceIdle</tt> event
-     * is fired for {@link IdleStatus#BOTH_IDLE}.
-     * @see #getLastIdleTime(IdleStatus)
-     */
-    long getLastBothIdleTime();
-
-    /**
-     * Returns idle time for the specified type of idleness in seconds.
-     */
-    int getIdleTime(IdleStatus status);
-
-    /**
-     * Returns idle time for the specified type of idleness in milliseconds.
-     */
-    long getIdleTimeInMillis(IdleStatus status);
-
-    /**
-     * Sets idle time for the specified type of idleness in seconds.
-     */
-    void setIdleTime(IdleStatus status, int idleTime);
-
-    /**
-     * Returns idle time for {@link IdleStatus#READER_IDLE} in seconds.
-     */
-    int getReaderIdleTime();
-
-    /**
-     * Returns idle time for {@link IdleStatus#READER_IDLE} in milliseconds.
-     */
-    long getReaderIdleTimeInMillis();
-
-    /**
-     * Sets idle time for {@link IdleStatus#READER_IDLE} in seconds.
-     */
-    void setReaderIdleTime(int idleTime);
-
-    /**
-     * Returns idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
-     */
-    int getWriterIdleTime();
-
-    /**
-     * Returns idle time for {@link IdleStatus#WRITER_IDLE} in milliseconds.
-     */
-    long getWriterIdleTimeInMillis();
-
-    /**
-     * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
-     */
-    void setWriterIdleTime(int idleTime);
-
-    /**
-     * Returns idle time for {@link IdleStatus#BOTH_IDLE} in seconds.
-     */
-    int getBothIdleTime();
-
-    /**
-     * Returns idle time for {@link IdleStatus#BOTH_IDLE} in milliseconds.
-     */
-    long getBothIdleTimeInMillis();
-
-    /**
-     * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
-     */
-    void setBothIdleTime(int idleTime);
-
-    /**
-     * Returns the number of bytes read by this service
-     *
-     * @return
-     * 	The number of bytes this service has read
-     */
-    long getReadBytes();
-
-    /**
-     * Returns the number of bytes written out by this service
-     *
-     * @return
-     * 	The number of bytes this service has written
-     */
-    long getWrittenBytes();
-
-    /**
-     * Returns the number of messages this services has read
-     *
-     * @return
-     * 	The number of messages this services has read
-     */
-    long getReadMessages();
-
-    /**
-     * Returns the number of messages this service has written
-     *
-     * @return
-     * 	The number of messages this service has written
-     */
-    long getWrittenMessages();
-
-    /**
-     * Returns the number of read bytes per second.
-     */
-    double getReadBytesThroughput();
-
-    /**
-     * Returns the number of written bytes per second.
-     */
-    double getWrittenBytesThroughput();
-
-    /**
-     * Returns the number of read messages per second.
-     */
-    double getReadMessagesThroughput();
-
-    /**
-     * Returns the number of written messages per second.
-     */
-    double getWrittenMessagesThroughput();
-
-    /**
-     * Returns the maximum of the {@link #getReadBytesThroughput() readBytesThroughput}.
-     */
-    double getLargestReadBytesThroughput();
-
-    /**
-     * Returns the maximum of the {@link #getWrittenBytesThroughput() writtenBytesThroughput}.
-     */
-    double getLargestWrittenBytesThroughput();
-
-    /**
-     * Returns the maximum of the {@link #getReadMessagesThroughput() readMessagesThroughput}.
-     */
-    double getLargestReadMessagesThroughput();
-
-    /**
-     * Returns the maximum of the {@link #getWrittenMessagesThroughput() writtenMessagesThroughput}.
-     */
-    double getLargestWrittenMessagesThroughput();
-
-    /**
-     * Returns the interval (seconds) between each throughput calculation.
-     * The default value is <tt>3</tt> seconds.
-     */
-    int getThroughputCalculationInterval();
-
-    /**
-     * Returns the interval (milliseconds) between each throughput calculation.
-     * The default value is <tt>3</tt> seconds.
-     */
-    long getThroughputCalculationIntervalInMillis();
-
-    /**
-     * Sets the interval (seconds) between each throughput calculation.  The
-     * default value is <tt>3</tt> seconds.
-     */
-    void setThroughputCalculationInterval(int throughputCalculationInterval);
+    void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory);
 
     /**
      * Returns the number of bytes scheduled to be written
@@ -434,21 +190,16 @@ public interface IoService {
     int getScheduledWriteMessages();
 
     /**
-     * Writes the specified {@code message} to all the {@link IoSession}s
-     * managed by this service.  This method is a convenience shortcut for
-     * {@link IoUtil#broadcast(Object, Collection)}.
+     * Returns the IoServiceIdleState for this service.
+     * 
+     * @return The idle state object for this service.
      */
-    Set<WriteFuture> broadcast(Object message);
+    IoServiceIdleState getIdleState();
 
     /**
-     * Returns the {@link IoSessionDataStructureFactory} that provides
-     * related data structures for a new session created by this service.
+     * Returns the IoServiceStatistics object for this service.
+     * 
+     * @return The statistics object for this service.
      */
-    IoSessionDataStructureFactory getSessionDataStructureFactory();
-
-    /**
-     * Sets the {@link IoSessionDataStructureFactory} that provides
-     * related data structures for a new session created by this service.
-     */
-    void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory);
+    IoServiceStatistics getStatistics();
 }
