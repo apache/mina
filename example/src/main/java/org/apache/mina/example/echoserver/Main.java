@@ -57,7 +57,8 @@ public class Main {
         System.out.println("Listening on port " + PORT);
         
         for (;;) {
-            System.out.println("R: " + acceptor.getReadBytesThroughput() + ", W: " + acceptor.getWrittenBytesThroughput());
+            System.out.println("R: " + acceptor.getStatistics().getReadBytesThroughput() + 
+                ", W: " + acceptor.getStatistics().getWrittenBytesThroughput());
             Thread.sleep(3000);
         }
     }
@@ -68,11 +69,5 @@ public class Main {
                 .getInstance(true));
         chain.addLast("sslFilter", sslFilter);
         System.out.println("SSL ON");
-    }
-
-    private static void addLogger(DefaultIoFilterChainBuilder chain)
-            throws Exception {
-        chain.addLast("logger", new LoggingFilter());
-        System.out.println("Logging ON");
     }
 }
