@@ -30,6 +30,8 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IoFilter} implementation used to buffer outgoing {@link WriteRequest} almost 
@@ -41,11 +43,12 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
  * as it only handles {@link WriteRequest}'s carrying {@link IoBuffer} objects.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: $, $Date: $
+ * @version $Rev$, $Date$
  * @since MINA 2.0.0-M2
  */
 public final class BufferedWriteFilter extends IoFilterAdapter {
-
+    private final Logger logger = LoggerFactory.getLogger(BufferedWriteFilter.class);
+    
     /**
      * Default buffer size value in bytes.
      */
@@ -184,7 +187,9 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     private void internalFlush(NextFilter nextFilter, IoSession session,
             IoBuffer data) throws Exception {
         if (data != null) {
-            nextFilter.filterWrite(session, new DefaultWriteRequest(data));
+            data.flip();
+            logger.debug("Flushing buffer: {}", data);            
+            nextFilter.filterWrite(session, new DefaultWriteRequest(data.duplicate()));
             data.clear();
         }
     }
