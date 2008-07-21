@@ -17,7 +17,8 @@
  *  under the License.
  *
  */
-package org.apache.mina.core;
+package org.apache.mina.util;
+
 
 
 /**

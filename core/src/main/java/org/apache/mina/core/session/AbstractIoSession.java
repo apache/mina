@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.mina.core.ExceptionMonitor;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.DefaultFileRegion;
 import org.apache.mina.core.future.CloseFuture;
@@ -49,6 +48,7 @@ import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.apache.mina.util.CircularQueue;
+import org.apache.mina.util.ExceptionMonitor;
 
 
 /**

@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.core;
+package org.apache.mina.util;
 
 import org.apache.mina.core.service.IoService;
 import org.slf4j.Logger;

@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.core.ExceptionMonitor;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultConnectFuture;
@@ -35,6 +34,7 @@ import org.apache.mina.core.service.AbstractIoConnector;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.session.IoSessionInitializer;
+import org.apache.mina.util.ExceptionMonitor;
 
 /**
  * Connects to {@link IoHandler}s which is bound on the specified

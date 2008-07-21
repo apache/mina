@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.apache.mina.core.ExceptionMonitor;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.IoFuture;
@@ -45,6 +44,7 @@ import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.util.ExceptionMonitor;
 
 /**
  * A base class for implementing transport using a polling strategy. The

@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.mina.core.ExceptionMonitor;
 import org.apache.mina.core.IoUtil;
 import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -49,6 +48,7 @@ import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionDataStructureFactory;
 import org.apache.mina.core.session.IoSessionInitializationException;
 import org.apache.mina.core.session.IoSessionInitializer;
+import org.apache.mina.util.ExceptionMonitor;
 import org.apache.mina.util.NamePreservingRunnable;
 
 

@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.core.ExceptionMonitor;
 import org.apache.mina.core.polling.AbstractPollingIoProcessor;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.util.ExceptionMonitor;
 
 
 /**

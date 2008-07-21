@@ -22,7 +22,7 @@ package org.apache.mina.transport.socket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-import org.apache.mina.core.ExceptionMonitor;
+import org.apache.mina.util.ExceptionMonitor;
 
 /**
  * A default implementation of {@link DatagramSessionConfig}.
