@@ -43,6 +43,10 @@ public interface MessageHandler<E> {
     /**
      * Invoked when the specific type of message is received from or sent to
      * the specified <code>session</code>.
+     * 
+     * @param session the associated {@link IoSession}
+     * @param message the message to decode. Its type is set by the implementation
+     * @throws Exception if there is an error during the message processing
      */
     void handleMessage(IoSession session, E message) throws Exception;
 }
