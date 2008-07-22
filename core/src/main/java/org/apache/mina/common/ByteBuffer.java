@@ -158,7 +158,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 public abstract class ByteBuffer implements Comparable<ByteBuffer> {
     private static ByteBufferAllocator allocator = new PooledByteBufferAllocator();
 
-    private static boolean useDirectBuffers = true;
+    private static boolean useDirectBuffers = false;
 
     /**
      * Returns the current allocator which manages the allocated buffers.
@@ -911,44 +911,58 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
         int oldPos = position();
         int oldLimit = limit();
-        int end;
+        int end = -1;
+        int newPos;
 
         if (!utf16) {
-            while (hasRemaining()) {
-                if (get() == 0) {
-                    break;
-                }
-            }
-
-            end = position();
-            if (end == oldLimit && get(end - 1) != 0) {
-                limit(end);
+            end = indexOf((byte)0x00);
+            if (end < 0) {
+                newPos = end = oldLimit;
             } else {
-                limit(end - 1);
+                newPos = end + 1;
             }
         } else {
-            while (remaining() >= 2) {
-                boolean highZero = (get() == 0);
-                boolean lowZero = (get() == 0);
-                if (highZero && lowZero) {
+            int i = oldPos;
+            for (;;) {
+                boolean wasZero = get(i) == 0;
+                i++;
+
+                if (i >= oldLimit) {
+                    break;
+                }
+
+                if (get(i) != 0) {
+                    i++;
+                    if (i >= oldLimit) {
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+
+                if (wasZero) {
+                    end = i - 1;
                     break;
                 }
             }
 
-            end = position();
-            if (end == oldLimit || end == oldLimit - 1) {
-                limit(end);
+            if (end < 0) {
+                newPos = end = oldPos + (oldLimit - oldPos & 0xFFFFFFFE);
             } else {
-                limit(end - 2);
+                if (end + 2 <= oldLimit) {
+                    newPos = end + 2;
+                } else {
+                    newPos = end;
+                }
             }
         }
 
-        position(oldPos);
-        if (!hasRemaining()) {
-            limit(oldLimit);
-            position(end);
+        if (oldPos == end) {
+            position(newPos);
             return "";
         }
+
+        limit(end);
         decoder.reset();
 
         int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
@@ -983,7 +997,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         }
 
         limit(oldLimit);
-        position(end);
+        position(newPos);
         return out.flip().toString();
     }
 
@@ -1013,7 +1027,7 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
 
         int oldPos = position();
         int oldLimit = limit();
-        int end = position() + fieldSize;
+        int end = oldPos + fieldSize;
 
         if (oldLimit < end) {
             throw new BufferUnderflowException();
@@ -1022,34 +1036,31 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         int i;
 
         if (!utf16) {
-            for (i = 0; i < fieldSize; i++) {
-                if (get() == 0) {
+            for (i = oldPos; i < end; i++) {
+                if (get(i) == 0) {
                     break;
                 }
             }
 
-            if (i == fieldSize) {
+            if (i == end) {
                 limit(end);
             } else {
-                limit(position() - 1);
+                limit(i);
             }
         } else {
-            for (i = 0; i < fieldSize; i += 2) {
-                boolean highZero = (get() == 0);
-                boolean lowZero = (get() == 0);
-                if (highZero && lowZero) {
+            for (i = oldPos; i < end; i += 2) {
+                if (get(i) == 0 && get(i + 1) == 0) {
                     break;
                 }
             }
 
-            if (i == fieldSize) {
+            if (i == end) {
                 limit(end);
             } else {
-                limit(position() - 2);
+                limit(i);
             }
         }
 
-        position(oldPos);
         if (!hasRemaining()) {
             limit(oldLimit);
             position(end);
@@ -1093,6 +1104,32 @@ public abstract class ByteBuffer implements Comparable<ByteBuffer> {
         return out.flip().toString();
     }
 
+    private int indexOf(byte b) {
+        if (buf().hasArray()) {
+            int arrayOffset = arrayOffset();
+            int beginPos = arrayOffset + position();
+            int limit = arrayOffset + limit();
+            byte[] array = array();
+
+            for (int i = beginPos; i < limit; i++) {
+                if (array[i] == b) {
+                    return i - arrayOffset;
+                }
+            }
+        } else {
+            int beginPos = position();
+            int limit = limit();
+
+            for (int i = beginPos; i < limit; i++) {
+                if (get(i) == b) {
+                    return i;
+                }
+            }
+        }
+
+        return -1;
+    }
+    
     /**
      * Writes the content of <code>in</code> into this buffer using the
      * specified <code>encoder</code>.  This method doesn't terminate
