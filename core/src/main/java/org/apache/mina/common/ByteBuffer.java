@@ -158,7 +158,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 public abstract class ByteBuffer implements Comparable {
     private static ByteBufferAllocator allocator = new PooledByteBufferAllocator();
 
-    private static boolean useDirectBuffers = true;
+    private static boolean useDirectBuffers = false;
 
     /**
      * Returns the current allocator which manages the allocated buffers.
@@ -900,39 +900,156 @@ public abstract class ByteBuffer implements Comparable {
 
         int oldPos = position();
         int oldLimit = limit();
-        int end;
+        int end = -1;
+        int newPos;
 
         if (!utf16) {
-            while (hasRemaining()) {
-                if (get() == 0) {
-                    break;
-                }
-            }
-
-            end = position();
-            if (end == oldLimit && get(end - 1) != 0) {
-                limit(end);
+            end = indexOf((byte)0x00);
+            if (end < 0) {
+                newPos = end = oldLimit;
             } else {
-                limit(end - 1);
+                newPos = end + 1;
             }
         } else {
-            while (remaining() >= 2) {
-                boolean highZero = (get() == 0);
-                boolean lowZero = (get() == 0);
-                if (highZero && lowZero) {
+            int i = oldPos;
+            for (;;) {
+                boolean wasZero = get(i) == 0;
+                i++;
+                
+                if (i >= oldLimit) {
+                    break;
+                }
+            
+                if (get(i) != 0) {
+                    i++;
+                    if (i >= oldLimit) {
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+            
+                if (wasZero) {
+                    end = i - 1;
                     break;
                 }
             }
 
-            end = position();
-            if (end == oldLimit || end == oldLimit - 1) {
-                limit(end);
+            if (end < 0) {
+                newPos = end = oldPos + (oldLimit - oldPos & 0xFFFFFFFE);
             } else {
-                limit(end - 2);
+                if (end + 2 <= oldLimit) {
+                    newPos = end + 2;
+                } else {
+                    newPos = end;
+                }
             }
         }
 
-        position(oldPos);
+        if (oldPos == end) {
+            position(newPos);
+            return "";
+        }
+        
+        limit(end);
+        decoder.reset();
+
+        int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
+        CharBuffer out = CharBuffer.allocate(expectedLength);
+        for (;;) {
+            CoderResult cr;
+            if (hasRemaining()) {
+                cr = decoder.decode(buf(), out, true);
+            } else {
+                cr = decoder.flush(out);
+            }
+
+            if (cr.isUnderflow()) {
+                break;
+            }
+
+            if (cr.isOverflow()) {
+                CharBuffer o = CharBuffer.allocate(out.capacity()
+                        + expectedLength);
+                out.flip();
+                o.put(out);
+                out = o;
+                continue;
+            }
+
+            if (cr.isError()) {
+                // Revert the buffer back to the previous state.
+                limit(oldLimit);
+                position(oldPos);
+                cr.throwException();
+            }
+        }
+
+        limit(oldLimit);
+        position(newPos);
+        return out.flip().toString();
+    }
+
+    /**
+     * Reads a <code>NUL</code>-terminated string from this buffer using the
+     * specified <code>decoder</code> and returns it.
+     *
+     * @param fieldSize the maximum number of bytes to read
+     */
+    public String getString(int fieldSize, CharsetDecoder decoder)
+            throws CharacterCodingException {
+        checkFieldSize(fieldSize);
+
+        if (fieldSize == 0) {
+            return "";
+        }
+
+        if (!hasRemaining()) {
+            return "";
+        }
+
+        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
+
+        if (utf16 && ((fieldSize & 1) != 0)) {
+            throw new IllegalArgumentException("fieldSize is not even.");
+        }
+
+        int oldPos = position();
+        int oldLimit = limit();
+        int end = oldPos + fieldSize;
+
+        if (oldLimit < end) {
+            throw new BufferUnderflowException();
+        }
+
+        int i;
+
+        if (!utf16) {
+            for (i = oldPos; i < end; i++) {
+                if (get(i) == 0) {
+                    break;
+                }
+            }
+
+            if (i == end) {
+                limit(end);
+            } else {
+                limit(i);
+            }
+        } else {
+            for (i = oldPos; i < end; i += 2) {
+                if (get(i) == 0 && get(i + 1) == 0) {
+                    break;
+                }
+            }
+
+            if (i == end) {
+                limit(end);
+            } else {
+                limit(i);
+            }
+        }
+
         if (!hasRemaining()) {
             limit(oldLimit);
             position(end);
@@ -975,111 +1092,31 @@ public abstract class ByteBuffer implements Comparable {
         position(end);
         return out.flip().toString();
     }
-
-    /**
-     * Reads a <code>NUL</code>-terminated string from this buffer using the
-     * specified <code>decoder</code> and returns it.
-     *
-     * @param fieldSize the maximum number of bytes to read
-     */
-    public String getString(int fieldSize, CharsetDecoder decoder)
-            throws CharacterCodingException {
-        checkFieldSize(fieldSize);
-
-        if (fieldSize == 0) {
-            return "";
-        }
-
-        if (!hasRemaining()) {
-            return "";
-        }
-
-        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
-
-        if (utf16 && ((fieldSize & 1) != 0)) {
-            throw new IllegalArgumentException("fieldSize is not even.");
-        }
-
-        int oldPos = position();
-        int oldLimit = limit();
-        int end = position() + fieldSize;
-
-        if (oldLimit < end) {
-            throw new BufferUnderflowException();
-        }
-
-        int i;
-
-        if (!utf16) {
-            for (i = 0; i < fieldSize; i++) {
-                if (get() == 0) {
-                    break;
+    
+    private int indexOf(byte b) {
+        if (buf().hasArray()) {
+            int arrayOffset = arrayOffset();
+            int beginPos = arrayOffset + position();
+            int limit = arrayOffset + limit();
+            byte[] array = array();
+            
+            for (int i = beginPos; i < limit; i++) {
+                if (array[i] == b) {
+                    return i - arrayOffset;
                 }
-            }
-
-            if (i == fieldSize) {
-                limit(end);
-            } else {
-                limit(position() - 1);
             }
         } else {
-            for (i = 0; i < fieldSize; i += 2) {
-                boolean highZero = (get() == 0);
-                boolean lowZero = (get() == 0);
-                if (highZero && lowZero) {
-                    break;
+            int beginPos = position();
+            int limit = limit();
+            
+            for (int i = beginPos; i < limit; i++) {
+                if (get(i) == b) {
+                    return i;
                 }
             }
-
-            if (i == fieldSize) {
-                limit(end);
-            } else {
-                limit(position() - 2);
-            }
         }
-
-        position(oldPos);
-        if (!hasRemaining()) {
-            limit(oldLimit);
-            position(end);
-            return "";
-        }
-        decoder.reset();
-
-        int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
-        CharBuffer out = CharBuffer.allocate(expectedLength);
-        for (;;) {
-            CoderResult cr;
-            if (hasRemaining()) {
-                cr = decoder.decode(buf(), out, true);
-            } else {
-                cr = decoder.flush(out);
-            }
-
-            if (cr.isUnderflow()) {
-                break;
-            }
-
-            if (cr.isOverflow()) {
-                CharBuffer o = CharBuffer.allocate(out.capacity()
-                        + expectedLength);
-                out.flip();
-                o.put(out);
-                out = o;
-                continue;
-            }
-
-            if (cr.isError()) {
-                // Revert the buffer back to the previous state.
-                limit(oldLimit);
-                position(oldPos);
-                cr.throwException();
-            }
-        }
-
-        limit(oldLimit);
-        position(end);
-        return out.flip().toString();
+        
+        return -1;
     }
 
     /**
