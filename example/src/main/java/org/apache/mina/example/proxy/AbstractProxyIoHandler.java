@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
     private static final Charset CHARSET = Charset.forName("iso8859-1");
+    public static final String OTHER_IO_SESSION = AbstractProxyIoHandler.class.getName()+".OtherIoSession";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
@@ -48,10 +49,11 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
-        if (session.getAttribute( "" ) != null) {
-            ((IoSession) session.getAttribute("")).setAttribute("", null);
-            ((IoSession) session.getAttribute("")).closeOnFlush();
-            session.setAttribute("", null);
+        if (session.getAttribute( OTHER_IO_SESSION ) != null) {
+            IoSession sess = (IoSession) session.getAttribute(OTHER_IO_SESSION);
+            sess.setAttribute(OTHER_IO_SESSION, null);
+            sess.closeOnFlush();
+            session.setAttribute(OTHER_IO_SESSION, null);
         }
     }
 
@@ -63,7 +65,7 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         rb.mark();
         wb.put(rb);
         wb.flip();
-        ((IoSession) session.getAttribute("")).write(wb);
+        ((IoSession) session.getAttribute(OTHER_IO_SESSION)).write(wb);
         rb.reset();
         logger.info(rb.getString(CHARSET.newDecoder()));
     }
