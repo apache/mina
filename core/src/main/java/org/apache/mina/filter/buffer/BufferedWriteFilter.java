@@ -68,21 +68,39 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
 
     /**
      * Default constructor. Sets buffer size to {@link #DEFAULT_BUFFER_SIZE}
-     * bytes.
+     * bytes. Uses a default instance of {@link ConcurrentHashMap}.
      */
     public BufferedWriteFilter() {
-        this(DEFAULT_BUFFER_SIZE);
+        this(DEFAULT_BUFFER_SIZE, null);
     }
 
     /**
-     * Constructor which sets buffer size to <code>bufferSize</code>.
+     * Constructor which sets buffer size to <code>bufferSize</code>.Uses a default 
+     * instance of {@link ConcurrentHashMap}.
      * 
      * @param bufferSize the new buffer size
      */
     public BufferedWriteFilter(int bufferSize) {
+        this(bufferSize, null);
+    }
+
+    /**
+     * Constructor which sets buffer size to <code>bufferSize</code>. If 
+     * <code>buffersMap</code> is null then a default instance of {@link ConcurrentHashMap} 
+     * is created else the provided instance is used.
+     * 
+     * @param bufferSize the new buffer size
+     * @param buffersMap the map to use for storing each session buffer 
+     */
+    public BufferedWriteFilter(int bufferSize,
+            final ConcurrentMap<IoSession, IoBuffer> buffersMap) {
         super();
         this.bufferSize = bufferSize;
-        buffersMap = new ConcurrentHashMap<IoSession, IoBuffer>();
+        if (buffersMap == null) {
+            this.buffersMap = new ConcurrentHashMap<IoSession, IoBuffer>();
+        } else {
+            this.buffersMap = buffersMap;
+        }
     }
 
     /**
@@ -183,13 +201,14 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      */
     private void internalFlush(NextFilter nextFilter, IoSession session,
             IoBuffer buf) throws Exception {
+        IoBuffer tmp = null;
         synchronized (buf) {
-            buf.flip();
-            logger.debug("Flushing buffer: {}", buf);
-            nextFilter.filterWrite(session, new DefaultWriteRequest(buf
-                    .duplicate()));
+            buf.flip();            
+            tmp = buf.duplicate();
             buf.clear();
         }
+        logger.debug("Flushing buffer: {}", tmp);
+        nextFilter.filterWrite(session, new DefaultWriteRequest(tmp));
     }
 
     /**
