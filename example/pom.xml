@@ -46,6 +46,11 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.2.0</version>
+    </dependency>
   </dependencies>
 </project>
 
