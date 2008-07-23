@@ -20,8 +20,6 @@ package org.apache.mina.example.haiku;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
@@ -29,13 +27,16 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.Executors;
+
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
  * @version $Rev: $, $Date:  $
  */
 
 public class HaikuValidationServer {
-    public static void main(String... args) throws Exception {
+    public static void main(String[] args) throws Exception {
         ExecutorService executor = Executors.newCachedThreadPool();
         SocketAcceptor acceptor = new SocketAcceptor(Runtime.getRuntime()
                 .availableProcessors(), executor);

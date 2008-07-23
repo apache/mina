@@ -8,7 +8,9 @@ public class PhraseUtilities {
     static int countSyllablesInPhrase(String phrase) {
         int syllables = 0;
 
-        for (String word : phrase.split("[^\\w-]+")) {
+        String[] words = phrase.split("[^\\w-]+");
+        for (int i = 0, max = words.length; i < max; i++) {
+            String word = words[i];
             if (word.length() > 0) {
                 syllables += countSyllablesInWord(word.toLowerCase());
             }
