@@ -22,12 +22,12 @@ import java.util.Arrays;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev: $, $Date:  $
  */
 public class Haiku {
     private final String[] phrases;
 
-    public Haiku(String[] lines) {
+    public Haiku(String... lines) {
         this.phrases = lines;
         if (null == lines || lines.length != 3) {
             throw new IllegalArgumentException("Must pass in 3 phrases of text");
@@ -38,6 +38,7 @@ public class Haiku {
         return phrases;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
@@ -49,10 +50,12 @@ public class Haiku {
         return Arrays.equals(phrases, haiku.phrases);
     }
 
+    @Override
     public int hashCode() {
         return Arrays.hashCode(phrases);
     }
 
+    @Override
     public String toString() {
         return Arrays.toString(phrases);
     }

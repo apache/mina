@@ -23,13 +23,14 @@ import org.apache.mina.common.IoSession;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
+ * @version $Rev: $, $Date:  $
  */
 
 public class HaikuValidatorIoHandler extends IoHandlerAdapter {
 
     private final HaikuValidator validator = new HaikuValidator();
 
+    @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
         Haiku haiku = (Haiku) message;
