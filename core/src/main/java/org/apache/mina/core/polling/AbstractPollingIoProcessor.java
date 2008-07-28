@@ -686,6 +686,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                             session, req, hasFragmentation,
                             maxWrittenBytes - writtenBytes,
                             currentTime);
+                    if (localWrittenBytes > 0 && ((IoBuffer)message).hasRemaining() ) {
+                    	// the buffer isn't empty, we re-interest it in writing 
+                    	writtenBytes += localWrittenBytes;    	
+                    	setInterestedInWrite(session, true);
+                        return false;
+                    }
                 } else if (message instanceof FileRegion) {
                     localWrittenBytes = writeFile(
                             session, req, hasFragmentation,
