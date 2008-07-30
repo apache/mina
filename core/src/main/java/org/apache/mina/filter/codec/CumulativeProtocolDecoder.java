@@ -95,9 +95,9 @@ import org.apache.mina.core.session.IoSession;
  * Please note that this decoder simply forward the call to
  * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)} if the
  * underlying transport doesn't have a packet fragmentation.  Whether the
- * transport has fragmentation or not is determined by querying 
+ * transport has fragmentation or not is determined by querying
  * {@link TransportMetadata}.
- * 
+ *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
@@ -159,7 +159,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
                 newBuf.put(in);
                 newBuf.flip();
                 buf = newBuf;
-                
+
                 // Update the session attribute.
                 session.setAttribute(BUFFER, buf);
             }
@@ -189,7 +189,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         // it in a buffer in the session and next time this decoder is
         // invoked the session buffer gets appended to
         if (buf.hasRemaining()) {
-            if (usingSessionBuffer) {
+            if (usingSessionBuffer && buf.isAutoExpand()) {
                 buf.compact();
             } else {
                 storeRemainingInSession(buf, session);
@@ -231,10 +231,10 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
 
     private void storeRemainingInSession(IoBuffer buf, IoSession session) {
         final IoBuffer remainingBuf = IoBuffer.allocate(buf.capacity()).setAutoExpand(true);
-        
+
         remainingBuf.order(buf.order());
         remainingBuf.put(buf);
-        
+
         session.setAttribute(BUFFER, remainingBuf);
     }
 }
