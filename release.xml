@@ -83,41 +83,48 @@
         <include>*.jar</include>
       </includes>
     </fileSet>
-    <fileset>
+    <fileSet>
      <directory>integration-ognl/target</directory>
      <outputDirectory></outputDirectory>
       <includes>
         <include>*.jar</include>
       </includes>
-    </fileset>
-    <fileset>
-     <directory>examples/target</directory>
+    </fileSet>
+    <fileSet>
+     <directory>example/target</directory>
      <outputDirectory></outputDirectory>
       <includes>
         <include>*.jar</include>
       </includes>
-    </fileset>
-    <fileset>
+    </fileSet>
+    <fileSet>
      <directory>statemachine/target</directory>
      <outputDirectory></outputDirectory>
       <includes>
         <include>*.jar</include>
       </includes>
-    </fileset>
-    <fileset>
+    </fileSet>
+    <fileSet>
      <directory>integration-beans/target</directory>
      <outputDirectory></outputDirectory>
       <includes>
         <include>*.jar</include>
       </includes>
-    </fileset>
-    <fileset>
+    </fileSet>
+    <fileSet>
      <directory>transport-apr/target</directory>
      <outputDirectory></outputDirectory>
       <includes>
         <include>*.jar</include>
       </includes>
-    </fileset>
+    </fileSet>
+    <fileSet>
+     <directory>transport-serial/target</directory>
+     <outputDirectory></outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileSet>
 
   </fileSets>
 </assembly>
