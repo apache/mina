@@ -56,7 +56,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     public TextLineDecoder() {
         this(LineDelimiter.AUTO);
     }
-    
+
     /**
      * Creates a new instance with the current default {@link Charset}
      * and the specified <tt>delimiter</tt>.
@@ -64,7 +64,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     public TextLineDecoder(String delimiter) {
         this(new LineDelimiter(delimiter));
     }
-    
+
     /**
      * Creates a new instance with the current default {@link Charset}
      * and the specified <tt>delimiter</tt>.
@@ -80,7 +80,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     public TextLineDecoder(Charset charset) {
         this(charset, LineDelimiter.AUTO);
     }
-    
+
     /**
      * Creates a new instance with the spcified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.
@@ -88,7 +88,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     public TextLineDecoder(Charset charset, String delimiter) {
         this(charset, new LineDelimiter(delimiter));
     }
-    
+
     /**
      * Creates a new instance with the specified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.
@@ -135,9 +135,9 @@ public class TextLineDecoder implements ProtocolDecoder {
         Context ctx = getContext(session);
 
         if (LineDelimiter.AUTO.equals(delimiter)) {
-            decodeAuto(ctx, in, out);
+            decodeAuto(ctx, session, in, out);
         } else {
-            decodeNormal(ctx, in, out);
+            decodeNormal(ctx, session, in, out);
         }
     }
 
@@ -162,7 +162,7 @@ public class TextLineDecoder implements ProtocolDecoder {
         }
     }
 
-    private void decodeAuto(Context ctx, IoBuffer in, ProtocolDecoderOutput out)
+    private void decodeAuto(Context ctx, IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws CharacterCodingException, ProtocolDecoderException {
 
         int matchCount = ctx.getMatchCount();
@@ -204,7 +204,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                     buf.flip();
                     buf.limit(buf.limit() - matchCount);
                     try {
-                        out.write(buf.getString(ctx.getDecoder()));
+                    	writeText(session, buf.getString(ctx.getDecoder()), out);
                     } finally {
                         buf.clear();
                     }
@@ -227,7 +227,7 @@ public class TextLineDecoder implements ProtocolDecoder {
         ctx.setMatchCount(matchCount);
     }
 
-    private void decodeNormal(Context ctx, IoBuffer in, ProtocolDecoderOutput out)
+    private void decodeNormal(Context ctx, IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws CharacterCodingException, ProtocolDecoderException {
 
         int matchCount = ctx.getMatchCount();
@@ -262,7 +262,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                         buf.flip();
                         buf.limit(buf.limit() - matchCount);
                         try {
-                            out.write(buf.getString(ctx.getDecoder()));
+                        	writeText(session, buf.getString(ctx.getDecoder()), out);
                         } finally {
                             buf.clear();
                         }
@@ -288,6 +288,19 @@ public class TextLineDecoder implements ProtocolDecoder {
         ctx.append(in);
 
         ctx.setMatchCount(matchCount);
+    }
+
+    /**
+     * By default, this method propagates the decoded line of text to
+     * {@code ProtocolDecoderOutput#write(Object)}.  You may override this method to modify
+     * the default behavior.
+     *
+     * @param session  the {@code IoSession} the received data.
+     * @param text  the decoded text
+     * @param out  the upstream {@code ProtocolDecoderOutput}.
+     */
+    protected void writeText(IoSession session, String text, ProtocolDecoderOutput out) {
+    	out.write(text);
     }
 
     private class Context {
