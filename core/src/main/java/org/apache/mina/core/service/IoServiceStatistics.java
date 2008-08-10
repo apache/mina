@@ -19,39 +19,91 @@
  */
 package org.apache.mina.core.service;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+
 /**
- * Provides usage statistics for an IoService.
+ * Provides usage statistics for an {@link AbstractIoService} instance.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since 2.0.0-M3
  */
-public interface IoServiceStatistics {
+public class IoServiceStatistics {
+    
+    private AbstractIoService service;
+    
+    private double readBytesThroughput;
+    private double writtenBytesThroughput;
+    private double readMessagesThroughput;
+    private double writtenMessagesThroughput;
+    private double largestReadBytesThroughput;
+    private double largestWrittenBytesThroughput;
+    private double largestReadMessagesThroughput;
+    private double largestWrittenMessagesThroughput;    
+    
+    private final AtomicLong readBytes = new AtomicLong();
+    private final AtomicLong writtenBytes = new AtomicLong();
+    private final AtomicLong readMessages = new AtomicLong();
+    private final AtomicLong writtenMessages = new AtomicLong();    
+    private long lastReadTime;
+    private long lastWriteTime;
+    
+    private long lastReadBytes;
+    private long lastWrittenBytes;
+    private long lastReadMessages;
+    private long lastWrittenMessages;
+    private long lastThroughputCalculationTime;
+
+    private final AtomicInteger scheduledWriteBytes = new AtomicInteger();
+    private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
+    
+    private int throughputCalculationInterval = 3;
+    
+    private final Object throughputCalculationLock = new Object();
+    
+    public IoServiceStatistics(AbstractIoService service) {
+        this.service = service;
+    }
+    
     /**
      * Returns the maximum number of sessions which were being managed at the
      * same time.
      */
-    int getLargestManagedSessionCount();
+    public final int getLargestManagedSessionCount() {
+        return service.getListeners().getLargestManagedSessionCount();
+    }
 
     /**
      * Returns the cumulative number of sessions which were managed (or are
      * being managed) by this service, which means 'currently managed session
      * count + closed session count'.
      */
-    long getCumulativeManagedSessionCount();
+    public final long getCumulativeManagedSessionCount() {
+        return service.getListeners().getCumulativeManagedSessionCount();
+    }
     
     /**
      * Returns the time in millis when I/O occurred lastly.
      */
-    long getLastIoTime();
+    public final long getLastIoTime() {
+        return Math.max(lastReadTime, lastWriteTime);
+    }
 
     /**
      * Returns the time in millis when read operation occurred lastly.
      */
-    long getLastReadTime();
+    public final long getLastReadTime() {
+        return lastReadTime;
+    }
 
     /**
      * Returns the time in millis when write operation occurred lastly.
      */
-    long getLastWriteTime();
+    public final long getLastWriteTime() {
+        return lastWriteTime;
+    }
     
     /**
      * Returns the number of bytes read by this service
@@ -59,7 +111,9 @@ public interface IoServiceStatistics {
      * @return
      *     The number of bytes this service has read
      */
-    long getReadBytes();
+    public final long getReadBytes() {
+        return readBytes.get();
+    }
 
     /**
      * Returns the number of bytes written out by this service
@@ -67,7 +121,9 @@ public interface IoServiceStatistics {
      * @return
      *     The number of bytes this service has written
      */
-    long getWrittenBytes();
+    public final long getWrittenBytes() {
+        return writtenBytes.get();
+    }
 
     /**
      * Returns the number of messages this services has read
@@ -75,7 +131,9 @@ public interface IoServiceStatistics {
      * @return
      *     The number of messages this services has read
      */
-    long getReadMessages();
+    public final long getReadMessages() {
+        return readMessages.get();
+    }
 
     /**
      * Returns the number of messages this service has written
@@ -83,63 +141,250 @@ public interface IoServiceStatistics {
      * @return
      *     The number of messages this service has written
      */
-    long getWrittenMessages();
+    public final long getWrittenMessages() {
+        return writtenMessages.get();
+    }
 
     /**
      * Returns the number of read bytes per second.
      */
-    double getReadBytesThroughput();
+    public final double getReadBytesThroughput() {
+        resetThroughput();
+        return readBytesThroughput;
+    }
 
     /**
      * Returns the number of written bytes per second.
      */
-    double getWrittenBytesThroughput();
+    public final double getWrittenBytesThroughput() {
+        resetThroughput();
+        return writtenBytesThroughput;
+    }
 
     /**
      * Returns the number of read messages per second.
      */
-    double getReadMessagesThroughput();
+    public final double getReadMessagesThroughput() {
+        resetThroughput();
+        return readMessagesThroughput;
+    }
 
     /**
      * Returns the number of written messages per second.
      */
-    double getWrittenMessagesThroughput();
+    public final double getWrittenMessagesThroughput() {
+        resetThroughput();
+        return writtenMessagesThroughput;
+    }
 
     /**
      * Returns the maximum of the {@link #getReadBytesThroughput() readBytesThroughput}.
      */
-    double getLargestReadBytesThroughput();
+    public final double getLargestReadBytesThroughput() {
+        return largestReadBytesThroughput;
+    }
 
     /**
      * Returns the maximum of the {@link #getWrittenBytesThroughput() writtenBytesThroughput}.
      */
-    double getLargestWrittenBytesThroughput();
+    public final double getLargestWrittenBytesThroughput() {
+        return largestWrittenBytesThroughput;
+    }
 
     /**
      * Returns the maximum of the {@link #getReadMessagesThroughput() readMessagesThroughput}.
      */
-    double getLargestReadMessagesThroughput();
+    public final double getLargestReadMessagesThroughput() {
+        return largestReadMessagesThroughput;
+    }
 
     /**
      * Returns the maximum of the {@link #getWrittenMessagesThroughput() writtenMessagesThroughput}.
      */
-    double getLargestWrittenMessagesThroughput();
+    public final double getLargestWrittenMessagesThroughput() {
+        return largestWrittenMessagesThroughput;
+    }
 
     /**
      * Returns the interval (seconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */
-    int getThroughputCalculationInterval();
+    public final int getThroughputCalculationInterval() {
+        return throughputCalculationInterval;
+    }
 
     /**
      * Returns the interval (milliseconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */
-    long getThroughputCalculationIntervalInMillis();
+    public final long getThroughputCalculationIntervalInMillis() {
+        return throughputCalculationInterval * 1000L;
+    }
 
     /**
      * Sets the interval (seconds) between each throughput calculation.  The
      * default value is <tt>3</tt> seconds.
      */
-    void setThroughputCalculationInterval(int throughputCalculationInterval);
+    public final void setThroughputCalculationInterval(
+            int throughputCalculationInterval) {
+        if (throughputCalculationInterval < 0) {
+            throw new IllegalArgumentException(
+                    "throughputCalculationInterval: "
+                            + throughputCalculationInterval);
+        }
+
+        this.throughputCalculationInterval = throughputCalculationInterval;
+    }
+
+    /**
+     * TODO add documentation
+     */
+    protected final void setLastReadTime(long lastReadTime) {
+        this.lastReadTime = lastReadTime;
+    }
+
+    /**
+     * TODO add documentation
+     */     
+    protected final void setLastWriteTime(long lastWriteTime) {
+        this.lastWriteTime = lastWriteTime;
+    }
+    
+    /**
+     * TODO add documentation
+     */
+    private void resetThroughput() {
+        if (service.getManagedSessionCount() == 0) {
+            readBytesThroughput = 0;
+            writtenBytesThroughput = 0;
+            readMessagesThroughput = 0;
+            writtenMessagesThroughput = 0;
+        }
+    }
+
+    /**
+     * TODO add documentation
+     */    
+    public void updateThroughput(long currentTime) {
+        synchronized (throughputCalculationLock) {
+            int interval = (int) (currentTime - lastThroughputCalculationTime);
+            long minInterval = getThroughputCalculationIntervalInMillis();
+            if (minInterval == 0 || interval < minInterval) {
+                return;
+            }
+
+            long readBytes = this.readBytes.get();
+            long writtenBytes = this.writtenBytes.get();
+            long readMessages = this.readMessages.get();
+            long writtenMessages = this.writtenMessages.get();
+
+            readBytesThroughput = (readBytes - lastReadBytes) * 1000.0
+                    / interval;
+            writtenBytesThroughput = (writtenBytes - lastWrittenBytes) * 1000.0
+                    / interval;
+            readMessagesThroughput = (readMessages - lastReadMessages) * 1000.0
+                    / interval;
+            writtenMessagesThroughput = (writtenMessages - lastWrittenMessages)
+                    * 1000.0 / interval;
+
+            if (readBytesThroughput > largestReadBytesThroughput) {
+                largestReadBytesThroughput = readBytesThroughput;
+            }
+            if (writtenBytesThroughput > largestWrittenBytesThroughput) {
+                largestWrittenBytesThroughput = writtenBytesThroughput;
+            }
+            if (readMessagesThroughput > largestReadMessagesThroughput) {
+                largestReadMessagesThroughput = readMessagesThroughput;
+            }
+            if (writtenMessagesThroughput > largestWrittenMessagesThroughput) {
+                largestWrittenMessagesThroughput = writtenMessagesThroughput;
+            }
+
+            lastReadBytes = readBytes;
+            lastWrittenBytes = writtenBytes;
+            lastReadMessages = readMessages;
+            lastWrittenMessages = writtenMessages;
+
+            lastThroughputCalculationTime = currentTime;
+        }
+    }
+    
+    /**
+     * TODO add documentation
+     */ 
+    public final void increaseReadBytes(long increment, long currentTime) {
+        readBytes.addAndGet(increment);
+        lastReadTime = currentTime;
+        service.getIdleState().resetIdleCountForRead();
+    }
+
+    /**
+     * TODO add documentation
+     */     
+    public final void increaseReadMessages(long currentTime) {
+        readMessages.incrementAndGet();
+        lastReadTime = currentTime;
+        service.getIdleState().resetIdleCountForRead();
+    }
+    
+    /**
+     * TODO add documentation
+     */
+    public final void increaseWrittenBytes(int increment, long currentTime) {
+        writtenBytes.addAndGet(increment);
+        lastWriteTime = currentTime;
+        service.getIdleState().resetIdleCountForWrite();
+    }
+
+    /**
+     * TODO add documentation
+     */    
+    public final void increaseWrittenMessages(long currentTime) {
+        writtenMessages.incrementAndGet();
+        lastWriteTime = currentTime;
+        service.getIdleState().resetIdleCountForWrite();
+    }
+    
+    /**
+     * TODO add documentation
+     */
+    public final int getScheduledWriteBytes() {
+        return scheduledWriteBytes.get();
+    }
+
+    /**
+     * TODO add documentation
+     */    
+    public final void increaseScheduledWriteBytes(int increment) {
+        scheduledWriteBytes.addAndGet(increment);
+    }
+
+    /**
+     * TODO add documentation
+     */
+    public final int getScheduledWriteMessages() {
+        return scheduledWriteMessages.get();
+    }
+
+    /**
+     * TODO add documentation
+     */    
+    public final void increaseScheduledWriteMessages() {
+        scheduledWriteMessages.incrementAndGet();
+    }
+
+    /**
+     * TODO add documentation
+     */    
+    public final void decreaseScheduledWriteMessages() {
+        scheduledWriteMessages.decrementAndGet();
+    }
+
+    /**
+     * TODO add documentation
+     */        
+    protected void setLastThroughputCalculationTime(
+            long lastThroughputCalculationTime) {
+        this.lastThroughputCalculationTime = lastThroughputCalculationTime;
+    }    
 }

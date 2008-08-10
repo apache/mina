@@ -717,7 +717,7 @@ public abstract class AbstractIoSession implements IoSession {
         idleCountForRead = 0;
 
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseReadBytes(increment, currentTime);
+            ((AbstractIoService) getService()).getStatistics().increaseReadBytes(increment, currentTime);
         }
     }
 
@@ -731,7 +731,7 @@ public abstract class AbstractIoSession implements IoSession {
         idleCountForRead = 0;
 
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseReadMessages(currentTime);
+            ((AbstractIoService) getService()).getStatistics().increaseReadMessages(currentTime);
         }
     }
 
@@ -749,7 +749,7 @@ public abstract class AbstractIoSession implements IoSession {
         idleCountForWrite = 0;
 
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseWrittenBytes(increment, currentTime);
+            ((AbstractIoService) getService()).getStatistics().increaseWrittenBytes(increment, currentTime);
         }
 
         increaseScheduledWriteBytes(-increment);
@@ -771,7 +771,7 @@ public abstract class AbstractIoSession implements IoSession {
         writtenMessages++;
         lastWriteTime = currentTime;
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseWrittenMessages(currentTime);
+            ((AbstractIoService) getService()).getStatistics().increaseWrittenMessages(currentTime);
         }
 
         decreaseScheduledWriteMessages();
@@ -783,7 +783,7 @@ public abstract class AbstractIoSession implements IoSession {
     public final void increaseScheduledWriteBytes(int increment) {
         scheduledWriteBytes.addAndGet(increment);
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseScheduledWriteBytes(increment);
+            ((AbstractIoService) getService()).getStatistics().increaseScheduledWriteBytes(increment);
         }
     }
 
@@ -793,7 +793,7 @@ public abstract class AbstractIoSession implements IoSession {
     public final void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).increaseScheduledWriteMessages();
+            ((AbstractIoService) getService()).getStatistics().increaseScheduledWriteMessages();
         }
     }
 
@@ -803,7 +803,7 @@ public abstract class AbstractIoSession implements IoSession {
     private void decreaseScheduledWriteMessages() {
         scheduledWriteMessages.decrementAndGet();
         if (getService() instanceof AbstractIoService) {
-            ((AbstractIoService) getService()).decreaseScheduledWriteMessages();
+            ((AbstractIoService) getService()).getStatistics().decreaseScheduledWriteMessages();
         }
     }
 
