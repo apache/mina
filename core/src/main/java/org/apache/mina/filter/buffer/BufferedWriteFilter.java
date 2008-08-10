@@ -21,7 +21,6 @@ package org.apache.mina.filter.buffer;
 
 import java.io.BufferedOutputStream;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter;
@@ -30,6 +29,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.util.LazyInitializedCacheMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * The map that matches an {@link IoSession} and it's {@link IoBuffer}
      * buffer.
      */
-    private final ConcurrentMap<IoSession, IoBuffer> buffersMap;
+    private final LazyInitializedCacheMap<IoSession, IoBuffer> buffersMap;
 
     /**
      * Default constructor. Sets buffer size to {@link #DEFAULT_BUFFER_SIZE}
@@ -93,11 +93,11 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * @param buffersMap the map to use for storing each session buffer 
      */
     public BufferedWriteFilter(int bufferSize,
-            final ConcurrentMap<IoSession, IoBuffer> buffersMap) {
+            LazyInitializedCacheMap<IoSession, IoBuffer> buffersMap) {
         super();
         this.bufferSize = bufferSize;
         if (buffersMap == null) {
-            this.buffersMap = new ConcurrentHashMap<IoSession, IoBuffer>();
+            this.buffersMap = new LazyInitializedCacheMap<IoSession, IoBuffer>();
         } else {
             this.buffersMap = buffersMap;
         }
@@ -146,11 +146,8 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * @param data the data to buffer
      */
     private void write(IoSession session, IoBuffer data) {
-        IoBuffer dest = buffersMap.get(session);
-        if (dest == null) {
-            buffersMap.putIfAbsent(session, IoBuffer.allocate(bufferSize));
-            dest = buffersMap.get(session);
-        }
+        IoBuffer dest = buffersMap.putIfAbsent(session,
+                new IoBufferLazyInitializer(bufferSize));
 
         write(session, data, dest);
     }
@@ -203,7 +200,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
             IoBuffer buf) throws Exception {
         IoBuffer tmp = null;
         synchronized (buf) {
-            buf.flip();            
+            buf.flip();
             tmp = buf.duplicate();
             buf.clear();
         }
