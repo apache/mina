@@ -90,8 +90,40 @@ public final class NioSocketConnector
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
+    
+    /**
+     * Constructor for {@link NioSocketConnector} with default configuration which will use a built-in 
+     * thread pool executor to manage the given number of processor instances. The processor class must have 
+     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a 
+     * no-arg constructor.
+     * 
+     * @param processorClass the processor class.
+     * @param processorCount the number of processors to instantiate.
+     * @see org.apache.mina.core.service.SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int)
+     * @since 2.0.0-M4
+     */
+    public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass,
+			int processorCount) {
+		super(new DefaultSocketSessionConfig(), processorClass, processorCount);
+	}
 
     /**
+     * Constructor for {@link NioSocketConnector} with default configuration with default configuration which will use a built-in 
+     * thread pool executor to manage the default number of processor instances. The processor class must have 
+     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a 
+     * no-arg constructor. The default number of instances is equal to the number of processor cores 
+     * in the system, plus one.
+     * 
+     * @param processorClass the processor class.
+     * @see org.apache.mina.core.service.SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int)
+     * @see org.apache.mina.core.service.SimpleIoProcessorPool#DEFAULT_SIZE
+     * @since 2.0.0-M4
+     */
+	public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass) {
+		super(new DefaultSocketSessionConfig(), processorClass);
+	}
+
+	/**
      * {@inheritDoc}
      */
     @Override
