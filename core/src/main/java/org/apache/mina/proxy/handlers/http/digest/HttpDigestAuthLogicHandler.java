@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.proxy.ProxyAuthException;
 import org.apache.mina.proxy.handlers.http.AbstractAuthLogicHandler;
@@ -37,6 +36,7 @@ import org.apache.mina.proxy.handlers.http.HttpProxyRequest;
 import org.apache.mina.proxy.handlers.http.HttpProxyResponse;
 import org.apache.mina.proxy.session.ProxyIoSession;
 import org.apache.mina.proxy.utils.StringUtilities;
+import org.apache.mina.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
