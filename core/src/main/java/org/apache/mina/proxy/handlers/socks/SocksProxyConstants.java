@@ -22,8 +22,9 @@ package org.apache.mina.proxy.handlers.socks;
 /**
  * SocksProxyConstants.java - SOCKS proxy constants.
  * 
- * @author Edouard De Oliveira <a href="mailto:doe_wanted@yahoo.fr">doe_wanted@yahoo.fr</a>
- * @version $Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class SocksProxyConstants {
     /**

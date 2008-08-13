@@ -55,9 +55,9 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @see		http://www.nabble.com/Meta-Transport%3A-an-idea-on-implementing-reconnection-and-proxy-td12969001.html
  * @see		http://issues.apache.org/jira/browse/DIRMINA-415
  * 
- * @author Edouard De Oliveira <a href="mailto:doe_wanted@yahoo.fr">doe_wanted@yahoo.fr</a>
- * @author	James Furness <a href="mailto:james.furness@lehman.com">james.furness@lehman.com</a>  
- * @version	$Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class ProxyConnector extends AbstractIoConnector {
     static final TransportMetadata METADATA = new DefaultTransportMetadata(

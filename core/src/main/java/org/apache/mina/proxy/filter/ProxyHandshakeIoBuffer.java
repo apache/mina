@@ -26,8 +26,9 @@ import org.apache.mina.core.buffer.IoBufferWrapper;
  * ProxyHandshakeIoBuffer.java - {@link IoBuffer} wrapper to indicate handshake 
  * related messages which should not be passed upstream of the {@link ProxyFilter}.
  * 
- * @author James Furness <a href="mailto:james.furness@lehman.com">james.furness@lehman.com</a>
- * @version $Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class ProxyHandshakeIoBuffer extends IoBufferWrapper {
     public ProxyHandshakeIoBuffer(final IoBuffer buf) {

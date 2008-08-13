@@ -34,8 +34,9 @@ import org.slf4j.LoggerFactory;
  * HttpSmartProxyHandler.java - HTTP proxy handler that automatically handles forwarding request 
  * to the appropriate authentication mechanism logic handler.
  * 
- * @author Edouard De Oliveira <a href="mailto:doe_wanted@yahoo.fr">doe_wanted@yahoo.fr</a>
- * @version $Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
     private final static Logger logger = LoggerFactory

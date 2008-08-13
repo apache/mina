@@ -22,8 +22,9 @@ package org.apache.mina.proxy.event;
 /**
  * IoSessionEventType.java - Enumerates session event types.
  * 
- * @author Edouard De Oliveira <a href="mailto:doe_wanted@yahoo.fr">doe_wanted@yahoo.fr</a>
- * @version $Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public enum IoSessionEventType {
     CREATED(1), OPENED(2), IDLE(3), CLOSED(4);

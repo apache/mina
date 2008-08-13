@@ -25,8 +25,9 @@ import javax.security.sasl.SaslException;
  * ProxyAuthException.java - This class extends {@link SaslException} and represents an
  * authentication failure to the proxy.
  * 
- * @author Edouard De Oliveira <a href="mailto:doe_wanted@yahoo.fr">doe_wanted@yahoo.fr</a>
- * @version $Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class ProxyAuthException extends SaslException {
     private static final long serialVersionUID = -6511596809517532988L;

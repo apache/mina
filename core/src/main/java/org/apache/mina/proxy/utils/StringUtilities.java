@@ -33,8 +33,9 @@ import javax.security.sasl.SaslException;
  * StringUtilities.java - Various methods to handle strings.
  * Note: Some code has been borrowed from <a href="http://tedorg.free.fr/en/projects.php">Mailster </a>
  * 
- * @author <a href="mailto:doe_wanted@yahoo.fr">Edouard De Oliveira</a>
- * @version $Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class StringUtilities {
 

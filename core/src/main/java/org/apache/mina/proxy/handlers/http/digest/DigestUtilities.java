@@ -36,8 +36,9 @@ import org.apache.mina.proxy.utils.StringUtilities;
  * 
  * Note: Some code has been borrowed from <a href="http://tedorg.free.fr/en/projects.php">Mailster</a>  
  * 
- * @author Edouard De Oliveira <a href="mailto:doe_wanted@yahoo.fr">doe_wanted@yahoo.fr</a>
- * @version $Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class DigestUtilities {
 

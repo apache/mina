@@ -24,8 +24,9 @@ import java.io.UnsupportedEncodingException;
 /**
  * ByteUtilities.java - Byte manipulation functions.
  * 
- * @author <a href="mailto:doe_wanted@yahoo.fr">Edouard De Oliveira</a>
- * @version $Revision:$, $Date:$
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class ByteUtilities {
     /**

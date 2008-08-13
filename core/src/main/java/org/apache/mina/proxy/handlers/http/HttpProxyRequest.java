@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
 /**
  * HttpProxyRequest.java - Wrapper class for HTTP requests.
  * 
- * @author Edouard De Oliveira <a href="mailto:doe_wanted@yahoo.fr">doe_wanted@yahoo.fr</a>
- * @author James Furness <a href="mailto:james.furness@lehman.com">james.furness@lehman.com</a> 
- * @version $Id: $
+ * @author The Apache MINA Project (dev@mina.apache.org)
+ * @version $Rev$, $Date$
+ * @since MINA 2.0.0-M3
  */
 public class HttpProxyRequest extends ProxyRequest {
     private final static Logger logger = LoggerFactory
