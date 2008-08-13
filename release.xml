@@ -19,110 +19,100 @@
   under the License.
 -->
 
+<!--
+
+OPEN ISSUES:
+
+2008-08-12 - duplicate entries in the lib/ directory. This is a Maven bug filed 
+             here: http://jira.codehaus.org/browse/MASSEMBLY-285. A work-around
+             might be to use the assembly plugin to create an assembly directory
+             only, and add an antrun to make the final tarballs.
+             
+2008-08-12 - I'm not convinced that the xrefs should be includes under docs, as
+             the sources are available under src/ anyway.
+
+2008-08-12 - The assembly plugin supports filtering line endings to unix/win32
+             style. May want to pull the zip and tar.* distributions into two
+             separate release.xml files and use this feature.
+
+-->
 <assembly>
   <id>all</id>
   <formats>
     <format>tar.gz</format>
-    <format>tar.bz2</format>
+    <format>tar.bz2</format> 
     <format>zip</format>
   </formats>
+  
+  <moduleSets>
+		<moduleSet>
+			<includeSubModules/>
+			<sources>
+				<outputDirectoryMapping>src/${module.artifactId}</outputDirectoryMapping>
+				<fileSets>
+					<fileSet>
+						<includes>
+						  <!-- copy per-module sources into src/mina-*/ -->
+							<include>src/**</include>
+							<include>pom.xml</include>
+							<include>LICENSE*</include>
+							<include>NOTICE*</include>
+						</includes>
+					</fileSet>
+				</fileSets>
+			</sources>
+			<binaries>
+			  <!-- copy project jars into dist/ -->
+				<outputDirectory>dist</outputDirectory>
+				<includeDependencies>false</includeDependencies>
+				<unpack>false</unpack>
+				<dependencySets>
+					<dependencySet>
+					  <!-- copy project dependencies into lib/ -->
+						<outputDirectory>lib</outputDirectory>
+						<useTransitiveDependencies>true</useTransitiveDependencies>
+						<unpack>false</unpack>
+						<useProjectArtifact>false</useProjectArtifact>
+						<excludes>
+						  <!-- during build, the plugin warns that this exclusion is never
+						       triggered, but the truth is it works just fine and you can't
+						       do without it. -->
+							<exclude>org.apache.mina:*</exclude>
+						</excludes>
+					</dependencySet>
+				</dependencySets>
+			</binaries> 
+		</moduleSet>  	
+  </moduleSets>
+  
   <fileSets>
-    <!-- Source Code -->
     <fileSet>
+    	<!-- copy the root pom into src/ -->
+    	<outputDirectory>src</outputDirectory>
+    	<filtered>false</filtered>
       <includes>
-        <include>**/README*</include>
-        <include>**/LICENSE*</include>
-        <include>**/NOTICE*</include>
-        <include>**/*.txt</include>
-        <include>**/*.xml</include>
-        <include>**/src/**</include>
-        <include>**/lib/**</include> <!-- 3rd party libs -->
+        <include>pom.xml</include>
       </includes>
-      <excludes>
-        <exclude>**/target/**</exclude>
-        <exclude>**/.*/**</exclude>
-      </excludes>
     </fileSet>
-
-    <!-- Reports -->
+    
     <fileSet>
+      <!-- copy the licenses into / -->
+    	<outputDirectory></outputDirectory>
+    	<filtered>false</filtered>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+      </includes>
+    </fileSet>
+  	
+    <fileSet>
+    	<!-- copy the javadoc into docs/ -->
       <directory>target/site</directory>
       <outputDirectory>docs</outputDirectory>
       <includes>
         <include>apidocs*/**</include>
         <include>xref*/**</include>
-      </includes>
-    </fileSet>
-
-    <!-- JARs -->
-    <fileSet>
-      <directory>core/target</directory>
-      <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>filter-codec-netty/target</directory>
-      <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>filter-compression/target</directory>
-      <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>integration-jmx/target</directory>
-      <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-     <directory>integration-ognl/target</directory>
-     <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-     <directory>example/target</directory>
-     <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-     <directory>statemachine/target</directory>
-     <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-     <directory>integration-beans/target</directory>
-     <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-     <directory>transport-apr/target</directory>
-     <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-     <directory>transport-serial/target</directory>
-     <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.jar</include>
       </includes>
     </fileSet>
 

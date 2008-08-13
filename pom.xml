@@ -462,12 +462,6 @@
           </dependency>
         </dependencies>
       </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rat-maven-plugin</artifactId>
-        <version>1.0-alpha-3</version>
-      </plugin>
     </plugins>
   </build>
 
@@ -508,6 +502,20 @@
           <outputEncoding>UTF-8</outputEncoding>
           <windowTitle>Apache MINA ${project.version} Cross Reference</windowTitle>
           <docTitle>Apache MINA ${project.version} Cross Reference</docTitle>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>rat-maven-plugin</artifactId>
+        <version>1.0-alpha-3</version>
+        <configuration>
+          <excludes>
+            <exclude>**/target/**/*</exclude>
+            <exclude>**/.*</exclude>
+            <exclude>**/NOTICE.txt</exclude>
+            <exclude>**/LICENSE*.txt</exclude>
+          </excludes>
+          <excludeSubProjects>false</excludeSubProjects>
         </configuration>
       </plugin>
     </plugins>
