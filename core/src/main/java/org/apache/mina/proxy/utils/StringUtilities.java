@@ -31,7 +31,6 @@ import javax.security.sasl.SaslException;
 
 /**
  * StringUtilities.java - Various methods to handle strings.
- * Note: Some code has been borrowed from <a href="http://tedorg.free.fr/en/projects.php">Mailster </a>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$

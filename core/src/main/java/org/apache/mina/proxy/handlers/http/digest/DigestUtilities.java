@@ -34,8 +34,6 @@ import org.apache.mina.proxy.utils.StringUtilities;
 /**
  * DigestUtilities.java - A class supporting the HTTP DIGEST authentication (see RFC 2617).
  * 
- * Note: Some code has been borrowed from <a href="http://tedorg.free.fr/en/projects.php">Mailster</a>  
- * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
