@@ -19,20 +19,27 @@
  */
 package org.apache.mina.core.buffer;
 
-
-
 /**
- * Provides utility methods for an {@link IoBuffer}.
+ * Provides utility methods to dump an {@link IoBuffer} into a hex formatted string.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 class IoBufferHexDumper {
+
+    /**
+     * The high digits lookup table.
+     */
     private static final byte[] highDigits;
 
+    /**
+     * The low digits lookup table.
+     */
     private static final byte[] lowDigits;
 
-    // initialize lookup tables
+    /**
+     * Initialize lookup tables.
+     */
     static {
         final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8',
                 '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -50,6 +57,13 @@ class IoBufferHexDumper {
         lowDigits = low;
     }
 
+    /**
+     * Dumps an {@link IoBuffer} to a hex formatted string.
+     * 
+     * @param in the buffer to dump
+     * @param lengthLimit the limit at which hex dumping will stop
+     * @return a hex formatted string representation of the <i>in</i> {@link Iobuffer}.
+     */
     public static String getHexdump(IoBuffer in, int lengthLimit) {
         if (lengthLimit == 0) {
             throw new IllegalArgumentException("lengthLimit: " + lengthLimit
@@ -68,7 +82,7 @@ class IoBufferHexDumper {
             return "empty";
         }
 
-        StringBuffer out = new StringBuffer(in.remaining() * 3 - 1);
+        StringBuilder out = new StringBuilder(in.remaining() * 3 - 1);
 
         int mark = in.position();
 
